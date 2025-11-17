@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+.eggs/
+.env
+.venv
+venv/
+ENV/
+env/
+
+# Logs & temp
+*.log
+*.tmp
+tmp/
+*.swp
+
+# Local data/state that shouldn't go to GitHub
+hands-off-out/
+*.sqlite
+*.db
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
