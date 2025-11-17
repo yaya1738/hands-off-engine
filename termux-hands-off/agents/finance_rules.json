@@ -1,0 +1,11 @@
+{
+  "poll_seconds": 45,
+  "fiat": "USD",
+  "symbols": ["BTC-USDT", "ETH-USDT", "XLM-USDT"],
+  "alerts": [
+    {"symbol": "BTC-USDT", "above": 88000},
+    {"symbol": "BTC-USDT", "below": 70000},
+    {"symbol": "ETH-USDT", "above": 4200},
+    {"symbol": "ETH-USDT", "below": 3000}
+  ]
+}

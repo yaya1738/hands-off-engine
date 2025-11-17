@@ -1,0 +1,22 @@
+--- 2025-11-03 23:46:35 — run
+[Edge Digest @ 2025-11-03 23:46] threshold=0.05
+No edges above threshold. Adjust watchlist/fair_priors or lower EDGE_THRESHOLD.
+--- 2025-11-04 00:16:36 — run
+[Edge Digest @ 2025-11-04 00:16] threshold=0.05
+No edges above threshold. Adjust watchlist/fair_priors or lower EDGE_THRESHOLD.
+--- 2025-11-04 00:46:38 — run
+[Edge Digest @ 2025-11-04 00:46] threshold=0.05
+No edges above threshold. Adjust watchlist/fair_priors or lower EDGE_THRESHOLD.
+--- 2025-11-04 01:16:39 — run
+[Edge Digest @ 2025-11-04 01:16] threshold=0.05
+No edges above threshold. Adjust watchlist/fair_priors or lower EDGE_THRESHOLD.
+--- 2025-11-04 01:46:41 — run
+[Edge Digest @ 2025-11-04 01:46] threshold=0.05
+No edges above threshold. Adjust watchlist/fair_priors or lower EDGE_THRESHOLD.
+/data/data/com.termux/files/home/hands-off/autopilot/edge_engine.py:64: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+  utc = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
+[Edge Digest @ 2025-11-03 23:46] threshold=0.05
+- test_market: fair=0.620, mkt=0.480, edge=+0.140  [BUY YES] http add demo
+- oil above: fair=0.580, mkt=0.440, edge=+0.140  [BUY YES] demo +0.14
+- celtics win: fair=0.100, mkt=0.220, edge=-0.120  [BUY NO] demo short edge -0.12
+- bitcoin above: fair=0.550, mkt=0.450, edge=+0.100  [BUY YES] demo long edge +0.10

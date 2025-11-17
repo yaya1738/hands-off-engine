@@ -1,0 +1,13 @@
+.git/
+.venv/
+__pycache__/
+node_modules/
+.cache/
+.mypy_cache/
+.pytest_cache/
+.ipynb_checkpoints/
+*.mp4
+*.mp3
+*.zip
+*.tar
+*.tar.gz

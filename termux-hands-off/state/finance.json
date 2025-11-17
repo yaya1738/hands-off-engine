@@ -1,0 +1,291 @@
+{
+  "balances": {
+    "cash_usd": 1200,
+    "crypto_usd": 0.0,
+    "polymarket_usd": 300
+  },
+  "history": [
+    {
+      "ts": 1730928000,
+      "cash_pnl": 0.2,
+      "crypto_pnl": -15.3,
+      "polymarket_pnl": 4.8
+    },
+    {
+      "ts": 1731100800,
+      "cash_pnl": 0.1,
+      "crypto_pnl": 2.2,
+      "polymarket_pnl": -0.7
+    },
+    {
+      "ts": 1731273600,
+      "cash_pnl": 0.05,
+      "crypto_pnl": 1.1,
+      "polymarket_pnl": 0.3
+    },
+    {
+      "ts": 1762753209,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762753259,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762753259,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762753458,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762753518,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762753669,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762753711,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762753869,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762754401,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762754520,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762758000,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762758121,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762761600,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762761720,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762765201,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762765320,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762768800,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762768920,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762772400,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762772520,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762776000,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762776120,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762779600,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762779721,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762783201,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762783321,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762786801,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762786920,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762790400,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762790520,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762794000,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762794121,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762797601,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762797720,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762801200,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762801320,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762804801,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762804920,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762808400,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762808520,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762812000,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762812121,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762815600,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    },
+    {
+      "ts": 1762815721,
+      "cash_pnl": 1200,
+      "crypto_pnl": 0.0,
+      "pm_pnl": 300
+    }
+  ]
+}

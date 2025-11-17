@@ -1,0 +1,100 @@
+{
+  "timestamp": "2025-11-13T16:30:01Z",
+  "providers": {
+    "polymarket": {
+      "ok": true,
+      "count": 5,
+      "data": [
+        {
+          "query": "bitcoin",
+          "error": "no_results"
+        },
+        {
+          "query": "ethereum",
+          "error": "no_results"
+        },
+        {
+          "query": "trump",
+          "error": "no_results"
+        },
+        {
+          "query": "israel",
+          "error": "no_results"
+        },
+        {
+          "query": "nba",
+          "error": "no_results"
+        }
+      ],
+      "debug": {
+        "tried": [
+          {
+            "url": "https://gamma-api.polymarket.com/public-search",
+            "params": {
+              "q": "bitcoin",
+              "limit_per_type": 3,
+              "optimized": true
+            },
+            "status": null,
+            "err": "HTTPSConnectionPool(host='gamma-api.polymarket.com', port=443): Max retries exceeded with url: /public-search?q=bitcoin&limit_per_type=3&optimized=True (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x6f36060fb0>: Failed to resolve 'gamma-api.polymarket.com' ([Errno 7] No address associated with hostname)\"))"
+          },
+          {
+            "url": "https://gamma-api.polymarket.com/public-search",
+            "params": {
+              "q": "ethereum",
+              "limit_per_type": 3,
+              "optimized": true
+            },
+            "status": null,
+            "err": "HTTPSConnectionPool(host='gamma-api.polymarket.com', port=443): Max retries exceeded with url: /public-search?q=ethereum&limit_per_type=3&optimized=True (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x6f360612e0>: Failed to resolve 'gamma-api.polymarket.com' ([Errno 7] No address associated with hostname)\"))"
+          },
+          {
+            "url": "https://gamma-api.polymarket.com/public-search",
+            "params": {
+              "q": "trump",
+              "limit_per_type": 3,
+              "optimized": true
+            },
+            "status": null,
+            "err": "HTTPSConnectionPool(host='gamma-api.polymarket.com', port=443): Max retries exceeded with url: /public-search?q=trump&limit_per_type=3&optimized=True (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x6f360616d0>: Failed to resolve 'gamma-api.polymarket.com' ([Errno 7] No address associated with hostname)\"))"
+          },
+          {
+            "url": "https://gamma-api.polymarket.com/public-search",
+            "params": {
+              "q": "israel",
+              "limit_per_type": 3,
+              "optimized": true
+            },
+            "status": null,
+            "err": "HTTPSConnectionPool(host='gamma-api.polymarket.com', port=443): Max retries exceeded with url: /public-search?q=israel&limit_per_type=3&optimized=True (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x6f36061ac0>: Failed to resolve 'gamma-api.polymarket.com' ([Errno 7] No address associated with hostname)\"))"
+          },
+          {
+            "url": "https://gamma-api.polymarket.com/public-search",
+            "params": {
+              "q": "nba",
+              "limit_per_type": 3,
+              "optimized": true
+            },
+            "status": null,
+            "err": "HTTPSConnectionPool(host='gamma-api.polymarket.com', port=443): Max retries exceeded with url: /public-search?q=nba&limit_per_type=3&optimized=True (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x6f36061eb0>: Failed to resolve 'gamma-api.polymarket.com' ([Errno 7] No address associated with hostname)\"))"
+          }
+        ],
+        "hits": 0
+      }
+    },
+    "coingecko": {
+      "ok": true,
+      "data": {
+        "error": "HTTPSConnectionPool(host='api.coingecko.com', port=443): Max retries exceeded with url: /api/v3/simple/price?ids=bitcoin%2Cethereum%2Ctether%2Csolana&vs_currencies=usd (Caused by NameResolutionError(\"<urllib3.connection.HTTPSConnection object at 0x6f36062870>: Failed to resolve 'api.coingecko.com' ([Errno 7] No address associated with hostname)\"))"
+      }
+    },
+    "fx": {
+      "ok": false,
+      "USDILS": null
+    }
+  },
+  "meta": {
+    "runtime_sec": 0.055,
+    "warnings": []
+  }
+}

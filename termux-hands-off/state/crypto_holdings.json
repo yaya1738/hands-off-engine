@@ -1,0 +1,7 @@
+{
+  // coin IDs from CoinGecko, amounts you hold (edit later any time)
+  "bitcoin": 0.00,
+  "ethereum": 0.00,
+  "tether": 0.00,
+  "solana": 0.00
+}

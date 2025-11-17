@@ -1,0 +1,11 @@
+{
+  "ts": 1762839901,
+  "components": {
+    "polymarket_cash_usd": 0.0,
+    "polymarket_mark_usd": 0.0
+  },
+  "notes": [
+    "crypto_holdings.json missing or empty"
+  ],
+  "net_usd": 0.0
+}

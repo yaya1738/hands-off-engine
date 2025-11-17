@@ -1,0 +1,41 @@
+{
+  "raw": {
+    "accounts": [
+      {
+        "balance": 0.0,
+        "currency": "USD",
+        "name": "schwab_cash_usd"
+      },
+      {
+        "balance": 0.0,
+        "currency": "USD",
+        "name": "paypal_usd"
+      },
+      {
+        "balance": 0.0,
+        "currency": "USD",
+        "name": "CRYPTO:BITCOIN"
+      },
+      {
+        "balance": 0.0,
+        "currency": "USD",
+        "name": "CRYPTO:ETHEREUM"
+      },
+      {
+        "balance": 0.0,
+        "currency": "USD",
+        "name": "CRYPTO:TETHER"
+      },
+      {
+        "balance": 0.0,
+        "currency": "USD",
+        "name": "CRYPTO:SOLANA"
+      }
+    ],
+    "delta_usd": 0.0,
+    "prev_usd": 0.0,
+    "total_usd": 0.0,
+    "updated": "2025-11-16T12:00:01Z"
+  },
+  "total_usd": 0.0
+}

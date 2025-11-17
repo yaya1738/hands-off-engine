@@ -1,0 +1,6 @@
+{
+  "trusted_contacts": ["Relative_Name", "Lawyer_Name"],
+  "local_support": ["ERAN 1201", "NATAL 1-800-363-363"],
+  "documents_list": ["passport.jpg", "lease.pdf", "vault.json"],
+  "last_updated": ""
+}

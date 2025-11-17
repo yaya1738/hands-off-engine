@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hands-Off Dashboard</title>
+<meta http-equiv="refresh" content="3600">
+<style>
+  :root {
+    --bg:#0b0f14; --fg:#e7f0ff; --mut:#9cb1d1; --card:#131a22; --accent:#59f;
+    --pos:#1db954; --neg:#ff5c5c;
+  }
+  body { background:var(--bg); color:var(--fg); font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial,sans-serif; margin:0; padding:24px; }
+  h1 { margin:0 0 16px; font-size:24px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit,minmax(260px,1fr)); gap:16px; }
+  .card { background:var(--card); border-radius:16px; padding:16px; box-shadow:0 2px 12px rgba(0,0,0,.2); }
+  .k { font-size:13px; color:var(--mut); }
+  .v { font-size:22px; font-weight:700; }
+  .row { display:flex; justify-content:space-between; align-items:center; margin:8px 0; }
+  table { width:100%; border-collapse:collapse; margin-top:8px; font-size:13px; }
+  th, td { padding:8px; border-bottom:1px solid #223; text-align:left; }
+  th { color:var(--mut); font-weight:600; }
+  .pos { color:var(--pos); }
+  .neg { color:var(--neg); }
+  .mut { color:var(--mut); }
+  small { color:var(--mut); }
+  .pill { background:#1b2430; padding:4px 8px; border-radius:999px; font-size:12px; color:var(--mut); }
+</style>
+</head>
+<body>
+  <h1>Hands-Off Dashboard <span class="pill">2025-11-17T10:32:20Z</span></h1>
+
+  <div class="grid">
+    <div class="card">
+      <div class="k">Net worth (live)</div>
+      <div class="v">$53,304.67</div>
+      <div class="k">Includes external accounts + crypto balances</div>
+    </div>
+
+    <div class="card">
+      <div class="k">Total utilization</div>
+      <div class="v">-</div>
+      <div class="k">Statement reminders</div>
+      <div class="k">-</div>
+    </div>
+
+    <div class="card">
+      <div class="k">Polymarket</div>
+      <div class="row"><span class="k">Mark (EV)</span><span class="v">$0.00</span></div>
+      <div class="row"><span class="k">Cash</span><span class="v">$470.00</span></div>
+      <div class="row"><span class="k">Unrealized</span><span class="v neg">$-530.00</span></div>
+      <small>Cost basis: $530.00</small>
+    </div>
+
+    <div class="card">
+      <div class="k">Rent</div>
+      <div class="row"><span class="k">₪ / mo</span><span class="v">₪4000</span></div>
+      <div class="row"><span class="k">$ / mo</span><span class="v">$1,066.67</span></div>
+      <small>Adjust in external_accounts.json</small>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="k">Daily Net Worth</div>
+    <table>
+      <thead><tr><th>Date</th><th>USD</th><th>Δ vs prev</th></tr></thead>
+      <tbody>
+        <tr><td>2025-11-04</td><td>$53,304.67</td><td class='mut'>-</td></tr>
+<tr><td>2025-11-05</td><td>$53,304.67</td><td class='pos'>$0.00</td></tr>
+<tr><td>2025-11-06</td><td>$53,304.67</td><td class='pos'>$-0.00</td></tr>
+<tr><td>2025-11-07</td><td>$53,304.67</td><td class='pos'>$0.00</td></tr>
+<tr><td>2025-11-09</td><td>$53,304.67</td><td class='pos'>$0.00</td></tr>
+<tr><td>2025-11-10</td><td>$53,304.67</td><td class='pos'>$0.00</td></tr>
+<tr><td>2025-11-14</td><td>$53,304.67</td><td class='pos'>$-0.00</td></tr>
+<tr><td>2025-11-15</td><td>$53,304.67</td><td class='pos'>$0.00</td></tr>
+<tr><td>2025-11-16</td><td>$53,304.67</td><td class='pos'>$-0.00</td></tr>
+<tr><td>2025-11-17</td><td>$53,304.67</td><td class='pos'>$0.00</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div class="k">Cards (limits, utilization, statement countdown)</div>
+    <table>
+      <thead>
+        <tr><th>Card</th><th>Limit</th><th>Balance</th><th>Util%</th><th>Days→Stmt</th><th>Stmt day</th><th>APR%</th><th>Flags</th></tr>
+      </thead>
+      <tbody>
+        
+      </tbody>
+    </table>
+    <small>Edit with agents/cards_limits_fill.py</small>
+  </div>
+
+  <div class="grid" style="margin-top:16px;">
+    <div class="card">
+      <div class="k">Positions (Polymarket, latest pull)</div>
+      <table>
+        <thead><tr><th>Market</th><th>Outcome</th><th>Qty</th><th>Price</th><th>Value</th></tr></thead>
+        <tbody>
+          
+        </tbody>
+      </table>
+      <small>Full history at logs/polymarket_positions.csv</small>
+    </div>
+
+    <div class="card">
+      <div class="k">Performance (manual/assisted P&L)</div>
+      <table>
+        <thead><tr><th>Date</th><th>Polymarket</th><th>Robinhood</th><th>Total</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>2025-11-04</td><td class='pos'>$0.00</td><td class='pos'>$0.00</td><td class='pos'>$0.00</td><td>init</td></tr>
+<tr><td>2025-11-04</td><td class='pos'>$0.00</td><td class='pos'>$0.00</td><td class='pos'>$0.00</td><td>init</td></tr>
+<tr><td>2025-11-04</td><td class='pos'>$0.00</td><td class='pos'>$0.00</td><td class='pos'>$0.00</td><td>init</td></tr>
+        </tbody>
+      </table>
+      <small>Edit agents/perf_inputs.json then run perf_logger.py (or use quick_update.py)</small>
+    </div>
+  </div>
+
+  <p class="mut" style="margin-top:16px;">Data sources: external_accounts.json, cards.json, finance_balances.log, finance_daily.csv, cards_status.json, polymarket_positions.csv, performance_daily.csv, finance_credit.log.</p>
+</body>
+</html>

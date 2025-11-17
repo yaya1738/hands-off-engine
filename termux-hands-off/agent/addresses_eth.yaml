@@ -1,0 +1,4 @@
+# Add your Ethereum addresses here (checks USDC on mainnet)
+addresses:
+  - 0x0000000000000000000000000000000000000000  # replace with your address
+  # - 0xYourSecondAddressHere

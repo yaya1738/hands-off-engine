@@ -1,0 +1,2 @@
+#!/data/data/com.termux/files/usr/bin/bash
+$HOME/hands-off/agent/alert_mux.sh --src pm --sev "${1:-warn}" --title "Polymarket" --body "${2:-(no body)}"

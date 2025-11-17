@@ -1,0 +1,27 @@
+# save with Ctrl+O, Enter, then Ctrl+X
+python agent.py# Put rough numbers for a first snapshot. Edit anytime.
+# Currency: USD unless noted.
+cash:
+  schwab_checking: 0
+  paypal_available: 0
+  usdc_wallets_total: 313
+  polymarket_cash: 41
+
+crypto:
+  btc: 200   # on Robinhood (approx)
+  other_coins: 200
+
+securities:
+  # example placeholders; edit/remove freely
+  spy: 0
+  tlt: 0
+  slv: 0
+  gld: 0
+
+liabilities:
+  # Enter positive numbers for what you owe
+  credit_cards_total: 0
+  other_debts: 0
+
+notes: |
+  Seeded from memory; adjust when convenient.
