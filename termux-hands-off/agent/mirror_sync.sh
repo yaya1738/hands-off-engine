@@ -25,7 +25,7 @@ tg() {
 }
 
 # Ensure remote path exists
-ssh -p "${SSH_PORT:-22}" $SSH_OPTS "${DO_USER}@${DO_IP}" "mkdir -p '$DST/state' '$DST/agent'"
+ssh -p "${SSH_PORT:-22}" $SSH_OPTS "${DO_USER}@${DO_IP}" "mkdir -p '$DST/state' '$DST/agent' '$DST/ai'"
 
 # Write a heartbeat stamp locally
 STAMP_LOCAL="$HOME/hands-off/state/.mirror_stamp"
@@ -46,9 +46,10 @@ EXC=(
   "--exclude=*.log"
 )
 
-# Push state and agent
+# Push state, agent, and ai
 rsync $R "${EXC[@]}" "$HOME/hands-off/state/"  "${DO_USER}@${DO_IP}:$DST/state/"  -e "ssh -p ${SSH_PORT:-22} $SSH_OPTS"
 rsync $R "${EXC[@]}" "$HOME/hands-off/agent/"  "${DO_USER}@${DO_IP}:$DST/agent/"  -e "ssh -p ${SSH_PORT:-22} $SSH_OPTS"
+rsync $R "${EXC[@]}" "$HOME/hands-off/ai/"     "${DO_USER}@${DO_IP}:$DST/ai/"     -e "ssh -p ${SSH_PORT:-22} $SSH_OPTS"
 
 # Also push a compact manifest to verify integrity
 MAN="$HOME/hands-off/state/.manifest.txt"
@@ -58,6 +59,10 @@ MAN="$HOME/hands-off/state/.manifest.txt"
 ) > "$MAN"
 
 rsync $R "$MAN" "${DO_USER}@${DO_IP}:$DST/.manifest.txt" -e "ssh -p ${SSH_PORT:-22} $SSH_OPTS"
+
+# Trigger AI-Runner deploy hook on droplet
+echo "[hook] Triggering AI-Runner deploy..."
+ssh -p "${SSH_PORT:-22}" $SSH_OPTS "${DO_USER}@${DO_IP}" "bash $DST/ai/ho-ai-deploy.sh" || echo "[warn] AI deploy hook failed"
 
 echo "[ok] mirror_sync complete → $DO_USER@$DO_IP:$DST"
 tg "✅ Mirror sync OK → $DO_IP:$DST"

@@ -1,0 +1,17 @@
+[Unit]
+Description=Hands-Off AI Runner
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-out/ai
+ExecStart=/usr/bin/python3 /root/hands-off-out/ai/ai_runner.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+Environment="AI_RUNNER_POLL_INTERVAL=10"
+
+[Install]
+WantedBy=multi-user.target
