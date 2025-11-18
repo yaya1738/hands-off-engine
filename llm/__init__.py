@@ -20,9 +20,13 @@ __version__ = "0.1.0"
 
 from .backend_selector import LLMBackend, select_backend
 from .market_analyst import LLMMarketAnalyst
+from .cost_tracker import CostTracker
+from .evaluation import LLMEvaluator
 
 __all__ = [
     "LLMBackend",
     "select_backend",
     "LLMMarketAnalyst",
+    "CostTracker",
+    "LLMEvaluator",
 ]

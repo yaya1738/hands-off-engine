@@ -476,16 +476,252 @@ Check `llm_alpha_report.json` for:
 
 ---
 
+## Cost Tracking & Budgeting
+
+The LLM system includes comprehensive cost tracking to monitor token usage and API spending.
+
+### Cost Tracker (`llm/cost_tracker.py`)
+
+**Features:**
+- Tracks token usage per API call (input/output tokens)
+- Calculates costs using backend-specific pricing tables
+- Aggregates statistics by backend and model
+- Exports detailed cost reports to JSON
+- Budget checking with over-budget alerts
+
+**Pricing Table:**
+
+| Backend | Model | Input ($/MTok) | Output ($/MTok) |
+|---------|-------|----------------|-----------------|
+| Claude API | claude-sonnet-4 | $3.00 | $15.00 |
+| Claude API | claude-haiku | $0.25 | $1.25 |
+| OpenRouter | gpt-4-turbo | $10.00 | $30.00 |
+| OpenRouter | llama-3.1-70b | $0.35 | $0.40 |
+| Simulation | dryrun | $0.00 | $0.00 |
+
+**Usage:**
+
+```python
+from llm import CostTracker
+
+tracker = CostTracker()
+
+# Track a call
+cost = tracker.track_call(
+    model_name="claude-sonnet-4",
+    tokens_in=250,
+    tokens_out=150,
+    backend="claude-api",
+    metadata={"market_id": "m-123"}
+)
+
+# Aggregate session statistics
+summary = tracker.aggregate_session()
+print(f"Total cost: ${summary.total_cost_usd:.4f}")
+print(f"Total tokens: {summary.total_tokens_in + summary.total_tokens_out:,}")
+
+# Check budget
+budget_status = tracker.check_budget(budget_usd=10.0)
+if budget_status["over_budget"]:
+    print(f"WARNING: Over budget by ${abs(budget_status['remaining_usd']):.2f}")
+
+# Export report
+tracker.export_cost_report(Path("state/llm_cost_report.json"))
+```
+
+**Output Format (`llm_cost_report.json`):**
+
+```json
+{
+  "summary": {
+    "session_start": "2025-11-18T12:00:00Z",
+    "session_end": "2025-11-18T12:15:30Z",
+    "total_calls": 42,
+    "total_tokens_in": 10500,
+    "total_tokens_out": 6300,
+    "total_cost_usd": 0.126,
+    "calls_by_backend": {"claude-api": 40, "simulation": 2},
+    "calls_by_model": {"claude-sonnet-4": 40, "dryrun": 2},
+    "cost_by_backend": {"claude-api": 0.126, "simulation": 0.0}
+  },
+  "detailed_calls": [
+    {
+      "timestamp": "2025-11-18T12:00:05Z",
+      "model_name": "claude-sonnet-4",
+      "backend": "claude-api",
+      "tokens_in": 250,
+      "tokens_out": 150,
+      "cost_usd": 0.003,
+      "metadata": {"market_id": "m-123", "category": "crypto"}
+    }
+  ]
+}
+```
+
+---
+
+## Evaluation & Calibration
+
+The system evaluates LLM performance by comparing against the naive baseline model.
+
+### Evaluator (`llm/evaluation.py`)
+
+**Metrics:**
+
+1. **Directional Agreement** - Do LLM and naive agree on action (buy_yes/buy_no/avoid)?
+2. **Probability Delta** - Difference between LLM and naive fair probability estimates
+3. **Edge Delta** - Difference in estimated edge (basis points)
+4. **Confidence Alignment** - Does LLM confidence match edge size?
+   - High confidence → large edge (|edge| >= 500 bps): **aligned**
+   - High confidence → small edge (|edge| < 500 bps): **misaligned**
+   - Medium confidence → 200-500 bps: **aligned**
+   - Low confidence → <200 bps: **aligned**
+5. **Calibration Score** - Percentage of predictions with aligned confidence-edge pairs
+
+**Usage:**
+
+```python
+from llm import LLMEvaluator
+
+evaluator = LLMEvaluator()
+
+# Add comparison
+evaluator.add_comparison(
+    market_id="m-123",
+    market_question="Will Bitcoin reach $100k?",
+    market_category="crypto",
+    llm_opinion={
+        "fair_probability": 68.5,
+        "confidence": "high",
+        "edge_bps": 650,
+        "action": "buy_yes"
+    },
+    naive_opinion={
+        "fair_yes": 0.62,
+        "edge": 0.0,
+        "rec": "avoid",
+        "notes": "Naive model baseline"
+    }
+)
+
+# Generate report
+report = evaluator.generate_report()
+print(f"Agreement rate: {report.agreement_rate:.1%}")
+print(f"Avg probability delta: {report.avg_probability_delta:.1f}%")
+print(f"Calibration score: {report.calibration_score:.1%}")
+
+# Export report
+evaluator.export_report(Path("state/llm_evaluation_report.json"))
+```
+
+**Output Format (`llm_evaluation_report.json`):**
+
+```json
+{
+  "report": {
+    "generated_at": "2025-11-18T12:15:30Z",
+    "total_comparisons": 42,
+    "llm_available_count": 40,
+    "fallback_count": 2,
+    "agreement_rate": 0.75,
+    "agreements": 30,
+    "disagreements": 10,
+    "avg_probability_delta": 5.2,
+    "avg_edge_delta_bps": 120,
+    "calibration_score": 0.85,
+    "by_confidence": {
+      "high": {
+        "count": 15,
+        "agreement_rate": 0.80,
+        "avg_edge_delta_bps": 150,
+        "confidence_alignment_rate": 0.93
+      },
+      "medium": {"count": 20, "agreement_rate": 0.75, "avg_edge_delta_bps": 100, "confidence_alignment_rate": 0.85},
+      "low": {"count": 5, "agreement_rate": 0.60, "avg_edge_delta_bps": 50, "confidence_alignment_rate": 0.80}
+    },
+    "by_category": {
+      "crypto": {"count": 20, "llm_available": 19, "agreement_rate": 0.79},
+      "politics": {"count": 15, "llm_available": 14, "agreement_rate": 0.71},
+      "sports": {"count": 7, "llm_available": 7, "agreement_rate": 0.71}
+    }
+  },
+  "detailed_comparisons": [
+    {
+      "market_id": "m-123",
+      "market_question": "Will Bitcoin reach $100k?",
+      "market_category": "crypto",
+      "llm_fair_probability": 68.5,
+      "llm_edge_bps": 650,
+      "llm_action": "buy_yes",
+      "llm_confidence": "high",
+      "naive_fair_probability": 62.0,
+      "naive_edge_bps": 0,
+      "naive_action": "avoid",
+      "directional_agreement": false,
+      "probability_delta": 6.5,
+      "edge_delta_bps": 650,
+      "confidence_edge_alignment": "aligned"
+    }
+  ]
+}
+```
+
+**Interpreting Results:**
+
+- **High agreement rate (>80%)**: LLM and naive converge, good calibration
+- **Low agreement rate (<50%)**: LLM diverges from baseline, may find novel edges
+- **High calibration score (>90%)**: LLM confidence matches edge estimates well
+- **Low calibration score (<70%)**: LLM confidence miscalibrated, needs prompt tuning
+- **Large probability deltas**: LLM sees opportunities naive model misses
+- **Small probability deltas**: LLM agrees with baseline, conservative estimates
+
+---
+
+## Integrated Pipeline
+
+The cost tracker and evaluator integrate seamlessly into `ho_llm_polymarket.py`:
+
+```python
+from llm import LLMMarketAnalyst, CostTracker, LLMEvaluator
+
+# Initialize
+analyst = LLMMarketAnalyst(dry_run=True)
+cost_tracker = CostTracker()
+evaluator = LLMEvaluator()
+
+# Analyze markets with cost + eval tracking
+results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
+
+# Export reports
+cost_tracker.export_cost_report(Path("state/llm_cost_report.json"))
+evaluator.export_report(Path("state/llm_evaluation_report.json"))
+
+# Print summary
+cost_summary = cost_tracker.aggregate_session()
+eval_report = evaluator.generate_report()
+
+print(f"Cost: ${cost_summary.total_cost_usd:.6f}")
+print(f"Agreement: {eval_report.agreement_rate:.1%}")
+print(f"Calibration: {eval_report.calibration_score:.1%}")
+```
+
+**Default Output Locations:**
+
+- Cost report: `~/hands-off-out/state/llm_cost_report.json`
+- Evaluation report: `~/hands-off-out/state/llm_evaluation_report.json`
+- Alpha report: `~/hands-off-out/state/llm_alpha_report.json`
+
+---
+
 ## Future Enhancements
 
-1. **Cost tracker module** - Track token usage and spending
-2. **Ensemble voting** - Combine multiple LLM backends for better accuracy
-3. **Evaluation framework** - Compare LLM vs naive vs actual outcomes
-4. **Real-time API calls** - Implement actual Claude/OpenRouter integration
-5. **Local model support** - Run Llama locally for privacy/cost savings
-6. **Prompt A/B testing** - Test different prompt variations
-7. **Category-specific models** - Specialized analysis per category
-8. **Historical calibration** - Track LLM prediction accuracy over time
+1. **Ensemble voting** - Combine multiple LLM backends for better accuracy
+2. **Real-time API calls** - Implement actual Claude/OpenRouter integration
+3. **Local model support** - Run Llama locally for privacy/cost savings
+4. **Prompt A/B testing** - Test different prompt variations
+5. **Category-specific models** - Specialized analysis per category
+6. **Historical outcome tracking** - Compare predictions to actual market resolutions
+7. **Adaptive budgeting** - Dynamic budget allocation based on market value
 
 ---
 

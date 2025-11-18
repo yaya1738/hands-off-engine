@@ -35,11 +35,24 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from llm.market_analyst import LLMMarketAnalyst, LLMOpinion
 from llm.backend_selector import Priority
+from llm.cost_tracker import CostTracker
+from llm.evaluation import LLMEvaluator
+
+# Import naive model for baseline comparison
+try:
+    sys.path.insert(0, str(Path(__file__).parent.parent / "termux-hands-off" / "agent"))
+    from polymarket_skeleton import NaivePriceModel, Market, Category
+    NAIVE_MODEL_AVAILABLE = True
+except ImportError:
+    NAIVE_MODEL_AVAILABLE = False
+    print("[ho_llm_polymarket] WARNING: Naive model not available for evaluation")
 
 
 # Default paths (can be overridden via CLI)
 DEFAULT_INPUT = Path.home() / "hands-off-out" / "state" / "polymarket-compact.json"
 DEFAULT_OUTPUT = Path.home() / "hands-off-out" / "state" / "llm_alpha_report.json"
+DEFAULT_COST_REPORT = Path.home() / "hands-off-out" / "state" / "llm_cost_report.json"
+DEFAULT_EVAL_REPORT = Path.home() / "hands-off-out" / "state" / "llm_evaluation_report.json"
 
 
 def load_markets(input_path: Path) -> List[Dict[str, Any]]:
@@ -82,6 +95,8 @@ def load_markets(input_path: Path) -> List[Dict[str, Any]]:
 def analyze_markets_with_llm(
     markets: List[Dict[str, Any]],
     analyst: LLMMarketAnalyst,
+    cost_tracker: CostTracker,
+    evaluator: LLMEvaluator,
     max_markets: Optional[int] = None,
 ) -> List[Dict[str, Any]]:
     """
@@ -90,6 +105,8 @@ def analyze_markets_with_llm(
     Args:
         markets: List of market dicts
         analyst: LLMMarketAnalyst instance
+        cost_tracker: CostTracker instance
+        evaluator: LLMEvaluator instance
         max_markets: Optional limit on number of markets to analyze
 
     Returns:
@@ -98,22 +115,80 @@ def analyze_markets_with_llm(
     if max_markets:
         markets = markets[:max_markets]
 
+    # Initialize naive model for baseline comparison
+    naive_model = NaivePriceModel() if NAIVE_MODEL_AVAILABLE else None
+
     results = []
 
     for i, market in enumerate(markets, 1):
         market_id = market.get("id", "unknown")
         question = market.get("question", "Unknown question")
+        category = market.get("category", "other")
 
         print(f"\n[ho_llm_polymarket] [{i}/{len(markets)}] Analyzing: {question[:80]}")
 
         # Try LLM analysis
         llm_opinion = analyst.analyze_market(market)
 
+        # Track cost (estimate tokens if not available)
+        if llm_opinion and llm_opinion.tokens_used:
+            tokens_in = llm_opinion.tokens_used // 2  # Rough estimate
+            tokens_out = llm_opinion.tokens_used // 2
+        else:
+            # Estimate: ~250 tokens in (prompt), ~150 tokens out (response)
+            tokens_in = 250
+            tokens_out = 150
+
+        cost = cost_tracker.track_call(
+            model_name=llm_opinion.model_name if llm_opinion else "simulation",
+            tokens_in=tokens_in,
+            tokens_out=tokens_out,
+            backend=llm_opinion.backend_used if llm_opinion else "simulation",
+            metadata={"market_id": market_id, "category": category},
+        )
+
+        # Get naive model opinion for comparison
+        naive_opinion = None
+        if naive_model and NAIVE_MODEL_AVAILABLE:
+            try:
+                # Convert market dict to Market dataclass
+                market_obj = Market(
+                    id=market_id,
+                    question=question,
+                    category=Category(category) if category in ["sports", "crypto", "politics", "macro", "other"] else Category.OTHER,
+                    closes_at=market.get("closes_at", ""),
+                    yes_price=market.get("yes_price", 0.5),
+                    no_price=market.get("no_price", 0.5),
+                    volume=market.get("volume"),
+                )
+                context = {"target_edge_bps": 500}
+                naive_opinion_obj = naive_model.score(market_obj, context)
+
+                # Convert to dict format for evaluation
+                naive_opinion = {
+                    "fair_yes": naive_opinion_obj.fair_yes,
+                    "edge": naive_opinion_obj.edge,
+                    "rec": naive_opinion_obj.rec,
+                    "notes": naive_opinion_obj.notes,
+                }
+            except Exception as e:
+                print(f"[ho_llm_polymarket]   WARNING: Failed to get naive opinion: {e}")
+
+        # Add to evaluator
+        if naive_opinion:
+            evaluator.add_comparison(
+                market_id=market_id,
+                market_question=question,
+                market_category=category,
+                llm_opinion=llm_opinion.to_dict() if llm_opinion else None,
+                naive_opinion=naive_opinion,
+            )
+
         # Build result dict
         result = {
             "id": market_id,
             "question": question,
-            "category": market.get("category", "other"),
+            "category": category,
             "yes_price": market.get("yes_price"),
             "volume": market.get("volume"),
             "closes_at": market.get("closes_at"),
@@ -126,6 +201,7 @@ def analyze_markets_with_llm(
 
             print(f"[ho_llm_polymarket]   LLM: {llm_opinion.action} @ {llm_opinion.fair_probability:.1f}% "
                   f"(edge: {llm_opinion.edge_bps} bps, confidence: {llm_opinion.confidence})")
+            print(f"[ho_llm_polymarket]   Cost: ${cost:.6f}")
         else:
             # LLM failed, mark as unavailable
             result["llm_analysis"] = None
@@ -241,6 +317,12 @@ def main(argv: Optional[List[str]] = None) -> None:
         dry_run=not args.no_dryrun,  # DRYRUN by default
     )
 
+    # Initialize cost tracker
+    cost_tracker = CostTracker()
+
+    # Initialize evaluator
+    evaluator = LLMEvaluator()
+
     # Get analyst status
     status = analyst.get_status()
     print(f"\n[ho_llm_polymarket] Analyst status:")
@@ -249,10 +331,33 @@ def main(argv: Optional[List[str]] = None) -> None:
     print(f"  - Available backends: {status['available_backends']}")
 
     # Analyze markets
-    results = analyze_markets_with_llm(markets, analyst, args.max_markets)
+    results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator, args.max_markets)
 
-    # Write output
+    # Write main output
     write_output(results, args.output, status)
+
+    # Export cost report
+    cost_summary = cost_tracker.aggregate_session()
+    cost_tracker.export_cost_report(DEFAULT_COST_REPORT)
+    print(f"\n[ho_llm_polymarket] Cost Summary:")
+    print(f"  - Total calls: {cost_summary.total_calls}")
+    print(f"  - Total tokens: {cost_summary.total_tokens_in + cost_summary.total_tokens_out:,}")
+    print(f"  - Total cost: ${cost_summary.total_cost_usd:.6f}")
+    print(f"  - Cost report: {DEFAULT_COST_REPORT}")
+
+    # Export evaluation report
+    if NAIVE_MODEL_AVAILABLE:
+        eval_report = evaluator.generate_report()
+        evaluator.export_report(DEFAULT_EVAL_REPORT)
+        print(f"\n[ho_llm_polymarket] Evaluation Summary:")
+        print(f"  - Total comparisons: {eval_report.total_comparisons}")
+        print(f"  - LLM available: {eval_report.llm_available_count}")
+        print(f"  - Agreement rate: {eval_report.agreement_rate:.1%}")
+        print(f"  - Avg probability delta: {eval_report.avg_probability_delta:.1f}%")
+        print(f"  - Calibration score: {eval_report.calibration_score:.1%}")
+        print(f"  - Evaluation report: {DEFAULT_EVAL_REPORT}")
+    else:
+        print(f"\n[ho_llm_polymarket] Evaluation skipped (naive model not available)")
 
     print("\n[ho_llm_polymarket] Analysis complete")
 

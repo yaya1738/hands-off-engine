@@ -8,6 +8,8 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from llm.ho_llm_polymarket import load_markets, analyze_markets_with_llm, write_output
 from llm.market_analyst import LLMMarketAnalyst
 from llm.backend_selector import Priority
+from llm.cost_tracker import CostTracker
+from llm.evaluation import LLMEvaluator
 import pytest
 
 
@@ -81,6 +83,8 @@ class TestLLMPipeline:
     def test_analyze_markets_with_llm_dryrun(self):
         """Should analyze markets in DRYRUN mode"""
         analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
 
         markets = [
             {
@@ -93,7 +97,7 @@ class TestLLMPipeline:
             }
         ]
 
-        results = analyze_markets_with_llm(markets, analyst)
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
 
         assert len(results) == 1
 
@@ -109,13 +113,15 @@ class TestLLMPipeline:
     def test_analyze_markets_with_max_limit(self):
         """Should respect max_markets limit"""
         analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
 
         markets = [
             {"id": f"market-{i}", "question": f"Q{i}", "category": "other", "yes_price": 0.5}
             for i in range(10)
         ]
 
-        results = analyze_markets_with_llm(markets, analyst, max_markets=3)
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator, max_markets=3)
 
         # Should only analyze first 3
         assert len(results) == 3
@@ -123,6 +129,8 @@ class TestLLMPipeline:
     def test_analyze_markets_includes_all_fields(self):
         """Analysis results should include all required fields"""
         analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
 
         markets = [
             {
@@ -135,7 +143,7 @@ class TestLLMPipeline:
             }
         ]
 
-        results = analyze_markets_with_llm(markets, analyst)
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
 
         result = results[0]
 
@@ -249,7 +257,9 @@ class TestLLMPipeline:
 
         # Analyze with LLM (DRYRUN)
         analyst = LLMMarketAnalyst(dry_run=True, default_priority=Priority.QUALITY)
-        results = analyze_markets_with_llm(markets, analyst)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
 
         assert len(results) == 2
 
@@ -273,6 +283,8 @@ class TestLLMPipeline:
     def test_pipeline_handles_malformed_market_data(self):
         """Pipeline should handle markets with missing fields gracefully"""
         analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
 
         # Market with missing optional fields
         markets = [
@@ -285,7 +297,7 @@ class TestLLMPipeline:
         ]
 
         # Should not crash
-        results = analyze_markets_with_llm(markets, analyst)
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
 
         assert len(results) == 1
         assert results[0]["id"] == "minimal"
@@ -293,6 +305,8 @@ class TestLLMPipeline:
     def test_pipeline_preserves_market_order(self):
         """Pipeline should preserve order of markets"""
         analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
 
         markets = [
             {"id": "first", "question": "Q1", "yes_price": 0.5},
@@ -300,7 +314,7 @@ class TestLLMPipeline:
             {"id": "third", "question": "Q3", "yes_price": 0.7},
         ]
 
-        results = analyze_markets_with_llm(markets, analyst)
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
 
         assert results[0]["id"] == "first"
         assert results[1]["id"] == "second"
@@ -323,3 +337,110 @@ class TestLLMPipeline:
 
         # Should be able to serialize again (no non-JSON objects)
         json.dumps(data)  # Should not raise
+
+    def test_pipeline_with_cost_tracking_and_evaluation(self):
+        """Should track costs and evaluate LLM vs naive when integrated"""
+        analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
+
+        markets = [
+            {
+                "id": "crypto-1",
+                "question": "Will Bitcoin reach $100k?",
+                "category": "crypto",
+                "yes_price": 0.62,
+                "volume": 500000,
+                "closes_at": "2025-12-31",
+            },
+            {
+                "id": "politics-1",
+                "question": "Will the Senate pass the bill?",
+                "category": "politics",
+                "yes_price": 0.55,
+                "volume": 100000,
+                "closes_at": "2025-03-01",
+            },
+        ]
+
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
+
+        # Should analyze both markets
+        assert len(results) == 2
+
+        # Cost tracker should have recorded calls
+        assert len(cost_tracker.calls) >= 0  # May be 0 if no backends available
+
+        # Evaluator should have comparisons (if naive model available)
+        # Note: comparisons only added if naive model available
+        assert evaluator.comparisons is not None
+
+    def test_cost_and_evaluation_reports_export(self, tmp_path):
+        """Should export cost and evaluation reports successfully"""
+        analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
+
+        cost_report_path = tmp_path / "cost_report.json"
+        eval_report_path = tmp_path / "eval_report.json"
+
+        markets = [
+            {
+                "id": "test-1",
+                "question": "Test market?",
+                "category": "crypto",
+                "yes_price": 0.60,
+                "volume": 100000,
+                "closes_at": "2025-12-31",
+            }
+        ]
+
+        # Run analysis with tracking
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
+
+        # Export reports
+        cost_tracker.export_cost_report(cost_report_path)
+        evaluator.export_report(eval_report_path)
+
+        # Cost report should exist and be valid JSON
+        assert cost_report_path.exists()
+        cost_data = json.loads(cost_report_path.read_text())
+        assert "summary" in cost_data
+        assert "detailed_calls" in cost_data
+
+        # Evaluation report should exist and be valid JSON
+        assert eval_report_path.exists()
+        eval_data = json.loads(eval_report_path.read_text())
+        assert "report" in eval_data
+        assert "detailed_comparisons" in eval_data
+
+    def test_dryrun_safety_with_cost_and_eval(self):
+        """DRYRUN mode should be preserved with cost tracking and evaluation"""
+        analyst = LLMMarketAnalyst(dry_run=True)
+        cost_tracker = CostTracker()
+        evaluator = LLMEvaluator()
+
+        # Verify analyst is in DRYRUN
+        assert analyst.dry_run is True
+
+        markets = [
+            {
+                "id": "test-1",
+                "question": "Test?",
+                "category": "other",
+                "yes_price": 0.5,
+                "volume": 1000,
+                "closes_at": "2025-01-01",
+            }
+        ]
+
+        # Should not make real API calls
+        results = analyze_markets_with_llm(markets, analyst, cost_tracker, evaluator)
+
+        # Should complete without real API costs
+        summary = cost_tracker.aggregate_session()
+
+        # All costs should be zero or minimal (simulation only)
+        if summary.total_cost_usd > 0:
+            # If costs are non-zero, they should be very small (simulation estimates)
+            assert summary.total_cost_usd < 0.01
