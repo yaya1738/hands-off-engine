@@ -1,0 +1,61 @@
+{
+  "generated_at": "2025-11-18T12:00:00Z",
+  "source": "brain_feedback_monitor_v1",
+  "issues": [
+    {
+      "severity": "critical",
+      "type": "data_inconsistency",
+      "description": "Portfolio state mismatch detected between cache and reality",
+      "fixable": false,
+      "impact": "high"
+    },
+    {
+      "severity": "high",
+      "type": "performance_degradation",
+      "description": "API response time increased by 300% over baseline",
+      "fixable": true,
+      "impact": "medium"
+    },
+    {
+      "severity": "high",
+      "type": "error",
+      "description": "Failed to fetch market data for 3 consecutive intervals",
+      "fixable": true,
+      "impact": "high"
+    },
+    {
+      "severity": "medium",
+      "type": "warning",
+      "description": "Memory usage approaching threshold (85%)",
+      "fixable": true,
+      "impact": "low"
+    },
+    {
+      "severity": "medium",
+      "type": "configuration_drift",
+      "description": "Risk parameters differ from policy baseline",
+      "fixable": true,
+      "impact": "medium"
+    },
+    {
+      "severity": "low",
+      "type": "info",
+      "description": "Scheduled maintenance window approaching",
+      "fixable": false,
+      "impact": "low"
+    }
+  ],
+  "metrics": {
+    "error_rate": 0.12,
+    "success_rate": 0.88,
+    "avg_response_time_ms": 450,
+    "cache_hit_rate": 0.76,
+    "uptime_percentage": 99.2
+  },
+  "notes": [
+    "Batch 21 feedback generation completed successfully",
+    "6 issues detected across multiple severity levels",
+    "Performance metrics within acceptable ranges except error_rate"
+  ],
+  "errors": []
+}
