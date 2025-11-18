@@ -60,23 +60,25 @@ def write_outputs(analyzed: List[Dict[str, Any]]) -> None:
     OUTPUT_JSON.write_text(json.dumps(payload, indent=2), encoding="utf-8")
     print(f"[pm_model] wrote {OUTPUT_JSON} with {len(analyzed)} markets")
 
-    # 2) Text summary (sorted by absolute edge, biggest first)
+    # 2) Text summary (sorted by composite score, then by edge)
     lines: List[str] = []
     ts = datetime.now(timezone.utc).isoformat()
     lines.append(f"[pm_model] summary generated @ {ts} UTC")
     lines.append(f"total_markets: {len(analyzed)}")
     lines.append("")
 
-    # Sort by |edge| descending, then by volume (if present)
+    # Sort by composite score descending (alpha scoring), then by |edge|, then by volume
     def sort_key(m: Dict[str, Any]):
+        score = float(m.get("score", 0.0))
         edge = float(m.get("edge", 0.0))
         vol = float(m.get("volume") or 0.0)
-        return (-abs(edge), -vol)
+        return (-score, -abs(edge), -vol)
 
     top = sorted(analyzed, key=sort_key)
 
     for m in top[:50]:  # cap at top 50 for readability
         rec = str(m.get("rec", "hold"))
+        score = float(m.get("score", 0.0))
         edge = float(m.get("edge", 0.0))
         fair = float(m.get("fair_yes", 0.0))
         yes_price = float(m.get("yes_price", 0.0))
@@ -84,11 +86,11 @@ def write_outputs(analyzed: List[Dict[str, Any]]) -> None:
         q = str(m.get("question", ""))
 
         # trim long questions
-        if len(q) > 160:
-            q = q[:157] + "..."
+        if len(q) > 140:
+            q = q[:137] + "..."
 
         lines.append(
-            f"{rec:8} | cat={cat:8} | edge={edge:+.3f} | fair={fair:.3f} | yes={yes_price:.3f} | {q}"
+            f"{rec:8} | cat={cat:8} | score={score:.4f} | edge={edge:+.3f} | fair={fair:.3f} | yes={yes_price:.3f} | {q}"
         )
 
     OUTPUT_TXT.write_text("\n".join(lines) + "\n", encoding="utf-8")

@@ -17,6 +17,19 @@ KEYMAP = {
     r"\bnba\b": "nba",  # generic fallback
 }
 
+def infer_category(text: str) -> str:
+    """Infer market category from title/question"""
+    t = text.lower()
+    if any(w in t for w in ['bitcoin', 'eth', 'ethereum', 'crypto', 'btc', 'sol', 'doge']):
+        return 'crypto'
+    if any(w in t for w in ['nba', 'nfl', 'mlb', 'soccer', 'celtics', 'lakers', 'touchdowns', 'points']):
+        return 'sports'
+    if any(w in t for w in ['election', 'president', 'trump', 'biden', 'senate', 'votes']):
+        return 'politics'
+    if any(w in t for w in ['inflation', 'cpi', 'gdp', 'fed', 'interest rate', 'unemployment']):
+        return 'macro'
+    return 'other'
+
 def load_watchlist():
     try:
         with open(WATCHLIST_FILE, "r") as f:
@@ -108,28 +121,50 @@ def main():
             if p_mkt is None:
                 continue
 
+            # Extract volume and spread
+            volume = m.get('volume') or m.get('volumeUSD') or m.get('totalVolume')
+            best_bid = m.get('bestBid')
+            best_ask = m.get('bestAsk')
+
             # normalize a candidate key that maps to your priors
             key = choose_key(f"{title} {q}")
             note = f"{title} | {q}"
+
+            # Infer category
+            category = infer_category(f"{title} {q}")
+
             lines.append({
                 "key": key,
                 "p_fair": None,        # engine will fallback to priors.json for fair
                 "p_mkt": round(float(p_mkt), 3),
                 "note": note,
                 "t": now_iso,
+                "volume": float(volume) if volume else None,
+                "best_bid": float(best_bid) if best_bid else None,
+                "best_ask": float(best_ask) if best_ask else None,
+                "category": category,
             })
 
     if not lines:
         print("[fetch] no candidates found for current watchlist")
         return
 
+    # Deduplicate by key
+    seen = set()
+    dedup = []
+    for line in lines:
+        key = line.get('key')
+        if key not in seen:
+            seen.add(key)
+            dedup.append(line)
+
     # write/append: we will refresh candidates.jsonl (overwrite to keep it clean)
     tmp = CAND_FILE + ".tmp"
     with open(tmp, 'w') as f:
         for x in dedup:
-            f.write(x + "\n")
+            f.write(json.dumps(x) + "\n")
     os.replace(tmp, CAND_FILE)
-    print(f"[fetch] wrote {len(lines)} candidates to {CAND_FILE}")
+    print(f"[fetch] wrote {len(dedup)} candidates (deduplicated from {len(lines)}) to {CAND_FILE}")
 if __name__ == "__main__":
     if "--debug" in sys.argv:
         # lightweight debug pass

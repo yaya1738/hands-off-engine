@@ -10,10 +10,11 @@ Generic, pluggable skeleton for Polymarket event modelling.
 
 - Normalizes into an internal Market dataclass
 - Auto-categorizes each market (sports / crypto / politics / macro / other)
-- Routes each market to a category model (for now: NaivePriceModel stub)
+- Routes each market to a category model (uses alpha_scorer for multi-factor scoring)
 - Produces an output JSON with per-market:
     - fair_yes
     - edge vs current yes price
+    - score (composite multi-factor score from alpha_scorer)
     - rec: buy_yes / buy_no / hold
     - notes: short explanation
 """
@@ -23,9 +24,20 @@ from __future__ import annotations
 import json
 import sys
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
 from typing import Any, Dict, List, Optional
+
+# Import alpha scorer for composite scoring
+# Try to import from alpha/ directory first, fallback to local if not available
+try:
+    sys.path.insert(0, str(Path(__file__).parent.parent.parent / "alpha"))
+    from alpha_scorer import calculate_composite_score
+    ALPHA_SCORER_AVAILABLE = True
+except ImportError:
+    ALPHA_SCORER_AVAILABLE = False
+    print("[polymarket_skeleton] Warning: alpha_scorer not available, using basic scoring")
 
 
 # ---------- Core domain types ----------
@@ -55,11 +67,13 @@ class Opinion:
     """
     fair_yes : model's fair probability for YES (0-1)
     edge     : fair_yes - market.yes_price (positive = YES edge)
+    score    : composite multi-factor score (higher = better opportunity)
     rec      : "buy_yes" / "buy_no" / "hold"
     notes    : human-readable explanation
     """
     fair_yes: float
     edge: float
+    score: float
     rec: str
     notes: str = ""
 
@@ -75,17 +89,19 @@ class BaseModel:
 
 class NaivePriceModel(BaseModel):
     """
-    Skeleton model:
+    Model with alpha scoring integration:
 
-    - Treats current yes_price as "fair"
-    - Uses a simple minimum edge threshold (in basis points)
-    - Only to exercise the plumbing; replace per-category later.
+    - Treats current yes_price as "fair" (placeholder for real model)
+    - Uses alpha_scorer's calculate_composite_score for multi-factor scoring
+    - Factors: edge, volume, spread, time decay, confidence
+    - Falls back to basic scoring if alpha_scorer unavailable
     """
 
     category = Category.OTHER
 
     def score(self, market: Market, context: Dict[str, Any]) -> Opinion:
-        # For now: assume fair_yes == market price (no real edge / modelling)
+        # For now: assume fair_yes == market price (no real model yet)
+        # In production, replace with actual model predictions per category
         fair_yes = max(0.01, min(0.99, float(market.yes_price)))
 
         # Target edge threshold in basis points (e.g. 500 = 5%)
@@ -94,6 +110,41 @@ class NaivePriceModel(BaseModel):
 
         edge = fair_yes - market.yes_price
 
+        # Calculate composite score using alpha_scorer
+        if ALPHA_SCORER_AVAILABLE:
+            # Extract optional fields for scoring
+            volume = market.volume
+
+            # Calculate spread from extra fields if available
+            spread = None
+            best_bid = market.extra.get("best_bid")
+            best_ask = market.extra.get("best_ask")
+            if best_bid is not None and best_ask is not None:
+                spread = abs(float(best_ask) - float(best_bid))
+
+            # Calculate days to close
+            days_to_close = None
+            if market.closes_at:
+                try:
+                    close_dt = datetime.fromisoformat(market.closes_at.replace('Z', '+00:00'))
+                    now = datetime.now(timezone.utc)
+                    days_to_close = max(0, (close_dt - now).days)
+                except Exception:
+                    pass
+
+            # Use alpha_scorer's composite scoring
+            composite_score = calculate_composite_score(
+                edge_raw=edge,
+                volume=volume,
+                spread=spread,
+                days_to_close=days_to_close,
+                p_fair=fair_yes
+            )
+        else:
+            # Fallback: simple score based on absolute edge
+            composite_score = abs(edge)
+
+        # Recommendation based on edge threshold
         if edge > threshold:
             rec = "buy_yes"
         elif -edge > threshold:
@@ -101,11 +152,14 @@ class NaivePriceModel(BaseModel):
         else:
             rec = "hold"
 
+        notes = "alpha-scored" if ALPHA_SCORER_AVAILABLE else "basic scoring (alpha_scorer unavailable)"
+
         return Opinion(
             fair_yes=fair_yes,
             edge=edge,
+            score=composite_score,
             rec=rec,
-            notes="naive skeleton (no real model yet)",
+            notes=notes,
         )
 
 
@@ -244,6 +298,7 @@ def analyze_markets(
                 "volume": m.volume,
                 "fair_yes": opinion.fair_yes,
                 "edge": opinion.edge,
+                "score": opinion.score,
                 "rec": opinion.rec,
                 "notes": opinion.notes,
             }
