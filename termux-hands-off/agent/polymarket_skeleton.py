@@ -100,9 +100,16 @@ class NaivePriceModel(BaseModel):
     category = Category.OTHER
 
     def score(self, market: Market, context: Dict[str, Any]) -> Opinion:
-        # For now: assume fair_yes == market price (no real model yet)
-        # In production, replace with actual model predictions per category
-        fair_yes = max(0.01, min(0.99, float(market.yes_price)))
+        # Try to get fair value from market.extra first (if provided by upstream)
+        fair_yes_raw = market.extra.get('fair_yes')
+
+        if fair_yes_raw is not None:
+            # Use provided fair value
+            fair_yes = max(0.01, min(0.99, float(fair_yes_raw)))
+        else:
+            # Fallback: assume market price is fair (naive model, zero edge)
+            # In production, replace with actual model predictions per category
+            fair_yes = max(0.01, min(0.99, float(market.yes_price)))
 
         # Target edge threshold in basis points (e.g. 500 = 5%)
         target_edge_bps = float(context.get("target_edge_bps", 500))
