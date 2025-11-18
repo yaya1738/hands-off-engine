@@ -1,0 +1,28 @@
+{
+  "ts": 1705320000,
+  "weights_prev": {
+    "cash": 0.34,
+    "crypto": 0.33,
+    "polymarket": 0.33
+  },
+  "scores": {
+    "cash": 120.5,
+    "crypto": 245.8,
+    "polymarket": 189.3
+  },
+  "weights": {
+    "cash": 0.30,
+    "crypto": 0.35,
+    "polymarket": 0.35
+  },
+  "recommend": {
+    "cash": 30000.0,
+    "crypto": 35000.0,
+    "polymarket": 35000.0
+  },
+  "balances": {
+    "cash_usd": 28500.0,
+    "crypto_usd": 36200.0,
+    "polymarket_usd": 32300.0
+  }
+}
