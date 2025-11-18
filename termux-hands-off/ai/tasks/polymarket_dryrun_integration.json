@@ -1,0 +1,35 @@
+{
+  "id": "polymarket_dryrun_integration",
+  "name": "Polymarket Dry-Run Integration",
+  "description": "Run ho_alpha_polymarket.py, ho_decider.py, and ho_executor_plan.py in order, capture all outputs to /state, run in DRYRUN mode with network disabled and no live trading. Produce a final integration summary block at /state/integration_summary.json.",
+  "author": "yair",
+  "steps": [
+    {
+      "type": "run_python",
+      "script": "ho-alpha-polymarket.py",
+      "output": "/state/alpha_report.json"
+    },
+    {
+      "type": "run_python",
+      "script": "ho_decider.py",
+      "output": "/state/decision_report.json"
+    },
+    {
+      "type": "run_python",
+      "script": "ho_executor_plan.py",
+      "output": "/state/execution_plan.json"
+    },
+    {
+      "type": "aggregate",
+      "inputs": [
+        "/state/alpha_report.json",
+        "/state/decision_report.json",
+        "/state/execution_plan.json"
+      ],
+      "output": "/state/integration_summary.json"
+    }
+  ],
+  "mode": "DRYRUN",
+  "network": "disabled",
+  "live_trading": false
+}
