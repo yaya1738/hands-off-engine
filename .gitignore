@@ -23,6 +23,18 @@ hands-off-out/
 *.sqlite
 *.db
 
+# AI runner directories (keep only .gitkeep)
+ai/tasks/*
+!ai/tasks/.gitkeep
+ai/results/*
+!ai/results/.gitkeep
+ai/processed/*
+!ai/processed/.gitkeep
+
+# State directory (for testing)
+state/*
+!state/.gitkeep
+
 # Editor / OS files
 .DS_Store
 Thumbs.db
