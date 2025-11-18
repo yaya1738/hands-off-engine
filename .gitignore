@@ -20,6 +20,7 @@ tmp/
 
 # Local data/state that shouldn't go to GitHub
 hands-off-out/
+state/
 *.sqlite
 *.db
 
