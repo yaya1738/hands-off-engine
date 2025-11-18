@@ -28,3 +28,8 @@ hands-off-out/
 Thumbs.db
 .idea/
 .vscode/
+
+# Test coverage reports
+.coverage
+htmlcov/
+.pytest_cache/
