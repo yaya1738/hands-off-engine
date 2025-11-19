@@ -1,0 +1,71 @@
+{
+  "generated_at": "2025-11-19T02:50:51.181722Z",
+  "source": "state/brain_consensus.json",
+  "run_count": 1,
+  "issue_history": [
+    {
+      "hash": "7792f68b470142ad",
+      "first_seen": "2025-11-19T02:50:51.181759Z",
+      "last_seen": "2025-11-19T02:50:51.181759Z",
+      "occurrences": 1,
+      "severity": "high",
+      "confidence": 0.9,
+      "message": "Polymarket API rate limit approaching threshold"
+    },
+    {
+      "hash": "739ed7a9752f9472",
+      "first_seen": "2025-11-19T02:50:51.181759Z",
+      "last_seen": "2025-11-19T02:50:51.181759Z",
+      "occurrences": 1,
+      "severity": "medium",
+      "confidence": 0.74,
+      "message": "Stale market data detected in cache"
+    },
+    {
+      "hash": "f6ec08e7c7b16daf",
+      "first_seen": "2025-11-19T02:50:51.181759Z",
+      "last_seen": "2025-11-19T02:50:51.181759Z",
+      "occurrences": 1,
+      "severity": "low",
+      "confidence": 0.64,
+      "message": "Minor configuration inconsistencies"
+    }
+  ],
+  "agent_performance": {
+    "rules": {
+      "accuracy": 1.0,
+      "runs": 1,
+      "total_accuracy": 1.0
+    },
+    "llm_1": {
+      "accuracy": 1.0,
+      "runs": 1,
+      "total_accuracy": 1.0
+    },
+    "llm_2": {
+      "accuracy": 1.0,
+      "runs": 1,
+      "total_accuracy": 1.0
+    },
+    "heuristics": {
+      "accuracy": 0.5,
+      "runs": 1,
+      "total_accuracy": 0.5
+    }
+  },
+  "trend_metrics": {
+    "error_rate_mean": 0.16666666666666666,
+    "error_rate_std": 0.03,
+    "consensus_mean": 0.38000000000000006,
+    "consensus_trend": "up"
+  },
+  "learning_weights": {
+    "rules": 0.29,
+    "llm_1": 0.29,
+    "llm_2": 0.29,
+    "heuristics": 0.14
+  },
+  "recommendations": [
+    "High error rate detected \u2014 review agent configurations"
+  ]
+}
