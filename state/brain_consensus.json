@@ -1,0 +1,106 @@
+{
+  "generated_at": "2025-11-19T10:00:00Z",
+  "source": "batch_22_consensus_engine",
+  "agent_responses": {
+    "risk_analyzer": {
+      "assessment": "Market volatility high, recommend caution",
+      "confidence": 0.85,
+      "timestamp": "2025-11-19T09:55:00Z"
+    },
+    "trend_detector": {
+      "assessment": "Downward trend detected in crypto markets",
+      "confidence": 0.78,
+      "timestamp": "2025-11-19T09:55:30Z"
+    },
+    "sentiment_monitor": {
+      "assessment": "Negative sentiment across social channels",
+      "confidence": 0.72,
+      "timestamp": "2025-11-19T09:56:00Z"
+    }
+  },
+  "agreement_scores": {
+    "overall": 0.82,
+    "by_category": {
+      "market_conditions": 0.88,
+      "risk_level": 0.85,
+      "recommended_action": 0.75
+    }
+  },
+  "stability": 0.84,
+  "contradictions": [
+    {
+      "agents": ["trend_detector", "sentiment_monitor"],
+      "issue": "Timing disagreement on trend reversal",
+      "severity": "low"
+    }
+  ],
+  "priorities": [
+    {
+      "category": "risk_management",
+      "score": 0.92,
+      "urgency": "high"
+    },
+    {
+      "category": "position_sizing",
+      "score": 0.78,
+      "urgency": "medium"
+    },
+    {
+      "category": "entry_timing",
+      "score": 0.65,
+      "urgency": "low"
+    }
+  ],
+  "final_recommendations": [
+    {
+      "type": "risk-reduction",
+      "consensus_score": 0.88,
+      "agents": ["risk_analyzer", "trend_detector", "sentiment_monitor"],
+      "triggers": [
+        "high_volatility",
+        "negative_sentiment",
+        "downward_trend"
+      ],
+      "next_step": "Reduce position sizes by 30-50%",
+      "reasoning": "All agents agree on elevated risk conditions"
+    },
+    {
+      "type": "health-check",
+      "consensus_score": 0.75,
+      "agents": ["risk_analyzer", "sentiment_monitor"],
+      "triggers": [
+        "market_uncertainty",
+        "portfolio_stress"
+      ],
+      "next_step": "Review portfolio health and rebalance if needed",
+      "reasoning": "Moderate agreement on need for portfolio review"
+    },
+    {
+      "type": "monitoring",
+      "consensus_score": 0.82,
+      "agents": ["trend_detector", "sentiment_monitor"],
+      "triggers": [
+        "trend_change_potential",
+        "sentiment_shift"
+      ],
+      "next_step": "Increase monitoring frequency for reversal signals",
+      "reasoning": "Watch for trend reversal indicators"
+    },
+    {
+      "type": "opportunity-scan",
+      "consensus_score": 0.45,
+      "agents": ["sentiment_monitor"],
+      "triggers": [
+        "oversold_conditions"
+      ],
+      "next_step": "Identify potential counter-trend opportunities",
+      "reasoning": "Low consensus, contrarian play possibility"
+    }
+  ],
+  "metadata": {
+    "agents_queried": 3,
+    "total_recommendations": 4,
+    "high_priority_count": 1,
+    "consensus_threshold": 0.7
+  }
+}

@@ -1,0 +1,120 @@
+{
+  "generated_at": "2025-11-19T03:19:44.057032Z",
+  "source_consensus": "state/brain_consensus.json",
+  "source_learning": "state/brain_learning.json",
+  "weights_used": {
+    "risk_analyzer": {
+      "base_weight": 0.75,
+      "accuracy": 0.82,
+      "trend": 0.15,
+      "sample_size": 45,
+      "last_updated": "2025-11-19T10:00:00Z"
+    },
+    "trend_detector": {
+      "base_weight": 0.65,
+      "accuracy": 0.68,
+      "trend": -0.05,
+      "sample_size": 38,
+      "last_updated": "2025-11-19T10:00:00Z"
+    },
+    "sentiment_monitor": {
+      "base_weight": 0.55,
+      "accuracy": 0.71,
+      "trend": 0.08,
+      "sample_size": 52,
+      "last_updated": "2025-11-19T10:00:00Z"
+    }
+  },
+  "actions": [
+    {
+      "type": "health-check",
+      "priority": 0.847,
+      "confidence": "high",
+      "reasoning": [
+        "Consensus score: 0.75",
+        "Avg agent weight: 0.84",
+        "Recurrence factor: 1.00 (12 occurrences)",
+        "Trend factor: 1.00 (trend=0.02)",
+        "FINAL PRIORITY: 0.847"
+      ],
+      "triggers": [
+        "market_uncertainty",
+        "portfolio_stress"
+      ],
+      "recommended_next_step": "Review portfolio health and rebalance if needed",
+      "source_agents": [
+        "risk_analyzer",
+        "sentiment_monitor"
+      ],
+      "learning_weight": 0.838
+    },
+    {
+      "type": "monitoring",
+      "priority": 0.845,
+      "confidence": "high",
+      "reasoning": [
+        "Consensus score: 0.82",
+        "Avg agent weight: 0.72",
+        "Recurrence factor: 1.00 (25 occurrences)",
+        "Trend factor: 1.00 (trend=-0.01)",
+        "FINAL PRIORITY: 0.845"
+      ],
+      "triggers": [
+        "trend_change_potential",
+        "sentiment_shift"
+      ],
+      "recommended_next_step": "Increase monitoring frequency for reversal signals",
+      "source_agents": [
+        "trend_detector",
+        "sentiment_monitor"
+      ],
+      "learning_weight": 0.718
+    },
+    {
+      "type": "risk-reduction",
+      "priority": 0.832,
+      "confidence": "high",
+      "reasoning": [
+        "Consensus score: 0.88",
+        "Avg agent weight: 0.81",
+        "Recurrence factor: 0.80 (8 occurrences)",
+        "Trend factor: 0.98 (trend=0.12)",
+        "FINAL PRIORITY: 0.832"
+      ],
+      "triggers": [
+        "high_volatility",
+        "negative_sentiment",
+        "downward_trend"
+      ],
+      "recommended_next_step": "Reduce position sizes by 30-50%",
+      "source_agents": [
+        "risk_analyzer",
+        "trend_detector",
+        "sentiment_monitor"
+      ],
+      "learning_weight": 0.812
+    },
+    {
+      "type": "opportunity-scan",
+      "priority": 0.619,
+      "confidence": "medium",
+      "reasoning": [
+        "Consensus score: 0.45",
+        "Avg agent weight: 0.68",
+        "Recurrence factor: 0.50 (5 occurrences)",
+        "Trend factor: 1.04 (trend=-0.18)",
+        "FINAL PRIORITY: 0.619"
+      ],
+      "triggers": [
+        "oversold_conditions"
+      ],
+      "recommended_next_step": "Identify potential counter-trend opportunities",
+      "source_agents": [
+        "sentiment_monitor"
+      ],
+      "learning_weight": 0.676
+    }
+  ],
+  "notes": [],
+  "errors": []
+}

@@ -1,0 +1,117 @@
+{
+  "generated_at": "2025-11-19T10:05:00Z",
+  "source": "batch_23_learning_integration",
+  "issue_history": {
+    "risk-reduction": {
+      "count": 8,
+      "last_seen": "2025-11-19T09:00:00Z",
+      "outcomes": {
+        "successful": 6,
+        "failed": 2,
+        "pending": 0
+      },
+      "avg_confidence": 0.84,
+      "trend": "increasing"
+    },
+    "health-check": {
+      "count": 12,
+      "last_seen": "2025-11-18T14:30:00Z",
+      "outcomes": {
+        "successful": 10,
+        "failed": 1,
+        "pending": 1
+      },
+      "avg_confidence": 0.78,
+      "trend": "stable"
+    },
+    "monitoring": {
+      "count": 25,
+      "last_seen": "2025-11-19T08:00:00Z",
+      "outcomes": {
+        "successful": 20,
+        "failed": 3,
+        "pending": 2
+      },
+      "avg_confidence": 0.72,
+      "trend": "stable"
+    },
+    "opportunity-scan": {
+      "count": 5,
+      "last_seen": "2025-11-17T16:00:00Z",
+      "outcomes": {
+        "successful": 2,
+        "failed": 2,
+        "pending": 1
+      },
+      "avg_confidence": 0.52,
+      "trend": "decreasing"
+    }
+  },
+  "weights": {
+    "risk_analyzer": {
+      "base_weight": 0.75,
+      "accuracy": 0.82,
+      "trend": 0.15,
+      "sample_size": 45,
+      "last_updated": "2025-11-19T10:00:00Z"
+    },
+    "trend_detector": {
+      "base_weight": 0.65,
+      "accuracy": 0.68,
+      "trend": -0.05,
+      "sample_size": 38,
+      "last_updated": "2025-11-19T10:00:00Z"
+    },
+    "sentiment_monitor": {
+      "base_weight": 0.55,
+      "accuracy": 0.71,
+      "trend": 0.08,
+      "sample_size": 52,
+      "last_updated": "2025-11-19T10:00:00Z"
+    }
+  },
+  "trend_metrics": {
+    "risk-reduction": {
+      "trend": 0.12,
+      "velocity": 0.03,
+      "acceleration": 0.01,
+      "confidence": 0.88
+    },
+    "health-check": {
+      "trend": 0.02,
+      "velocity": 0.0,
+      "acceleration": -0.01,
+      "confidence": 0.75
+    },
+    "monitoring": {
+      "trend": -0.01,
+      "velocity": 0.0,
+      "acceleration": 0.0,
+      "confidence": 0.82
+    },
+    "opportunity-scan": {
+      "trend": -0.18,
+      "velocity": -0.05,
+      "acceleration": -0.02,
+      "confidence": 0.65
+    }
+  },
+  "learning_summary": {
+    "total_issues_tracked": 50,
+    "total_agents_monitored": 3,
+    "avg_agent_accuracy": 0.74,
+    "best_performing_agent": "risk_analyzer",
+    "improvement_trend": "positive",
+    "recommendations": [
+      "Continue prioritizing risk_analyzer recommendations",
+      "Monitor trend_detector for accuracy degradation",
+      "sentiment_monitor showing improvement, increase weight"
+    ]
+  },
+  "metadata": {
+    "lookback_period_days": 30,
+    "min_sample_size": 10,
+    "weight_update_frequency": "daily",
+    "last_full_analysis": "2025-11-19T10:00:00Z"
+  }
+}
