@@ -1,0 +1,17 @@
+# DRAFT STUB — ho-brain-orchestrator.timer
+# NOTE (Phase 2 STUB):
+# - This unit is installed as part of Batch 26 Wiring v4.
+# - It MUST NOT be enabled or started in Phase 1 / DRYRUN.
+# - Reserved for a future batch to fully implement and activate.
+[Unit]
+Description=Timer for Hands-Off Brain Orchestrator (STUB)
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=5min
+Unit=ho-brain-orchestrator.service
+AccuracySec=30s
+Persistent=true
+
+[Install]
+WantedBy=timers.target

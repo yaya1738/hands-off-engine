@@ -1,0 +1,19 @@
+# ho-brain-viewer.service
+[Unit]
+Description=Hands-Off Brain Viewer (Batch 26 Wiring v4)
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/hands-off-out
+# Shared service env (STATE dir, VENV, PYTHONPATH, etc.)
+EnvironmentFile=/root/hands-off-out/config/brain-services.env
+# Viewer-specific settings (port, host, etc.)
+EnvironmentFile=/root/hands-off-out/config/brain-viewer.env
+ExecStart=/root/hands-off-out/bin/ho-brain-viewer.sh
+Restart=on-failure
+RestartSec=5
+Nice=5
+
+[Install]
+WantedBy=multi-user.target

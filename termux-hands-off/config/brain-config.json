@@ -1,0 +1,36 @@
+{
+  "brain": {
+    "version": "batch-26-wiring-v4",
+    "phase": 1,
+    "description": "Hands-Off Brain configuration - Phase 1 (viewer only)",
+
+    "state_root": "/root/hands-off-out/state",
+
+    "intervals": {
+      "orchestrator_minutes": 5,
+      "decider_minutes": 5,
+      "executor_minutes": 5
+    },
+
+    "paths": {
+      "markets_dir": "/root/hands-off-out/state/markets",
+      "decisions_dir": "/root/hands-off-out/state/decisions",
+      "finance_file": "/root/hands-off-out/state/finance/finance.json",
+      "logs_dir": "/root/hands-off-out/state/logs",
+      "flags_dir": "/root/hands-off-out/state/flags"
+    },
+
+    "viewer": {
+      "port": 8091,
+      "host": "127.0.0.1",
+      "read_only": true
+    },
+
+    "phase2_stubs": {
+      "orchestrator": "not_active",
+      "decider": "not_active",
+      "executor": "not_active",
+      "note": "Phase 2 units installed but not enabled in this batch"
+    }
+  }
+}

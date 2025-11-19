@@ -1,0 +1,18 @@
+# DRAFT STUB — ho-brain-orchestrator.service
+# NOTE (Phase 2 STUB):
+# - This unit is installed as part of Batch 26 Wiring v4.
+# - It MUST NOT be enabled or started in Phase 1 / DRYRUN.
+# - Reserved for a future batch to fully implement and activate.
+[Unit]
+Description=Hands-Off Brain Orchestrator (STUB - not active yet)
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/hands-off-out
+EnvironmentFile=/root/hands-off-out/config/brain-services.env
+ExecStart=/root/hands-off-out/bin/ho-brain-orchestrator.sh
+Nice=5
+
+[Install]
+WantedBy=multi-user.target
