@@ -12,11 +12,6 @@ jobs:
   handle-intake:
     runs-on: ubuntu-latest
 
-    # Only run on the AI Intake issue number (default: 1)
-    if: >
-      github.event.issue.number ==
-      fromJSON(env.AI_INTAKE_ISSUE_NUMBER || '1')
-
     env:
       AI_INTAKE_ISSUE_NUMBER: "1"
 
@@ -43,4 +38,4 @@ jobs:
           GITHUB_EVENT_PATH: ${{ github.event_path }}
           AI_INTAKE_ISSUE_NUMBER: "1"
         run: |
-          python ai/ai_intake_handler.py
+          python ai/ai_intake_handler
