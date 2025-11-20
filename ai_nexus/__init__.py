@@ -5,7 +5,7 @@ Coordinates multiple AI agents (Copilot, ChatGPT, Claude, etc.) with full audit 
 and ledger tracking for accountability and self-improvement.
 """
 
-from .nexus import AINexus, AITask, AIResult
+from .nexus import AINexus, AITask, AIResult, AIProvider, TaskPriority, TaskStatus
 from .ledger import ActionLedger
 
-__all__ = ['AINexus', 'AITask', 'AIResult', 'ActionLedger']
+__all__ = ['AINexus', 'AITask', 'AIResult', 'AIProvider', 'TaskPriority', 'TaskStatus', 'ActionLedger']
