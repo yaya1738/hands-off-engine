@@ -5,6 +5,8 @@ This directory contains configuration and task definitions for AI-driven work on
 ## Structure
 
 - **`/tasks/*.json`** - Individual task definitions for AI agents
+- **`ai_intake_handler.py`** - GitHub Action handler for `/plan` and future commands
+- **`requirements.txt`** - Python dependencies for AI Intake handler
 - **`/state/knowledge.json`** (repo root) - Central knowledge base with primary docs and bootstrap instructions
 
 ## How to Use
@@ -27,3 +29,29 @@ See `EXAMPLE_TASK.json` for the template. Key fields:
 - `status` - Current state (pending/in_progress/completed/template)
 
 This makes the "standard opening instruction" part of the **data model**, not just natural language conventions.
+
+## AI Intake Handler
+
+The `ai_intake_handler.py` script powers the GitHub Action workflow for ChatOps-style AI commands.
+
+### How It Works
+
+1. Comment on the designated AI Intake issue (default: issue #1) with a slash command
+2. GitHub Action triggers and runs the handler
+3. Handler reads AI_POLICY.md and the research report
+4. Calls OpenAI API with context
+5. Posts response back as a comment
+
+### Supported Commands
+
+- **`/plan`** - Generate a roadmap-aligned plan based on current status and next steps
+
+### Setup Requirements
+
+**Required GitHub Secret:**
+- `OPENAI_API_KEY` - Your OpenAI API key (added via repo Settings → Secrets and variables → Actions)
+
+**Environment Variables:**
+- `AI_INTAKE_ISSUE_NUMBER` - Issue number for AI Intake (default: 1)
+
+See `.github/workflows/ai-intake.yml` for the workflow configuration.
