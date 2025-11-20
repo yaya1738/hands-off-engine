@@ -4,6 +4,8 @@
 **Branch:** `claude/setup-mcp-servers-01SNZCq9RQzXucg9qmzEM14q`
 **Status:** ✅ Complete and tested
 
+> ⚠️ **Important:** MCP uses **stdio protocol**, NOT HTTP. If you're looking for REST API endpoints or port 8765, see [MCP_ARCHITECTURE_CORRECTION.md](./MCP_ARCHITECTURE_CORRECTION.md) for clarification.
+
 ## What Was Done
 
 ### 1. MCP Server Installation

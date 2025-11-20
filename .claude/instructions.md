@@ -26,3 +26,11 @@ Before doing any substantial work, you MUST:
 ## If Starting a Task
 
 Check `ai/tasks/*.json` for formal task definitions with required context files.
+
+## MCP Architecture
+
+⚠️ **CRITICAL:** MCP (Model Context Protocol) uses **stdio**, NOT HTTP.
+- **DO NOT** implement HTTP clients for `localhost:8765/mcp/*`
+- **DO NOT** create REST API servers for MCP
+- Read [MCP_ARCHITECTURE_CORRECTION.md](./MCP_ARCHITECTURE_CORRECTION.md) for details
+- MCP servers are child processes managed by Claude Code automatically
