@@ -4,6 +4,13 @@ This directory contains the core documentation for the Hands-Off Engine project.
 
 ## Key Documents
 
+### Quick Start
+
+- **[EXECUTIVE_SUMMARY.md](EXECUTIVE_SUMMARY.md)** ⭐
+  - Quick reference answer to "how do we proceed?"
+  - One-page overview of the complete plan
+  - Start here for fast understanding
+
 ### Strategic & Planning
 
 - **[HANDS_OFF_RESEARCH_REPORT_2025-11-20.md](../termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md)** 
