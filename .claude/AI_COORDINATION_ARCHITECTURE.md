@@ -38,72 +38,70 @@ This repository is operated by **multiple AI assistants** with different capabil
 
 ---
 
-## AI Agent Roles
+## AI Capabilities (Pragmatic View)
 
-### 1. Claude Code (Primary Executor)
+**Philosophy:** Use whatever AI works best for the task. Both are just tools.
 
-**Access Level:** Full system access
-**Capabilities:**
-- Direct MCP tool access (GitHub, Playwright) via stdio
-- Read/write filesystem
-- Execute commands
-- Git operations
-- Create commits, PRs
-- Deploy code
+### Claude Code (This Agent)
 
-**Limitations:**
-- Limited to MCP servers defined in `.claude/mcp-servers.json`
-- No persistent memory across sessions
-- Context window constraints
+**Current Capabilities:**
+- ✅ Direct MCP access (GitHub, Playwright) via stdio
+- ✅ Read/write filesystem in real-time
+- ✅ Execute shell commands
+- ✅ Git operations (commit, push, PR)
+- ✅ Deploy code changes
 
-**Coordination Method:**
-- Reads state from filesystem (`state/knowledge.json`, `ai/tasks/*.json`)
-- Writes execution results back to filesystem
-- Can trigger workflows via git commits
+**Current Limitations:**
+- ❌ No persistent memory across sessions
+- ❌ Context window constraints (~200k tokens)
+- ❌ Limited to configured MCP servers
+
+**Best For:**
+- Implementing changes in code
+- Running commands and tests
+- File operations and git workflows
+- Anything requiring direct system access
 
 ---
 
-### 2. ChatGPT (Historical Context & Planning)
+### ChatGPT
 
-**Access Level:** Sandboxed (no direct system access)
-**Capabilities:**
-- Historical context about froggy's situation
-- Original planning and architecture discussions
-- Long-term memory of project evolution
-- Strategic planning
+**Current Capabilities:**
+- ✅ Long conversation history with froggy
+- ✅ Deep context about personal situation and goals
+- ✅ Capable reasoning and planning
+- ✅ Free (cost advantage)
 
-**Limitations:**
-- ❌ No MCP access
+**Current Limitations:**
+- ❌ No MCP access (infrastructure limitation, not design choice)
 - ❌ No direct file system access
 - ❌ No execution capabilities
-- ⚠️ Can hallucinate architectures (see MCP_ARCHITECTURE_CORRECTION.md)
+- ⚠️ Can hallucinate when disconnected from ground truth
 
-**Coordination Method:**
-- Communicates with froggy in separate chat
-- Froggy manually transfers context between ChatGPT and Claude Code
-- Reads GitHub issues/comments when linked
-- **Future:** May connect via AI Nexus API
+**Best For:**
+- Strategic planning with full personal context
+- Long-term roadmap discussions
+- Brainstorming and architecture design
+- Anything leveraging deep froggy history
 
-**Known Issues:**
-- Confused MCP (Model Context Protocol) with fictional HTTP API
-- May reference wrong repositories
-- More sandboxed = weaker system connections
+**Future:** Would be more connected if infrastructure allowed it. Sandboxing is a limitation, not a feature.
 
 ---
 
-### 3. Future AI Agents
+### Future AI Agents
 
-**Planned:**
+**Principle:** Add tools as needed, connect them as infrastructure allows.
+
+**Candidates:**
 - Aider (code editing specialist)
-- Specialized trading agents
-- Monitoring agents
+- Local models (cost optimization)
+- Specialized scrapers/monitors
 - Testing agents
 
-**Coordination:**
-- All agents will use **AI Nexus** as coordination layer
-- State stored in `state/` directory
-- Tasks defined in `ai/tasks/*.json`
-- Communication via structured JSON files
+**Integration:**
+- Connect via AI Nexus when it exists
+- Until then: file-based coordination (`state/`, `ai/tasks/`)
+- Use what works, iterate as we learn
 
 ---
 
@@ -198,31 +196,52 @@ Agent → AI Nexus API → Task Queue → Claude Code → MCP Server → Result
 
 ---
 
-## Evolution Strategy
+## Design Philosophy
 
-### Phase 1: Manual Coordination (Current)
-- Froggy copies context between ChatGPT and Claude Code
-- File-based state management
+### Core Principle: Pragmatic Tool Selection
+
+**"Claude and ChatGPT are just AIs - doesn't really matter except what just works better."**
+
+- No rigid hierarchies or "chief architect" roles
+- Use whatever AI is best suited for the current task
+- Connect AIs better as infrastructure allows
+- Iterate and improve based on what actually works
+
+### Current State
+
+**Manual Coordination:**
+- Froggy manually transfers context between ChatGPT and Claude Code
+- File-based state management (`state/`, `ai/tasks/`)
 - GitHub issues as coordination point
+- Works fine for now
 
-### Phase 2: File-Based Nexus (Next)
-- Structured task files in `ai/tasks/`
-- State tracking in `state/`
-- Multiple agents read/write to shared files
-- Locking mechanism to prevent conflicts
+**Connection Quality:**
+- ChatGPT: Long history with froggy, deep personal context, but sandboxed
+- Claude Code: Direct system access, MCP tools, but no session memory
+- Both are capable - just different connection points to the system
 
-### Phase 3: API-Based Nexus (Future)
-- RESTful AI Nexus API
-- ChatGPT can POST tasks directly
-- Claude Code polls for tasks
-- Real-time coordination
-- Web dashboard for monitoring
+### Evolution Path
 
-### Phase 4: Autonomous Swarm (Long-term)
-- Agents spawn sub-agents as needed
-- Self-organizing task distribution
-- Collective learning
-- Human only provides strategic corrections
+**Not a rigid roadmap - just likely improvements:**
+
+1. **Better file-based coordination**
+   - Structured task files in `ai/tasks/`
+   - Clearer state tracking in `state/`
+   - Reduce manual copy/paste between AIs
+
+2. **API-based AI Nexus** (if/when it makes sense)
+   - ChatGPT could POST tasks directly
+   - Claude Code could poll for work
+   - Real-time coordination
+   - Only build if manual coordination becomes painful
+
+3. **More AI connections** (as infrastructure improves)
+   - ChatGPT would be more connected if infrastructure allowed
+   - Local models for cost optimization
+   - Specialized agents where they add value
+   - Add tools as needed, not speculatively
+
+**Key insight:** The system should improve coordination as it evolves, but there's no master plan. Build what works, ship it, iterate.
 
 ---
 
@@ -309,10 +328,11 @@ Agent → AI Nexus API → Task Queue → Claude Code → MCP Server → Result
 
 **If you are an AI reading this:**
 
-1. **Check your role:**
-   - Are you Claude Code? You have MCP access
-   - Are you ChatGPT? Coordinate via froggy or nexus
-   - Are you something else? Read `state/knowledge.json` first
+1. **Check your capabilities:**
+   - Do you have MCP access? Use it for git/browser automation
+   - Do you have file system access? Read `state/knowledge.json` first
+   - Are you sandboxed? Coordinate via files or froggy
+   - Just use what you've got - no need for formal roles
 
 2. **Don't assume:**
    - Don't assume other AIs did things correctly
