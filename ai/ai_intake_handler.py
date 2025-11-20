@@ -7,10 +7,39 @@ Currently supports: /plan
 """
 import json
 import os
+from datetime import datetime
 from pathlib import Path
 
 import requests
 from openai import OpenAI
+
+
+def log(message: str) -> None:
+    """Centralized logging with [AI-INTAKE] prefix for easy filtering."""
+    print(f"[AI-INTAKE] {message}", flush=True)
+
+
+# Configuration for task JSON generation
+TASKS_DIR = Path(os.getenv("AI_INTAKE_TASKS_DIR", "ai/tasks"))
+AI_INTAKE_ENABLE_TASKS = os.getenv("AI_INTAKE_ENABLE_TASKS", "1") not in ("0", "false", "False")
+
+
+def write_task_json(task: dict) -> Path:
+    """
+    Persist an AI intake task JSON for downstream runners.
+
+    Directory can be overridden via AI_INTAKE_TASKS_DIR.
+    """
+    TASKS_DIR.mkdir(parents=True, exist_ok=True)
+
+    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+    task_id = task.get("task_id") or f"ai-intake-{ts}"
+
+    path = TASKS_DIR / f"{task_id}.json"
+    path.write_text(json.dumps(task, indent=2), encoding="utf-8")
+
+    log(f"task json written: {path}")
+    return path
 
 
 def load_text(path: str) -> str:
@@ -105,7 +134,39 @@ TASK:
         "_Generated automatically by `ai_intake_handler.py`._"
     )
 
+    # Build AI-runner task JSON
+    comment_dict = event.get("comment", {})
+    repo_dict = event.get("repository", {})
+
+    task_id = f"ai-intake-{repo_dict.get('full_name', 'unknown').replace('/', '-')}-{issue_number}-{comment_dict.get('id')}"
+
+    task_payload = {
+        "task_id": task_id,
+        "source": "github-ai-intake",
+        "created_at": datetime.utcnow().isoformat() + "Z",
+        "command": "/plan",
+        "repo_full_name": repo_dict.get("full_name"),
+        "issue_number": issue_number,
+        "issue_title": issue.get("title"),
+        "comment_id": comment_dict.get("id"),
+        "comment_author": (comment_dict.get("user") or {}).get("login"),
+        "comment_body": comment_body,
+        # the thing for AI-runner / MBOL to actually chew on:
+        "plan_markdown": plan_text,
+        # optional free-form metadata for future routing:
+        "meta": {
+            "ai_intake_issue_number": os.getenv("AI_INTAKE_ISSUE_NUMBER"),
+            "github_event_action": event.get("action"),
+        },
+    }
+
+    if AI_INTAKE_ENABLE_TASKS:
+        write_task_json(task_payload)
+    else:
+        log("Task JSON generation disabled via AI_INTAKE_ENABLE_TASKS")
+
     post_comment(repo, issue_number, comment)
+    log("Successfully handled /plan and posted response")
 
 
 def main() -> None:
@@ -119,7 +180,7 @@ def main() -> None:
 
     # Only handle issue_comment events
     if event.get("action") != "created":
-        print("Not a newly created comment, exiting.")
+        log("Not a newly created comment, exiting.")
         return
 
     issue = event.get("issue") or {}
@@ -128,7 +189,7 @@ def main() -> None:
     comment_body = (comment.get("body") or "").strip()
 
     if issue_number is None or not comment_body:
-        print("No issue number or comment body, exiting.")
+        log("No issue number or comment body, exiting.")
         return
 
     # Restrict to the AI Intake issue (default: 1, configurable via env)
@@ -139,20 +200,20 @@ def main() -> None:
         ai_issue_number = 1  # default
 
     if issue_number != ai_issue_number:
-        print(f"Issue #{issue_number} is not AI Intake (#{ai_issue_number}), skipping.")
+        log(f"Issue #{issue_number} is not AI Intake (#{ai_issue_number}), skipping.")
         return
 
     # Only react to commands starting with '/'
     first_line = comment_body.splitlines()[0].strip()
     if not first_line.startswith("/"):
-        print("No leading slash command, skipping.")
+        log("No leading slash command, skipping.")
         return
 
     if first_line.startswith("/plan"):
-        print("Handling /plan command...")
+        log("Handling /plan command...")
         run_plan(event)
     else:
-        print(f"Command {first_line} not implemented yet, skipping for now.")
+        log(f"Command {first_line} not implemented yet, skipping for now.")
 
 
 if __name__ == "__main__":
