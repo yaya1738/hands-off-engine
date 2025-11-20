@@ -6,36 +6,15 @@
       "env": {
         "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
       },
-      "description": "GitHub MCP Server - Git operations and repository management",
-      "tools": [
-        "git-init",
-        "git-status",
-        "git-add",
-        "git-commit",
-        "git-push",
-        "git-pull",
-        "git-branch",
-        "git-checkout",
-        "git-log",
-        "git-diff"
-      ]
+      "description": "GitHub MCP Server - Git operations and repository management (30+ operations auto-discovered)",
+      "notes": "Tools are discovered dynamically via stdio. Claude Code has direct access. Other AIs (ChatGPT) access via AI Nexus coordination layer."
     },
     "playwright": {
       "command": "npx",
       "args": ["@playwright/mcp"],
       "env": {},
-      "description": "Playwright MCP Server - Web browser automation and testing",
-      "tools": [
-        "navigate",
-        "click",
-        "fill",
-        "screenshot",
-        "get_page_html",
-        "evaluate",
-        "wait",
-        "new_page",
-        "close_page"
-      ]
+      "description": "Playwright MCP Server - Web browser automation and testing (tools auto-discovered)",
+      "notes": "Tools are discovered dynamically via stdio. Claude Code has direct access. Other AIs access via AI Nexus coordination layer."
     }
   },
   "configuration": {
