@@ -1,16 +1,49 @@
-# Aider configuration for Hands-Off Engine
+# Aider configuration for hands-off-engine Termux workflow
+# Optimized for mobile development and offline-first operation
 
-# Read these files for context on every session
-read:
-  - termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md
-  - state/knowledge.json
-  - AI_POLICY.md
+# Model settings - use Claude Sonnet for quality, Haiku for speed
+model: claude-sonnet-4-5-20250929
+weak-model: claude-3-5-haiku-20241022
 
-# Prompt to include in every session
-chat-mode: ask
-edit-format: diff
+# Editor model for complex refactoring (optional, uses main model if not set)
+editor-model: claude-sonnet-4-5-20250929
 
-# Guidance
-# - Follow the roadmap in HANDS_OFF_RESEARCH_REPORT
-# - Use Termux-compatible solutions (no systemd/Docker/root)
-# - AI agents do the work, humans provide strategic direction
+# Git settings
+auto-commits: true
+dirty-commits: true
+attribute-author: true
+attribute-committer: false
+attribute-commit-message-author: true
+attribute-commit-message-committer: false
+
+# Commit message template
+commit-prompt: |
+  Write a clear, concise commit message following conventional commits format.
+  Focus on the "why" rather than the "what".
+  Keep it under 72 characters for the subject line.
+
+  End with:
+  🤖 Generated with [aider](https://aider.chat) + Claude
+
+# UI preferences for mobile
+dark-mode: true
+pretty: true
+stream: true
+
+# Chat history
+chat-history-file: .aider.chat.history.md
+restore-chat-history: false
+
+# File handling
+watch-files: false
+
+# LLM settings
+max-tokens: 8192
+timeout: 120
+
+# Upgrade check (disable on mobile to save bandwidth)
+check-update: false
+
+# Voice mode (experimental - may not work well on mobile)
+voice-format: wav
+voice-language: en

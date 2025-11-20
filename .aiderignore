@@ -1,0 +1,73 @@
+# Sensitive files - never let aider touch these
+.env
+.env.*
+*.key
+*.pem
+*.cert
+credentials.json
+secrets.json
+config.json
+
+# API keys and tokens
+**/api_keys.txt
+**/tokens.txt
+**/.anthropic
+
+# Logs and temp files
+logs/
+*.log
+*.tmp
+*.temp
+tmp/
+temp/
+
+# Git internals
+.git/
+.gitignore
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+ENV/
+
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build artifacts
+dist/
+build/
+*.egg-info/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Termux-specific (these are managed by hand or other scripts)
+termux/termux_wire_github.sh
+termux/emergency_sync_fix.sh
+
+# Aider's own files
+.aider*
+!.aider.conf.yml
+!.aiderignore
+
+# Documentation that shouldn't be auto-modified
+README.md
+LICENSE
+
+# CI/CD configs (careful with these)
+.github/workflows/
