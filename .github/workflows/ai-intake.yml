@@ -1,0 +1,46 @@
+name: AI Intake
+
+on:
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  handle-intake:
+    runs-on: ubuntu-latest
+
+    # Only run on the AI Intake issue number (default: 1)
+    if: >
+      github.event.issue.number ==
+      fromJSON(env.AI_INTAKE_ISSUE_NUMBER || '1')
+
+    env:
+      AI_INTAKE_ISSUE_NUMBER: "1"
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install openai requests
+
+      - name: Run AI Intake handler
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_API_URL: ${{ github.api_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          GITHUB_EVENT_PATH: ${{ github.event_path }}
+          AI_INTAKE_ISSUE_NUMBER: "1"
+        run: |
+          python ai/ai_intake_handler.py

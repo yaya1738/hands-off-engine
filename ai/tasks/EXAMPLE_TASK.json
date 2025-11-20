@@ -1,0 +1,13 @@
+{
+  "task_id": "example-001",
+  "description": "Example task template showing how to wire in standard context",
+  "context_files": [
+    "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md"
+  ],
+  "instructions": [
+    "This is an example template.",
+    "Real tasks should always include the research report in context_files.",
+    "The AI will read those files before starting work."
+  ],
+  "status": "template"
+}

@@ -1,0 +1,35 @@
+# AI Session Initialization
+
+This file is read by AI tools at session start to bootstrap context.
+
+## Required First Steps
+
+Any AI agent starting work on this repository MUST:
+
+1. **Read the primary status document:**
+   `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
+
+2. **Load the knowledge base:**
+   `state/knowledge.json`
+
+3. **Align with the current roadmap** described in those documents before:
+   - Making changes to code
+   - Refactoring existing systems
+   - Planning new features
+   - Proposing architectural changes
+
+## Quick Context
+
+- **Project:** Hands-Off Engine - AI-driven personal finance & trading automation
+- **Primary Environment:** Termux on Android (Pixel 6a)
+- **Secondary Environment:** DigitalOcean droplet (future)
+- **Key Constraint:** Must work with Termux limitations (no systemd, root, Docker)
+- **Philosophy:** AI agents do the work, minimal manual intervention
+
+## If You're Starting a Specific Task
+
+Check `ai/tasks/*.json` for task definitions that include required context files.
+
+## Current Priority
+
+Follow the roadmap in the research report. Do not deviate without explicit instruction.

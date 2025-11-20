@@ -1,0 +1,18 @@
+# Cursor AI Rules for Hands-Off Engine
+
+## Required First Step
+Read `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md` before making any changes.
+
+## Context
+- AI-driven trading/finance automation running on Termux (Android)
+- Must work WITHOUT: systemd, root access, Docker
+- Must work WITH: Termux services, cron, pkg packages, Python venv
+
+## Workflow
+1. Read research report for current status and roadmap
+2. Align proposed changes with documented roadmap
+3. Use Termux-compatible solutions only
+4. Test in dryrun/staging modes before production
+
+## Philosophy
+AI agents build it. Humans provide strategic direction only.
