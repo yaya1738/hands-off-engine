@@ -170,6 +170,38 @@ except Exception as e:
     raise
 ```
 
+#### AI Operations Logging
+
+The AI Intake handler automatically logs all AI operations:
+
+```python
+# AI Intake Handler logs:
+# - Command invocation (/plan, etc.)
+# - Data fetching (policy files, reports)
+# - AI decision generation (OpenAI API calls)
+# - GitHub comment posting
+# - Errors during execution
+
+# Example of what gets logged automatically:
+# 1. When /plan command is invoked on issue #1
+# 2. Loading of AI_POLICY.md and research reports
+# 3. OpenAI API call with model, temperature, prompt length
+# 4. Generated plan length and preview
+# 5. GitHub comment posted successfully
+
+# All events are grouped by session_id for traceability
+```
+
+To view AI Intake audit logs:
+
+```bash
+# View all AI intake operations
+python3 audit/audit_viewer.py --component ai.intake_handler
+
+# View a specific session
+python3 audit/audit_viewer.py --session ai_intake_plan_20251120_102247
+```
+
 ### Viewing Audit Logs
 
 #### Basic Viewing
@@ -258,6 +290,10 @@ The audit system is currently integrated into:
 
 2. **Autopilot Scripts**:
    - `termux-hands-off/autopilot/edge_engine.py` - Edge detection
+   - `termux-hands-off/autopilot/fetch_polymarket.py` - Data fetching
+
+3. **AI/Agent Systems**:
+   - `ai/ai_intake_handler.py` - AI Intake command handling (logs all `/plan` commands, API calls, and responses)
    - `termux-hands-off/autopilot/fetch_polymarket.py` - Data fetching
 
 ## Best Practices
