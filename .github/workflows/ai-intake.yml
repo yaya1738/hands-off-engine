@@ -38,4 +38,4 @@ jobs:
           GITHUB_EVENT_PATH: ${{ github.event_path }}
           AI_INTAKE_ISSUE_NUMBER: "1"
         run: |
-          python ai/ai_intake_handler
+          python ai/ai_intake_handler.py
