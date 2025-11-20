@@ -1,5 +1,10 @@
 # Hands-Off Engine
 
+## Status & Roadmap
+
+See `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
+for the current status and next steps.
+
 This repository is the canonical codebase for my "Hands-Off" personal finance, trading,
 and automation engine. It is designed to be driven primarily by AI coding agents
 (LLMs) with minimal manual involvement.
