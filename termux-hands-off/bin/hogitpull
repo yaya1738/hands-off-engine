@@ -2,4 +2,14 @@
 set -euo pipefail
 
 # Pull latest code from GitHub into the droplet repo
-ssh do138 'cd /root/hands-off && git pull --ff-only'
+# Try new path first, fall back to legacy path
+if ssh do138 '[ -d /root/hands-off-engine/.git ]'; then
+  echo "[hogitpull] using /root/hands-off-engine"
+  ssh do138 'cd /root/hands-off-engine && git pull --ff-only'
+elif ssh do138 '[ -d /root/hands-off/.git ]'; then
+  echo "[hogitpull] using legacy /root/hands-off"
+  ssh do138 'cd /root/hands-off && git pull --ff-only'
+else
+  echo "[hogitpull] ERROR: no git repo found on droplet"
+  exit 1
+fi

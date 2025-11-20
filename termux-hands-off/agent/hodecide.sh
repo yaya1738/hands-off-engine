@@ -5,5 +5,5 @@ set -euo pipefail
 REMOTE="do138"
 
 echo "[hodecide] running decider..."
-ssh "$REMOTE" "/usr/bin/python3 /root/hands-off-engine/termux-hands-off/agent/pm_decide.py"
+ssh "$REMOTE" "/usr/bin/python3 /root/hands-off/termux-hands-off/agent/pm_decide.py"
 echo "[hodecide] done"
