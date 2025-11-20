@@ -1,0 +1,16 @@
+# Aider configuration for Hands-Off Engine
+
+# Read these files for context on every session
+read:
+  - termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md
+  - state/knowledge.json
+  - AI_POLICY.md
+
+# Prompt to include in every session
+chat-mode: ask
+edit-format: diff
+
+# Guidance
+# - Follow the roadmap in HANDS_OFF_RESEARCH_REPORT
+# - Use Termux-compatible solutions (no systemd/Docker/root)
+# - AI agents do the work, humans provide strategic direction
