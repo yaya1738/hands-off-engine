@@ -17,6 +17,7 @@ env/
 *.tmp
 tmp/
 *.swp
+logs/audit/*.jsonl
 
 # Local data/state that shouldn't go to GitHub
 hands-off-out/
