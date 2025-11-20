@@ -294,6 +294,7 @@ The audit system is currently integrated into:
 
 3. **AI/Agent Systems**:
    - `ai/ai_intake_handler.py` - AI Intake command handling (logs all `/plan` commands, API calls, and responses)
+   - `ai_nexus/` - **AI Nexus multi-brain orchestration system** (tracks all AI operations, costs, and financial outcomes)
    - `termux-hands-off/autopilot/fetch_polymarket.py` - Data fetching
 
 ## Best Practices
