@@ -4,13 +4,22 @@ AI Intake Handler for Hands-Off Engine
 
 Handles commands posted as issue comments on the designated AI Intake issue.
 Currently supports: /plan
+
+Now integrated with AI Nexus audit logging and financial tracking.
 """
 import json
 import os
+import sys
 from pathlib import Path
 
 import requests
 from openai import OpenAI
+
+# Add parent directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+from audit import AuditLogger, FinancialLedger
+from ai_nexus import AIProvider, AIRequest, AIResponse, NexusCore, AIProviderType, OpenAIProvider
 
 
 def load_text(path: str) -> str:
@@ -44,6 +53,26 @@ def run_plan(event: dict) -> None:
     issue_number = issue["number"]
     comment_body = event["comment"]["body"]
 
+    # Initialize AI Nexus for audit logging and cost tracking
+    audit_logger = AuditLogger()
+    ledger = FinancialLedger()
+    nexus = NexusCore(audit_logger=audit_logger, ledger=ledger)
+
+    # Register OpenAI provider
+    openai_provider = OpenAIProvider(audit_logger, ledger)
+    nexus.register_provider(openai_provider)
+
+    # Log the /plan command invocation
+    audit_logger.log_event(
+        component="ai.intake_handler",
+        action="plan_command_invoked",
+        metadata={
+            "repo": repo,
+            "issue_number": issue_number,
+            "comment_length": len(comment_body)
+        }
+    )
+
     # Load policy + research report
     policy_text = load_text("AI_POLICY.md")
     report_text = load_text(
@@ -51,8 +80,16 @@ def run_plan(event: dict) -> None:
     )
     issue_description = issue.get("body") or ""
 
-    # Set up OpenAI client
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    # Log data loading
+    audit_logger.log_event(
+        component="ai.intake_handler",
+        action="load_policy_data",
+        metadata={
+            "policy_length": len(policy_text),
+            "report_length": len(report_text),
+            "issue_description_length": len(issue_description)
+        }
+    )
 
     system_msg = (
         "You are the planning assistant for the 'Hands-Off Engine' repository. "
@@ -84,28 +121,102 @@ TASK:
 - Keep it short enough to fit comfortably in a single GitHub comment.
 """.strip()
 
-    # Call OpenAI Chat Completion (modern SDK)
-    response = client.chat.completions.create(
+    # Create AI request through Nexus
+    ai_request = AIRequest(
+        provider_type=AIProviderType.OPENAI,
+        action="plan_generation",
+        prompt=user_prompt,
+        system_message=system_msg,
         model="gpt-4o-mini",
-        messages=[
-            {"role": "system", "content": system_msg},
-            {"role": "user", "content": user_prompt},
-        ],
         temperature=0.3,
+        metadata={
+            "repo": repo,
+            "issue_number": issue_number
+        }
     )
 
-    plan_text = response.choices[0].message.content
+    # Execute through Nexus (logs costs automatically)
+    ai_response = nexus.execute_request(ai_request)
+
+    if not ai_response.success:
+        error_msg = f"Failed to generate plan: {ai_response.error}"
+        audit_logger.log_event(
+            component="ai.intake_handler",
+            action="plan_generation_failed",
+            metadata={"error": ai_response.error},
+            error=error_msg
+        )
+        # Post error comment
+        post_comment(repo, issue_number, f"❌ Error generating plan: {ai_response.error}")
+        return
+
+    plan_text = ai_response.content
+
+    # Log plan generation success
+    audit_logger.log_event(
+        component="ai.intake_handler",
+        action="plan_generated",
+        metadata={
+            "model": ai_response.model_used,
+            "tokens": ai_response.tokens_used,
+            "cost": ai_response.cost,
+            "plan_length": len(plan_text)
+        },
+        cost=ai_response.cost,
+        outcome="success"
+    )
+
+    # Add cost information to the comment
+    cost_info = (
+        f"\n\n---\n"
+        f"📊 **AI Nexus Metrics:**\n"
+        f"- Model: {ai_response.model_used}\n"
+        f"- Tokens: {ai_response.tokens_used['total']:,}\n"
+        f"- Cost: ${ai_response.cost:.4f}\n"
+        f"- Session: `{nexus.session_id[:8]}...`\n"
+    )
 
     comment = (
         "### 🤖 AI Intake – Plan\n\n"
         "Here is a roadmap-aligned plan based on the current AI policy and "
         "research report:\n\n"
         f"{plan_text}\n\n"
+        f"{cost_info}\n"
         "---\n"
-        "_Generated automatically by `ai_intake_handler.py`._"
+        "_Generated automatically by `ai_intake_handler.py` via AI Nexus._"
     )
 
-    post_comment(repo, issue_number, comment)
+    try:
+        post_comment(repo, issue_number, comment)
+        # Log successful comment posting
+        audit_logger.log_event(
+            component="ai.intake_handler",
+            action="comment_posted",
+            metadata={
+                "issue_number": issue_number,
+                "comment_length": len(comment)
+            },
+            outcome="success"
+        )
+    except Exception as e:
+        # Log error
+        audit_logger.log_event(
+            component="ai.intake_handler",
+            action="comment_posting_failed",
+            metadata={"issue_number": issue_number},
+            error=str(e)
+        )
+        raise
+
+    # Print session summary
+    print("\n" + "="*80)
+    print("AI NEXUS SESSION SUMMARY")
+    print("="*80)
+    summary = nexus.get_session_metrics()
+    print(f"Session ID: {summary['session_id']}")
+    print(f"Total Cost: ${summary['financial']['total_costs']:.4f}")
+    print(f"ROI: {summary['financial']['roi_percent']:.2f}%")
+    print("="*80 + "\n")
 
 
 def main() -> None:
