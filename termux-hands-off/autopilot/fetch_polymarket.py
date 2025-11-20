@@ -1,5 +1,13 @@
 import os, sys, json, time, re, urllib.request
-import json
+import datetime
+
+# Add audit logging
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
+try:
+    from audit import get_audit_logger
+    audit = get_audit_logger(component="autopilot.fetch_polymarket")
+except ImportError:
+    audit = None
 
 BASE = os.path.expanduser("~/hands-off/autopilot")
 WATCHLIST_FILE = os.path.join(BASE, "watchlist.txt")
@@ -72,8 +80,26 @@ def main():
     url = "https://gamma-api.polymarket.com/events"
     try:
         events = get_json(url)
+        if audit:
+            session_id = f"fetch_polymarket_{datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+            audit.log_data_fetch(
+                source="polymarket_api",
+                params={"url": url, "watchlist": watch},
+                success=True,
+                record_count=len(events) if isinstance(events, list) else 0,
+                session_id=session_id
+            )
     except Exception as e:
         print(f"[fetch] error fetching events: {e}", file=sys.stderr)
+        if audit:
+            session_id = f"fetch_polymarket_{datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+            audit.log_data_fetch(
+                source="polymarket_api",
+                params={"url": url},
+                success=False,
+                error=str(e),
+                session_id=session_id
+            )
         sys.exit(0)
 
     # Build candidate lines
@@ -124,12 +150,22 @@ def main():
         return
 
     # write/append: we will refresh candidates.jsonl (overwrite to keep it clean)
+    dedup = [json.dumps(x) for x in lines]
     tmp = CAND_FILE + ".tmp"
     with open(tmp, 'w') as f:
         for x in dedup:
             f.write(x + "\n")
     os.replace(tmp, CAND_FILE)
     print(f"[fetch] wrote {len(lines)} candidates to {CAND_FILE}")
+    
+    if audit:
+        session_id = f"fetch_polymarket_{datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        audit.log_action(
+            action_type="write_candidates",
+            action_data={"file": CAND_FILE, "count": len(lines)},
+            result="success",
+            session_id=session_id
+        )
 if __name__ == "__main__":
     if "--debug" in sys.argv:
         # lightweight debug pass
@@ -164,3 +200,5 @@ if __name__ == "__main__":
             if shown >= 20:
                 break
         sys.exit(0)
+    else:
+        main()
