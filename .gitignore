@@ -22,6 +22,7 @@ tmp/
 hands-off-out/
 *.sqlite
 *.db
+state/pipeline_logs/
 
 # Editor / OS files
 .DS_Store
