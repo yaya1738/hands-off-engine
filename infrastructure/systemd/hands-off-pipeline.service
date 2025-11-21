@@ -1,0 +1,39 @@
+[Unit]
+Description=Hands-Off Engine Pipeline Execution
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=user
+Group=user
+WorkingDirectory=/home/user/hands-off-engine
+Environment="PYTHONUNBUFFERED=1"
+Environment="PATH=/home/user/.local/bin:/usr/local/bin:/usr/bin:/bin"
+
+# Run the main pipeline
+ExecStart=/home/user/hands-off-engine/scripts/run_and_notify.sh
+
+# Resource limits
+MemoryLimit=1G
+CPUQuota=100%
+
+# Timeout (should complete within 10 minutes)
+TimeoutStartSec=600
+
+# Logging
+StandardOutput=append:/var/log/hands-off-engine/pipeline.log
+StandardError=append:/var/log/hands-off-engine/pipeline.log
+SyslogIdentifier=hands-off-pipeline
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=false
+ReadWritePaths=/home/user/hands-off-engine
+ReadWritePaths=/var/log/hands-off-engine
+
+[Install]
+WantedBy=multi-user.target
