@@ -45,4 +45,8 @@ else
     exit $NOTIFY_EXIT
 fi
 
+# Log performance metrics
+python3 scripts/track_performance.py
+echo "[$(date)] ✓ Performance metrics logged"
+
 exit 0

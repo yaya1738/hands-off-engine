@@ -1,18 +1,29 @@
 {
-  "timestamp": "2025-11-21T09:39:22.420915",
+  "timestamp": "2025-11-21T09:51:39.542091",
   "dryrun": true,
-  "total_orders": 2,
-  "total_size_usd": 55.99999999999999,
+  "total_orders": 3,
+  "total_size_usd": 89.6,
   "orders": [
     {
-      "market_id": "will-bitcoin-dip-to-80k-in-november-2025-899",
-      "question": "Will Bitcoin dip to $80,000 in November?",
+      "market_id": "will-the-los-angeles-lakers-win-the-2026-nba-finals",
+      "question": "Will the Los Angeles Lakers win the 2026 NBA Finals?",
+      "side": "yes",
+      "size_usd": 33.6,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 4.8%, Current odds: 0.05, Confidence: 70.0%",
+      "status": "planned"
+    },
+    {
+      "market_id": "will-trump-talk-to-volodymyr-zelenskyy-in-november",
+      "question": "Will Trump talk to Volodymyr Zelenskyy in November?",
       "side": "yes",
       "size_usd": 27.999999999999996,
       "confidence": 0.7,
       "edge": null,
       "category": "unknown",
-      "reason": "Edge: 4.0%, Current odds: 0.06, Confidence: 70.0%",
+      "reason": "Edge: 4.0%, Current odds: 0.51, Confidence: 70.0%",
       "status": "planned"
     },
     {
