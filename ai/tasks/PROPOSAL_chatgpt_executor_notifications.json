@@ -1,0 +1,207 @@
+{
+  "task_id": "chatgpt-executor-notifications",
+  "submitted_by": "chatgpt",
+  "evaluated_by": "claude-code",
+  "date": "2025-11-20",
+  "status": "evaluated",
+
+  "proposal_summary": "ChatGPT proposes a 3-step plan: (1) Declare MCP HTTP server fiction dead, (2) Verify MCP works host-side, (3) Create Decider→Executor→Notification pipeline",
+
+  "chatgpt_steps": [
+    {
+      "step": 1,
+      "description": "Declare 8765 MCP HTTP server dead, establish stdio MCP as truth",
+      "status": "DONE",
+      "evidence": [
+        ".claude/MCP_ARCHITECTURE_CORRECTION.md created",
+        ".claude/AI_COORDINATION_ARCHITECTURE.md updated",
+        "Commits: 1f3cd11, ecec633, d446788"
+      ]
+    },
+    {
+      "step": 2,
+      "description": "Verify MCP works in Claude Code host-side (one-time sanity check)",
+      "status": "NOT_YET_DONE",
+      "my_assessment": "Valid. Should test git-status via GitHub MCP tool once to confirm."
+    },
+    {
+      "step": 3,
+      "description": "Build Decider→Executor→Notification pipeline for trading",
+      "status": "PARTIALLY_EXISTS",
+      "details": "See analysis below"
+    }
+  ],
+
+  "analysis_step_3": {
+    "what_chatgpt_wants": {
+      "input": "state/decision_report.json (Decider output)",
+      "new_layer": "ho_executor_* (DRYRUN sizing + hygiene)",
+      "output": "state/execution_plan.json + Telegram/IFTTT push",
+      "format_per_order": [
+        "market id / title",
+        "side (YES/NO)",
+        "price band (e.g. up to 0.46)",
+        "size in USDC",
+        "which risk caps applied",
+        "one-line reason"
+      ]
+    },
+
+    "what_actually_exists": {
+      "decider": {
+        "file": "decider/ho_decider.py",
+        "status": "EXISTS",
+        "capabilities": [
+          "Converts alpha signals to PlannedAction objects",
+          "Includes: market_id, market_name, side, amount, confidence, reasoning"
+        ]
+      },
+      "executor": {
+        "file": "executor/ho_executor_plan.py",
+        "status": "EXISTS",
+        "capabilities": [
+          "Validates actions (confidence threshold, position size limits)",
+          "DRYRUN mode supported",
+          "Safety reflexes (MAX_POSITION_SIZE=100, MIN_CONFIDENCE=0.7)",
+          "Execution results with success/failure tracking"
+        ]
+      },
+      "execution_plan_json": {
+        "file": "executor/execution_plan.json",
+        "status": "EXISTS",
+        "current_format": {
+          "has_timestamp": true,
+          "has_dryrun_flag": true,
+          "has_total_size": true,
+          "per_order_fields": [
+            "candidate_id ✓",
+            "question ✓",
+            "side ✓",
+            "size_usd ✓",
+            "score ✓",
+            "edge ✓",
+            "category ✓",
+            "reason ✓",
+            "status ✓"
+          ]
+        }
+      },
+      "decisions_json": {
+        "file": "decider/decisions.json",
+        "status": "EXISTS",
+        "includes": "buy_yes/skip actions with scores, edges, reasoning"
+      },
+      "shell_scripts": {
+        "files": [
+          "termux-hands-off/agent/ho-executor-plan.sh",
+          "termux-hands-off/agent/ho-executor-sim.sh",
+          "termux-hands-off/agent/ho-executor-preview.sh",
+          "termux-hands-off/agent/ho-decisions-summary.sh"
+        ],
+        "status": "EXISTS"
+      }
+    },
+
+    "gaps_identified": [
+      {
+        "gap": "Price band information",
+        "chatgpt_wants": "e.g., 'up to 0.46'",
+        "current_state": "Not in execution_plan.json",
+        "severity": "minor",
+        "reason": "Polymarket API integration needed for current odds/liquidity"
+      },
+      {
+        "gap": "Notification push (Telegram/IFTTT)",
+        "chatgpt_wants": "Auto-push execution plan to froggy",
+        "current_state": "No notification integration",
+        "severity": "MAJOR",
+        "reason": "This is the key value add - froggy gets notified of plans"
+      },
+      {
+        "gap": "Human-readable summary format",
+        "chatgpt_wants": "Clean text view for mobile",
+        "current_state": "Only JSON files",
+        "severity": "medium",
+        "reason": "JSON is not mobile-friendly for quick review"
+      },
+      {
+        "gap": "Which risk caps were applied",
+        "chatgpt_wants": "Explicit mention in output",
+        "current_state": "Implicit in executor validation, not surfaced",
+        "severity": "minor",
+        "reason": "Would help froggy understand why actions were rejected"
+      }
+    ]
+  },
+
+  "my_recommendation": {
+    "verdict": "PARTIALLY_AGREE_WITH_MODIFICATIONS",
+    "reasoning": [
+      "Step 1 (MCP correction): DONE ✓",
+      "Step 2 (MCP verification): AGREE - should do once",
+      "Step 3 (Executor pipeline): MOSTLY EXISTS - focus on NOTIFICATIONS gap"
+    ],
+
+    "proposed_implementation": {
+      "priority_1_critical": {
+        "task": "Add Telegram notification integration",
+        "rationale": "This is the missing piece. Execution plan exists, but froggy doesn't see it.",
+        "implementation": [
+          "Create termux-hands-off/agent/notify_execution_plan.py",
+          "Read executor/execution_plan.json",
+          "Format as human-readable text (markdown)",
+          "POST to Telegram bot API or IFTTT webhook",
+          "Run after ho-executor-plan.sh"
+        ],
+        "effort": "Small (50-100 lines)",
+        "impact": "High - immediate value"
+      },
+
+      "priority_2_nice_to_have": {
+        "task": "Add price band info to execution plan",
+        "rationale": "Helps froggy know 'up to what price' to set limit orders",
+        "implementation": [
+          "Fetch current market odds from Polymarket API",
+          "Add current_price and max_price fields to execution_plan.json",
+          "Include in notification text"
+        ],
+        "effort": "Medium (needs API integration)",
+        "impact": "Medium - improves plan quality"
+      },
+
+      "priority_3_polish": {
+        "task": "Surface which risk caps were applied",
+        "rationale": "Educational for froggy to understand rejections",
+        "implementation": [
+          "Add validation_details field to execution results",
+          "List which checks passed/failed",
+          "Include in rejection messages"
+        ],
+        "effort": "Small (refactor executor)",
+        "impact": "Low - nice clarity improvement"
+      }
+    },
+
+    "what_i_disagree_with": [
+      {
+        "chatgpt_claim": "Need to create execution_plan.json",
+        "reality": "Already exists with good schema",
+        "action": "Use existing, enhance notification layer"
+      },
+      {
+        "chatgpt_claim": "New ho_executor_* layer needed",
+        "reality": "Already exists (executor/ho_executor_plan.py)",
+        "action": "Extend existing, don't rebuild"
+      }
+    ],
+
+    "next_steps_if_approved": [
+      "1. Verify MCP works (ChatGPT step 2) - quick test",
+      "2. Implement Telegram notification (Priority 1)",
+      "3. Test notification with current execution_plan.json",
+      "4. Optionally add price bands if froggy wants them"
+    ]
+  },
+
+  "conclusion": "ChatGPT's direction is sound (focus on money-making pipeline), but the implementation already exists at 70%. The critical missing piece is NOTIFICATIONS, not the pipeline itself. Recommend: skip rebuilding executor, focus on notification integration."
+}
