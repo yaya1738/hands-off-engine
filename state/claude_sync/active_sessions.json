@@ -1,0 +1,13 @@
+{
+  "sessions": [
+    {
+      "instance": "web",
+      "session_id": "web-session-1763724358",
+      "started_at": "2025-11-21T11:25:58.383947Z",
+      "last_heartbeat": "2025-11-21T11:27:31.009473Z",
+      "current_task": "Setting up dual-Claude coordination",
+      "status": "active"
+    }
+  ],
+  "last_sync": "2025-11-21T11:27:31.009492Z"
+}

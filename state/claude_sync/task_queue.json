@@ -1,0 +1,46 @@
+{
+  "tasks": [
+    {
+      "task_id": "coord-001",
+      "description": "Monitor production pipeline health and optimize performance",
+      "priority": "medium",
+      "assigned_to": "any",
+      "claimed_by": null,
+      "status": "pending",
+      "created_at": "2025-11-21T11:26:42.471856Z",
+      "claimed_at": null,
+      "completed_at": null,
+      "dependencies": [],
+      "artifacts": [],
+      "notes": ""
+    },
+    {
+      "task_id": "coord-002",
+      "description": "Enhance alpha model from placeholder to real prediction logic",
+      "priority": "medium",
+      "assigned_to": "any",
+      "claimed_by": null,
+      "status": "pending",
+      "created_at": "2025-11-21T11:26:46.466802Z",
+      "claimed_at": null,
+      "completed_at": null,
+      "dependencies": [],
+      "artifacts": [],
+      "notes": ""
+    },
+    {
+      "task_id": "coord-003",
+      "description": "Implement backtesting framework for strategy validation",
+      "priority": "medium",
+      "assigned_to": "any",
+      "claimed_by": null,
+      "status": "pending",
+      "created_at": "2025-11-21T11:26:50.581287Z",
+      "claimed_at": null,
+      "completed_at": null,
+      "dependencies": [],
+      "artifacts": [],
+      "notes": ""
+    }
+  ]
+}
