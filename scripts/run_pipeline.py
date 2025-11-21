@@ -110,11 +110,11 @@ def run_pipeline(
         # Step 3: Execute Actions (Executor/Body)
         if verbose:
             print_header("STEP 3: Execute Actions (Executor)")
-        
+
         executor = Executor(dryrun=dryrun)
         execution_results = executor.execute_actions(planned_actions)
         summary = executor.get_execution_summary(execution_results)
-        
+
         results['steps']['execute'] = {
             'success': True,
             'mode': summary['mode'],
@@ -123,13 +123,45 @@ def run_pipeline(
             'rejected': summary['rejected'],
             'total_amount': summary['total_amount_executed']
         }
-        
+
         if verbose:
             print(f"✓ Executed actions")
             print(f"  Mode: {summary['mode']}")
             print(f"  Successful: {summary['successful']}/{summary['total_actions']}")
             print(f"  Rejected: {summary['rejected']}")
             print(f"  Total amount: ${summary['total_amount_executed']:.2f}")
+
+        # Step 3.5: Write execution plan for notifications
+        successful_actions = [
+            action for action, result in zip(planned_actions, execution_results)
+            if result.success
+        ]
+
+        if successful_actions:
+            execution_plan_path = repo_root / 'executor' / 'execution_plan.json'
+            execution_plan = {
+                'timestamp': datetime.now().isoformat(),
+                'dryrun': dryrun,
+                'total_orders': len(successful_actions),
+                'total_size_usd': sum(a.amount for a in successful_actions),
+                'orders': [{
+                    'market_id': action.market_id,
+                    'question': action.market_name,
+                    'side': action.side.lower(),
+                    'size_usd': action.amount,
+                    'confidence': action.confidence,
+                    'edge': None,  # Extract from alpha signals if needed
+                    'category': 'unknown',  # Extract from market_id if needed
+                    'reason': action.reasoning,
+                    'status': 'planned'
+                } for action in successful_actions]
+            }
+
+            with open(execution_plan_path, 'w') as f:
+                json.dump(execution_plan, f, indent=2)
+
+            if verbose:
+                print(f"✓ Execution plan written: {execution_plan_path}")
         
         # Success!
         results['success'] = True

@@ -1,0 +1,79 @@
+{
+  "decisions": [
+    {
+      "candidate_id": "inflation-target",
+      "question": "CPI drops below 2.5% by June?",
+      "action": "buy_yes",
+      "score": 0.407008,
+      "edge": 0.1,
+      "category": "macro",
+      "reason": "Score 0.4070 > threshold, edge 0.100",
+      "dryrun": true
+    },
+    {
+      "candidate_id": "eth-5k",
+      "question": "Ethereum reaches $5k by Q1?",
+      "action": "buy_yes",
+      "score": 0.395392,
+      "edge": 0.1,
+      "category": "crypto",
+      "reason": "Score 0.3954 > threshold, edge 0.100",
+      "dryrun": true
+    },
+    {
+      "candidate_id": "lakers-championship",
+      "question": "Lakers win NBA championship?",
+      "action": "skip",
+      "score": 0.213753,
+      "edge": 0.06,
+      "category": "sports",
+      "reason": "Score 0.2138 or edge 0.060 below threshold",
+      "dryrun": true
+    },
+    {
+      "candidate_id": "fed-cut",
+      "question": "Fed cuts rates by 0.25% in Dec?",
+      "action": "buy_yes",
+      "score": 0.194237,
+      "edge": 0.15,
+      "category": "macro",
+      "reason": "Score 0.1942 > threshold, edge 0.150",
+      "dryrun": true
+    },
+    {
+      "candidate_id": "btc-100k",
+      "question": "Bitcoin reaches $100k by EOY?",
+      "action": "skip",
+      "score": 0.130363,
+      "edge": 0.15,
+      "category": "crypto",
+      "reason": "Score 0.1304 or edge 0.150 below threshold",
+      "dryrun": true
+    },
+    {
+      "candidate_id": "oil-crash",
+      "question": "Oil drops below $60 by year end?",
+      "action": "skip",
+      "score": 0.105055,
+      "edge": -0.15,
+      "category": "macro",
+      "reason": "Score 0.1051 or edge 0.150 below threshold",
+      "dryrun": true
+    },
+    {
+      "candidate_id": "trump-2024",
+      "question": "Trump wins 2024 election?",
+      "action": "skip",
+      "score": 0.070585,
+      "edge": 0.02,
+      "category": "politics",
+      "reason": "Score 0.0706 or edge 0.020 below threshold",
+      "dryrun": true
+    }
+  ],
+  "summary": {
+    "buy_yes": 3,
+    "skip": 4
+  },
+  "dryrun": true
+}

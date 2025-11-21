@@ -1,0 +1,29 @@
+[Alpha Polymarket Summary] @ 2025-11-18T03:07:25.036712+00:00 UTC
+================================================================================
+Total candidates: 7
+Filtered (score >= 0.02): 7
+Best score: 0.4070
+Average score: 0.2166
+Median score: 0.1942
+Top 10 average: 0.2166
+
+Category Breakdown:
+--------------------------------------------------------------------------------
+  crypto     | count=  2 | avg_score=0.2629 | top_score=0.3954 | top_edge=0.1500
+  macro      | count=  3 | avg_score=0.2354 | top_score=0.4070 | top_edge=0.1500
+  politics   | count=  1 | avg_score=0.0706 | top_score=0.0706 | top_edge=0.0200
+  sports     | count=  1 | avg_score=0.2138 | top_score=0.2138 | top_edge=0.0600
+
+Score Percentiles:
+--------------------------------------------------------------------------------
+  p25=0.1051 | p50=0.1942 | p75=0.3954 | p90=0.4070 | p95=0.4070
+
+Top 7 Ranked Candidates:
+--------------------------------------------------------------------------------
+ 1. [buy_yes ] score=0.4070 edge=+0.100 cat=macro    | CPI drops below 2.5% by June?
+ 2. [buy_yes ] score=0.3954 edge=+0.100 cat=crypto   | Ethereum reaches $5k by Q1?
+ 3. [buy_yes ] score=0.2138 edge=+0.060 cat=sports   | Lakers win NBA championship?
+ 4. [buy_yes ] score=0.1942 edge=+0.150 cat=macro    | Fed cuts rates by 0.25% in Dec?
+ 5. [buy_yes ] score=0.1304 edge=+0.150 cat=crypto   | Bitcoin reaches $100k by EOY?
+ 6. [buy_no  ] score=0.1051 edge=-0.150 cat=macro    | Oil drops below $60 by year end?
+ 7. [hold    ] score=0.0706 edge=+0.020 cat=politics | Trump wins 2024 election?

@@ -120,16 +120,19 @@ def format_execution_plan(plan_data):
             question = order.get("question", "Unknown")
             side = order.get("side", "?")
             size = order.get("size_usd", 0)
-            edge = order.get("edge", 0)
-            category = order.get("category", "?")
+            edge = order.get("edge")
+            category = order.get("category", "market")
 
             # Truncate long questions for mobile
             if len(question) > 50:
                 question = question[:47] + "..."
 
+            # Format edge if available
+            edge_str = f" • Edge: {edge:.1%}" if edge is not None else ""
+
             lines.append(
                 f"{i}. [{category}] {question}\n"
-                f"   {side} • ${size} • Edge: {edge:.1%}"
+                f"   {side} • ${size}{edge_str}"
             )
 
         lines.append(f"")
