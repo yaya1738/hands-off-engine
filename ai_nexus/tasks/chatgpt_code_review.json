@@ -1,0 +1,8 @@
+{
+  "provider": "chatgpt",
+  "prompt": "Review the executor implementation and identify potential issues with safety checks, edge cases, and error handling. Provide specific recommendations for improvements.",
+  "context_files": [
+    "executor/ho_executor_plan.py",
+    "decider/ho_decider.py"
+  ]
+}

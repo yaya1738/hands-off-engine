@@ -24,6 +24,11 @@ hands-off-out/
 *.db
 state/pipeline_logs/
 
+# AI Nexus output (task results)
+ai_nexus/output/
+*_result.json
+*_result.txt
+
 # Editor / OS files
 .DS_Store
 Thumbs.db
