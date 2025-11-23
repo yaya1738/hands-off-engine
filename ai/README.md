@@ -5,6 +5,8 @@ This directory contains configuration and task definitions for AI-driven work on
 ## Structure
 
 - **`/tasks/*.json`** - Individual task definitions for AI agents
+- **`/coordination/`** - AI-to-AI coordination files (messages, status, handoffs)
+- **`AI_COORDINATION_PROTOCOL.md`** - Protocol for direct AI-to-AI interaction
 - **`ai_intake_handler.py`** - GitHub Action handler for `/plan` and future commands
 - **`requirements.txt`** - Python dependencies for AI Intake handler
 - **`/state/knowledge.json`** (repo root) - Central knowledge base with primary docs and bootstrap instructions
@@ -17,6 +19,17 @@ This directory contains configuration and task definitions for AI-driven work on
 2. Read the primary status doc (currently: `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`)
 3. For specific tasks, load the task JSON from `/ai/tasks/*.json`
 4. Include files listed in `context_files` as required reading
+
+### For AI-to-AI Coordination
+
+Multiple AI agents can work together without user intermediation:
+
+1. Read `AI_COORDINATION_PROTOCOL.md` for the coordination protocol
+2. Check `coordination/status.json` for current state
+3. Read `coordination/messages.jsonl` for recent communications
+4. Write messages to coordinate work, hand off tasks, or resolve conflicts
+
+See `coordination/README.md` for usage examples.
 
 ### Task JSON Format
 
