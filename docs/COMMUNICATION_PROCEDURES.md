@@ -684,9 +684,22 @@ ai/coordination/
 
 **Solution:**
 1. Check agent has write access to `ai/coordination/`
+   ```bash
+   ls -la ai/coordination/
+   # Should show writable directory
+   ```
 2. Verify JSON format is valid
-3. Ensure agent follows protocol requirements
-4. Check agent instructions include coordination protocol
+   ```bash
+   tail -1 ai/coordination/messages.jsonl | python3 -m json.tool
+   # Should print formatted JSON without errors
+   ```
+3. Check file permissions
+   ```bash
+   chmod 755 ai/coordination/
+   chmod 644 ai/coordination/messages.jsonl
+   ```
+4. Ensure agent follows protocol requirements (see `.claude/COORDINATION_PROTOCOL.md`)
+5. Check agent instructions include coordination protocol
 
 **Problem:** Messages not being read by other agents
 
@@ -694,6 +707,8 @@ ai/coordination/
 1. Verify `to` field includes correct agent name or "all"
 2. Check coordination_agent service is running: `systemctl status coordination-agent`
 3. Review logs: `tail -f /var/log/coordination-agent.log`
+4. Verify message timestamp is recent (not from past session)
+5. Check agent_state.json for processed message IDs
 
 ### Future Enhancements
 

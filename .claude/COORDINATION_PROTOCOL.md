@@ -10,10 +10,33 @@ Ensure GitHub Copilot and other AI agents are automatically informed of CLI sess
 
 ### 1. Session Start (REQUIRED)
 
-At the beginning of EVERY session, write to the coordination ledger:
+At the beginning of EVERY session, write to the coordination ledger.
 
+**Option A: Using helper function (recommended):**
+```python
+log_coordination_message(
+    "Session started: [brief task description]",
+    context={"session_id": str(int(time.time())), "trigger": "user"}
+)
+```
+
+**Option B: Using bash command:**
 ```bash
-echo '{"timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'","from":"claude-code","to":"all","type":"info","message":"Session started: [brief task description]","context":{"session_id":"'$(date +%s)'","trigger":"user|autonomous|scheduled"}}' >> ai/coordination/messages.jsonl
+# Generate and append message to ledger
+python3 << 'EOF'
+import json
+from datetime import datetime
+entry = {
+    "timestamp": datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ"),
+    "from": "claude-code",
+    "to": "all",
+    "type": "info",
+    "message": "Session started: [brief task description]",
+    "context": {"session_id": "12345", "trigger": "user"}
+}
+with open("ai/coordination/messages.jsonl", "a") as f:
+    f.write(json.dumps(entry) + "\n")
+EOF
 ```
 
 ### 2. Progress Updates (REQUIRED every 30 minutes)
@@ -105,7 +128,19 @@ from datetime import datetime
 from pathlib import Path
 
 def log_coordination_message(message: str, msg_type: str = "info", to: str = "all", context: dict = None):
-    """Write message to coordination ledger."""
+    """Write message to coordination ledger.
+    
+    Args:
+        message: Human-readable description
+        msg_type: One of: info, request, response, handoff
+        to: Target agent or "all"
+        context: Additional context dictionary
+    """
+    # Validate message type
+    valid_types = ["info", "request", "response", "handoff"]
+    if msg_type not in valid_types:
+        raise ValueError(f"msg_type must be one of {valid_types}, got: {msg_type}")
+    
     coord_file = Path("ai/coordination/messages.jsonl")
     coord_file.parent.mkdir(parents=True, exist_ok=True)
     
