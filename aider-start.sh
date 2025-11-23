@@ -39,7 +39,8 @@ if ! command -v aider >/dev/null 2>&1; then
 fi
 
 # Show current status
-echo "🚀 Starting aider: $REPO_ROOT"
+echo "🚀 Starting aider in: $REPO_ROOT"
+echo "📊 Git status:"
 git status --short
 
 echo ""
