@@ -23,6 +23,7 @@ hands-off-out/
 *.sqlite
 *.db
 state/pipeline_logs/
+state/ai_nexus_logs/
 
 # Editor / OS files
 .DS_Store

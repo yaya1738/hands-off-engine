@@ -10,6 +10,7 @@ Runs continuously (via cron) and invokes Claude Code when:
 - Performance metrics show degradation
 - Optimization opportunities identified
 - Scheduled autonomous improvement cycles
+- Multi-AI collaboration messages pending
 
 Part of CLM/Nexus/System serving Yair Siegel's domain.
 """
@@ -21,6 +22,10 @@ from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 
+# Add ai directory to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent / 'ai'))
+from multi_ai_coordinator import MultiAICoordinator
+
 
 class ClaudeOrchestrator:
     """Autonomous orchestrator for Claude Code engagement"""
@@ -28,6 +33,7 @@ class ClaudeOrchestrator:
     def __init__(self, repo_root: Path):
         self.repo_root = repo_root
         self.state_dir = repo_root / 'state'
+        self.coordinator = MultiAICoordinator(repo_root)
         self.orchestrator_state = self.state_dir / 'claude_orchestrator.json'
         self.metrics_file = self.state_dir / 'performance_metrics.jsonl'
         self.execution_plan = repo_root / 'executor' / 'execution_plan.json'
@@ -81,6 +87,11 @@ class ClaudeOrchestrator:
         opportunity = self.check_optimization_opportunities()
         if opportunity:
             return True, f"Optimization opportunity: {opportunity}"
+        
+        # Check 5: Multi-AI collaboration messages pending
+        pending_messages = self.coordinator.get_pending_messages('claude-cli')
+        if pending_messages:
+            return True, f"Multi-AI collaboration: {len(pending_messages)} pending message(s)"
 
         return False, "No autonomous invocation needed"
 

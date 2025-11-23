@@ -6,7 +6,8 @@ Before doing any substantial work, you MUST:
 
 1. Read `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
 2. Review `state/knowledge.json` for current canonical docs
-3. Align all work with the roadmap in the research report
+3. **Check for multi-AI collaboration messages:** `python3 ai/check_ai_messages.py claude-cli check`
+4. Align all work with the roadmap in the research report
 
 ## Project Context
 
@@ -14,6 +15,16 @@ Before doing any substantial work, you MUST:
 - **Environment:** Termux (Android Pixel 6a) + future DigitalOcean
 - **Constraint:** No systemd, no root, no Docker - Termux-native solutions only
 - **Pattern:** AI agents build and maintain, human only provides strategic direction
+
+## Multi-AI Collaboration
+
+**NEW:** Claude CLI is part of a multi-AI team including ChatGPT, Claude Web, and GitHub Copilot.
+
+**On each session:**
+1. Check for messages: `python3 ai/check_ai_messages.py claude-cli check`
+2. If messages exist, respond to them
+3. Post updates to active collaborations
+4. See `.claude/MULTI_AI_COLLABORATION.md` for full documentation
 
 ## Working Philosophy
 
