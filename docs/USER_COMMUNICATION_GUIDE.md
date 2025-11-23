@@ -141,12 +141,14 @@ Based on the current roadmap (Tier 1 priorities):
 
 **Key configuration files:**
 
-| File | Purpose | Location |
-|------|---------|----------|
-| Risk config | Position sizing, caps, limits | `state/risk_config.json` (future) |
-| Alpha weights | Model scoring weights | `state/polymarket-model.json` |
-| Telegram config | Notification credentials | `state/tg/bots/handsoff.env` |
-| Task queue | Manual task additions | `state/autonomous_task_queue.json` |
+| File | Purpose | Location | Status |
+|------|---------|----------|--------|
+| Risk config | Position sizing, caps, limits | `state/risk_config.json` | Planned (see Roadmap Tier 1) |
+| Alpha weights | Model scoring weights | `state/polymarket-model.json` | Active |
+| Telegram config | Notification credentials | `state/tg/bots/handsoff.env` | Active |
+| Task queue | Manual task additions | `state/autonomous_task_queue.json` | Active |
+
+**Note:** Risk configuration is currently handled in code. The dedicated risk config file is part of Roadmap Tier 1 (see `HANDS_OFF_RESEARCH_REPORT_2025-11-20.md` section 4.1, item 2). Until then, risk parameters are embedded in the alpha/risk modules.
 
 **How to edit:**
 1. Clone repository or edit on GitHub web
@@ -429,7 +431,14 @@ Based on `.claude/USER_PROFILE.md`:
 **Check:**
 1. Telegram bot credentials in `state/tg/bots/handsoff.env`
 2. Bot token and chat ID are correct
-3. Test with: `termux-hands-off/agent/ho-executor-notify.sh`
+3. Test notifications manually:
+   ```bash
+   # If script exists (verify path first)
+   termux-hands-off/agent/ho-executor-notify.sh
+   
+   # Or test directly with Python
+   python3 termux-hands-off/agent/notify_execution_plan.py
+   ```
 4. Check Telegram bot is not blocked
 
 **Fix:**
