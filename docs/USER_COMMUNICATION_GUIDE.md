@@ -487,7 +487,7 @@ Based on `.claude/USER_PROFILE.md`:
 | Review trading opportunities | Check Telegram | Phone |
 | Request strategic plan | Post `/plan` | GitHub Issue #1 |
 | Check system status | Review state files | `state/*.json` |
-| Adjust risk limits | Edit config | `state/risk_config.json` |
+| Adjust risk limits | Edit config (planned Tier 1) | In code modules (future: `state/risk_config.json`) |
 | Change notification settings | Edit env file | `state/tg/bots/handsoff.env` |
 | See what AIs are working on | Check coordination | `ai/coordination/status.json` |
 | Monitor performance | Check metrics | `state/performance_metrics.jsonl` |
