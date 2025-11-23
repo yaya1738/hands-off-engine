@@ -215,8 +215,11 @@ def run_status(event: dict) -> None:
         status_msg += f"\n**Autonomous Task Queue:** {len(pending_tasks)} pending tasks\n"
     except (ImportError, ModuleNotFoundError) as e:
         status_msg += f"\n*Could not load task queue module: {e}*\n"
-    except (AttributeError, KeyError) as e:
+    except (AttributeError, KeyError, TypeError, ValueError) as e:
         status_msg += f"\n*Error reading task queue: {e}*\n"
+    except Exception as e:
+        # Catch any other unexpected errors
+        status_msg += f"\n*Unexpected error loading task queue status: {e}*\n"
     
     status_msg += "\n---\n_Updated automatically by AI Intake Handler_"
     

@@ -155,7 +155,7 @@ class MultiAICoordinator:
         
         return True
 
-    def get_pending_messages(self, for_ai: str, unread_only: bool = False) -> List[Dict[str, Any]]:
+    def get_pending_messages(self, for_ai: str, unread_only: bool = True) -> List[Dict[str, Any]]:
         """
         Get all pending messages for a specific AI system.
         
