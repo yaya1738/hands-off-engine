@@ -35,30 +35,31 @@ class AIMessageProcessor:
         self.repo_root = repo_root
         self.coordinator = MultiAICoordinator(repo_root)
     
-    def check_and_process_messages(self, auto_respond: bool = False) -> Dict[str, Any]:
+    def check_and_process_messages(self, auto_respond: bool = False, unread_only: bool = True) -> Dict[str, Any]:
         """
         Check for pending messages and optionally process them.
         
         Args:
             auto_respond: If True, automatically generate and post responses
+            unread_only: If True, only show unread messages
             
         Returns:
             Dictionary with message count and summary
         """
-        # Get pending messages
-        messages = self.coordinator.get_pending_messages(self.ai_name)
+        # Get pending messages (unread by default)
+        messages = self.coordinator.get_pending_messages(self.ai_name, unread_only=unread_only)
         
         if not messages:
             return {
                 'pending_messages': 0,
                 'processed': 0,
-                'summary': f'No pending messages for {self.ai_name}'
+                'summary': f'No {"unread " if unread_only else ""}messages for {self.ai_name}'
             }
         
         print(f"\n{'='*60}")
         print(f"MESSAGES FOR {self.ai_name.upper()}")
         print('='*60)
-        print(f"\nFound {len(messages)} pending message(s)\n")
+        print(f"\nFound {len(messages)} {'unread ' if unread_only else ''}message(s)\n")
         
         processed = 0
         for i, msg_info in enumerate(messages, 1):
@@ -88,6 +89,11 @@ class AIMessageProcessor:
                     )
                     processed += 1
                     print(f"  ✓ Auto-responded")
+        
+        # Mark all messages in these collaborations as read
+        collab_ids = set(msg_info['collaboration_id'] for msg_info in messages)
+        for collab_id in collab_ids:
+            self.coordinator.mark_messages_read(collab_id, self.ai_name)
         
         print('='*60 + '\n')
         
@@ -174,8 +180,9 @@ def main():
         print("AI names: claude-cli, chatgpt, copilot, claude-web")
         print()
         print("Commands:")
-        print("  check              - Check for pending messages (default)")
-        print("  check --auto       - Check and auto-respond to messages")
+        print("  check              - Check for unread messages (default)")
+        print("  check --auto       - Check and auto-respond to unread messages")
+        print("  check --all        - Check all messages including read")
         print("  post <collab_id> <message> - Post a message to a collaboration")
         print("  context <collab_id> - Get full collaboration context")
         return
@@ -188,7 +195,8 @@ def main():
     
     if command == 'check':
         auto_respond = '--auto' in sys.argv
-        result = processor.check_and_process_messages(auto_respond=auto_respond)
+        unread_only = '--all' not in sys.argv
+        result = processor.check_and_process_messages(auto_respond=auto_respond, unread_only=unread_only)
         print(result['summary'])
     
     elif command == 'post':

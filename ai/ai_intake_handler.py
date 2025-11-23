@@ -207,15 +207,16 @@ def run_status(event: dict) -> None:
     
     # Add autonomous task queue status
     try:
-        from autonomous_task_queue import AutonomousTaskQueue
-        repo_root = Path(__file__).parent.parent
         sys.path.insert(0, str(repo_root / 'scripts'))
+        from autonomous_task_queue import AutonomousTaskQueue
         queue = AutonomousTaskQueue(repo_root)
         pending_tasks = queue.get_all_tasks()
         
         status_msg += f"\n**Autonomous Task Queue:** {len(pending_tasks)} pending tasks\n"
-    except Exception as e:
-        status_msg += f"\n*Could not load task queue status: {e}*\n"
+    except (ImportError, ModuleNotFoundError) as e:
+        status_msg += f"\n*Could not load task queue module: {e}*\n"
+    except (AttributeError, KeyError) as e:
+        status_msg += f"\n*Error reading task queue: {e}*\n"
     
     status_msg += "\n---\n_Updated automatically by AI Intake Handler_"
     

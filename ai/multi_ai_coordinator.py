@@ -155,7 +155,7 @@ class MultiAICoordinator:
         
         return True
 
-    def get_pending_messages(self, for_ai: str) -> List[Dict[str, Any]]:
+    def get_pending_messages(self, for_ai: str, unread_only: bool = False) -> List[Dict[str, Any]]:
         """
         Get all pending messages for a specific AI system.
         
@@ -164,6 +164,7 @@ class MultiAICoordinator:
         
         Args:
             for_ai: Which AI to get messages for (claude-web, chatgpt, claude-cli, copilot)
+            unread_only: If True, only return messages not yet read by this AI
             
         Returns:
             List of pending messages with collaboration context
@@ -179,20 +180,62 @@ class MultiAICoordinator:
             if for_ai not in collab['participants']:
                 continue
             
-            # Get unread messages for this AI
+            # Get messages for this AI
             for msg in collab['messages']:
                 # Message is for this AI if:
                 # 1. Explicitly addressed to this AI, OR
                 # 2. Broadcast (to is None) and not from this AI
-                if msg['to'] == for_ai or (msg['to'] is None and msg['from'] != for_ai):
-                    pending_messages.append({
-                        'collaboration_id': collab_id,
-                        'collaboration_topic': collab['topic'],
-                        'message': msg,
-                        'context': collab['context']
-                    })
+                is_for_this_ai = (msg['to'] == for_ai or 
+                                 (msg['to'] is None and msg['from'] != for_ai))
+                
+                if not is_for_this_ai:
+                    continue
+                
+                # Check if read (if filtering for unread only)
+                if unread_only:
+                    read_by = msg.get('read_by', [])
+                    if for_ai in read_by:
+                        continue
+                
+                pending_messages.append({
+                    'collaboration_id': collab_id,
+                    'collaboration_topic': collab['topic'],
+                    'message': msg,
+                    'context': collab['context']
+                })
         
         return pending_messages
+
+    def mark_messages_read(self, collaboration_id: str, reader_ai: str) -> bool:
+        """
+        Mark all messages in a collaboration as read by a specific AI.
+        
+        Args:
+            collaboration_id: ID of the collaboration
+            reader_ai: Which AI is marking messages as read
+            
+        Returns:
+            True if successful
+        """
+        collaborations = self._load_active_collaborations()
+        
+        if collaboration_id not in collaborations:
+            return False
+        
+        collaboration = collaborations[collaboration_id]
+        
+        # Mark all messages as read by this AI
+        for msg in collaboration['messages']:
+            if 'read_by' not in msg:
+                msg['read_by'] = []
+            if reader_ai not in msg['read_by']:
+                msg['read_by'].append(reader_ai)
+        
+        # Save updated collaboration
+        collaborations[collaboration_id] = collaboration
+        self._save_active_collaborations(collaborations)
+        
+        return True
 
     def complete_collaboration(
         self,
