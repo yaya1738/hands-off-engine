@@ -5,6 +5,15 @@
 See `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
 for the current status and next steps.
 
+## Communication & Control
+
+See `docs/COMMUNICATION_PROCEDURES.md` for how to interact with the system.
+
+**Quick start:**
+- **Telegram Bot** - Primary control interface (setup in 5 min)
+- **GitHub AI Intake** - AI planning via `/plan` commands
+- **Automated Notifications** - System status updates
+
 ### For any AI / agent working on this repo
 
 Before doing anything substantial, the AI/agent MUST:

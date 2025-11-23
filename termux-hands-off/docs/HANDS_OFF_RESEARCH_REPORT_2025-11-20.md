@@ -21,6 +21,10 @@ Hands-Off is a personal "money + decisions" engine:
 Minimize human effort while maximizing safe, compounding edge. The human sets
 goals and constraints; the system and AIs do the heavy lifting.
 
+**Communication:**
+For how to interact with the system, see `docs/COMMUNICATION_PROCEDURES.md`.
+This covers Telegram bot setup, GitHub AI Intake, and optimal communication channels.
+
 ---
 
 ## 2. High-Level Architecture Snapshot (V1)
