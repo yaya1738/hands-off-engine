@@ -143,12 +143,12 @@ Based on the current roadmap (Tier 1 priorities):
 
 | File | Purpose | Location | Status |
 |------|---------|----------|--------|
-| Risk config | Position sizing, caps, limits | `state/risk_config.json` | Planned (see Roadmap Tier 1) |
 | Alpha weights | Model scoring weights | `state/polymarket-model.json` | Active |
 | Telegram config | Notification credentials | `state/tg/bots/handsoff.env` | Active |
 | Task queue | Manual task additions | `state/autonomous_task_queue.json` | Active |
+| Risk config | Position sizing, caps, limits | Code modules (future: `state/risk_config.json`) | Planned Tier 1 |
 
-**Note:** Risk configuration is currently handled in code. The dedicated risk config file is part of Roadmap Tier 1 (see `HANDS_OFF_RESEARCH_REPORT_2025-11-20.md` section 4.1, item 2). Until then, risk parameters are embedded in the alpha/risk modules.
+**Note:** Risk configuration is currently handled in code. The dedicated risk config file is part of Roadmap Tier 1 (see `HANDS_OFF_RESEARCH_REPORT_2025-11-20.md` section 4.1, item 2). To adjust risk parameters now, work with AI agents via `/plan` command.
 
 **How to edit:**
 1. Clone repository or edit on GitHub web
@@ -433,7 +433,10 @@ Based on `.claude/USER_PROFILE.md`:
 2. Bot token and chat ID are correct
 3. Test notifications manually:
    ```bash
-   # If script exists (verify path first)
+   # Verify script exists first
+   ls -la termux-hands-off/agent/ho-executor-notify.sh
+   
+   # If exists, run it
    termux-hands-off/agent/ho-executor-notify.sh
    
    # Or test directly with Python
@@ -482,16 +485,23 @@ Based on `.claude/USER_PROFILE.md`:
 
 ### I want to...
 
+**Currently Available:**
+
 | Goal | Method | Location |
 |------|--------|----------|
 | Review trading opportunities | Check Telegram | Phone |
 | Request strategic plan | Post `/plan` | GitHub Issue #1 |
 | Check system status | Review state files | `state/*.json` |
-| Adjust risk limits | Edit config (planned Tier 1) | In code modules (future: `state/risk_config.json`) |
 | Change notification settings | Edit env file | `state/tg/bots/handsoff.env` |
 | See what AIs are working on | Check coordination | `ai/coordination/status.json` |
 | Monitor performance | Check metrics | `state/performance_metrics.jsonl` |
 | Report an issue | Create issue or comment | GitHub Issues |
+
+**Planned (Roadmap Tier 1):**
+
+| Goal | Method | Notes |
+|------|--------|-------|
+| Adjust risk limits | Edit config file | Currently in code; use `/plan` to request changes |
 
 ---
 
