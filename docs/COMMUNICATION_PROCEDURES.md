@@ -560,7 +560,151 @@ This document should be updated when:
 
 ---
 
-## Summary
+## 12. Agent Coordination Protocol
+
+### Purpose
+
+Enable autonomous communication between AI agents (GitHub Copilot, Claude CLI, Claude Web, ChatGPT) without user intervention.
+
+### Coordination Ledger
+
+**Location:** `ai/coordination/messages.jsonl`
+
+**Format:** JSONL (one JSON object per line)
+
+```json
+{
+  "timestamp": "2025-11-23T17:00:00Z",
+  "from": "claude-code",
+  "to": "copilot",
+  "type": "info|request|response|handoff",
+  "message": "Human-readable description",
+  "context": {
+    "key": "value"
+  }
+}
+```
+
+### When Agents Should Write to Ledger
+
+**Claude CLI MUST write when:**
+1. Starting a new session (handshake)
+2. Making significant decisions autonomously
+3. Implementing new features
+4. Deploying services or infrastructure
+5. Closing session with summary
+6. Requesting input from another agent
+7. Every 30 minutes during long sessions (progress updates)
+
+**GitHub Copilot MUST write when:**
+1. Responding to coordination requests
+2. Creating/updating documentation
+3. Reviewing code changes
+4. Identifying issues that need CLI attention
+
+**All agents MUST write when:**
+- Handoffs occur (one agent passing work to another)
+- Critical decisions are made
+- System state changes significantly
+- User needs to be informed via multiple channels
+
+### Protocol Requirements
+
+#### For Claude CLI Sessions
+
+**Session Start:**
+```json
+{
+  "timestamp": "...",
+  "from": "claude-code",
+  "to": "all",
+  "type": "info",
+  "message": "Session started: [brief description of task]",
+  "context": {"session_id": "...", "trigger": "user|autonomous|scheduled"}
+}
+```
+
+**Progress Updates (every 30 min):**
+```json
+{
+  "timestamp": "...",
+  "from": "claude-code",
+  "to": "all",
+  "type": "info",
+  "message": "Progress update: [what has been done]",
+  "context": {"session_duration_min": 30, "commits": 2, "tasks_completed": ["task1"]}
+}
+```
+
+**Session End:**
+```json
+{
+  "timestamp": "...",
+  "from": "claude-code",
+  "to": "all",
+  "type": "info",
+  "message": "Session complete: [summary of work]",
+  "context": {"duration_min": 120, "commits": 5, "files_changed": 12}
+}
+```
+
+#### For GitHub Copilot
+
+**When creating/updating docs:**
+```json
+{
+  "timestamp": "...",
+  "from": "copilot",
+  "to": "all",
+  "type": "info",
+  "message": "Documentation updated: [file name]",
+  "context": {"pr": "PR number", "files": ["file1.md"], "scope": "communication"}
+}
+```
+
+#### For Coordination Agent
+
+**Monitoring:** Checks `messages.jsonl` every 5 minutes
+**Processing:** Executes safe tasks, escalates risky ones
+**Response:** Writes status back to ledger
+
+### File Structure
+
+```
+ai/coordination/
+├── messages.jsonl       # Message ledger (append-only)
+├── status.json          # Current system status
+├── handoffs.json        # Active task handoffs
+└── agent_state.json     # Coordination agent state
+```
+
+### Troubleshooting
+
+**Problem:** Agent not writing to ledger
+
+**Solution:**
+1. Check agent has write access to `ai/coordination/`
+2. Verify JSON format is valid
+3. Ensure agent follows protocol requirements
+4. Check agent instructions include coordination protocol
+
+**Problem:** Messages not being read by other agents
+
+**Solution:**
+1. Verify `to` field includes correct agent name or "all"
+2. Check coordination_agent service is running: `systemctl status coordination-agent`
+3. Review logs: `tail -f /var/log/coordination-agent.log`
+
+### Future Enhancements
+
+- **Webhook integration** - Real-time notifications instead of polling
+- **Message priorities** - Urgent vs. normal vs. info
+- **Encryption** - For sensitive coordination data
+- **Audit trail** - Immutable log with signatures
+
+---
+
+## 13. Summary
 
 The Hands-Off Engine uses a **tiered communication architecture**:
 
@@ -568,9 +712,12 @@ The Hands-Off Engine uses a **tiered communication architecture**:
 2. **GitHub AI Intake** (Secondary) - AI planning and coordination
 3. **Automated Notifications** (Outbound) - System status without queries
 4. **Claude Code CLI** (Emergency) - <1% for deep work
+5. **Agent Coordination** (Background) - AI-to-AI communication
 
 **Goal:** Zero-touch operation where user is informed and in control without needing to manually query or intervene in routine operations.
 
 **Current Status:** Core infrastructure implemented, deployment and optimization in progress.
 
 **User Action:** Complete Telegram bot setup to enable primary communication channel.
+
+**Agent Action:** All AI agents must follow coordination protocol to ensure automatic information sharing.

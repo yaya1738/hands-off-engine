@@ -7,6 +7,7 @@ Before doing any substantial work, you MUST:
 1. Read `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
 2. Review `state/knowledge.json` for current canonical docs
 3. Align all work with the roadmap in the research report
+4. **CRITICAL:** Follow `.claude/COORDINATION_PROTOCOL.md` - Write to coordination ledger at session start, every 30 min, and session end
 
 ## Project Context
 
