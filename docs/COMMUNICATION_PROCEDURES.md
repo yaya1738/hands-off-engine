@@ -7,6 +7,65 @@ This document describes the **optimal communication procedures** between user an
 
 ---
 
+## 🚀 Quick Start: How to Communicate RIGHT NOW
+
+**Currently Active Methods:**
+
+### 1. GitHub Issues (✅ Works Now)
+**Use for:** AI planning, strategic questions, feature requests
+
+- Go to issue #1 in this repository
+- Comment with `/plan` to get AI-generated roadmap advice
+- The system will automatically respond with context-aware planning
+
+**Example:**
+```
+/plan
+```
+
+### 2. Claude Code CLI (✅ Using Now)
+**Use for:** Deep work, debugging, code changes
+
+- You're using it right now!
+- Continue using for code changes, investigations, architectural work
+- This is the current primary method until Telegram is set up
+
+### 3. Telegram Bot (⚙️ Needs 5-Minute Setup)
+**Use for:** Quick status checks, metrics, health monitoring (once set up)
+
+**To activate (takes ~5 minutes):**
+1. Message `@BotFather` on Telegram → Send `/newbot`
+2. Message `@userinfobot` on Telegram → Get your chat ID
+3. On your server:
+   ```bash
+   export TELEGRAM_BOT_TOKEN="your_token"
+   export TELEGRAM_CHAT_ID="your_chat_id"
+   python3 telegram/telegram_bot_listener.py
+   ```
+4. Text your bot: `/status`
+
+**After setup, you'll get:**
+- `/status` - System health and latest execution
+- `/metrics` - 24h performance data
+- `/health` - Comprehensive health check
+- Automatic notifications when trades are planned
+
+### Recommendation for This Moment
+
+**Short term (today):**
+- ✅ Use GitHub issue #1 with `/plan` for strategic planning
+- ✅ Continue using Claude Code CLI for code work
+
+**Next step (5 minutes):**
+- ⚙️ Set up Telegram bot to enable mobile access
+- 📱 After setup, you can check system status from your phone anytime
+
+**Long term goal:**
+- 🎯 Use Telegram for 99% of routine queries
+- 🎯 Reserve CLI for rare emergencies only
+
+---
+
 ## Overview
 
 The Hands-Off Engine uses a **multi-channel communication architecture** designed to minimize manual intervention while maintaining full user control:
