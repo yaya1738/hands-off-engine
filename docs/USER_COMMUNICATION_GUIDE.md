@@ -2,7 +2,8 @@
 
 **Date:** 2025-11-23  
 **Purpose:** Define how communication works between you (Yair) and the Hands-Off Engine  
-**Status:** Active and evolving
+**Status:** Living document - evolves with system roadmap (currently Tier 1)  
+**Evolution:** Communication patterns adapt as system matures through roadmap tiers
 
 ---
 
@@ -10,11 +11,14 @@
 
 The Hands-Off Engine operates autonomously to minimize your workload while keeping you informed and in control. This guide explains all communication channels between you and the system.
 
+**This guide evolves alongside the system** - as capabilities mature, communication patterns shift from manual oversight → intelligent filtering → exception-only notifications.
+
 **Core Philosophy:**
 - System works autonomously (minimal user intervention)
 - User receives important notifications (mobile-friendly)
 - User can interact when desired (via simple commands)
 - User stays in control (approve/reject decisions)
+- **Communication adapts to system maturity level**
 
 ---
 
@@ -424,6 +428,137 @@ Based on `.claude/USER_PROFILE.md`:
 
 ---
 
+## Communication Evolution Strategy
+
+This guide evolves in tandem with the Hands-Off Engine's development roadmap. As the system progresses through its tiers, communication patterns adapt to support new capabilities.
+
+### Tier 1: Establish Trust (Current Phase)
+
+**System Maturity:** Building reliable foundation  
+**Communication Focus:** Transparency and manual oversight
+
+**Active Channels:**
+- Telegram notifications for all execution plans (DRYRUN)
+- GitHub Issues `/plan` for strategic planning
+- Manual file editing for config changes
+- Direct state file monitoring
+
+**User Involvement:** High (review all opportunities, ~30 min/week)
+
+**Evolution Trigger:** When Tier 1 complete (risk model locked, decider stable, infra hardened)
+
+---
+
+### Tier 2: Increase Intelligence (Planned)
+
+**System Maturity:** Proven reliability, improving quality  
+**Communication Focus:** Selective notifications, richer insights
+
+**New Channels:**
+- `/status` - Quick system health checks
+- `/risk` - Risk model analysis
+- `/alpha` - Model performance reports
+- Daily digests (consolidated notifications)
+- Performance trend alerts
+
+**Enhanced Features:**
+- Notification filtering (high-priority only)
+- Weekly summary reports
+- Automatic parameter suggestions
+
+**User Involvement:** Medium (review digests, ~15 min/week)
+
+**Evolution Trigger:** When alpha quality improves, false positive rate drops, consistent edge demonstrated
+
+---
+
+### Tier 3: Scale & Automate (Future)
+
+**System Maturity:** Multi-brain orchestration, proven edge  
+**Communication Focus:** Exception-only, one-tap actions
+
+**New Channels:**
+- One-tap Telegram approvals (inline buttons)
+- Voice commands for quick actions
+- Proactive system recommendations
+- Automated execution reports (post-trade)
+
+**Enhanced Features:**
+- Exception-only notifications (system handles routine)
+- Predictive alerts (opportunities before they arise)
+- Automated position management
+- Cross-market opportunity detection
+
+**User Involvement:** Low (exceptions only, ~5-10 min/week)
+
+**Evolution Trigger:** When MBOL active, cost tracking proven, multi-market scaling validated
+
+---
+
+### Evolution Principles
+
+**As system capability increases:**
+1. **Notification volume decreases** - More signal, less noise
+2. **Action simplicity increases** - From file edits → commands → one-tap → automatic
+3. **Intelligence visibility increases** - Better explanations of why system acts
+4. **User control remains constant** - Always able to override or intervene
+
+**As system trust increases:**
+1. **DRYRUN → LIVE transitions** - Gradual, validated, capped
+2. **Manual → Automatic approvals** - For proven patterns only
+3. **Reactive → Proactive notifications** - System anticipates needs
+4. **Interrupt → Digest communication** - Batched, convenient timing
+
+**Continuous improvements:**
+- Response to user feedback patterns
+- Adaptation to market condition changes
+- Integration of new data sources
+- Enhancement of AI agent capabilities
+
+---
+
+### Roadmap Alignment
+
+Communication evolution tracks the [Hands-Off Research Report](../termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md) roadmap:
+
+| Roadmap Phase | Communication Changes | User Impact |
+|---------------|----------------------|-------------|
+| **Tier 1** (Current) | Foundation channels | Manual oversight, learning |
+| **Tier 2** (Next) | Intelligent filtering | Selective attention |
+| **Tier 3** (Future) | Exception-only | Minimal involvement |
+
+**Update Policy:**
+- This guide updates when roadmap tiers complete
+- New channels documented before launch
+- Deprecated channels noted with migration path
+- User notified of communication changes via Telegram
+
+**Feedback Loop:**
+- User communication preferences tracked
+- Notification effectiveness measured
+- Channel usage monitored
+- Guide refined based on actual usage
+
+---
+
+### Document Maintenance
+
+**This guide will be updated when:**
+1. New communication channels are added
+2. Roadmap tiers complete
+3. User feedback indicates needed changes
+4. System capabilities materially change
+5. Communication patterns prove ineffective
+
+**Who updates:**
+- AI agents (with user review)
+- System (automated improvements)
+- User (direct edits)
+
+**Version history tracked in Git** - All changes auditable and reversible
+
+---
+
 ## Troubleshooting
 
 ### Not Receiving Notifications
@@ -513,20 +648,28 @@ Based on `.claude/USER_PROFILE.md`:
 4. **Reversible actions**: All changes tracked in Git
 5. **Safe by default**: DRYRUN until proven, caps and limits enforced
 6. **Continuous improvement**: System learns and optimizes itself
+7. **Evolves with system**: Communication adapts as capabilities mature
 
 ---
 
 ## Related Documentation
 
+### System Evolution
+- `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md` - **Roadmap and status** (drives communication evolution)
+- See **Communication Evolution Strategy** section above for how this guide tracks roadmap tiers
+
+### Current Communication Setup
 - `AI_POLICY.md` - High-level policy for AI agents
-- `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md` - Status and roadmap
 - `docs/AI_INTAKE_SETUP_GUIDE.md` - AI Intake command setup
 - `docs/EXECUTION_NOTIFICATIONS.md` - Telegram notification details
+
+### User & AI Coordination
 - `.claude/USER_PROFILE.md` - Your preferences and goals
 - `.claude/AI_COORDINATION_ARCHITECTURE.md` - Multi-agent coordination
 
 ---
 
 **Last Updated:** 2025-11-23  
+**Next Review:** When Roadmap Tier 1 completes  
 **Owner:** System (with user review)  
-**Status:** Living document (evolves with system)
+**Status:** Living document - evolves with system roadmap tiers
