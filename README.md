@@ -1,5 +1,15 @@
 # Hands-Off Engine
 
+## For Users
+
+**How to communicate with the system:** See [`docs/USER_COMMUNICATION_GUIDE.md`](docs/USER_COMMUNICATION_GUIDE.md)
+
+This guide explains:
+- How to receive notifications (Telegram)
+- How to issue commands (GitHub Issues, `/plan`)
+- How to monitor system status
+- Expected time commitment (~10-30 min/week)
+
 ## Status & Roadmap
 
 See `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
