@@ -17,7 +17,15 @@
         "SYSTEM_HANDOFF_blocks"
       ],
       "repo_access": "none",
-      "documentation": "docs/CHATGPT_COMMS_PROTOCOL_v0.5.md"
+      "documentation": "docs/CHATGPT_COMMS_PROTOCOL_v0.5.md",
+      "backend_session": {
+        "supports_tri_agent_session": true,
+        "provider": "openai",
+        "provider_module": "ai_nexus.provider_openai",
+        "default_model": "gpt-4-turbo-preview",
+        "max_tokens_hint": 2048,
+        "requires_env": ["OPENAI_API_KEY"]
+      }
     },
     {
       "id": "claude_cli",
@@ -38,7 +46,15 @@
         "ai/coordination/messages.jsonl"
       ],
       "repo_access": "full",
-      "documentation": ".claude/instructions.md"
+      "documentation": ".claude/instructions.md",
+      "backend_session": {
+        "supports_tri_agent_session": true,
+        "provider": "anthropic",
+        "provider_module": "ai_nexus.provider_claude",
+        "default_model": "claude-3-5-sonnet-20241022",
+        "max_tokens_hint": 2048,
+        "requires_env": ["ANTHROPIC_API_KEY"]
+      }
     },
     {
       "id": "github_copilot_agent",
@@ -63,7 +79,14 @@
         "GitHub issue comments",
         "Pull request reviews"
       ],
-      "documentation": ".github/workflows/ai-intake.yml"
+      "documentation": ".github/workflows/ai-intake.yml",
+      "backend_session": {
+        "supports_tri_agent_session": true,
+        "provider": "github_copilot",
+        "provider_module": "ai_nexus.provider_copilot",
+        "status_v0_1": "stub_implementation",
+        "note": "v0.1 has limited backend participation. See provider_copilot.py for details."
+      }
     }
   ],
   "communication_flows": [
