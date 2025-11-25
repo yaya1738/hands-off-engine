@@ -127,6 +127,28 @@ Next session starts → repeat
    - Optimize performance
    - Reduce user workload further
 
+   **IMPORTANT: Use approval system for risky changes**
+   ```python
+   from ai.autonomous_change import propose_change
+
+   # Safe changes (docs, logs, metrics) = auto-apply
+   # Risky changes (trading params, strategy) = require approval
+
+   result = propose_change(
+       title="Change description",
+       description="Why needed",
+       change_type="trading_parameters",  # or "documentation", "code", etc.
+       files=["file/path"],
+       action={"type": "edit_file", ...},
+       risk_level="high"  # low/medium/high
+   )
+
+   # If not approved, user gets Telegram notification
+   # Continue with other tasks while waiting
+   ```
+
+   See `ai/README_APPROVAL_SYSTEM.md` for full details.
+
 4. **Document everything:**
    - What was done
    - Why it was done

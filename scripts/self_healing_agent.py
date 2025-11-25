@@ -275,7 +275,7 @@ class SelfHealingAgent:
         if not issue.get("auto_fixable", False):
             if issue.get("alert_user", False):
                 logger.warning(f"Issue requires user attention: {issue['description']}")
-                # TODO: Send Telegram alert
+                self.send_telegram_alert(issue)
             return None
 
         logger.info(f"Attempting to fix: {issue['description']}")
@@ -326,6 +326,47 @@ class SelfHealingAgent:
         except Exception as e:
             logger.error(f"Error rotating log: {e}")
             return None
+
+    def send_telegram_alert(self, issue: Dict):
+        """Send Telegram alert for issues requiring user attention."""
+        try:
+            import requests
+
+            bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+            chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+            if not bot_token or not chat_id:
+                logger.warning("Telegram not configured - cannot send alert")
+                return
+
+            severity_emoji = {"low": "🟡", "medium": "🟠", "high": "🔴"}
+            emoji = severity_emoji.get(issue.get("severity", "medium"), "🟠")
+
+            message = f"""{emoji} **System Alert**
+
+**Issue Detected:** {issue['description']}
+
+**Type:** {issue['type']}
+**Severity:** {issue['severity']}
+**Auto-fixable:** No - requires manual intervention
+
+The self-healing agent cannot automatically resolve this issue.
+Please investigate when convenient."""
+
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            data = {
+                "chat_id": chat_id,
+                "text": message,
+                "parse_mode": "Markdown"
+            }
+
+            response = requests.post(url, json=data, timeout=10)
+            response.raise_for_status()
+
+            logger.info(f"✓ Sent Telegram alert for: {issue['description']}")
+
+        except Exception as e:
+            logger.error(f"Error sending Telegram alert: {e}")
 
     def run_forever(self):
         """Main loop - run continuously."""

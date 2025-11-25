@@ -1,9 +1,42 @@
 {
-  "timestamp": "2025-11-21T13:00:04.324934",
+  "timestamp": "2025-11-23T07:00:01.388687",
   "dryrun": true,
-  "total_orders": 1,
-  "total_size_usd": 27.999999999999996,
+  "total_orders": 6,
+  "total_size_usd": 163.79999999999998,
   "orders": [
+    {
+      "market_id": "will-bitcoin-dip-to-90k-in-november-2025-691",
+      "question": "Will Bitcoin dip to $90,000 in November?",
+      "side": "no",
+      "size_usd": 34.99999999999999,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 5.0%, Current odds: 0.40, Confidence: 70.0%",
+      "status": "planned"
+    },
+    {
+      "market_id": "will-trump-talk-to-jerome-powell-in-november",
+      "question": "Will Trump talk to Jerome Powell in November?",
+      "side": "yes",
+      "size_usd": 27.999999999999996,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 4.0%, Current odds: 0.10, Confidence: 70.0%",
+      "status": "planned"
+    },
+    {
+      "market_id": "will-bitcoin-reach-115k-in-november-2025",
+      "question": "Will Bitcoin reach $115,000 in November?",
+      "side": "no",
+      "size_usd": 27.999999999999996,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 4.0%, Current odds: 0.08, Confidence: 70.0%",
+      "status": "planned"
+    },
     {
       "market_id": "will-the-new-york-knicks-win-the-2026-nba-finals",
       "question": "Will the New York Knicks win the 2026 NBA Finals?",
@@ -13,6 +46,28 @@
       "edge": null,
       "category": "unknown",
       "reason": "Edge: 4.0%, Current odds: 0.05, Confidence: 70.0%",
+      "status": "planned"
+    },
+    {
+      "market_id": "will-the-cleveland-cavaliers-win-the-2026-nba-finals",
+      "question": "Will the Cleveland Cavaliers win the 2026 NBA Finals?",
+      "side": "no",
+      "size_usd": 22.4,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 3.2%, Current odds: 0.08, Confidence: 70.0%",
+      "status": "planned"
+    },
+    {
+      "market_id": "will-the-los-angeles-lakers-win-the-2026-nba-finals",
+      "question": "Will the Los Angeles Lakers win the 2026 NBA Finals?",
+      "side": "no",
+      "size_usd": 22.4,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 3.2%, Current odds: 0.05, Confidence: 70.0%",
       "status": "planned"
     }
   ]

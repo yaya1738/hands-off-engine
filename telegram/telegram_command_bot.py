@@ -25,11 +25,17 @@ import sys
 from datetime import datetime, timedelta
 from pathlib import Path
 
+# Add parent to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 AI_COORD_DIR = REPO_ROOT / "ai" / "coordination"
+
+# Import approval queue
+from ai.approval_queue import ApprovalQueue
 
 # Telegram config (from environment or config file)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -44,8 +50,10 @@ class TelegramCommandBot:
             '/status': self.cmd_status,
             '/metrics': self.cmd_metrics,
             '/health': self.cmd_health,
+            '/pending': self.cmd_pending,
             '/approve': self.cmd_approve,
             '/reject': self.cmd_reject,
+            '/task': self.cmd_task,
             '/agents': self.cmd_agents,
             '/help': self.cmd_help,
         }
@@ -201,38 +209,148 @@ System is operating normally."""
         except Exception as e:
             return f"❌ Error running health check: {str(e)}"
 
+    def cmd_pending(self, args) -> str:
+        """Show pending changes awaiting approval."""
+        try:
+            queue = ApprovalQueue()
+            pending = queue.get_pending()
+
+            if not pending:
+                return "✅ No pending changes requiring approval"
+
+            msg = f"📋 **Pending Approvals** ({len(pending)})\n\n"
+
+            for change in pending[:5]:  # Show first 5
+                risk_emoji = {"low": "🟢", "medium": "🟡", "high": "🔴"}
+                emoji = risk_emoji.get(change.get("risk_level", "medium"), "🟡")
+
+                msg += f"""{emoji} **{change['id']}**: {change['title']}
+Type: {change['change_type']}
+Risk: {change['risk_level']}
+
+"""
+
+            if len(pending) > 5:
+                msg += f"\n... and {len(pending)-5} more\n"
+
+            msg += "\nUse /approve <id> or /reject <id>"
+
+            return msg
+
+        except Exception as e:
+            return f"❌ Error getting pending changes: {str(e)}"
+
     def cmd_approve(self, args) -> str:
         """Approve a pending change."""
         if not args:
-            return "❌ Usage: /approve <id>\nExample: /approve 123"
+            return "❌ Usage: /approve <id>\nExample: /approve abc123"
 
-        approval_id = args[0]
+        change_id = args[0]
+        queue = ApprovalQueue()
 
-        # TODO: Implement approval system
-        # For now, placeholder response
-        return f"""✅ Approved: {approval_id}
+        # Get the change
+        change = queue.get_change(change_id)
+        if not change:
+            return f"❌ Change {change_id} not found"
 
-This feature is being implemented.
-Currently, all safe changes are auto-applied.
-Risky changes will require approval via this command.
+        if change["status"] != "pending":
+            return f"❌ Change {change_id} is already {change['status']}"
 
-Status: Pending implementation"""
+        # Approve it
+        if queue.approve(change_id):
+            # Execute the change
+            result = queue.execute_approved(change_id)
+
+            if result["success"]:
+                return f"""✅ Approved and executed: {change_id}
+
+**{change['title']}**
+
+{result.get('message', 'Change applied successfully')}"""
+            else:
+                return f"""✅ Approved: {change_id}
+❌ Execution failed: {result.get('error', 'Unknown error')}
+
+Change is marked approved but not applied. Check logs."""
+        else:
+            return f"❌ Failed to approve {change_id}"
 
     def cmd_reject(self, args) -> str:
         """Reject a pending change."""
         if not args:
-            return "❌ Usage: /reject <id>\nExample: /reject 123"
+            return "❌ Usage: /reject <id> [reason]\nExample: /reject abc123 Not ready yet"
 
-        rejection_id = args[0]
+        change_id = args[0]
+        reason = " ".join(args[1:]) if len(args) > 1 else "No reason provided"
 
-        # TODO: Implement rejection system
-        return f"""❌ Rejected: {rejection_id}
+        queue = ApprovalQueue()
 
-This feature is being implemented.
-Currently, all safe changes are auto-applied.
-Risky changes will require approval via /approve.
+        # Get the change
+        change = queue.get_change(change_id)
+        if not change:
+            return f"❌ Change {change_id} not found"
 
-Status: Pending implementation"""
+        if change["status"] != "pending":
+            return f"❌ Change {change_id} is already {change['status']}"
+
+        # Reject it
+        if queue.reject(change_id, reason):
+            return f"""❌ Rejected: {change_id}
+
+**{change['title']}**
+
+Reason: {reason}
+
+Change will not be applied."""
+        else:
+            return f"❌ Failed to reject {change_id}"
+
+    def cmd_task(self, args) -> str:
+        """Queue a task for the system to work on."""
+        if not args:
+            return """❌ Usage: /task <description>
+
+Example: /task Optimize alpha model to reduce selection rate
+
+This queues a task for autonomous agents to work on.
+Next Claude Code session will pick it up automatically."""
+
+        # Join all args as task description
+        task_description = " ".join(args)
+
+        try:
+            # Add to autonomous task queue
+            sys.path.insert(0, str(REPO_ROOT))
+            from scripts.autonomous_task_queue import AutonomousTaskQueue
+
+            queue = AutonomousTaskQueue(REPO_ROOT)
+            task_id = queue.add_task(
+                title=task_description[:80],  # First 80 chars as title
+                description=f"""User request from Telegram: {task_description}
+
+Autonomous operation protocol:
+1. Assess what's needed
+2. Implement solution
+3. Use approval system for risky changes
+4. Document what was done
+
+Priority: User requested task""",
+                priority='high',  # User requests are high priority
+                source='telegram_user',
+                metadata={'user': 'yair', 'via': 'telegram'}
+            )
+
+            return f"""✅ Task queued: {task_id[:8]}
+
+**Task:** {task_description}
+
+The system will work on this autonomously.
+Next Claude Code session will pick it up.
+
+You'll be notified when complete."""
+
+        except Exception as e:
+            return f"❌ Error queueing task: {str(e)}"
 
     def cmd_agents(self, args) -> str:
         """Get AI agent coordination status."""
@@ -286,18 +404,23 @@ Pending Tasks: {len(pending_tasks)}"""
         """Show command help."""
         return """📱 Telegram Bot Commands
 
+**Monitor:**
 /status - Full system status
 /metrics - Performance metrics (24h)
 /health - Run health check
+
+**Interact:**
+/task <description> - Request system to do something
+/pending - View pending approvals
 /approve <id> - Approve pending change
 /reject <id> - Reject pending change
+
+**Info:**
 /agents - AI coordination status
 /help - This message
 
 You can control the entire system via Telegram.
-No need to launch Claude Code CLI for routine operations.
-
-For emergencies only, launch CLI manually."""
+No need to launch Claude Code CLI for routine operations."""
 
 
 def send_telegram_message(message: str):
