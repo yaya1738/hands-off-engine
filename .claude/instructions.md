@@ -27,6 +27,30 @@ Before doing any substantial work, you MUST:
 
 Check `ai/tasks/*.json` for formal task definitions with required context files.
 
+## Receiving SYSTEM HANDOFF Blocks
+
+You may receive structured **SYSTEM HANDOFF** blocks copied from ChatGPT or other AI agents.
+
+**Format:**
+```
+=== SYSTEM HANDOFF: [TITLE] ===
+TARGET: [Destination agent]
+INTENT: [Checkboxes]
+SUMMARY: [Context]
+AGENT TASKS: [Concrete tasks]
+=== END SYSTEM HANDOFF ===
+```
+
+**When you receive one:**
+1. **Validate TARGET** - Confirm it's meant for Claude Code in this repo
+2. **Read SUMMARY** - Understand the context and decisions made
+3. **Implement AGENT TASKS** - Treat as high-priority todo list with concrete file changes
+4. **Follow CONSTRAINTS** - Respect any style/complexity guidelines specified
+
+**Philosophy:** Use whatever AI works best. If ChatGPT excels at research/design and Claude Code excels at implementation, this protocol bridges them efficiently.
+
+**Full spec:** `docs/CHATGPT_COMMS_PROTOCOL_v0.5.md`
+
 ## MCP Architecture
 
 ⚠️ **CRITICAL:** MCP (Model Context Protocol) uses **stdio**, NOT HTTP.
