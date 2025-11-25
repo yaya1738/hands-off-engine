@@ -1,8 +1,9 @@
-# Spark Plug Architecture v0.1
+# Spark Plug Architecture v0.2
 
-**Status:** Active Design
+**Status:** Active Implementation
 **Purpose:** Define the 3-part infrastructure that keeps user and system "alive in lockstep"
 **Created:** 2025-11-25
+**Updated:** 2025-11-25 (v0.2: Continuous CPU + Kernel Updates)
 
 ---
 
@@ -663,12 +664,104 @@ hands-off-engine/
 
 ---
 
-**Status:** v0.1 architecture defined, implementation in progress
+## 🆕 v0.2 Updates: Continuous CPU + Kernel Auto-Updates
 
-**Next:** Define core types, refactor tri-agent runner, stub memory kernels, commit
+**Status:** Implemented 2025-11-25
+
+### What's New in v0.2
+
+1. **Continuous CPU Mode**
+   - CPU can now run indefinitely with safety caps
+   - New CLI flags:
+     - `--continuous` - Enable continuous mode (default: burst mode)
+     - `--max-steps` - Maximum steps before stopping (default: 20)
+     - `--max-duration-seconds` - Maximum wall-clock time (default: 900s)
+   - CPU stops when EITHER cap is reached
+   - Backward compatible: burst mode unchanged
+
+2. **Kernel Auto-Updates**
+   - CPU can now automatically update bound memory kernels
+   - New CLI flag:
+     - `--kernel-update-mode` - Update mode: `none` or `append_notes`
+   - In `append_notes` mode:
+     - At end of continuous run, CPU generates session summary
+     - Summary appended to all bound kernels
+     - Includes: conversation_id, cpu_id, session_goal, steps, duration
+   - Kernels evolve from CPU sessions automatically
+
+3. **Enhanced CpuInstance Tracking (v0.2)**
+   - New fields:
+     - `steps_completed` - Total steps taken in continuous mode
+     - `duration_seconds` - Total duration in seconds
+     - `kernel_updates_applied` - Whether kernel updates were written
+   - All v0.2 fields are backward compatible (defaults provided)
+
+### Example Commands (v0.2)
+
+**Burst mode (unchanged from v0.1):**
+```bash
+python -m ai_nexus.tri_agent_session_runner \
+    --conversation-id 20251125_burst_demo \
+    --session-goal "Quickly analyze risk model" \
+    --rounds 3 \
+    --agents chatgpt,claude_cli
+```
+
+**Continuous mode with step cap:**
+```bash
+python -m ai_nexus.tri_agent_session_runner \
+    --conversation-id 20251125_continuous_steps \
+    --session-goal "Deep analysis of trading strategy" \
+    --continuous \
+    --max-steps 10 \
+    --agents chatgpt,claude_cli
+```
+
+**Continuous mode with kernel binding + auto-updates:**
+```bash
+python -m ai_nexus.tri_agent_session_runner \
+    --conversation-id 20251125_continuous_kernels \
+    --session-goal "Research risk model improvements" \
+    --continuous \
+    --max-steps 5 \
+    --bind-kernels risk_model_v2,infra_architecture \
+    --kernel-update-mode append_notes \
+    --agents chatgpt,claude_cli
+```
+
+### Safety Guarantees (v0.2)
+
+✅ Continuous mode is **design-only** (no trading/execution access)
+✅ Safety caps prevent runaway loops (max-steps, max-duration-seconds)
+✅ Kernel updates are append-only (no destructive changes)
+✅ All v0.2 features maintain `safety_profile: design_only`
+✅ No new wires to decider/executor/risk modules
+
+### Tests (v0.2)
+
+New tests in `tests/unit/test_tri_agent_cpu_v02.py`:
+- ✅ Continuous mode stops on max-steps
+- ✅ Continuous mode stops on max-duration-seconds
+- ✅ Kernel updates applied in append_notes mode
+- ✅ Burst mode backward compatibility
+- ✅ CpuInstance v0.2 fields serialization
+
+All tests offline (no real LLM calls).
+
+### Implementation Files (v0.2)
+
+- `ai_nexus/spark_plug_types.py` - Extended CpuInstance and CpuConfig for v0.2
+- `ai_nexus/tri_agent_session_runner.py` - Added continuous loop and kernel updates
+- `tests/unit/test_tri_agent_cpu_v02.py` - v0.2 test coverage
+
+---
+
+**Status:** v0.2 implemented and tested
+
+**Next:** Part 3 UI connector, full contraction engine, production readiness
 
 ---
 
 **Created by:** Claude CLI
 **Date:** 2025-11-25
-**Version:** 0.1
+**Version:** 0.2 (Continuous CPU + Kernel Updates)
