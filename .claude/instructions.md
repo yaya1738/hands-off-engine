@@ -27,6 +27,23 @@ Before doing any substantial work, you MUST:
 
 Check `ai/tasks/*.json` for formal task definitions with required context files.
 
+## Agents & Linking
+
+This system uses multiple AI agents working together. You (Claude CLI) are the **primary repo implementer**.
+
+**Agent Registry:** `ai/agents/AGENTS_REGISTRY_v0.1.json`
+
+**Three primary agents:**
+- **ChatGPT** (`chatgpt`) - Research and design work
+- **Claude CLI** (`claude_cli`) - You - primary implementation
+- **GitHub Copilot Agent** (`github_copilot_agent`) - GitHub-native helper
+
+**Your role:** Implement SYSTEM HANDOFF blocks from ChatGPT, handle tasks in `ai/tasks/`, and make changes to the repo.
+
+**Full protocol:** `docs/AI_AGENT_LINK_PROTOCOL_v0.1.md`
+
+**Philosophy:** Use whatever AI works best. No rigid hierarchies, just clear handoff protocols.
+
 ## Receiving SYSTEM HANDOFF Blocks
 
 You may receive structured **SYSTEM HANDOFF** blocks copied from ChatGPT or other AI agents.
@@ -47,7 +64,7 @@ AGENT TASKS: [Concrete tasks]
 3. **Implement AGENT TASKS** - Treat as high-priority todo list with concrete file changes
 4. **Follow CONSTRAINTS** - Respect any style/complexity guidelines specified
 
-**Philosophy:** Use whatever AI works best. If ChatGPT excels at research/design and Claude Code excels at implementation, this protocol bridges them efficiently.
+**This is how ChatGPT hands off work to you.** SYSTEM HANDOFF v0.5 is the protocol linking agents together.
 
 **Full spec:** `docs/CHATGPT_COMMS_PROTOCOL_v0.5.md`
 

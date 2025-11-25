@@ -1,5 +1,11 @@
 name: AI Intake
 
+# GitHub Copilot Agent workflow
+# Part of AI Agent Link Protocol v0.1 (see docs/AI_AGENT_LINK_PROTOCOL_v0.1.md)
+# This workflow enables GitHub Copilot Agent to respond to issue commands
+# Primary flow: ChatGPT → SYSTEM HANDOFF → Claude CLI
+# Secondary flow: ChatGPT → SYSTEM HANDOFF → GitHub Copilot Agent (via issue paste)
+
 on:
   issue_comment:
     types: [created]

@@ -1,0 +1,92 @@
+{
+  "version": "0.1",
+  "protocol": "AI_AGENT_LINK_PROTOCOL_v0.1",
+  "updated": "2025-11-25",
+  "agents": [
+    {
+      "id": "chatgpt",
+      "kind": "llm",
+      "role": "research_and_design",
+      "description": "Research, strategy, architecture, and design work. Produces SYSTEM HANDOFF blocks for implementation by other agents.",
+      "handoff_protocol": "SYSTEM_HANDOFF_v0.5",
+      "entry_point": "User copy-pastes SYSTEM HANDOFF blocks into Claude CLI / GitHub Copilot Agent",
+      "handoff_in": [
+        "user_conversation"
+      ],
+      "handoff_out": [
+        "SYSTEM_HANDOFF_blocks"
+      ],
+      "repo_access": "none",
+      "documentation": "docs/CHATGPT_COMMS_PROTOCOL_v0.5.md"
+    },
+    {
+      "id": "claude_cli",
+      "kind": "llm",
+      "role": "primary_repo_implementer",
+      "description": "Main code and documentation implementation in repository. Full repo access for commits, edits, and git operations.",
+      "handoff_protocol": "SYSTEM_HANDOFF_v0.5",
+      "handoff_in": [
+        "SYSTEM_HANDOFF_v0.5",
+        "ai/tasks/*.json",
+        ".claude/instructions.md",
+        "direct_user_requests"
+      ],
+      "handoff_out": [
+        "commits",
+        "docs/*",
+        "ai/tasks/*.json",
+        "ai/coordination/messages.jsonl"
+      ],
+      "repo_access": "full",
+      "documentation": ".claude/instructions.md"
+    },
+    {
+      "id": "github_copilot_agent",
+      "kind": "llm",
+      "role": "github_native_helper",
+      "description": "GitHub-native AI helper for issues, pull requests, and AI-intake workflow. Works through GitHub UI and APIs.",
+      "human_label": "GitHub Copilot Agent",
+      "handoff_in": [
+        "GitHub issues/PRs",
+        "AI-intake workflow",
+        "SYSTEM_HANDOFF (if user pastes it into issues/PRs)"
+      ],
+      "handoff_out": [
+        "PRs",
+        "commits",
+        "status comments",
+        "issue updates"
+      ],
+      "repo_access": "via_github_apis",
+      "entry_points": [
+        ".github/workflows/ai-intake.yml",
+        "GitHub issue comments",
+        "Pull request reviews"
+      ],
+      "documentation": ".github/workflows/ai-intake.yml"
+    }
+  ],
+  "communication_flows": [
+    {
+      "name": "primary_implementation_flow",
+      "path": "ChatGPT → SYSTEM_HANDOFF → Claude CLI → repo",
+      "description": "Main path for implementing ChatGPT research and designs"
+    },
+    {
+      "name": "github_native_flow",
+      "path": "ChatGPT → SYSTEM_HANDOFF → GitHub Copilot Agent → PR → repo",
+      "description": "Alternative path using GitHub features and PR workflow"
+    },
+    {
+      "name": "agent_collaboration",
+      "path": "Claude CLI ↔ repo ↔ GitHub Copilot Agent",
+      "description": "Bidirectional collaboration via shared repo state"
+    }
+  ],
+  "notes": [
+    "v0.1 is documentation-only - no code depends on this registry yet",
+    "Future versions may add automatic routing and validation",
+    "Registry is machine-readable for future tooling",
+    "Philosophy: Use whatever AI works best for each task"
+  ]
+}
