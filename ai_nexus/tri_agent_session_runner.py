@@ -43,7 +43,9 @@ from ai_nexus.spark_plug_types import (
     CpuMessage,
     create_cpu_message
 )
-from ai_nexus.memory_kernels import load_kernel, list_kernels
+from ai_nexus.memory_kernels import load_kernel, list_kernels, append_kernel_update
+from ai_nexus.spark_plug_types import KernelUpdate
+import time
 
 # Agent provider mapping
 AGENT_PROVIDERS = {
@@ -69,7 +71,11 @@ class TriAgentSession:
         session_goal: str = "General discussion",
         bound_kernels: Optional[List[str]] = None,
         max_rounds: Optional[int] = None,
-        max_cost_usd: float = 1.0
+        max_cost_usd: float = 1.0,
+        continuous: bool = False,
+        max_steps: int = 20,
+        max_duration_seconds: int = 900,
+        kernel_update_mode: str = "none"
     ):
         self.conversation_id = conversation_id
         self.session_goal = session_goal
@@ -77,6 +83,7 @@ class TriAgentSession:
         self.thread_file = self.intercom_dir / "thread.jsonl"
         self.metadata_file = self.intercom_dir / "metadata.json"
         self.cpu_instance_file = self.intercom_dir / "cpu_instance.json"
+        self.kernel_update_mode = kernel_update_mode
 
         # Ensure directory exists
         self.intercom_dir.mkdir(parents=True, exist_ok=True)
@@ -85,7 +92,10 @@ class TriAgentSession:
         self.cpu = self._load_or_create_cpu_instance(
             bound_kernels=bound_kernels or [],
             max_rounds=max_rounds,
-            max_cost_usd=max_cost_usd
+            max_cost_usd=max_cost_usd,
+            continuous=continuous,
+            max_steps=max_steps,
+            max_duration_seconds=max_duration_seconds
         )
 
         # Load or create metadata (legacy compatibility)
@@ -95,7 +105,10 @@ class TriAgentSession:
         self,
         bound_kernels: List[str],
         max_rounds: Optional[int],
-        max_cost_usd: float
+        max_cost_usd: float,
+        continuous: bool,
+        max_steps: int,
+        max_duration_seconds: int
     ) -> CpuInstance:
         """Load existing CpuInstance or create new"""
         if self.cpu_instance_file.exists():
@@ -103,16 +116,19 @@ class TriAgentSession:
                 return CpuInstance.from_dict(json.load(f))
         else:
             cpu_id = f"cpu_{self.conversation_id}"
+            mode = "continuous" if continuous else "burst"
             cpu = CpuInstance(
                 cpu_id=cpu_id,
-                mode="burst",
+                mode=mode,
                 bound_kernels=bound_kernels,
                 intercom_path=str(self.thread_file),
                 status="idle",
                 config=CpuConfig(
                     max_rounds=max_rounds,
                     max_cost_usd=max_cost_usd,
-                    safety_profile="design_only"
+                    safety_profile="design_only",
+                    max_steps=max_steps,
+                    max_duration_seconds=max_duration_seconds
                 )
             )
             self._save_cpu_instance(cpu)
@@ -311,6 +327,141 @@ class TriAgentSession:
         print(f"CPU Instance: {self.cpu_instance_file}")
         print(f"{'='*60}\n")
 
+    def run_continuous_session(self, agents: List[str]):
+        """Run continuous CPU loop with safety caps (v0.2)"""
+        print(f"\n{'='*60}")
+        print(f"TRI-AGENT CONTINUOUS SESSION (v0.2)")
+        print(f"{'='*60}")
+        print(f"CPU ID: {self.cpu.cpu_id}")
+        print(f"Mode: {self.cpu.mode}")
+        print(f"Conversation: {self.conversation_id}")
+        print(f"Goal: {self.session_goal}")
+        print(f"Agents: {', '.join(agents)}")
+        print(f"Max Steps: {self.cpu.config.max_steps}")
+        print(f"Max Duration: {self.cpu.config.max_duration_seconds}s")
+        print(f"Bound Kernels: {', '.join(self.cpu.bound_kernels) if self.cpu.bound_kernels else 'none'}")
+        print(f"Kernel Update Mode: {self.kernel_update_mode}")
+        print(f"Storage: {self.thread_file}")
+        print(f"Safety: {self.cpu.config.safety_profile}")
+        print(f"{'='*60}\n")
+
+        # Initialize timers
+        start_time = time.time()
+        step_count = 0
+
+        # Continuous loop
+        while True:
+            # Check caps
+            elapsed = time.time() - start_time
+            if step_count >= self.cpu.config.max_steps:
+                print(f"\n⏹️  Stopped: Reached max steps ({self.cpu.config.max_steps})")
+                break
+            if elapsed >= self.cpu.config.max_duration_seconds:
+                print(f"\n⏹️  Stopped: Reached max duration ({self.cpu.config.max_duration_seconds}s)")
+                break
+
+            # Run one step
+            print(f"\n--- Step {step_count + 1} ---")
+            self.run_round(agents)
+            step_count += 1
+
+            # Update CPU tracking
+            self.cpu.steps_completed = step_count
+            self.cpu.duration_seconds = time.time() - start_time
+            self._save_cpu_instance(self.cpu)
+
+        # Final CPU state
+        self.cpu.status = "stopped"
+        self.cpu.steps_completed = step_count
+        self.cpu.duration_seconds = time.time() - start_time
+        self._save_cpu_instance(self.cpu)
+
+        # Apply kernel updates if requested
+        if self.kernel_update_mode == "append_notes" and self.cpu.bound_kernels:
+            self._apply_kernel_updates()
+
+        # Print summary
+        all_messages = self.load_thread()
+        print(f"\n{'='*60}")
+        print(f"CONTINUOUS SESSION COMPLETE")
+        print(f"{'='*60}")
+        print(f"CPU ID: {self.cpu.cpu_id}")
+        print(f"Total steps: {step_count}")
+        print(f"Duration: {self.cpu.duration_seconds:.1f}s")
+        print(f"Total messages: {len(all_messages)}")
+        print(f"Kernel updates applied: {self.cpu.kernel_updates_applied}")
+        print(f"\nLast message from each agent:")
+        print(f"{'='*60}\n")
+
+        for agent_id in agents:
+            agent_messages = [m for m in all_messages if m.from_ == agent_id]
+            if agent_messages:
+                last = agent_messages[-1]
+                content_preview = last.content[:150]
+                if len(last.content) > 150:
+                    content_preview += "..."
+                print(f"[{agent_id}]:")
+                print(f"  {content_preview}\n")
+
+        print(f"Full thread: {self.thread_file}")
+        print(f"CPU Instance: {self.cpu_instance_file}")
+        print(f"{'='*60}\n")
+
+    def _apply_kernel_updates(self):
+        """Apply kernel updates in append_notes mode (v0.2)"""
+        print(f"\n📝 Applying kernel updates...")
+
+        # Generate session summary
+        all_messages = self.load_thread()
+        summary = self._generate_session_summary(all_messages)
+
+        # Create update for each bound kernel
+        update = KernelUpdate(
+            update_type="summary_edit",
+            content={
+                "conversation_id": self.conversation_id,
+                "cpu_id": self.cpu.cpu_id,
+                "session_goal": self.session_goal,
+                "summary": summary,
+                "steps": self.cpu.steps_completed,
+                "duration_seconds": self.cpu.duration_seconds,
+                "raw_ref": str(self.thread_file)
+            },
+            source=self.cpu.cpu_id,
+            agent="system"
+        )
+
+        # Apply to each kernel
+        for kernel_id in self.cpu.bound_kernels:
+            try:
+                append_kernel_update(kernel_id, update)
+                print(f"   ✓ Updated kernel: {kernel_id}")
+            except Exception as e:
+                print(f"   ⚠️  Failed to update kernel {kernel_id}: {e}")
+
+        self.cpu.kernel_updates_applied = True
+        self._save_cpu_instance(self.cpu)
+
+    def _generate_session_summary(self, messages: List[CpuMessage]) -> str:
+        """Generate a compact summary of the session (v0.2)"""
+        if not messages:
+            return "No messages in session."
+
+        # Simple heuristic summary
+        summary_parts = []
+        summary_parts.append(f"Session: {self.conversation_id}")
+        summary_parts.append(f"Goal: {self.session_goal}")
+        summary_parts.append(f"Messages: {len(messages)}")
+
+        # Extract key topics from messages (simple keyword extraction)
+        agent_counts = {}
+        for msg in messages:
+            agent_counts[msg.from_] = agent_counts.get(msg.from_, 0) + 1
+
+        summary_parts.append(f"Participants: {', '.join(f'{a}({c})' for a, c in agent_counts.items())}")
+
+        return " | ".join(summary_parts)
+
 
 def main():
     """CLI entrypoint"""
@@ -358,6 +509,35 @@ def main():
         help="Maximum cost in USD (default: 1.0)"
     )
 
+    # v0.2: Continuous mode flags
+    parser.add_argument(
+        "--continuous",
+        action="store_true",
+        help="Enable continuous mode (loop until max-steps or max-duration-seconds)"
+    )
+
+    parser.add_argument(
+        "--max-steps",
+        type=int,
+        default=20,
+        help="Maximum steps for continuous mode (default: 20)"
+    )
+
+    parser.add_argument(
+        "--max-duration-seconds",
+        type=int,
+        default=900,
+        help="Maximum wall-clock seconds for continuous mode (default: 900)"
+    )
+
+    # v0.2: Kernel update mode
+    parser.add_argument(
+        "--kernel-update-mode",
+        choices=["none", "append_notes"],
+        default="none",
+        help="Kernel update mode: 'none' (default) or 'append_notes' (v0.2)"
+    )
+
     args = parser.parse_args()
 
     # Parse agents list
@@ -389,11 +569,20 @@ def main():
         session_goal=args.session_goal,
         bound_kernels=bound_kernels,
         max_rounds=args.rounds,
-        max_cost_usd=args.max_cost
+        max_cost_usd=args.max_cost,
+        continuous=args.continuous,
+        max_steps=args.max_steps,
+        max_duration_seconds=args.max_duration_seconds,
+        kernel_update_mode=args.kernel_update_mode
     )
 
     try:
-        session.run_session(agents=agents, rounds=args.rounds)
+        if args.continuous:
+            # v0.2: Continuous mode
+            session.run_continuous_session(agents=agents)
+        else:
+            # v0.1: Burst mode (backward compatible)
+            session.run_session(agents=agents, rounds=args.rounds)
     except KeyboardInterrupt:
         print("\n\n⏹️  Session interrupted by user")
         print(f"Partial thread saved to: {session.thread_file}")
