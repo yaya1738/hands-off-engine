@@ -27,6 +27,10 @@ class CpuConfig:
     allowed_nodes: List[str] = field(default_factory=lambda: ["chatgpt", "claude_cli", "github_copilot_agent"])
     safety_profile: str = "design_only"       # No execution access
 
+    # v0.2: Continuous mode caps
+    max_steps: Optional[int] = 20             # Max steps for continuous mode (v0.2)
+    max_duration_seconds: Optional[int] = 900  # Max wall-clock seconds (v0.2)
+
     def to_dict(self) -> Dict:
         return asdict(self)
 
@@ -57,6 +61,11 @@ class CpuInstance:
     status: Literal["idle", "running", "paused", "stopped"] = "idle"
     config: CpuConfig = field(default_factory=CpuConfig)
     created: str = field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
+
+    # v0.2: Continuous mode tracking
+    steps_completed: int = 0                         # Total steps taken (v0.2)
+    duration_seconds: float = 0.0                    # Total duration in seconds (v0.2)
+    kernel_updates_applied: bool = False             # Whether kernel updates were written (v0.2)
 
     def to_dict(self) -> Dict:
         data = asdict(self)
