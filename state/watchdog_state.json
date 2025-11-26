@@ -4,7 +4,7 @@
   "agents": {
     "test_agent": {
       "first_seen": "2025-11-26T12:19:13.877917+00:00",
-      "last_heartbeat": "2025-11-26T12:19:13.877922+00:00",
+      "last_heartbeat": "2025-11-26T12:20:33.776693+00:00",
       "restart_count": 0
     }
   },
