@@ -1,0 +1,27 @@
+{
+  "market_id": "will-bitcoin-dip-to-60k-in-november-2025-496",
+  "question": "Will Bitcoin dip to $60,000 in November?",
+  "snapshots": [
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-bitcoin-dip-to-60k-in-november-2025-496",
+      "best_bid": 0.009,
+      "last_price": 0.009,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-bitcoin-dip-to-60k-in-november-2025-496",
+      "best_bid": 0.009,
+      "last_price": 0.009,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-bitcoin-dip-to-60k-in-november-2025-496",
+      "best_bid": 0.009,
+      "last_price": 0.009,
+      "spread": 0.0
+    }
+  ]
+}

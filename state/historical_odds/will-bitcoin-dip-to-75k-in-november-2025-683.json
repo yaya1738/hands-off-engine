@@ -1,0 +1,27 @@
+{
+  "market_id": "will-bitcoin-dip-to-75k-in-november-2025-683",
+  "question": "Will Bitcoin dip to $75,000 in November?",
+  "snapshots": [
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-bitcoin-dip-to-75k-in-november-2025-683",
+      "best_bid": 0.025,
+      "last_price": 0.032,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-bitcoin-dip-to-75k-in-november-2025-683",
+      "best_bid": 0.025,
+      "last_price": 0.032,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-bitcoin-dip-to-75k-in-november-2025-683",
+      "best_bid": 0.025,
+      "last_price": 0.032,
+      "spread": 0.0
+    }
+  ]
+}

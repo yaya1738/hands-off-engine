@@ -1,0 +1,27 @@
+{
+  "market_id": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
+  "question": "Will the San Antonio Spurs win the 2026 NBA Finals?",
+  "snapshots": [
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
+      "best_bid": 0.03,
+      "last_price": 0.03,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
+      "best_bid": 0.03,
+      "last_price": 0.03,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
+      "best_bid": 0.03,
+      "last_price": 0.03,
+      "spread": 0.0
+    }
+  ]
+}

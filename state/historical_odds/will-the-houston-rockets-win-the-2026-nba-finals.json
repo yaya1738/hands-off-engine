@@ -1,0 +1,27 @@
+{
+  "market_id": "will-the-houston-rockets-win-the-2026-nba-finals",
+  "question": "Will the Houston Rockets win the 2026 NBA Finals?",
+  "snapshots": [
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-the-houston-rockets-win-the-2026-nba-finals",
+      "best_bid": 0.07,
+      "last_price": 0.08,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-the-houston-rockets-win-the-2026-nba-finals",
+      "best_bid": 0.07,
+      "last_price": 0.08,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-the-houston-rockets-win-the-2026-nba-finals",
+      "best_bid": 0.07,
+      "last_price": 0.08,
+      "spread": 0.0
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "market_id": "will-trump-talk-to-friedrich-merz-in-november",
+  "question": "Will Trump talk to Friedrich Merz in November?",
+  "snapshots": [
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-trump-talk-to-friedrich-merz-in-november",
+      "best_bid": 0.1,
+      "last_price": 0.26,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-trump-talk-to-friedrich-merz-in-november",
+      "best_bid": 0.1,
+      "last_price": 0.26,
+      "spread": 0.0
+    },
+    {
+      "timestamp": "2025-11-16T12:05:00+00:00",
+      "market_id": "will-trump-talk-to-friedrich-merz-in-november",
+      "best_bid": 0.1,
+      "last_price": 0.26,
+      "spread": 0.0
+    }
+  ]
+}
