@@ -1,0 +1,16 @@
+# Cron Integration for Self-Healing Agent System
+#
+# Add these lines to your crontab (crontab -e):
+
+# Run watchdog check every 5 minutes
+*/5 * * * * cd /path/to/hands-off-engine && python3 agents/run_watchdog.py --once >> /tmp/watchdog.log 2>&1
+
+# Create daily backup at 3 AM
+0 3 * * * cd /path/to/hands-off-engine && python3 agents/run_backup.py >> /tmp/backup.log 2>&1
+
+# Alternative: For Termux (Android)
+# Use Termux's crond instead of system cron
+
+# Termux crontab example:
+# */5 * * * * cd $HOME/hands-off-engine && python3 agents/run_watchdog.py --once
+# 0 3 * * * cd $HOME/hands-off-engine && python3 agents/run_backup.py

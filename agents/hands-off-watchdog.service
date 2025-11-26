@@ -1,0 +1,20 @@
+[Unit]
+Description=Hands-Off Engine Self-Healing Watchdog
+After=network.target
+
+[Service]
+Type=simple
+User=runner
+WorkingDirectory=/home/runner/hands-off-engine
+Environment="PATH=/usr/bin:/usr/local/bin"
+ExecStart=/usr/bin/python3 /home/runner/hands-off-engine/agents/run_watchdog.py
+Restart=always
+RestartSec=60
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=hands-off-watchdog
+
+[Install]
+WantedBy=multi-user.target
