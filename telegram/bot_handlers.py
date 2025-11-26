@@ -17,9 +17,14 @@ import json
 import os
 import subprocess
 import sys
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -29,6 +34,11 @@ REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
 SCRIPTS_DIR = REPO_ROOT / "scripts"
 LOGS_DIR = REPO_ROOT / "logs"
+
+# Configurable thresholds
+MIN_CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence for opportunities
+MIN_EDGE_THRESHOLD = 0.05  # Minimum edge (5%)
+DEFAULT_SIMULATED_BALANCE = 1000.0  # Default balance for DRYRUN mode
 
 
 class BotHandlers:
@@ -478,7 +488,7 @@ _No CLI needed for routine tasks_"""
                 edge = market.get('edge', 0)
                 confidence = market.get('confidence', 0)
                 
-                if edge > 0 and confidence > 0.7:  # Min 70% confidence
+                if edge > MIN_EDGE_THRESHOLD and confidence > MIN_CONFIDENCE_THRESHOLD:
                     opportunities.append({
                         'market': market.get('title', 'Unknown'),
                         'side': market.get('recommended_side', 'N/A'),
@@ -514,9 +524,9 @@ _No CLI needed for routine tasks_"""
             
             # If no finance file, return simulated data for DRYRUN
             return {
-                'total': 1000.0,
-                'available': 900.0,
-                'in_positions': 100.0,
+                'total': DEFAULT_SIMULATED_BALANCE,
+                'available': DEFAULT_SIMULATED_BALANCE * 0.9,
+                'in_positions': DEFAULT_SIMULATED_BALANCE * 0.1,
                 'positions': [],
                 'note': 'Simulated balance for DRYRUN mode'
             }

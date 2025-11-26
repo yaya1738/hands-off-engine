@@ -84,8 +84,10 @@ class TelegramCommandBot:
             try:
                 return self.enhanced_handlers.handle_command(command_text)
             except Exception as e:
-                # Fallback to legacy handler if enhanced fails
-                pass
+                # Log the error and fallback to legacy handler
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.warning(f"Enhanced handler failed for {cmd}, using fallback: {e}")
 
         if cmd in self.commands:
             try:

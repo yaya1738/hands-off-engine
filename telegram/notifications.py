@@ -17,10 +17,15 @@ Integrates with:
 import json
 import os
 import sys
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, List, Optional
 import hashlib
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -30,6 +35,10 @@ REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
 LOGS_DIR = REPO_ROOT / "logs"
 NOTIFICATION_STATE_FILE = STATE_DIR / "notification_state.json"
+
+# Configurable thresholds
+MIN_CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence for opportunities
+MIN_EDGE_THRESHOLD = 0.05  # Minimum edge (5%)
 
 # Telegram config
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -96,8 +105,8 @@ class NotificationSystem:
             True if sent successfully, False otherwise
         """
         if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-            # Fallback: print to console
-            print(f"[TELEGRAM NOTIFICATION]\n{message}\n")
+            # Fallback: log to console
+            logger.info(f"Telegram notification (no config):\n{message}")
             return False
 
         try:
@@ -113,10 +122,11 @@ class NotificationSystem:
             response = requests.post(url, json=data, timeout=10)
             response.raise_for_status()
             
+            logger.info(f"Telegram notification sent to chat {TELEGRAM_CHAT_ID}")
             return True
 
         except Exception as e:
-            print(f"Error sending Telegram message: {e}")
+            logger.error(f"Error sending Telegram message: {e}")
             return False
 
     def send_edge_alert(self, opportunities: List[Dict]) -> bool:
@@ -459,7 +469,7 @@ class NotificationSystem:
                 edge = market.get('edge', 0)
                 confidence = market.get('confidence', 0)
 
-                if edge > 0 and confidence > 0.7:
+                if edge > MIN_EDGE_THRESHOLD and confidence > MIN_CONFIDENCE_THRESHOLD:
                     opportunities.append({
                         'market': market.get('title', 'Unknown'),
                         'edge': edge,
