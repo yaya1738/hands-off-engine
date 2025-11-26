@@ -27,6 +27,9 @@ hands-off-out/
 *.sqlite
 *.db
 state/pipeline_logs/
+state/portfolio/positions.json
+state/portfolio/history.jsonl
+state/portfolio/pnl_daily.json
 
 # Editor / OS files
 .DS_Store
