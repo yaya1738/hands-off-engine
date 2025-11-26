@@ -173,7 +173,7 @@ class NotificationSystem:
                 return True
 
         except Exception as e:
-            print(f"Error sending edge alert: {e}")
+            logger.error(f"Error sending edge alert: {e}")
 
         return False
 
@@ -252,7 +252,7 @@ class NotificationSystem:
                 return True
 
         except Exception as e:
-            print(f"Error sending daily summary: {e}")
+            logger.error(f"Error sending daily summary: {e}")
 
         return False
 
@@ -309,7 +309,7 @@ class NotificationSystem:
                 return True
 
         except Exception as e:
-            print(f"Error sending error notification: {e}")
+            logger.error(f"Error sending error notification: {e}")
 
         return False
 
@@ -372,7 +372,7 @@ class NotificationSystem:
                 return True
 
         except Exception as e:
-            print(f"Error sending trade confirmation: {e}")
+            logger.error(f"Error sending trade confirmation: {e}")
 
         return False
 

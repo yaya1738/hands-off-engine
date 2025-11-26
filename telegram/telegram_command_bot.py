@@ -22,8 +22,12 @@ import os
 import json
 import subprocess
 import sys
+import logging
 from datetime import datetime, timedelta
 from pathlib import Path
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -85,8 +89,6 @@ class TelegramCommandBot:
                 return self.enhanced_handlers.handle_command(command_text)
             except Exception as e:
                 # Log the error and fallback to legacy handler
-                import logging
-                logger = logging.getLogger(__name__)
                 logger.warning(f"Enhanced handler failed for {cmd}, using fallback: {e}")
 
         if cmd in self.commands:
