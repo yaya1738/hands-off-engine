@@ -37,6 +37,13 @@ AI_COORD_DIR = REPO_ROOT / "ai" / "coordination"
 # Import approval queue
 from ai.approval_queue import ApprovalQueue
 
+# Import new handlers
+try:
+    from telegram.bot_handlers import BotHandlers
+    ENHANCED_HANDLERS_AVAILABLE = True
+except ImportError:
+    ENHANCED_HANDLERS_AVAILABLE = False
+
 # Telegram config (from environment or config file)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
@@ -46,10 +53,18 @@ class TelegramCommandBot:
     """Handles incoming commands from Telegram and executes system operations."""
 
     def __init__(self):
+        # Initialize enhanced handlers if available
+        if ENHANCED_HANDLERS_AVAILABLE:
+            self.enhanced_handlers = BotHandlers()
+        else:
+            self.enhanced_handlers = None
+            
         self.commands = {
             '/status': self.cmd_status,
             '/metrics': self.cmd_metrics,
             '/health': self.cmd_health,
+            '/markets': self.cmd_markets,
+            '/balance': self.cmd_balance,
             '/pending': self.cmd_pending,
             '/approve': self.cmd_approve,
             '/reject': self.cmd_reject,
@@ -63,6 +78,14 @@ class TelegramCommandBot:
         parts = command_text.strip().split()
         cmd = parts[0].lower()
         args = parts[1:] if len(parts) > 1 else []
+
+        # Try enhanced handlers first for /status, /health, /markets, /balance
+        if self.enhanced_handlers and cmd in ['/status', '/health', '/markets', '/balance']:
+            try:
+                return self.enhanced_handlers.handle_command(command_text)
+            except Exception as e:
+                # Fallback to legacy handler if enhanced fails
+                pass
 
         if cmd in self.commands:
             try:
@@ -400,6 +423,27 @@ Pending Tasks: {len(pending_tasks)}"""
         except Exception as e:
             return f"❌ Error getting agent status: {str(e)}"
 
+    def cmd_markets(self, args) -> str:
+        """Show current market opportunities (fallback implementation)."""
+        try:
+            # Read polymarket model
+            model_path = STATE_DIR / "polymarket-model.json"
+            if not model_path.exists():
+                return "❌ No market data available. Run data fetchers first."
+
+            return "📈 Market opportunities available. Enhanced view requires bot_handlers module."
+
+        except Exception as e:
+            return f"❌ Error getting market data: {str(e)}"
+
+    def cmd_balance(self, args) -> str:
+        """Show portfolio/bankroll status (fallback implementation)."""
+        try:
+            return "💰 Balance information available. Enhanced view requires bot_handlers module."
+
+        except Exception as e:
+            return f"❌ Error getting balance: {str(e)}"
+
     def cmd_help(self, args) -> str:
         """Show command help."""
         return """📱 Telegram Bot Commands
@@ -408,6 +452,8 @@ Pending Tasks: {len(pending_tasks)}"""
 /status - Full system status
 /metrics - Performance metrics (24h)
 /health - Run health check
+/markets - Market opportunities
+/balance - Portfolio status
 
 **Interact:**
 /task <description> - Request system to do something

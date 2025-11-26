@@ -1,0 +1,44 @@
+{
+  "telegram": {
+    "bot_token": "YOUR_BOT_TOKEN_HERE",
+    "chat_id": "YOUR_CHAT_ID_HERE",
+    "description": "Get bot_token from @BotFather, chat_id from @userinfobot"
+  },
+  "notifications": {
+    "edge_alerts": true,
+    "daily_summary": true,
+    "error_notifications": true,
+    "trade_confirmations": true,
+    "daily_summary_hour": 8,
+    "description": "Notification preferences. daily_summary_hour is in 24h format (0-23)"
+  },
+  "commands": {
+    "enabled": [
+      "/status",
+      "/health",
+      "/markets",
+      "/balance",
+      "/help",
+      "/approve",
+      "/reject",
+      "/task",
+      "/agents",
+      "/metrics",
+      "/pending"
+    ],
+    "description": "List of enabled commands. Remove commands to disable them."
+  },
+  "security": {
+    "restrict_to_chat_id": true,
+    "require_approval_for_live_mode": true,
+    "max_trade_size_usd": 100,
+    "description": "Security settings. Always restrict to specific chat_id in production."
+  },
+  "integration": {
+    "use_ai_nexus": false,
+    "log_to_audit": true,
+    "state_dir": "state",
+    "logs_dir": "logs",
+    "description": "Integration settings with other system components"
+  }
+}

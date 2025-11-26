@@ -29,7 +29,12 @@ from telegram_command_bot import TelegramCommandBot
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional - restrict to specific user
 POLL_INTERVAL = 2  # seconds
-LOG_FILE = "/var/log/telegram-bot.log"
+
+# Use writable log location
+REPO_ROOT = Path(__file__).parent.parent
+LOG_DIR = REPO_ROOT / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+LOG_FILE = LOG_DIR / "telegram-bot.log"
 
 # Setup logging
 logging.basicConfig(
