@@ -6,8 +6,15 @@ It acts as both the body (execution) and reflexes (safety checks)
 to ensure no dangerous actions are taken.
 """
 
+import sys
+import os
 from dataclasses import dataclass
 from typing import List
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from audit import get_audit_logger
 
 
 @dataclass
@@ -38,10 +45,18 @@ class Executor:
             dryrun: If True, no actual trades are executed (default: True)
         """
         self.dryrun = dryrun
+        self.audit = get_audit_logger(component="executor")
 
     def execute(self):
         """Legacy method - kept for backwards compatibility"""
         print("Executing plan...")
+        
+        # Audit the execution
+        self.audit.log_action(
+            action_type="plan_execution",
+            action_data={"mode": "DRYRUN" if self.dryrun else "LIVE"},
+            result="completed"
+        )
 
     def validate_action(self, action) -> tuple[bool, str]:
         """

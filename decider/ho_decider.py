@@ -7,11 +7,22 @@ which are then validated and executed by the Executor (body).
 """
 
 import json
+import sys
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
 
-from ai_nexus.history_log import log_kernel_history_event
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from audit import get_audit_logger
+
+try:
+    from ai_nexus.history_log import log_kernel_history_event
+except ImportError:
+    # History log may not be available in all configurations
+    log_kernel_history_event = None
 
 
 @dataclass
@@ -39,10 +50,18 @@ class Decider:
             bankroll: Total bankroll for position sizing (default: $1000)
         """
         self.bankroll = bankroll
+        self.audit = get_audit_logger(component="decider")
 
     def decide(self):
         """Legacy method - kept for backwards compatibility"""
         print("Making a decision...")
+        
+        # Audit the decision
+        self.audit.log_decision(
+            decision_type="pipeline_decision",
+            inputs={},
+            outputs={"decision": "pending"}
+        )
 
     def load_model_signals(self, model_path: Path) -> List[dict]:
         """
@@ -128,57 +147,59 @@ class Decider:
 
             planned_actions.append(action)
 
-            # Log risk decision for Spark Plug kernels
+            # Log risk decision for Spark Plug kernels (if available)
+            if log_kernel_history_event:
+                try:
+                    log_kernel_history_event(
+                        kernel_ids=["risk_model_v2", "trading_philosophy"],
+                        kind="risk_decision",
+                        source="risk_model_v2",
+                        summary=f"Risk decision for {signal['market_id']}: f={kelly_fraction:.3f}, size=${amount:.2f}, edge={edge:.3f}, conf={confidence:.2f}",
+                        details={
+                            "market_id": signal['market_id'],
+                            "market_name": signal['market_name'],
+                            "side": signal['side'],
+                            "edge": edge,
+                            "confidence": confidence,
+                            "kelly_raw": kelly_fraction,
+                            "kelly_used": size_fraction,
+                            "size_usd": amount,
+                            "current_odds": signal.get('current_odds', None),
+                            "fair_price": signal.get('fair_price', None),
+                        },
+                        importance=8,
+                        tags=["risk_v2", "kelly"],
+                    )
+                except Exception as e:
+                    # Best-effort logging - never crash the decider
+                    print(f"[history_log] Warning: Failed to log risk decision: {e}")
+
+        # Log aggregate decider outcome for Spark Plug kernels (if available)
+        if log_kernel_history_event:
             try:
+                total_risk_usd = sum(action.amount for action in planned_actions)
+                num_buys = sum(1 for action in planned_actions if action.side == "YES")
+                num_sells = sum(1 for action in planned_actions if action.side == "NO")
+
                 log_kernel_history_event(
-                    kernel_ids=["risk_model_v2", "trading_philosophy"],
-                    kind="risk_decision",
-                    source="risk_model_v2",
-                    summary=f"Risk decision for {signal['market_id']}: f={kelly_fraction:.3f}, size=${amount:.2f}, edge={edge:.3f}, conf={confidence:.2f}",
+                    kernel_ids=["risk_model_v2", "alpha_polymarket_core", "trading_philosophy"],
+                    kind="decider_outcome",
+                    source="ho_decider",
+                    summary=f"Decider produced {len(planned_actions)} decisions, total_risk=${total_risk_usd:.2f}, buys={num_buys}, sells={num_sells}",
                     details={
-                        "market_id": signal['market_id'],
-                        "market_name": signal['market_name'],
-                        "side": signal['side'],
-                        "edge": edge,
-                        "confidence": confidence,
-                        "kelly_raw": kelly_fraction,
-                        "kelly_used": size_fraction,
-                        "size_usd": amount,
-                        "current_odds": signal.get('current_odds', None),
-                        "fair_price": signal.get('fair_price', None),
+                        "num_decisions": len(planned_actions),
+                        "total_risk_usd": total_risk_usd,
+                        "num_buys": num_buys,
+                        "num_sells": num_sells,
+                        "market_ids": [action.market_id for action in planned_actions],
+                        "bankroll": self.bankroll,
                     },
-                    importance=8,
-                    tags=["risk_v2", "kelly"],
+                    importance=7,
+                    tags=["decider", "aggregate"],
                 )
             except Exception as e:
                 # Best-effort logging - never crash the decider
-                print(f"[history_log] Warning: Failed to log risk decision: {e}")
-
-        # Log aggregate decider outcome for Spark Plug kernels
-        try:
-            total_risk_usd = sum(action.amount for action in planned_actions)
-            num_buys = sum(1 for action in planned_actions if action.side == "YES")
-            num_sells = sum(1 for action in planned_actions if action.side == "NO")
-
-            log_kernel_history_event(
-                kernel_ids=["risk_model_v2", "alpha_polymarket_core", "trading_philosophy"],
-                kind="decider_outcome",
-                source="ho_decider",
-                summary=f"Decider produced {len(planned_actions)} decisions, total_risk=${total_risk_usd:.2f}, buys={num_buys}, sells={num_sells}",
-                details={
-                    "num_decisions": len(planned_actions),
-                    "total_risk_usd": total_risk_usd,
-                    "num_buys": num_buys,
-                    "num_sells": num_sells,
-                    "market_ids": [action.market_id for action in planned_actions],
-                    "bankroll": self.bankroll,
-                },
-                importance=7,
-                tags=["decider", "aggregate"],
-            )
-        except Exception as e:
-            # Best-effort logging - never crash the decider
-            print(f"[history_log] Warning: Failed to log decider outcome: {e}")
+                print(f"[history_log] Warning: Failed to log decider outcome: {e}")
 
         return planned_actions
 
