@@ -7,9 +7,16 @@ which are then validated and executed by the Executor (body).
 """
 
 import json
+import sys
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List
+
+# Add parent directory to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from audit import get_audit_logger
 
 
 @dataclass
@@ -37,10 +44,18 @@ class Decider:
             bankroll: Total bankroll for position sizing (default: $1000)
         """
         self.bankroll = bankroll
+        self.audit = get_audit_logger(component="decider")
 
     def decide(self):
         """Legacy method - kept for backwards compatibility"""
         print("Making a decision...")
+        
+        # Audit the decision
+        self.audit.log_decision(
+            decision_type="pipeline_decision",
+            inputs={},
+            outputs={"decision": "pending"}
+        )
 
     def load_model_signals(self, model_path: Path) -> List[dict]:
         """
