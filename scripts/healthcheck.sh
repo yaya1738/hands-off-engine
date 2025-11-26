@@ -35,7 +35,8 @@ from datetime import datetime, timezone
 try:
     with open('executor/execution_plan.json') as f:
         plan = json.load(f)
-    ts = plan.get('timestamp', '')
+    # Support both 'as_of' (new format) and 'timestamp' (old format)
+    ts = plan.get('as_of') or plan.get('timestamp', '')
     if ts:
         # Handle both formats: with/without timezone
         ts_clean = ts.replace('Z', '+00:00')
