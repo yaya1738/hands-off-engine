@@ -1,0 +1,45 @@
+{
+  "last_updated": "2025-11-26T12:14:42.012735+00:00",
+  "snapshots": {
+    "2025-11-26": {
+      "date": "2025-11-26",
+      "timestamp": "2025-11-26T12:14:42.012681+00:00",
+      "mode": "DRYRUN",
+      "realized_pnl": 30.0,
+      "unrealized_pnl": 10.000000000000007,
+      "total_pnl": 40.00000000000001,
+      "by_market": {
+        "test_market_1": {
+          "realized_pnl": 15.0,
+          "unrealized_pnl": 0.0,
+          "total_pnl": 15.0,
+          "open_positions": 0,
+          "closed_positions": 1,
+          "total_invested": 65.0,
+          "current_value": 0.0,
+          "market_name": "Test Market Question?"
+        },
+        "market_1": {
+          "realized_pnl": 15.0,
+          "unrealized_pnl": 10.000000000000007,
+          "total_pnl": 25.000000000000007,
+          "open_positions": 1,
+          "closed_positions": 1,
+          "total_invested": 95.0,
+          "current_value": 55.00000000000001,
+          "market_name": "Will BTC hit $100k by EOY?"
+        },
+        "market_2": {
+          "realized_pnl": 0.0,
+          "unrealized_pnl": 0.0,
+          "total_pnl": 0.0,
+          "open_positions": 2,
+          "closed_positions": 0,
+          "total_invested": 70.0,
+          "current_value": 70.0,
+          "market_name": "Will S&P 500 reach 5000?"
+        }
+      }
+    }
+  }
+}
