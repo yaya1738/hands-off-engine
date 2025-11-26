@@ -1,0 +1,43 @@
+{
+  "$schema": "schemas/risk_schema.json",
+  "version": "1.0",
+  "description": "Risk parameters from RISK_MODEL_V1 - minimal, conservative risk model",
+  "position_sizing": {
+    "max_position_size": 100.0,
+    "max_bankroll_fraction": 0.10,
+    "kelly_fraction_cap": 0.10
+  },
+  "entry_thresholds": {
+    "min_edge": 0.03,
+    "min_confidence": 0.70,
+    "price_boundaries": {
+      "min_price": 0.05,
+      "max_price": 0.95
+    }
+  },
+  "daily_limits": {
+    "max_daily_risk": 500.0,
+    "max_positions": 20,
+    "circuit_breaker_loss": -200.0
+  },
+  "safety_layers": {
+    "alpha_filtering": true,
+    "decider_constraints": true,
+    "executor_validation": true,
+    "circuit_breakers": true
+  },
+  "mode": {
+    "default": "DRYRUN",
+    "live_requires_approval": true
+  },
+  "monitoring": {
+    "target_win_rate": 0.55,
+    "track_metrics": [
+      "win_rate",
+      "average_edge",
+      "position_size_distribution",
+      "daily_pnl",
+      "rejection_rate"
+    ]
+  }
+}

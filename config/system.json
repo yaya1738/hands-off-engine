@@ -1,0 +1,38 @@
+{
+  "$schema": "schemas/system_schema.json",
+  "version": "1.0",
+  "environment": "development",
+  "description": "Core system settings for Hands-Off Engine",
+  "system": {
+    "default_mode": "DRYRUN",
+    "log_level": "INFO",
+    "log_dir": "logs",
+    "state_dir": "state",
+    "audit_enabled": true
+  },
+  "paths": {
+    "audit_logs": "logs/audit",
+    "performance_logs": "logs/performance",
+    "state_files": "state",
+    "knowledge_base": "state/knowledge.json",
+    "policy_doc": "AI_POLICY.md",
+    "roadmap_doc": "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md"
+  },
+  "nodes": {
+    "termux": {
+      "enabled": true,
+      "sync_interval_minutes": 15,
+      "cron_enabled": true
+    },
+    "droplet": {
+      "enabled": true,
+      "api_port": 8000,
+      "viewer_enabled": true
+    },
+    "github": {
+      "enabled": true,
+      "ai_intake_issue_number": 1,
+      "workflows_enabled": true
+    }
+  }
+}

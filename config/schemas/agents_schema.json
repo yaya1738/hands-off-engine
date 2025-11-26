@@ -1,0 +1,121 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Agents Configuration Schema",
+  "description": "Schema for AI agent settings and orchestration",
+  "type": "object",
+  "required": ["version", "default_backend", "backends"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "default_backend": {
+      "type": "string"
+    },
+    "backends": {
+      "type": "object",
+      "patternProperties": {
+        ".*": {
+          "type": "object",
+          "required": ["type", "model"],
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "model": {
+              "type": "string"
+            },
+            "temperature": {
+              "type": "number",
+              "minimum": 0,
+              "maximum": 2
+            },
+            "max_tokens": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "timeout_seconds": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        }
+      }
+    },
+    "ai_intake": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "issue_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "supported_commands": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "max_response_length": {
+          "type": "integer",
+          "minimum": 100
+        }
+      }
+    },
+    "orchestration": {
+      "type": "object",
+      "properties": {
+        "multi_brain_enabled": {
+          "type": "boolean"
+        },
+        "task_routing_enabled": {
+          "type": "boolean"
+        },
+        "cost_tracking_enabled": {
+          "type": "boolean"
+        },
+        "budget_per_day_usd": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "coordination": {
+      "type": "object",
+      "properties": {
+        "status_file": {
+          "type": "string"
+        },
+        "messages_file": {
+          "type": "string"
+        },
+        "handoffs_file": {
+          "type": "string"
+        }
+      }
+    },
+    "safety": {
+      "type": "object",
+      "properties": {
+        "require_human_approval_for": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "max_autonomous_action_value": {
+          "type": "number",
+          "minimum": 0
+        },
+        "audit_all_decisions": {
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

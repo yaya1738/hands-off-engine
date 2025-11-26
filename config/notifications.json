@@ -1,0 +1,53 @@
+{
+  "$schema": "schemas/notifications_schema.json",
+  "version": "1.0",
+  "description": "Alert and notification settings",
+  "channels": {
+    "telegram": {
+      "enabled": true,
+      "priority_threshold": "INFO",
+      "rate_limit_per_hour": 50
+    },
+    "github": {
+      "enabled": true,
+      "issue_comments": true,
+      "workflow_notifications": false
+    },
+    "email": {
+      "enabled": false,
+      "smtp_configured": false
+    }
+  },
+  "alert_types": {
+    "execution": {
+      "enabled": true,
+      "notify_on_success": true,
+      "notify_on_failure": true,
+      "notify_on_dryrun": false
+    },
+    "risk": {
+      "enabled": true,
+      "circuit_breaker_triggered": true,
+      "daily_limit_approached": true,
+      "position_size_warning": true
+    },
+    "system": {
+      "enabled": true,
+      "errors": true,
+      "warnings": false,
+      "health_checks": false
+    },
+    "ai_coordination": {
+      "enabled": true,
+      "task_started": false,
+      "task_completed": true,
+      "task_failed": true
+    }
+  },
+  "formatting": {
+    "use_markdown": true,
+    "include_timestamps": true,
+    "include_session_ids": true,
+    "max_message_length": 4000
+  }
+}

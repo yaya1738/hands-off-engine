@@ -1,0 +1,32 @@
+{
+  "$schema": "schemas/trading_schema.json",
+  "version": "1.0",
+  "description": "Trading settings and execution parameters",
+  "execution": {
+    "default_mode": "DRYRUN",
+    "order_timeout_seconds": 30,
+    "retry_attempts": 3,
+    "retry_delay_seconds": 5
+  },
+  "markets": {
+    "primary_platform": "polymarket",
+    "supported_platforms": ["polymarket"],
+    "excluded_categories": [],
+    "min_liquidity": 1000.0
+  },
+  "decision_making": {
+    "alpha_sources": ["polymarket_model"],
+    "decider_version": "v1",
+    "bankroll_default": 1000.0
+  },
+  "position_management": {
+    "allow_multiple_positions_same_market": false,
+    "auto_close_expired": true,
+    "position_monitoring_interval_minutes": 60
+  },
+  "data_fetching": {
+    "fetch_interval_minutes": 15,
+    "cache_ttl_minutes": 10,
+    "max_markets_to_analyze": 100
+  }
+}

@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "System Configuration Schema",
+  "description": "Schema for core system settings",
+  "type": "object",
+  "required": ["version", "system", "paths", "nodes"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["development", "staging", "production"]
+    },
+    "description": {
+      "type": "string"
+    },
+    "system": {
+      "type": "object",
+      "required": ["default_mode", "log_level", "log_dir", "state_dir"],
+      "properties": {
+        "default_mode": {
+          "type": "string",
+          "enum": ["DRYRUN", "LIVE"]
+        },
+        "log_level": {
+          "type": "string",
+          "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+        },
+        "log_dir": {
+          "type": "string"
+        },
+        "state_dir": {
+          "type": "string"
+        },
+        "audit_enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "properties": {
+        "audit_logs": {
+          "type": "string"
+        },
+        "performance_logs": {
+          "type": "string"
+        },
+        "state_files": {
+          "type": "string"
+        },
+        "knowledge_base": {
+          "type": "string"
+        },
+        "policy_doc": {
+          "type": "string"
+        },
+        "roadmap_doc": {
+          "type": "string"
+        }
+      }
+    },
+    "nodes": {
+      "type": "object",
+      "properties": {
+        "termux": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "sync_interval_minutes": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "cron_enabled": {
+              "type": "boolean"
+            }
+          }
+        },
+        "droplet": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "api_port": {
+              "type": "integer",
+              "minimum": 1024,
+              "maximum": 65535
+            },
+            "viewer_enabled": {
+              "type": "boolean"
+            }
+          }
+        },
+        "github": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "ai_intake_issue_number": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "workflows_enabled": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

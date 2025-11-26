@@ -1,0 +1,153 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Notifications Configuration Schema",
+  "description": "Schema for alert and notification settings",
+  "type": "object",
+  "required": ["version", "channels", "alert_types"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "channels": {
+      "type": "object",
+      "properties": {
+        "telegram": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "priority_threshold": {
+              "type": "string",
+              "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+            },
+            "rate_limit_per_hour": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "github": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "issue_comments": {
+              "type": "boolean"
+            },
+            "workflow_notifications": {
+              "type": "boolean"
+            }
+          }
+        },
+        "email": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "smtp_configured": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "alert_types": {
+      "type": "object",
+      "properties": {
+        "execution": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "notify_on_success": {
+              "type": "boolean"
+            },
+            "notify_on_failure": {
+              "type": "boolean"
+            },
+            "notify_on_dryrun": {
+              "type": "boolean"
+            }
+          }
+        },
+        "risk": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "circuit_breaker_triggered": {
+              "type": "boolean"
+            },
+            "daily_limit_approached": {
+              "type": "boolean"
+            },
+            "position_size_warning": {
+              "type": "boolean"
+            }
+          }
+        },
+        "system": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "errors": {
+              "type": "boolean"
+            },
+            "warnings": {
+              "type": "boolean"
+            },
+            "health_checks": {
+              "type": "boolean"
+            }
+          }
+        },
+        "ai_coordination": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean"
+            },
+            "task_started": {
+              "type": "boolean"
+            },
+            "task_completed": {
+              "type": "boolean"
+            },
+            "task_failed": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    },
+    "formatting": {
+      "type": "object",
+      "properties": {
+        "use_markdown": {
+          "type": "boolean"
+        },
+        "include_timestamps": {
+          "type": "boolean"
+        },
+        "include_session_ids": {
+          "type": "boolean"
+        },
+        "max_message_length": {
+          "type": "integer",
+          "minimum": 100
+        }
+      }
+    }
+  }
+}

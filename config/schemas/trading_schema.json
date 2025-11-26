@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Trading Configuration Schema",
+  "description": "Schema for trading settings and execution parameters",
+  "type": "object",
+  "required": ["version", "execution", "markets"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "execution": {
+      "type": "object",
+      "required": ["default_mode"],
+      "properties": {
+        "default_mode": {
+          "type": "string",
+          "enum": ["DRYRUN", "LIVE"]
+        },
+        "order_timeout_seconds": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retry_attempts": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retry_delay_seconds": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "markets": {
+      "type": "object",
+      "required": ["primary_platform", "supported_platforms"],
+      "properties": {
+        "primary_platform": {
+          "type": "string"
+        },
+        "supported_platforms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1
+        },
+        "excluded_categories": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "min_liquidity": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "decision_making": {
+      "type": "object",
+      "properties": {
+        "alpha_sources": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "decider_version": {
+          "type": "string"
+        },
+        "bankroll_default": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "position_management": {
+      "type": "object",
+      "properties": {
+        "allow_multiple_positions_same_market": {
+          "type": "boolean"
+        },
+        "auto_close_expired": {
+          "type": "boolean"
+        },
+        "position_monitoring_interval_minutes": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "data_fetching": {
+      "type": "object",
+      "properties": {
+        "fetch_interval_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "cache_ttl_minutes": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "max_markets_to_analyze": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "$schema": "schemas/agents_schema.json",
+  "version": "1.0",
+  "description": "AI agent settings and orchestration configuration",
+  "default_backend": "openai",
+  "backends": {
+    "openai": {
+      "type": "openai",
+      "model": "gpt-4o-mini",
+      "temperature": 0.3,
+      "max_tokens": 2000,
+      "timeout_seconds": 30
+    },
+    "claude": {
+      "type": "anthropic",
+      "model": "claude-3-5-sonnet-latest",
+      "temperature": 0.3,
+      "max_tokens": 2000,
+      "timeout_seconds": 30
+    }
+  },
+  "ai_intake": {
+    "enabled": true,
+    "issue_number": 1,
+    "supported_commands": ["/plan", "/status", "/risk", "/alpha"],
+    "max_response_length": 4000
+  },
+  "orchestration": {
+    "multi_brain_enabled": false,
+    "task_routing_enabled": false,
+    "cost_tracking_enabled": true,
+    "budget_per_day_usd": 10.0
+  },
+  "coordination": {
+    "status_file": "ai/coordination/status.json",
+    "messages_file": "ai/coordination/messages.jsonl",
+    "handoffs_file": "ai/coordination/handoffs.json"
+  },
+  "safety": {
+    "require_human_approval_for": [
+      "live_trading",
+      "capital_changes",
+      "security_changes"
+    ],
+    "max_autonomous_action_value": 100.0,
+    "audit_all_decisions": true
+  }
+}
