@@ -307,6 +307,53 @@ class SystemToUserMessage:
         return cls.from_dict(json.loads(line))
 
 
+@dataclass
+class HistoryEvent:
+    """
+    General-purpose historical event for Part 3 history logging
+
+    Captures any significant event in the system:
+        - User messages/questions
+        - System decisions
+        - Trade outcomes
+        - Model updates
+        - Manual overrides
+        - CPU conclusions
+
+    These events accumulate in ai/history/user_events.jsonl and flow into
+    kernels via the history-to-kernels connector.
+    """
+    event_id: str                                    # Unique event ID
+    timestamp: str                                   # ISO 8601
+    event_type: Literal[
+        "user_message",
+        "system_decision",
+        "trade_outcome",
+        "model_update",
+        "manual_override",
+        "cpu_conclusion",
+        "observation",
+        "other"
+    ]
+    source: str                                      # e.g., "user:froggy", "cpu_risk_01", "manual"
+    content: str                                     # Natural language description
+    context: Dict = field(default_factory=dict)      # Additional metadata (kernel_id, outcome, etc.)
+
+    def to_dict(self) -> Dict:
+        return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict) -> "HistoryEvent":
+        return cls(**data)
+
+    def to_jsonl_line(self) -> str:
+        return json.dumps(self.to_dict())
+
+    @classmethod
+    def from_jsonl_line(cls, line: str) -> "HistoryEvent":
+        return cls.from_dict(json.loads(line))
+
+
 # =============================================================================
 # Utility Functions
 # =============================================================================
@@ -364,4 +411,25 @@ def create_kernel_update_failed_path(
         },
         source=source,
         agent=agent
+    )
+
+
+def create_history_event(
+    event_type: str,
+    source: str,
+    content: str,
+    event_id: Optional[str] = None,
+    **context_kwargs
+) -> "HistoryEvent":
+    """Helper to create a HistoryEvent with auto-generated ID and timestamp"""
+    if event_id is None:
+        event_id = f"evt_{datetime.utcnow().timestamp()}"
+
+    return HistoryEvent(
+        event_id=event_id,
+        timestamp=datetime.utcnow().isoformat() + "Z",
+        event_type=event_type,
+        source=source,
+        content=content,
+        context=context_kwargs
     )

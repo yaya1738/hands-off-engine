@@ -1,0 +1,15 @@
+{
+  "kernel_id": "risk_model_v2",
+  "topic": "Risk Model v2",
+  "summary": "Risk sizing, Kelly fraction, position caps, and consensus-aware rules for bet sizing and exposure management.",
+  "key_decisions": [],
+  "failed_paths": [],
+  "open_questions": [],
+  "source_weights": {
+    "chatgpt": 1.0,
+    "claude_cli": 0.8,
+    "github_copilot_agent": 0.6
+  },
+  "raw_refs": [],
+  "last_updated": "2025-11-26T10:55:17.859808Z"
+}

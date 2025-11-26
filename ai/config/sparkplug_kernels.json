@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "kernels": [
+    {
+      "kernel_id": "risk_model_v2",
+      "mode": "cpu",
+      "enabled": true,
+      "notes": "Risk sizing, Kelly, caps, and consensus-aware rules."
+    },
+    {
+      "kernel_id": "alpha_polymarket_core",
+      "mode": "cpu",
+      "enabled": true,
+      "notes": "Core views on Polymarket edge, models, and selection criteria."
+    },
+    {
+      "kernel_id": "trading_philosophy",
+      "mode": "cpu",
+      "enabled": true,
+      "notes": "Meta-level trading principles, post-mortems, and style updates."
+    },
+    {
+      "kernel_id": "system_health",
+      "mode": "cpu",
+      "enabled": true,
+      "notes": "Infrastructure reliability, recurring failure patterns, fixes."
+    },
+    {
+      "kernel_id": "ai_coordination",
+      "mode": "cpu",
+      "enabled": true,
+      "notes": "Patterns for coordinating ChatGPT, Claude, Copilot, etc."
+    }
+  ]
+}
