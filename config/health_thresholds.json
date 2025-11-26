@@ -1,0 +1,31 @@
+{
+  "health_check_interval_seconds": 300,
+  "api_timeout_seconds": 30,
+  "max_consecutive_failures": 3,
+  "state_file_age_warning_hours": 24,
+  "disk_usage_warning_percent": 80,
+  "disk_usage_critical_percent": 90,
+  "memory_usage_warning_percent": 80,
+  "memory_usage_critical_percent": 90,
+  "max_process_restart_attempts": 3,
+  "restart_cooldown_seconds": 60,
+  "heartbeat_timeout_seconds": 600,
+  "stale_lock_age_minutes": 30,
+  "critical_processes": [
+    "crond",
+    "telegram_bot_listener"
+  ],
+  "monitored_apis": [
+    {
+      "name": "polymarket",
+      "health_check_url": "https://gamma-api.polymarket.com/ping",
+      "max_response_time_ms": 5000
+    }
+  ],
+  "monitored_state_files": [
+    "state/polymarket-model.json",
+    "state/knowledge.json",
+    "state/approval_queue.json",
+    "state/autonomous_task_queue.json"
+  ]
+}

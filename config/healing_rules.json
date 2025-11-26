@@ -1,0 +1,55 @@
+{
+  "auto_healing_enabled": true,
+  "require_approval_for_critical": false,
+  "rules": [
+    {
+      "id": "restart_process",
+      "enabled": true,
+      "condition": "process_not_running",
+      "action": "restart",
+      "max_attempts": 3,
+      "cooldown_seconds": 60
+    },
+    {
+      "id": "restore_corrupted_state",
+      "enabled": true,
+      "condition": "state_file_corrupted",
+      "action": "restore_from_backup",
+      "max_attempts": 1
+    },
+    {
+      "id": "clear_stale_locks",
+      "enabled": true,
+      "condition": "lock_age_exceeds_threshold",
+      "action": "clear_lock",
+      "threshold_minutes": 30
+    },
+    {
+      "id": "reset_rate_limits",
+      "enabled": true,
+      "condition": "rate_limit_error",
+      "action": "reset_counter",
+      "cooldown_seconds": 300
+    },
+    {
+      "id": "retry_failed_operation",
+      "enabled": true,
+      "condition": "operation_failed",
+      "action": "retry",
+      "max_attempts": 3,
+      "backoff_multiplier": 2
+    },
+    {
+      "id": "cleanup_temp_files",
+      "enabled": true,
+      "condition": "disk_usage_high",
+      "action": "cleanup_temp",
+      "threshold_percent": 85
+    }
+  ],
+  "escalation": {
+    "enabled": true,
+    "escalate_after_failures": 3,
+    "escalation_channels": ["telegram", "audit_log"]
+  }
+}

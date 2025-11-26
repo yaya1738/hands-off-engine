@@ -1,0 +1,89 @@
+{
+  "updated_at": "2025-11-25T06:00:02.966755+00:00",
+  "tasks": [
+    {
+      "id": "03655716-d0ac-42b4-82df-2b63eb11e11e",
+      "title": "Health issue detected: Execution plan stale (5.0 hours old)",
+      "description": "Autonomous system task - Health issue detected: Execution plan stale (5.0 hours old)\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "high",
+      "source": "orchestrator",
+      "created_at": "2025-11-23T12:00:01.834469+00:00",
+      "metadata": {}
+    },
+    {
+      "id": "81ae02f7-f4fe-4878-b053-cd9de6710463",
+      "title": "Test task from CLI",
+      "description": "User request from Telegram: Test task from CLI\n\nAutonomous operation protocol:\n1. Assess what's needed\n2. Implement solution\n3. Use approval system for risky changes\n4. Document what was done\n\nPriority: User requested task",
+      "priority": "high",
+      "source": "telegram_user",
+      "created_at": "2025-11-23T15:31:34.054464+00:00",
+      "metadata": {
+        "user": "yair",
+        "via": "telegram"
+      }
+    },
+    {
+      "id": "cc72e7b3-d7fa-462b-8996-9091b0af1105",
+      "title": "Health issue detected: Execution plan stale (11.0 hours old)",
+      "description": "Autonomous system task - Health issue detected: Execution plan stale (11.0 hours old)\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "high",
+      "source": "orchestrator",
+      "created_at": "2025-11-23T18:00:01.917820+00:00",
+      "metadata": {}
+    },
+    {
+      "id": "d0bcb521-08b8-4ef5-81c3-5bf4763474b5",
+      "title": "Health issue detected: Execution plan stale (17.0 hours old)",
+      "description": "Autonomous system task - Health issue detected: Execution plan stale (17.0 hours old)\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "high",
+      "source": "orchestrator",
+      "created_at": "2025-11-24T00:00:01.798523+00:00",
+      "metadata": {}
+    },
+    {
+      "id": "cf61a1a5-5307-4329-8c17-8b09fdccb4b1",
+      "title": "Health issue detected: Execution plan stale (23.0 hours old)",
+      "description": "Autonomous system task - Health issue detected: Execution plan stale (23.0 hours old)\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "high",
+      "source": "orchestrator",
+      "created_at": "2025-11-24T06:00:02.362606+00:00",
+      "metadata": {}
+    },
+    {
+      "id": "e245a547-8d30-40b9-a623-71f1b8f2bca4",
+      "title": "Daily autonomous optimization cycle due",
+      "description": "Autonomous system task - Daily autonomous optimization cycle due\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "normal",
+      "source": "orchestrator",
+      "created_at": "2025-11-24T12:00:03.315047+00:00",
+      "metadata": {}
+    },
+    {
+      "id": "76a25c73-718d-4e5c-96f2-5420881a3b6c",
+      "title": "Health issue detected: Execution plan stale (35.0 hours old)",
+      "description": "Autonomous system task - Health issue detected: Execution plan stale (35.0 hours old)\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "high",
+      "source": "orchestrator",
+      "created_at": "2025-11-24T18:00:01.575533+00:00",
+      "metadata": {}
+    },
+    {
+      "id": "aa005bd1-1bf3-47e4-9b4f-c834346c8c69",
+      "title": "Health issue detected: Execution plan stale (41.0 hours old)",
+      "description": "Autonomous system task - Health issue detected: Execution plan stale (41.0 hours old)\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "high",
+      "source": "orchestrator",
+      "created_at": "2025-11-25T00:00:03.468598+00:00",
+      "metadata": {}
+    },
+    {
+      "id": "95a65ad8-38e5-4608-be8c-221c23902d11",
+      "title": "Health issue detected: Execution plan stale (47.0 hours old)",
+      "description": "Autonomous system task - Health issue detected: Execution plan stale (47.0 hours old)\n\nFollowing autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):\n\n1. Assess current system state:\n   - Check health via ./scripts/healthcheck.sh\n   - Review recent metrics in state/performance_metrics.jsonl\n   - Check logs in /var/log/hands-off-engine.log\n\n2. Identify and implement improvements:\n   - Fix any issues found\n   - Optimize performance\n   - Reduce user workload further\n\n3. Document all changes made\n\nThis task was created autonomously by the orchestrator system.\nMake decisions independently to serve user Yair Siegel.\nFocus on tangible improvements that reduce workload and improve system quality.\n\nWhen complete, mark this task as done in the autonomous task queue.\n",
+      "priority": "high",
+      "source": "orchestrator",
+      "created_at": "2025-11-25T06:00:02.966622+00:00",
+      "metadata": {}
+    }
+  ]
+}
