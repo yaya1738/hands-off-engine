@@ -28,6 +28,12 @@ hands-off-out/
 *.db
 state/pipeline_logs/
 
+# Simulator output (keep structure, ignore generated files)
+data/historical/*.json
+data/simulations/*.json
+data/simulations/reports/*.md
+data/simulations/reports/*.html
+
 # Editor / OS files
 .DS_Store
 Thumbs.db
