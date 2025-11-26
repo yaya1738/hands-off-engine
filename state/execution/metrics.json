@@ -1,0 +1,8 @@
+{
+  "total_orders": 10,
+  "successful_fills": 10,
+  "failed_orders": 0,
+  "total_slippage_bps": 0.0,
+  "avg_execution_time_ms": 100.10442733764648,
+  "last_reset": null
+}

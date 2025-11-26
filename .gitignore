@@ -27,6 +27,10 @@ hands-off-out/
 *.sqlite
 *.db
 state/pipeline_logs/
+state/execution/history.jsonl
+state/positions.json
+state/circuit_breaker.json
+state/kill_switch.json
 
 # Editor / OS files
 .DS_Store
