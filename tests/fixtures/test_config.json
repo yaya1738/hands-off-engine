@@ -1,0 +1,16 @@
+{
+  "test_mode": true,
+  "dryrun": true,
+  "bankroll": 1000.0,
+  "max_position_size": 100.0,
+  "min_confidence_threshold": 0.7,
+  "api_endpoints": {
+    "polymarket": "https://api.polymarket.com/v1",
+    "test_mode": true
+  },
+  "safety_limits": {
+    "max_daily_trades": 10,
+    "max_concurrent_positions": 5,
+    "max_loss_per_day": 200.0
+  }
+}

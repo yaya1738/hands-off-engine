@@ -1,0 +1,30 @@
+{
+  "markets": [
+    {
+      "id": "test_market_1",
+      "question": "Will BTC reach $50k by EOY?",
+      "description": "Test market 1 description",
+      "outcomes": ["YES", "NO"],
+      "prices": {
+        "YES": 0.50,
+        "NO": 0.50
+      },
+      "volume": 50000,
+      "liquidity": 25000,
+      "end_date": "2025-12-31T23:59:59Z"
+    },
+    {
+      "id": "test_market_2",
+      "question": "Will ETH outperform BTC in Q1?",
+      "description": "Test market 2 description",
+      "outcomes": ["YES", "NO"],
+      "prices": {
+        "YES": 0.40,
+        "NO": 0.60
+      },
+      "volume": 30000,
+      "liquidity": 15000,
+      "end_date": "2025-03-31T23:59:59Z"
+    }
+  ]
+}

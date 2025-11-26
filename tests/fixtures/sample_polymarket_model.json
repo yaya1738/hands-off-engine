@@ -1,0 +1,36 @@
+{
+  "generated_at": "2025-01-15T12:00:00Z",
+  "model_version": "test_v1",
+  "markets": [
+    {
+      "market_id": "test_market_1",
+      "question": "Will BTC reach $50k by EOY?",
+      "side": "YES",
+      "model_edge": 0.08,
+      "model_confidence": 0.75,
+      "fair_price": 0.58,
+      "market_price": 0.50,
+      "volume_24h": 50000
+    },
+    {
+      "market_id": "test_market_2",
+      "question": "Will ETH outperform BTC in Q1?",
+      "side": "NO",
+      "model_edge": 0.05,
+      "model_confidence": 0.72,
+      "fair_price": 0.35,
+      "market_price": 0.40,
+      "volume_24h": 30000
+    },
+    {
+      "market_id": "test_market_3",
+      "question": "Will S&P 500 hit 5000?",
+      "side": "YES",
+      "model_edge": 0.03,
+      "model_confidence": 0.68,
+      "fair_price": 0.65,
+      "market_price": 0.62,
+      "volume_24h": 100000
+    }
+  ]
+}
