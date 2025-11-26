@@ -1,0 +1,10 @@
+{
+  "task_id": "list_open_prs",
+  "task_type": "github_list_prs",
+  "params": {
+    "owner": "yaya1738",
+    "repo": "hands-off-engine",
+    "state": "open",
+    "per_page": 10
+  }
+}

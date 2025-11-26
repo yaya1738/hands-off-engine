@@ -1,0 +1,8 @@
+{
+  "task_id": "comprehensive_stats",
+  "task_type": "github_repo_stats",
+  "params": {
+    "owner": "yaya1738",
+    "repo": "hands-off-engine"
+  }
+}
