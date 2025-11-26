@@ -15,6 +15,7 @@ from typing import List
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from audit import get_audit_logger
+from config import get_config
 
 
 @dataclass
@@ -33,19 +34,33 @@ class Executor:
     It validates planned actions against safety rules and executes them.
     """
 
-    # Safety parameters (reflexes)
-    MAX_POSITION_SIZE = 100.0  # Maximum dollars per position
-    MIN_CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence to execute
-
     def __init__(self, dryrun: bool = True):
         """
         Initialize executor.
 
         Args:
             dryrun: If True, no actual trades are executed (default: True)
+                   Can also be overridden by config
         """
-        self.dryrun = dryrun
         self.audit = get_audit_logger(component="executor")
+        
+        # Load configuration
+        config = get_config()
+        
+        # Get risk parameters from config
+        self.MAX_POSITION_SIZE = config.get(
+            'risk', 'position_sizing', 'max_position_size', 
+            default=100.0
+        )
+        self.MIN_CONFIDENCE_THRESHOLD = config.get(
+            'risk', 'entry_thresholds', 'min_confidence',
+            default=0.7
+        )
+        
+        # Get execution mode from config if not explicitly set
+        # Priority: parameter > config > default (DRYRUN)
+        config_mode = config.get('trading', 'execution', 'default_mode', default='DRYRUN')
+        self.dryrun = dryrun if dryrun is not None else (config_mode == 'DRYRUN')
 
     def execute(self):
         """Legacy method - kept for backwards compatibility"""

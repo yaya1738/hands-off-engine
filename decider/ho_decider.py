@@ -17,6 +17,7 @@ from typing import List
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from audit import get_audit_logger
+from config import get_config
 
 try:
     from ai_nexus.history_log import log_kernel_history_event
@@ -42,15 +43,40 @@ class Decider:
     It takes alpha signals and produces planned actions.
     """
 
-    def __init__(self, bankroll: float = 1000.0):
+    def __init__(self, bankroll: float = None):
         """
         Initialize the Decider.
         
         Args:
-            bankroll: Total bankroll for position sizing (default: $1000)
+            bankroll: Total bankroll for position sizing
+                     If None, uses value from config (default: $1000)
         """
-        self.bankroll = bankroll
         self.audit = get_audit_logger(component="decider")
+        
+        # Load configuration
+        config = get_config()
+        
+        # Get bankroll from config if not specified
+        if bankroll is None:
+            bankroll = config.get(
+                'trading', 'decision_making', 'bankroll_default',
+                default=1000.0
+            )
+        self.bankroll = bankroll
+        
+        # Get risk parameters from config
+        self.max_fraction = config.get(
+            'risk', 'position_sizing', 'max_bankroll_fraction',
+            default=0.10
+        )
+        self.kelly_cap = config.get(
+            'risk', 'position_sizing', 'kelly_fraction_cap',
+            default=0.10
+        )
+        self.max_position_size = config.get(
+            'risk', 'position_sizing', 'max_position_size',
+            default=100.0
+        )
 
     def decide(self):
         """Legacy method - kept for backwards compatibility"""
@@ -126,14 +152,18 @@ class Decider:
             # Kelly criterion approximation: f = (edge * confidence) / odds
             # Simplified: use a fraction of bankroll proportional to edge * confidence
             kelly_fraction = edge * confidence
-            max_fraction = 0.10  # Never risk more than 10% of bankroll per position
-            size_fraction = min(kelly_fraction, max_fraction)
+            
+            # Apply risk caps from config
+            size_fraction = min(kelly_fraction, self.kelly_cap, self.max_fraction)
             amount = self.bankroll * size_fraction
+            
+            # Apply max position size cap
+            amount = min(amount, self.max_position_size)
 
             # Create reasoning string
             reasoning = (
                 f"Edge: {edge:.1%}, Current odds: {signal.get('current_odds', 0):.2f}, "
-                f"Confidence: {confidence:.1%}"
+                f"Confidence: {confidence:.1%}, Kelly: {kelly_fraction:.1%}, Capped: {size_fraction:.1%}"
             )
 
             action = PlannedAction(
