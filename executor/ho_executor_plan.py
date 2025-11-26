@@ -35,7 +35,8 @@ class Executor:
 
     # Safety parameters (reflexes)
     MAX_POSITION_SIZE = 100.0  # Maximum dollars per position
-    MIN_CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence to execute
+    MIN_CONFIDENCE_THRESHOLD = 0.60  # Minimum confidence to execute (lowered from 0.7 to enable more markets)
+    CONFIDENCE_SCALING_ENABLED = True  # Scale position size by confidence
 
     def __init__(self, dryrun: bool = True):
         """
@@ -111,14 +112,24 @@ class Executor:
                 results.append(result)
                 continue
 
+            # Apply confidence-based scaling if enabled
+            final_amount = action.amount
+            if self.CONFIDENCE_SCALING_ENABLED and action.confidence < 0.70:
+                # Scale down position size for confidence between 60-70%
+                confidence_factor = action.confidence / 0.70
+                final_amount = action.amount * confidence_factor
+                scaling_note = f" (scaled from ${action.amount:.2f} by {confidence_factor:.1%} confidence)"
+            else:
+                scaling_note = ""
+
             # Execute action (body)
             if self.dryrun:
                 result = ExecutionResult(
                     market_id=action.market_id,
                     market_name=action.market_name,
                     success=True,
-                    message=f"DRYRUN: Would place {action.side} order for ${action.amount:.2f}",
-                    executed_amount=action.amount
+                    message=f"DRYRUN: Would place {action.side} order for ${final_amount:.2f}{scaling_note}",
+                    executed_amount=final_amount
                 )
             else:
                 # In production, this would call actual trading API
@@ -126,8 +137,8 @@ class Executor:
                     market_id=action.market_id,
                     market_name=action.market_name,
                     success=True,
-                    message=f"LIVE: Placed {action.side} order for ${action.amount:.2f}",
-                    executed_amount=action.amount
+                    message=f"LIVE: Placed {action.side} order for ${final_amount:.2f}{scaling_note}",
+                    executed_amount=final_amount
                 )
 
             results.append(result)
