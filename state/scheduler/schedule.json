@@ -1,0 +1,69 @@
+{
+  "tasks": [
+    {
+      "task_id": "fetch_markets",
+      "task_name": "Fetch Markets",
+      "cron_expression": "*/15 * * * *",
+      "enabled": true,
+      "dependencies": [],
+      "timeout_seconds": 300,
+      "retry_count": 3,
+      "retry_delay_seconds": 60,
+      "one_time": false,
+      "metadata": {}
+    },
+    {
+      "task_id": "calculate_alpha",
+      "task_name": "Calculate Alpha",
+      "cron_expression": "*/30 * * * *",
+      "enabled": true,
+      "dependencies": [],
+      "timeout_seconds": 600,
+      "retry_count": 3,
+      "retry_delay_seconds": 60,
+      "one_time": false,
+      "metadata": {}
+    },
+    {
+      "task_id": "generate_report",
+      "task_name": "Generate Report",
+      "cron_expression": "0 8 * * *",
+      "enabled": true,
+      "dependencies": [],
+      "timeout_seconds": 180,
+      "retry_count": 3,
+      "retry_delay_seconds": 60,
+      "one_time": false,
+      "metadata": {}
+    },
+    {
+      "task_id": "backup_state",
+      "task_name": "Backup State",
+      "cron_expression": "0 2 * * *",
+      "enabled": true,
+      "dependencies": [],
+      "timeout_seconds": 300,
+      "retry_count": 3,
+      "retry_delay_seconds": 60,
+      "one_time": false,
+      "metadata": {}
+    },
+    {
+      "task_id": "health_check",
+      "task_name": "Health Check",
+      "cron_expression": "*/5 * * * *",
+      "enabled": true,
+      "dependencies": [],
+      "timeout_seconds": 60,
+      "retry_count": 3,
+      "retry_delay_seconds": 60,
+      "one_time": false,
+      "metadata": {}
+    }
+  ],
+  "last_runs": {
+    "health_check": "2025-11-26T12:19:48.158275",
+    "fetch_markets": "2025-11-26T12:19:56.708075"
+  },
+  "updated_at": "2025-11-26T12:19:56.708157+00:00"
+}

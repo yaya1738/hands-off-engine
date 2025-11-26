@@ -22,6 +22,11 @@ logs/ledger/*.jsonl
 logs/ai_nexus/*.jsonl
 logs/ai_nexus/*.json
 
+# Scheduler state
+state/scheduler/history.jsonl
+state/scheduler/locks/*.lock
+backups/
+
 # Local data/state that shouldn't go to GitHub
 hands-off-out/
 *.sqlite
