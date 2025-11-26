@@ -6,6 +6,8 @@ Tests for Enhanced Polymarket Data Pipeline Components
 import json
 import sys
 import tempfile
+import time
+import traceback
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -249,7 +251,6 @@ def test_cache_invalidation():
     data2 = fetcher.fetch_with_retry(source)
     
     # Wait for cache to expire
-    import time
     time.sleep(2)
     
     # Third fetch should re-fetch (cache expired)
@@ -283,7 +284,6 @@ def main():
             results.append(result)
         except Exception as e:
             print(f"  ✗ {test.__name__}: FAIL - {e}")
-            import traceback
             traceback.print_exc()
             results.append(False)
         print()
