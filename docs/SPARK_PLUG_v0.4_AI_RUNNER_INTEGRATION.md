@@ -353,49 +353,100 @@ else:
 
 ---
 
-## Scheduling (Future Setup)
+## Scheduling
 
-While v0.4 provides the infrastructure, **scheduling is not configured in this release**.
+Spark Plug v0.4 includes a nightly script for easy scheduling of auto-kernel refreshes.
 
-Future setup will involve:
+### Nightly Script
+
+Use `scripts/sparkplug_nightly.py` to generate and run nightly tasks:
+
+```bash
+# Generate and run a nightly task (LIVE mode)
+python scripts/sparkplug_nightly.py run
+
+# Generate and run with dry-run (testing/verification)
+python scripts/sparkplug_nightly.py run --dry-run
+
+# Generate task file only (don't run)
+python scripts/sparkplug_nightly.py generate
+```
 
 ### Option 1: Cron
 
 ```bash
-# Example cron entry (not yet configured)
-0 2 * * * cd /root/hands-off-engine && python ai_runner.py process-all
+# Example cron entry (runs at 2am daily)
+0 2 * * * cd /path/to/hands-off-engine && python scripts/sparkplug_nightly.py run
 ```
 
 ### Option 2: Systemd Timer
 
 ```ini
-# Example systemd timer (not yet configured)
+# /etc/systemd/system/sparkplug-nightly.timer
 [Unit]
-Description=Spark Plug Nightly Auto-Kernel Refresh
+Description=Spark Plug Nightly Auto-Kernel Refresh Timer
 
 [Timer]
-OnCalendar=daily
-OnCalendar=02:00
+OnCalendar=*-*-* 02:00:00
+Persistent=true
 
 [Install]
 WantedBy=timers.target
 ```
 
+```ini
+# /etc/systemd/system/sparkplug-nightly.service
+[Unit]
+Description=Spark Plug Nightly Auto-Kernel Refresh
+After=network.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/path/to/hands-off-engine
+ExecStart=/usr/bin/python scripts/sparkplug_nightly.py run
+User=your-user
+
+[Install]
+WantedBy=multi-user.target
+```
+
+To enable the systemd timer:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable sparkplug-nightly.timer
+sudo systemctl start sparkplug-nightly.timer
+```
+
+### Manual Trigger
+
 To manually trigger a nightly refresh:
 
 ```bash
-# Drop a task file into ai/tasks/
-cat > ai/tasks/sparkplug_nightly_$(date +%Y%m%d).json <<EOF
-{
-  "task_type": "sparkplug_autokernel_refresh",
-  "task_id": "sparkplug_nightly_$(date +%Y%m%d)",
-  "mode": "config"
-}
-EOF
+# Option 1: Use the nightly script (recommended)
+python scripts/sparkplug_nightly.py run
 
-# Process it
+# Option 2: Process an existing live task
+python ai_runner.py process-one ai/tasks/sparkplug_live.json
+
+# Option 3: Process all pending tasks
 python ai_runner.py process-all
 ```
+
+### Pre-configured Live Task
+
+A pre-configured live task file is available at `ai/tasks/sparkplug_live.json`:
+
+```json
+{
+  "task_type": "sparkplug_autokernel_refresh",
+  "task_id": "sparkplug_live",
+  "mode": "config",
+  "dry_run": false
+}
+```
+
+This task will refresh all enabled kernels in `ai/config/sparkplug_kernels.json`.
 
 ---
 

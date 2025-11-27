@@ -1,0 +1,6 @@
+{
+  "task_type": "sparkplug_autokernel_refresh",
+  "task_id": "sparkplug_live",
+  "mode": "config",
+  "dry_run": false
+}

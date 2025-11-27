@@ -192,14 +192,51 @@ ls ai/memory/kernels/
 
 ---
 
+---
+
+## v0.4: Auto-Kernel Refresh (LIVE)
+
+Spark Plug v0.4 adds automated kernel refresh via AI-Runner integration.
+
+### Run Nightly Refresh (LIVE)
+
+```bash
+# Run a live nightly refresh
+python scripts/sparkplug_nightly.py run
+
+# Run with dry-run for testing
+python scripts/sparkplug_nightly.py run --dry-run
+```
+
+### Process Pre-configured Live Task
+
+```bash
+# Process the live task
+python ai_runner.py process-one ai/tasks/sparkplug_live.json
+```
+
+### Schedule with Cron
+
+```bash
+# Add to crontab for nightly runs at 2am
+0 2 * * * cd /path/to/hands-off-engine && python scripts/sparkplug_nightly.py run
+```
+
+See: `docs/SPARK_PLUG_v0.4_AI_RUNNER_INTEGRATION.md` for full documentation.
+
+---
+
 ## See Also
 
 - **Full Architecture:** `docs/SPARK_PLUG_ARCHITECTURE_v0.1.md` (now v0.2)
+- **v0.4 AI-Runner Integration:** `docs/SPARK_PLUG_v0.4_AI_RUNNER_INTEGRATION.md`
 - **Types:** `ai_nexus/spark_plug_types.py`
 - **Runner:** `ai_nexus/tri_agent_session_runner.py`
-- **Tests:** `tests/unit/test_tri_agent_cpu_v02.py`
+- **Nightly Script:** `scripts/sparkplug_nightly.py`
+- **Tests:** `tests/unit/test_tri_agent_cpu_v02.py`, `tests/unit/test_ai_runner.py`
 
 ---
 
 **Created:** 2025-11-25
-**Version:** 0.2
+**Updated:** 2025-11-27 (v0.4 LIVE mode)
+**Version:** 0.4
