@@ -35,6 +35,7 @@ Self-healing attempted, needs attention
 ### What You Can Ask (Active)
 
 - `/status` - How's everything?
+- `/pockets` - 💰 Show me my FAT POCKETS (cash display)
 - `/pending` - What needs my approval?
 - `/metrics` - Show me the numbers
 - `/health` - Any problems?

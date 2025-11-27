@@ -48,6 +48,7 @@ class TelegramCommandBot:
     def __init__(self):
         self.commands = {
             '/status': self.cmd_status,
+            '/pockets': self.cmd_pockets,
             '/metrics': self.cmd_metrics,
             '/health': self.cmd_health,
             '/pending': self.cmd_pending,
@@ -83,6 +84,28 @@ class TelegramCommandBot:
                 timeout=30
             )
 
+            # Load finance hub for pockets summary
+            finance_hub_path = REPO_ROOT / "finance" / "yair_finance_hub.json"
+            pockets_summary = ""
+            if finance_hub_path.exists():
+                with open(finance_hub_path) as f:
+                    hub = json.load(f)
+                total_liquid = hub.get("summary", {}).get("total_liquid_usd", 0)
+                pm_balance = hub.get("accounts", {}).get("polymarket", {}).get("balance_usdc", 0)
+                # Pocket emoji based on amount
+                if total_liquid >= 5000:
+                    pocket_emoji = "🤑"
+                elif total_liquid >= 2000:
+                    pocket_emoji = "💰"
+                elif total_liquid >= 1000:
+                    pocket_emoji = "💵"
+                else:
+                    pocket_emoji = "👛"
+                pockets_summary = f"""
+{pocket_emoji} FAT POCKETS: ${total_liquid:,.2f} liquid
+   └─ Trading: ${pm_balance:,.2f} USDC
+"""
+
             # Read latest execution plan
             exec_plan_path = REPO_ROOT / "executor" / "execution_plan.json"
             if exec_plan_path.exists():
@@ -111,7 +134,7 @@ class TelegramCommandBot:
 
             # Build status message
             status_msg = f"""📊 System Status
-
+{pockets_summary}
 🟢 Health: {health_result.stdout.strip() if health_result.returncode == 0 else '❌ Issues detected'}
 
 📈 Latest Execution:
@@ -122,6 +145,7 @@ class TelegramCommandBot:
 
 🤖 Mode: DRYRUN (no real money)
 
+Send /pockets for detailed cash view
 Send /metrics for detailed performance
 Send /health for full health check
 Send /agents for AI coordination status"""
@@ -130,6 +154,80 @@ Send /agents for AI coordination status"""
 
         except Exception as e:
             return f"❌ Error getting status: {str(e)}"
+
+    def cmd_pockets(self, args) -> str:
+        """Show fat pockets - cash and wealth display with fun visuals."""
+        try:
+            # Load finance hub
+            finance_hub_path = REPO_ROOT / "finance" / "yair_finance_hub.json"
+            if not finance_hub_path.exists():
+                return "❌ Finance hub not found"
+
+            with open(finance_hub_path) as f:
+                hub = json.load(f)
+
+            # Extract key amounts
+            accounts = hub.get("accounts", {})
+            polymarket = accounts.get("polymarket", {})
+            robinhood = accounts.get("robinhood", {})
+            paypal = accounts.get("paypal_business", {})
+            summary = hub.get("summary", {})
+
+            pm_balance = polymarket.get("balance_usdc", 0)
+            rh_balance = robinhood.get("balance_usd", 0)
+            pp_balance = paypal.get("balance_usd", 0)
+            total_liquid = summary.get("total_liquid_usd", 0)
+            credit_available = summary.get("total_credit_available", 0)
+
+            # Determine pocket "fatness" level based on total liquid
+            if total_liquid >= 10000:
+                fat_level = "🤑🤑🤑 MEGA FAT"
+                pocket_emoji = "👛💰💰💰💰💰"
+            elif total_liquid >= 5000:
+                fat_level = "🤑🤑 PRETTY FAT"
+                pocket_emoji = "👛💰💰💰💰"
+            elif total_liquid >= 2000:
+                fat_level = "🤑 GETTING THERE"
+                pocket_emoji = "👛💰💰💰"
+            elif total_liquid >= 1000:
+                fat_level = "😊 MODEST"
+                pocket_emoji = "👛💰💰"
+            elif total_liquid >= 500:
+                fat_level = "😅 SLIM"
+                pocket_emoji = "👛💰"
+            else:
+                fat_level = "😬 HUNGRY"
+                pocket_emoji = "👛"
+
+            # Build the fat pockets display
+            pockets_msg = f"""💵 FAT POCKETS STATUS 💵
+
+{pocket_emoji}
+
+{fat_level} POCKETS!
+
+═══════════════════════
+💰 LIQUID CASH: ${total_liquid:,.2f}
+═══════════════════════
+
+📊 Breakdown:
+• Polymarket: ${pm_balance:,.2f} USDC
+• Robinhood: ${rh_balance:,.2f}
+• PayPal Biz: ${pp_balance:,.2f}
+
+💳 Credit Available: ${credit_available:,}
+
+═══════════════════════
+
+🎯 Goal: Make those pockets FATTER!
+💪 Keep stacking that cash!
+
+Send /status for full system status"""
+
+            return pockets_msg
+
+        except Exception as e:
+            return f"❌ Error getting pockets: {str(e)}"
 
     def cmd_metrics(self, args) -> str:
         """Get performance metrics for last 24 hours."""
@@ -406,6 +504,7 @@ Pending Tasks: {len(pending_tasks)}"""
 
 **Monitor:**
 /status - Full system status
+/pockets - 💰 FAT POCKETS cash display
 /metrics - Performance metrics (24h)
 /health - Run health check
 
@@ -441,6 +540,7 @@ def main():
     # Test commands
     test_commands = [
         "/status",
+        "/pockets",
         "/metrics",
         "/health",
         "/agents",
