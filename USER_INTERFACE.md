@@ -4,6 +4,18 @@
 
 This is the ONLY interface Yair uses. All agents must align to this.
 
+## Flow State Sync: ENABLED ✅
+
+> **The system operates in sync with your flow state.**
+
+See `ai/FLOW_STATE_PROTOCOL.md` for the full protocol.
+
+**What this means for you:**
+- System works silently when you're focused
+- Notifications only for critical items (< 3 per day)
+- Daily summary at 9am, nothing else unless urgent
+- Single action per notification (approve/reject)
+
 ## Your Interface: Telegram Bot (@pm_alerts_autobot)
 
 That's it. Just Telegram. Nothing else required.
@@ -70,10 +82,11 @@ Self-healing attempted, needs attention
 
 No other interfaces. No GitHub Issues for user. No file editing required. No CLI sessions needed.
 
-Just Telegram. Simple.
+Just Telegram. Simple. Flow-protected.
 
 ---
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-27
 **Status:** CANONICAL - All agents must follow this
-**User Feedback:** "UI roadblock... tough and cumbersome" - FIX: Single interface only
+**Flow State:** ENABLED - System syncs with your flow (see ai/FLOW_STATE_PROTOCOL.md)
+**User Feedback:** "UI roadblock... tough and cumbersome" - FIX: Single interface only + Flow protection
