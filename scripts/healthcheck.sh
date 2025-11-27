@@ -77,6 +77,73 @@ if [ ! -w "/var/log/hands-off-engine.log" ]; then
     echo "[$(date)] WARNING: Cannot write to log file"
 fi
 
+# Check 6: GitHub authentication status
+GITHUB_CHECK_RESULT=$(python3 << 'PYEOF'
+import json
+import os
+from urllib.request import Request, urlopen
+from urllib.error import HTTPError, URLError
+
+token = os.environ.get("GITHUB_TOKEN", "")
+
+if not token:
+    print("missing")
+    exit(0)
+
+url = "https://api.github.com/rate_limit"
+headers = {
+    "Accept": "application/vnd.github+json",
+    "Authorization": f"Bearer {token}",
+    "User-Agent": "Hands-Off-Engine-Healthcheck",
+}
+
+try:
+    req = Request(url, headers=headers)
+    with urlopen(req, timeout=10) as response:
+        data = json.loads(response.read().decode("utf-8"))
+        limit = data.get("resources", {}).get("core", {}).get("limit", 0)
+        remaining = data.get("resources", {}).get("core", {}).get("remaining", 0)
+        
+        if limit == 5000:
+            print(f"ok:{remaining}")
+        elif limit == 60:
+            print("invalid")
+        else:
+            print(f"unknown:{limit}")
+except HTTPError as e:
+    if e.code == 401:
+        print("invalid")
+    else:
+        print(f"error:{e.code}")
+except URLError as e:
+    print(f"network_error")
+except Exception as e:
+    print(f"error:{str(e)}")
+PYEOF
+)
+
+case "$GITHUB_CHECK_RESULT" in
+    ok:*)
+        REMAINING="${GITHUB_CHECK_RESULT#ok:}"
+        echo "[$(date)] ✓ GitHub auth OK (${REMAINING} requests remaining)"
+        ;;
+    missing)
+        echo "[$(date)] ⚠️  WARNING: GITHUB_TOKEN not set (using 60 req/hour limit)"
+        echo "         Run: scripts/setup_github_token.sh to configure"
+        ;;
+    invalid)
+        echo "[$(date)] ⚠️  WARNING: GITHUB_TOKEN is invalid or expired"
+        echo "         Run: scripts/setup_github_token.sh to reconfigure"
+        send_alert "⚠️ GitHub token is invalid or expired. API access limited to 60 req/hour."
+        ;;
+    network_error)
+        echo "[$(date)] ⚠️  WARNING: Could not reach GitHub API (network issue)"
+        ;;
+    *)
+        echo "[$(date)] ⚠️  WARNING: GitHub check returned: $GITHUB_CHECK_RESULT"
+        ;;
+esac
+
 # All checks passed
 echo "[$(date)] ✓ All health checks passed"
 echo "  Execution plan age: ${AGE_MINS} minutes"
