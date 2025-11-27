@@ -55,6 +55,8 @@ class TelegramCommandBot:
             '/reject': self.cmd_reject,
             '/task': self.cmd_task,
             '/agents': self.cmd_agents,
+            '/cashexplosion': self.cmd_cash_explosion,
+            '/trades': self.cmd_trades,
             '/help': self.cmd_help,
         }
 
@@ -400,9 +402,133 @@ Pending Tasks: {len(pending_tasks)}"""
         except Exception as e:
             return f"❌ Error getting agent status: {str(e)}"
 
+    def cmd_cash_explosion(self, args) -> str:
+        """Run cash explosion operation or show status."""
+        try:
+            # If 'run' argument, execute the pipeline
+            if args and args[0] == 'run':
+                return self._run_cash_explosion()
+
+            # Otherwise show status
+            status_path = STATE_DIR / "cash_explosion_status.json"
+            if not status_path.exists():
+                return """💰 Cash Explosion Status
+
+No runs yet. Use /cashexplosion run to execute.
+
+The Cash Explosion operation:
+1. Fetches fresh Polymarket data
+2. Generates alpha signals
+3. Plans and executes trades (DRYRUN)
+4. Notifies you of results"""
+
+            with open(status_path) as f:
+                status = json.load(f)
+
+            deployment = status.get("deployment", {})
+            metrics = status.get("metrics", {})
+
+            return f"""💰 Cash Explosion Status
+
+Last Run: {status.get('timestamp', 'N/A')[:19]}
+Mode: {status.get('mode', 'DRYRUN')}
+
+💵 Deployment:
+• Total: ${deployment.get('total_usd', 0):.2f}
+• Bankroll %: {deployment.get('percentage', 0):.1f}%
+• Trades: {deployment.get('trades', 0)}
+
+📊 Metrics:
+• Markets Analyzed: {metrics.get('markets_analyzed', 0)}
+• Signals Generated: {metrics.get('signals_generated', 0)}
+• Trades Executed: {metrics.get('trades_executed', 0)}
+• Trades Rejected: {metrics.get('trades_rejected', 0)}
+
+Use /trades to see current positions
+Use /cashexplosion run to execute new cycle"""
+
+        except Exception as e:
+            return f"❌ Error getting cash explosion status: {str(e)}"
+
+    def _run_cash_explosion(self) -> str:
+        """Execute cash explosion operation."""
+        try:
+            result = subprocess.run(
+                ["python3", str(SCRIPTS_DIR / "cash_explosion_runner.py"), "--bankroll", "1500"],
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+
+            if result.returncode == 0:
+                # Read the status for summary
+                status_path = STATE_DIR / "cash_explosion_status.json"
+                if status_path.exists():
+                    with open(status_path) as f:
+                        status = json.load(f)
+                    deployment = status.get("deployment", {})
+
+                    return f"""✅ Cash Explosion Complete!
+
+💵 Deployed: ${deployment.get('total_usd', 0):.2f}
+📊 Trades: {deployment.get('trades', 0)}
+🎯 Bankroll: {deployment.get('percentage', 0):.1f}%
+
+Use /trades to see positions"""
+                else:
+                    return "✅ Cash Explosion completed. Check /trades for positions."
+            else:
+                return f"❌ Cash Explosion failed:\n{result.stderr[:500]}"
+
+        except subprocess.TimeoutExpired:
+            return "⏱️ Cash Explosion timed out. Check system status."
+        except Exception as e:
+            return f"❌ Error running cash explosion: {str(e)}"
+
+    def cmd_trades(self, args) -> str:
+        """Show current trade positions."""
+        try:
+            exec_plan_path = REPO_ROOT / "executor" / "execution_plan.json"
+            if not exec_plan_path.exists():
+                return "📊 No active trades. Run /cashexplosion run to generate."
+
+            with open(exec_plan_path) as f:
+                plan = json.load(f)
+
+            orders = plan.get("orders", [])
+            if not orders:
+                return "📊 No active trades in current plan."
+
+            msg = f"""📊 Current Trades ({len(orders)})
+
+Mode: {'DRYRUN' if plan.get('dryrun', True) else 'LIVE'}
+Total: ${plan.get('total_size_usd', 0):.2f}
+
+"""
+            for i, order in enumerate(orders[:5], 1):
+                side_emoji = "🟢" if order.get("side", "").upper() == "YES" else "🔴"
+                msg += f"""{i}. {side_emoji} {order.get('side', '?').upper()} ${order.get('size_usd', 0):.2f}
+   {order.get('question', 'Unknown')[:50]}...
+   Edge: {order.get('edge', 'N/A')} | Conf: {order.get('confidence', 0)*100:.0f}%
+
+"""
+
+            if len(orders) > 5:
+                msg += f"... and {len(orders) - 5} more trades"
+
+            return msg
+
+        except Exception as e:
+            return f"❌ Error getting trades: {str(e)}"
+
     def cmd_help(self, args) -> str:
         """Show command help."""
         return """📱 Telegram Bot Commands
+
+**Cash Explosion:**
+/cashexplosion - View cash explosion status
+/cashexplosion run - Execute trading cycle
+/trades - View current trade positions
 
 **Monitor:**
 /status - Full system status

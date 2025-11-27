@@ -1,6 +1,6 @@
 {
-  "generated_at": "2025-11-27T13:50:19Z",
-  "source_timestamp": "2025-11-27T13:48:58.079152+00:00",
+  "generated_at": "2025-11-27T14:15:23Z",
+  "source_timestamp": "2025-11-27T14:15:23.824904+00:00",
   "total_markets_analyzed": 3,
   "markets_selected": 3,
   "markets": [
@@ -9,23 +9,11 @@
       "question": "Will Donald Trump be the #1 searched person on Google this year?",
       "query_category": "trump",
       "side": "YES",
-      "model_edge": 0.06,
+      "model_edge": 0.1,
       "model_confidence": 0.63,
-      "fair_price": 0.16,
+      "fair_price": 0.2,
       "market_price": 0.1,
       "best_bid": 0.1,
-      "liquidity": 1000.0
-    },
-    {
-      "market_id": "bitcoin-above-90k-on-november-27",
-      "question": "Will the price of Bitcoin be above $90,000 on November 27?",
-      "query_category": "bitcoin",
-      "side": "NO",
-      "model_edge": 0.045,
-      "model_confidence": 0.7,
-      "fair_price": 0.795,
-      "market_price": 0.84,
-      "best_bid": 0.85,
       "liquidity": 1000.0
     },
     {
@@ -33,11 +21,23 @@
       "question": "Will Bitcoin reach $110,000 by December 31, 2025?",
       "query_category": "bitcoin",
       "side": "YES",
-      "model_edge": 0.04,
-      "model_confidence": 0.7,
-      "fair_price": 0.24,
+      "model_edge": 0.08,
+      "model_confidence": 0.63,
+      "fair_price": 0.28,
       "market_price": 0.2,
       "best_bid": 0.18,
+      "liquidity": 1000.0
+    },
+    {
+      "market_id": "bitcoin-above-90k-on-november-27",
+      "question": "Will the price of Bitcoin be above $90,000 on November 27?",
+      "query_category": "bitcoin",
+      "side": "NO",
+      "model_edge": 0.07,
+      "model_confidence": 0.63,
+      "fair_price": 0.83,
+      "market_price": 0.9,
+      "best_bid": 0.9,
       "liquidity": 1000.0
     }
   ]

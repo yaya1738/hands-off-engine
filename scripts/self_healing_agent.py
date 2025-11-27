@@ -87,6 +87,7 @@ class SelfHealingAgent:
         issues.extend(self.check_log_rotation())
         issues.extend(self.check_stale_processes())
         issues.extend(self.check_file_permissions())
+        issues.extend(self.check_cash_explosion_status())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -270,6 +271,64 @@ class SelfHealingAgent:
 
         return issues
 
+    def check_cash_explosion_status(self) -> List[Dict]:
+        """Check cash explosion pipeline health."""
+        issues = []
+        from datetime import datetime, timezone
+
+        # Check execution plan freshness
+        exec_plan_path = REPO_ROOT / "executor" / "execution_plan.json"
+        if exec_plan_path.exists():
+            try:
+                with open(exec_plan_path) as f:
+                    plan = json.load(f)
+
+                plan_time = plan.get("timestamp") or plan.get("as_of", "")
+                if plan_time:
+                    # Parse timestamp
+                    if "T" in plan_time:
+                        plan_dt = datetime.fromisoformat(plan_time.replace("Z", "+00:00"))
+                    else:
+                        plan_dt = datetime.now(timezone.utc)
+
+                    age_hours = (datetime.now(timezone.utc) - plan_dt).total_seconds() / 3600
+
+                    if age_hours > 24:
+                        issues.append({
+                            "type": "cash_explosion_stale",
+                            "description": f"Cash explosion plan is {age_hours:.1f}h old",
+                            "severity": "medium",
+                            "auto_fixable": True,
+                            "fix_action": "run_cash_explosion"
+                        })
+            except Exception as e:
+                logger.warning(f"Error checking execution plan: {e}")
+
+        # Check market data freshness
+        market_data_path = REPO_ROOT / "termux-hands-off" / "out" / "polymarket-compact.json"
+        if market_data_path.exists():
+            try:
+                with open(market_data_path) as f:
+                    data = json.load(f)
+
+                data_time = data.get("timestamp", "")
+                if data_time:
+                    data_dt = datetime.fromisoformat(data_time.replace("Z", "+00:00"))
+                    age_hours = (datetime.now(timezone.utc) - data_dt).total_seconds() / 3600
+
+                    if age_hours > 12:
+                        issues.append({
+                            "type": "market_data_stale",
+                            "description": f"Market data is {age_hours:.1f}h old",
+                            "severity": "low",
+                            "auto_fixable": True,
+                            "fix_action": "fetch_markets"
+                        })
+            except Exception as e:
+                logger.warning(f"Error checking market data: {e}")
+
+        return issues
+
     def attempt_fix(self, issue: Dict) -> str:
         """Attempt to automatically fix an issue."""
         if not issue.get("auto_fixable", False):
@@ -300,9 +359,57 @@ class SelfHealingAgent:
             # Custom fix actions
             elif issue.get("fix_action") == "rotate_log":
                 return self.rotate_log()
+            elif issue.get("fix_action") == "run_cash_explosion":
+                return self.run_cash_explosion()
+            elif issue.get("fix_action") == "fetch_markets":
+                return self.fetch_markets()
 
         except Exception as e:
             logger.error(f"Error applying fix: {e}")
+            return None
+
+    def run_cash_explosion(self) -> str:
+        """Run cash explosion pipeline to refresh stale data."""
+        try:
+            logger.info("Running cash explosion pipeline...")
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "scripts" / "cash_explosion_runner.py"), "--bankroll", "1500"],
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+
+            if result.returncode == 0:
+                logger.info("✓ Cash explosion pipeline completed")
+                return "Cash explosion pipeline refreshed"
+            else:
+                logger.error(f"Cash explosion failed: {result.stderr}")
+                return None
+
+        except Exception as e:
+            logger.error(f"Error running cash explosion: {e}")
+            return None
+
+    def fetch_markets(self) -> str:
+        """Fetch fresh market data."""
+        try:
+            logger.info("Fetching fresh market data...")
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "scripts" / "fetch_live_markets.py")],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+
+            if result.returncode == 0:
+                logger.info("✓ Market data refreshed")
+                return "Market data refreshed"
+            else:
+                logger.error(f"Market fetch failed: {result.stderr}")
+                return None
+
+        except Exception as e:
+            logger.error(f"Error fetching markets: {e}")
             return None
 
     def rotate_log(self) -> str:

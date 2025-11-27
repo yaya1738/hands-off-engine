@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-27T13:48:58.079152+00:00",
+  "timestamp": "2025-11-27T14:15:23.824904+00:00",
   "counts": {
     "bitcoin": 12,
     "ethereum": 1,
@@ -44,8 +44,8 @@
         "query": "bitcoin",
         "slug": "bitcoin-above-90k-on-november-27",
         "question": "Will the price of Bitcoin be above $90,000 on November 27?",
-        "bestBid": 0.85,
-        "last": 0.84,
+        "bestBid": 0.9,
+        "last": 0.9,
         "endDate": "2025-11-27T17:00:00Z"
       },
       {
@@ -53,7 +53,7 @@
         "slug": "will-bitcoin-reach-115k-in-november-2025",
         "question": "Will Bitcoin reach $115,000 in November?",
         "bestBid": 0.004,
-        "last": 0.004,
+        "last": 0.005,
         "endDate": "2025-12-01T05:00:00Z"
       },
       {
@@ -76,7 +76,7 @@
         "query": "bitcoin",
         "slug": "will-bitcoin-dip-to-80k-in-november-2025-899",
         "question": "Will Bitcoin dip to $80,000 in November?",
-        "bestBid": 0.018,
+        "bestBid": 0.014,
         "last": 0.018,
         "endDate": "2025-12-01T05:00:00Z"
       },
@@ -84,7 +84,7 @@
         "query": "bitcoin",
         "slug": "bitcoin-up-or-down-on-november-27",
         "question": "Bitcoin Up or Down on November 27?",
-        "bestBid": 0.987,
+        "bestBid": 0.983,
         "last": 0.988,
         "endDate": "2025-11-27T17:00:00Z"
       },
@@ -92,7 +92,7 @@
         "query": "bitcoin",
         "slug": "bitcoin-above-84k-on-november-27",
         "question": "Will the price of Bitcoin be above $84,000 on November 27?",
-        "bestBid": 0.998,
+        "bestBid": 0.999,
         "last": 0.999,
         "endDate": "2025-11-27T17:00:00Z"
       },
@@ -109,7 +109,7 @@
         "slug": "will-bitcoin-reach-150000-by-december-31-2025-188",
         "question": "Will Bitcoin reach $150,000 by December 31, 2025?",
         "bestBid": 0.018,
-        "last": 0.019,
+        "last": 0.018,
         "endDate": "2025-12-31T12:00:00Z"
       }
     ],

@@ -1,8 +1,13 @@
 {
-  "timestamp": "2025-11-27T14:15:23.830843",
-  "dryrun": true,
-  "total_orders": 3,
-  "total_size_usd": 236.25,
+  "run_id": "20251127_141523",
+  "timestamp": "2025-11-27T14:15:23.831668+00:00",
+  "mode": "DRYRUN",
+  "bankroll": 1500.0,
+  "deployment": {
+    "total_usd": 236.25,
+    "percentage": 15.75,
+    "trades": 3
+  },
   "orders": [
     {
       "market_id": "will-donald-trump-be-the-1-searched-person-on-google-this-year",
@@ -37,5 +42,12 @@
       "reason": "Edge: 7.0%, Current odds: 0.90, Confidence: 63.0%",
       "status": "planned"
     }
-  ]
+  ],
+  "metrics": {
+    "markets_analyzed": 23,
+    "signals_generated": 3,
+    "trades_planned": 3,
+    "trades_executed": 3,
+    "trades_rejected": 0
+  }
 }
