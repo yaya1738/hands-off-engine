@@ -141,14 +141,15 @@ class FedRateAnalyzer:
             prob_cut_25 = self._calculate_implied_probability_from_futures(
                 futures_price, current_rate, current_rate - 25
             )
-            prob_hold = 1.0 - prob_cut_50 - prob_cut_25
+            # Ensure prob_hold is non-negative before normalization
+            prob_hold = max(0.0, 1.0 - prob_cut_50 - prob_cut_25)
 
-            # Normalize probabilities
-            total = prob_cut_50 + prob_cut_25 + max(0, prob_hold)
+            # Normalize probabilities to sum to 1.0
+            total = prob_cut_50 + prob_cut_25 + prob_hold
             if total > 0:
                 prob_cut_50 /= total
                 prob_cut_25 /= total
-                prob_hold = max(0, prob_hold) / total
+                prob_hold /= total
         else:
             # Default to consensus estimates (these should be updated
             # with actual market data in production)
@@ -395,8 +396,10 @@ class FedRateAnalyzer:
                 "model_confidence": analysis.confidence,
                 "fair_price": scenario.fair_probability,
                 "market_price": scenario.market_probability,
-                "best_bid": scenario.market_probability * 0.95,  # Estimate
-                "liquidity": 10000.0,  # Placeholder
+                # TODO: Fetch actual best_bid from Polymarket orderbook API
+                "best_bid": scenario.market_probability * 0.95,  # Estimate based on market price
+                # TODO: Fetch actual liquidity from Polymarket market data
+                "liquidity": 10000.0,  # Placeholder - update with real market data
                 "metadata": {
                     "meeting_date": analysis.meeting_date,
                     "target_rate_bps": scenario.target_rate_bps,
