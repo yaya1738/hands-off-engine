@@ -17,6 +17,7 @@ env/
 *.tmp
 tmp/
 *.swp
+logs/*.jsonl
 logs/audit/*.jsonl
 logs/ledger/*.jsonl
 logs/ai_nexus/*.jsonl
