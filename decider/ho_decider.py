@@ -17,6 +17,7 @@ from typing import List
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from audit import get_audit_logger
+from executor.trading_safeguards import load_risk_profile
 
 try:
     from ai_nexus.history_log import log_kernel_history_event
@@ -42,15 +43,21 @@ class Decider:
     It takes alpha signals and produces planned actions.
     """
 
-    def __init__(self, bankroll: float = 5000.0):
+    def __init__(self, bankroll: float = 5000.0, max_position_usd: float = None):
         """
         Initialize the Decider.
 
         Args:
             bankroll: Total bankroll for position sizing (default: $5000)
+            max_position_usd: Maximum position size in USD. If None, loads from risk_profile.json
         """
         self.bankroll = bankroll
         self.audit = get_audit_logger(component="decider")
+
+        # Load risk profile to get position limits
+        risk_profile = load_risk_profile()
+        self.max_position_usd = max_position_usd or risk_profile.get("max_position_usd", 50.0)
+        self.max_fraction = 0.10  # Kelly cap: never risk more than 10% of bankroll
 
     def decide(self):
         """Legacy method - kept for backwards compatibility"""
@@ -126,14 +133,16 @@ class Decider:
             # Kelly criterion approximation: f = (edge * confidence) / odds
             # Simplified: use a fraction of bankroll proportional to edge * confidence
             kelly_fraction = edge * confidence
-            max_fraction = 0.10  # Never risk more than 10% of bankroll per position
-            size_fraction = min(kelly_fraction, max_fraction)
+            size_fraction = min(kelly_fraction, self.max_fraction)
             amount = self.bankroll * size_fraction
+
+            # Apply maximum position size cap from risk profile
+            amount = min(amount, self.max_position_usd)
 
             # Create reasoning string
             reasoning = (
                 f"Edge: {edge:.1%}, Current odds: {signal.get('current_odds', 0):.2f}, "
-                f"Confidence: {confidence:.1%}"
+                f"Confidence: {confidence:.1%}, Size capped at ${self.max_position_usd:.0f}"
             )
 
             action = PlannedAction(

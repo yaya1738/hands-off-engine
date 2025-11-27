@@ -152,13 +152,13 @@ def test_executor_safety_reflexes():
         
         executor = Executor(dryrun=True)
         
-        # Test 1: Low confidence should be rejected
+        # Test 1: Low confidence should be rejected (below current 0.45 threshold)
         low_conf_action = PlannedAction(
             market_id='test1',
             market_name='Test Market 1',
             side='YES',
             amount=50.0,
-            confidence=0.5,  # Below 0.7 threshold
+            confidence=0.3,  # Below 0.45 threshold from risk_profile.json
             reasoning='Test'
         )
         
@@ -166,12 +166,12 @@ def test_executor_safety_reflexes():
         assert not is_valid, "Low confidence should be rejected"
         assert 'Confidence' in msg, "Error message should mention confidence"
         
-        # Test 2: Oversized position should be rejected
+        # Test 2: Oversized position should be rejected (above $50 max from risk_profile.json)
         large_action = PlannedAction(
             market_id='test2',
             market_name='Test Market 2',
             side='YES',
-            amount=150.0,  # Above MAX_POSITION_SIZE
+            amount=150.0,  # Above MAX_POSITION_SIZE ($50)
             confidence=0.9,
             reasoning='Test'
         )
