@@ -25,6 +25,13 @@ Change #abc123: Increase position size
 /approve abc123 or /reject abc123
 ```
 
+**When PR Action Needed:**
+```
+🔔 PR #15 merge requested
+Reason not auto-merged: [reason]
+To merge: /merge 15
+```
+
 **If Problems:**
 ```
 ⚠️ System Alert
@@ -38,21 +45,37 @@ Self-healing attempted, needs attention
 - `/pending` - What needs my approval?
 - `/metrics` - Show me the numbers
 - `/health` - Any problems?
+- `/prs` - List open pull requests
 - `/help` - Show commands
 
 ### What You Can Do
 
 - `/approve abc123` - Yes, do it
 - `/reject abc123` - No, don't do it
+- `/merge 15` - Merge a PR
 - `/task Do something specific` - Request something (rarely needed)
 
 ## What You DON'T See
 
 - GitHub Issues (agents use this to coordinate)
+- GitHub PR reviews (auto-handled)
 - Coordination files (agents talk to each other)
 - Multiple interfaces (all consolidated to Telegram)
 - Technical decisions (agents handle internally)
 - Implementation details (hidden complexity)
+
+## Repo Management: Zero-Touch
+
+**You don't need to:**
+- Visit GitHub to merge PRs
+- Review code changes manually
+- Manage branches or conflicts
+
+**The system handles:**
+- Auto-merging approved PRs
+- Auto-merging safe changes (docs, tests)
+- Notifying you only when your input is needed
+- All PR operations via simple Telegram commands
 
 ## Time Commitment
 
@@ -67,13 +90,15 @@ Self-healing attempted, needs attention
 **If it requires Yair's input → Send it to Telegram**
 **If it's agent coordination → Use coordination files (invisible to Yair)**
 **If it's strategic planning → Agents decide, notify Yair of outcome**
+**If it's a PR that's safe → Auto-merge, notify Yair**
+**If it's a PR that needs approval → Notify via Telegram, wait for /merge**
 
-No other interfaces. No GitHub Issues for user. No file editing required. No CLI sessions needed.
+No other interfaces. No GitHub Issues for user. No file editing required. No CLI sessions needed. No manual PR management.
 
 Just Telegram. Simple.
 
 ---
 
-**Last Updated:** 2025-11-23
+**Last Updated:** 2025-11-27
 **Status:** CANONICAL - All agents must follow this
-**User Feedback:** "UI roadblock... tough and cumbersome" - FIX: Single interface only
+**New:** Zero-touch repo/PR management via /prs and /merge commands

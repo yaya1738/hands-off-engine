@@ -194,29 +194,86 @@ class CoordinationAgent:
         """Handle request to merge a PR."""
         logger.info(f"PR merge requested by {from_agent}: #{pr_num}")
 
-        # Check if PR is safe to merge (has tests passing, no conflicts, etc.)
-        is_safe = self.assess_pr_safety(pr_num)
+        try:
+            # Use the PR auto manager for actual merge
+            import sys
+            sys.path.insert(0, str(REPO_ROOT))
+            from scripts.pr_auto_manager import PRAutoManager
 
-        if is_safe:
-            # Auto-merge
-            logger.info(f"PR #{pr_num} assessed as safe - auto-merging")
-            # TODO: Implement actual merge via gh CLI
+            manager = PRAutoManager()
+            assessment = manager.assess_pr_safety(pr_num)
+
+            if assessment['can_auto_merge']:
+                # Auto-merge
+                logger.info(f"PR #{pr_num} assessed as safe - attempting merge")
+                result = manager.merge_pr(pr_num)
+
+                if result['success']:
+                    self.respond_to_agent(
+                        to=from_agent,
+                        message=f"PR #{pr_num} auto-merged successfully",
+                        msg_type="response"
+                    )
+                    self._send_telegram_notification(
+                        f"✅ PR #{pr_num} auto-merged\n\nRequested by: {from_agent}"
+                    )
+                    return True
+                else:
+                    logger.error(f"Merge failed: {result['message']}")
+                    self.respond_to_agent(
+                        to=from_agent,
+                        message=f"PR #{pr_num} merge failed: {result['message']}",
+                        msg_type="response"
+                    )
+                    return False
+            else:
+                # Request user approval via Telegram
+                logger.info(f"PR #{pr_num} requires user approval: {assessment['reason']}")
+                self._send_telegram_notification(
+                    f"🔔 PR #{pr_num} merge requested by {from_agent}\n\n"
+                    f"Reason not auto-merged: {assessment['reason']}\n\n"
+                    f"To merge: /merge {pr_num}"
+                )
+                self.respond_to_agent(
+                    to=from_agent,
+                    message=f"PR #{pr_num} requires user approval - request sent to Telegram",
+                    msg_type="response"
+                )
+                return False
+
+        except ImportError:
+            logger.error("PR auto manager not available")
             self.respond_to_agent(
                 to=from_agent,
-                message=f"PR #{pr_num} auto-merged successfully",
-                msg_type="response"
-            )
-            return True
-        else:
-            # Request user approval
-            logger.info(f"PR #{pr_num} requires user approval")
-            # TODO: Send Telegram message requesting approval
-            self.respond_to_agent(
-                to=from_agent,
-                message=f"PR #{pr_num} requires user approval - request sent to Telegram",
+                message=f"PR #{pr_num} merge failed: PR manager not available",
                 msg_type="response"
             )
             return False
+        except Exception as e:
+            logger.error(f"Error handling PR merge: {e}")
+            return False
+
+    def _send_telegram_notification(self, message: str):
+        """Send notification to user via Telegram."""
+        import requests
+
+        bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+
+        if not bot_token or not chat_id:
+            logger.warning(f"Telegram not configured. Message: {message}")
+            return
+
+        try:
+            url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+            data = {
+                "chat_id": chat_id,
+                "text": message,
+                "parse_mode": "Markdown"
+            }
+            requests.post(url, json=data, timeout=10)
+        except Exception as e:
+            logger.error(f"Error sending Telegram notification: {e}")
 
     def handle_review_request(self, msg: Dict) -> bool:
         """Handle code review request."""
@@ -268,13 +325,17 @@ class CoordinationAgent:
 
     def assess_pr_safety(self, pr_num: int) -> bool:
         """Assess if a PR is safe to auto-merge."""
-        # TODO: Implement actual safety checks:
-        # - All tests passing
-        # - No merge conflicts
-        # - Code review approved
-        # - Changes are within safe bounds
-        # For now, return False (require approval)
-        return False
+        try:
+            import sys
+            sys.path.insert(0, str(REPO_ROOT))
+            from scripts.pr_auto_manager import PRAutoManager
+
+            manager = PRAutoManager()
+            assessment = manager.assess_pr_safety(pr_num)
+            return assessment.get('can_auto_merge', False)
+        except Exception as e:
+            logger.error(f"Error assessing PR safety: {e}")
+            return False
 
     def extract_pr_number(self, context: Dict) -> Optional[int]:
         """Extract PR number from message context."""

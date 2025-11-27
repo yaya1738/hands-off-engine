@@ -55,6 +55,8 @@ class TelegramCommandBot:
             '/reject': self.cmd_reject,
             '/task': self.cmd_task,
             '/agents': self.cmd_agents,
+            '/prs': self.cmd_prs,
+            '/merge': self.cmd_merge,
             '/help': self.cmd_help,
         }
 
@@ -400,6 +402,85 @@ Pending Tasks: {len(pending_tasks)}"""
         except Exception as e:
             return f"❌ Error getting agent status: {str(e)}"
 
+    def cmd_prs(self, args) -> str:
+        """List open PRs with their status."""
+        try:
+            from scripts.pr_auto_manager import PRAutoManager
+
+            manager = PRAutoManager()
+            prs = manager.list_prs()
+
+            return manager.format_pr_list_for_telegram(prs)
+
+        except ImportError:
+            return "❌ PR manager not available"
+        except Exception as e:
+            return f"❌ Error listing PRs: {str(e)}"
+
+    def cmd_merge(self, args) -> str:
+        """Merge a PR by number."""
+        if not args:
+            return """❌ Usage: /merge <pr_number>
+
+Example: /merge 15
+
+This will assess the PR and merge it if safe.
+Use /prs to see available PRs."""
+
+        try:
+            pr_number = int(args[0])
+        except ValueError:
+            return f"❌ Invalid PR number: {args[0]}"
+
+        try:
+            from scripts.pr_auto_manager import PRAutoManager
+
+            manager = PRAutoManager()
+
+            # First show status
+            status = manager.format_pr_status_for_telegram(pr_number)
+
+            # Assess and attempt merge
+            assessment = manager.assess_pr_safety(pr_number)
+
+            if not assessment['can_auto_merge']:
+                return f"""{status}
+
+⚠️ **Cannot auto-merge**
+Reason: {assessment['reason']}
+
+To force merge, use the GitHub web interface."""
+
+            # Attempt merge
+            result = manager.merge_pr(pr_number)
+
+            if result['success']:
+                return f"""✅ **PR #{pr_number} merged successfully!**
+
+{result['message']}
+
+The branch has been deleted automatically."""
+            else:
+                # Try triggering workflow instead
+                workflow_result = manager.trigger_merge_workflow(pr_number)
+
+                if workflow_result['success']:
+                    return f"""⏳ **Merge workflow triggered for PR #{pr_number}**
+
+Direct merge failed, but the auto-merge workflow has been triggered.
+Check back in a few minutes for the result."""
+                else:
+                    return f"""❌ **Merge failed for PR #{pr_number}**
+
+{result['message']}
+
+Please merge manually via GitHub."""
+
+        except ImportError:
+            return "❌ PR manager not available"
+        except Exception as e:
+            return f"❌ Error merging PR: {str(e)}"
+
     def cmd_help(self, args) -> str:
         """Show command help."""
         return """📱 Telegram Bot Commands
@@ -408,6 +489,10 @@ Pending Tasks: {len(pending_tasks)}"""
 /status - Full system status
 /metrics - Performance metrics (24h)
 /health - Run health check
+
+**Repo Management:**
+/prs - List open pull requests
+/merge <number> - Merge a PR
 
 **Interact:**
 /task <description> - Request system to do something
@@ -420,7 +505,7 @@ Pending Tasks: {len(pending_tasks)}"""
 /help - This message
 
 You can control the entire system via Telegram.
-No need to launch Claude Code CLI for routine operations."""
+No need to manually manage the repo or PRs."""
 
 
 def send_telegram_message(message: str):

@@ -1,0 +1,165 @@
+name: Auto-merge PRs
+
+# Automatically merge approved PRs for zero-touch repo management
+# Supports:
+# 1. Auto-merge when checks pass and PR is approved
+# 2. Manual trigger via workflow_dispatch
+# 3. Telegram-triggered merge via repository_dispatch
+
+on:
+  pull_request_review:
+    types: [submitted]
+  check_suite:
+    types: [completed]
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to merge'
+        required: true
+        type: number
+  repository_dispatch:
+    types: [merge_pr]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  auto-merge-approved:
+    runs-on: ubuntu-latest
+    # Run on approval review or when checks complete
+    if: >
+      (github.event_name == 'pull_request_review' && github.event.review.state == 'approved') ||
+      (github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success') ||
+      github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'repository_dispatch'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Determine PR number
+        id: pr_number
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "pr=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            echo "pr=${{ github.event.client_payload.pr_number }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "pull_request_review" ]; then
+            echo "pr=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" == "check_suite" ]; then
+            # Get PRs associated with this check suite
+            PR=$(gh pr list --json number,headRefName --jq '.[] | select(.headRefName == "${{ github.event.check_suite.head_branch }}") | .number' | head -1)
+            echo "pr=$PR" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check PR merge eligibility
+        id: check_eligible
+        if: steps.pr_number.outputs.pr != ''
+        run: |
+          PR_NUM="${{ steps.pr_number.outputs.pr }}"
+          
+          echo "Checking PR #$PR_NUM for merge eligibility..."
+          
+          # Get PR details
+          PR_INFO=$(gh pr view $PR_NUM --json state,mergeable,mergeStateStatus,reviewDecision,statusCheckRollup,labels,title,body,changedFiles,additions,deletions)
+          
+          STATE=$(echo "$PR_INFO" | jq -r '.state')
+          MERGEABLE=$(echo "$PR_INFO" | jq -r '.mergeable')
+          MERGE_STATUS=$(echo "$PR_INFO" | jq -r '.mergeStateStatus')
+          REVIEW_DECISION=$(echo "$PR_INFO" | jq -r '.reviewDecision')
+          TITLE=$(echo "$PR_INFO" | jq -r '.title')
+          CHANGES=$(echo "$PR_INFO" | jq -r '.changedFiles')
+          ADDITIONS=$(echo "$PR_INFO" | jq -r '.additions')
+          DELETIONS=$(echo "$PR_INFO" | jq -r '.deletions')
+          
+          echo "PR State: $STATE"
+          echo "Mergeable: $MERGEABLE"
+          echo "Merge Status: $MERGE_STATUS"
+          echo "Review Decision: $REVIEW_DECISION"
+          echo "Title: $TITLE"
+          echo "Changes: $CHANGES files (+$ADDITIONS/-$DELETIONS)"
+          
+          # Check if auto-merge label exists
+          HAS_AUTO_MERGE=$(echo "$PR_INFO" | jq '.labels[] | select(.name == "auto-merge")' | wc -l)
+          
+          # Determine if safe to auto-merge
+          CAN_MERGE="false"
+          REASON=""
+          
+          if [ "$STATE" != "OPEN" ]; then
+            REASON="PR is not open (state: $STATE)"
+          elif [ "$MERGEABLE" != "MERGEABLE" ]; then
+            REASON="PR has merge conflicts"
+          elif [ "$MERGE_STATUS" == "BLOCKED" ]; then
+            REASON="PR is blocked by branch protection"
+          elif [ "$REVIEW_DECISION" == "APPROVED" ]; then
+            CAN_MERGE="true"
+            REASON="PR is approved and ready to merge"
+          elif [ "$HAS_AUTO_MERGE" -gt 0 ]; then
+            CAN_MERGE="true"
+            REASON="PR has auto-merge label"
+          elif [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            # Manual trigger - allow merge
+            CAN_MERGE="true"
+            REASON="Manual merge trigger"
+          else
+            REASON="PR needs approval before merge"
+          fi
+          
+          echo "can_merge=$CAN_MERGE" >> $GITHUB_OUTPUT
+          echo "reason=$REASON" >> $GITHUB_OUTPUT
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          
+          echo ""
+          echo "Decision: CAN_MERGE=$CAN_MERGE"
+          echo "Reason: $REASON"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Merge PR
+        if: steps.check_eligible.outputs.can_merge == 'true'
+        run: |
+          PR_NUM="${{ steps.pr_number.outputs.pr }}"
+          echo "Merging PR #$PR_NUM..."
+          
+          gh pr merge $PR_NUM --squash --auto \
+            --subject "Auto-merge: ${{ steps.check_eligible.outputs.title }}" \
+            --body "Automatically merged by hands-off-engine auto-merge workflow."
+          
+          echo "✅ PR #$PR_NUM merged successfully"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Post merge notification
+        if: steps.check_eligible.outputs.can_merge == 'true' && success()
+        run: |
+          # Add comment to PR
+          gh pr comment ${{ steps.pr_number.outputs.pr }} --body "✅ **Auto-merged** by hands-off-engine
+
+This PR was automatically merged because:
+- ${{ steps.check_eligible.outputs.reason }}
+
+🤖 Zero-touch repo management is active."
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log non-merge reason
+        if: steps.check_eligible.outputs.can_merge != 'true' && steps.pr_number.outputs.pr != ''
+        run: |
+          echo "⚠️ PR #${{ steps.pr_number.outputs.pr }} was NOT merged"
+          echo "Reason: ${{ steps.check_eligible.outputs.reason }}"
+          
+          # Optionally add comment explaining why not merged
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+            gh pr comment ${{ steps.pr_number.outputs.pr }} --body "⚠️ **Auto-merge attempted but blocked**
+
+Reason: ${{ steps.check_eligible.outputs.reason }}
+
+Please resolve the issue and try again, or merge manually."
+          fi
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
