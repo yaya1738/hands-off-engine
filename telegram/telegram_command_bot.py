@@ -22,8 +22,11 @@ import os
 import json
 import subprocess
 import sys
+import time
+import requests
 from datetime import datetime, timedelta
 from pathlib import Path
+from typing import Optional
 
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -423,37 +426,160 @@ You can control the entire system via Telegram.
 No need to launch Claude Code CLI for routine operations."""
 
 
-def send_telegram_message(message: str):
-    """Send message to user via Telegram."""
-    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
-        print(f"Would send to Telegram:\n{message}")
+def send_telegram_message(message: str, chat_id: Optional[str] = None) -> bool:
+    """Send message to user via Telegram.
+
+    Args:
+        message: Text message to send (supports Markdown)
+        chat_id: Optional chat ID override (defaults to TELEGRAM_CHAT_ID)
+
+    Returns:
+        True if message sent successfully, False otherwise
+    """
+    if not TELEGRAM_BOT_TOKEN:
+        print(f"[DRY RUN] Would send to Telegram:\n{message}")
+        return False
+
+    target_chat = chat_id or TELEGRAM_CHAT_ID
+    if not target_chat:
+        print(f"[ERROR] No chat_id specified and TELEGRAM_CHAT_ID not set")
+        return False
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/sendMessage"
+
+    payload = {
+        "chat_id": target_chat,
+        "text": message,
+        "parse_mode": "Markdown",
+        "disable_web_page_preview": True
+    }
+
+    try:
+        response = requests.post(url, json=payload, timeout=10)
+        if response.status_code == 200:
+            return True
+        else:
+            print(f"[ERROR] Telegram API error: {response.status_code} - {response.text}")
+            return False
+    except requests.RequestException as e:
+        print(f"[ERROR] Failed to send Telegram message: {e}")
+        return False
+
+
+def get_telegram_updates(offset: int = 0, timeout: int = 30) -> list:
+    """Get new messages from Telegram using long polling.
+
+    Args:
+        offset: Update ID to start from (to avoid duplicate processing)
+        timeout: Long polling timeout in seconds
+
+    Returns:
+        List of update objects from Telegram
+    """
+    if not TELEGRAM_BOT_TOKEN:
+        return []
+
+    url = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}/getUpdates"
+
+    params = {
+        "offset": offset,
+        "timeout": timeout,
+        "allowed_updates": ["message"]
+    }
+
+    try:
+        response = requests.get(url, params=params, timeout=timeout + 5)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("ok"):
+                return data.get("result", [])
+        return []
+    except requests.RequestException:
+        return []
+
+
+def run_telegram_bot():
+    """Run the Telegram bot with long polling.
+
+    This is the main entry point for running the bot as a service.
+    It continuously polls for new messages and responds to commands.
+    """
+    if not TELEGRAM_BOT_TOKEN:
+        print("[ERROR] TELEGRAM_BOT_TOKEN not set. Set it via environment variable.")
+        print("        export TELEGRAM_BOT_TOKEN='your_bot_token'")
+        print("        export TELEGRAM_CHAT_ID='your_chat_id'")
         return
 
-    # TODO: Implement actual Telegram API call
-    # Using python-telegram-bot library or direct API
-    print(f"Sending to Telegram chat {TELEGRAM_CHAT_ID}:\n{message}")
+    bot = TelegramCommandBot()
+    last_update_id = 0
+
+    print(f"[INFO] Telegram bot starting...")
+    print(f"[INFO] Chat ID: {TELEGRAM_CHAT_ID or 'Will accept from any chat'}")
+    print(f"[INFO] Listening for commands...")
+
+    while True:
+        try:
+            updates = get_telegram_updates(offset=last_update_id + 1, timeout=30)
+
+            for update in updates:
+                last_update_id = update.get("update_id", last_update_id)
+                message = update.get("message", {})
+                text = message.get("text", "")
+                chat_id = str(message.get("chat", {}).get("id", ""))
+                user = message.get("from", {}).get("username", "unknown")
+
+                # Security: Only respond to configured chat ID if set
+                if TELEGRAM_CHAT_ID and chat_id != TELEGRAM_CHAT_ID:
+                    print(f"[WARN] Ignoring message from unauthorized chat: {chat_id}")
+                    continue
+
+                if text.startswith("/"):
+                    print(f"[CMD] {user}: {text}")
+                    response = bot.process_command(text)
+                    send_telegram_message(response, chat_id=chat_id)
+
+        except KeyboardInterrupt:
+            print("\n[INFO] Bot stopped by user")
+            break
+        except Exception as e:
+            print(f"[ERROR] Bot error: {e}")
+            time.sleep(5)  # Wait before retrying
 
 
 def main():
-    """Main entry point - for testing."""
-    bot = TelegramCommandBot()
+    """Main entry point.
 
-    # Test commands
-    test_commands = [
-        "/status",
-        "/metrics",
-        "/health",
-        "/agents",
-        "/help"
-    ]
+    Usage:
+        python telegram_command_bot.py          # Run the bot (polling mode)
+        python telegram_command_bot.py --test   # Test commands locally
+    """
+    import argparse
 
-    print("Testing Telegram Command Bot\n")
-    for cmd in test_commands:
-        print(f"\n{'='*60}")
-        print(f"Command: {cmd}")
-        print(f"{'='*60}")
-        response = bot.process_command(cmd)
-        print(response)
+    parser = argparse.ArgumentParser(description="Telegram Command Bot")
+    parser.add_argument("--test", action="store_true", help="Run in test mode (no Telegram)")
+    parser.add_argument("--send", type=str, help="Send a single message and exit")
+    args = parser.parse_args()
+
+    if args.send:
+        # Send a single message
+        success = send_telegram_message(args.send)
+        sys.exit(0 if success else 1)
+
+    if args.test:
+        # Test mode - run commands locally
+        bot = TelegramCommandBot()
+        test_commands = ["/status", "/metrics", "/health", "/agents", "/help"]
+
+        print("Testing Telegram Command Bot\n")
+        for cmd in test_commands:
+            print(f"\n{'='*60}")
+            print(f"Command: {cmd}")
+            print(f"{'='*60}")
+            response = bot.process_command(cmd)
+            print(response)
+    else:
+        # Production mode - run the bot
+        run_telegram_bot()
 
 
 if __name__ == "__main__":
