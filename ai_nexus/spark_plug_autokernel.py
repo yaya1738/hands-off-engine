@@ -38,6 +38,13 @@ from datetime import datetime
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
+# v0.3 Constants
+VERSION = "0.3"
+MAX_DECISION_LENGTH = 500  # Max characters for extracted decisions
+MAX_FAILED_PATH_LENGTH = 300  # Max characters for extracted failed paths
+MAX_QUESTION_LENGTH = 200  # Max characters for extracted questions
+MIN_MEANINGFUL_LENGTH = 10  # Minimum length for meaningful content
+
 from ai_nexus.spark_plug_types import (
     HistoryEvent,
     KernelUpdate,
@@ -105,12 +112,13 @@ def extract_decisions_from_content(content: str, source: str, agent: str) -> Lis
     updates = []
 
     # Pattern 1: Explicit DECISION: blocks
+    # Matches "DECISION:", "Decision:", "RECOMMEND:", "Recommend:" followed by content
     decision_pattern = r"(?:DECISION|Decision|RECOMMEND|Recommend)[:\s]+([^\n]+(?:\n(?![A-Z]{2,}:)[^\n]+)*)"
     for match in re.finditer(decision_pattern, content):
         decision_text = match.group(1).strip()
-        if len(decision_text) > 10:  # Minimum meaningful decision
+        if len(decision_text) > MIN_MEANINGFUL_LENGTH:
             updates.append(create_kernel_update_decision(
-                decision=decision_text[:500],  # Cap at 500 chars
+                decision=decision_text[:MAX_DECISION_LENGTH],
                 rationale="Extracted from CPU discussion",
                 source=source,
                 agent=agent
@@ -120,7 +128,7 @@ def extract_decisions_from_content(content: str, source: str, agent: str) -> Lis
     action_pattern = r"(?:We should|I recommend|We decide to|Let's|We will)\s+([^.!?]+[.!?])"
     for match in re.finditer(action_pattern, content, re.IGNORECASE):
         statement = match.group(1).strip()
-        if len(statement) > 15 and len(statement) < 300:  # Reasonable length
+        if len(statement) > 15 and len(statement) < MAX_FAILED_PATH_LENGTH:  # Reasonable length
             # Avoid duplicates
             if not any(statement[:50] in u.content.get("decision", "")[:50] for u in updates):
                 updates.append(create_kernel_update_decision(
@@ -153,13 +161,14 @@ def extract_failed_paths_from_content(content: str, source: str, agent: str) -> 
     updates = []
 
     # Pattern 1: Explicit FAILED or LESSON blocks
+    # Matches "FAILED:", "LESSON:", etc. followed by content
     failed_pattern = r"(?:FAILED|LESSON|Failed|Lesson)[:\s]+([^\n]+(?:\n(?![A-Z]{2,}:)[^\n]+)*)"
     for match in re.finditer(failed_pattern, content):
         text = match.group(1).strip()
-        if len(text) > 10:
+        if len(text) > MIN_MEANINGFUL_LENGTH:
             updates.append(create_kernel_update_failed_path(
                 attempt="See discussion",
-                failure=text[:300],
+                failure=text[:MAX_FAILED_PATH_LENGTH],
                 lesson="Extracted from CPU discussion",
                 source=source,
                 agent=agent
@@ -169,7 +178,7 @@ def extract_failed_paths_from_content(content: str, source: str, agent: str) -> 
     problem_pattern = r"(?:didn't work|failed because|problem was|issue was|that approach)\s+([^.!?]+[.!?])"
     for match in re.finditer(problem_pattern, content, re.IGNORECASE):
         failure_text = match.group(1).strip()
-        if len(failure_text) > 15 and len(failure_text) < 300:
+        if len(failure_text) > 15 and len(failure_text) < MAX_FAILED_PATH_LENGTH:
             updates.append(create_kernel_update_failed_path(
                 attempt="Approach discussed in CPU session",
                 failure=failure_text,
@@ -200,22 +209,24 @@ def extract_questions_from_content(content: str, source: str, agent: str) -> Lis
     updates = []
 
     # Pattern 1: Explicit QUESTION blocks
+    # Matches "QUESTION:", "Open question:", etc. followed by content
     question_block_pattern = r"(?:QUESTION|Question|OPEN QUESTION|Open question)[:\s]+([^\n]+)"
     for match in re.finditer(question_block_pattern, content):
         question = match.group(1).strip()
-        if len(question) > 10:
+        if len(question) > MIN_MEANINGFUL_LENGTH:
             updates.append(KernelUpdate(
                 update_type="question",
-                content={"question": question[:200]},
+                content={"question": question[:MAX_QUESTION_LENGTH]},
                 source=source,
                 agent=agent
             ))
 
     # Pattern 2: Important questions (ending with ?)
+    # Common question starters that indicate strategic questions
     question_pattern = r"(?:Should we|Do we|How should|What is|What are|Is there|Are there|Could we|Would it)\s+[^?]+\?"
     for match in re.finditer(question_pattern, content, re.IGNORECASE):
         question = match.group(0).strip()
-        if len(question) > 15 and len(question) < 200:
+        if len(question) > 15 and len(question) < MAX_QUESTION_LENGTH:
             # Avoid duplicates
             if not any(question[:30] in u.content.get("question", "")[:30] for u in updates):
                 updates.append(KernelUpdate(
@@ -1081,7 +1092,7 @@ Examples:
 
         # Print summary
         print(f"\n{'='*70}")
-        print(f"Spark Plug Auto-Kernel Refresh v0.3")
+        print(f"Spark Plug Auto-Kernel Refresh v{VERSION}")
         print(f"{'='*70}")
         print(f"Status: {result['status']}")
         print(f"Kernel: {result['kernel_id']}")
@@ -1141,7 +1152,7 @@ Examples:
             sys.exit(1)
 
         print(f"\n{'='*70}")
-        print(f"Spark Plug v0.3 - Extract Kernel Updates from Thread")
+        print(f"Spark Plug v{VERSION} - Extract Kernel Updates from Thread")
         print(f"{'='*70}")
         print(f"Thread: {thread_path}")
         print(f"Kernel: {args.kernel_id}")
