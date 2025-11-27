@@ -160,10 +160,9 @@ jobs:
         run: |
           mkdir -p ai/coordination
           
-          # Append digest message to coordination log
-          cat >> ai/coordination/messages.jsonl << 'EOF'
-          {"timestamp": "${{ github.event.repository.updated_at }}", "from": "github-actions", "to": "all", "type": "info", "message": "Weekly digest generated. Check workflow logs for full report.", "context": {"workflow": "weekly-digest"}}
-          EOF
+          # Append digest message to coordination log with current timestamp
+          TIMESTAMP=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          echo "{\"timestamp\": \"${TIMESTAMP}\", \"from\": \"github-actions\", \"to\": \"all\", \"type\": \"info\", \"message\": \"Weekly digest generated. Check workflow logs for full report.\", \"context\": {\"workflow\": \"weekly-digest\"}}" >> ai/coordination/messages.jsonl
 
       - name: Send Telegram notification
         if: ${{ inputs.send_telegram != 'false' }}
@@ -171,10 +170,11 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          TELEGRAM_MSG: ${{ steps.digest.outputs.telegram_msg }}
         run: |
           if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
-            # Escape the message for JSON
-            MSG=$(echo '${{ steps.digest.outputs.telegram_msg }}' | jq -Rs .)
+            # Safely escape the message for JSON using environment variable
+            MSG=$(printf '%s' "$TELEGRAM_MSG" | jq -Rs .)
             
             curl -s -X POST \
               "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \

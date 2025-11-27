@@ -16,13 +16,11 @@ The goal is **maximum autonomy with minimal user intervention**. Users should:
 |----------|---------|---------|---------------------|
 | `issue-auto-assign.yml` | New issue | Auto-assigns to Copilot, adds labels | None |
 | `ai-intake.yml` | `/plan` command | Processes planning requests | Issue creation only |
-| `auto-merge.yml` | PR ready | Auto-merges safe PRs | None for safe PRs |
-| `pr-sync.yml` | Push/schedule | Syncs PR branches, labels PRs | None |
 | `weekly-digest.yml` | Weekly/manual | Consolidated status report | ~2 min review |
 | `workflow-failure-notify.yml` | Workflow fails | Telegram alert | Only if action needed |
 | `agent-coordination-notify.yml` | Coordination updates | Notifies agents | None |
-| `tests.yml` | PR/push | Runs test suite | None |
-| `ci.yml` | PR/push | Basic CI checks | None |
+
+**Note:** Additional workflows like `auto-merge.yml`, `pr-sync.yml`, `ci.yml`, and `tests.yml` exist on main branch but may not be present on all branches.
 
 ---
 
