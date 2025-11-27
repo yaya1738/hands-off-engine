@@ -111,10 +111,12 @@ jobs:
             ) || checks.check_runs.length === 0;
             
             // Determine if PR is auto-mergeable
+            // SECURITY: Require BOTH trusted author AND safe files to auto-merge
             const canAutoMerge = pr.mergeable && 
                                  pr.mergeable_state === 'clean' &&
                                  allChecksPassing &&
-                                 (isTrustedAuthor || allFilesAreSafe);
+                                 isTrustedAuthor &&
+                                 allFilesAreSafe;
             
             console.log(`Author trusted: ${isTrustedAuthor}`);
             console.log(`All files safe: ${allFilesAreSafe}`);
@@ -132,9 +134,11 @@ jobs:
       - name: Auto-merge PR
         if: steps.check_prs.outputs.can_merge == 'true'
         uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.check_prs.outputs.pr_number }}
         with:
           script: |
-            const prNumber = ${{ steps.check_prs.outputs.pr_number || 0 }};
+            const prNumber = parseInt(process.env.PR_NUMBER, 10);
             if (!prNumber || prNumber === 0) {
               console.log('No PR number available');
               return;
@@ -158,9 +162,11 @@ jobs:
       - name: Notify on merge failure
         if: failure()
         uses: actions/github-script@v7
+        env:
+          PR_NUMBER: ${{ steps.check_prs.outputs.pr_number }}
         with:
           script: |
-            const prNumber = ${{ steps.check_prs.outputs.pr_number || 0 }};
+            const prNumber = parseInt(process.env.PR_NUMBER, 10);
             if (prNumber > 0) {
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
