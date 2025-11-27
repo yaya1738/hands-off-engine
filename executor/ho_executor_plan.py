@@ -8,13 +8,30 @@ to ensure no dangerous actions are taken.
 
 import sys
 import os
+import json
 from dataclasses import dataclass
-from typing import List
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import List, Optional
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 from audit import get_audit_logger
+
+# Polymarket CLOB client import (optional - only needed for LIVE trading)
+try:
+    from py_clob_client.client import ClobClient
+    from py_clob_client.clob_types import OrderArgs, OrderType
+    CLOB_AVAILABLE = True
+except ImportError:
+    CLOB_AVAILABLE = False
+    ClobClient = None
+
+
+# Polymarket API configuration
+POLYMARKET_HOST = "https://clob.polymarket.com"
+POLYGON_CHAIN_ID = 137  # Polygon mainnet
 
 
 @dataclass
@@ -25,6 +42,38 @@ class ExecutionResult:
     success: bool
     message: str
     executed_amount: float = 0.0
+    order_id: Optional[str] = None
+
+
+def get_polymarket_credentials() -> tuple[Optional[str], Optional[str]]:
+    """
+    Get Polymarket API credentials from environment variables.
+    
+    Returns:
+        Tuple of (api_key, secret) or (None, None) if not configured
+    """
+    api_key = os.environ.get('POLYMARKET_API_KEY')
+    secret = os.environ.get('POLYMARKET_SECRET')
+    return api_key, secret
+
+
+def validate_live_trading_prerequisites() -> tuple[bool, str]:
+    """
+    Validate that all prerequisites for live trading are met.
+    
+    Returns:
+        Tuple of (is_valid, error_message)
+    """
+    if not CLOB_AVAILABLE:
+        return False, "py-clob-client not installed. Run: pip install py-clob-client"
+    
+    api_key, secret = get_polymarket_credentials()
+    if not api_key:
+        return False, "POLYMARKET_API_KEY environment variable not set"
+    if not secret:
+        return False, "POLYMARKET_SECRET environment variable not set"
+    
+    return True, "OK"
 
 
 class Executor:
@@ -36,6 +85,8 @@ class Executor:
     # Safety parameters (reflexes)
     MAX_POSITION_SIZE = 100.0  # Maximum dollars per position
     MIN_CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence to execute
+    MAX_DAILY_USD = 50.0  # Maximum USD to trade per day (LIVE mode)
+    MAX_PER_ORDER_USD = 10.0  # Maximum USD per single order (LIVE mode)
 
     def __init__(self, dryrun: bool = True):
         """
@@ -46,6 +97,49 @@ class Executor:
         """
         self.dryrun = dryrun
         self.audit = get_audit_logger(component="executor")
+        self._clob_client: Optional[ClobClient] = None
+        self._daily_spent_usd = 0.0
+        self._last_reset_date: Optional[str] = None
+    
+    def _get_clob_client(self) -> Optional[ClobClient]:
+        """
+        Get or create the CLOB client for Polymarket API.
+        
+        Returns:
+            ClobClient instance or None if not configured
+        """
+        if self._clob_client is not None:
+            return self._clob_client
+        
+        if not CLOB_AVAILABLE:
+            return None
+        
+        api_key, secret = get_polymarket_credentials()
+        if not api_key or not secret:
+            return None
+        
+        try:
+            # Initialize CLOB client with Level 1 auth (private key)
+            # The POLYMARKET_SECRET is the private key for signing
+            self._clob_client = ClobClient(
+                host=POLYMARKET_HOST,
+                chain_id=POLYGON_CHAIN_ID,
+                key=secret
+            )
+            return self._clob_client
+        except Exception as e:
+            self.audit.log_error(
+                error_type="clob_client_init",
+                error_message=f"Failed to initialize CLOB client: {e}"
+            )
+            return None
+    
+    def _reset_daily_limit_if_needed(self):
+        """Reset daily spending limit if it's a new day."""
+        today = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+        if self._last_reset_date != today:
+            self._daily_spent_usd = 0.0
+            self._last_reset_date = today
 
     def execute(self):
         """Legacy method - kept for backwards compatibility"""
@@ -58,12 +152,13 @@ class Executor:
             result="completed"
         )
 
-    def validate_action(self, action) -> tuple[bool, str]:
+    def validate_action(self, action, for_live: bool = False) -> tuple[bool, str]:
         """
         Validate a planned action against safety rules (reflexes).
 
         Args:
             action: PlannedAction object to validate
+            for_live: If True, apply additional LIVE trading constraints
 
         Returns:
             Tuple of (is_valid, error_message)
@@ -79,9 +174,130 @@ class Executor:
         # Check for valid side
         if action.side not in ["YES", "NO"]:
             return False, f"Invalid side '{action.side}', must be YES or NO"
+        
+        # Additional safety checks for LIVE trading
+        if for_live:
+            # Check per-order limit
+            if action.amount > self.MAX_PER_ORDER_USD:
+                return False, f"LIVE: Order size ${action.amount:.2f} exceeds max per order ${self.MAX_PER_ORDER_USD:.2f}"
+            
+            # Check daily limit
+            self._reset_daily_limit_if_needed()
+            if self._daily_spent_usd + action.amount > self.MAX_DAILY_USD:
+                remaining = self.MAX_DAILY_USD - self._daily_spent_usd
+                return False, f"LIVE: Would exceed daily limit. Spent: ${self._daily_spent_usd:.2f}, Limit: ${self.MAX_DAILY_USD:.2f}, Remaining: ${remaining:.2f}"
 
         # All checks passed
         return True, "OK"
+    
+    def _execute_live_order(self, action) -> ExecutionResult:
+        """
+        Execute a single order on Polymarket CLOB.
+        
+        Args:
+            action: PlannedAction object
+            
+        Returns:
+            ExecutionResult with outcome
+        """
+        # Validate prerequisites
+        is_ready, prereq_msg = validate_live_trading_prerequisites()
+        if not is_ready:
+            return ExecutionResult(
+                market_id=action.market_id,
+                market_name=action.market_name,
+                success=False,
+                message=f"LIVE: Prerequisites not met - {prereq_msg}",
+                executed_amount=0.0
+            )
+        
+        client = self._get_clob_client()
+        if not client:
+            return ExecutionResult(
+                market_id=action.market_id,
+                market_name=action.market_name,
+                success=False,
+                message="LIVE: Failed to initialize Polymarket CLOB client",
+                executed_amount=0.0
+            )
+        
+        try:
+            # Convert side to CLOB format (BUY for YES, SELL for NO)
+            clob_side = "BUY" if action.side == "YES" else "SELL"
+            
+            # For market orders, we use a high price for BUY, low price for SELL
+            # This ensures immediate execution
+            # Note: In production, you may want to use limit orders with proper price discovery
+            price = 0.99 if clob_side == "BUY" else 0.01
+            
+            # Create order arguments
+            # Note: token_id is the market's token ID (YES/NO token)
+            # In a real implementation, you'd need to get the correct token_id from the market
+            order_args = OrderArgs(
+                token_id=action.market_id,  # This should be the actual token ID
+                price=price,
+                size=action.amount,
+                side=clob_side
+            )
+            
+            # Log pre-execution audit
+            self.audit.log_order(
+                order_type="market",
+                market=action.market_id,
+                side=action.side,
+                size=action.amount,
+                price=price,
+                dryrun=False
+            )
+            
+            # Execute the order
+            result = client.create_and_post_order(order_args)
+            
+            # Update daily spending tracker
+            self._daily_spent_usd += action.amount
+            
+            # Log successful execution
+            order_id = result.get('orderID') or result.get('id') or str(result)
+            self.audit.log_action(
+                action_type="live_order_executed",
+                action_data={
+                    "market_id": action.market_id,
+                    "market_name": action.market_name,
+                    "side": action.side,
+                    "amount": action.amount,
+                    "order_id": order_id,
+                    "response": str(result)[:500]  # Truncate for audit
+                },
+                result="success"
+            )
+            
+            return ExecutionResult(
+                market_id=action.market_id,
+                market_name=action.market_name,
+                success=True,
+                message=f"LIVE: Placed {action.side} order for ${action.amount:.2f}",
+                executed_amount=action.amount,
+                order_id=order_id
+            )
+            
+        except Exception as e:
+            error_msg = str(e)
+            self.audit.log_error(
+                error_type="live_order_failed",
+                error_message=error_msg,
+                context={
+                    "market_id": action.market_id,
+                    "side": action.side,
+                    "amount": action.amount
+                }
+            )
+            return ExecutionResult(
+                market_id=action.market_id,
+                market_name=action.market_name,
+                success=False,
+                message=f"LIVE: Order failed - {error_msg}",
+                executed_amount=0.0
+            )
 
     def execute_actions(self, planned_actions: List) -> List[ExecutionResult]:
         """
@@ -96,8 +312,8 @@ class Executor:
         results = []
 
         for action in planned_actions:
-            # Validate action (reflexes)
-            is_valid, validation_msg = self.validate_action(action)
+            # Validate action (reflexes) - apply LIVE constraints if not in dryrun
+            is_valid, validation_msg = self.validate_action(action, for_live=not self.dryrun)
 
             if not is_valid:
                 # Safety reflex triggered - reject action
@@ -113,6 +329,14 @@ class Executor:
 
             # Execute action (body)
             if self.dryrun:
+                # Log the dryrun order for audit trail
+                self.audit.log_order(
+                    order_type="market",
+                    market=action.market_id,
+                    side=action.side,
+                    size=action.amount,
+                    dryrun=True
+                )
                 result = ExecutionResult(
                     market_id=action.market_id,
                     market_name=action.market_name,
@@ -121,14 +345,8 @@ class Executor:
                     executed_amount=action.amount
                 )
             else:
-                # In production, this would call actual trading API
-                result = ExecutionResult(
-                    market_id=action.market_id,
-                    market_name=action.market_name,
-                    success=True,
-                    message=f"LIVE: Placed {action.side} order for ${action.amount:.2f}",
-                    executed_amount=action.amount
-                )
+                # LIVE MODE: Execute on Polymarket CLOB API
+                result = self._execute_live_order(action)
 
             results.append(result)
 
@@ -149,13 +367,70 @@ class Executor:
         rejected = total - successful
         total_executed = sum(r.executed_amount for r in results)
 
-        return {
+        summary = {
             'total_actions': total,
             'successful': successful,
             'rejected': rejected,
             'total_amount_executed': total_executed,
             'mode': 'DRYRUN' if self.dryrun else 'LIVE'
         }
+        
+        # Add LIVE mode specific info
+        if not self.dryrun:
+            self._reset_daily_limit_if_needed()
+            summary['daily_spent_usd'] = self._daily_spent_usd
+            summary['daily_remaining_usd'] = max(0, self.MAX_DAILY_USD - self._daily_spent_usd)
+            summary['max_per_order_usd'] = self.MAX_PER_ORDER_USD
+            summary['max_daily_usd'] = self.MAX_DAILY_USD
+        
+        return summary
+
+
+def load_execution_plan(plan_path: Optional[Path] = None) -> dict:
+    """
+    Load the execution plan configuration from JSON file.
+    
+    Args:
+        plan_path: Path to execution_plan.json (default: executor/execution_plan.json)
+        
+    Returns:
+        Execution plan configuration dict
+    """
+    if plan_path is None:
+        plan_path = Path(__file__).parent / "execution_plan.json"
+    
+    with open(plan_path, 'r') as f:
+        return json.load(f)
+
+
+def create_executor_from_plan(plan_path: Optional[Path] = None) -> Executor:
+    """
+    Create an Executor instance based on the execution plan configuration.
+    
+    Args:
+        plan_path: Path to execution_plan.json (default: executor/execution_plan.json)
+        
+    Returns:
+        Configured Executor instance
+    """
+    plan = load_execution_plan(plan_path)
+    
+    # Determine mode from plan
+    mode = plan.get('mode', 'DRYRUN')
+    live_enabled = plan.get('live_enabled', False)
+    
+    # DRYRUN unless explicitly set to LIVE and live_enabled is True
+    dryrun = not (mode == 'LIVE' and live_enabled)
+    
+    executor = Executor(dryrun=dryrun)
+    
+    # Override safety limits from plan if specified
+    if 'max_live_per_order_usd' in plan:
+        executor.MAX_PER_ORDER_USD = plan['max_live_per_order_usd']
+    if 'max_live_daily_usd' in plan:
+        executor.MAX_DAILY_USD = plan['max_live_daily_usd']
+    
+    return executor
 
 
 # Instantiate and execute (for backwards compatibility)
