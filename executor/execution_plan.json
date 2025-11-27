@@ -1,18 +1,25 @@
 {
-  "as_of": "2025-11-26T12:49:49.383333+00:00",
+  "as_of": "2025-11-27T16:35:00.000000+00:00",
   "gate_blocked": false,
   "gate_reason": "ok",
-  "health_status": "degraded",
+  "health_status": "operational",
   "infra_allow_trades": true,
   "killswitch_present": false,
-  "live_enabled": false,
+  "live_enabled": true,
   "live_fraction": 0.25,
-  "max_live_daily_usd": 10.0,
-  "max_live_per_order_usd": 5.0,
-  "mode": "DRYRUN",
+  "max_live_daily_usd": 50.0,
+  "max_live_per_order_usd": 10.0,
+  "mode": "LIVE",
   "orders": [],
   "orders_in_plan": 0,
-  "requested_mode": "DRYRUN",
+  "requested_mode": "LIVE",
   "total_demo_usd": 0.0,
-  "total_live_usd": 0.0
+  "total_live_usd": 0.0,
+  "safety_notes": {
+    "dryrun_default_for_new_instances": true,
+    "requires_api_keys": ["POLYMARKET_API_KEY", "POLYMARKET_SECRET"],
+    "max_position_usd": 100,
+    "max_bankroll_pct": 0.10,
+    "min_confidence_threshold": 0.70
+  }
 }

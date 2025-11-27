@@ -77,6 +77,47 @@ if [ ! -w "/var/log/hands-off-engine.log" ]; then
     echo "[$(date)] WARNING: Cannot write to log file"
 fi
 
+# Check 6: GitHub API rate limit status
+GH_STATUS=$(python3 << 'PYEOF'
+import os
+import sys
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from scripts.github_client import GitHubClient
+    client = GitHubClient()
+    status = client.get_auth_status()
+    if status["remaining"] == 0:
+        print("RATE_LIMITED")
+    elif not status["authenticated"]:
+        print("UNAUTHENTICATED")
+    elif status["remaining"] < 500:
+        print("LOW")
+    else:
+        print("OK")
+except Exception as e:
+    print("ERROR", file=sys.stderr)
+    print(f"GitHub check failed: {e}", file=sys.stderr)
+PYEOF
+)
+
+case "$GH_STATUS" in
+    "RATE_LIMITED")
+        send_alert "🔴 GitHub API rate limited! Configure GITHUB_TOKEN."
+        ;;
+    "UNAUTHENTICATED")
+        echo "[$(date)] WARNING: GitHub API unauthenticated (60 req/hour limit)"
+        ;;
+    "LOW")
+        echo "[$(date)] WARNING: GitHub API rate limit running low (<500 remaining)"
+        ;;
+    "OK")
+        echo "[$(date)] ✓ GitHub API: Authenticated with sufficient rate limit"
+        ;;
+    *)
+        echo "[$(date)] WARNING: Could not check GitHub API status"
+        ;;
+esac
+
 # All checks passed
 echo "[$(date)] ✓ All health checks passed"
 echo "  Execution plan age: ${AGE_MINS} minutes"

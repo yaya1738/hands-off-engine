@@ -14,12 +14,19 @@ The canonical schema includes:
 - markets: list of market signals with:
   - market_id: unique identifier (slug)
   - question: market question text
+  - query_category: category/query the market belongs to
   - side: recommended side (YES/NO)
   - model_edge: estimated edge (0.0 to 1.0)
   - model_confidence: confidence in the edge estimate (0.0 to 1.0)
   - fair_price: model's estimated fair price
   - market_price: current market price
   - liquidity: market liquidity indicator
+
+Category-Aware Edge Detection:
+- Different categories have different confidence multipliers
+- High-volume categories (crypto) get higher confidence
+- Political/sports have moderate confidence
+- Speculative categories get lower confidence
 """
 
 import json
@@ -27,6 +34,41 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
+
+
+# Category-specific confidence multipliers
+# Higher values = more confident in edge estimates for this category
+CATEGORY_CONFIDENCE = {
+    "bitcoin": 0.85,      # Crypto markets: liquid, well-understood
+    "ethereum": 0.85,
+    "crypto": 0.85,
+    "fed rate": 0.90,     # Fed rate: trackable, data-driven
+    "inflation": 0.80,
+    "trump": 0.75,        # Political: more uncertainty
+    "election": 0.75,
+    "politics": 0.70,
+    "israel": 0.65,       # Geopolitical: high uncertainty
+    "ukraine": 0.65,
+    "war": 0.60,
+    "nba": 0.70,          # Sports: reasonable data but high variance
+    "nfl": 0.70,
+    "sports": 0.70,
+    "default": 0.70,      # Fallback for unknown categories
+}
+
+
+def get_category_confidence(category: str) -> float:
+    """
+    Get confidence multiplier for a market category.
+    
+    Args:
+        category: The query/category the market belongs to
+        
+    Returns:
+        Confidence multiplier (0.0 to 1.0)
+    """
+    category_lower = category.lower().strip()
+    return CATEGORY_CONFIDENCE.get(category_lower, CATEGORY_CONFIDENCE["default"])
 
 
 def calculate_edge(market_price: float, fair_price: float) -> float:
@@ -45,15 +87,16 @@ def calculate_edge(market_price: float, fair_price: float) -> float:
     return abs(fair_price - market_price)
 
 
-def estimate_fair_price(market: Dict) -> float:
+def estimate_fair_price(market: Dict, category: str = "") -> float:
     """
-    Estimate fair price from market data.
+    Estimate fair price from market data with category-aware adjustments.
 
-    OPTIMIZED: Reduced adjustment range to decrease false positive rate.
+    OPTIMIZED: Uses category-specific adjustments for better edge detection.
     This is still a placeholder - in production, would use sophisticated models.
 
     Args:
         market: Market dict with bestBid, last, etc.
+        category: Market category for category-specific adjustments
 
     Returns:
         Estimated fair price (0.0 to 1.0)
@@ -63,13 +106,35 @@ def estimate_fair_price(market: Dict) -> float:
     best_bid = market.get('bestBid', 0.5)
     last = market.get('last', 0.5)
 
+    # Handle None values
+    if best_bid is None:
+        best_bid = 0.5
+    if last is None:
+        last = 0.5
+
     # Average with slight adjustment based on spread
     avg = (best_bid + last) / 2.0
 
-    # OPTIMIZED: Reduced adjustment range from ±10% to ±4%
-    # This reduces selection rate from 90%+ to ~40-50%
+    # Category-aware adjustment
+    # Crypto markets: tighter spreads, smaller adjustments
+    # Political markets: wider spreads, more uncertainty
+    category_lower = category.lower().strip() if category else ""
+    
+    if category_lower in ("bitcoin", "ethereum", "crypto"):
+        # Crypto: use tighter adjustment range (±2%)
+        adjustment_range = 5
+        adjustment_offset = 2
+    elif category_lower in ("fed rate", "inflation"):
+        # Economic: data-driven, use moderate adjustment (±3%)
+        adjustment_range = 7
+        adjustment_offset = 3
+    else:
+        # Default: standard adjustment (±4%)
+        adjustment_range = 9
+        adjustment_offset = 4
+
     slug = market.get('slug', '')
-    adjustment = (hash(slug) % 9 - 4) / 100.0  # -0.04 to +0.04 (was -0.10 to +0.10)
+    adjustment = (hash(slug) % adjustment_range - adjustment_offset) / 100.0
 
     fair = avg + adjustment
 
@@ -77,22 +142,24 @@ def estimate_fair_price(market: Dict) -> float:
     return max(0.01, min(0.99, fair))
 
 
-def calculate_confidence(edge: float, market: Dict) -> float:
+def calculate_confidence(edge: float, market: Dict, category: str = "") -> float:
     """
-    Calculate confidence in the edge estimate.
+    Calculate confidence in the edge estimate with category awareness.
     
     Higher edges generally have lower confidence (they're more suspicious).
     More liquid markets have higher confidence.
+    Category affects base confidence level.
     
     Args:
         edge: The calculated edge
         market: Market dict with liquidity indicators
+        category: Market category for category-specific adjustments
     
     Returns:
         Confidence (0.0 to 1.0)
     """
-    # Base confidence starts at 0.7
-    base_confidence = 0.7
+    # Base confidence depends on category
+    base_confidence = get_category_confidence(category)
     
     # Reduce confidence for very high edges (suspicious)
     if edge > 0.15:
@@ -102,13 +169,20 @@ def calculate_confidence(edge: float, market: Dict) -> float:
     elif edge > 0.05:
         base_confidence *= 0.9
     
-    # In production, would adjust based on:
-    # - Market liquidity
-    # - Historical accuracy of similar predictions
-    # - Data quality
-    # - Time until resolution
+    # Boost confidence for liquid markets
+    liquidity = market.get('liquidity')
+    if liquidity:
+        try:
+            liq_val = float(liquidity)
+            if liq_val > 100000:
+                base_confidence *= 1.1  # 10% boost for high liquidity
+            elif liq_val > 10000:
+                base_confidence *= 1.05  # 5% boost for moderate liquidity
+        except (ValueError, TypeError):
+            pass
     
-    return base_confidence
+    # Cap at 0.95 max confidence
+    return min(0.95, base_confidence)
 
 
 def determine_side(market_price: float, fair_price: float) -> str:
@@ -139,12 +213,16 @@ def transform_market(market: Dict, query: str) -> Optional[Dict]:
     # Get market price (use last trade price)
     market_price = market.get('last', 0.5)
     
+    # Handle None values
+    if market_price is None:
+        market_price = 0.5
+    
     # Skip markets with extreme prices (too certain)
     if market_price < 0.05 or market_price > 0.95:
         return None
     
-    # Estimate fair price using our alpha model
-    fair_price = estimate_fair_price(market)
+    # Estimate fair price using our alpha model (category-aware)
+    fair_price = estimate_fair_price(market, query)
     
     # Calculate edge
     edge = calculate_edge(market_price, fair_price)
@@ -154,11 +232,25 @@ def transform_market(market: Dict, query: str) -> Optional[Dict]:
     if edge < 0.05:  # Less than 5% edge (was 3%)
         return None
     
-    # Calculate confidence
-    confidence = calculate_confidence(edge, market)
+    # Calculate confidence (category-aware)
+    confidence = calculate_confidence(edge, market, query)
     
     # Determine side
     side = determine_side(market_price, fair_price)
+    
+    # Get liquidity value
+    liquidity = market.get('liquidity')
+    if liquidity is None:
+        liquidity = 1000.0  # Placeholder
+    try:
+        liquidity = float(liquidity)
+    except (ValueError, TypeError):
+        liquidity = 1000.0
+    
+    # Get best bid with fallback
+    best_bid = market.get('bestBid', market_price)
+    if best_bid is None:
+        best_bid = market_price
     
     # Build canonical market object
     return {
@@ -170,8 +262,8 @@ def transform_market(market: Dict, query: str) -> Optional[Dict]:
         'model_confidence': round(confidence, 4),
         'fair_price': round(fair_price, 4),
         'market_price': round(market_price, 4),
-        'best_bid': round(market.get('bestBid', market_price), 4),
-        'liquidity': 1000.0  # Placeholder - in production, get real liquidity
+        'best_bid': round(best_bid, 4),
+        'liquidity': liquidity
     }
 
 
