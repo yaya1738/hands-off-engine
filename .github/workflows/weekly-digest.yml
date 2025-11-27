@@ -1,0 +1,187 @@
+name: Weekly Digest
+
+# Generates a weekly status digest of repository activity
+# Sent every Monday at 8 AM UTC - minimizes user effort by providing consolidated updates
+
+on:
+  schedule:
+    # Every Monday at 8 AM UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+    inputs:
+      send_telegram:
+        description: 'Send notification to Telegram'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+
+jobs:
+  generate-digest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Generate Weekly Digest
+        id: digest
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const now = new Date();
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            // Get PRs merged in the last week
+            const { data: closedPRs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed',
+              sort: 'updated',
+              direction: 'desc',
+              per_page: 50
+            });
+            
+            const mergedPRs = closedPRs.filter(pr => 
+              pr.merged_at && new Date(pr.merged_at) > oneWeekAgo
+            );
+            
+            // Get open PRs
+            const { data: openPRs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+            
+            // Get open issues
+            const { data: openIssues } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              per_page: 50
+            });
+            
+            // Filter out PRs from issues
+            const actualIssues = openIssues.filter(issue => !issue.pull_request);
+            
+            // Get new issues this week
+            const newIssues = actualIssues.filter(issue => 
+              new Date(issue.created_at) > oneWeekAgo
+            );
+            
+            // Get recent commits
+            const { data: commits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              since: oneWeekAgo.toISOString(),
+              per_page: 100
+            });
+            
+            // Get workflow runs from the past week
+            const { data: workflowRuns } = await github.rest.actions.listWorkflowRunsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              created: `>${oneWeekAgo.toISOString()}`,
+              per_page: 100
+            });
+            
+            const failedRuns = workflowRuns.workflow_runs.filter(run => 
+              run.conclusion === 'failure'
+            );
+            
+            const successRuns = workflowRuns.workflow_runs.filter(run => 
+              run.conclusion === 'success'
+            );
+            
+            // Build digest
+            let digest = `# 📊 Weekly Digest - ${now.toISOString().split('T')[0]}\n\n`;
+            digest += `## Summary\n\n`;
+            digest += `| Metric | Count |\n`;
+            digest += `|--------|-------|\n`;
+            digest += `| PRs Merged | ${mergedPRs.length} |\n`;
+            digest += `| Open PRs | ${openPRs.length} |\n`;
+            digest += `| New Issues | ${newIssues.length} |\n`;
+            digest += `| Open Issues | ${actualIssues.length} |\n`;
+            digest += `| Commits | ${commits.length} |\n`;
+            digest += `| CI Success | ${successRuns.length} |\n`;
+            digest += `| CI Failures | ${failedRuns.length} |\n\n`;
+            
+            // PRs merged
+            if (mergedPRs.length > 0) {
+              digest += `## 🔀 PRs Merged (${mergedPRs.length})\n\n`;
+              for (const pr of mergedPRs.slice(0, 10)) {
+                digest += `- [#${pr.number}](${pr.html_url}) ${pr.title}\n`;
+              }
+              digest += '\n';
+            }
+            
+            // Open PRs needing attention
+            if (openPRs.length > 0) {
+              digest += `## ⏳ Open PRs (${openPRs.length})\n\n`;
+              for (const pr of openPRs.slice(0, 10)) {
+                const daysOpen = Math.floor((now - new Date(pr.created_at)) / (1000 * 60 * 60 * 24));
+                digest += `- [#${pr.number}](${pr.html_url}) ${pr.title} (${daysOpen}d)\n`;
+              }
+              digest += '\n';
+            }
+            
+            // Failed runs
+            if (failedRuns.length > 0) {
+              digest += `## ❌ CI Failures (${failedRuns.length})\n\n`;
+              for (const run of failedRuns.slice(0, 5)) {
+                digest += `- [${run.name}](${run.html_url}) - ${run.head_branch}\n`;
+              }
+              digest += '\n';
+            }
+            
+            // Telegram-friendly summary
+            let telegramMsg = `📊 *Weekly Digest*\n\n`;
+            telegramMsg += `✅ ${mergedPRs.length} PRs merged\n`;
+            telegramMsg += `⏳ ${openPRs.length} PRs open\n`;
+            telegramMsg += `📝 ${newIssues.length} new issues\n`;
+            telegramMsg += `📦 ${commits.length} commits\n`;
+            if (failedRuns.length > 0) {
+              telegramMsg += `❌ ${failedRuns.length} CI failures\n`;
+            }
+            telegramMsg += `\n_Hands-Off Engine - ${now.toISOString().split('T')[0]}_`;
+            
+            core.setOutput('digest', digest);
+            core.setOutput('telegram_msg', telegramMsg);
+            core.setOutput('has_failures', failedRuns.length > 0 ? 'true' : 'false');
+            
+            console.log('Digest generated successfully');
+            console.log(digest);
+
+      - name: Write digest to coordination
+        run: |
+          mkdir -p ai/coordination
+          
+          # Append digest message to coordination log
+          cat >> ai/coordination/messages.jsonl << 'EOF'
+          {"timestamp": "${{ github.event.repository.updated_at }}", "from": "github-actions", "to": "all", "type": "info", "message": "Weekly digest generated. Check workflow logs for full report.", "context": {"workflow": "weekly-digest"}}
+          EOF
+
+      - name: Send Telegram notification
+        if: ${{ inputs.send_telegram != 'false' }}
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            # Escape the message for JSON
+            MSG=$(echo '${{ steps.digest.outputs.telegram_msg }}' | jq -Rs .)
+            
+            curl -s -X POST \
+              "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -H "Content-Type: application/json" \
+              -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": ${MSG}, \"parse_mode\": \"Markdown\"}" || true
+              
+            echo "Telegram notification sent"
+          else
+            echo "Telegram not configured, skipping notification"
+          fi

@@ -1,0 +1,92 @@
+name: Workflow Failure Notification
+
+# Notifies user via Telegram when any workflow fails
+# This ensures critical failures are not missed
+
+on:
+  workflow_run:
+    workflows: 
+      - "CI"
+      - "Tests"
+      - "AI Intake"
+      - "Auto-merge PRs"
+      - "PR Sync and Management"
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  notify-failure:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'failure' }}
+
+    steps:
+      - name: Get failure details
+        id: failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const run = context.payload.workflow_run;
+            
+            // Get failed jobs
+            const { data: jobs } = await github.rest.actions.listJobsForWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: run.id
+            });
+            
+            const failedJobs = jobs.jobs.filter(job => job.conclusion === 'failure');
+            const failedJobNames = failedJobs.map(job => job.name).join(', ');
+            
+            const message = [
+              '❌ Workflow Failed',
+              '',
+              'Workflow: ' + run.name,
+              'Branch: ' + run.head_branch,
+              'Commit: ' + run.head_sha.substring(0, 7),
+              'Failed Jobs: ' + (failedJobNames || 'Unknown'),
+              '',
+              'View Run: ' + run.html_url,
+              '',
+              'Hands-Off Engine Alert'
+            ].join('\n');
+
+            core.setOutput('message', message);
+            core.setOutput('run_name', run.name);
+            core.setOutput('branch', run.head_branch);
+            core.setOutput('run_url', run.html_url);
+            core.setOutput('failed_jobs', failedJobNames);
+
+      - name: Send Telegram notification
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          RUN_NAME: ${{ steps.failure.outputs.run_name }}
+          BRANCH: ${{ steps.failure.outputs.branch }}
+          FAILED_JOBS: ${{ steps.failure.outputs.failed_jobs }}
+          RUN_URL: ${{ steps.failure.outputs.run_url }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            MSG="❌ Workflow Failed - ${RUN_NAME} on ${BRANCH}. Failed jobs: ${FAILED_JOBS}. View: ${RUN_URL}"
+            
+            # Escape for JSON
+            MSG_ESCAPED=$(echo "$MSG" | jq -Rs .)
+            
+            curl -s -X POST \
+              "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -H "Content-Type: application/json" \
+              -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": ${MSG_ESCAPED}}" || true
+              
+            echo "Failure notification sent to Telegram"
+          else
+            echo "Telegram not configured - printing to log only"
+            echo "FAILURE: ${RUN_NAME} on ${BRANCH}"
+            echo "Failed jobs: ${FAILED_JOBS}"
+          fi
+
+      - name: Log failure
+        run: |
+          echo "Workflow failure logged: ${{ steps.failure.outputs.run_name }}"

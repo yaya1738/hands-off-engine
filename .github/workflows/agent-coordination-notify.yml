@@ -58,54 +58,61 @@ jobs:
             if (issues.data.length > 0) {
               // Comment on existing issue
               issueNumber = issues.data[0].number;
+              const commentBody = [
+                '## 🔔 New Coordination Message',
+                '',
+                '**From:** ' + lastMsg.from,
+                '**To:** ' + lastMsg.to,
+                '**Type:** ' + lastMsg.type,
+                '**Time:** ' + lastMsg.timestamp,
+                '',
+                '**Message:**',
+                lastMsg.message,
+                '',
+                '---',
+                '*View full coordination log: `ai/coordination/messages.jsonl`*'
+              ].join('\n');
+              
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
-                body: `## 🔔 New Coordination Message
-
-**From:** ${lastMsg.from}
-**To:** ${lastMsg.to}
-**Type:** ${lastMsg.type}
-**Time:** ${lastMsg.timestamp}
-
-**Message:**
-${lastMsg.message}
-
----
-*View full coordination log: \`ai/coordination/messages.jsonl\`*`
+                body: commentBody
               });
             } else {
               // Create new coordination issue
+              const issueBody = [
+                '## Agent Coordination Messages',
+                '',
+                'This issue tracks real-time coordination between AI agents.',
+                '',
+                '**Latest Message:**',
+                '',
+                '**From:** ' + lastMsg.from,
+                '**To:** ' + lastMsg.to,
+                '**Type:** ' + lastMsg.type,
+                '',
+                '**Message:**',
+                lastMsg.message,
+                '',
+                '---',
+                '',
+                '**Coordination Protocol:**',
+                '- Agents coordinate via `ai/coordination/messages.jsonl`',
+                '- This issue provides notifications',
+                '- View full log: `ai/coordination/messages.jsonl`',
+                '',
+                '**Active Agents:**',
+                '- Claude Code CLI',
+                '- GitHub Copilot'
+              ].join('\n');
+              
               await github.rest.issues.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 title: '🤖 Agent Coordination Hub',
                 labels: ['agent-coordination'],
-                body: `## Agent Coordination Messages
-
-This issue tracks real-time coordination between AI agents.
-
-**Latest Message:**
-
-**From:** ${lastMsg.from}
-**To:** ${lastMsg.to}
-**Type:** ${lastMsg.type}
-
-**Message:**
-${lastMsg.message}
-
----
-
-**Coordination Protocol:**
-- Agents coordinate via \`ai/coordination/messages.jsonl\`
-- This issue provides notifications
-- View full log: \`ai/coordination/messages.jsonl\`
-
-**Active Agents:**
-- Claude Code CLI
-- GitHub Copilot
-`
+                body: issueBody
               });
             }
 
