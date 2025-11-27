@@ -1,18 +1,41 @@
 {
-  "as_of": "2025-11-26T12:49:49.383333+00:00",
-  "gate_blocked": false,
-  "gate_reason": "ok",
-  "health_status": "degraded",
-  "infra_allow_trades": true,
-  "killswitch_present": false,
-  "live_enabled": false,
-  "live_fraction": 0.25,
-  "max_live_daily_usd": 10.0,
-  "max_live_per_order_usd": 5.0,
-  "mode": "DRYRUN",
-  "orders": [],
-  "orders_in_plan": 0,
-  "requested_mode": "DRYRUN",
-  "total_demo_usd": 0.0,
-  "total_live_usd": 0.0
+  "timestamp": "2025-11-27T13:50:19.564856",
+  "dryrun": true,
+  "total_orders": 3,
+  "total_size_usd": 145.95,
+  "orders": [
+    {
+      "market_id": "will-donald-trump-be-the-1-searched-person-on-google-this-year",
+      "question": "Will Donald Trump be the #1 searched person on Google this year?",
+      "side": "yes",
+      "size_usd": 56.7,
+      "confidence": 0.63,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 6.0%, Current odds: 0.10, Confidence: 63.0%",
+      "status": "planned"
+    },
+    {
+      "market_id": "bitcoin-above-90k-on-november-27",
+      "question": "Will the price of Bitcoin be above $90,000 on November 27?",
+      "side": "no",
+      "size_usd": 47.25,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 4.5%, Current odds: 0.84, Confidence: 70.0%",
+      "status": "planned"
+    },
+    {
+      "market_id": "will-bitcoin-reach-110000-by-december-31-2025",
+      "question": "Will Bitcoin reach $110,000 by December 31, 2025?",
+      "side": "yes",
+      "size_usd": 41.99999999999999,
+      "confidence": 0.7,
+      "edge": null,
+      "category": "unknown",
+      "reason": "Edge: 4.0%, Current odds: 0.20, Confidence: 70.0%",
+      "status": "planned"
+    }
+  ]
 }

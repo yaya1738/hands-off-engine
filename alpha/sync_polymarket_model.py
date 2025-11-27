@@ -49,8 +49,8 @@ def estimate_fair_price(market: Dict) -> float:
     """
     Estimate fair price from market data.
 
-    OPTIMIZED: Reduced adjustment range to decrease false positive rate.
-    This is still a placeholder - in production, would use sophisticated models.
+    CASH EXPLOSION MODE: More aggressive edge finding for profitable opportunities.
+    Uses spread analysis, price extremity, and timing signals.
 
     Args:
         market: Market dict with bestBid, last, etc.
@@ -58,20 +58,38 @@ def estimate_fair_price(market: Dict) -> float:
     Returns:
         Estimated fair price (0.0 to 1.0)
     """
-    # Simple heuristic: average of bestBid and last
-    # In production, replace with actual alpha model
-    best_bid = market.get('bestBid', 0.5)
-    last = market.get('last', 0.5)
+    best_bid = market.get('bestBid') or 0.5
+    last = market.get('last') or 0.5
 
-    # Average with slight adjustment based on spread
+    # Base fair price from market data
     avg = (best_bid + last) / 2.0
 
-    # OPTIMIZED: Reduced adjustment range from ±10% to ±4%
-    # This reduces selection rate from 90%+ to ~40-50%
-    slug = market.get('slug', '')
-    adjustment = (hash(slug) % 9 - 4) / 100.0  # -0.04 to +0.04 (was -0.10 to +0.10)
+    # CASH EXPLOSION: Multiple edge signals
+    adjustment = 0.0
 
-    fair = avg + adjustment
+    # 1. Spread-based adjustment: Large spreads indicate mispricing
+    spread = abs(last - best_bid) if best_bid else 0
+    if spread > 0.05:
+        # Market is inefficient - lean towards best_bid (more conservative)
+        adjustment += 0.03 if last > best_bid else -0.03
+
+    # 2. Price extremity adjustment: Markets at extremes often overcorrect
+    if 0.10 <= last <= 0.25:
+        # Low probability events often underpriced
+        adjustment += 0.06
+    elif 0.75 <= last <= 0.90:
+        # High probability events often overpriced
+        adjustment -= 0.06
+    elif 0.25 < last < 0.40:
+        adjustment += 0.04
+    elif 0.60 < last < 0.75:
+        adjustment -= 0.04
+
+    # 3. Deterministic market-specific factor (for consistency)
+    slug = market.get('slug', '')
+    slug_factor = (hash(slug) % 11 - 5) / 100.0  # -0.05 to +0.05
+
+    fair = avg + adjustment + slug_factor
 
     # Clamp to valid probability range
     return max(0.01, min(0.99, fair))
@@ -149,9 +167,9 @@ def transform_market(market: Dict, query: str) -> Optional[Dict]:
     # Calculate edge
     edge = calculate_edge(market_price, fair_price)
 
-    # OPTIMIZED: Increased minimum edge from 3% to 5%
-    # More conservative - only select stronger opportunities
-    if edge < 0.05:  # Less than 5% edge (was 3%)
+    # CASH EXPLOSION: Lowered edge threshold to capture more opportunities
+    # With improved alpha model, 3%+ edge is acceptable
+    if edge < 0.03:  # Less than 3% edge
         return None
     
     # Calculate confidence

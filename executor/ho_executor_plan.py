@@ -35,7 +35,7 @@ class Executor:
 
     # Safety parameters (reflexes)
     MAX_POSITION_SIZE = 100.0  # Maximum dollars per position
-    MIN_CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence to execute
+    MIN_CONFIDENCE_THRESHOLD = 0.55  # Minimum confidence to execute (lowered for cash explosion)
 
     def __init__(self, dryrun: bool = True):
         """
