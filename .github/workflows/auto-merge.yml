@@ -4,7 +4,7 @@ name: Auto-merge PRs
 # This workflow enables zero-touch repo management as per the Hands-Off Engine goals
 # 
 # Merges automatically when:
-# 1. PR is from Copilot (trusted source)
+# 1. PR is from Copilot or other trusted sources
 # 2. PR is marked ready for review (not draft)
 # 3. All required checks pass
 # 4. No merge conflicts
@@ -31,6 +31,10 @@ permissions:
   contents: write
   pull-requests: write
   issues: write
+
+# Trusted bot authors that can auto-merge (case-insensitive matching used in script)
+env:
+  TRUSTED_AUTHORS: "copilot,github-actions[bot],dependabot[bot]"
 
 jobs:
   auto-merge:
@@ -108,7 +112,7 @@ jobs:
             exit 0
           fi
           
-          # Check if all checks pass
+          # Check if all checks pass (only evaluate completed checks)
           CHECKS_PASSED=$(echo "$PR_INFO" | jq '[.statusCheckRollup[]? | select(.status == "COMPLETED") | .conclusion] | all(. == "SUCCESS" or . == "SKIPPED" or . == "NEUTRAL")')
           HAS_PENDING=$(echo "$PR_INFO" | jq '[.statusCheckRollup[]? | .status] | any(. == "PENDING" or . == "QUEUED" or . == "IN_PROGRESS")')
           
@@ -118,14 +122,23 @@ jobs:
           fi
           
           # Auto-merge criteria:
-          # 1. From Copilot (trusted bot)
-          # 2. From trusted sources OR manual trigger
+          # 1. From trusted sources (case-insensitive check)
+          # 2. Manual trigger allows any author
           SHOULD_MERGE="false"
+          AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
           
-          if [ "$AUTHOR" == "Copilot" ] || [ "$AUTHOR" == "copilot" ] || [ "$AUTHOR" == "github-actions[bot]" ]; then
-            echo "PR is from trusted bot ($AUTHOR), will auto-merge"
-            SHOULD_MERGE="true"
-          elif [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+          # Check if author is in trusted list (case-insensitive)
+          for trusted in $(echo "$TRUSTED_AUTHORS" | tr ',' ' '); do
+            trusted_lower=$(echo "$trusted" | tr '[:upper:]' '[:lower:]')
+            if [ "$AUTHOR_LOWER" == "$trusted_lower" ]; then
+              echo "PR is from trusted source ($AUTHOR), will auto-merge"
+              SHOULD_MERGE="true"
+              break
+            fi
+          done
+          
+          # Manual/API triggers allow merge regardless of author
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "${{ github.event_name }}" == "repository_dispatch" ]; then
             echo "Manual/API trigger, will attempt merge"
             SHOULD_MERGE="true"
           fi
@@ -143,35 +156,50 @@ jobs:
           echo "Attempting direct merge..."
           if gh pr merge $PR_NUM --squash --delete-branch 2>/dev/null; then
             echo "✅ PR #$PR_NUM merged successfully!"
-            
-            # Add comment
-            gh pr comment $PR_NUM --body "✅ **Auto-merged** by hands-off-engine. Author: $AUTHOR (trusted source). All checks passed. Zero-touch repo management is active." 2>/dev/null || true
           else
             echo "Direct merge failed, auto-merge may be pending"
           fi
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
 
   # Separate job to handle draft PRs when they become ready
   mark-ready-and-merge:
     runs-on: ubuntu-latest
     if: >
       github.event_name == 'pull_request' && 
-      github.event.action == 'ready_for_review' &&
-      github.event.pull_request.user.login == 'Copilot'
-    
+      github.event.action == 'ready_for_review'
+
     steps:
-      - name: Auto-merge ready Copilot PR
+      - name: Auto-merge ready PR from trusted source
         run: |
           PR_NUM="${{ github.event.pull_request.number }}"
-          echo "Copilot PR #$PR_NUM is now ready for review"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
           
-          # Wait for checks to complete
-          sleep 30
+          echo "PR #$PR_NUM is now ready for review (author: $AUTHOR)"
           
-          # Enable auto-merge
+          # Check if author is trusted (case-insensitive)
+          IS_TRUSTED="false"
+          for trusted in $(echo "$TRUSTED_AUTHORS" | tr ',' ' '); do
+            trusted_lower=$(echo "$trusted" | tr '[:upper:]' '[:lower:]')
+            if [ "$AUTHOR_LOWER" == "$trusted_lower" ]; then
+              IS_TRUSTED="true"
+              break
+            fi
+          done
+          
+          if [ "$IS_TRUSTED" != "true" ]; then
+            echo "Author $AUTHOR is not in trusted list, skipping"
+            exit 0
+          fi
+          
+          echo "Author $AUTHOR is trusted, enabling auto-merge"
+          
+          # Enable auto-merge (will merge when checks pass)
           gh pr merge $PR_NUM --squash --auto 2>/dev/null || true
           
           echo "Auto-merge enabled for PR #$PR_NUM"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
