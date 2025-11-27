@@ -139,6 +139,8 @@
 3. **Check these files first:**
    - `.claude/USER_PROFILE.md` (this file) - User's goals
    - `.claude/PRODUCTION_STATUS.md` - Current system state
+   - `docs/business/UNIFIED_FINANCE_PROFILE.md` - Business & finance reference
+   - `state/knowledge.json` - Bootstrap instructions & primary docs
    - `state/performance_metrics.jsonl` - Recent performance
    - `/var/log/hands-off-engine.log` - Recent activity
 

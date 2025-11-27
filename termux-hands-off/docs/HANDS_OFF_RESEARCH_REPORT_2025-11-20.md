@@ -67,6 +67,9 @@ This is intentionally approximate and should be updated as reality evolves.
   - ✅ Existing in Termux stack; provide JSON snapshots.
 - **Finance/state JSONs:**
   - ✅ Exist; quality and coverage vary by file and need improvement over time.
+- **Unified Business Integration:**
+  - ✅ `business/finance_hub.py` provides unified access to all financial data.
+  - ✅ `docs/business/UNIFIED_FINANCE_PROFILE.md` documents all finance sources.
 
 ### 3.3 Alpha, Risk, Decider, Executor
 

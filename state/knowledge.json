@@ -1,7 +1,16 @@
 {
   "primary_status_doc": "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md",
+  "business_integration_doc": "docs/business/UNIFIED_FINANCE_PROFILE.md",
   "ai_bootstrap_instructions": [
     "Read the primary_status_doc before planning or changing anything.",
-    "Use the roadmap there as the main source of truth."
-  ]
+    "Use the roadmap there as the main source of truth.",
+    "For finance/business data, see business_integration_doc for unified reference.",
+    "Use the business.FinanceHub module for programmatic access to financial data."
+  ],
+  "finance_data_sources": {
+    "accounts": "termux-hands-off/agents/external_accounts.json",
+    "credit_cards": "termux-hands-off/agents/cards.json",
+    "manual_balances": "termux-hands-off/agent/balances_manual.yaml",
+    "finance_rules": "termux-hands-off/agents/finance_rules.json"
+  }
 }
