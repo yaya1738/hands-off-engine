@@ -377,33 +377,28 @@ class SelfHealingAgent:
             return None
 
     def trigger_infrastructure_scaler(self, issue: Dict) -> str:
-        """Trigger infrastructure scaler to handle droplet issues."""
+        """Trigger autonomous infrastructure manager to handle droplet issues."""
         try:
-            scaler_script = REPO_ROOT / "scripts" / "infrastructure_scaler.py"
-
-            if not scaler_script.exists():
-                logger.error("Infrastructure scaler not found")
-                return None
-
-            # Run health check via scaler
+            # Use the comprehensive infrastructure module
             result = subprocess.run(
-                ["python3", str(scaler_script), "health"],
+                ["python3", "-m", "infrastructure.auto_provisioner", "--status"],
                 capture_output=True,
                 text=True,
-                timeout=120
+                timeout=120,
+                cwd=str(REPO_ROOT)
             )
 
             if result.returncode == 0:
-                logger.info(f"Infrastructure scaler triggered successfully")
+                logger.info(f"Infrastructure manager triggered successfully")
                 return f"Triggered infrastructure health check for {issue.get('droplet_ip', 'unknown')}"
             else:
-                logger.error(f"Infrastructure scaler failed: {result.stderr}")
+                logger.error(f"Infrastructure manager failed: {result.stderr}")
                 # Alert user since auto-fix didn't work
                 self.send_telegram_alert(issue)
                 return None
 
         except Exception as e:
-            logger.error(f"Error triggering infrastructure scaler: {e}")
+            logger.error(f"Error triggering infrastructure manager: {e}")
             self.send_telegram_alert(issue)
             return None
 

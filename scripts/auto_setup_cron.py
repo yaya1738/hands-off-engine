@@ -59,8 +59,8 @@ CRON_JOBS = [
     },
     {
         "schedule": "0 * * * *",
-        "command": f"python3 {REPO_ROOT}/scripts/infrastructure_scaler.py",
-        "description": "Infrastructure scaler - hourly"
+        "command": f"cd {REPO_ROOT} && python3 -m infrastructure.autonomous_infra_manager",
+        "description": "Infrastructure manager - hourly"
     },
 
     # Daily Tasks

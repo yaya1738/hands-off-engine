@@ -121,22 +121,19 @@ def check_acquisition_triggers(revenue: float, state: dict) -> list:
 
 
 def run_infrastructure_scaler(command: str = None) -> dict:
-    """Run the infrastructure scaler."""
-    scaler_script = REPO_ROOT / "scripts" / "infrastructure_scaler.py"
-
-    if not scaler_script.exists():
-        return {"error": "Infrastructure scaler not found"}
-
+    """Run the autonomous infrastructure manager."""
     try:
-        cmd = ["python3", str(scaler_script)]
-        if command:
-            cmd.append(command)
+        # Use the comprehensive infrastructure module
+        cmd = ["python3", "-m", "infrastructure.autonomous_infra_manager"]
+        if command == "status":
+            cmd.append("--status")
 
         result = subprocess.run(
             cmd,
             capture_output=True,
             text=True,
-            timeout=180
+            timeout=180,
+            cwd=str(REPO_ROOT)
         )
 
         return {
