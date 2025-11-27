@@ -33,11 +33,11 @@ except ImportError:
     print("Error: requests library not found. Install with: pip install requests")
     sys.exit(1)
 
-# Configuration
+# Configuration (can be overridden via environment variables)
 REPO_ROOT = Path(__file__).parent.parent
-OWNER = "yaya1738"
-REPO = "hands-off-engine"
-WORKFLOW_ID = "208529335"  # Copilot coding agent workflow ID
+OWNER = os.getenv("GITHUB_OWNER", "yaya1738")
+REPO = os.getenv("GITHUB_REPO", "hands-off-engine")
+WORKFLOW_ID = os.getenv("COPILOT_WORKFLOW_ID", "208529335")  # Copilot coding agent workflow ID
 API_BASE = "https://api.github.com"
 SESSION_LOG = REPO_ROOT / "logs" / "agent_sessions.jsonl"
 
@@ -113,8 +113,13 @@ class AgentSessionViewer:
             
             # Handle rate limiting
             if response.status_code == 403:
-                remaining = response.headers.get("X-RateLimit-Remaining", "?")
-                if remaining == "0":
+                remaining = response.headers.get("X-RateLimit-Remaining", "")
+                try:
+                    remaining_int = int(remaining) if remaining else -1
+                except ValueError:
+                    remaining_int = -1
+                    
+                if remaining_int == 0:
                     print("⚠️ GitHub API rate limit exceeded. Set GITHUB_TOKEN for higher limits.", file=sys.stderr)
                 else:
                     print(f"⚠️ Access denied. This repo may be private. Set GITHUB_TOKEN env var.", file=sys.stderr)
@@ -225,7 +230,7 @@ class AgentSessionViewer:
                 continue
             
             reaction = {
-                "run_id": session.run_id,
+                "run_id": str(session.run_id),  # String for JSON serialization consistency
                 "branch": session.branch,
                 "conclusion": session.conclusion,
                 "suggestion": "",
@@ -269,37 +274,40 @@ class AgentSessionViewer:
     
     def _log_reactions(self, reactions: List[Dict[str, str]]):
         """Log reactions to the session log file."""
-        SESSION_LOG.parent.mkdir(parents=True, exist_ok=True)
-        
-        timestamp = datetime.now(timezone.utc).isoformat()
-        
-        with open(SESSION_LOG, 'a') as f:
-            for reaction in reactions:
-                entry = {
-                    "timestamp": timestamp,
-                    "type": "reaction",
-                    **reaction,
-                }
-                f.write(json.dumps(entry) + "\n")
+        try:
+            SESSION_LOG.parent.mkdir(parents=True, exist_ok=True)
+            
+            timestamp = datetime.now(timezone.utc).isoformat()
+            
+            with open(SESSION_LOG, 'a') as f:
+                for reaction in reactions:
+                    entry = {
+                        "timestamp": timestamp,
+                        "type": "reaction",
+                        **reaction,
+                    }
+                    f.write(json.dumps(entry) + "\n")
+        except (OSError, IOError) as e:
+            print(f"⚠️ Failed to log reactions: {e}", file=sys.stderr)
 
 
 def format_session_table(sessions: List[AgentSession]) -> str:
-    """Format sessions as a text table."""
+    """Format sessions as a text table with proper separators."""
     if not sessions:
         return "No sessions found."
     
     lines = []
     lines.append("=" * 100)
-    lines.append(f"{'Run #':<8} {'Status':<10} {'Branch':<40} {'Duration':<12} {'PR':<6}")
+    lines.append(f"{'Run #':<8} | {'Status':<10} | {'Branch':<38} | {'Duration':<12} | {'PR':<6}")
     lines.append("-" * 100)
     
     for s in sessions:
         pr_str = f"#{s.pr_number}" if s.pr_number else "-"
         status_str = f"{s.status_emoji()} {s.conclusion or s.status}"
-        branch_str = s.branch[:38] if len(s.branch) > 38 else s.branch
+        branch_str = s.branch[:36] + ".." if len(s.branch) > 38 else s.branch
         lines.append(
-            f"{s.run_number:<8} {status_str:<10} {branch_str:<40} "
-            f"{s.format_duration():<12} {pr_str:<6}"
+            f"{s.run_number:<8} | {status_str:<10} | {branch_str:<38} | "
+            f"{s.format_duration():<12} | {pr_str:<6}"
         )
     
     lines.append("=" * 100)
