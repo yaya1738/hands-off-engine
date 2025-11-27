@@ -4,7 +4,7 @@ Business Integration Package for Hands-Off Engine
 This package provides unified access to all financial and business data.
 """
 
-from business.finance_hub import (
+from .finance_hub import (
     FinanceHub,
     FinancialSummary,
     AccountBalance,
