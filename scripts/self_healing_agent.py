@@ -87,6 +87,10 @@ class SelfHealingAgent:
         issues.extend(self.check_log_rotation())
         issues.extend(self.check_stale_processes())
         issues.extend(self.check_file_permissions())
+        # Critical trading checks (added to prevent revenue loss)
+        issues.extend(self.check_data_freshness())
+        issues.extend(self.check_live_trading_setup())
+        issues.extend(self.check_pipeline_execution())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -267,6 +271,149 @@ class SelfHealingAgent:
                         "auto_fixable": True,
                         "fix_cmd": ["chmod", "+x", str(script)]
                     })
+
+        return issues
+
+    def check_data_freshness(self) -> List[Dict]:
+        """Check if market data is stale - critical for revenue generation."""
+        issues = []
+
+        # Check polymarket-compact.json (source data from Termux)
+        compact_file = REPO_ROOT / "termux-hands-off" / "out" / "polymarket-compact.json"
+        model_file = REPO_ROOT / "state" / "polymarket-model.json"
+
+        for data_file, description in [
+            (compact_file, "Termux market data"),
+            (model_file, "Alpha model data")
+        ]:
+            if data_file.exists():
+                try:
+                    with open(data_file) as f:
+                        data = json.load(f)
+
+                    timestamp_str = data.get("timestamp") or data.get("source_timestamp")
+                    if timestamp_str:
+                        # Parse timestamp
+                        data_time = datetime.fromisoformat(timestamp_str.replace("Z", "+00:00"))
+                        age_hours = (datetime.now(data_time.tzinfo) - data_time).total_seconds() / 3600
+
+                        if age_hours > 24:  # Data older than 24 hours
+                            issues.append({
+                                "type": "stale_data",
+                                "description": f"{description} is {age_hours:.0f} hours old - revenue at risk!",
+                                "severity": "high",
+                                "auto_fixable": False,
+                                "alert_user": True,
+                                "details": f"Last update: {timestamp_str}"
+                            })
+                except Exception as e:
+                    logger.error(f"Error checking {data_file}: {e}")
+            else:
+                issues.append({
+                    "type": "missing_data",
+                    "description": f"{description} file missing at {data_file}",
+                    "severity": "high",
+                    "auto_fixable": False,
+                    "alert_user": True
+                })
+
+        return issues
+
+    def check_live_trading_setup(self) -> List[Dict]:
+        """Check if live trading is properly configured - critical for revenue."""
+        issues = []
+
+        # Check trading_mode.json
+        mode_file = REPO_ROOT / "state" / "trading_mode.json"
+        if mode_file.exists():
+            try:
+                with open(mode_file) as f:
+                    mode = json.load(f)
+
+                # Check if live trading is enabled in state
+                if not mode.get("live_trading_enabled", False):
+                    issues.append({
+                        "type": "trading_disabled",
+                        "description": f"Live trading disabled in state file: {mode.get('reason', 'unknown')}",
+                        "severity": "high",
+                        "auto_fixable": False,
+                        "alert_user": True
+                    })
+            except Exception as e:
+                logger.error(f"Error checking trading mode: {e}")
+
+        # Check environment variables (these are required for actual execution)
+        env_file = REPO_ROOT / ".env.polymarket"
+        if not env_file.exists():
+            issues.append({
+                "type": "missing_config",
+                "description": ".env.polymarket not found - live trading will not work!",
+                "severity": "high",
+                "auto_fixable": False,
+                "alert_user": True
+            })
+
+        return issues
+
+    def check_pipeline_execution(self) -> List[Dict]:
+        """Check if trading pipeline is running and producing results."""
+        issues = []
+
+        # Check shadow_trades.jsonl for recent activity
+        shadow_log = REPO_ROOT / "state" / "shadow_trades.jsonl"
+        if shadow_log.exists():
+            try:
+                # Read file once and collect both timestamp and trade data
+                last_trade_time = None
+                recent_trades = []
+                with open(shadow_log) as f:
+                    for line in f:
+                        try:
+                            trade = json.loads(line)
+                            recent_trades.append(trade)
+                            ts = trade.get("timestamp")
+                            if ts:
+                                last_trade_time = datetime.fromisoformat(ts.replace("Z", "+00:00"))
+                        except (json.JSONDecodeError, ValueError):
+                            continue
+
+                if last_trade_time:
+                    age_hours = (datetime.now(last_trade_time.tzinfo) - last_trade_time).total_seconds() / 3600
+
+                    if age_hours > 24:  # No trades in 24 hours
+                        issues.append({
+                            "type": "stale_pipeline",
+                            "description": f"No trades logged in {age_hours:.0f} hours - pipeline may be stuck",
+                            "severity": "medium",
+                            "auto_fixable": False,
+                            "alert_user": True
+                        })
+
+                    # Check if trades are actually executing (not just shadow)
+                    # Only check last 5 trades for efficiency
+                    for trade in recent_trades[-5:]:
+                        extra = trade.get("extra", {})
+                        # Alert if explicitly set to False (shadow mode confirmed)
+                        if extra.get("live_trading_active") is False:
+                            issues.append({
+                                "type": "shadow_only",
+                                "description": "Recent trades are shadow-only - no real revenue being generated!",
+                                "severity": "high",
+                                "auto_fixable": False,
+                                "alert_user": True
+                            })
+                            break  # Only report once
+
+            except Exception as e:
+                logger.error(f"Error checking pipeline execution: {e}")
+        else:
+            issues.append({
+                "type": "no_trades",
+                "description": "No shadow trades log found - pipeline not running",
+                "severity": "high",
+                "auto_fixable": False,
+                "alert_user": True
+            })
 
         return issues
 
