@@ -121,6 +121,12 @@ jobs:
             exit 0
           fi
           
+          # Ensure all completed checks passed
+          if [ "$CHECKS_PASSED" != "true" ]; then
+            echo "Some checks failed, skipping"
+            exit 0
+          fi
+          
           # Auto-merge criteria:
           # 1. From trusted sources (case-insensitive check)
           # 2. Manual trigger allows any author
@@ -150,15 +156,16 @@ jobs:
           
           # Enable auto-merge if not already enabled
           echo "Enabling auto-merge for PR #$PR_NUM..."
-          gh pr merge $PR_NUM --squash --auto 2>/dev/null || true
+          AUTO_MERGE_OUTPUT=$(gh pr merge $PR_NUM --squash --auto 2>&1) && echo "Auto-merge enabled" || echo "Auto-merge setup returned: $AUTO_MERGE_OUTPUT"
           
           # If auto-merge is not available, try direct merge
           echo "Attempting direct merge..."
-          if gh pr merge $PR_NUM --squash --delete-branch 2>/dev/null; then
+          MERGE_OUTPUT=$(gh pr merge $PR_NUM --squash --delete-branch 2>&1) && {
             echo "✅ PR #$PR_NUM merged successfully!"
-          else
-            echo "Direct merge failed, auto-merge may be pending"
-          fi
+          } || {
+            echo "Direct merge returned: $MERGE_OUTPUT"
+            echo "Auto-merge may be pending until branch protections are satisfied"
+          }
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
@@ -197,9 +204,11 @@ jobs:
           echo "Author $AUTHOR is trusted, enabling auto-merge"
           
           # Enable auto-merge (will merge when checks pass)
-          gh pr merge $PR_NUM --squash --auto 2>/dev/null || true
-          
-          echo "Auto-merge enabled for PR #$PR_NUM"
+          AUTO_MERGE_OUTPUT=$(gh pr merge $PR_NUM --squash --auto 2>&1) && {
+            echo "Auto-merge enabled for PR #$PR_NUM"
+          } || {
+            echo "Auto-merge setup returned: $AUTO_MERGE_OUTPUT"
+          }
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
