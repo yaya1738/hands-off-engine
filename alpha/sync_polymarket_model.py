@@ -60,7 +60,9 @@ def estimate_fair_price(market: Dict) -> float:
     Returns:
         Estimated fair price (0.0 to 1.0)
     """
-    best_bid = market.get('bestBid') or market.get('last', 0.5)
+    best_bid = market.get('bestBid')
+    if best_bid is None:
+        best_bid = market.get('last', 0.5)
     last = market.get('last', 0.5)
     volume = market.get('volume', 0)
     query = market.get('query', '').lower()

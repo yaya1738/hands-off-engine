@@ -30,8 +30,9 @@ Output: JSON in polymarket-compact.json format:
 import argparse
 import json
 import sys
-import urllib.request
 import urllib.error
+import urllib.parse
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Optional
