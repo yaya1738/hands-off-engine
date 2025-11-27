@@ -29,6 +29,13 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Tuple, Optional
 
+# Try to import requests, set flag if unavailable
+try:
+    import requests
+    REQUESTS_AVAILABLE = True
+except ImportError:
+    REQUESTS_AVAILABLE = False
+
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
 LOG_FILE = "/var/log/self-healing-agent.log"
@@ -166,12 +173,14 @@ class DigitalOceanManager:
 
     def is_configured(self) -> bool:
         """Check if DigitalOcean API is configured."""
-        return bool(self.api_token and self.droplet_id)
+        return bool(self.api_token and self.droplet_id and REQUESTS_AVAILABLE)
 
     def _api_request(self, method: str, endpoint: str, data: Optional[Dict] = None) -> Optional[Dict]:
         """Make API request to DigitalOcean."""
+        if not REQUESTS_AVAILABLE:
+            logger.error("requests library not available - cannot make API calls")
+            return None
         try:
-            import requests
             url = f"{self.api_base}{endpoint}"
             headers = {
                 "Authorization": f"Bearer {self.api_token}",
@@ -300,16 +309,51 @@ class SelfHealingAgent:
         }
 
     def load_resource_config(self) -> Dict:
-        """Load resource limits configuration."""
+        """Load resource limits configuration with proper merging."""
+        result = DEFAULT_RESOURCE_LIMITS.copy()
+
         if RESOURCE_CONFIG_FILE.exists():
             try:
                 with open(RESOURCE_CONFIG_FILE) as f:
                     config = json.load(f)
-                    # Merge with defaults
-                    return {**DEFAULT_RESOURCE_LIMITS, **config}
+
+                # Map JSON structure to flat config keys
+                if "cpu" in config:
+                    if "warning_threshold" in config["cpu"]:
+                        result["cpu_warning_threshold"] = config["cpu"]["warning_threshold"]
+                    if "critical_threshold" in config["cpu"]:
+                        result["cpu_critical_threshold"] = config["cpu"]["critical_threshold"]
+
+                if "memory" in config:
+                    if "warning_threshold" in config["memory"]:
+                        result["memory_warning_threshold"] = config["memory"]["warning_threshold"]
+                    if "critical_threshold" in config["memory"]:
+                        result["memory_critical_threshold"] = config["memory"]["critical_threshold"]
+
+                if "auto_scale" in config:
+                    if "enabled" in config["auto_scale"]:
+                        result["auto_scale_enabled"] = config["auto_scale"]["enabled"]
+
+                if "runaway_process" in config:
+                    if "enabled" in config["runaway_process"]:
+                        result["auto_kill_runaway_enabled"] = config["runaway_process"]["enabled"]
+                    if "cpu_threshold" in config["runaway_process"]:
+                        result["runaway_cpu_threshold"] = config["runaway_process"]["cpu_threshold"]
+                    if "duration_seconds" in config["runaway_process"]:
+                        result["runaway_duration_seconds"] = config["runaway_process"]["duration_seconds"]
+
+                if "droplet_sizes" in config:
+                    if "upgrade_path" in config["droplet_sizes"]:
+                        result["droplet_upgrade_sizes"] = config["droplet_sizes"]["upgrade_path"]
+                    if "max_size" in config["droplet_sizes"]:
+                        result["max_droplet_size"] = config["droplet_sizes"]["max_size"]
+
+                logger.info("Loaded resource configuration from file")
+
             except Exception as e:
-                logger.error(f"Error loading resource config: {e}")
-        return DEFAULT_RESOURCE_LIMITS.copy()
+                logger.error(f"Error loading resource config: {e}, using defaults")
+
+        return result
 
     def save_state(self):
         """Save agent state to disk."""
@@ -810,9 +854,11 @@ class SelfHealingAgent:
 
     def send_telegram_alert(self, issue: Dict):
         """Send Telegram alert for issues requiring user attention."""
-        try:
-            import requests
+        if not REQUESTS_AVAILABLE:
+            logger.warning("requests library not available - cannot send Telegram alert")
+            return
 
+        try:
             bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
             chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
@@ -820,7 +866,7 @@ class SelfHealingAgent:
                 logger.warning("Telegram not configured - cannot send alert")
                 return
 
-            severity_emoji = {"low": "🟡", "medium": "🟠", "high": "🔴"}
+            severity_emoji = {"low": "🟡", "medium": "🟠", "high": "🔴", "critical": "🚨"}
             emoji = severity_emoji.get(issue.get("severity", "medium"), "🟠")
 
             message = f"""{emoji} **System Alert**
