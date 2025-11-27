@@ -7,7 +7,7 @@ with mocked API responses.
 
 import json
 import pytest
-from unittest.mock import patch, MagicMock, PropertyMock
+from unittest.mock import patch, MagicMock
 import sys
 from pathlib import Path
 
