@@ -59,6 +59,25 @@ class TelegramCommandBot:
             '/help': self.cmd_help,
         }
 
+    def _load_finance_hub(self):
+        """Load finance hub data."""
+        finance_hub_path = REPO_ROOT / "finance" / "yair_finance_hub.json"
+        if finance_hub_path.exists():
+            with open(finance_hub_path) as f:
+                return json.load(f)
+        return None
+
+    def _get_pocket_emoji(self, total_liquid: float) -> str:
+        """Get pocket emoji based on total liquid amount."""
+        if total_liquid >= 5000:
+            return "🤑"
+        elif total_liquid >= 2000:
+            return "💰"
+        elif total_liquid >= 1000:
+            return "💵"
+        else:
+            return "👛"
+
     def process_command(self, command_text: str) -> str:
         """Process incoming command and return response text."""
         parts = command_text.strip().split()
@@ -85,22 +104,12 @@ class TelegramCommandBot:
             )
 
             # Load finance hub for pockets summary
-            finance_hub_path = REPO_ROOT / "finance" / "yair_finance_hub.json"
             pockets_summary = ""
-            if finance_hub_path.exists():
-                with open(finance_hub_path) as f:
-                    hub = json.load(f)
+            hub = self._load_finance_hub()
+            if hub:
                 total_liquid = hub.get("summary", {}).get("total_liquid_usd", 0)
                 pm_balance = hub.get("accounts", {}).get("polymarket", {}).get("balance_usdc", 0)
-                # Pocket emoji based on amount
-                if total_liquid >= 5000:
-                    pocket_emoji = "🤑"
-                elif total_liquid >= 2000:
-                    pocket_emoji = "💰"
-                elif total_liquid >= 1000:
-                    pocket_emoji = "💵"
-                else:
-                    pocket_emoji = "👛"
+                pocket_emoji = self._get_pocket_emoji(total_liquid)
                 pockets_summary = f"""
 {pocket_emoji} FAT POCKETS: ${total_liquid:,.2f} liquid
    └─ Trading: ${pm_balance:,.2f} USDC
@@ -155,16 +164,28 @@ Send /agents for AI coordination status"""
         except Exception as e:
             return f"❌ Error getting status: {str(e)}"
 
+    def _get_fat_level(self, total_liquid: float) -> tuple:
+        """Get fatness level label and detailed emoji based on total liquid amount."""
+        if total_liquid >= 10000:
+            return "🤑🤑🤑 MEGA FAT", "👛💰💰💰💰💰"
+        elif total_liquid >= 5000:
+            return "🤑🤑 PRETTY FAT", "👛💰💰💰💰"
+        elif total_liquid >= 2000:
+            return "🤑 GETTING THERE", "👛💰💰💰"
+        elif total_liquid >= 1000:
+            return "😊 MODEST", "👛💰💰"
+        elif total_liquid >= 500:
+            return "😅 SLIM", "👛💰"
+        else:
+            return "😬 HUNGRY", "👛"
+
     def cmd_pockets(self, args) -> str:
         """Show fat pockets - cash and wealth display with fun visuals."""
         try:
             # Load finance hub
-            finance_hub_path = REPO_ROOT / "finance" / "yair_finance_hub.json"
-            if not finance_hub_path.exists():
+            hub = self._load_finance_hub()
+            if not hub:
                 return "❌ Finance hub not found"
-
-            with open(finance_hub_path) as f:
-                hub = json.load(f)
 
             # Extract key amounts
             accounts = hub.get("accounts", {})
@@ -180,24 +201,7 @@ Send /agents for AI coordination status"""
             credit_available = summary.get("total_credit_available", 0)
 
             # Determine pocket "fatness" level based on total liquid
-            if total_liquid >= 10000:
-                fat_level = "🤑🤑🤑 MEGA FAT"
-                pocket_emoji = "👛💰💰💰💰💰"
-            elif total_liquid >= 5000:
-                fat_level = "🤑🤑 PRETTY FAT"
-                pocket_emoji = "👛💰💰💰💰"
-            elif total_liquid >= 2000:
-                fat_level = "🤑 GETTING THERE"
-                pocket_emoji = "👛💰💰💰"
-            elif total_liquid >= 1000:
-                fat_level = "😊 MODEST"
-                pocket_emoji = "👛💰💰"
-            elif total_liquid >= 500:
-                fat_level = "😅 SLIM"
-                pocket_emoji = "👛💰"
-            else:
-                fat_level = "😬 HUNGRY"
-                pocket_emoji = "👛"
+            fat_level, pocket_emoji = self._get_fat_level(total_liquid)
 
             # Build the fat pockets display
             pockets_msg = f"""💵 FAT POCKETS STATUS 💵
