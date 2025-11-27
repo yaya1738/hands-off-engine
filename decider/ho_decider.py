@@ -11,7 +11,7 @@ import sys
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -43,7 +43,7 @@ class Decider:
     It takes alpha signals and produces planned actions.
     """
 
-    def __init__(self, bankroll: float = 5000.0, max_position_usd: float = None):
+    def __init__(self, bankroll: float = 5000.0, max_position_usd: Optional[float] = None):
         """
         Initialize the Decider.
 
@@ -56,7 +56,7 @@ class Decider:
 
         # Load risk profile to get position limits
         risk_profile = load_risk_profile()
-        self.max_position_usd = max_position_usd or risk_profile.get("max_position_usd", 50.0)
+        self.max_position_usd = max_position_usd if max_position_usd is not None else risk_profile.get("max_position_usd", 50.0)
         self.max_fraction = 0.10  # Kelly cap: never risk more than 10% of bankroll
 
     def decide(self):

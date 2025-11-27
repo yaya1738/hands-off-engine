@@ -149,16 +149,20 @@ def test_executor_safety_reflexes():
     
     try:
         from decider.ho_decider import PlannedAction
+        from executor.trading_safeguards import load_risk_profile
         
         executor = Executor(dryrun=True)
+        risk_profile = load_risk_profile()
+        confidence_threshold = risk_profile.get("confidence_threshold", 0.45)
+        max_position_usd = risk_profile.get("max_position_usd", 50.0)
         
-        # Test 1: Low confidence should be rejected (below current 0.45 threshold)
+        # Test 1: Low confidence should be rejected (below threshold from risk profile)
         low_conf_action = PlannedAction(
             market_id='test1',
             market_name='Test Market 1',
             side='YES',
             amount=50.0,
-            confidence=0.3,  # Below 0.45 threshold from risk_profile.json
+            confidence=confidence_threshold - 0.2,  # Below threshold from risk_profile.json
             reasoning='Test'
         )
         
@@ -166,12 +170,12 @@ def test_executor_safety_reflexes():
         assert not is_valid, "Low confidence should be rejected"
         assert 'Confidence' in msg, "Error message should mention confidence"
         
-        # Test 2: Oversized position should be rejected (above $50 max from risk_profile.json)
+        # Test 2: Oversized position should be rejected (above max from risk profile)
         large_action = PlannedAction(
             market_id='test2',
             market_name='Test Market 2',
             side='YES',
-            amount=150.0,  # Above MAX_POSITION_SIZE ($50)
+            amount=max_position_usd * 3,  # Above MAX_POSITION_SIZE from risk profile
             confidence=0.9,
             reasoning='Test'
         )
