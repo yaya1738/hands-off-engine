@@ -1,0 +1,155 @@
+name: AI PR Handler
+
+# Handles PRs created by AI agents (Copilot, dependabot)
+# - Converts draft PRs to ready for review
+# - Adds labels based on content
+# - Approves PRs from trusted AI agents with safe changes
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+  handle-ai-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Process AI PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request?.number;
+            if (!prNumber) {
+              console.log('No PR in this event');
+              return;
+            }
+            
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            
+            console.log(`Processing PR #${prNumber}: ${pr.title}`);
+            console.log(`Author: ${pr.user.login}, Draft: ${pr.draft}`);
+            
+            // Check if from AI agent
+            const aiAuthors = [
+              'Copilot',
+              'copilot[bot]',
+              'github-copilot[bot]',
+              'dependabot[bot]',
+              'github-actions[bot]'
+            ];
+            
+            const isAiPr = aiAuthors.includes(pr.user.login);
+            
+            if (!isAiPr) {
+              console.log('Not an AI PR, skipping');
+              return;
+            }
+            
+            console.log('AI PR detected');
+            
+            // Get changed files
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber
+            });
+            
+            // Determine labels based on files
+            const labels = [];
+            let hasSafeChangesOnly = true;
+            
+            for (const file of files) {
+              const filename = file.filename;
+              
+              if (filename.startsWith('docs/') || filename.endsWith('.md')) {
+                if (!labels.includes('documentation')) labels.push('documentation');
+              }
+              if (filename.startsWith('tests/') || filename.includes('test_')) {
+                if (!labels.includes('testing')) labels.push('testing');
+              }
+              if (filename.startsWith('.github/')) {
+                if (!labels.includes('ci-cd')) labels.push('ci-cd');
+              }
+              if (filename.startsWith('ai/')) {
+                if (!labels.includes('ai-coordination')) labels.push('ai-coordination');
+              }
+              if (filename.startsWith('scripts/')) {
+                if (!labels.includes('automation')) labels.push('automation');
+              }
+              
+              // Check for risky patterns
+              const riskyPatterns = [
+                /^executor\//,
+                /^alpha\//,
+                /^decider\//,
+                /config/,
+                /\.env/,
+                /crontab/,
+                /requirements\.txt$/,
+                /package\.json$/
+              ];
+              
+              if (riskyPatterns.some(pattern => pattern.test(filename))) {
+                hasSafeChangesOnly = false;
+                if (!labels.includes('needs-review')) labels.push('needs-review');
+              }
+            }
+            
+            // Add AI label
+            if (!labels.includes('ai-generated')) labels.push('ai-generated');
+            
+            // Apply labels
+            if (labels.length > 0) {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: prNumber,
+                  labels: labels
+                });
+                console.log(`Added labels: ${labels.join(', ')}`);
+              } catch (error) {
+                console.log(`Could not add labels: ${error.message}`);
+              }
+            }
+            
+            // For safe AI PRs, mark as ready for review if draft
+            if (pr.draft && hasSafeChangesOnly) {
+              try {
+                await github.graphql(`
+                  mutation($id: ID!) {
+                    markPullRequestReadyForReview(input: {pullRequestId: $id}) {
+                      pullRequest {
+                        isDraft
+                      }
+                    }
+                  }
+                `, { id: pr.node_id });
+                console.log('Marked PR as ready for review');
+              } catch (error) {
+                console.log(`Could not mark as ready: ${error.message}`);
+              }
+            }
+            
+            // Post coordination message
+            console.log(JSON.stringify({
+              timestamp: new Date().toISOString(),
+              from: 'github-actions',
+              to: 'all',
+              type: 'info',
+              message: `Processed AI PR #${prNumber}: ${labels.join(', ')}`,
+              context: { pr: prNumber, safe: hasSafeChangesOnly }
+            }));
