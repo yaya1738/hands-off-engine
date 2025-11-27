@@ -1,0 +1,11 @@
+{
+  "total_trades_analyzed": 0,
+  "insights_generated": 0,
+  "adjustments_made": 0,
+  "current_confidence_bias": 0.0,
+  "market_type_weights": {},
+  "last_learning_cycle": "2025-11-27T23:31:34.202675+00:00",
+  "cumulative_pnl": 0,
+  "win_rate": 0.0,
+  "last_updated": "2025-11-27T23:31:34.202681+00:00"
+}
