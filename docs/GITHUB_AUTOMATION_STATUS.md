@@ -1,15 +1,59 @@
-# GitHub Repo Automation Status Report
+# Hands-Off System Status Report
 
-**Last Updated:** 2025-11-27T21:28:00Z  
+**Last Updated:** 2025-11-27T21:51:00Z  
 **Verified By:** Copilot Coding Agent
 
 ## Executive Summary
 
-**Status: ✅ OPERATIONAL with IMPROVEMENTS PENDING**
+### GitHub Automation: ✅ WORKING
+### Trading Execution: ⚠️ SHADOW MODE (No Cash Flow Yet)
 
-The GitHub repo automation is **live and working** with no critical problems. Two workflows are active on main:
-1. AI Intake (issue comment handling)
-2. Agent Coordination Notifications (coordination file change alerts)
+The GitHub repo automation is fully operational. However, **trades are running in SHADOW mode** - they're being logged but NOT executed on Polymarket. This is why there's no cash flow.
+
+---
+
+## 🚨 Cash Flow Blocker: Trading in Shadow Mode
+
+**Evidence from `state/shadow_trades.jsonl`:**
+```json
+"executor_mode": "shadow"
+"live_trading_active": true  // Config says live, but...
+```
+
+**Root Cause:** The executor requires TWO things to go LIVE:
+1. `LIVE_TRADING_ENABLED=1` environment variable
+2. `.env.polymarket` file with API credentials
+
+**Current State:**
+- `state/trading_mode.json`: `"live_trading_enabled": true` ✅
+- `state/risk_profile.json`: baby_mode active, $50 max position ✅
+- `.env.polymarket`: **NOT PRESENT** ❌
+- `LIVE_TRADING_ENABLED` env var: **NOT SET** ❌
+
+### How to Enable Cash Flow
+
+On your Termux/droplet, run:
+```bash
+# 1. Create Polymarket credentials file
+cat > .env.polymarket << 'EOF'
+LIVE_TRADING_ENABLED=1
+HANDS_OFF_EXECUTOR_MODE=live
+POLYMARKET_API_KEY=your_api_key_here
+POLYMARKET_API_SECRET=your_api_secret_here
+EOF
+
+# 2. Source and run
+source .env.polymarket
+python scripts/run_and_notify.sh
+```
+
+---
+
+## GitHub Automation Status
+
+Two workflows are active on main:
+1. AI Intake (issue comment handling) - ✅ 72 successful runs
+2. Agent Coordination Notifications - ✅ Working
 
 Multiple PRs propose additional automation (auto-merge, PR sync, etc.) that would enhance functionality once merged.
 
@@ -26,104 +70,31 @@ Multiple PRs propose additional automation (auto-merge, PR sync, etc.) that woul
 | Last Run | 2025-11-27T21:13:00Z (72 successful runs) |
 | Status | Fully operational |
 
-**What it does:**
-- Monitors issue comments for AI intake commands
-- Runs `ai/ai_intake_handler.py` to process requests
-- Enables ChatGPT → Claude CLI → GitHub Copilot handoffs
-
 ### 2. `agent-coordination-notify.yml` ✅ WORKING
 
 | Property | Value |
 |----------|-------|
 | Trigger | Push to `ai/coordination/messages.jsonl` or `status.json` |
 | Purpose | Create GitHub Issues for urgent coordination messages |
-| Status | Operational (runs only when coordination files change) |
-
-**What it does:**
-- Detects urgent coordination messages between agents
-- Creates/updates coordination issues for visibility
-- Triggers repository dispatch for cross-agent communication
+| Status | Operational |
 
 ---
 
-## Pending Improvements (Unmerged PRs)
+## Pending PR Improvements
 
-These PRs contain additional automation that is NOT YET active on main:
+PRs #64, #65, #67, #68 contain auto-merge and PR sync workflows - will be fully active once merged.
 
-| PR | Title | New Workflows |
-|----|-------|---------------|
-| #64 | Fix repo auto-management infrastructure | `auto-merge.yml`, `pr-sync.yml` |
-| #65 | Add GitHub automation workflows for self-management | `issue-auto-assign.yml`, `weekly-digest.yml`, `workflow-failure-notify.yml` |
-| #67, #68 | GitHub automation for autonomous PR management | `auto-merge.yml`, `ai-pr-handler.yml`, `pr-sync.yml` |
-
-### Proposed Workflows (in PRs, not on main):
-
-1. **`auto-merge.yml`** - Auto-merge PRs from trusted bots when checks pass
-2. **`pr-sync.yml`** - Auto-update branches, label PRs by file patterns, mark stale PRs
-3. **`ai-pr-handler.yml`** - Label AI PRs, convert safe drafts to ready-for-review
-4. **`issue-auto-assign.yml`** - Auto-assign issues to Copilot with labels
-5. **`weekly-digest.yml`** - Monday consolidated status reports via Telegram
-6. **`workflow-failure-notify.yml`** - Immediate Telegram alerts on failures
+**Chicken-and-Egg Problem:** These PRs need manual merge to bootstrap auto-merge capability.
 
 ---
 
-## Known Considerations
+## Agent Coordination: ✅ OPERATIONAL
 
-### "Chicken-and-Egg" Problem
-The automation workflows that would auto-merge PRs exist only in unmerged branches. This creates a circular dependency:
-- PRs #64-68 contain auto-merge workflows
-- But these workflows aren't on main yet
-- So the PRs can't be auto-merged
+| Agent | Status |
+|-------|--------|
+| Copilot | ✅ Active |
+| Claude Code | ✅ Active |
+| Claude Web | ✅ Active |
+| ChatGPT | ✅ Active |
 
-**Solution:** User needs to manually merge ONE of these PRs (#64, #67, or #68) to bootstrap the auto-merge capability.
-
-### Workflow Skipping (Not a Failure)
-Some workflow runs appear as "skipped" with 0 jobs - this is **expected behavior**:
-- `agent-coordination-notify.yml` only runs when coordination files change
-- If a push doesn't touch those files, the workflow is skipped
-- This is NOT a failure, it's working correctly
-
----
-
-## Agent Coordination Status
-
-| Agent | Status | Protocol Confirmed |
-|-------|--------|-------------------|
-| Copilot | ✅ Active | Yes (2025-11-26) |
-| Claude Code | ✅ Active | Yes |
-| Claude Web | ✅ Active | Yes |
-| ChatGPT | ✅ Active | Yes |
-
-**Coordination Protocol:** v1.0-hybrid
-- Agents coordinate via `ai/coordination/messages.jsonl`
-- Status tracked in `ai/coordination/status.json`
-- User interface: Telegram-primary, GitHub Issues for planning
-
----
-
-## Recommendations
-
-1. **Merge PR #68** (or #64, #67) to enable auto-merge capability
-2. **Set up repository secrets** for Telegram notifications:
-   - `TELEGRAM_BOT_TOKEN`
-   - `TELEGRAM_CHAT_ID`
-3. **Review pending PRs** - many contain useful automation improvements
-
----
-
-## Health Check Commands
-
-```bash
-# View recent workflow runs
-gh run list --limit 10
-
-# Check workflow status
-gh workflow list
-
-# View coordination status
-jq .current_phase ai/coordination/status.json
-```
-
----
-
-*This report was auto-generated by Copilot to verify GitHub repo automation status.*
+Protocol: v1.0-hybrid | User Interface: Telegram-primary
