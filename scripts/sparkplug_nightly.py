@@ -41,7 +41,8 @@ def generate_task_file(dry_run: bool = False) -> Path:
     Generate a nightly spark plug task file.
     
     Args:
-        dry_run: If True, generate task with dry_run=True
+        dry_run: If True, generate task with dry_run=True.
+                 Default is False (LIVE mode) for production use.
         
     Returns:
         Path to generated task file
@@ -50,11 +51,12 @@ def generate_task_file(dry_run: bool = False) -> Path:
     date_str = datetime.now(timezone.utc).strftime("%Y-%m-%d")
     task_id = f"sparkplug_nightly_{date_str}"
     
+    # Generate task - default is LIVE mode (dry_run=False)
     task = {
         "task_type": "sparkplug_autokernel_refresh",
         "task_id": task_id,
         "mode": "config",
-        "dry_run": dry_run
+        "dry_run": dry_run  # False = LIVE, True = dry-run testing
     }
     
     # Ensure tasks directory exists
