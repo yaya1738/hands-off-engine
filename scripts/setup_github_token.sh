@@ -4,6 +4,21 @@
 
 set -e
 
+# Helper function to parse JSON rate limit response
+parse_rate_limit() {
+    local json="$1"
+    local field="$2"
+    python3 -c "
+import json
+import sys
+try:
+    data = json.loads(sys.stdin.read())
+    print(data.get('resources', {}).get('core', {}).get('$field', 0))
+except:
+    print(0)
+" <<< "$json" 2>/dev/null || echo "0"
+}
+
 echo "=================================="
 echo "🔑 GITHUB TOKEN SETUP"
 echo "=================================="
@@ -47,8 +62,8 @@ if [ -n "$GITHUB_TOKEN" ]; then
         -H "Accept: application/vnd.github+json" \
         "https://api.github.com/rate_limit" 2>/dev/null || echo '{}')
     
-    LIMIT=$(echo "$RATE_INFO" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('resources',{}).get('core',{}).get('limit',0))" 2>/dev/null || echo "0")
-    REMAINING=$(echo "$RATE_INFO" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('resources',{}).get('core',{}).get('remaining',0))" 2>/dev/null || echo "0")
+    LIMIT=$(parse_rate_limit "$RATE_INFO" "limit")
+    REMAINING=$(parse_rate_limit "$RATE_INFO" "remaining")
     
     if [ "$LIMIT" = "5000" ]; then
         echo "✅ Token is valid! Rate limit: $REMAINING/$LIMIT remaining"
@@ -102,8 +117,8 @@ RATE_INFO=$(curl -s -H "Authorization: Bearer $GITHUB_TOKEN_INPUT" \
     -H "Accept: application/vnd.github+json" \
     "https://api.github.com/rate_limit" 2>/dev/null || echo '{}')
 
-LIMIT=$(echo "$RATE_INFO" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('resources',{}).get('core',{}).get('limit',0))" 2>/dev/null || echo "0")
-REMAINING=$(echo "$RATE_INFO" | python3 -c "import json,sys; d=json.load(sys.stdin); print(d.get('resources',{}).get('core',{}).get('remaining',0))" 2>/dev/null || echo "0")
+LIMIT=$(parse_rate_limit "$RATE_INFO" "limit")
+REMAINING=$(parse_rate_limit "$RATE_INFO" "remaining")
 
 if [ "$LIMIT" = "5000" ]; then
     echo "✅ Token is valid!"

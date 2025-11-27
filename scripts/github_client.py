@@ -21,12 +21,13 @@ from urllib.parse import urljoin
 from urllib.request import Request, urlopen
 
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+# Configure logging only if no handlers exist
 logger = logging.getLogger("github_client")
+if not logger.handlers and not logging.getLogger().handlers:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
 
 
 @dataclass
