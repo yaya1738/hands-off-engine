@@ -1,0 +1,118 @@
+{
+  "timestamp": "2025-11-27T17:00:11.809353+00:00",
+  "overall_status": "warning",
+  "agents": [
+    {
+      "agent_id": "chatgpt",
+      "agent_type": "llm",
+      "status": "healthy",
+      "last_active": null,
+      "tasks_completed_24h": 0,
+      "cost_24h": 0.0,
+      "error_count_24h": 0,
+      "metadata": {
+        "autonomous_mode": true,
+        "pending_tasks": 0
+      }
+    },
+    {
+      "agent_id": "claude_cli",
+      "agent_type": "llm",
+      "status": "unknown",
+      "last_active": null,
+      "tasks_completed_24h": 0,
+      "cost_24h": 0.0,
+      "error_count_24h": 0,
+      "metadata": {
+        "pending_tasks": 0
+      }
+    },
+    {
+      "agent_id": "github_copilot_agent",
+      "agent_type": "llm",
+      "status": "unknown",
+      "last_active": null,
+      "tasks_completed_24h": 0,
+      "cost_24h": 0.0,
+      "error_count_24h": 0,
+      "metadata": {
+        "pending_tasks": 0
+      }
+    }
+  ],
+  "nexus_status": {
+    "status": "healthy",
+    "total_cost_24h": 0,
+    "tasks_24h": 0,
+    "budget_status": {
+      "copilot": {
+        "limit": 100.0,
+        "used": 0,
+        "remaining": 100.0,
+        "utilization": 0.0
+      },
+      "chatgpt": {
+        "limit": 50.0,
+        "used": 0,
+        "remaining": 50.0,
+        "utilization": 0.0
+      },
+      "claude": {
+        "limit": 50.0,
+        "used": 0,
+        "remaining": 50.0,
+        "utilization": 0.0
+      },
+      "openai": {
+        "limit": 50.0,
+        "used": 0,
+        "remaining": 50.0,
+        "utilization": 0.0
+      }
+    },
+    "warnings": [],
+    "last_updated": null
+  },
+  "coordination_status": {
+    "status": "warning",
+    "messages_24h": 0,
+    "pending_handoffs": 0,
+    "stale_handoffs": 0,
+    "active_agents": [
+      "copilot",
+      "claude-code",
+      "chatgpt",
+      "claude-web"
+    ],
+    "current_phase": "Autonomous Operation - PR Consolidation",
+    "autonomous_mode": {
+      "copilot": true,
+      "claude-code": true,
+      "claude-web": true,
+      "chatgpt": true,
+      "enabled": "2025-11-23T03:31:00Z",
+      "note": "Autonomous operation enabled per user request - AI agents serve user Yair without manual prompting"
+    },
+    "warnings": [
+      "No agent coordination messages in last 24h"
+    ]
+  },
+  "business_metrics": {
+    "ai_cost_24h": 0,
+    "trade_revenue_24h": 0,
+    "trade_profit_24h": 0,
+    "net_profit_24h": 0,
+    "roi_24h": 0,
+    "model_age_hours": 29.0,
+    "markets_analyzed": 7,
+    "self_financing": false
+  },
+  "warnings": [
+    "No agent coordination messages in last 24h"
+  ],
+  "recommendations": [
+    "Investigate inactive agents: claude_cli, github_copilot_agent",
+    "Coordination: No agent coordination messages in last 24h",
+    "Alpha model is 29.0h old - consider refresh"
+  ]
+}

@@ -72,6 +72,14 @@ GitHub Copilot wrapper that:
 - Monitors code review expenses
 - Reports session summaries
 
+### System Monitor (`system_monitor.py`)
+Unified monitoring system that:
+- Monitors all AI agents (Copilot, ChatGPT, Claude)
+- Tracks AI Nexus task submissions and costs
+- Checks coordination system health
+- Calculates business-aligned metrics (ROI, self-financing)
+- Generates actionable recommendations
+
 ## Usage
 
 ### Basic Task Submission
@@ -143,6 +151,43 @@ cat logs/ledger/ledger_2025-11-20.jsonl | python3 -m json.tool
 
 # Check budget status
 python3 -c "from ai_nexus import AINexus; n = AINexus(); print(n.get_budget_status())"
+```
+
+### Monitor System Health
+
+```bash
+# Run single health check
+python3 scripts/ai_system_monitor.py
+
+# Run continuous monitoring (5 min interval)
+python3 scripts/ai_system_monitor.py --continuous
+
+# Get JSON output for integration
+python3 scripts/ai_system_monitor.py --json
+```
+
+### Using the System Monitor in Python
+
+```python
+from ai_nexus.system_monitor import AISystemMonitor
+
+# Initialize monitor
+monitor = AISystemMonitor()
+
+# Generate health report
+report = monitor.generate_health_report()
+
+# Get human-readable summary
+print(monitor.get_summary_text(report))
+
+# Save report to file
+monitor.save_report(report)
+
+# Access specific data
+print(f"Overall: {report.overall_status.value}")
+print(f"Agents: {len(report.agents)}")
+print(f"Cost 24h: ${report.business_metrics['ai_cost_24h']:.2f}")
+print(f"Self-financing: {report.business_metrics['self_financing']}")
 ```
 
 ## Budget Limits
