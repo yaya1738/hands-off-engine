@@ -201,7 +201,7 @@ class TestListSessions:
             metadata = {
                 "conversation_id": f"session_{i}",
                 "status": "active",
-                "created": f"2025-11-27T1{i}:00:00Z"
+                "created": f"2025-11-27T0{i}:00:00Z"
             }
             with open(session_dir / "metadata.json", "w") as f:
                 json.dump(metadata, f)

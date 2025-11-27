@@ -43,6 +43,12 @@ INTERCOM_DIR = REPO_ROOT / "ai" / "intercom"
 TEMPLATES_DIR = REPO_ROOT / "ai" / "session_templates"
 COORDINATION_DIR = REPO_ROOT / "ai" / "coordination"
 
+# Configuration constants
+MAX_TOPIC_LENGTH = 30
+GOAL_WORDS_FOR_TOPIC = 3
+MAX_DISPLAYED_QUESTIONS = 3
+MAX_PENDING_TASKS = 3
+
 
 # =============================================================================
 # Session Templates
@@ -270,7 +276,7 @@ def generate_conversation_id(topic: Optional[str] = None) -> str:
 
     if topic:
         # Sanitize topic
-        topic_slug = topic.lower().replace(" ", "_")[:30]
+        topic_slug = topic.lower().replace(" ", "_")[:MAX_TOPIC_LENGTH]
         topic_slug = "".join(c for c in topic_slug if c.isalnum() or c == "_")
         return f"{timestamp}_{topic_slug}"
 
@@ -327,7 +333,7 @@ def create_session(
     # Generate conversation ID
     if not conversation_id:
         # Extract topic from goal
-        topic = goal.split()[0:3]
+        topic = goal.split()[0:GOAL_WORDS_FOR_TOPIC]
         topic_str = "_".join(topic) if topic else "session"
         conversation_id = generate_conversation_id(topic_str)
 
@@ -439,7 +445,7 @@ def suggest_sessions() -> List[Dict]:
         if kernel and kernel.open_questions:
             suggestions.append({
                 "reason": f"Kernel '{kernel_id}' has {len(kernel.open_questions)} open questions",
-                "open_questions": kernel.open_questions[:3],  # First 3
+                "open_questions": kernel.open_questions[:MAX_DISPLAYED_QUESTIONS],
                 "template": _suggest_template_for_kernel(kernel_id),
                 "goal": f"Address open questions in {kernel.topic}",
                 "kernels": [kernel_id],
@@ -459,7 +465,7 @@ def suggest_sessions() -> List[Dict]:
                 if t.get("status") == "pending"
             ]
 
-            for task in pending_tasks[:3]:  # Top 3 pending
+            for task in pending_tasks[:MAX_PENDING_TASKS]:
                 suggestions.append({
                     "reason": f"Pending task: {task.get('description', 'unknown')}",
                     "task_id": task.get("id"),
