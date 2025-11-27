@@ -1,7 +1,8 @@
 {
-  "version": "0.1",
-  "protocol": "AI_AGENT_LINK_PROTOCOL_v0.1",
-  "updated": "2025-11-25",
+  "version": "0.2",
+  "protocol": "MULTI_AGENT_COMMUNICATION_PROTOCOL_v1.0",
+  "protocol_doc": "docs/MULTI_AGENT_COMMUNICATION_PROTOCOL.md",
+  "updated": "2025-11-27",
   "agents": [
     {
       "id": "chatgpt",
@@ -37,7 +38,8 @@
         "SYSTEM_HANDOFF_v0.5",
         "ai/tasks/*.json",
         ".claude/instructions.md",
-        "direct_user_requests"
+        "direct_user_requests",
+        "ai/coordination/messages.jsonl"
       ],
       "handoff_out": [
         "commits",
@@ -60,32 +62,41 @@
       "id": "github_copilot_agent",
       "kind": "llm",
       "role": "github_native_helper",
-      "description": "GitHub-native AI helper for issues, pull requests, and AI-intake workflow. Works through GitHub UI and APIs.",
+      "description": "GitHub-native AI helper for issues, pull requests, and AI-intake workflow. Works through GitHub UI and APIs. Enhanced coordination via ai_nexus provider.",
       "human_label": "GitHub Copilot Agent",
       "handoff_in": [
         "GitHub issues/PRs",
         "AI-intake workflow",
-        "SYSTEM_HANDOFF (if user pastes it into issues/PRs)"
+        "SYSTEM_HANDOFF (if user pastes it into issues/PRs)",
+        "ai/coordination/messages.jsonl"
       ],
       "handoff_out": [
         "PRs",
         "commits",
         "status comments",
-        "issue updates"
+        "issue updates",
+        "ai/coordination/messages.jsonl"
       ],
       "repo_access": "via_github_apis",
       "entry_points": [
         ".github/workflows/ai-intake.yml",
+        ".github/workflows/agent-coordination-notify.yml",
         "GitHub issue comments",
         "Pull request reviews"
       ],
-      "documentation": ".github/workflows/ai-intake.yml",
+      "documentation": ".github/copilot-instructions.md",
       "backend_session": {
         "supports_tri_agent_session": true,
         "provider": "github_copilot",
         "provider_module": "ai_nexus.provider_copilot",
-        "status_v0_1": "stub_implementation",
-        "note": "v0.1 has limited backend participation. See provider_copilot.py for details."
+        "status_v0_2": "coordination_integrated",
+        "note": "v0.2 integrates with file-based coordination. See provider_copilot.py for details.",
+        "capabilities": [
+          "github_issues_prs",
+          "file_based_coordination",
+          "github_actions_workflows",
+          "ai_intake_commands"
+        ]
       }
     }
   ],
@@ -102,14 +113,31 @@
     },
     {
       "name": "agent_collaboration",
-      "path": "Claude CLI ↔ repo ↔ GitHub Copilot Agent",
-      "description": "Bidirectional collaboration via shared repo state"
+      "path": "Claude CLI ↔ ai/coordination/messages.jsonl ↔ GitHub Copilot Agent",
+      "description": "Bidirectional collaboration via shared coordination files"
+    },
+    {
+      "name": "copilot_claude_coordination",
+      "path": "Copilot → messages.jsonl → GitHub Actions → Claude notification",
+      "description": "Automated notification flow between Copilot and Claude"
+    },
+    {
+      "name": "tri_agent_backend",
+      "path": "ChatGPT ↔ Claude ↔ Copilot (via ai_nexus providers)",
+      "description": "Direct backend session with multiple AI agents"
     }
   ],
+  "coordination_files": {
+    "messages": "ai/coordination/messages.jsonl",
+    "status": "ai/coordination/status.json",
+    "handoffs": "ai/coordination/handoffs.json",
+    "protocol": "docs/MULTI_AGENT_COMMUNICATION_PROTOCOL.md"
+  },
   "notes": [
-    "v0.1 is documentation-only - no code depends on this registry yet",
-    "Future versions may add automatic routing and validation",
-    "Registry is machine-readable for future tooling",
-    "Philosophy: Use whatever AI works best for each task"
+    "v0.2 adds full coordination integration for all agents",
+    "Copilot provider enhanced with file-based coordination",
+    "See docs/MULTI_AGENT_COMMUNICATION_PROTOCOL.md for complete protocol",
+    "All agents can communicate via ai/coordination/messages.jsonl",
+    "GitHub Actions workflows provide automated notifications"
   ]
 }
