@@ -243,7 +243,9 @@ class ServerSyncAgent:
                 timeout=30
             )
             if result.returncode == 0:
-                return result.stdout.strip().split('\n')
+                output = result.stdout.strip()
+                # Return empty list if no changes, otherwise split by newline
+                return output.split('\n') if output else []
         except Exception as e:
             logger.error(f"Error getting changed files: {e}")
         return []
