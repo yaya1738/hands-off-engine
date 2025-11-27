@@ -77,6 +77,44 @@ if [ ! -w "/var/log/hands-off-engine.log" ]; then
     echo "[$(date)] WARNING: Cannot write to log file"
 fi
 
+# Check 6: GitHub authentication
+GITHUB_AUTH_OK=$(python3 << 'PYEOF'
+import os
+try:
+    token = os.environ.get('GITHUB_TOKEN', '')
+    if not token:
+        print("no_token")
+    else:
+        import json
+        from urllib.request import Request, urlopen
+        req = Request(
+            "https://api.github.com/rate_limit",
+            headers={
+                "Authorization": f"token {token}",
+                "Accept": "application/vnd.github+json"
+            }
+        )
+        with urlopen(req, timeout=10) as resp:
+            data = json.loads(resp.read())
+            limit = data.get('resources', {}).get('core', {}).get('limit', 0)
+            if limit >= 5000:
+                print("ok")
+            else:
+                print("low_limit")
+except Exception as e:
+    print(f"error:{e}")
+PYEOF
+)
+
+if [ "$GITHUB_AUTH_OK" = "ok" ]; then
+    echo "[$(date)] ✓ GitHub auth verified (5000 req/hr)"
+elif [ "$GITHUB_AUTH_OK" = "no_token" ]; then
+    echo "[$(date)] WARNING: GITHUB_TOKEN not set"
+    echo "  Run: ./scripts/setup_github_token.sh"
+else
+    echo "[$(date)] WARNING: GitHub auth issue: $GITHUB_AUTH_OK"
+fi
+
 # All checks passed
 echo "[$(date)] ✓ All health checks passed"
 echo "  Execution plan age: ${AGE_MINS} minutes"
