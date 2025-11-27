@@ -1,164 +1,104 @@
+#!/usr/bin/env python3
 """
-Executor: The "Body + Reflexes" of the Hands-Off Engine
+ho_executor_plan.py - Generate execution plan from decisions (DRYRUN-safe)
 
-This module validates and executes planned actions.
-It acts as both the body (execution) and reflexes (safety checks)
-to ensure no dangerous actions are taken.
+Reads decider/decisions.json and creates executor/execution_plan.json with
+orders ready for execution.
 """
-
+import json
 import sys
-import os
-from dataclasses import dataclass
-from typing import List
+from pathlib import Path
+from datetime import datetime, timezone
+from typing import List, Dict, Any
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+DECIDER_DIR = Path(__file__).parent.parent / "decider"
+INPUT_FILE = DECIDER_DIR / "decisions.json"
+OUTPUT_FILE = Path(__file__).parent / "execution_plan.json"
 
-from audit import get_audit_logger
-
-
-@dataclass
-class ExecutionResult:
-    """Result of attempting to execute a planned action"""
-    market_id: str
-    market_name: str
-    success: bool
-    message: str
-    executed_amount: float = 0.0
+DEFAULT_POSITION_SIZE = 25  # Default position size in USD (small for DRYRUN testing)
 
 
-class Executor:
-    """
-    The Executor is the body and reflexes of the pipeline.
-    It validates planned actions against safety rules and executes them.
-    """
+def load_decisions() -> Dict[str, Any]:
+    """Load decisions from decider"""
+    if not INPUT_FILE.exists():
+        print(f"[executor] Decisions file not found: {INPUT_FILE}")
+        return {'decisions': [], 'dryrun': True}
 
-    # Safety parameters (reflexes)
-    MAX_POSITION_SIZE = 100.0  # Maximum dollars per position
-    MIN_CONFIDENCE_THRESHOLD = 0.7  # Minimum confidence to execute
-
-    def __init__(self, dryrun: bool = True):
-        """
-        Initialize executor.
-
-        Args:
-            dryrun: If True, no actual trades are executed (default: True)
-        """
-        self.dryrun = dryrun
-        self.audit = get_audit_logger(component="executor")
-
-    def execute(self):
-        """Legacy method - kept for backwards compatibility"""
-        print("Executing plan...")
-        
-        # Audit the execution
-        self.audit.log_action(
-            action_type="plan_execution",
-            action_data={"mode": "DRYRUN" if self.dryrun else "LIVE"},
-            result="completed"
-        )
-
-    def validate_action(self, action) -> tuple[bool, str]:
-        """
-        Validate a planned action against safety rules (reflexes).
-
-        Args:
-            action: PlannedAction object to validate
-
-        Returns:
-            Tuple of (is_valid, error_message)
-        """
-        # Check confidence threshold
-        if action.confidence < self.MIN_CONFIDENCE_THRESHOLD:
-            return False, f"Confidence {action.confidence:.1%} below threshold {self.MIN_CONFIDENCE_THRESHOLD:.1%}"
-
-        # Check position size
-        if action.amount > self.MAX_POSITION_SIZE:
-            return False, f"Position size ${action.amount:.2f} exceeds max ${self.MAX_POSITION_SIZE:.2f}"
-
-        # Check for valid side
-        if action.side not in ["YES", "NO"]:
-            return False, f"Invalid side '{action.side}', must be YES or NO"
-
-        # All checks passed
-        return True, "OK"
-
-    def execute_actions(self, planned_actions: List) -> List[ExecutionResult]:
-        """
-        Execute a list of planned actions with safety validation.
-
-        Args:
-            planned_actions: List of PlannedAction objects
-
-        Returns:
-            List of ExecutionResult objects showing outcomes
-        """
-        results = []
-
-        for action in planned_actions:
-            # Validate action (reflexes)
-            is_valid, validation_msg = self.validate_action(action)
-
-            if not is_valid:
-                # Safety reflex triggered - reject action
-                result = ExecutionResult(
-                    market_id=action.market_id,
-                    market_name=action.market_name,
-                    success=False,
-                    message=f"REJECTED: {validation_msg}",
-                    executed_amount=0.0
-                )
-                results.append(result)
-                continue
-
-            # Execute action (body)
-            if self.dryrun:
-                result = ExecutionResult(
-                    market_id=action.market_id,
-                    market_name=action.market_name,
-                    success=True,
-                    message=f"DRYRUN: Would place {action.side} order for ${action.amount:.2f}",
-                    executed_amount=action.amount
-                )
-            else:
-                # In production, this would call actual trading API
-                result = ExecutionResult(
-                    market_id=action.market_id,
-                    market_name=action.market_name,
-                    success=True,
-                    message=f"LIVE: Placed {action.side} order for ${action.amount:.2f}",
-                    executed_amount=action.amount
-                )
-
-            results.append(result)
-
-        return results
-
-    def get_execution_summary(self, results: List[ExecutionResult]) -> dict:
-        """
-        Generate summary statistics for execution results.
-
-        Args:
-            results: List of ExecutionResult objects
-
-        Returns:
-            Dictionary with summary statistics
-        """
-        total = len(results)
-        successful = sum(1 for r in results if r.success)
-        rejected = total - successful
-        total_executed = sum(r.executed_amount for r in results)
-
-        return {
-            'total_actions': total,
-            'successful': successful,
-            'rejected': rejected,
-            'total_amount_executed': total_executed,
-            'mode': 'DRYRUN' if self.dryrun else 'LIVE'
-        }
+    try:
+        return json.loads(INPUT_FILE.read_text())
+    except Exception as e:
+        print(f"[executor] Failed to load decisions: {e}")
+        return {'decisions': [], 'dryrun': True}
 
 
-# Instantiate and execute (for backwards compatibility)
+def create_execution_plan(decisions_data: Dict[str, Any]) -> Dict[str, Any]:
+    """Create execution plan from decisions"""
+    decisions = decisions_data.get('decisions', [])
+    dryrun = decisions_data.get('dryrun', True)
+
+    orders = []
+
+    for decision in decisions:
+        if decision['action'] in ('buy_yes', 'buy_no'):
+            order = {
+                'candidate_id': decision['candidate_id'],
+                'question': decision['question'],
+                'side': decision['action'],
+                'size_usd': DEFAULT_POSITION_SIZE,
+                'score': decision['score'],
+                'edge': decision['edge'],
+                'category': decision['category'],
+                'reason': decision['reason'],
+                'status': 'planned' if dryrun else 'pending'
+            }
+            orders.append(order)
+
+    plan = {
+        'timestamp': datetime.now(timezone.utc).isoformat(),
+        'dryrun': dryrun,
+        'total_orders': len(orders),
+        'total_size_usd': len(orders) * DEFAULT_POSITION_SIZE,
+        'orders': orders
+    }
+
+    return plan
+
+
+def main():
+    # Default to DRYRUN unless explicitly disabled
+    dryrun = '--live' not in sys.argv
+
+    print(f"[executor] Running in {'DRYRUN' if dryrun else 'LIVE'} mode")
+
+    decisions_data = load_decisions()
+    if not decisions_data.get('decisions'):
+        print("[executor] No decisions to execute")
+        return
+
+    print(f"[executor] Creating execution plan...")
+    plan = create_execution_plan(decisions_data)
+
+    print(f"[executor] Plan: {plan['total_orders']} orders, ${plan['total_size_usd']} total")
+
+    # Write output
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT_FILE.write_text(json.dumps(plan, indent=2))
+
+    print(f"[executor] Wrote {OUTPUT_FILE}")
+
+    # Print summary
+    if plan['orders']:
+        print(f"\n[executor] Execution Plan Summary:")
+        for i, order in enumerate(plan['orders'][:10], 1):
+            side = order['side']
+            size = order['size_usd']
+            score = order['score']
+            question = order['question'][:60]
+            print(f"  {i}. {side:10} ${size:3} | score={score:.4f} | {question}")
+
+        if len(plan['orders']) > 10:
+            print(f"  ... and {len(plan['orders']) - 10} more orders")
+
+
 if __name__ == "__main__":
-    executor = Executor()
-    executor.execute()
+    main()

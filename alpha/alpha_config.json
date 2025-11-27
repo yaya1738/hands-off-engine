@@ -1,0 +1,20 @@
+{
+  "min_score_threshold": 0.02,
+  "max_candidates_global": 50,
+  "max_candidates_per_category": 15,
+  "edge_threshold": 0.05,
+  "category_caps": {
+    "crypto": 20,
+    "sports": 10,
+    "politics": 15,
+    "macro": 10,
+    "other": 5
+  },
+  "category_priority": {
+    "crypto": 1,
+    "politics": 2,
+    "macro": 3,
+    "sports": 4,
+    "other": 5
+  }
+}

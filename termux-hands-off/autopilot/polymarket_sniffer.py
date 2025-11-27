@@ -1,7 +1,12 @@
-import json, os
+import json, os, sys
 from datetime import datetime, timezone
 from dateutil import tz
+from pathlib import Path
 import requests
+
+# Add alpha module to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'alpha'))
+from alpha_scorer import score_candidate, calculate_summary_stats
 
 TZ = tz.gettz('Asia/Jerusalem')
 BASE = os.path.dirname(__file__)
@@ -121,30 +126,55 @@ def main():
 
         p_mkt = yes_price
         p_fair= guess_fair(title)
-        edge  = p_mkt - p_fair
+        edge  = p_fair - p_mkt  # FIXED: was p_mkt - p_fair (wrong sign)
 
-        if abs(edge) >= EDGE_THRESHOLD:
-            url = m.get('url') or m.get('slug') or ''
-            # Make slug a proper URL if needed
-            if url and not url.startswith('http'):
-                url = f"https://polymarket.com/event/{url.strip('/')}"
+        url = m.get('url') or m.get('slug') or ''
+        # Make slug a proper URL if needed
+        if url and not url.startswith('http'):
+            url = f"https://polymarket.com/event/{url.strip('/')}"
+
+        candidate = {
+            'key': title[:100],
+            'p_fair': p_fair,
+            'p_mkt': p_mkt,
+            'volume': m.get('volume'),
+            'best_bid': m.get('bestBid'),
+            'best_ask': m.get('bestAsk'),
+            'closes_at': m.get('endDate') or m.get('end_date_iso'),
+            'note': title,
+            'url': url,
+            'category': 'other'  # Could enhance with category inference
+        }
+
+        scored = score_candidate(candidate)
+
+        if scored['score'] >= EDGE_THRESHOLD:
             rows.append({
                 'title': title[:200],
                 'p_market': round(p_mkt, 3),
                 'p_fair': round(p_fair, 3),
-                'edge': round(edge, 3),
-                'side': 'BUY' if p_mkt < p_fair else 'SELL',
+                'edge': round(scored['edge_raw'], 3),
+                'score': scored['score'],
+                'side': 'BUY YES' if scored['edge_raw'] > 0 else 'BUY NO',
                 'url': url
             })
 
-    rows.sort(key=lambda r: abs(r['edge']), reverse=True)
+    rows.sort(key=lambda r: r['score'], reverse=True)
     rows = rows[:MAX_RESULTS]
 
+    # Calculate stats for summary
+    stats = calculate_summary_stats(
+        [{'score': r['score'], 'edge_raw': r['edge'], 'category': 'unknown'} for r in rows],
+        EDGE_THRESHOLD
+    )
+
     print(f"[Edge Digest @ {now.strftime('%Y-%m-%d %H:%M')}] threshold={EDGE_THRESHOLD}")
+    print(f"Total: {stats['total_candidates']} | Filtered: {stats['filtered_candidates']} | Best: {stats['best_score']:.4f}")
     if not rows:
         print("No edges above threshold. Adjust watchlist/fair_priors or lower EDGE_THRESHOLD.")
         return
     for i, r in enumerate(rows, 1):
-        print(f"{i:02d}. {r['side']:4s} | edge={r['edge']:+.3f} | mkt={r['p_market']:.3f} vs fair={r['p_fair']:.3f}\n    {r['title']}\n    {r['url']}")
+        print(f"{i:02d}. {r['side']:8s} | score={r['score']:.4f} edge={r['edge']:+.3f} | "
+              f"mkt={r['p_market']:.3f} vs fair={r['p_fair']:.3f}\n    {r['title']}\n    {r['url']}")
 if __name__ == '__main__':
     main()

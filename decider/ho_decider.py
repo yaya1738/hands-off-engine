@@ -1,210 +1,105 @@
+#!/usr/bin/env python3
 """
-Decider: The "Brain" of the Hands-Off Engine
+ho_decider.py - Decision logic for scored candidates (DRYRUN-safe)
 
-This module converts alpha signals into structured planned actions.
-It produces PlannedAction objects that represent trading intentions,
-which are then validated and executed by the Executor (body).
+Reads alpha/alpha_candidates_scored.json and applies decision rules to generate
+decider/decisions.json with trading decisions.
 """
-
 import json
 import sys
-import os
-from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Dict, Any
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+ALPHA_DIR = Path(__file__).parent.parent / "alpha"
+INPUT_FILE = ALPHA_DIR / "alpha_candidates_scored.json"
+OUTPUT_FILE = Path(__file__).parent / "decisions.json"
 
-from audit import get_audit_logger
-
-try:
-    from ai_nexus.history_log import log_kernel_history_event
-except ImportError:
-    # History log may not be available in all configurations
-    log_kernel_history_event = None
+SCORE_THRESHOLD = 0.15  # Minimum score to consider
+EDGE_THRESHOLD = 0.08   # Minimum edge to act
 
 
-@dataclass
-class PlannedAction:
-    """Structured representation of a planned trading action"""
-    market_id: str
-    market_name: str
-    side: str  # "YES" or "NO"
-    amount: float  # Dollar amount to risk
-    confidence: float  # 0.0 to 1.0
-    reasoning: str  # Why this action makes sense
+def load_candidates() -> List[Dict[str, Any]]:
+    """Load scored candidates from alpha pipeline"""
+    if not INPUT_FILE.exists():
+        print(f"[decider] Input file not found: {INPUT_FILE}")
+        return []
+
+    try:
+        data = json.loads(INPUT_FILE.read_text())
+        return data.get('ranked_candidates', [])
+    except Exception as e:
+        print(f"[decider] Failed to load candidates: {e}")
+        return []
 
 
-class Decider:
-    """
-    The Decider is the brain of the pipeline.
-    It takes alpha signals and produces planned actions.
-    """
+def make_decisions(candidates: List[Dict[str, Any]], dryrun: bool = True) -> List[Dict[str, Any]]:
+    """Generate trading decisions from scored candidates"""
+    decisions = []
 
-    def __init__(self, bankroll: float = 1000.0):
-        """
-        Initialize the Decider.
-        
-        Args:
-            bankroll: Total bankroll for position sizing (default: $1000)
-        """
-        self.bankroll = bankroll
-        self.audit = get_audit_logger(component="decider")
+    for cand in candidates:
+        score = cand.get('score', 0)
+        edge = abs(cand.get('edge_raw', 0))
+        rec = cand.get('rec', 'hold')
 
-    def decide(self):
-        """Legacy method - kept for backwards compatibility"""
-        print("Making a decision...")
-        
-        # Audit the decision
-        self.audit.log_decision(
-            decision_type="pipeline_decision",
-            inputs={},
-            outputs={"decision": "pending"}
-        )
+        # Decision rules
+        if score < SCORE_THRESHOLD or edge < EDGE_THRESHOLD:
+            action = 'skip'
+            reason = f'Score {score:.4f} or edge {edge:.3f} below threshold'
+        elif rec == 'hold':
+            action = 'skip'
+            reason = 'Recommendation is HOLD'
+        else:
+            action = rec  # buy_yes or buy_no
+            reason = f'Score {score:.4f} > threshold, edge {edge:.3f}'
 
-    def load_model_signals(self, model_path: Path) -> List[dict]:
-        """
-        Load alpha signals from polymarket-model.json file.
-        
-        Args:
-            model_path: Path to polymarket-model.json
-        
-        Returns:
-            List of alpha signal dicts in the format expected by plan_actions
-        """
-        with open(model_path, 'r') as f:
-            model_data = json.load(f)
-        
-        # Transform model format to internal alpha signals format
-        alpha_signals = []
-        for market in model_data.get('markets', []):
-            signal = {
-                'market_id': market['market_id'],
-                'market_name': market['question'],
-                'edge': market['model_edge'],
-                'current_odds': market['market_price'],
-                'side': market['side'],
-                'model_confidence': market['model_confidence'],
-                'fair_price': market['fair_price']
-            }
-            alpha_signals.append(signal)
-        
-        return alpha_signals
+        decision = {
+            'candidate_id': cand.get('key', 'unknown'),
+            'question': cand.get('question', ''),
+            'action': action,
+            'score': score,
+            'edge': cand.get('edge_raw', 0),
+            'category': cand.get('category', 'other'),
+            'reason': reason,
+            'dryrun': dryrun
+        }
+        decisions.append(decision)
 
-    def plan_actions(self, alpha_signals: List[dict]) -> List[PlannedAction]:
-        """
-        Convert alpha signals into planned actions.
-
-        Args:
-            alpha_signals: List of dicts with keys:
-                - market_id: str
-                - market_name: str
-                - edge: float (expected edge, e.g., 0.05 for 5%)
-                - current_odds: float (current market odds)
-                - side: str ("YES" or "NO")
-                - model_confidence: float (optional, from model)
-
-        Returns:
-            List of PlannedAction objects representing trading intentions
-        """
-        planned_actions = []
-
-        for signal in alpha_signals:
-            # Get edge and model confidence
-            edge = signal.get('edge', 0.0)
-            model_confidence = signal.get('model_confidence')
-            
-            # Use model confidence if available, otherwise derive from edge
-            if model_confidence is not None:
-                confidence = model_confidence
-            else:
-                confidence = 0.5 + (edge * 5)  # Simple scaling: 5% edge -> 0.75 confidence
-                confidence = max(0.0, min(1.0, confidence))  # Clamp to [0, 1]
-
-            # Size position based on edge and confidence
-            # Kelly criterion approximation: f = (edge * confidence) / odds
-            # Simplified: use a fraction of bankroll proportional to edge * confidence
-            kelly_fraction = edge * confidence
-            max_fraction = 0.10  # Never risk more than 10% of bankroll per position
-            size_fraction = min(kelly_fraction, max_fraction)
-            amount = self.bankroll * size_fraction
-
-            # Create reasoning string
-            reasoning = (
-                f"Edge: {edge:.1%}, Current odds: {signal.get('current_odds', 0):.2f}, "
-                f"Confidence: {confidence:.1%}"
-            )
-
-            action = PlannedAction(
-                market_id=signal['market_id'],
-                market_name=signal['market_name'],
-                side=signal['side'],
-                amount=amount,
-                confidence=confidence,
-                reasoning=reasoning
-            )
-
-            planned_actions.append(action)
-
-            # Log risk decision for Spark Plug kernels (if available)
-            if log_kernel_history_event:
-                try:
-                    log_kernel_history_event(
-                        kernel_ids=["risk_model_v2", "trading_philosophy"],
-                        kind="risk_decision",
-                        source="risk_model_v2",
-                        summary=f"Risk decision for {signal['market_id']}: f={kelly_fraction:.3f}, size=${amount:.2f}, edge={edge:.3f}, conf={confidence:.2f}",
-                        details={
-                            "market_id": signal['market_id'],
-                            "market_name": signal['market_name'],
-                            "side": signal['side'],
-                            "edge": edge,
-                            "confidence": confidence,
-                            "kelly_raw": kelly_fraction,
-                            "kelly_used": size_fraction,
-                            "size_usd": amount,
-                            "current_odds": signal.get('current_odds', None),
-                            "fair_price": signal.get('fair_price', None),
-                        },
-                        importance=8,
-                        tags=["risk_v2", "kelly"],
-                    )
-                except Exception as e:
-                    # Best-effort logging - never crash the decider
-                    print(f"[history_log] Warning: Failed to log risk decision: {e}")
-
-        # Log aggregate decider outcome for Spark Plug kernels (if available)
-        if log_kernel_history_event:
-            try:
-                total_risk_usd = sum(action.amount for action in planned_actions)
-                num_buys = sum(1 for action in planned_actions if action.side == "YES")
-                num_sells = sum(1 for action in planned_actions if action.side == "NO")
-
-                log_kernel_history_event(
-                    kernel_ids=["risk_model_v2", "alpha_polymarket_core", "trading_philosophy"],
-                    kind="decider_outcome",
-                    source="ho_decider",
-                    summary=f"Decider produced {len(planned_actions)} decisions, total_risk=${total_risk_usd:.2f}, buys={num_buys}, sells={num_sells}",
-                    details={
-                        "num_decisions": len(planned_actions),
-                        "total_risk_usd": total_risk_usd,
-                        "num_buys": num_buys,
-                        "num_sells": num_sells,
-                        "market_ids": [action.market_id for action in planned_actions],
-                        "bankroll": self.bankroll,
-                    },
-                    importance=7,
-                    tags=["decider", "aggregate"],
-                )
-            except Exception as e:
-                # Best-effort logging - never crash the decider
-                print(f"[history_log] Warning: Failed to log decider outcome: {e}")
-
-        return planned_actions
+    return decisions
 
 
-# Instantiate and decide (for backwards compatibility)
+def main():
+    # Default to DRYRUN unless explicitly disabled
+    dryrun = '--live' not in sys.argv
+
+    print(f"[decider] Running in {'DRYRUN' if dryrun else 'LIVE'} mode")
+
+    candidates = load_candidates()
+    if not candidates:
+        print("[decider] No candidates to process")
+        return
+
+    print(f"[decider] Processing {len(candidates)} candidates...")
+    decisions = make_decisions(candidates, dryrun=dryrun)
+
+    # Count actions
+    actions = {}
+    for d in decisions:
+        action = d['action']
+        actions[action] = actions.get(action, 0) + 1
+
+    print(f"[decider] Decisions: {dict(actions)}")
+
+    # Write output
+    OUTPUT_FILE.parent.mkdir(parents=True, exist_ok=True)
+    output_data = {
+        'decisions': decisions,
+        'summary': actions,
+        'dryrun': dryrun
+    }
+    OUTPUT_FILE.write_text(json.dumps(output_data, indent=2))
+
+    print(f"[decider] Wrote {len(decisions)} decisions to {OUTPUT_FILE}")
+
+
 if __name__ == "__main__":
-    decider = Decider()
-    decider.decide()
+    main()

@@ -1,4 +1,9 @@
 import os, sys, json, datetime
+from pathlib import Path
+
+# Add alpha module to path
+sys.path.insert(0, str(Path(__file__).parent.parent.parent / 'alpha'))
+from alpha_scorer import score_candidate, calculate_summary_stats, rank_and_cap_candidates, ScoringConfig
 
 BASE = os.path.expanduser("~/hands-off/autopilot")
 thr = float(os.environ.get("EDGE_THRESHOLD", "0.05"))
@@ -33,7 +38,8 @@ def load_candidates():
     return out
 
 cands = load_candidates()
-edges = []
+scored_candidates = []
+
 for c in cands:
     key = c.get("key") or c.get("market") or "unknown"
     p_mkt = c.get("p_mkt")
@@ -50,25 +56,38 @@ for c in cands:
     if p_fair is None:
         continue
 
-    edge = float(p_fair) - float(p_mkt)
-    if abs(edge) >= thr:
-        edges.append({
-            "key": key,
-            "p_fair": float(p_fair),
-            "p_mkt": float(p_mkt),
-            "edge": float(edge),
-            "note": c.get("note","")
-        })
+    # Update candidate with p_fair
+    c['p_fair'] = p_fair
 
-# print digest
+    # Score using multi-factor algorithm
+    scored = score_candidate(c)
+    scored_candidates.append(scored)
+
+# Calculate summary stats
+stats = calculate_summary_stats(scored_candidates, thr)
+
+# Rank and cap
+config = ScoringConfig(
+    min_score_threshold=thr,
+    max_candidates_global=50,
+    max_candidates_per_category=15
+)
+final_candidates = rank_and_cap_candidates(scored_candidates, config)
+
+# Print digest
 utc = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M")
 print(f"[Edge Digest @ {utc}] threshold={thr}")
-if not edges:
+print(f"Total candidates: {stats['total_candidates']}")
+print(f"Filtered (above threshold): {stats['filtered_candidates']}")
+print(f"Best score: {stats['best_score']:.4f}")
+print(f"Avg score: {stats['avg_score']:.4f}\n")
+
+if not final_candidates:
     print("No edges above threshold. Adjust watchlist/fair_priors or lower EDGE_THRESHOLD.")
     sys.exit(0)
 
-# sort by absolute edge desc
-edges.sort(key=lambda x: abs(x["edge"]), reverse=True)
-for e in edges:
-    sign = "BUY YES" if e["edge"]>0 else "BUY NO"
-    print(f"- {e['key']}: fair={e['p_fair']:.3f}, mkt={e['p_mkt']:.3f}, edge={e['edge']:+.3f}  [{sign}] {e['note']}")
+for i, e in enumerate(final_candidates, 1):
+    sign = "BUY YES" if e["edge_raw"] > 0 else "BUY NO"
+    cat = e.get('category', 'other').upper()
+    print(f"{i:02d}. [{cat:8s}] score={e['score']:.4f} edge={e['edge_raw']:+.3f} | "
+          f"fair={e['p_fair']:.3f} mkt={e['p_mkt']:.3f} | {sign:7s} | {e['note']}")
