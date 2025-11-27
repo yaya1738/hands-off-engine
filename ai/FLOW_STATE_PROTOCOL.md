@@ -77,7 +77,7 @@ Triggers:
 - Agent coordination completed
 - Minor optimization applied
 
-Delivery: Daily summary at 9am local time
+Delivery: Daily summary at 9 AM local time
 
 ### ⚪ SILENT (Log Only)
 **Never notify, log for audit**
@@ -100,12 +100,12 @@ Based on typical human productivity patterns:
 
 | Time | Flow State | System Behavior |
 |------|------------|-----------------|
-| 6-9am | Low | Morning briefing OK |
-| 9am-12pm | HIGH | Silent unless CRITICAL |
-| 12-1pm | Low (lunch) | Batch notifications OK |
-| 1-5pm | HIGH | Silent unless CRITICAL |
-| 5-7pm | Medium | Non-urgent OK |
-| 7pm-6am | Resting | Emergency only |
+| 6-9 AM | Low | Morning briefing OK |
+| 9 AM-12 PM | HIGH | Silent unless CRITICAL |
+| 12-1 PM | Low (lunch) | Batch notifications OK |
+| 1-5 PM | HIGH | Silent unless CRITICAL |
+| 5-7 PM | Medium | Non-urgent OK |
+| 7 PM-6 AM | Resting | Emergency only |
 
 **Note:** These are defaults. System learns actual patterns over time.
 
