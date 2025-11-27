@@ -87,6 +87,7 @@ class SelfHealingAgent:
         issues.extend(self.check_log_rotation())
         issues.extend(self.check_stale_processes())
         issues.extend(self.check_file_permissions())
+        issues.extend(self.check_droplet_connectivity())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -270,6 +271,73 @@ class SelfHealingAgent:
 
         return issues
 
+    def check_droplet_connectivity(self) -> List[Dict]:
+        """Check connectivity to remote droplets with retry logic."""
+        issues = []
+
+        # Read droplet configuration
+        mirror_env = Path.home() / "hands-off" / "state" / "mirror.env"
+        hosts_file = Path.home() / "hands-off" / "state" / "hosts.txt"
+
+        # Also check infrastructure state
+        infra_state = REPO_ROOT / "state" / "infrastructure_state.json"
+
+        droplet_ips = []
+
+        # Parse hosts.txt if exists
+        if hosts_file.exists():
+            try:
+                with open(hosts_file) as f:
+                    for line in f:
+                        line = line.strip()
+                        if line and not line.startswith('#'):
+                            ip = line.split()[0]
+                            droplet_ips.append(ip)
+            except Exception as e:
+                logger.warning(f"Could not parse hosts.txt: {e}")
+
+        # Add known droplet IP
+        if "138.68.103.156" not in droplet_ips:
+            droplet_ips.append("138.68.103.156")
+
+        # Check each droplet
+        ports_to_try = [22, 443, 2222]
+        ssh_opts = "-o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
+
+        for ip in droplet_ips:
+            reachable = False
+
+            for port in ports_to_try:
+                try:
+                    result = subprocess.run(
+                        f"ssh {ssh_opts} -o StrictHostKeyChecking=no -p {port} root@{ip} 'echo ok' 2>/dev/null",
+                        shell=True,
+                        capture_output=True,
+                        text=True,
+                        timeout=45
+                    )
+                    if result.returncode == 0 and "ok" in result.stdout:
+                        reachable = True
+                        break
+                except subprocess.TimeoutExpired:
+                    continue
+                except Exception as e:
+                    logger.warning(f"SSH check failed for {ip}:{port}: {e}")
+                    continue
+
+            if not reachable:
+                issues.append({
+                    "type": "droplet_connectivity",
+                    "description": f"Droplet {ip} unreachable on all ports",
+                    "severity": "high",
+                    "auto_fixable": True,
+                    "fix_action": "trigger_infrastructure_scaler",
+                    "droplet_ip": ip,
+                    "alert_user": True
+                })
+
+        return issues
+
     def attempt_fix(self, issue: Dict) -> str:
         """Attempt to automatically fix an issue."""
         if not issue.get("auto_fixable", False):
@@ -301,8 +369,42 @@ class SelfHealingAgent:
             elif issue.get("fix_action") == "rotate_log":
                 return self.rotate_log()
 
+            elif issue.get("fix_action") == "trigger_infrastructure_scaler":
+                return self.trigger_infrastructure_scaler(issue)
+
         except Exception as e:
             logger.error(f"Error applying fix: {e}")
+            return None
+
+    def trigger_infrastructure_scaler(self, issue: Dict) -> str:
+        """Trigger infrastructure scaler to handle droplet issues."""
+        try:
+            scaler_script = REPO_ROOT / "scripts" / "infrastructure_scaler.py"
+
+            if not scaler_script.exists():
+                logger.error("Infrastructure scaler not found")
+                return None
+
+            # Run health check via scaler
+            result = subprocess.run(
+                ["python3", str(scaler_script), "health"],
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+
+            if result.returncode == 0:
+                logger.info(f"Infrastructure scaler triggered successfully")
+                return f"Triggered infrastructure health check for {issue.get('droplet_ip', 'unknown')}"
+            else:
+                logger.error(f"Infrastructure scaler failed: {result.stderr}")
+                # Alert user since auto-fix didn't work
+                self.send_telegram_alert(issue)
+                return None
+
+        except Exception as e:
+            logger.error(f"Error triggering infrastructure scaler: {e}")
+            self.send_telegram_alert(issue)
             return None
 
     def rotate_log(self) -> str:

@@ -232,7 +232,7 @@ class CoordinationAgent:
         try:
             result = subprocess.run(
                 ["gh", "pr", "merge", str(pr_num), "--squash", "--auto"],
-                capture_output=True, text=True, timeout=60,
+                capture_output=True, text=True, timeout=120,
                 cwd=str(REPO_ROOT)
             )
 

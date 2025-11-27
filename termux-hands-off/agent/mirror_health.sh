@@ -7,7 +7,7 @@ CONF="$HOME/hands-off/state/mirror.env"
 # shellcheck disable=SC1090
 . "$CONF"
 
-SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=10"
+SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=30 -o ServerAliveInterval=15 -o ServerAliveCountMax=3"
 if [ "${STRICT_HOST_CHECKING:-no}" != "yes" ]; then
   SSH_OPTS="$SSH_OPTS -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 fi
