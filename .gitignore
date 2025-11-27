@@ -27,6 +27,8 @@ hands-off-out/
 *.sqlite
 *.db
 state/pipeline_logs/
+state/fed_rate_analysis.json
+state/fed_rate_backtest.json
 
 # Editor / OS files
 .DS_Store
