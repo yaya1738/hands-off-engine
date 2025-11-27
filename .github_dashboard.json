@@ -1,0 +1,16 @@
+{
+  "repositories": [
+    {
+      "owner": "yaya1738",
+      "repo": "hands-off-engine"
+    },
+    {
+      "owner": "anthropics",
+      "repo": "anthropic-sdk-python"
+    }
+  ],
+  "refresh_interval": 300,
+  "show_prs": true,
+  "show_issues": true,
+  "show_releases": true
+}

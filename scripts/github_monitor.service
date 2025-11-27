@@ -1,0 +1,16 @@
+[Unit]
+Description=GitHub Repository Monitoring Dashboard
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/user/hands-off-engine
+Environment="GITHUB_TOKEN="
+EnvironmentFile=-/root/.config/github/env
+ExecStart=/usr/bin/python3 /home/user/hands-off-engine/scripts/github_dashboard.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
