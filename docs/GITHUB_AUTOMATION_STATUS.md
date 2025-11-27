@@ -1,40 +1,39 @@
 # Hands-Off System Status Report
 
-**Last Updated:** 2025-11-27T21:51:00Z  
+**Last Updated:** 2025-11-27T21:57:00Z  
 **Verified By:** Copilot Coding Agent
 
 ## Executive Summary
 
-### GitHub Automation: ✅ WORKING
-### Trading Execution: ⚠️ SHADOW MODE (No Cash Flow Yet)
+**The system is designed to be SELF-UNIFIED.** The self-healing agent now monitors trading configuration and will alert via Telegram if trades are running in shadow mode.
 
-The GitHub repo automation is fully operational. However, **trades are running in SHADOW mode** - they're being logged but NOT executed on Polymarket. This is why there's no cash flow.
+| Component | Status |
+|-----------|--------|
+| GitHub Automation | ✅ Working |
+| Agent Coordination | ✅ Working |
+| Self-Healing Agent | ✅ Now detects trading config issues |
+| Trading Execution | ⚠️ Needs one-time server setup |
 
 ---
 
-## 🚨 Cash Flow Blocker: Trading in Shadow Mode
+## Self-Healing: Trading Configuration Detection
 
-**Evidence from `state/shadow_trades.jsonl`:**
-```json
-"executor_mode": "shadow"
-"live_trading_active": true  // Config says live, but...
-```
+The self-healing agent (`scripts/self_healing_agent.py`) now includes a `check_trading_configuration()` method that:
 
-**Root Cause:** The executor requires TWO things to go LIVE:
-1. `LIVE_TRADING_ENABLED=1` environment variable
-2. `.env.polymarket` file with API credentials
+1. **Detects missing `.env.polymarket`** → Alerts via Telegram
+2. **Detects `LIVE_TRADING_ENABLED != 1`** → Alerts via Telegram  
+3. **Detects shadow mode trades** → Alerts via Telegram
 
-**Current State:**
-- `state/trading_mode.json`: `"live_trading_enabled": true` ✅
-- `state/risk_profile.json`: baby_mode active, $50 max position ✅
-- `.env.polymarket`: **NOT PRESENT** ❌
-- `LIVE_TRADING_ENABLED` env var: **NOT SET** ❌
+This ensures the system will **automatically notify you** if trading isn't executing properly.
 
-### How to Enable Cash Flow
+---
 
-On your Termux/droplet, run:
+## One-Time Server Setup Required
+
+The Polymarket API credentials are **secrets** that cannot be stored in the repo. On your Termux/droplet, run ONCE:
+
 ```bash
-# 1. Create Polymarket credentials file
+# 1. Create credentials file
 cat > .env.polymarket << 'EOF'
 LIVE_TRADING_ENABLED=1
 HANDS_OFF_EXECUTOR_MODE=live
@@ -42,10 +41,11 @@ POLYMARKET_API_KEY=your_api_key_here
 POLYMARKET_API_SECRET=your_api_secret_here
 EOF
 
-# 2. Source and run
-source .env.polymarket
-python scripts/run_and_notify.sh
+# 2. Run full autonomous setup
+./scripts/setup_autonomous_mode.sh
 ```
+
+After this one-time setup, the system is fully autonomous.
 
 ---
 

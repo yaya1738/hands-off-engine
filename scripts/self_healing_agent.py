@@ -27,6 +27,21 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Tuple
 
+try:
+    from dotenv import load_dotenv
+except ImportError:
+    # Fallback if dotenv not installed
+    def load_dotenv(path):
+        """Simple fallback to parse .env file."""
+        if not path or not Path(path).exists():
+            return
+        with open(path) as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith('#') and '=' in line:
+                    key, value = line.split('=', 1)
+                    os.environ[key.strip()] = value.strip().strip('"').strip("'")
+
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
 LOG_FILE = "/var/log/self-healing-agent.log"
@@ -87,6 +102,7 @@ class SelfHealingAgent:
         issues.extend(self.check_log_rotation())
         issues.extend(self.check_stale_processes())
         issues.extend(self.check_file_permissions())
+        issues.extend(self.check_trading_configuration())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -267,6 +283,61 @@ class SelfHealingAgent:
                         "auto_fixable": True,
                         "fix_cmd": ["chmod", "+x", str(script)]
                     })
+
+        return issues
+
+    def check_trading_configuration(self) -> List[Dict]:
+        """Check if trading is properly configured for live execution."""
+        issues = []
+
+        # Check for .env.polymarket file
+        env_file = REPO_ROOT / ".env.polymarket"
+        if not env_file.exists():
+            issues.append({
+                "type": "trading_config",
+                "description": "Trading in SHADOW MODE - .env.polymarket missing",
+                "severity": "high",
+                "auto_fixable": False,
+                "alert_user": True,
+                "fix_hint": "Create .env.polymarket with LIVE_TRADING_ENABLED=1 and Polymarket API credentials"
+            })
+            return issues  # No point checking further
+
+        # Load the env file to check its contents
+        load_dotenv(env_file)
+
+        # Check if LIVE_TRADING_ENABLED is set
+        live_trading = os.getenv("LIVE_TRADING_ENABLED", "0")
+        if live_trading != "1":
+            issues.append({
+                "type": "trading_config",
+                "description": "Trading in SHADOW MODE - LIVE_TRADING_ENABLED not set to 1",
+                "severity": "high",
+                "auto_fixable": False,
+                "alert_user": True,
+                "fix_hint": "Set LIVE_TRADING_ENABLED=1 in .env.polymarket and source it"
+            })
+
+        # Check shadow trades to see if trades are being logged but not executed
+        shadow_file = REPO_ROOT / "state" / "shadow_trades.jsonl"
+        if shadow_file.exists():
+            try:
+                # Read last few lines
+                with open(shadow_file, 'r') as f:
+                    lines = f.readlines()
+                if lines:
+                    last_trade = json.loads(lines[-1])
+                    if last_trade.get("executor_mode") == "shadow":
+                        market_name = last_trade.get('market_name') or 'unknown'
+                        issues.append({
+                            "type": "trading_config",
+                            "description": f"Recent trades in SHADOW mode - no real cash flow. Last: {market_name[:50]}",
+                            "severity": "high",
+                            "auto_fixable": False,
+                            "alert_user": True
+                        })
+            except Exception as e:
+                logger.debug(f"Could not read shadow trades: {e}")
 
         return issues
 
