@@ -36,15 +36,23 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            // Only process branch pushes, not tags
+            if (!context.ref.startsWith('refs/heads/')) {
+              console.log(`Skipping non-branch ref: ${context.ref}`);
+              return;
+            }
+            
+            const branchName = context.ref.replace('refs/heads/', '');
+            
             // Get all open PRs targeting the updated branch
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              base: context.ref.replace('refs/heads/', ''),
+              base: branchName,
               state: 'open'
             });
             
-            console.log(`Found ${prs.length} open PRs targeting ${context.ref}`);
+            console.log(`Found ${prs.length} open PRs targeting ${branchName}`);
             
             for (const pr of prs) {
               // Check if PR is behind

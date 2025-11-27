@@ -44,7 +44,6 @@ jobs:
             
             // Check if from AI agent
             const aiAuthors = [
-              'Copilot',
               'copilot[bot]',
               'github-copilot[bot]',
               'dependabot[bot]',

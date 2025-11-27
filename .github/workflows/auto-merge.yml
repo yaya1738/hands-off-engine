@@ -71,8 +71,7 @@ jobs:
               'github-actions[bot]',
               'dependabot[bot]',
               'copilot[bot]',
-              'github-copilot[bot]',
-              'Copilot'
+              'github-copilot[bot]'
             ];
             
             const isTrustedAuthor = trustedAuthors.includes(pr.user.login);
@@ -135,7 +134,11 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const prNumber = ${{ steps.check_prs.outputs.pr_number }};
+            const prNumber = ${{ steps.check_prs.outputs.pr_number || 0 }};
+            if (!prNumber || prNumber === 0) {
+              console.log('No PR number available');
+              return;
+            }
             
             try {
               await github.rest.pulls.merge({
