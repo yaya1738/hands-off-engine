@@ -1,0 +1,8 @@
+{
+  "live_trading_enabled": true,
+  "reason": "manual_resume",
+  "last_changed": "2025-11-26T14:34:46.009260+00:00",
+  "auto_paused": false,
+  "pause_count_today": 0,
+  "last_resume": null
+}

@@ -128,17 +128,35 @@ def determine_side(market_price: float, fair_price: float) -> str:
 def transform_market(market: Dict, query: str) -> Optional[Dict]:
     """
     Transform a raw market into the canonical model format.
-    
+
     Args:
         market: Raw market dict from polymarket-compact.json
         query: The query/category this market belongs to
-    
+
     Returns:
         Transformed market dict, or None if market should be filtered
     """
-    # Get market price (use last trade price)
-    market_price = market.get('last', 0.5)
-    
+    # Get market price - try multiple field sources
+    market_price = market.get('last')
+    if market_price is None:
+        # Try outcomePrices (Gamma API format) - first price is YES
+        outcome_prices = market.get('outcomePrices', [])
+        if outcome_prices and isinstance(outcome_prices, list):
+            try:
+                market_price = float(outcome_prices[0]) if isinstance(outcome_prices[0], str) else outcome_prices[0]
+            except (ValueError, IndexError):
+                market_price = None
+    if market_price is None:
+        # Fallback to bestBid/bestAsk midpoint
+        best_bid = market.get('bestBid', 0)
+        best_ask = market.get('bestAsk', 0)
+        if best_bid and best_ask:
+            market_price = (best_bid + best_ask) / 2
+        elif best_bid:
+            market_price = best_bid
+        else:
+            market_price = 0.5
+
     # Skip markets with extreme prices (too certain)
     if market_price < 0.05 or market_price > 0.95:
         return None
@@ -200,13 +218,25 @@ def sync_polymarket_model(
     
     # Transform markets
     all_markets = []
-    markets_by_query = compact_data.get('markets', {})
-    
-    for query, markets in markets_by_query.items():
-        for market in markets:
+    markets_data = compact_data.get('markets', {})
+
+    # Handle both formats: dict (grouped by query) or list (flat from Gamma API)
+    if isinstance(markets_data, dict):
+        # Old format: {query: [markets]}
+        for query, markets in markets_data.items():
+            for market in markets:
+                transformed = transform_market(market, query)
+                if transformed:
+                    all_markets.append(transformed)
+    elif isinstance(markets_data, list):
+        # New format: flat list from Gamma API
+        for market in markets_data:
+            query = market.get('category', market.get('groupItemTitle', 'general'))
             transformed = transform_market(market, query)
             if transformed:
                 all_markets.append(transformed)
+    else:
+        raise ValueError(f"Unexpected markets format: {type(markets_data)}")
     
     # Sort by edge (highest first) and take top N
     all_markets.sort(key=lambda m: m['model_edge'], reverse=True)

@@ -32,18 +32,18 @@ def print_header(text: str):
 
 
 def run_pipeline(
-    bankroll: float = 1000.0,
+    bankroll: float = 5000.0,
     dryrun: bool = True,
     verbose: bool = True
 ) -> dict:
     """
     Run the full pipeline.
-    
+
     Args:
         bankroll: Total bankroll for position sizing
         dryrun: If True, no real trades executed (default: True)
         verbose: If True, print detailed progress
-    
+
     Returns:
         Dict with pipeline results and statistics
     """
@@ -131,20 +131,15 @@ def run_pipeline(
             print(f"  Rejected: {summary['rejected']}")
             print(f"  Total amount: ${summary['total_amount_executed']:.2f}")
 
-        # Step 3.5: Write execution plan for notifications
-        successful_actions = [
-            action for action, result in zip(planned_actions, execution_results)
-            if result.success
-        ]
-
-        if successful_actions:
+        # Step 3.5: Write execution plan for notifications (always write if we have planned actions)
+        # This ensures shadow mode tracking and healthcheck see fresh plans
+        if planned_actions:
             execution_plan_path = repo_root / 'executor' / 'execution_plan.json'
-            execution_plan = {
-                'timestamp': datetime.now().isoformat(),
-                'dryrun': dryrun,
-                'total_orders': len(successful_actions),
-                'total_size_usd': sum(a.amount for a in successful_actions),
-                'orders': [{
+
+            # Track execution status for each action
+            orders = []
+            for action, result in zip(planned_actions, execution_results):
+                orders.append({
                     'market_id': action.market_id,
                     'question': action.market_name,
                     'side': action.side.lower(),
@@ -153,8 +148,17 @@ def run_pipeline(
                     'edge': None,  # Extract from alpha signals if needed
                     'category': 'unknown',  # Extract from market_id if needed
                     'reason': action.reasoning,
-                    'status': 'planned'
-                } for action in successful_actions]
+                    'status': 'executed' if result.success else 'planned',
+                    'execution_error': result.message if not result.success else None
+                })
+
+            execution_plan = {
+                'timestamp': datetime.now().isoformat(),
+                'dryrun': dryrun,
+                'total_orders': len(planned_actions),
+                'total_size_usd': sum(a.amount for a in planned_actions),
+                'successful_orders': summary['successful'],
+                'orders': orders
             }
 
             with open(execution_plan_path, 'w') as f:
@@ -214,8 +218,8 @@ def main():
     parser.add_argument(
         '--bankroll',
         type=float,
-        default=1000.0,
-        help='Total bankroll for position sizing (default: 1000.0)'
+        default=5000.0,
+        help='Total bankroll for position sizing (default: 5000.0)'
     )
     parser.add_argument(
         '--live',
