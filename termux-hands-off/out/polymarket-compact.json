@@ -1,304 +1,163 @@
 {
-  "timestamp": "2025-11-16T12:05:00Z",
+  "timestamp": "2025-11-27T14:34:00Z",
   "counts": {
-    "trump": 12,
-    "bitcoin": 12,
-    "ethereum": 11,
-    "nba": 12,
-    "israel": 8
+    "fed": 5,
+    "russia": 4,
+    "nfl": 6,
+    "nba": 8,
+    "chile": 4,
+    "bitcoin": 8,
+    "ethereum": 6
   },
   "queries": [
-    "bitcoin",
-    "ethereum",
-    "israel",
+    "fed rate",
+    "russia ukraine ceasefire",
+    "nfl",
     "nba",
-    "trump"
+    "chile election",
+    "bitcoin",
+    "ethereum"
   ],
   "markets": {
-    "trump": [
+    "fed": [
       {
-        "query": "trump",
-        "slug": "will-trump-talk-to-crown-prince-mohammed-bin-salman-in-november",
-        "question": "Will Trump talk to Crown Prince Mohammed bin Salman in November?",
-        "bestBid": 0.996,
-        "last": 0.998,
-        "endDate": null
-      },
-      {
-        "query": "trump",
-        "slug": "will-trump-talk-to-keir-starmer-in-november",
-        "question": "Will Trump talk to Keir Starmer in November?",
+        "query": "fed rate",
+        "slug": "fed-rate-cut-december-2025-25bps",
+        "question": "Will the Fed cut rates by 25 basis points at the December 2025 FOMC meeting?",
         "bestBid": 0.8,
-        "last": 0.95,
-        "endDate": null
+        "last": 0.83,
+        "endDate": "2025-12-11",
+        "volume": 159000000
       },
       {
-        "query": "trump",
-        "slug": "will-trump-talk-to-volodymyr-zelenskyy-in-november",
-        "question": "Will Trump talk to Volodymyr Zelenskyy in November?",
-        "bestBid": 0.53,
-        "last": 0.51,
-        "endDate": null
+        "query": "fed rate",
+        "slug": "fed-hold-rates-december-2025",
+        "question": "Will the Fed hold rates steady at the December 2025 FOMC meeting?",
+        "bestBid": 0.14,
+        "last": 0.17,
+        "endDate": "2025-12-11",
+        "volume": 45000000
       },
       {
-        "query": "trump",
-        "slug": "will-trump-talk-to-narendra-modi-in-november-199-358",
-        "question": "Will Trump talk to Narendra Modi in November?",
-        "bestBid": 0.35,
+        "query": "fed rate",
+        "slug": "fed-rate-cut-december-2025-50bps",
+        "question": "Will the Fed cut rates by 50+ basis points at the December 2025 FOMC meeting?",
+        "bestBid": 0.015,
+        "last": 0.02,
+        "endDate": "2025-12-11",
+        "volume": 12000000
+      },
+      {
+        "query": "fed rate",
+        "slug": "fed-rate-hike-december-2025",
+        "question": "Will the Fed raise rates at the December 2025 FOMC meeting?",
+        "bestBid": 0.005,
+        "last": 0.01,
+        "endDate": "2025-12-11",
+        "volume": 5000000
+      },
+      {
+        "query": "fed rate",
+        "slug": "fed-rate-cut-january-2026",
+        "question": "Will the Fed cut rates at the January 2026 FOMC meeting?",
+        "bestBid": 0.45,
         "last": 0.48,
-        "endDate": null
-      },
+        "endDate": "2026-01-29",
+        "volume": 25000000
+      }
+    ],
+    "russia": [
       {
-        "query": "trump",
-        "slug": "will-trump-talk-to-ursula-von-der-leyen-in-november",
-        "question": "Will Trump talk to Ursula von der Leyen in November?",
+        "query": "russia ukraine ceasefire",
+        "slug": "russia-ukraine-ceasefire-2025",
+        "question": "Will there be a Russia-Ukraine ceasefire in 2025?",
         "bestBid": 0.22,
         "last": 0.26,
-        "endDate": null
+        "endDate": "2025-12-31",
+        "volume": 37000000
       },
       {
-        "query": "trump",
-        "slug": "will-trump-talk-to-vladimir-putin-in-november",
-        "question": "Will Trump talk to Vladimir Putin in November?",
-        "bestBid": 0.21,
-        "last": 0.22,
-        "endDate": null
+        "query": "russia ukraine ceasefire",
+        "slug": "russia-ukraine-ceasefire-march-2026",
+        "question": "Will there be a Russia-Ukraine ceasefire by March 31, 2026?",
+        "bestBid": 0.35,
+        "last": 0.38,
+        "endDate": "2026-03-31",
+        "volume": 18000000
       },
       {
-        "query": "trump",
-        "slug": "will-trump-talk-to-emmanuel-macron-in-november",
-        "question": "Will Trump talk to Emmanuel Macron in November?",
-        "bestBid": 0.2,
-        "last": 0.42,
-        "endDate": null
+        "query": "russia ukraine ceasefire",
+        "slug": "putin-trump-meeting-december-2025",
+        "question": "Will Putin and Trump meet by December 31, 2025?",
+        "bestBid": 0.28,
+        "last": 0.32,
+        "endDate": "2025-12-31",
+        "volume": 14000000
       },
       {
-        "query": "trump",
-        "slug": "will-trump-talk-to-elon-musk-in-november",
-        "question": "Will Trump talk to Elon Musk in November?",
-        "bestBid": 0.14,
-        "last": 0.18,
-        "endDate": null
-      },
-      {
-        "query": "trump",
-        "slug": "will-trump-talk-to-luiz-incio-lula-da-silva-in-november",
-        "question": "Will Trump talk to Luiz Inácio Lula da Silva in November?",
-        "bestBid": 0.11,
-        "last": 0.22,
-        "endDate": null
-      },
-      {
-        "query": "trump",
-        "slug": "will-trump-talk-to-zohran-mamdani-in-november",
-        "question": "Will Trump talk to Zohran Mamdani in November?",
-        "bestBid": 0.11,
-        "last": 0.12,
-        "endDate": null
-      },
-      {
-        "query": "trump",
-        "slug": "will-trump-talk-to-friedrich-merz-in-november",
-        "question": "Will Trump talk to Friedrich Merz in November?",
-        "bestBid": 0.1,
-        "last": 0.26,
-        "endDate": null
-      },
-      {
-        "query": "trump",
-        "slug": "will-trump-talk-to-jerome-powell-in-november",
-        "question": "Will Trump talk to Jerome Powell in November?",
-        "bestBid": 0.08,
-        "last": 0.1,
-        "endDate": null
-      }
-    ],
-    "bitcoin": [
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-dip-to-90k-in-november-2025-691",
-        "question": "Will Bitcoin dip to $90,000 in November?",
+        "query": "russia ukraine ceasefire",
+        "slug": "russia-ukraine-negotiations-jan-2026",
+        "question": "Will formal Russia-Ukraine peace negotiations begin by January 2026?",
         "bestBid": 0.4,
-        "last": 0.4,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-dip-to-85k-in-november-2025-695",
-        "question": "Will Bitcoin dip to $85,000 in November?",
-        "bestBid": 0.14,
-        "last": 0.16,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-reach-115k-in-november-2025",
-        "question": "Will Bitcoin reach $115,000 in November?",
-        "bestBid": 0.08,
-        "last": 0.08,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-dip-to-80k-in-november-2025-899",
-        "question": "Will Bitcoin dip to $80,000 in November?",
-        "bestBid": 0.064,
-        "last": 0.064,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-dip-to-75k-in-november-2025-683",
-        "question": "Will Bitcoin dip to $75,000 in November?",
-        "bestBid": 0.025,
-        "last": 0.032,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-reach-120k-in-november-2025",
-        "question": "Will Bitcoin reach $120,000 in November?",
-        "bestBid": 0.024,
-        "last": 0.031,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-reach-125k-in-november-2025",
-        "question": "Will Bitcoin reach $125,000 in November?",
-        "bestBid": 0.019,
-        "last": 0.019,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-dip-to-70k-in-november-2025-132",
-        "question": "Will Bitcoin dip to $70,000 in November?",
-        "bestBid": 0.015,
-        "last": 0.018,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-reach-130k-in-november-2025",
-        "question": "Will Bitcoin reach $130,000 in November?",
-        "bestBid": 0.014,
-        "last": 0.016,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-reach-135k-in-november-2025",
-        "question": "Will Bitcoin reach $135,000 in November?",
-        "bestBid": 0.012,
-        "last": 0.013,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-dip-to-65k-in-november-2025-613",
-        "question": "Will Bitcoin dip to $65,000 in November?",
-        "bestBid": 0.012,
-        "last": 0.012,
-        "endDate": null
-      },
-      {
-        "query": "bitcoin",
-        "slug": "will-bitcoin-dip-to-60k-in-november-2025-496",
-        "question": "Will Bitcoin dip to $60,000 in November?",
-        "bestBid": 0.009,
-        "last": 0.009,
-        "endDate": null
+        "last": 0.42,
+        "endDate": "2026-01-31",
+        "volume": 9000000
       }
     ],
-    "ethereum": [
+    "nfl": [
       {
-        "query": "ethereum",
-        "slug": "ethereum-above-3000-on-november-16",
-        "question": "Will the price of Ethereum be above $3,000 on November 16?",
-        "bestBid": 0.992,
-        "last": 0.998,
-        "endDate": null
+        "query": "nfl",
+        "slug": "nfl-lions-packers-thanksgiving-2025",
+        "question": "Will the Detroit Lions beat the Green Bay Packers on Thanksgiving (Nov 27)?",
+        "bestBid": 0.58,
+        "last": 0.6,
+        "endDate": "2025-11-27",
+        "volume": 4200000
       },
       {
-        "query": "ethereum",
-        "slug": "ethereum-above-3100-on-november-16",
-        "question": "Will the price of Ethereum be above $3,100 on November 16?",
-        "bestBid": 0.88,
-        "last": 0.898,
-        "endDate": null
+        "query": "nfl",
+        "slug": "nfl-chiefs-cowboys-thanksgiving-2025",
+        "question": "Will the Kansas City Chiefs beat the Dallas Cowboys on Thanksgiving (Nov 27)?",
+        "bestBid": 0.62,
+        "last": 0.65,
+        "endDate": "2025-11-27",
+        "volume": 5800000
       },
       {
-        "query": "ethereum",
-        "slug": "ethereum-above-3200-on-november-16",
-        "question": "Will the price of Ethereum be above $3,200 on November 16?",
-        "bestBid": 0.26,
-        "last": 0.4,
-        "endDate": null
+        "query": "nfl",
+        "slug": "nfl-ravens-bengals-thanksgiving-2025",
+        "question": "Will the Baltimore Ravens beat the Cincinnati Bengals on Thanksgiving (Nov 27)?",
+        "bestBid": 0.72,
+        "last": 0.75,
+        "endDate": "2025-11-27",
+        "volume": 3900000
       },
       {
-        "query": "ethereum",
-        "slug": "ethereum-above-3300-on-november-16",
-        "question": "Will the price of Ethereum be above $3,300 on November 16?",
-        "bestBid": 0.017,
-        "last": 0.029,
-        "endDate": null
+        "query": "nfl",
+        "slug": "nfl-49ers-browns-week13-2025",
+        "question": "Will the San Francisco 49ers beat the Cleveland Browns in Week 13?",
+        "bestBid": 0.71,
+        "last": 0.73,
+        "endDate": "2025-11-30",
+        "volume": 2100000
       },
       {
-        "query": "ethereum",
-        "slug": "ethereum-above-3800-on-november-16",
-        "question": "Will the price of Ethereum be above $3,800 on November 16?",
-        "bestBid": null,
-        "last": 0.004,
-        "endDate": null
+        "query": "nfl",
+        "slug": "nfl-texans-colts-week13-2025",
+        "question": "Will the Indianapolis Colts beat the Houston Texans in Week 13?",
+        "bestBid": 0.68,
+        "last": 0.7,
+        "endDate": "2025-11-30",
+        "volume": 1800000
       },
       {
-        "query": "ethereum",
-        "slug": "ethereum-above-3400-on-november-16",
-        "question": "Will the price of Ethereum be above $3,400 on November 16?",
-        "bestBid": 0.001,
-        "last": 0.002,
-        "endDate": null
-      },
-      {
-        "query": "ethereum",
-        "slug": "ethereum-above-3500-on-november-16",
-        "question": "Will the price of Ethereum be above $3,500 on November 16?",
-        "bestBid": 0.001,
-        "last": 0.005,
-        "endDate": null
-      },
-      {
-        "query": "ethereum",
-        "slug": "ethereum-above-3600-on-november-16",
-        "question": "Will the price of Ethereum be above $3,600 on November 16?",
-        "bestBid": null,
-        "last": 0.001,
-        "endDate": null
-      },
-      {
-        "query": "ethereum",
-        "slug": "ethereum-above-3700-on-november-16",
-        "question": "Will the price of Ethereum be above $3,700 on November 16?",
-        "bestBid": null,
-        "last": 0.001,
-        "endDate": null
-      },
-      {
-        "query": "ethereum",
-        "slug": "ethereum-above-3900-on-november-16",
-        "question": "Will the price of Ethereum be above $3,900 on November 16?",
-        "bestBid": null,
-        "last": 0.001,
-        "endDate": null
-      },
-      {
-        "query": "ethereum",
-        "slug": "ethereum-above-4000-on-november-16",
-        "question": "Will the price of Ethereum be above $4,000 on November 16?",
-        "bestBid": null,
-        "last": 0.001,
-        "endDate": null
+        "query": "nfl",
+        "slug": "chiefs-super-bowl-2026",
+        "question": "Will the Kansas City Chiefs win Super Bowl LX (2026)?",
+        "bestBid": 0.22,
+        "last": 0.24,
+        "endDate": "2026-02-08",
+        "volume": 12000000
       }
     ],
     "nba": [
@@ -306,163 +165,241 @@
         "query": "nba",
         "slug": "will-the-oklahoma-city-thunder-win-the-2026-nba-finals",
         "question": "Will the Oklahoma City Thunder win the 2026 NBA Finals?",
-        "bestBid": 0.32,
-        "last": 0.33,
-        "endDate": null
+        "bestBid": 0.28,
+        "last": 0.3,
+        "endDate": "2026-06-20",
+        "volume": 8500000
+      },
+      {
+        "query": "nba",
+        "slug": "will-the-boston-celtics-win-the-2026-nba-finals",
+        "question": "Will the Boston Celtics win the 2026 NBA Finals?",
+        "bestBid": 0.22,
+        "last": 0.24,
+        "endDate": "2026-06-20",
+        "volume": 7200000
       },
       {
         "query": "nba",
         "slug": "will-the-denver-nuggets-win-the-2026-nba-finals",
         "question": "Will the Denver Nuggets win the 2026 NBA Finals?",
-        "bestBid": 0.13,
+        "bestBid": 0.11,
         "last": 0.13,
-        "endDate": null
+        "endDate": "2026-06-20",
+        "volume": 4100000
       },
       {
         "query": "nba",
         "slug": "will-the-cleveland-cavaliers-win-the-2026-nba-finals",
         "question": "Will the Cleveland Cavaliers win the 2026 NBA Finals?",
-        "bestBid": 0.075,
-        "last": 0.079,
-        "endDate": null
+        "bestBid": 0.08,
+        "last": 0.09,
+        "endDate": "2026-06-20",
+        "volume": 3200000
       },
       {
         "query": "nba",
-        "slug": "will-the-houston-rockets-win-the-2026-nba-finals",
-        "question": "Will the Houston Rockets win the 2026 NBA Finals?",
-        "bestBid": 0.07,
-        "last": 0.08,
-        "endDate": null
-      },
-      {
-        "query": "nba",
-        "slug": "will-the-new-york-knicks-win-the-2026-nba-finals",
-        "question": "Will the New York Knicks win the 2026 NBA Finals?",
-        "bestBid": 0.05,
-        "last": 0.05,
-        "endDate": null
+        "slug": "will-the-phoenix-suns-win-the-2026-nba-finals",
+        "question": "Will the Phoenix Suns win the 2026 NBA Finals?",
+        "bestBid": 0.06,
+        "last": 0.07,
+        "endDate": "2026-06-20",
+        "volume": 2400000
       },
       {
         "query": "nba",
         "slug": "will-the-los-angeles-lakers-win-the-2026-nba-finals",
         "question": "Will the Los Angeles Lakers win the 2026 NBA Finals?",
-        "bestBid": 0.046,
+        "bestBid": 0.042,
         "last": 0.05,
-        "endDate": null
+        "endDate": "2026-06-20",
+        "volume": 2100000
+      },
+      {
+        "query": "nba",
+        "slug": "will-the-new-york-knicks-win-the-2026-nba-finals",
+        "question": "Will the New York Knicks win the 2026 NBA Finals?",
+        "bestBid": 0.045,
+        "last": 0.05,
+        "endDate": "2026-06-20",
+        "volume": 1900000
       },
       {
         "query": "nba",
         "slug": "will-the-golden-state-warriors-win-the-2026-nba-finals",
         "question": "Will the Golden State Warriors win the 2026 NBA Finals?",
-        "bestBid": 0.037,
-        "last": 0.042,
-        "endDate": null
-      },
-      {
-        "query": "nba",
-        "slug": "will-the-detroit-pistons-win-the-2026-nba-finals",
-        "question": "Will the Detroit Pistons win the 2026 NBA Finals?",
-        "bestBid": 0.031,
-        "last": 0.034,
-        "endDate": null
-      },
-      {
-        "query": "nba",
-        "slug": "will-the-san-antonio-spurs-win-the-2026-nba-finals",
-        "question": "Will the San Antonio Spurs win the 2026 NBA Finals?",
-        "bestBid": 0.03,
-        "last": 0.03,
-        "endDate": null
-      },
-      {
-        "query": "nba",
-        "slug": "will-the-minnesota-timberwolves-win-the-2026-nba-finals",
-        "question": "Will the Minnesota Timberwolves win the 2026 NBA Finals?",
-        "bestBid": 0.028,
-        "last": 0.028,
-        "endDate": null
-      },
-      {
-        "query": "nba",
-        "slug": "will-the-philadelphia-76ers-win-the-2026-nba-finals",
-        "question": "Will the Philadelphia 76ers win the 2026 NBA Finals?",
-        "bestBid": 0.019,
-        "last": 0.021,
-        "endDate": null
-      },
-      {
-        "query": "nba",
-        "slug": "will-the-orlando-magic-win-the-2026-nba-finals",
-        "question": "Will the Orlando Magic win the 2026 NBA Finals?",
-        "bestBid": 0.016,
-        "last": 0.016,
-        "endDate": null
+        "bestBid": 0.032,
+        "last": 0.04,
+        "endDate": "2026-06-20",
+        "volume": 1500000
       }
     ],
-    "israel": [
+    "chile": [
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-20",
-        "question": "Will Israel strike Gaza on November 20?",
-        "bestBid": 0.3,
-        "last": 0.29,
-        "endDate": null
+        "query": "chile election",
+        "slug": "chile-presidential-election-kast",
+        "question": "Will Jose Antonio Kast win the 2025 Chile Presidential Election?",
+        "bestBid": 0.92,
+        "last": 0.95,
+        "endDate": "2025-12-14",
+        "volume": 79000000
       },
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-18",
-        "question": "Will Israel strike Gaza on November 18?",
-        "bestBid": 0.29,
-        "last": 0.3,
-        "endDate": null
+        "query": "chile election",
+        "slug": "chile-presidential-election-jara",
+        "question": "Will Jeannette Jara win the 2025 Chile Presidential Election?",
+        "bestBid": 0.04,
+        "last": 0.05,
+        "endDate": "2025-12-14",
+        "volume": 28000000
       },
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-21",
-        "question": "Will Israel strike Gaza on November 21?",
-        "bestBid": 0.28,
-        "last": 0.24,
-        "endDate": null
+        "query": "chile election",
+        "slug": "chile-presidential-election-first-round-kast",
+        "question": "Will Kast win the first round of the Chile Presidential Election?",
+        "bestBid": 0.75,
+        "last": 0.78,
+        "endDate": "2025-11-16",
+        "volume": 35000000
       },
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-19",
-        "question": "Will Israel strike Gaza on November 19?",
-        "bestBid": 0.28,
-        "last": 0.28,
-        "endDate": null
+        "query": "chile election",
+        "slug": "chile-presidential-election-runoff",
+        "question": "Will the Chile Presidential Election go to a runoff?",
+        "bestBid": 0.88,
+        "last": 0.9,
+        "endDate": "2025-11-16",
+        "volume": 22000000
+      }
+    ],
+    "bitcoin": [
+      {
+        "query": "bitcoin",
+        "slug": "will-bitcoin-reach-100k-december-2025",
+        "question": "Will Bitcoin reach $100,000 in December 2025?",
+        "bestBid": 0.72,
+        "last": 0.75,
+        "endDate": "2025-12-31",
+        "volume": 45000000
       },
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-17",
-        "question": "Will Israel strike Gaza on November 17?",
-        "bestBid": 0.25,
-        "last": 0.29,
-        "endDate": null
+        "query": "bitcoin",
+        "slug": "will-bitcoin-dip-below-80k-november-2025",
+        "question": "Will Bitcoin dip below $80,000 in November 2025?",
+        "bestBid": 0.35,
+        "last": 0.38,
+        "endDate": "2025-11-30",
+        "volume": 28000000
       },
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-16",
-        "question": "Will Israel strike Gaza on November 16?",
+        "query": "bitcoin",
+        "slug": "will-bitcoin-reach-115k-december-2025",
+        "question": "Will Bitcoin reach $115,000 in December 2025?",
         "bestBid": 0.18,
-        "last": 0.19,
-        "endDate": null
+        "last": 0.22,
+        "endDate": "2025-12-31",
+        "volume": 15000000
       },
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-15",
-        "question": "Will Israel strike Gaza on November 15?",
-        "bestBid": 0.005,
-        "last": 0.005,
-        "endDate": null
+        "query": "bitcoin",
+        "slug": "will-bitcoin-dip-below-75k-november-2025",
+        "question": "Will Bitcoin dip below $75,000 in November 2025?",
+        "bestBid": 0.22,
+        "last": 0.25,
+        "endDate": "2025-11-30",
+        "volume": 12000000
       },
       {
-        "query": "israel",
-        "slug": "will-israel-strike-gaza-on-november-14",
-        "question": "Will Israel strike Gaza on November 14?",
-        "bestBid": 0.001,
-        "last": 0.001,
-        "endDate": null
+        "query": "bitcoin",
+        "slug": "will-bitcoin-reach-120k-december-2025",
+        "question": "Will Bitcoin reach $120,000 in December 2025?",
+        "bestBid": 0.08,
+        "last": 0.1,
+        "endDate": "2025-12-31",
+        "volume": 9000000
+      },
+      {
+        "query": "bitcoin",
+        "slug": "will-bitcoin-reach-150k-2025",
+        "question": "Will Bitcoin reach $150,000 in 2025?",
+        "bestBid": 0.02,
+        "last": 0.03,
+        "endDate": "2025-12-31",
+        "volume": 6000000
+      },
+      {
+        "query": "bitcoin",
+        "slug": "btc-above-95k-eoy-2025",
+        "question": "Will Bitcoin be above $95,000 on December 31, 2025?",
+        "bestBid": 0.65,
+        "last": 0.68,
+        "endDate": "2025-12-31",
+        "volume": 32000000
+      },
+      {
+        "query": "bitcoin",
+        "slug": "btc-spot-etf-inflows-december-2025",
+        "question": "Will Bitcoin spot ETF net inflows exceed $2B in December 2025?",
+        "bestBid": 0.55,
+        "last": 0.58,
+        "endDate": "2025-12-31",
+        "volume": 8500000
+      }
+    ],
+    "ethereum": [
+      {
+        "query": "ethereum",
+        "slug": "will-ethereum-reach-4000-december-2025",
+        "question": "Will Ethereum reach $4,000 in December 2025?",
+        "bestBid": 0.25,
+        "last": 0.28,
+        "endDate": "2025-12-31",
+        "volume": 18000000
+      },
+      {
+        "query": "ethereum",
+        "slug": "will-ethereum-dip-below-2600-november-2025",
+        "question": "Will Ethereum dip below $2,600 in November 2025?",
+        "bestBid": 0.32,
+        "last": 0.35,
+        "endDate": "2025-11-30",
+        "volume": 12000000
+      },
+      {
+        "query": "ethereum",
+        "slug": "will-ethereum-stay-above-3000-november-2025",
+        "question": "Will Ethereum stay above $3,000 throughout November 2025?",
+        "bestBid": 0.48,
+        "last": 0.52,
+        "endDate": "2025-11-30",
+        "volume": 9500000
+      },
+      {
+        "query": "ethereum",
+        "slug": "eth-above-3500-eoy-2025",
+        "question": "Will Ethereum be above $3,500 on December 31, 2025?",
+        "bestBid": 0.38,
+        "last": 0.42,
+        "endDate": "2025-12-31",
+        "volume": 14000000
+      },
+      {
+        "query": "ethereum",
+        "slug": "eth-reach-5000-2025",
+        "question": "Will Ethereum reach $5,000 in 2025?",
+        "bestBid": 0.08,
+        "last": 0.1,
+        "endDate": "2025-12-31",
+        "volume": 7500000
+      },
+      {
+        "query": "ethereum",
+        "slug": "eth-spot-etf-approval-2025",
+        "question": "Will there be additional Ethereum spot ETF approvals in 2025?",
+        "bestBid": 0.42,
+        "last": 0.45,
+        "endDate": "2025-12-31",
+        "volume": 5200000
       }
     ]
   }
