@@ -78,12 +78,8 @@ class TestGitHubClientInit(unittest.TestCase):
     @patch.dict(os.environ, {}, clear=True)
     def test_init_no_token_raises(self):
         """Test that missing token raises GitHubAuthError."""
-        # Clear GITHUB_TOKEN if it exists
-        env = os.environ.copy()
-        env.pop("GITHUB_TOKEN", None)
-        with patch.dict(os.environ, env, clear=True):
-            with self.assertRaises(GitHubAuthError):
-                GitHubClient()
+        with self.assertRaises(GitHubAuthError):
+            GitHubClient()
     
     def test_init_custom_settings(self):
         """Test initialization with custom settings."""
@@ -276,10 +272,7 @@ class TestCheckGitHubAuth(unittest.TestCase):
     @patch.dict(os.environ, {}, clear=True)
     def test_returns_false_when_no_token(self):
         """Test check_github_auth returns False when no token."""
-        env = os.environ.copy()
-        env.pop("GITHUB_TOKEN", None)
-        with patch.dict(os.environ, env, clear=True):
-            self.assertFalse(check_github_auth())
+        self.assertFalse(check_github_auth())
 
 
 class TestCachedRateLimit(unittest.TestCase):
