@@ -201,7 +201,7 @@ class AlphaSelfLearningEngine:
             "win_rate": wins / len(completed),
             "total_pnl": total_pnl,
             "avg_pnl": total_pnl / len(completed),
-            "avg_edge": statistics.mean([o.predicted_edge for o in completed]) if completed else 0
+            "avg_edge": statistics.mean([o.predicted_edge for o in completed])
         }
 
     def analyze_prediction_accuracy(self) -> Dict:

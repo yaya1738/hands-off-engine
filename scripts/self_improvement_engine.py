@@ -378,7 +378,7 @@ class SelfImprovementEngine:
                 else:
                     action.result = "skipped"
                     action.details = "No auto-fix handler for this type"
-            except Exception as e:
+            except (IOError, OSError, PermissionError) as e:
                 action.result = "failed"
                 action.details = str(e)
 

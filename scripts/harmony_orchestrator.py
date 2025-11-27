@@ -16,6 +16,7 @@ Run modes:
 
 import json
 import os
+import shutil
 import sys
 import time
 import logging
@@ -312,7 +313,6 @@ class HarmonyOrchestrator:
 
         # Check disk space
         try:
-            import shutil
             total, used, free = shutil.disk_usage(REPO_ROOT)
             usage_pct = (used / total) * 100
             metrics["disk_usage_pct"] = round(usage_pct, 1)
@@ -324,7 +324,7 @@ class HarmonyOrchestrator:
             elif usage_pct > 80:
                 issues.append(f"Disk space low: {usage_pct:.1f}%")
                 score -= 0.1
-        except Exception as e:
+        except OSError as e:
             issues.append(f"Cannot check disk: {e}")
 
         # Check log directory size
