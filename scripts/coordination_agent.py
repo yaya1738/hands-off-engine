@@ -200,23 +200,82 @@ class CoordinationAgent:
         if is_safe:
             # Auto-merge
             logger.info(f"PR #{pr_num} assessed as safe - auto-merging")
-            # TODO: Implement actual merge via gh CLI
-            self.respond_to_agent(
-                to=from_agent,
-                message=f"PR #{pr_num} auto-merged successfully",
-                msg_type="response"
-            )
-            return True
+            merge_result = self.execute_pr_merge(pr_num)
+
+            if merge_result:
+                self.respond_to_agent(
+                    to=from_agent,
+                    message=f"PR #{pr_num} auto-merged successfully",
+                    msg_type="response"
+                )
+                return True
+            else:
+                self.respond_to_agent(
+                    to=from_agent,
+                    message=f"PR #{pr_num} merge failed - manual review needed",
+                    msg_type="response"
+                )
+                return False
         else:
-            # Request user approval
+            # Request user approval via Telegram
             logger.info(f"PR #{pr_num} requires user approval")
-            # TODO: Send Telegram message requesting approval
+            self.request_telegram_approval(pr_num, from_agent)
             self.respond_to_agent(
                 to=from_agent,
                 message=f"PR #{pr_num} requires user approval - request sent to Telegram",
                 msg_type="response"
             )
             return False
+
+    def execute_pr_merge(self, pr_num: int) -> bool:
+        """Execute the actual PR merge via gh CLI."""
+        try:
+            result = subprocess.run(
+                ["gh", "pr", "merge", str(pr_num), "--squash", "--auto"],
+                capture_output=True, text=True, timeout=60,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode == 0:
+                logger.info(f"PR #{pr_num} merged successfully")
+                return True
+            else:
+                logger.error(f"PR #{pr_num} merge failed: {result.stderr}")
+                return False
+
+        except Exception as e:
+            logger.error(f"Error merging PR #{pr_num}: {e}")
+            return False
+
+    def request_telegram_approval(self, pr_num: int, from_agent: str):
+        """Send Telegram message requesting PR approval."""
+        import requests
+
+        token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
+        chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+
+        message = f'''🔔 <b>PR Approval Required</b>
+
+PR #{pr_num} needs manual approval.
+Requested by: {from_agent}
+
+<b>Actions:</b>
+• /approve_pr {pr_num} - Merge the PR
+• /reject_pr {pr_num} - Decline merge
+
+Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
+'''
+
+        try:
+            url = f'https://api.telegram.org/bot{token}/sendMessage'
+            requests.post(url, json={
+                'chat_id': chat_id,
+                'text': message,
+                'parse_mode': 'HTML'
+            }, timeout=10)
+            logger.info(f"Telegram approval request sent for PR #{pr_num}")
+        except Exception as e:
+            logger.error(f"Failed to send Telegram notification: {e}")
 
     def handle_review_request(self, msg: Dict) -> bool:
         """Handle code review request."""
@@ -268,13 +327,63 @@ class CoordinationAgent:
 
     def assess_pr_safety(self, pr_num: int) -> bool:
         """Assess if a PR is safe to auto-merge."""
-        # TODO: Implement actual safety checks:
-        # - All tests passing
-        # - No merge conflicts
-        # - Code review approved
-        # - Changes are within safe bounds
-        # For now, return False (require approval)
-        return False
+        try:
+            # Get PR status from GitHub CLI
+            result = subprocess.run(
+                ["gh", "pr", "view", str(pr_num), "--json",
+                 "state,mergeable,reviewDecision,statusCheckRollup,additions,deletions,changedFiles"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                logger.warning(f"Failed to fetch PR #{pr_num}: {result.stderr}")
+                return False
+
+            pr_data = json.loads(result.stdout)
+
+            # Check basic conditions
+            if pr_data.get('state') != 'OPEN':
+                logger.info(f"PR #{pr_num} is not open")
+                return False
+
+            if pr_data.get('mergeable') != 'MERGEABLE':
+                logger.info(f"PR #{pr_num} has merge conflicts")
+                return False
+
+            # Check status checks (CI)
+            status_checks = pr_data.get('statusCheckRollup', [])
+            if status_checks:
+                for check in status_checks:
+                    if check.get('conclusion') not in ['SUCCESS', 'NEUTRAL', 'SKIPPED']:
+                        logger.info(f"PR #{pr_num} has failing checks")
+                        return False
+
+            # Safety bounds: auto-merge small changes only
+            additions = pr_data.get('additions', 0)
+            deletions = pr_data.get('deletions', 0)
+            changed_files = pr_data.get('changedFiles', 0)
+
+            # Auto-merge if:
+            # - Less than 200 lines changed total
+            # - Less than 5 files changed
+            # - OR has approved review
+            is_small_change = (additions + deletions) < 200 and changed_files < 5
+            has_approval = pr_data.get('reviewDecision') == 'APPROVED'
+
+            if is_small_change or has_approval:
+                logger.info(f"PR #{pr_num} is safe to auto-merge (small={is_small_change}, approved={has_approval})")
+                return True
+            else:
+                logger.info(f"PR #{pr_num} too large for auto-merge: +{additions}/-{deletions}, {changed_files} files")
+                return False
+
+        except subprocess.TimeoutExpired:
+            logger.error(f"Timeout checking PR #{pr_num}")
+            return False
+        except Exception as e:
+            logger.error(f"Error assessing PR #{pr_num}: {e}")
+            return False
 
     def extract_pr_number(self, context: Dict) -> Optional[int]:
         """Extract PR number from message context."""

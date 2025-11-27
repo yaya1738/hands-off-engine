@@ -42,12 +42,12 @@ class Decider:
     It takes alpha signals and produces planned actions.
     """
 
-    def __init__(self, bankroll: float = 1000.0):
+    def __init__(self, bankroll: float = 5000.0):
         """
         Initialize the Decider.
-        
+
         Args:
-            bankroll: Total bankroll for position sizing (default: $1000)
+            bankroll: Total bankroll for position sizing (default: $5000)
         """
         self.bankroll = bankroll
         self.audit = get_audit_logger(component="decider")

@@ -8,7 +8,7 @@ def call_claude(
     agent_id: str,
     prior_messages: List[Dict],
     session_goal: str,
-    model: str = "claude-3-5-sonnet-20241022",
+    model: str = "claude-sonnet-4-20250514",
     max_tokens: int = 2048
 ) -> Dict:
     """
@@ -50,14 +50,16 @@ Review the prior messages and contribute your perspective. Be concise but thorou
         # Build conversation
         messages = []
         for msg in prior_messages[-10:]:  # Last 10 messages for context
-            role = "assistant" if msg['from_agent'] == agent_id else "user"
+            from_agent = msg.get('from_agent') or msg.get('from', 'unknown')
+            role = "assistant" if from_agent == agent_id else "user"
             messages.append({
                 "role": role,
-                "content": f"[{msg['from_agent']}]: {msg['content']}"
+                "content": f"[{from_agent}]: {msg['content']}"
             })
 
         # Add user prompt if last message wasn't from this agent
-        if not prior_messages or prior_messages[-1]['from_agent'] != agent_id:
+        last_from = prior_messages[-1].get('from_agent') or prior_messages[-1].get('from', '') if prior_messages else ''
+        if not prior_messages or last_from != agent_id:
             messages.append({
                 "role": "user",
                 "content": "Please provide your analysis and recommendations."
@@ -71,10 +73,17 @@ Review the prior messages and contribute your perspective. Be concise but thorou
             messages=messages
         )
 
+        # Handle empty or missing content
+        content = ""
+        if response.content and len(response.content) > 0:
+            content = response.content[0].text
+        else:
+            content = "[No response content from Claude]"
+
         return {
-            "content": response.content[0].text,
+            "content": content,
             "model": response.model,
-            "tokens": response.usage.input_tokens + response.usage.output_tokens
+            "tokens": response.usage.input_tokens + response.usage.output_tokens if response.usage else 0
         }
 
     except ImportError:

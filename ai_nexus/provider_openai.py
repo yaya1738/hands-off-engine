@@ -54,10 +54,11 @@ Review the prior messages and contribute your perspective. Be concise but thorou
 
         # Add prior messages
         for msg in prior_messages[-10:]:  # Last 10 messages for context
-            role = "assistant" if msg['from_agent'] == agent_id else "user"
+            from_agent = msg.get('from_agent') or msg.get('from', 'unknown')
+            role = "assistant" if from_agent == agent_id else "user"
             messages.append({
                 "role": role,
-                "content": f"[{msg['from_agent']}]: {msg['content']}"
+                "content": f"[{from_agent}]: {msg['content']}"
             })
 
         # Call OpenAI API
