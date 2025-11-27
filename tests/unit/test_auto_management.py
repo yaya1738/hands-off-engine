@@ -10,11 +10,19 @@ import tempfile
 from pathlib import Path
 from unittest.mock import patch, MagicMock
 import sys
+import os
 
-# Add scripts to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent / "scripts"))
+# Use absolute path for reliable imports
+REPO_ROOT_PATH = Path(__file__).parent.parent.parent
+SCRIPTS_PATH = REPO_ROOT_PATH / "scripts"
 
-from scripts.coordination_agent import CoordinationAgent, AI_COORD_DIR, REPO_ROOT
+# Only add to path if not already present
+if str(REPO_ROOT_PATH) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT_PATH))
+if str(SCRIPTS_PATH) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_PATH))
+
+from scripts.coordination_agent import CoordinationAgent, AI_COORD_DIR
 from scripts.self_healing_agent import SelfHealingAgent
 
 

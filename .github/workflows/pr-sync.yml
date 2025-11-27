@@ -67,7 +67,16 @@ jobs:
                   });
                   console.log(`Updated PR #${pr.number} branch`);
                 } catch (error) {
-                  console.log(`Could not update PR #${pr.number}: ${error.message}`);
+                  // Handle specific error types for better debugging
+                  if (error.status === 422) {
+                    console.log(`PR #${pr.number}: merge conflict or branch protection prevents update`);
+                  } else if (error.status === 403) {
+                    console.log(`PR #${pr.number}: permission denied - check workflow permissions`);
+                  } else if (error.status === 404) {
+                    console.log(`PR #${pr.number}: branch not found - may have been deleted`);
+                  } else {
+                    console.log(`PR #${pr.number}: unexpected error (${error.status}): ${error.message}`);
+                  }
                 }
               }
             }

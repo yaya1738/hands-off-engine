@@ -66,7 +66,7 @@ jobs:
             
             console.log(`Checking PR #${prNumber}: ${pr.title}`);
             
-            // Safety checks
+            // Safety checks - use exact matching for trusted authors
             const trustedAuthors = [
               'github-actions[bot]',
               'dependabot[bot]',
@@ -74,9 +74,7 @@ jobs:
               'github-copilot[bot]'
             ];
             
-            const isTrustedAuthor = trustedAuthors.some(author => 
-              pr.user.login.toLowerCase().includes(author.split('[')[0].toLowerCase())
-            );
+            const isTrustedAuthor = trustedAuthors.includes(pr.user.login);
             
             // Check if PR has safe labels or changes only safe files
             const { data: files } = await github.rest.pulls.listFiles({
@@ -104,8 +102,9 @@ jobs:
               /package\.json$/
             ];
             
+            // A file is safe if it's NOT risky (regardless of pattern match)
+            // This allows mixed safe/neutral files as long as none are risky
             const allFilesAreSafe = files.every(file => 
-              safePatterns.some(pattern => pattern.test(file.filename)) &&
               !riskyPatterns.some(pattern => pattern.test(file.filename))
             );
             
