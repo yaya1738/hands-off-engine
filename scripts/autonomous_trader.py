@@ -128,7 +128,9 @@ Auto-recovery in progress..."""
 class HealthCheckHandler(BaseHTTPRequestHandler):
     """HTTP handler for health check endpoint."""
     
-    trader = None  # Set by AutonomousTrader
+    def __init__(self, *args, trader=None, **kwargs):
+        self._trader = trader
+        super().__init__(*args, **kwargs)
     
     def log_message(self, format, *args):
         # Suppress HTTP logging
@@ -140,14 +142,15 @@ class HealthCheckHandler(BaseHTTPRequestHandler):
             self.send_header("Content-Type", "application/json")
             self.end_headers()
             
+            trader = self._trader
             health = {
                 "status": "healthy",
                 "timestamp": datetime.now(timezone.utc).isoformat(),
-                "running": self.trader.running if self.trader else False,
-                "cycle_count": self.trader.cycle_count if self.trader else 0,
-                "last_cycle": self.trader.last_cycle_time.isoformat() if self.trader and self.trader.last_cycle_time else None,
-                "consecutive_errors": self.trader.consecutive_errors if self.trader else 0,
-                "mode": "DRYRUN" if (self.trader and self.trader.dryrun) else "LIVE"
+                "running": trader.running if trader else False,
+                "cycle_count": trader.cycle_count if trader else 0,
+                "last_cycle": trader.last_cycle_time.isoformat() if trader and trader.last_cycle_time else None,
+                "consecutive_errors": trader.consecutive_errors if trader else 0,
+                "mode": "DRYRUN" if (trader and trader.dryrun) else "LIVE"
             }
             
             self.wfile.write(json.dumps(health).encode())
@@ -230,8 +233,9 @@ class AutonomousTrader:
     def _start_health_server(self):
         """Start HTTP health check server in background thread."""
         try:
-            HealthCheckHandler.trader = self
-            self.health_server = HTTPServer(("0.0.0.0", self.health_port), HealthCheckHandler)
+            from functools import partial
+            handler = partial(HealthCheckHandler, trader=self)
+            self.health_server = HTTPServer(("0.0.0.0", self.health_port), handler)
             self.health_thread = threading.Thread(target=self.health_server.serve_forever, daemon=True)
             self.health_thread.start()
             print(f"[INFO] Health check server started on port {self.health_port}")

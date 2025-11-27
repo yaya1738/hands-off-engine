@@ -158,9 +158,13 @@ def test_autonomous_trader_error_recovery():
         health_port=0
     )
     
+    # Create a function that raises an error
+    def raise_test_error():
+        raise Exception("Test error")
+    
     # Mock fetch_fresh_data to raise an error
     original_fetch = trader.fetch_fresh_data
-    trader.fetch_fresh_data = lambda: (_ for _ in ()).throw(Exception("Test error"))
+    trader.fetch_fresh_data = raise_test_error
     
     # Run cycle - should not raise
     result = trader.run_cycle()
