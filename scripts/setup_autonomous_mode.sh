@@ -180,6 +180,9 @@ echo "  ✓ Health Monitoring     - Every 15 minutes"
 echo "  ✓ Daily Recalibration   - 08:00 UTC"
 echo "  ✓ Phase Progression     - Midnight UTC"
 echo "  ✓ Coordination Agent    - Every 5 minutes"
+echo "  ✓ Self-Healing Agent    - Every 5 minutes"
+echo "  ✓ Hardware Management   - Every 15 minutes"
+echo "  ✓ Infrastructure Scaler - Hourly"
 echo "  ✓ Telegram Bot          - Running continuously"
 echo ""
 echo "Telegram Commands:"
@@ -212,12 +215,15 @@ All systems configured and running:
 ✅ Social Promotion (4h)
 ✅ Health Monitoring (15m)
 ✅ Phase Progression (daily)
+✅ Self-Healing Agent (5m)
+✅ Hardware Management (15m)
+✅ Infrastructure Scaler (hourly)
 ✅ Telegram Bot (continuous)
 
 <b>Commands:</b>
 /status /health /metrics /pause /resume
 
-System is now fully autonomous.
+System is now fully autonomous with self-hardware management.
 '''
 
 url = f'https://api.telegram.org/bot{token}/sendMessage'
