@@ -1,0 +1,43 @@
+[Unit]
+Description=Hands-Off Engine Autonomous Trader
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target
+
+[Service]
+Type=simple
+User=hands-off
+Group=hands-off
+WorkingDirectory=/home/hands-off/hands-off-engine
+Environment="PATH=/home/hands-off/.local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/home/hands-off/hands-off-engine"
+
+# Telegram notifications (set these in /etc/systemd/system/autonomous-trader.service.d/override.conf)
+# Environment="TELEGRAM_BOT_TOKEN=your-token"
+# Environment="TELEGRAM_CHAT_ID=your-chat-id"
+
+ExecStart=/usr/bin/python3 scripts/autonomous_trader.py --interval 900 --bankroll 1000
+
+# Graceful shutdown
+TimeoutStopSec=30
+KillSignal=SIGTERM
+
+# Auto-restart on failure
+Restart=always
+RestartSec=60
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=autonomous-trader
+
+# Security hardening
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/hands-off/hands-off-engine/logs
+ReadWritePaths=/home/hands-off/hands-off-engine/state
+ReadWritePaths=/home/hands-off/hands-off-engine/executor
+
+[Install]
+WantedBy=multi-user.target

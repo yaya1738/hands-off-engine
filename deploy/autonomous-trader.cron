@@ -1,0 +1,25 @@
+# Hands-Off Engine Autonomous Trader - Cron Configuration
+# ========================================================
+#
+# Alternative to systemd service for running autonomous trader.
+# Use this if systemd is not available or preferred.
+#
+# Installation:
+#   1. Edit paths below to match your setup
+#   2. crontab -e
+#   3. Paste the content below
+#
+# Note: For 24/7 autonomous operation, systemd service is recommended.
+# This cron runs the trader in --once mode every 15 minutes.
+#
+# --------------------------------------------------------
+
+# Run autonomous trader every 15 minutes
+*/15 * * * * cd /home/hands-off/hands-off-engine && /usr/bin/python3 scripts/autonomous_trader.py --once >> /var/log/autonomous-trader.log 2>&1
+
+# Alternative: Run as a long-running process (checked hourly)
+# This ensures the trader is always running
+# 0 * * * * pgrep -f "autonomous_trader.py" || cd /home/hands-off/hands-off-engine && /usr/bin/python3 scripts/autonomous_trader.py &
+
+# Health check - alert if last trading cycle was >30 minutes ago
+# */30 * * * * curl -s http://localhost:8899/health | python3 -c "import sys,json; h=json.load(sys.stdin); exit(0 if h.get('status')=='healthy' else 1)" || echo "Autonomous trader health check failed" >> /var/log/autonomous-trader-health.log
