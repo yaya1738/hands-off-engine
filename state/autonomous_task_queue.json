@@ -1,20 +1,17 @@
 {
-  "updated_at": "2025-11-26T12:48:00.000000+00:00",
-  "tasks": [
+  "updated_at": "2025-11-27T17:42:35.000000+00:00",
+  "tasks": [],
+  "completed_tasks": [
     {
       "id": "81ae02f7-f4fe-4878-b053-cd9de6710463",
-      "title": "Test task from CLI",
-      "description": "User request from Telegram: Test task from CLI\n\nAutonomous operation protocol:\n1. Assess what's needed\n2. Implement solution\n3. Use approval system for risky changes\n4. Document what was done\n\nPriority: User requested task",
-      "priority": "high",
-      "source": "telegram_user",
-      "created_at": "2025-11-23T15:31:34.054464+00:00",
-      "metadata": {
-        "user": "yair",
-        "via": "telegram"
-      }
-    }
-  ],
-  "completed_tasks": [
+      "completed_at": "2025-11-27T17:42:35.000000+00:00",
+      "summary": "Test task from CLI - closed as test/validation task",
+      "actions_taken": [
+        "Task was a system test from 2025-11-23",
+        "Validated task queue functionality is working",
+        "Closed during agent session health check"
+      ]
+    },
     {
       "completed_at": "2025-11-26T12:48:00.000000+00:00",
       "summary": "Resolved all stale execution plan health issues (5-77 hours old)",
