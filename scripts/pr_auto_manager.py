@@ -17,7 +17,7 @@ import os
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 import logging
 
 # Setup logging
@@ -61,7 +61,7 @@ class PRAutoManager:
         self.gh_token = os.getenv('GITHUB_TOKEN') or os.getenv('GH_TOKEN')
         self.repo = os.getenv('GITHUB_REPOSITORY', 'yaya1738/hands-off-engine')
 
-    def _run_gh_command(self, args: List[str]) -> tuple[bool, str]:
+    def _run_gh_command(self, args: List[str]) -> Tuple[bool, str]:
         """Run a gh CLI command and return success status and output."""
         try:
             result = subprocess.run(

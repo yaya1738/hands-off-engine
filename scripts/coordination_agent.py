@@ -17,6 +17,7 @@ Runs continuously or triggered by GitHub webhooks.
 """
 
 import os
+import sys
 import json
 import time
 import logging
@@ -30,6 +31,9 @@ REPO_ROOT = Path(__file__).parent.parent
 AI_COORD_DIR = REPO_ROOT / "ai" / "coordination"
 LOG_FILE = "/var/log/coordination-agent.log"
 CHECK_INTERVAL = 300  # 5 minutes
+
+# Add repo root to path for imports
+sys.path.insert(0, str(REPO_ROOT))
 
 # Setup logging
 logging.basicConfig(
@@ -196,8 +200,6 @@ class CoordinationAgent:
 
         try:
             # Use the PR auto manager for actual merge
-            import sys
-            sys.path.insert(0, str(REPO_ROOT))
             from scripts.pr_auto_manager import PRAutoManager
 
             manager = PRAutoManager()
@@ -326,8 +328,6 @@ class CoordinationAgent:
     def assess_pr_safety(self, pr_num: int) -> bool:
         """Assess if a PR is safe to auto-merge."""
         try:
-            import sys
-            sys.path.insert(0, str(REPO_ROOT))
             from scripts.pr_auto_manager import PRAutoManager
 
             manager = PRAutoManager()
