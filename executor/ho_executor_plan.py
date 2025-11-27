@@ -225,16 +225,25 @@ class Executor:
             # Convert side to CLOB format (BUY for YES, SELL for NO)
             clob_side = "BUY" if action.side == "YES" else "SELL"
             
-            # For market orders, we use a high price for BUY, low price for SELL
-            # This ensures immediate execution
-            # Note: In production, you may want to use limit orders with proper price discovery
-            price = 0.99 if clob_side == "BUY" else 0.01
+            # Get the token ID for the specific side (YES or NO token)
+            # The action should have the correct token_id for the YES/NO outcome
+            # If market_id is a condition_id, we need to get the specific token
+            token_id = getattr(action, 'token_id', None) or action.market_id
+            
+            # Use current market price with a small spread for better execution
+            # For BUY: use slightly above market (avoid aggressive 0.99)
+            # For SELL: use slightly below market (avoid aggressive 0.01)
+            # Default to 0.50 if no fair price available
+            fair_price = getattr(action, 'fair_price', None) or 0.50
+            spread = 0.02  # 2% spread for quick execution
+            if clob_side == "BUY":
+                price = min(0.99, fair_price + spread)
+            else:
+                price = max(0.01, fair_price - spread)
             
             # Create order arguments
-            # Note: token_id is the market's token ID (YES/NO token)
-            # In a real implementation, you'd need to get the correct token_id from the market
             order_args = OrderArgs(
-                token_id=action.market_id,  # This should be the actual token ID
+                token_id=token_id,
                 price=price,
                 size=action.amount,
                 side=clob_side
@@ -256,8 +265,17 @@ class Executor:
             # Update daily spending tracker
             self._daily_spent_usd += action.amount
             
-            # Log successful execution
-            order_id = result.get('orderID') or result.get('id') or str(result)
+            # Log successful execution - only log safe fields
+            order_id = 'unknown'
+            if isinstance(result, dict):
+                order_id = result.get('orderID') or result.get('id') or 'unknown'
+            
+            # Filter response to only safe, non-sensitive fields
+            safe_response = {}
+            if isinstance(result, dict):
+                safe_fields = ['orderID', 'id', 'status', 'createdAt', 'size', 'price', 'side']
+                safe_response = {k: v for k, v in result.items() if k in safe_fields}
+            
             self.audit.log_action(
                 action_type="live_order_executed",
                 action_data={
@@ -266,7 +284,7 @@ class Executor:
                     "side": action.side,
                     "amount": action.amount,
                     "order_id": order_id,
-                    "response": str(result)[:500]  # Truncate for audit
+                    "response": safe_response
                 },
                 result="success"
             )
