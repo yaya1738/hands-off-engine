@@ -1,0 +1,19 @@
+{
+  "enabled": true,
+  "enabled_at": "2025-11-27T14:05:53.095183Z",
+  "reason": "Critical cash position detected",
+  "measures": {
+    "reduce_ai_frequency": true,
+    "use_cheaper_models": true,
+    "pause_non_critical_automation": true,
+    "reduce_trading_frequency": true,
+    "sync_interval_seconds": 1800,
+    "optimization_interval_hours": 24,
+    "use_gpt35_instead_gpt4": true,
+    "max_daily_ai_spend": 5.0,
+    "pause_experimental_features": true,
+    "enable_cost_alerts": true,
+    "alert_threshold_daily": 10.0
+  },
+  "estimated_monthly_savings": 150.0
+}

@@ -1,0 +1,93 @@
+{
+  "timestamp": "2025-11-27T14:04:58.168422Z",
+  "severity": "CRITICAL",
+  "assessment": {
+    "severity": "CRITICAL",
+    "emergencies": [
+      {
+        "type": "credit_overlimit",
+        "severity": "CRITICAL",
+        "message": "Credit utilization 148.3% - OVER LIMIT! Credit score damage imminent",
+        "amount_overlimit": 3670.0
+      }
+    ],
+    "metrics": {
+      "personal_liquid": 2220.0,
+      "total_liquid": 14220.0,
+      "credit_utilization": 1.4828947368421053,
+      "net_worth": 4880.0,
+      "daily_burn": 50,
+      "monthly_burn": 1500,
+      "personal_runway_days": 44.4,
+      "total_runway_days": 284.4
+    }
+  },
+  "actions": [
+    {
+      "priority": 1,
+      "action": "IMMEDIATE_CREDIT_PAYDOWN",
+      "description": "Transfer $3670.00 from PayPal Cashback to pay down overlimit credit",
+      "impact": "Reduce credit balance by $3670.00, bring utilization under 100%",
+      "required_amount": 3670.0,
+      "steps": [
+        "1. Transfer funds from PayPal Cashback to PayPal main account",
+        "2. Use PayPal to pay Capital One and/or PayPal Credit",
+        "3. Prioritize whichever card is most overlimit"
+      ],
+      "urgency": "DO THIS NOW - WITHIN 24 HOURS"
+    },
+    {
+      "priority": 2,
+      "action": "EMERGENCY_SPENDING_FREEZE",
+      "description": "Implement immediate spending freeze on all non-essential items",
+      "impact": "Reduce burn rate, preserve remaining cash",
+      "steps": [
+        "1. Review all recurring subscriptions - cancel non-essential",
+        "2. Defer all discretionary purchases",
+        "3. Minimize trading activity to only high-confidence opportunities",
+        "4. Reduce AI API costs - use cheaper models, reduce frequency"
+      ],
+      "urgency": "IMPLEMENT IMMEDIATELY"
+    },
+    {
+      "priority": 3,
+      "action": "INCOME_ACCELERATION",
+      "description": "Focus 100% available time on income generation",
+      "impact": "Increase cash inflow, reduce burn rate impact",
+      "steps": [
+        "1. Identify highest $ per hour income opportunities",
+        "2. Defer all non-income activities",
+        "3. Leverage existing skills/platforms for quick cash",
+        "4. Consider gig work for immediate liquidity"
+      ],
+      "urgency": "START WITHIN 24 HOURS"
+    },
+    {
+      "priority": 4,
+      "action": "REQUEST_CREDIT_INCREASES",
+      "description": "Request credit limit increases to reduce utilization ratio",
+      "impact": "Immediate utilization reduction without paying down balance",
+      "steps": [
+        "1. Call Capital One - request limit increase",
+        "2. Call PayPal Credit - request limit increase",
+        "3. Emphasize payment history if good"
+      ],
+      "urgency": "DO WITHIN 48 HOURS",
+      "note": "Soft pull may be approved instantly, hard pull worth it given emergency"
+    },
+    {
+      "priority": 6,
+      "action": "REDUCE_SYSTEM_COSTS",
+      "description": "Immediately reduce AI and automation costs",
+      "impact": "Lower monthly burn rate by $50-200",
+      "steps": [
+        "1. Switch to cheaper AI models (GPT-3.5 instead of GPT-4)",
+        "2. Reduce automation frequency (hourly \u2192 every 4 hours)",
+        "3. Pause non-critical monitoring and analysis",
+        "4. Use cached results where possible"
+      ],
+      "urgency": "IMPLEMENT WITHIN 48 HOURS"
+    }
+  ],
+  "status": "ACTIVE"
+}

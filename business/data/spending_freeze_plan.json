@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-11-27T14:05:53.097153Z",
+  "status": "ACTIVE",
+  "categories": {
+    "ELIMINATED": [
+      "All discretionary spending",
+      "Non-essential subscriptions",
+      "Entertainment expenses",
+      "Dining out",
+      "Non-critical software subscriptions"
+    ],
+    "MINIMIZED": [
+      "AI API costs (use free tier where possible)",
+      "Cloud computing costs (downscale resources)",
+      "Data storage costs (clean up unused data)"
+    ],
+    "ESSENTIAL_ONLY": [
+      "Rent (already paid 2 months ahead)",
+      "Basic food/groceries",
+      "Essential utilities",
+      "Critical system infrastructure"
+    ]
+  },
+  "target_daily_burn": 20.0,
+  "target_monthly_burn": 600.0,
+  "reduction_needed": 900.0
+}
