@@ -53,7 +53,7 @@ sudo systemctl start self-healing-agent
 
 # Check status
 sudo systemctl status self-healing-agent
-sudo tail -f /var/log/self-healing-agent.log
+sudo tail -f /root/hands-off-engine/logs/self-healing-agent.log
 ```
 
 ### 3. Deploy Coordination Agent (Week 2)
@@ -90,7 +90,7 @@ sudo systemctl start coordination-agent
 
 # Check status
 sudo systemctl status coordination-agent
-sudo tail -f /var/log/coordination-agent.log
+sudo tail -f /root/hands-off-engine/logs/coordination-agent.log
 ```
 
 ### 4. Setup Telegram Bot Integration (Week 3)
@@ -126,7 +126,7 @@ ls -la /root/hands-off-engine/.git/index.lock
 # Should be gone
 
 # Check logs
-tail -20 /var/log/self-healing-agent.log
+tail -20 /root/hands-off-engine/logs/self-healing-agent.log
 # Should show auto-fix
 ```
 
@@ -186,14 +186,14 @@ Send these messages to your Telegram bot:
 ```bash
 # Self-healing agent
 sudo systemctl status self-healing-agent
-tail -f /var/log/self-healing-agent.log
+tail -f /root/hands-off-engine/logs/self-healing-agent.log
 
 # Coordination agent
 sudo systemctl status coordination-agent
-tail -f /var/log/coordination-agent.log
+tail -f /root/hands-off-engine/logs/coordination-agent.log
 
 # Trading pipeline (existing)
-tail -f /var/log/hands-off-engine.log
+tail -f /root/hands-off-engine/logs/hands-off-engine.log
 ```
 
 **Check coordination status:**

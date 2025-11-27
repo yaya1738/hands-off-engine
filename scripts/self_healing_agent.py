@@ -29,20 +29,33 @@ from typing import List, Dict, Tuple
 
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
-LOG_FILE = "/var/log/self-healing-agent.log"
+LOGS_DIR = REPO_ROOT / "logs"
 CHECK_INTERVAL = 300  # 5 minutes
 STATE_FILE = REPO_ROOT / "state" / "self_healing_state.json"
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_FILE),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+
+def setup_logging() -> logging.Logger:
+    """Setup logging with fallback to stderr if file logging fails."""
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    log_file = LOGS_DIR / "self-healing-agent.log"
+    
+    handlers = [logging.StreamHandler()]
+    
+    try:
+        handlers.append(logging.FileHandler(log_file))
+    except (PermissionError, OSError):
+        # Fall back to stderr only if file logging fails
+        pass
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        handlers=handlers
+    )
+    return logging.getLogger(__name__)
+
+
+logger = setup_logging()
 
 
 class SelfHealingAgent:
@@ -205,7 +218,7 @@ class SelfHealingAgent:
     def check_log_rotation(self) -> List[Dict]:
         """Check if logs need rotation."""
         issues = []
-        log_file = Path("/var/log/hands-off-engine.log")
+        log_file = LOGS_DIR / "hands-off-engine.log"
 
         if log_file.exists():
             size_mb = log_file.stat().st_size / (1024 * 1024)
@@ -307,7 +320,7 @@ class SelfHealingAgent:
 
     def rotate_log(self) -> str:
         """Rotate the main log file."""
-        log_file = Path("/var/log/hands-off-engine.log")
+        log_file = LOGS_DIR / "hands-off-engine.log"
         if not log_file.exists():
             return None
 

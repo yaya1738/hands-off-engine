@@ -28,19 +28,32 @@ from typing import List, Dict, Optional
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
 AI_COORD_DIR = REPO_ROOT / "ai" / "coordination"
-LOG_FILE = "/var/log/coordination-agent.log"
+LOGS_DIR = REPO_ROOT / "logs"
 CHECK_INTERVAL = 300  # 5 minutes
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_FILE),
-        logging.StreamHandler()
-    ]
-)
-logger = logging.getLogger(__name__)
+
+def setup_logging() -> logging.Logger:
+    """Setup logging with fallback to stderr if file logging fails."""
+    LOGS_DIR.mkdir(parents=True, exist_ok=True)
+    log_file = LOGS_DIR / "coordination-agent.log"
+    
+    handlers = [logging.StreamHandler()]
+    
+    try:
+        handlers.append(logging.FileHandler(log_file))
+    except (PermissionError, OSError):
+        # Fall back to stderr only if file logging fails
+        pass
+    
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        handlers=handlers
+    )
+    return logging.getLogger(__name__)
+
+
+logger = setup_logging()
 
 
 class CoordinationAgent:
