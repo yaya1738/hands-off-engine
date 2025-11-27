@@ -49,9 +49,9 @@ Use markdown headers consistently:
 ### Tables for Structured Info
 
 ```markdown
-| Parameter | Value | Rationale |
-|-----------|-------|-----------|
-| Max Position | $100 | Hard cap |
+| Parameter | Value |
+|-----------|-------|
+| Max Position | $100 |
 ```
 
 ### Code Examples

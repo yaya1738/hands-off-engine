@@ -73,11 +73,13 @@ def write_state(path: str, data: dict) -> None:
 
 ```python
 import sys
+from typing import Optional
 
-def log_error(msg: str) -> None:
+def log_error(msg: str, log_path: Optional[str] = None) -> None:
     """Log to file, fallback to stderr."""
+    path = log_path or 'logs/errors.log'
     try:
-        with open('logs/errors.log', 'a') as f:
+        with open(path, 'a') as f:
             f.write(f"{msg}\n")
     except OSError:
         print(msg, file=sys.stderr)
