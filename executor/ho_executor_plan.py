@@ -93,23 +93,25 @@ class PolymarketCLOBClient:
                 "logged_at": datetime.now(timezone.utc).isoformat()
             }
         
-        # TODO: Implement actual CLOB API call
-        # This would use:
+        # CLOB API integration pending - return failure to prevent false positives
+        # TODO: Implement actual CLOB API call using:
         # 1. py_clob_client library or direct API calls
         # 2. Sign request with api_secret
         # 3. Submit order to CLOB_API_BASE/order endpoint
         # 4. Return order confirmation
-        
-        # For now, return placeholder indicating API integration needed
+        # 
+        # Until this is implemented, we fail safe to prevent fake order records
         return {
-            "success": True,
-            "order_id": f"order_{datetime.now().strftime('%Y%m%d%H%M%S')}",
-            "status": "SUBMITTED",
+            "success": False,
+            "order_id": None,
+            "status": "API_NOT_IMPLEMENTED",
+            "reason": "CLOB API integration pending - order logged but not executed",
+            "logged": True,
+            "logged_at": datetime.now(timezone.utc).isoformat(),
             "market_id": market_id,
             "side": side,
             "amount": amount,
-            "price": price,
-            "submitted_at": datetime.now(timezone.utc).isoformat()
+            "price": price
         }
     
     def get_balance(self) -> Dict[str, Any]:
@@ -118,7 +120,12 @@ class PolymarketCLOBClient:
             return {"error": "Not authenticated", "balance_usd": 0.0}
         
         # TODO: Implement actual balance check
-        return {"balance_usd": 0.0, "wallet": self.wallet_address}
+        # Until implemented, return unknown to prevent incorrect decisions
+        return {
+            "error": "Balance check not implemented", 
+            "balance_usd": None,
+            "wallet": self.wallet_address
+        }
 
 
 class Executor:

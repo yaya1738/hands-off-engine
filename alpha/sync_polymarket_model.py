@@ -36,6 +36,9 @@ from pathlib import Path
 from typing import Dict, List, Optional
 
 
+# Maximum confidence cap to prevent overconfidence
+MAX_CONFIDENCE = 0.95
+
 # Category-specific confidence multipliers
 # Higher values = more confident in edge estimates for this category
 CATEGORY_CONFIDENCE = {
@@ -181,8 +184,8 @@ def calculate_confidence(edge: float, market: Dict, category: str = "") -> float
         except (ValueError, TypeError):
             pass
     
-    # Cap at 0.95 max confidence
-    return min(0.95, base_confidence)
+    # Cap at maximum confidence to prevent overconfidence
+    return min(MAX_CONFIDENCE, base_confidence)
 
 
 def determine_side(market_price: float, fair_price: float) -> str:
