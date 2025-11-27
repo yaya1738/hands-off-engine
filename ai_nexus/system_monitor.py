@@ -356,6 +356,28 @@ class AISystemMonitor:
             "warnings": warnings
         }
     
+    def _calculate_roi(self, total_profit: float, total_cost: float) -> float:
+        """
+        Calculate Return on Investment (ROI) as a percentage.
+        
+        Formula: ROI = ((Profit - Cost) / Cost) * 100
+        
+        This measures the net return per dollar spent on AI operations.
+        - Positive ROI: AI operations are generating more value than cost
+        - Zero ROI: Break-even
+        - Negative ROI: AI operations cost more than they generate
+        
+        Args:
+            total_profit: Total trading profit from AI-assisted decisions
+            total_cost: Total cost of AI operations (API calls, etc.)
+            
+        Returns:
+            ROI as percentage (e.g., 150.0 means 150% return)
+        """
+        if total_cost <= 0:
+            return 0.0
+        return ((total_profit - total_cost) / total_cost) * 100
+    
     def _is_within_hours(self, timestamp: Optional[str], hours: int) -> bool:
         """Check if timestamp is within given hours from now"""
         if not timestamp:
@@ -398,8 +420,11 @@ class AISystemMonitor:
             if e.get("entry_type") == "trade"
         )
         
-        # Calculate ROI
-        roi = ((total_trade_profit - total_ai_cost) / total_ai_cost * 100) if total_ai_cost > 0 else 0
+        # Calculate ROI (Return on Investment)
+        # Formula: ROI = ((Net Profit - AI Cost) / AI Cost) * 100
+        # This measures how much return we get for every dollar spent on AI operations
+        # A positive ROI means the system is generating more value than its AI costs
+        roi = self._calculate_roi(total_trade_profit, total_ai_cost)
         
         # Check state files for trading status
         model_file = self.state_dir / "polymarket-model.json"

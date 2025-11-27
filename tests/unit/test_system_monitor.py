@@ -386,6 +386,41 @@ class TestBusinessMetrics:
         assert metrics["roi_24h"] == 0
 
 
+class TestROICalculation:
+    """Test ROI calculation helper"""
+    
+    def test_calculate_roi_positive(self, temp_repo_dir, sample_agents_registry):
+        """Test ROI calculation with profit"""
+        monitor = AISystemMonitor(repo_root=str(temp_repo_dir))
+        
+        # $15 profit on $5 cost = 200% ROI
+        roi = monitor._calculate_roi(15.0, 5.0)
+        assert roi == 200.0
+    
+    def test_calculate_roi_negative(self, temp_repo_dir, sample_agents_registry):
+        """Test ROI calculation with loss"""
+        monitor = AISystemMonitor(repo_root=str(temp_repo_dir))
+        
+        # $3 profit on $10 cost = -70% ROI (lost $7)
+        roi = monitor._calculate_roi(3.0, 10.0)
+        assert roi == -70.0
+    
+    def test_calculate_roi_zero_cost(self, temp_repo_dir, sample_agents_registry):
+        """Test ROI with zero cost"""
+        monitor = AISystemMonitor(repo_root=str(temp_repo_dir))
+        
+        roi = monitor._calculate_roi(100.0, 0.0)
+        assert roi == 0.0
+    
+    def test_calculate_roi_breakeven(self, temp_repo_dir, sample_agents_registry):
+        """Test ROI at breakeven"""
+        monitor = AISystemMonitor(repo_root=str(temp_repo_dir))
+        
+        # $10 profit on $10 cost = 0% ROI (breakeven)
+        roi = monitor._calculate_roi(10.0, 10.0)
+        assert roi == 0.0
+
+
 class TestHealthReport:
     """Test health report generation"""
     

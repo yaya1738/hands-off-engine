@@ -125,7 +125,7 @@ def should_alert(
     report: SystemHealthReport,
     state: dict,
     always_alert_critical: bool = True
-) -> tuple[bool, str]:
+) -> "tuple[bool, str]":
     """
     Determine if we should send an alert based on business logic.
     

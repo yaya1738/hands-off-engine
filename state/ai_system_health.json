@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-27T17:00:11.809353+00:00",
+  "timestamp": "2025-11-27T17:05:37.397544+00:00",
   "overall_status": "warning",
   "agents": [
     {
@@ -84,7 +84,7 @@
       "chatgpt",
       "claude-web"
     ],
-    "current_phase": "Autonomous Operation - PR Consolidation",
+    "current_phase": "Autonomous Operation - Unified AI Monitoring",
     "autonomous_mode": {
       "copilot": true,
       "claude-code": true,
@@ -102,8 +102,8 @@
     "trade_revenue_24h": 0,
     "trade_profit_24h": 0,
     "net_profit_24h": 0,
-    "roi_24h": 0,
-    "model_age_hours": 29.0,
+    "roi_24h": 0.0,
+    "model_age_hours": 29.1,
     "markets_analyzed": 7,
     "self_financing": false
   },
@@ -113,6 +113,6 @@
   "recommendations": [
     "Investigate inactive agents: claude_cli, github_copilot_agent",
     "Coordination: No agent coordination messages in last 24h",
-    "Alpha model is 29.0h old - consider refresh"
+    "Alpha model is 29.1h old - consider refresh"
   ]
 }
