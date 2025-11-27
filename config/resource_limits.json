@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-27T22:30:00Z",
+  "description": "Resource monitoring and auto-scaling configuration for self-healing agent",
+  "updated_by": "copilot-agent",
+
+  "cpu": {
+    "warning_threshold": 80,
+    "critical_threshold": 95,
+    "description": "CPU usage thresholds in percent"
+  },
+
+  "memory": {
+    "warning_threshold": 80,
+    "critical_threshold": 95,
+    "description": "Memory usage thresholds in percent"
+  },
+
+  "auto_scale": {
+    "enabled": true,
+    "description": "If true, automatically resize DigitalOcean droplet when resources are critical"
+  },
+
+  "runaway_process": {
+    "enabled": true,
+    "cpu_threshold": 50,
+    "duration_seconds": 600,
+    "description": "Kill processes using >50% CPU for >10 minutes"
+  },
+
+  "droplet_sizes": {
+    "upgrade_path": [
+      "s-1vcpu-1gb",
+      "s-1vcpu-2gb",
+      "s-2vcpu-2gb",
+      "s-2vcpu-4gb",
+      "s-4vcpu-8gb"
+    ],
+    "max_size": "s-4vcpu-8gb",
+    "description": "Ordered list of droplet sizes for auto-scaling. Will upgrade to next size in list."
+  },
+
+  "environment_variables_needed": {
+    "DIGITALOCEAN_API_TOKEN": "Your DigitalOcean API token for droplet management",
+    "DIGITALOCEAN_DROPLET_ID": "The ID of your droplet (find via: doctl compute droplet list)",
+    "description": "Set these env vars to enable auto-scaling"
+  },
+
+  "notes": [
+    "Auto-scaling requires brief downtime (~1-2 min) as droplet must power off to resize",
+    "Set auto_scale.enabled=false to disable automatic upgrades (will still alert)",
+    "Runaway process detection helps prevent single processes from overloading system",
+    "Resource history is saved in state/self_healing_state.json for trend analysis"
+  ]
+}

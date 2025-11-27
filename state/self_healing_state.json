@@ -1,6 +1,16 @@
 {
   "total_fixes": 0,
-  "last_check": "2025-11-26T12:50:59.917902",
-  "issues_detected": [],
-  "auto_fixed": []
+  "last_check": "2025-11-27T22:36:13.078064",
+  "issues_detected": [
+    "Cron job not configured"
+  ],
+  "auto_fixed": [],
+  "resource_history": [
+    {
+      "timestamp": "2025-11-27T22:36:13.078047",
+      "cpu_percent": 0.0,
+      "memory_percent": 17.7,
+      "memory_available_mb": 6538.9
+    }
+  ]
 }
