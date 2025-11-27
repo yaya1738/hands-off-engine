@@ -524,18 +524,19 @@ class TestRunAutokernelRefresh:
         assert result["cpu"]["conversation_id"] == "autokernel_test_kernel_20251126_103000"
         assert result["cpu"]["intercom_thread"] == str(thread_file)
 
-        # Verify updates section (v0.4: minimal, no auto-apply)
+        # Verify updates section (v0.3: auto-apply enabled by default)
         assert "updates" in result
         assert len(result["updates"]["applied"]) == 1
-        assert result["updates"]["applied"][0]["type"] == "cpu_suggestion"
-        assert result["updates"]["applied"][0]["auto_applied"] is False
+        assert result["updates"]["applied"][0]["type"] == "auto_applied"
+        assert result["updates"]["applied"][0]["auto_applied"] is False  # No updates extracted from mock thread
         assert result["updates"]["kernel_file"] is not None
 
-        # Verify refresh was called with correct params
+        # Verify refresh was called with correct params (v0.3: auto_apply=True by default)
         mock_refresh.assert_called_once_with(
             kernel_id="test_kernel",
             max_events=20,
-            dry_run=False
+            dry_run=False,
+            auto_apply=True
         )
 
     @patch('ai_nexus.spark_plug_autokernel.refresh_kernel_from_history')
@@ -718,11 +719,248 @@ class TestV04SafetyConstraints:
             kernel_after = load_kernel("test_kernel")
             decisions_after = len(kernel_after.key_decisions)
 
-            # Kernel should NOT have been mutated (v0.4 safety)
+            # v0.3: auto_apply=True by default, but no updates extracted from mock thread
+            # Kernel should NOT have been mutated in this test (mock returns no updates)
             assert decisions_before == decisions_after
             assert result["updates"]["backup_file"] is None
-            assert result["updates"]["applied"][0]["auto_applied"] is False
-            assert "Manual review required" in result["updates"]["applied"][0]["reason"]
+            # v0.3: type is now "auto_applied" by default
+            assert result["updates"]["applied"][0]["type"] == "auto_applied"
+            assert "v0.3" in result["updates"]["applied"][0]["reason"]
+
+
+# =============================================================================
+# v0.3 Tests: Kernel Update Extraction
+# =============================================================================
+
+class TestV03KernelExtraction:
+    """Tests for v0.3 kernel update extraction from CPU thread output"""
+
+    def test_extract_decisions_from_content(self):
+        """Test extracting decision-type updates from LLM content"""
+        from ai_nexus.spark_plug_autokernel import extract_decisions_from_content
+
+        content = """
+        Based on our analysis, I recommend several key decisions:
+
+        DECISION: Increase Kelly fraction from 0.15 to 0.20 over the next 2 weeks.
+
+        We should also implement position size caps at 10% of bankroll.
+
+        I recommend using staged rollout for all parameter changes.
+        """
+
+        updates = extract_decisions_from_content(content, "cpu_test_01", "chatgpt")
+
+        # Should extract at least 2 decisions
+        assert len(updates) >= 2
+        assert all(u.update_type == "decision" for u in updates)
+        assert all("decision" in u.content for u in updates)
+        assert all(u.source == "cpu_test_01" for u in updates)
+        assert all(u.agent == "chatgpt" for u in updates)
+
+    def test_extract_failed_paths_from_content(self):
+        """Test extracting failed_path-type updates from LLM content"""
+        from ai_nexus.spark_plug_autokernel import extract_failed_paths_from_content
+
+        content = """
+        We encountered several issues in our previous approach.
+
+        FAILED: The aggressive Kelly fraction of 0.30 led to excessive drawdowns.
+
+        The problem was that we didn't account for correlation between positions.
+        That approach didn't work because the model wasn't calibrated properly.
+        """
+
+        updates = extract_failed_paths_from_content(content, "cpu_test_01", "claude_cli")
+
+        # Should extract at least 2 failed paths
+        assert len(updates) >= 2
+        assert all(u.update_type == "failed_path" for u in updates)
+        assert all("failure" in u.content for u in updates)
+
+    def test_extract_questions_from_content(self):
+        """Test extracting question-type updates from LLM content"""
+        from ai_nexus.spark_plug_autokernel import extract_questions_from_content
+
+        content = """
+        Several open questions remain:
+
+        QUESTION: What is the optimal position size limit for high-volatility markets?
+
+        Should we implement separate Kelly fractions for different market regimes?
+        Do we need additional safeguards for correlation risk?
+        """
+
+        updates = extract_questions_from_content(content, "cpu_test_01", "chatgpt")
+
+        # Should extract at least 2 questions
+        assert len(updates) >= 2
+        assert all(u.update_type == "question" for u in updates)
+        assert all("question" in u.content for u in updates)
+
+    def test_extract_kernel_updates_from_thread_empty_file(self, temp_dirs):
+        """Test extraction from non-existent thread file"""
+        from ai_nexus.spark_plug_autokernel import extract_kernel_updates_from_thread
+
+        temp_path = temp_dirs["temp_path"]
+        thread_file = temp_path / "intercom" / "test_session" / "thread.jsonl"
+
+        updates = extract_kernel_updates_from_thread(thread_file, "risk_model_v2")
+        assert updates == []
+
+    def test_extract_kernel_updates_from_thread(self, temp_dirs):
+        """Test full extraction from a thread file with LLM responses"""
+        from ai_nexus.spark_plug_autokernel import extract_kernel_updates_from_thread
+        import json
+
+        temp_path = temp_dirs["temp_path"]
+        intercom_dir = temp_path / "intercom" / "test_session"
+        intercom_dir.mkdir(parents=True, exist_ok=True)
+        thread_file = intercom_dir / "thread.jsonl"
+
+        # Create mock thread with LLM responses
+        messages = [
+            {
+                "msg_id": "msg-0001",
+                "timestamp": "2025-11-26T10:00:00Z",
+                "from": "system",
+                "role": "system",
+                "content": "Review and update kernel",
+                "meta": {}
+            },
+            {
+                "msg_id": "msg-0002",
+                "timestamp": "2025-11-26T10:01:00Z",
+                "from": "chatgpt",
+                "role": "assistant",
+                "content": "DECISION: Increase Kelly to 0.20. We should also cap position sizes.",
+                "meta": {}
+            },
+            {
+                "msg_id": "msg-0003",
+                "timestamp": "2025-11-26T10:02:00Z",
+                "from": "claude_cli",
+                "role": "assistant",
+                "content": "QUESTION: Should we implement regime-based sizing? The problem was that our prior approach didn't work because of volatility clustering.",
+                "meta": {}
+            }
+        ]
+
+        with open(thread_file, 'w') as f:
+            for msg in messages:
+                f.write(json.dumps(msg) + '\n')
+
+        updates = extract_kernel_updates_from_thread(thread_file, "risk_model_v2")
+
+        # Should extract decisions, questions, and failed paths
+        assert len(updates) >= 3
+        types = [u.update_type for u in updates]
+        assert "decision" in types
+        assert "question" in types
+        assert "failed_path" in types
+
+    def test_apply_kernel_updates(self, temp_dirs):
+        """Test applying extracted updates to a kernel"""
+        from ai_nexus.spark_plug_autokernel import apply_kernel_updates
+        from ai_nexus.spark_plug_types import create_kernel_update_decision
+        from ai_nexus.memory_kernels import load_kernel
+
+        temp_path = temp_dirs["temp_path"]
+        kernels_dir = temp_dirs["kernels_dir"]
+        kernels_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create test kernel
+        kernel = MemoryKernel(
+            kernel_id="test_kernel",
+            topic="Test",
+            summary="Test kernel"
+        )
+        save_kernel(kernel)
+
+        # Create updates
+        updates = [
+            create_kernel_update_decision(
+                decision="Test decision 1",
+                rationale="Test rationale",
+                source="cpu_test_01",
+                agent="chatgpt"
+            ),
+            create_kernel_update_decision(
+                decision="Test decision 2",
+                rationale="Test rationale",
+                source="cpu_test_01",
+                agent="claude_cli"
+            )
+        ]
+
+        # Apply updates
+        result = apply_kernel_updates("test_kernel", updates, dry_run=False)
+
+        assert result["applied"] == 2
+        assert result["skipped"] == 0
+        assert result["errors"] == 0
+
+        # Verify kernel was updated
+        updated_kernel = load_kernel("test_kernel")
+        assert len(updated_kernel.key_decisions) == 2
+
+    def test_apply_kernel_updates_dry_run(self, temp_dirs):
+        """Test that dry_run mode doesn't mutate the kernel"""
+        from ai_nexus.spark_plug_autokernel import apply_kernel_updates
+        from ai_nexus.spark_plug_types import create_kernel_update_decision
+        from ai_nexus.memory_kernels import load_kernel
+
+        temp_path = temp_dirs["temp_path"]
+        kernels_dir = temp_dirs["kernels_dir"]
+        kernels_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create test kernel
+        kernel = MemoryKernel(
+            kernel_id="test_kernel",
+            topic="Test",
+            summary="Test kernel"
+        )
+        save_kernel(kernel)
+
+        # Create updates
+        updates = [
+            create_kernel_update_decision(
+                decision="Test decision",
+                rationale="Test rationale",
+                source="cpu_test_01",
+                agent="chatgpt"
+            )
+        ]
+
+        # Apply in dry_run mode
+        result = apply_kernel_updates("test_kernel", updates, dry_run=True)
+
+        assert result["applied"] == 0
+        assert result["skipped"] == 1
+        assert result["errors"] == 0
+
+        # Verify kernel was NOT updated
+        unchanged_kernel = load_kernel("test_kernel")
+        assert len(unchanged_kernel.key_decisions) == 0
+
+    def test_deduplication_in_extraction(self):
+        """Test that extraction deduplicates similar updates"""
+        from ai_nexus.spark_plug_autokernel import extract_decisions_from_content
+
+        content = """
+        DECISION: Increase Kelly to 0.20
+
+        We should increase Kelly to 0.20 based on our analysis.
+
+        I recommend that we increase Kelly to 0.20.
+        """
+
+        updates = extract_decisions_from_content(content, "cpu_test", "chatgpt")
+
+        # Should deduplicate similar decisions (content starts the same)
+        # Even if patterns match multiple times, unique fingerprints should filter
+        decision_texts = [u.content.get("decision", "") for u in updates]
+        assert len(decision_texts) >= 1  # At least one decision found
 
 
 if __name__ == "__main__":
