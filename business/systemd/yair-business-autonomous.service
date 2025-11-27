@@ -1,0 +1,23 @@
+[Unit]
+Description=Yair Siegel Autonomous Business Engine
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=10
+User=%u
+WorkingDirectory=/home/user/hands-off-engine
+ExecStart=/usr/bin/python3 /home/user/hands-off-engine/business/autonomous_business_engine.py --interval 1800
+
+# Logging
+StandardOutput=append:/home/user/hands-off-engine/logs/autonomous_engine.log
+StandardError=append:/home/user/hands-off-engine/logs/autonomous_engine_error.log
+
+# Security
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
