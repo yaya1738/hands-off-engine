@@ -1,0 +1,85 @@
+{
+  "version": "1.0.0",
+  "description": "Trading system protection configuration for hardware monitoring",
+  "standard": "Yair Siegel Master Level Operations",
+  "systems": [
+    {
+      "system_name": "hands_off_executor",
+      "process_patterns": [
+        "python.*executor",
+        "python.*ho_executor"
+      ],
+      "critical_ports": [8080],
+      "min_cpu_headroom": 20.0,
+      "min_memory_headroom_gb": 2.0,
+      "max_latency_ms": 100.0,
+      "auto_restart_on_failure": true,
+      "alert_on_degradation": true,
+      "pause_upgrades_during_trading": true,
+      "priority": 1
+    },
+    {
+      "system_name": "hands_off_decider",
+      "process_patterns": [
+        "python.*decider",
+        "python.*ho_decider"
+      ],
+      "critical_ports": [],
+      "min_cpu_headroom": 15.0,
+      "min_memory_headroom_gb": 1.5,
+      "max_latency_ms": 150.0,
+      "auto_restart_on_failure": true,
+      "alert_on_degradation": true,
+      "pause_upgrades_during_trading": true,
+      "priority": 2
+    },
+    {
+      "system_name": "hands_off_alpha",
+      "process_patterns": [
+        "python.*alpha",
+        "python.*ho_alpha"
+      ],
+      "critical_ports": [],
+      "min_cpu_headroom": 10.0,
+      "min_memory_headroom_gb": 1.0,
+      "max_latency_ms": 200.0,
+      "auto_restart_on_failure": true,
+      "alert_on_degradation": true,
+      "pause_upgrades_during_trading": false,
+      "priority": 3
+    },
+    {
+      "system_name": "ai_nexus",
+      "process_patterns": [
+        "python.*ai_nexus",
+        "python.*nexus"
+      ],
+      "critical_ports": [],
+      "min_cpu_headroom": 10.0,
+      "min_memory_headroom_gb": 1.0,
+      "max_latency_ms": 300.0,
+      "auto_restart_on_failure": true,
+      "alert_on_degradation": false,
+      "pause_upgrades_during_trading": false,
+      "priority": 4
+    }
+  ],
+  "global_settings": {
+    "enable_auto_protection": true,
+    "enable_emergency_halt": true,
+    "alert_channels": ["console", "audit_log"],
+    "maintenance_requires_approval": true,
+    "max_consecutive_critical": 3,
+    "critical_escalation_interval_seconds": 60
+  },
+  "thresholds": {
+    "critical_cpu_percent": 95,
+    "critical_memory_available_gb": 0.5,
+    "critical_disk_percent": 98,
+    "critical_latency_ms": 500,
+    "warning_cpu_percent": 85,
+    "warning_memory_available_gb": 1.5,
+    "warning_disk_percent": 90,
+    "warning_latency_ms": 200
+  }
+}
