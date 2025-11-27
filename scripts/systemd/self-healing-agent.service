@@ -1,0 +1,23 @@
+[Unit]
+Description=Hands-Off Engine Self-Healing Agent
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+ExecStart=/usr/bin/python3 /root/hands-off-engine/scripts/self_healing_agent.py
+Restart=always
+RestartSec=60
+
+# Logging
+StandardOutput=append:/var/log/self-healing-agent.log
+StandardError=append:/var/log/self-healing-agent.log
+
+# Resource limits
+MemoryMax=128M
+CPUQuota=10%
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,23 @@
+[Unit]
+Description=Hands-Off Engine AI Coordination Agent
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+ExecStart=/usr/bin/python3 /root/hands-off-engine/scripts/coordination_agent.py
+Restart=always
+RestartSec=60
+
+# Logging
+StandardOutput=append:/var/log/coordination-agent.log
+StandardError=append:/var/log/coordination-agent.log
+
+# Resource limits
+MemoryMax=256M
+CPUQuota=20%
+
+[Install]
+WantedBy=multi-user.target

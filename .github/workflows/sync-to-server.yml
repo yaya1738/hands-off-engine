@@ -1,0 +1,71 @@
+name: Sync Repository to Server
+
+# This workflow triggers on pushes to main and notifies the server to pull latest code
+# Part of automated repo-server synchronization
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - '**.md'
+      - '.github/workflows/sync-from-server.yml'
+      - 'state/server_state/**'
+  workflow_dispatch:
+    inputs:
+      restart_services:
+        description: 'Restart services after sync'
+        required: false
+        default: 'true'
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  notify-server-sync:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Notify server to sync
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          # Get commit info
+          COMMIT_MSG=$(git log -1 --pretty=%B)
+          COMMIT_SHA=$(git rev-parse --short HEAD)
+          COMMIT_AUTHOR=$(git log -1 --pretty=%an)
+          
+          # Build notification message
+          MESSAGE="🔄 **Repo Updated - Auto-Sync Triggered**
+
+          📦 Commit: \`${COMMIT_SHA}\`
+          👤 Author: ${COMMIT_AUTHOR}
+          📝 Message: ${COMMIT_MSG}
+
+          🤖 The server should auto-pull this change via the sync agent.
+          
+          If sync doesn't happen in 5 minutes, the server sync agent may need attention."
+          
+          # Send Telegram notification (if configured)
+          if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
+            curl -s -X POST "https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage" \
+              -H "Content-Type: application/json" \
+              -d "{\"chat_id\": \"${TELEGRAM_CHAT_ID}\", \"text\": \"${MESSAGE}\", \"parse_mode\": \"Markdown\"}" \
+              || echo "Warning: Telegram notification failed"
+          else
+            echo "Telegram not configured - skipping notification"
+          fi
+
+      - name: Log sync trigger
+        run: |
+          echo "Sync triggered at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          echo "Commit: $(git rev-parse --short HEAD)"
+          echo "Branch: main"
+          echo ""
+          echo "The server-side sync agent will pull these changes automatically."
+          echo "See scripts/server_sync_agent.py for the sync logic."

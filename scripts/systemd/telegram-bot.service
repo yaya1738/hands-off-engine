@@ -1,0 +1,29 @@
+[Unit]
+Description=Hands-Off Engine Telegram Bot Listener
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+ExecStart=/usr/bin/python3 /root/hands-off-engine/telegram/telegram_bot_listener.py
+
+# Environment variables for Telegram
+# Set these in /etc/environment or uncomment and fill in:
+# Environment=TELEGRAM_BOT_TOKEN=your-token
+# Environment=TELEGRAM_CHAT_ID=your-chat-id
+
+Restart=always
+RestartSec=30
+
+# Logging
+StandardOutput=append:/var/log/telegram-bot.log
+StandardError=append:/var/log/telegram-bot.log
+
+# Resource limits
+MemoryMax=128M
+CPUQuota=10%
+
+[Install]
+WantedBy=multi-user.target
