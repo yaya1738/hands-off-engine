@@ -3,5 +3,9 @@
   "ai_bootstrap_instructions": [
     "Read the primary_status_doc before planning or changing anything.",
     "Use the roadmap there as the main source of truth."
-  ]
+  ],
+  "state_files": {
+    "subscriptions": "state/subscriptions.json",
+    "description": "Tracks AI subscriptions and connected accounts (Claude Max, GitHub Pro Plus, ChatGPT Plus, etc.)"
+  }
 }
