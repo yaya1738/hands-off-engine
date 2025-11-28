@@ -95,6 +95,8 @@ class SelfHealingAgent:
         issues.extend(self.check_orphaned_docs())
         issues.extend(self.check_development_standards())
         issues.extend(self.check_meta_metrics())
+        issues.extend(self.check_json_validity())
+        issues.extend(self.check_atomic_writes())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -746,6 +748,93 @@ class SelfHealingAgent:
 
         except Exception as e:
             logger.error(f"Error checking unmerged branches: {e}")
+
+        return issues
+
+    def check_json_validity(self) -> List[Dict]:
+        """Check critical JSON files are valid and parseable.
+
+        Race conditions between concurrent writers can corrupt JSON files.
+        This check detects corruption early before it causes cascading failures.
+        See: docs/claude/RACE_CONDITION_FIX_2025-11-28.md
+        """
+        issues = []
+
+        # Critical JSON files that multiple scripts read/write
+        critical_json_files = [
+            Path("/root/hands-off-out/state/decision_report.json"),
+            Path("/root/hands-off-out/state/health.json"),
+            Path("/root/hands-off-out/state/scanner_report.json"),
+            REPO_ROOT / "state" / "knowledge.json",
+            REPO_ROOT / "executor" / "execution_plan.json",
+            REPO_ROOT / "state" / "polymarket-model.json",
+        ]
+
+        for json_file in critical_json_files:
+            if not json_file.exists():
+                continue
+
+            try:
+                content = json_file.read_text(encoding="utf-8")
+                json.loads(content)
+            except json.JSONDecodeError as e:
+                issues.append({
+                    "type": "corrupt_json",
+                    "description": f"Corrupt JSON: {json_file.name} - {str(e)[:50]}",
+                    "severity": "critical",
+                    "auto_fixable": False,
+                    "alert_user": True,
+                    "file_path": str(json_file)
+                })
+                logger.error(f"Corrupt JSON detected: {json_file} - {e}")
+            except Exception as e:
+                logger.warning(f"Could not check {json_file}: {e}")
+
+        return issues
+
+    def check_atomic_writes(self) -> List[Dict]:
+        """Check that scripts writing shared JSON files use atomic writes.
+
+        Scripts should write to .tmp then rename/replace to prevent race conditions.
+        See: docs/DEVELOPMENT_STANDARDS.md line 2728, docs/claude/RACE_CONDITION_FIX_2025-11-28.md
+        """
+        issues = []
+
+        # Scripts that write to shared state files
+        scripts_to_check = [
+            REPO_ROOT / "bin" / "ho-decision-infra.py",
+            REPO_ROOT / "bin" / "ho-market-scanner.py",
+            REPO_ROOT / "bin" / "decision_enricher.py",
+        ]
+
+        for script in scripts_to_check:
+            if not script.exists():
+                continue
+
+            try:
+                content = script.read_text(encoding="utf-8")
+
+                # Check if script writes JSON files
+                writes_json = "json.dump" in content or "write_text" in content or ".write(" in content
+
+                if writes_json:
+                    # Check for atomic write pattern (.tmp + replace/rename)
+                    has_tmp_pattern = ".tmp" in content or "tmp_" in content
+                    has_replace = ".replace(" in content or ".rename(" in content or "os.rename" in content
+
+                    if not (has_tmp_pattern and has_replace):
+                        issues.append({
+                            "type": "non_atomic_write",
+                            "description": f"Script {script.name} may not use atomic writes",
+                            "severity": "medium",
+                            "auto_fixable": False,
+                            "alert_user": False,
+                            "file_path": str(script)
+                        })
+                        logger.warning(f"Script {script.name} may not use atomic writes - check for race conditions")
+
+            except Exception as e:
+                logger.warning(f"Could not check {script}: {e}")
 
         return issues
 
