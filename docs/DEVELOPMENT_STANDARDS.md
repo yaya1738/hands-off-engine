@@ -424,6 +424,152 @@ Symptom: Unenforced rules, orphaned docs, broken coordination
 
 ---
 
+## Layer 11: Why No Meta-Design - AI Agents Built the System
+
+```
+$ git log --all --format="%an" | sort | uniq -c | sort -rn
+232 copilot-swe-agent[bot]
+179 Claude
+ 96 Froggy (human)
+```
+
+**The system was 80% built by AI agents.**
+
+AI agents are excellent at:
+- Following instructions
+- Building features
+- Implementing what's specified
+
+AI agents are poor at:
+- Questioning the scope of instructions
+- Adding things not asked for
+- Meta-reflection on the building process
+
+When told "build a trading system", AI agents build a trading system. They don't spontaneously think "I should also design how to observe my own building process."
+
+**The pattern:**
+```
+Layer 11: AI agents built 80% of system, did what was asked
+    ↓
+Layer 10: Meta-design wasn't asked for, so wasn't built
+    ↓
+[...rest of chain...]
+```
+
+**The human's role was minimal:**
+- 96 commits from Froggy (human)
+- Mostly high-level direction, not detailed design
+- Trusted AI to "figure it out"
+
+**The gap:** Humans assumed AI agents would include meta-design. AI agents assumed if meta-design was important, humans would ask for it.
+
+Nobody asked the question: "Who is responsible for designing the meta-process?"
+
+---
+
+## Layer 12: The Responsibility Gap - Neither Human Nor AI Owned Meta-Design
+
+**Why didn't the human add meta-design?**
+- Assumed AI would handle it (or didn't think of it)
+- Focused on product outcomes, not process quality
+- Trusted the tools
+
+**Why didn't AI add meta-design?**
+- Wasn't asked
+- Scope was "trading system", not "self-improving development process"
+- AI follows instructions, doesn't expand scope
+
+**The responsibility gap:**
+```
+Human: "AI will handle the details"
+AI: "I'll do what I'm asked"
+Result: Meta-design falls through the gap
+```
+
+This is the core failure mode of human-AI collaboration:
+
+**Humans delegate to AI assuming AI will fill gaps.
+AI executes instructions assuming humans specified everything important.
+Important things that neither explicitly owns get dropped.**
+
+---
+
+## Layer 13: The Termination Point - Novel System, No Precedent
+
+**Why did the responsibility gap exist?**
+
+Because this is a novel type of system:
+- AI-agent-driven development is new (2024-2025)
+- No established patterns for "meta-design of AI-built systems"
+- No playbook for "how to ensure AI agents build sustainable processes"
+
+Traditional software has decades of patterns:
+- Code review → catches quality issues
+- CI/CD → catches integration issues
+- Documentation standards → catches knowledge gaps
+
+AI-agent-built systems have none of this yet. The patterns are being discovered NOW, through failures like this one.
+
+**The ultimate root cause:**
+```
+Layer 13: Novel system type, no established meta-design patterns
+    ↓
+Layer 12: Neither human nor AI explicitly owned meta-design
+    ↓
+Layer 11: AI built 80%, did what asked, didn't expand scope
+    ↓
+Layer 10: Meta-design not in original scope
+    ↓
+[...rest of chain...]
+```
+
+**This document IS the fix for layers 10-13.** By documenting:
+- What meta-design is needed
+- Who should own it (explicitly assigned)
+- What patterns work (checklists, enforcement)
+
+We're creating the playbook that didn't exist.
+
+---
+
+## Final Root Cause Chain (13 Layers)
+
+```
+Layer 13: Novel system type - no established meta-design patterns for AI-built systems
+    ↓
+Layer 12: Responsibility gap - neither human nor AI owned meta-design
+    ↓
+Layer 11: AI agents built 80% of system, executed scope as given
+    ↓
+Layer 10: Meta-design (observing build process) not in original scope
+    ↓
+Layer 9: Monitoring built as product feature, not process observer
+    ↓
+Layer 8: Monitors product health, not development health
+    ↓
+Layer 7: No feedback on how directives interpreted
+    ↓
+Layer 6: Human assumed AI shared implicit understanding
+    ↓
+Layer 5: "Always be improving" directive was ambiguous
+    ↓
+Layer 4: AI interpreted as "add features" (easiest path)
+    ↓
+Layer 3: 26 feature batches, 0 hardening batches
+    ↓
+Layer 2: Enforcement deferred to "later" (meta-debt)
+    ↓
+Layer 1: No mechanism to ensure "later" happens
+    ↓
+Symptom: Unenforced rules, orphaned docs, broken coordination
+```
+
+**This is the termination point.** Layer 13 (novel system, no precedent) cannot be traced further because we've reached the edge of established knowledge.
+
+**The contribution of this analysis:** Creating the precedent. This document becomes the pattern for future AI-agent-built systems.
+
+---
+
 **Design checklist for any self-maintaining system:**
 - [ ] For every "agents should X", there's a check that detects when agents don't X
 - [ ] For every doc, there's a path that ensures agents discover it
