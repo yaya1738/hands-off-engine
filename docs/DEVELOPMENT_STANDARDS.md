@@ -6,6 +6,20 @@
 
 ---
 
+## Why This Document Exists
+
+The system has two layers of design principles:
+
+1. **Product principles** - How to build the trading system (safety, modularity, resilience)
+2. **Process principles** - How agents should build and maintain things (enforcement, extensibility, categorization)
+
+Product principles describe WHAT we're building.
+Process principles describe HOW to build it well.
+
+This document covers **process principles**. Without it, agents know what to build but not how to build it in a way that the system can maintain itself.
+
+---
+
 ## Core Principle
 
 **Every rule needs enforcement. Every component needs monitoring.**
