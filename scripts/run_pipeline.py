@@ -42,11 +42,13 @@ def run_intelligent_alpha(output_path: Path, bankroll: float, verbose: bool = Tr
     engine = IntelligentAlphaEngine(
         bankroll=bankroll,
         use_chatgpt=False,  # Only Claude for now
-        use_claude=True
+        use_claude=True,
+        min_edge=0.03,  # 3% minimum edge
+        min_confidence="low"  # Accept all confidence levels
     )
 
-    # Generate signals
-    signals = engine.generate_signals(limit=20)
+    # Generate signals - limit to 5 for faster runtime (each takes ~20s API call)
+    signals = engine.generate_signals(limit=5)
 
     if verbose:
         print(f"  Generated {len(signals)} intelligent signals")
