@@ -23,6 +23,74 @@ from alpha.sync_polymarket_model import sync_polymarket_model
 from decider.ho_decider import Decider
 from executor.ho_executor_plan import Executor
 
+# Optional intelligent alpha engine
+try:
+    from alpha.intelligent_alpha_engine import IntelligentAlphaEngine
+    HAS_INTELLIGENT_ALPHA = True
+except ImportError:
+    HAS_INTELLIGENT_ALPHA = False
+
+
+def run_intelligent_alpha(output_path: Path, bankroll: float, verbose: bool = True) -> dict:
+    """
+    Run intelligent alpha engine and save in canonical format.
+
+    Returns dict compatible with sync_polymarket_model output.
+    """
+    from datetime import timezone
+
+    engine = IntelligentAlphaEngine(
+        bankroll=bankroll,
+        use_chatgpt=False,  # Only Claude for now
+        use_claude=True
+    )
+
+    # Generate signals
+    signals = engine.generate_signals(limit=20)
+
+    if verbose:
+        print(f"  Generated {len(signals)} intelligent signals")
+
+    # Convert confidence string to float
+    conf_map = {"low": 0.3, "medium": 0.6, "high": 0.9}
+
+    # Convert to canonical format expected by Decider
+    markets = []
+    for sig in signals:
+        markets.append({
+            "market_id": sig.market_id,
+            "question": sig.question,
+            "query_category": "intelligent",
+            "side": sig.side,
+            "model_edge": round(sig.edge, 4),
+            "model_confidence": conf_map.get(sig.confidence, 0.5),
+            "fair_price": round(sig.fair_probability, 4),
+            "market_price": round(sig.market_price, 4),
+            "best_bid": round(sig.market_price, 4),
+            "liquidity": sig.liquidity,
+            # Extra fields from intelligent engine
+            "reasoning": sig.reasoning,
+            "reasoning_quality": sig.reasoning_quality,
+            "order_type": sig.order_type,
+            "recommended_size_usd": sig.recommended_size_usd
+        })
+
+    # Build output
+    output = {
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "source_timestamp": datetime.now(timezone.utc).isoformat(),
+        "total_markets_analyzed": len(signals),
+        "markets_selected": len(signals),
+        "engine": "intelligent_alpha_v1",
+        "markets": markets
+    }
+
+    # Save to file
+    with open(output_path, 'w') as f:
+        json.dump(output, f, indent=2)
+
+    return output
+
 
 def print_header(text: str):
     """Print a formatted header"""
@@ -34,7 +102,8 @@ def print_header(text: str):
 def run_pipeline(
     bankroll: float = 5000.0,
     dryrun: bool = True,
-    verbose: bool = True
+    verbose: bool = True,
+    intelligent: bool = False
 ) -> dict:
     """
     Run the full pipeline.
@@ -43,6 +112,7 @@ def run_pipeline(
         bankroll: Total bankroll for position sizing
         dryrun: If True, no real trades executed (default: True)
         verbose: If True, print detailed progress
+        intelligent: If True, use LLM-based intelligent alpha engine
 
     Returns:
         Dict with pipeline results and statistics
@@ -60,46 +130,55 @@ def run_pipeline(
     try:
         # Step 1: Sync Polymarket Model (Alpha)
         if verbose:
-            print_header("STEP 1: Sync Alpha Signals")
+            engine_type = "Intelligent (LLM)" if intelligent else "Simple (hash)"
+            print_header(f"STEP 1: Generate Alpha Signals [{engine_type}]")
 
-        input_path = repo_root / 'termux-hands-off' / 'out' / 'polymarket-compact.json'
         output_path = repo_root / 'state' / 'polymarket-model.json'
 
-        # Auto-fetch if data is missing or stale (>2 hours old)
-        should_fetch = False
-        if not input_path.exists():
-            should_fetch = True
+        if intelligent and HAS_INTELLIGENT_ALPHA:
+            # Use LLM-based intelligent alpha engine
             if verbose:
-                print("⚠ Input data missing, auto-fetching...")
+                print("  Using intelligent alpha engine (Claude)...")
+            model = run_intelligent_alpha(output_path, bankroll, verbose)
         else:
-            # Check staleness
-            import os
-            file_age_hours = (datetime.now().timestamp() - os.path.getmtime(input_path)) / 3600
-            if file_age_hours > 2:
+            # Use simple hash-based model (backward compatible)
+            input_path = repo_root / 'termux-hands-off' / 'out' / 'polymarket-compact.json'
+
+            # Auto-fetch if data is missing or stale (>2 hours old)
+            should_fetch = False
+            if not input_path.exists():
                 should_fetch = True
                 if verbose:
-                    print(f"⚠ Input data stale ({file_age_hours:.1f}h old), auto-fetching...")
-
-        if should_fetch:
-            try:
-                # Import and run fetch
-                sys.path.insert(0, str(repo_root / 'scripts'))
-                from fetch_fresh_markets import fetch_active_markets, save_compact_format
-                markets = fetch_active_markets(limit=50)
-                save_compact_format(markets, str(input_path))
-                if verbose:
-                    print(f"✓ Fetched {markets['count']} fresh markets")
-            except Exception as fetch_err:
-                if not input_path.exists():
-                    raise FileNotFoundError(
-                        f"Input data not found and fetch failed: {fetch_err}\n"
-                        "Please ensure Polymarket API is accessible."
-                    )
-                else:
+                    print("⚠ Input data missing, auto-fetching...")
+            else:
+                # Check staleness
+                import os
+                file_age_hours = (datetime.now().timestamp() - os.path.getmtime(input_path)) / 3600
+                if file_age_hours > 2:
+                    should_fetch = True
                     if verbose:
-                        print(f"⚠ Fetch failed ({fetch_err}), using stale data")
-        
-        model = sync_polymarket_model(input_path, output_path)
+                        print(f"⚠ Input data stale ({file_age_hours:.1f}h old), auto-fetching...")
+
+            if should_fetch:
+                try:
+                    # Import and run fetch
+                    sys.path.insert(0, str(repo_root / 'scripts'))
+                    from fetch_fresh_markets import fetch_active_markets, save_compact_format
+                    markets = fetch_active_markets(limit=50)
+                    save_compact_format(markets, str(input_path))
+                    if verbose:
+                        print(f"✓ Fetched {markets['count']} fresh markets")
+                except Exception as fetch_err:
+                    if not input_path.exists():
+                        raise FileNotFoundError(
+                            f"Input data not found and fetch failed: {fetch_err}\n"
+                            "Please ensure Polymarket API is accessible."
+                        )
+                    else:
+                        if verbose:
+                            print(f"⚠ Fetch failed ({fetch_err}), using stale data")
+
+            model = sync_polymarket_model(input_path, output_path)
         
         results['steps']['sync'] = {
             'success': True,
@@ -264,6 +343,11 @@ def main():
         action='store_true',
         help='Save run log to state/pipeline_logs/'
     )
+    parser.add_argument(
+        '--intelligent',
+        action='store_true',
+        help='Use LLM-based intelligent alpha engine instead of simple hash model'
+    )
     
     args = parser.parse_args()
 
@@ -308,14 +392,17 @@ def main():
     
     if verbose:
         mode = 'DRYRUN (safe)' if dryrun else 'LIVE (real money!)'
+        alpha_type = "Intelligent (LLM)" if args.intelligent else "Simple"
         print(f"\n🚀 Starting Hands-Off Engine Pipeline")
         print(f"   Mode: {mode}")
+        print(f"   Alpha: {alpha_type}")
         print(f"   Bankroll: ${args.bankroll:.2f}")
-    
+
     results = run_pipeline(
         bankroll=args.bankroll,
         dryrun=dryrun,
-        verbose=verbose
+        verbose=verbose,
+        intelligent=args.intelligent
     )
     
     # Save log if requested
