@@ -2581,6 +2581,47 @@ Both are now complete with actionable fixes implemented.
 
 ---
 
+## Layer 85-86: Discovering The Core Placeholder (2025-11-28)
+
+**Context:** After completing meta-debt cleanup, asked "now what?" and was told to figure out why I don't know what to focus on.
+
+### Layer 85: Why I Didn't Know What To Focus On
+
+When the immediate task completed, I listed options and asked user to choose. This violates:
+- User Goal #3: Hands-off operation
+- Directive 7: Don't defer completion decisions
+
+**Root cause:** No prioritization framework for "what to do when nothing is urgent."
+
+**Fix:** Check what serves user's primary goal. System purpose = trading signals that generate profit.
+
+### Layer 86: The Core Component Is A Placeholder
+
+**Discovery:** The alpha model (`sync_polymarket_model.py`) uses a hash function as "edge detection":
+
+```python
+# Line 81 of sync_polymarket_model.py
+adjustment = (hash(slug) % 9 - 4) / 100.0  # -0.04 to +0.04
+```
+
+This produces the same `model_edge: 0.04` for most markets. It's literally random noise.
+
+**Meanwhile:** `intelligent_alpha_engine.py` exists with:
+- LLM integration (Claude + ChatGPT)
+- Consensus engine
+- Reasoning quality scoring
+
+But it's NOT WIRED UP. The pipeline uses the placeholder.
+
+**This is the ultimate "later means never":**
+- Comment in code: "In production, replace with actual alpha model"
+- Actual alpha model exists (`intelligent_alpha_engine.py`)
+- Never connected to production pipeline
+
+**Status:** Documented. Fix requires wiring `intelligent_alpha_engine` into `run_pipeline.py`. This is a major change to core value-generating component - flagged for user awareness.
+
+---
+
 ## Core Principle
 
 **Every rule needs enforcement. Every component needs monitoring.**
