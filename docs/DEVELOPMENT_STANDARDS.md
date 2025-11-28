@@ -313,10 +313,85 @@ Layer 7: No feedback on directive interpretation
 
 ---
 
-## Complete Root Cause Chain (8 Layers)
+## Layer 9: Why Operational Focus - Monitoring Was a Feature, Not Meta-System
+
+The first monitoring was added in Batch 14 (commit `329a3da`):
 
 ```
-Layer 8: Monitoring focused on operational metrics, not meta-metrics
+Batch 14: Add unified health monitoring system (DRYRUN-only)
+```
+
+It was added AS a feature, following the same pattern as everything else:
+- Batch 12: Data ingestion (feature)
+- Batch 13: History analytics (feature)
+- Batch 14: Health monitoring (feature)
+- Batch 15: AI Runner (feature)
+
+Monitoring was treated as "a thing the trading system needs" rather than "a thing that observes how we build."
+
+**The meta-pattern:**
+```
+Layer 9: Monitoring built as product feature, not meta-system observer
+    ↓
+Layer 8: Monitors product (trading), not process (development)
+    ↓
+[...rest of chain...]
+```
+
+**Why this matters:** The system can monitor itself operationally but cannot reflect on HOW it's being built.
+
+**The deeper insight:** Self-maintaining systems need TWO kinds of observation:
+1. **Product monitoring:** Is the trading system working? (Batch 14 ✓)
+2. **Process monitoring:** Is the development process healthy? (Missing ✗)
+
+Without #2, the system can fix operational bugs but cannot fix systematic development issues.
+
+---
+
+## Layer 10: The Termination Point - No Meta-Design Process
+
+**Why was there no process monitoring?**
+
+Because nobody designed a meta-process. The system was designed as:
+- "Build a trading system" (product)
+- "Have AI agents build it" (process)
+
+But NOT:
+- "Design how to observe and improve the building process itself" (meta-process)
+
+This is the termination point because it's where the buck stops:
+
+**The original design scope was the product, not the process of building the product.**
+
+When Claude was told "build a trading system", it built:
+- Trading features
+- Trading monitoring
+- Trading safety
+
+It did NOT build:
+- Development process features
+- Development process monitoring
+- Development process safety
+
+Because that wasn't in scope.
+
+**The final fix:** Any self-maintaining system needs explicit meta-design:
+1. Design the product
+2. Design the process of building the product
+3. Design the observation of the building process
+
+Without #3, you can build a great product with a broken process.
+
+---
+
+## Complete Root Cause Chain (10 Layers)
+
+```
+Layer 10: No meta-design process (building process not in scope)
+    ↓
+Layer 9: Monitoring built as product feature, not meta-system
+    ↓
+Layer 8: Monitors product health, not development health
     ↓
 Layer 7: No feedback on directive interpretation
     ↓
@@ -334,6 +409,18 @@ Layer 1: No mechanism ensures "later" happens
     ↓
 Symptom: Unenforced rules, orphaned docs, broken coordination
 ```
+
+**Complete fix at each layer:**
+- Layer 10: Include meta-design in project scope
+- Layer 9: Build process monitoring alongside product monitoring
+- Layer 8: Add meta-metrics (work type, enforcement coverage)
+- Layer 7: Add feedback showing directive interpretation
+- Layer 6: Enumerate what counts in directives
+- Layer 5: Make directives explicit
+- Layer 4: Define what counts as improvement
+- Layer 3: Include hardening in every batch
+- Layer 2: Never defer enforcement
+- Layer 1: Add enforcement mechanisms
 
 ---
 
