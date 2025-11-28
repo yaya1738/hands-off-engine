@@ -130,6 +130,71 @@ When adding a feature:
 
 ---
 
+## Why Velocity Pressure Existed: Ambiguous Improvement Directives
+
+The USER_PROFILE.md (core directive for all agents) says:
+
+```
+"Always be improving"
+"Each session should leave system better than you found it"
+"Ship improvements, don't just plan"
+```
+
+This is ambiguous. "Improving" could mean:
+- Adding features (what happened)
+- Adding hardening (what didn't happen)
+- Adding enforcement (what didn't happen)
+
+Without explicit guidance that hardening IS improvement, agents interpreted "improve" as "add features."
+
+**The pattern:**
+```
+"Always be improving" (ambiguous directive)
+    → interpreted as "add features"
+    → 26 feature batches, 0 hardening batches
+    → enforcement deferred
+    → meta-debt accumulates
+```
+
+**The deeper lesson:** Ambiguous directives get interpreted in the easiest direction.
+
+- "Improve" → easiest interpretation is "add features" (visible, measurable)
+- "Improve" → hardest interpretation is "add enforcement" (invisible until it fails)
+
+**The fix:** Make enforcement as explicit as features in directives.
+
+Updated guidance should say:
+- "Each session should improve features OR hardening"
+- "Hardening is as valuable as features"
+- "A feature without enforcement is incomplete"
+
+---
+
+## Root Cause Summary: The Full Chain
+
+```
+Layer 5: Ambiguous improvement directive ("always be improving")
+    ↓
+Layer 4: Interpreted as "add features" (easiest direction)
+    ↓
+Layer 3: Velocity pressure (47 commits/day, 26 feature batches)
+    ↓
+Layer 2: Hardening deferred to "later" (meta-debt)
+    ↓
+Layer 1: "Later" never came (no mechanism to ensure it)
+    ↓
+Symptom: Unenforced rules, orphaned docs, broken coordination
+```
+
+**Fix at each layer:**
+- Layer 5: Make directives explicit ("features AND hardening")
+- Layer 4: Define what counts as improvement (include enforcement)
+- Layer 3: Include hardening in every batch (not separate)
+- Layer 2: Never defer enforcement ("later" = "never")
+- Layer 1: Add mechanisms that ensure rules are followed
+
+---
+
 **Design checklist for any self-maintaining system:**
 - [ ] For every "agents should X", there's a check that detects when agents don't X
 - [ ] For every doc, there's a path that ensures agents discover it
