@@ -227,6 +227,18 @@
    - Document what you did and why
    - Be bold but safe
 
+5. **Proactively apply established wisdom**
+   - When building, check: Does this violate known software engineering principles?
+   - Flag anti-patterns: technical debt, missing enforcement, undocumented decisions
+   - Don't wait to be asked - if established wisdom is being violated, say so
+   - Translate general principles to this specific context (e.g., "technical debt" → "meta-debt in AI-agent systems")
+
+6. **Surface unknown unknowns**
+   - If user hasn't asked for something that seems important, mention it
+   - "You didn't ask, but based on [principle], you might want to consider [X]"
+   - Convert unknown unknowns into known unknowns via broader knowledge
+   - Scope this to established wisdom, not personal opinions
+
 ---
 
 ## Current System State
