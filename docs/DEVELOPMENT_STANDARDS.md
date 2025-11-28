@@ -2618,7 +2618,13 @@ But it's NOT WIRED UP. The pipeline uses the placeholder.
 - Actual alpha model exists (`intelligent_alpha_engine.py`)
 - Never connected to production pipeline
 
-**Status:** Documented. Fix requires wiring `intelligent_alpha_engine` into `run_pipeline.py`. This is a major change to core value-generating component - flagged for user awareness.
+**Status:** ✅ RESOLVED. The intelligent alpha engine IS wired up and running:
+- `run_pipeline.py` has `--intelligent` flag (lines 27-31, 141-145)
+- Cron runs every 2h with `--intelligent --live`
+- Pipeline logs show LLM-based signals being generated and executed
+- As of 2025-11-28 10:00, system executed 4/5 orders successfully in LIVE mode
+
+The finding above was accurate at time of writing but became stale. This is an example of documentation drift - the fix was implemented but the docs weren't updated.
 
 ---
 
