@@ -83,11 +83,16 @@ echo "  Execution plan age: ${AGE_MINS} minutes"
 echo "  Status: Healthy"
 
 # Run master orchestrator (unified coordination for Yair's sphere)
-if [ -f "$REPO_ROOT/scripts/master_orchestrator.py" ]; then
-    python3 "$REPO_ROOT/scripts/master_orchestrator.py" 2>/dev/null || true
-elif [ -f "$REPO_ROOT/scripts/claude_orchestrator.py" ]; then
-    # Fallback to legacy orchestrator
-    python3 "$REPO_ROOT/scripts/claude_orchestrator.py" 2>/dev/null || true
+# Skip if called from orchestrator (prevents circular dependency that causes 60s timeout)
+if [ -z "$HEALTHCHECK_FROM_ORCHESTRATOR" ]; then
+    if [ -f "$REPO_ROOT/scripts/master_orchestrator.py" ]; then
+        python3 "$REPO_ROOT/scripts/master_orchestrator.py" 2>/dev/null || true
+    elif [ -f "$REPO_ROOT/scripts/claude_orchestrator.py" ]; then
+        # Fallback to legacy orchestrator
+        python3 "$REPO_ROOT/scripts/claude_orchestrator.py" 2>/dev/null || true
+    fi
+else
+    echo "[$(date)] Skipping orchestrator (called from orchestrator context)"
 fi
 
 exit 0
