@@ -270,9 +270,54 @@ This is why metrics matter - not for performance, but for calibrating human-AI c
 
 ---
 
-## Complete Root Cause Chain (7 Layers)
+## Layer 8: Why No Feedback Loop - Monitoring Focused on Wrong Thing
+
+The system DOES have monitoring (commit `b7c1205` - "comprehensive self-monitoring"):
+- System health checks ✓
+- Trading performance metrics ✓
+- Uptime tracking ✓
+
+But it monitors **operational metrics** (is it running?) not **meta-metrics** (what kind of work is being done?).
+
+```python
+# What was monitored:
+- "Is the pipeline running?" → Yes
+- "What's the trading accuracy?" → 65%
+- "Is the system healthy?" → Yes
+
+# What was NOT monitored:
+- "How many feature batches vs hardening batches?" → Unknown
+- "How many rules have enforcement?" → Unknown
+- "What's being deferred?" → Unknown
+```
+
+**The pattern:**
+```
+Layer 8: Monitoring focuses on operational metrics, not meta-metrics
+    ↓
+Layer 7: No feedback on directive interpretation
+    ↓
+[...rest of chain...]
+```
+
+**Why this happened:** It's natural to monitor what's visible and urgent:
+- System down → urgent, visible → monitor it
+- Trading loss → urgent, visible → monitor it
+- Hardening debt → not urgent, invisible → don't monitor it
+
+**The fix:** Add meta-metrics that track work quality, not just system operation:
+- Work type distribution (features vs hardening vs enforcement)
+- Rule enforcement coverage (% of rules with checks)
+- Deferred work accumulation (what's been pushed to "later")
+- Documentation coverage (% of components with docs)
+
+---
+
+## Complete Root Cause Chain (8 Layers)
 
 ```
+Layer 8: Monitoring focused on operational metrics, not meta-metrics
+    ↓
 Layer 7: No feedback on directive interpretation
     ↓
 Layer 6: Human assumes AI shares implicit understanding
