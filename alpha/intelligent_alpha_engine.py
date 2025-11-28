@@ -145,13 +145,22 @@ class IntelligentAlphaEngine:
         """Fetch live tradeable markets from Polymarket"""
         LOG.info("Fetching live markets from Polymarket...")
 
-        markets = self.api.get_active_markets(
-            limit=limit,
-            min_volume_24h=5000,  # $5k minimum volume
-            min_liquidity=10000,  # $10k minimum liquidity
-            exclude_restricted=True,
-            exclude_sports=False,  # Include sports - they have edge opportunities!
-        )
+        # Try the working fetch approach first (via /events endpoint)
+        markets = self._fetch_via_events(limit)
+
+        if not markets:
+            # Fallback to local fresh markets file
+            markets = self._load_from_fresh_markets(limit)
+
+        if not markets:
+            # Last resort: API class method
+            markets = self.api.get_active_markets(
+                limit=limit,
+                min_volume_24h=1000,
+                min_liquidity=5000,
+                exclude_restricted=True,
+                exclude_sports=False,
+            )
 
         # Enrich with order book data
         for market in markets:
@@ -161,6 +170,136 @@ class IntelligentAlphaEngine:
                 LOG.warning(f"Failed to enrich {market.slug}: {e}")
 
         LOG.info(f"Fetched {len(markets)} live markets")
+        return markets
+
+    def _load_from_fresh_markets(self, limit: int = 30) -> List[Market]:
+        """Load markets from state/fresh_polymarket_markets.json"""
+        fresh_path = Path(__file__).parent.parent / "state" / "fresh_polymarket_markets.json"
+        if not fresh_path.exists():
+            LOG.warning(f"Fresh markets file not found: {fresh_path}")
+            return []
+
+        try:
+            with open(fresh_path) as f:
+                data = json.load(f)
+        except Exception as e:
+            LOG.warning(f"Failed to load fresh markets: {e}")
+            return []
+
+        markets = []
+        for m in data.get("markets", []):
+            if m.get("closed", False):
+                continue
+            # Note: Don't filter on restricted - Polymarket marks many markets
+            # as restricted for certain regions, but they're still tradeable
+            if m.get("liquidity", 0) < 5000:
+                continue
+
+            # Get token IDs
+            token_id = m.get("token_id", "")
+            market = Market(
+                condition_id=m.get("condition_id", ""),
+                token_id_yes=token_id,
+                token_id_no="",  # Not in compact format
+                slug=m.get("slug", ""),
+                question=m.get("question", ""),
+                last_price=m.get("yes_price"),
+                volume_24h=m.get("volume_24h", 0),
+                liquidity=m.get("liquidity", 0),
+                active=m.get("active", True),
+                closed=m.get("closed", False),
+                restricted=m.get("restricted", False),
+                end_date=m.get("end_date"),
+                category=m.get("category", "unknown"),
+            )
+            markets.append(market)
+            if len(markets) >= limit:
+                break
+
+        LOG.info(f"Loaded {len(markets)} markets from fresh_polymarket_markets.json")
+        return markets
+
+    def _fetch_via_events(self, limit: int = 30) -> List[Market]:
+        """
+        Fetch markets via /events endpoint (more reliable than /markets).
+        """
+        import requests
+
+        url = "https://gamma-api.polymarket.com/events"
+        params = {"closed": "false", "limit": limit * 2, "active": "true"}
+
+        try:
+            resp = requests.get(url, params=params, timeout=30)
+            resp.raise_for_status()
+            events = resp.json()
+        except Exception as e:
+            LOG.warning(f"Events endpoint fetch failed: {e}")
+            return []
+
+        markets = []
+        for event in events:
+            for m in event.get("markets", []):
+                if m.get("closed", False):
+                    continue
+
+                # Parse token IDs
+                clob_ids = m.get("clobTokenIds")
+                if not clob_ids:
+                    continue
+                try:
+                    if isinstance(clob_ids, str):
+                        token_ids = json.loads(clob_ids)
+                    else:
+                        token_ids = clob_ids
+                    if len(token_ids) < 2:
+                        continue
+                except (json.JSONDecodeError, TypeError):
+                    continue
+
+                # Parse prices
+                outcome_prices = m.get("outcomePrices")
+                last_price = None
+                if outcome_prices:
+                    try:
+                        if isinstance(outcome_prices, str):
+                            prices = json.loads(outcome_prices)
+                        else:
+                            prices = outcome_prices
+                        if prices:
+                            last_price = float(prices[0])
+                    except (json.JSONDecodeError, TypeError, ValueError):
+                        pass
+
+                volume_24h = float(m.get("volume24hr", 0) or 0)
+                liquidity = float(m.get("liquidityNum", 0) or 0)
+
+                # Filter: require minimum liquidity
+                if liquidity < 5000:
+                    continue
+
+                market = Market(
+                    condition_id=m.get("conditionId", ""),
+                    token_id_yes=token_ids[0],
+                    token_id_no=token_ids[1] if len(token_ids) > 1 else "",
+                    slug=m.get("slug", ""),
+                    question=m.get("question", ""),
+                    last_price=last_price,
+                    volume_24h=volume_24h,
+                    liquidity=liquidity,
+                    active=m.get("active", True),
+                    closed=m.get("closed", False),
+                    restricted=m.get("restricted", False),
+                    end_date=m.get("endDate"),
+                    category=m.get("category", "unknown"),
+                )
+                markets.append(market)
+
+                if len(markets) >= limit:
+                    break
+
+            if len(markets) >= limit:
+                break
+
         return markets
 
     def analyze_market_with_ai(self, market: Market) -> List[Dict]:
@@ -195,7 +334,7 @@ Format your response as JSON:
             try:
                 response = call_chatgpt(
                     agent_id="chatgpt",
-                    prior_messages=[],
+                    prior_messages=[{"role": "user", "content": prompt}],
                     session_goal=f"Analyze Polymarket: {market.question}",
                 )
                 if "error" not in response:
@@ -212,7 +351,7 @@ Format your response as JSON:
             try:
                 response = call_claude(
                     agent_id="claude",
-                    prior_messages=[],
+                    prior_messages=[{"role": "user", "content": prompt}],
                     session_goal=f"Analyze Polymarket: {market.question}",
                 )
                 if "error" not in response:
