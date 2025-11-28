@@ -681,20 +681,116 @@ This is a fundamental property of markets and human cognition:
    - It's how markets work
    - The fix is at the organizational level: explicitly fund invisible value
 
-**This is the true termination point.** We've reached a fundamental property of human cognition and market economics that cannot be traced further.
+---
+
+## Layer 18: Why Humans Discount Invisible Value - Evolutionary Mismatch
+
+**Why do humans discount invisible value?**
+
+Because our cognitive hardware evolved for a different environment:
+
+**Ancestral environment (where our brains evolved):**
+- Immediate threats visible (predators, enemies)
+- Immediate rewards visible (food, mates)
+- Prevention = avoiding visible danger
+- Time horizon: days to weeks
+
+**Modern environment:**
+- Threats invisible (technical debt, process failures)
+- Rewards invisible (prevented disasters)
+- Prevention = building systems that stop unseen problems
+- Time horizon: months to years
+
+**The mismatch:**
+```
+Brain optimized for: "See threat → react"
+Modern need: "Predict invisible threat → prevent"
+```
+
+Our brains didn't evolve to value prevention of abstract future problems. We evolved to react to visible immediate threats.
+
+**The pattern:**
+```
+Layer 18: Evolutionary mismatch - brains optimized for visible/immediate
+    ↓
+Layer 17: Humans discount invisible value
+    ↓
+[...rest of chain...]
+```
 
 ---
 
-## Final Root Cause Chain (17 Layers)
+## Layer 19: Why Evolutionary Mismatch Exists - Selection Pressure Timing
+
+**Why are our brains optimized for visible/immediate?**
+
+Because that's what survival required during the period when human cognition evolved:
+
+- Human cognitive architecture: ~200,000 years old
+- Agricultural revolution: ~10,000 years ago
+- Industrial revolution: ~200 years ago
+- Software: ~70 years ago
+- AI agents: ~3 years ago
+
+**The math:**
+```
+Time optimizing for visible threats: 200,000 years
+Time needing to handle invisible threats: <100 years
+Evolutionary adaptation time: ~10,000+ years
+```
+
+Evolution is slow. Our environment changed faster than our brains could adapt.
+
+**The pattern:**
+```
+Layer 19: Selection pressure was for visible/immediate (200k years)
+    ↓
+Layer 18: Brains optimized for that environment
+    ↓
+Layer 17: Mismatch with modern invisible-value problems
+    ↓
+[...rest of chain...]
+```
+
+---
+
+## Layer 20: The True Termination Point - Physics of Evolution
+
+**Why is evolutionary adaptation slow?**
+
+Because it's constrained by physics and biology:
+
+1. **Generational time** - Humans reproduce slowly (~25 years/generation)
+2. **Selection pressure** - Discounting invisible value doesn't kill you before reproduction
+3. **Genetic change rate** - Mutations are rare, most are harmful
+
+For a cognitive trait to evolve:
+- It must affect reproductive success
+- Over thousands of generations
+- With consistent selection pressure
+
+**Discounting invisible value doesn't prevent reproduction.** Therefore no selection pressure. Therefore no evolution.
+
+**This is the true termination point.** We've reached the physics of how evolution works - the speed of genetic change vs environmental change.
+
+---
+
+## Final Root Cause Chain (20 Layers)
 
 ```
-Layer 17: Markets/humans discount invisible value (fundamental economics)
+Layer 20: Evolution constrained by physics (generation time, mutation rate)
     ↓
-Layer 16: Markets reward visible capability over invisible wisdom
+Layer 19: 200k years of selection for visible/immediate threats
     ↓
-Layer 15: Incentives favor AI capability investment over process wisdom
+Layer 18: Human brains optimized for ancestral environment
     ↓
-Layer 14: AI capability grew faster than process understanding (3 years vs 30)
+Layer 17: Humans cognitively discount invisible value
+    ↓
+Layer 16: Markets amplify this bias (reward visible, ignore invisible)
+    ↓
+Layer 15: Incentives favor AI capability over process wisdom
+    ↓
+Layer 14: AI capability grew faster than process understanding
     ↓
 Layer 13: No established patterns for AI-agent-built systems
     ↓
@@ -725,9 +821,11 @@ Layer 1: No mechanism to ensure "later" happens
 Symptom: Unenforced rules, orphaned docs, broken coordination
 ```
 
+**This is the termination point** because Layer 20 is constrained by physics - the fundamental rates at which biological systems can change. You cannot ask "why is evolution slow" without leaving the domain of fixable causes and entering fundamental physics (thermodynamics, chemistry of DNA replication, etc.).
+
 **The organizational fix (what we can control):**
 
-Since we can't fix layers 15-17 (market dynamics, human cognition), the fix is at the organizational level:
+Since we can't fix layers 17-20 (evolution, physics), the fix is at the organizational level:
 
 1. **Explicitly budget for invisible work** - Hardening, enforcement, meta-design
 2. **Make invisible work visible** - Metrics for process health, not just product health
