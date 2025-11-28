@@ -29,3 +29,7 @@
 {"timestamp": "2025-11-28T04:14:05.908344", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
 {"timestamp": "2025-11-28T04:15:05.924254", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
 {"timestamp": "2025-11-28T04:16:05.943102", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
+{"timestamp": "2025-11-28T04:17:05.960083", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
+{"timestamp": "2025-11-28T04:18:05.975972", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
+{"timestamp": "2025-11-28T04:19:05.990591", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
+{"timestamp": "2025-11-28T04:20:06.004974", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
