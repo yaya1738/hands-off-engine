@@ -363,10 +363,10 @@ Format your response as JSON:
             except Exception as e:
                 LOG.warning(f"Claude analysis failed: {e}")
 
-        # If no AI available, use heuristic analysis
+        # If no AI available, log and return empty
+        # Don't fall back to heuristic - bad signals are worse than no signals
         if not analyses:
-            heuristic = self._heuristic_analysis(market)
-            analyses.append(heuristic)
+            LOG.warning(f"No AI analysis available for {market.slug} - skipping (no heuristic fallback)")
 
         return analyses
 
