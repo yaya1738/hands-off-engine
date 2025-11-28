@@ -90,6 +90,7 @@ class SelfHealingAgent:
         issues.extend(self.check_stale_processes())
         issues.extend(self.check_file_permissions())
         issues.extend(self.check_trading_health())
+        issues.extend(self.check_unmerged_branches())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -362,6 +363,59 @@ class SelfHealingAgent:
 
         except Exception as e:
             logger.error(f"Error checking trading health: {e}")
+
+        return issues
+
+    def check_unmerged_branches(self) -> List[Dict]:
+        """Check for agent branches with unmerged work that should be merged."""
+        issues = []
+
+        try:
+            # Fetch latest from origin
+            subprocess.run(
+                ["git", "fetch", "--all"],
+                capture_output=True, timeout=60, cwd=str(REPO_ROOT)
+            )
+
+            # Get list of agent branches (copilot/ and claude/)
+            result = subprocess.run(
+                ["git", "branch", "-r"],
+                capture_output=True, text=True, timeout=30, cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return issues
+
+            agent_branches = []
+            for line in result.stdout.strip().split('\n'):
+                branch = line.strip()
+                if 'copilot/' in branch or 'claude/' in branch:
+                    if 'HEAD' not in branch:
+                        agent_branches.append(branch)
+
+            # Check each for unmerged commits
+            unmerged_count = 0
+            for branch in agent_branches[:20]:  # Limit to first 20
+                result = subprocess.run(
+                    ["git", "log", f"main..{branch}", "--oneline"],
+                    capture_output=True, text=True, timeout=30, cwd=str(REPO_ROOT)
+                )
+                if result.returncode == 0 and result.stdout.strip():
+                    commit_count = len(result.stdout.strip().split('\n'))
+                    if commit_count > 0:
+                        unmerged_count += 1
+
+            if unmerged_count > 5:
+                issues.append({
+                    "type": "unmerged_branches",
+                    "description": f"{unmerged_count} agent branches have unmerged work - auto-merge may not be working",
+                    "severity": "high",
+                    "auto_fixable": False,
+                    "alert_user": True
+                })
+
+        except Exception as e:
+            logger.error(f"Error checking unmerged branches: {e}")
 
         return issues
 
