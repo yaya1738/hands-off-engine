@@ -52,6 +52,21 @@ class Decider:
         self.bankroll = bankroll
         self.audit = get_audit_logger(component="decider")
 
+        # Load max position from risk profile to align with executor limits
+        self.max_position_usd = self._load_max_position()
+
+    def _load_max_position(self) -> float:
+        """Load max position size from risk profile, default to $50."""
+        try:
+            risk_path = Path(__file__).parent.parent / "state" / "risk_profile.json"
+            if risk_path.exists():
+                with open(risk_path) as f:
+                    profile = json.load(f)
+                return profile.get("max_position_usd", 50.0)
+        except Exception:
+            pass
+        return 50.0  # Conservative default
+
     def decide(self):
         """Legacy method - kept for backwards compatibility"""
         print("Making a decision...")
@@ -129,6 +144,9 @@ class Decider:
             max_fraction = 0.10  # Never risk more than 10% of bankroll per position
             size_fraction = min(kelly_fraction, max_fraction)
             amount = self.bankroll * size_fraction
+
+            # Cap at risk profile max position to align with executor limits
+            amount = min(amount, self.max_position_usd)
 
             # Create reasoning string
             reasoning = (

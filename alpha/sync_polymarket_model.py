@@ -53,25 +53,34 @@ def estimate_fair_price(market: Dict) -> float:
     This is still a placeholder - in production, would use sophisticated models.
 
     Args:
-        market: Market dict with bestBid, last, etc.
+        market: Market dict with yes_price, bestBid, last, etc.
 
     Returns:
         Estimated fair price (0.0 to 1.0)
     """
-    # Simple heuristic: average of bestBid and last
+    # Get the current market price first
+    # Try yes_price (new Gamma API format), then bestBid/last (CLOB format)
+    market_price = market.get('yes_price')
+    if market_price is None:
+        best_bid = market.get('bestBid')
+        last = market.get('last')
+        if best_bid and last:
+            market_price = (best_bid + last) / 2.0
+        elif best_bid:
+            market_price = best_bid
+        elif last:
+            market_price = last
+        else:
+            market_price = 0.5  # Last resort fallback
+
+    # Simple heuristic: start from market price and apply small adjustment
     # In production, replace with actual alpha model
-    best_bid = market.get('bestBid', 0.5)
-    last = market.get('last', 0.5)
-
-    # Average with slight adjustment based on spread
-    avg = (best_bid + last) / 2.0
-
     # OPTIMIZED: Reduced adjustment range from ±10% to ±4%
     # This reduces selection rate from 90%+ to ~40-50%
     slug = market.get('slug', '')
     adjustment = (hash(slug) % 9 - 4) / 100.0  # -0.04 to +0.04 (was -0.10 to +0.10)
 
-    fair = avg + adjustment
+    fair = market_price + adjustment
 
     # Clamp to valid probability range
     return max(0.01, min(0.99, fair))
@@ -139,6 +148,9 @@ def transform_market(market: Dict, query: str) -> Optional[Dict]:
     # Get market price - try multiple field sources
     market_price = market.get('last')
     if market_price is None:
+        # Try yes_price (new format from fetch_fresh_markets.py)
+        market_price = market.get('yes_price')
+    if market_price is None:
         # Try outcomePrices (Gamma API format) - first price is YES
         outcome_prices = market.get('outcomePrices', [])
         if outcome_prices and isinstance(outcome_prices, list):
@@ -155,7 +167,8 @@ def transform_market(market: Dict, query: str) -> Optional[Dict]:
         elif best_bid:
             market_price = best_bid
         else:
-            market_price = 0.5
+            # No price data available - skip this market
+            return None
 
     # Skip markets with extreme prices (too certain)
     if market_price < 0.05 or market_price > 0.95:
@@ -167,9 +180,8 @@ def transform_market(market: Dict, query: str) -> Optional[Dict]:
     # Calculate edge
     edge = calculate_edge(market_price, fair_price)
 
-    # OPTIMIZED: Increased minimum edge from 3% to 5%
-    # More conservative - only select stronger opportunities
-    if edge < 0.05:  # Less than 5% edge (was 3%)
+    # Minimum edge threshold - select markets with reasonable edge
+    if edge < 0.02:  # Less than 2% edge
         return None
     
     # Calculate confidence

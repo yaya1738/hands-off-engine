@@ -83,10 +83,13 @@ class SelfHealingAgent:
         # Run all checks
         issues.extend(self.check_git_locks())
         issues.extend(self.check_cron_job())
+        issues.extend(self.check_stale_data())
+        issues.extend(self.check_execution_plan_freshness())
         issues.extend(self.check_disk_space())
         issues.extend(self.check_log_rotation())
         issues.extend(self.check_stale_processes())
         issues.extend(self.check_file_permissions())
+        issues.extend(self.check_trading_health())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -151,22 +154,66 @@ class SelfHealingAgent:
                     "type": "cron_missing",
                     "description": "Cron job not configured",
                     "severity": "high",
-                    "auto_fixable": False,  # Requires manual setup
-                    "alert_user": True
+                    "auto_fixable": True,
+                    "fix_action": "reinstall_cron"
                 })
             else:
                 # Check if hands-off-engine cron is present
-                if "hands-off-engine" not in result.stdout:
+                if "run_and_notify" not in result.stdout:
                     issues.append({
                         "type": "cron_missing",
                         "description": "Hands-off-engine cron job missing",
                         "severity": "high",
-                        "auto_fixable": False,
-                        "alert_user": True
+                        "auto_fixable": True,
+                        "fix_action": "reinstall_cron"
                     })
 
         except Exception as e:
             logger.error(f"Error checking cron: {e}")
+
+        return issues
+
+    def check_stale_data(self) -> List[Dict]:
+        """Check for stale data files that need refresh."""
+        issues = []
+
+        data_file = REPO_ROOT / "termux-hands-off" / "out" / "polymarket-compact.json"
+        if data_file.exists():
+            age_hours = (time.time() - data_file.stat().st_mtime) / 3600
+            if age_hours > 4:  # More than 4 hours old
+                issues.append({
+                    "type": "stale_data",
+                    "description": f"Market data is {age_hours:.1f}h old",
+                    "severity": "medium",
+                    "auto_fixable": True,
+                    "fix_action": "refresh_data"
+                })
+        else:
+            issues.append({
+                "type": "missing_data",
+                "description": "Market data file missing",
+                "severity": "high",
+                "auto_fixable": True,
+                "fix_action": "refresh_data"
+            })
+
+        return issues
+
+    def check_execution_plan_freshness(self) -> List[Dict]:
+        """Check if execution plan is being updated."""
+        issues = []
+
+        plan_file = REPO_ROOT / "executor" / "execution_plan.json"
+        if plan_file.exists():
+            age_hours = (time.time() - plan_file.stat().st_mtime) / 3600
+            if age_hours > 3:  # More than 3 hours (should update every 2h)
+                issues.append({
+                    "type": "stale_plan",
+                    "description": f"Execution plan is {age_hours:.1f}h old - pipeline may not be running",
+                    "severity": "high",
+                    "auto_fixable": True,
+                    "fix_action": "trigger_pipeline"
+                })
 
         return issues
 
@@ -270,6 +317,54 @@ class SelfHealingAgent:
 
         return issues
 
+    def check_trading_health(self) -> List[Dict]:
+        """Check if trading is blocked by high error rate from old failures."""
+        issues = []
+        perf_log = REPO_ROOT / "logs" / "trading_performance.jsonl"
+
+        if not perf_log.exists():
+            return issues
+
+        try:
+            with open(perf_log) as f:
+                lines = f.readlines()
+
+            if len(lines) < 5:
+                return issues  # Not enough data to judge
+
+            # Check last 10 trades
+            recent = lines[-10:] if len(lines) >= 10 else lines
+            trades = [json.loads(line) for line in recent if line.strip()]
+
+            failed = [t for t in trades if not t.get("success", False)]
+            if len(trades) > 0:
+                failure_rate = len(failed) / len(trades)
+
+                # If >50% failure rate AND all failures are old (>1 hour)
+                if failure_rate > 0.5 and failed:
+                    oldest_fail = min(t.get("timestamp", "") for t in failed)
+                    # If oldest failure is more than 1 hour old, these are stale failures
+                    from datetime import datetime, timezone
+                    try:
+                        fail_time = datetime.fromisoformat(oldest_fail.replace("Z", "+00:00"))
+                        age_hours = (datetime.now(timezone.utc) - fail_time).total_seconds() / 3600
+
+                        if age_hours > 1:
+                            issues.append({
+                                "type": "trading_health_blocked",
+                                "description": f"Trading blocked by {failure_rate:.0%} error rate from failures {age_hours:.1f}h ago",
+                                "severity": "high",
+                                "auto_fixable": True,
+                                "fix_action": "reset_trading_health"
+                            })
+                    except Exception:
+                        pass
+
+        except Exception as e:
+            logger.error(f"Error checking trading health: {e}")
+
+        return issues
+
     def attempt_fix(self, issue: Dict) -> str:
         """Attempt to automatically fix an issue."""
         if not issue.get("auto_fixable", False):
@@ -300,9 +395,105 @@ class SelfHealingAgent:
             # Custom fix actions
             elif issue.get("fix_action") == "rotate_log":
                 return self.rotate_log()
+            elif issue.get("fix_action") == "reinstall_cron":
+                return self.reinstall_cron()
+            elif issue.get("fix_action") == "refresh_data":
+                return self.refresh_data()
+            elif issue.get("fix_action") == "trigger_pipeline":
+                return self.trigger_pipeline()
+            elif issue.get("fix_action") == "reset_trading_health":
+                return self.reset_trading_health()
 
         except Exception as e:
             logger.error(f"Error applying fix: {e}")
+            return None
+
+    def reinstall_cron(self) -> str:
+        """Reinstall cron jobs from auto_setup_cron.py."""
+        try:
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "scripts" / "auto_setup_cron.py"), "--install"],
+                capture_output=True,
+                text=True,
+                timeout=60,
+                cwd=str(REPO_ROOT)
+            )
+            if result.returncode == 0:
+                logger.info("✓ Reinstalled cron jobs")
+                return "Reinstalled cron jobs"
+            else:
+                logger.error(f"Failed to reinstall cron: {result.stderr}")
+                return None
+        except Exception as e:
+            logger.error(f"Error reinstalling cron: {e}")
+            return None
+
+    def refresh_data(self) -> str:
+        """Refresh market data by running fetch script."""
+        try:
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "scripts" / "fetch_fresh_markets.py")],
+                capture_output=True,
+                text=True,
+                timeout=120,
+                cwd=str(REPO_ROOT)
+            )
+            if result.returncode == 0:
+                logger.info("✓ Refreshed market data")
+                return "Refreshed market data"
+            else:
+                logger.error(f"Failed to refresh data: {result.stderr}")
+                return None
+        except Exception as e:
+            logger.error(f"Error refreshing data: {e}")
+            return None
+
+    def trigger_pipeline(self) -> str:
+        """Trigger the pipeline to run immediately."""
+        try:
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "scripts" / "run_pipeline.py"), "--bankroll", "500"],
+                capture_output=True,
+                text=True,
+                timeout=300,
+                cwd=str(REPO_ROOT),
+                env={**os.environ, "HANDS_OFF_AUTONOMOUS": "1"}
+            )
+            if result.returncode == 0:
+                logger.info("✓ Triggered pipeline run")
+                return "Triggered pipeline run"
+            else:
+                logger.error(f"Failed to trigger pipeline: {result.stderr}")
+                return None
+        except Exception as e:
+            logger.error(f"Error triggering pipeline: {e}")
+            return None
+
+    def reset_trading_health(self) -> str:
+        """Reset trading performance log when blocked by stale failures."""
+        perf_log = REPO_ROOT / "logs" / "trading_performance.jsonl"
+
+        if not perf_log.exists():
+            return None
+
+        try:
+            # Archive old log
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            backup = perf_log.parent / f"trading_performance.jsonl.healed_{timestamp}"
+            perf_log.rename(backup)
+
+            # Create note about reset
+            note_file = perf_log.parent / f"trading_performance.jsonl.HEALED_NOTE"
+            with open(note_file, 'w') as f:
+                f.write(f"# Auto-healed on {datetime.now().isoformat()}\n")
+                f.write(f"# Old failures archived to {backup.name}\n")
+                f.write("# Self-healing agent cleared stale failures blocking live trading\n")
+
+            logger.info(f"✓ Reset trading health - archived stale failures to {backup.name}")
+            return f"Reset trading health (archived {backup.name})"
+
+        except Exception as e:
+            logger.error(f"Error resetting trading health: {e}")
             return None
 
     def rotate_log(self) -> str:

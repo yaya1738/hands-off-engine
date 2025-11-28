@@ -73,5 +73,13 @@ AGENT TASKS: [Concrete tasks]
 ⚠️ **CRITICAL:** MCP (Model Context Protocol) uses **stdio**, NOT HTTP.
 - **DO NOT** implement HTTP clients for `localhost:8765/mcp/*`
 - **DO NOT** create REST API servers for MCP
-- Read [MCP_ARCHITECTURE_CORRECTION.md](./MCP_ARCHITECTURE_CORRECTION.md) for details
-- MCP servers are child processes managed by Claude Code automatically
+- Read `docs/claude/MCP_ARCHITECTURE_CORRECTION.md` for details
+- MCP servers are configured in `.mcp.json` (repo root) and managed by Claude Code automatically
+
+## Session Logs & Coordination History
+
+Historical session logs and coordination docs are in `docs/claude/`:
+- `AI_AGENT_COORDINATION_LOG.md` - Multi-AI collaboration history
+- `AI_COORDINATION_ARCHITECTURE.md` - Architecture overview
+- `AUTONOMOUS_OPERATION.md` - Autonomous mode documentation
+- `MCP_*.md` - MCP setup guides and verification results

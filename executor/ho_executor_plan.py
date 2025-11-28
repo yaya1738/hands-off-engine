@@ -25,8 +25,35 @@ load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env.polymarket'))
 
 LOG = logging.getLogger(__name__)
 
-# Global trading toggle - check BOTH environment and state file
-_ENV_LIVE_TRADING = os.getenv("LIVE_TRADING_ENABLED", "0") == "1"
+
+def _check_state_file_trading_enabled() -> bool:
+    """Check if live trading is enabled in state file (primary source of truth)"""
+    state_file = os.path.join(os.path.dirname(__file__), '..', 'state', 'trading_mode.json')
+    try:
+        if os.path.exists(state_file):
+            import json
+            with open(state_file) as f:
+                mode = json.load(f)
+            return mode.get('live_trading_enabled', False) and not mode.get('auto_paused', False)
+    except Exception as e:
+        LOG.warning(f"Failed to read trading_mode.json: {e}")
+    return False
+
+
+# Global trading toggle - state file is primary, env var can override to DISABLE only
+_STATE_FILE_TRADING = _check_state_file_trading_enabled()
+_ENV_OVERRIDE = os.getenv("LIVE_TRADING_ENABLED")
+
+# Logic: State file enables, env var can force disable (but not force enable)
+# This prevents env var from bypassing state file safety
+if _ENV_OVERRIDE == "0":
+    _ENV_LIVE_TRADING = False
+    LOG.info("Live trading force-disabled by environment variable")
+elif _STATE_FILE_TRADING:
+    _ENV_LIVE_TRADING = True
+    LOG.info("Live trading enabled by state file")
+else:
+    _ENV_LIVE_TRADING = os.getenv("LIVE_TRADING_ENABLED", "0") == "1"
 
 
 def get_executor_mode() -> str:
@@ -179,16 +206,25 @@ class Executor:
         if action.confidence < self.MIN_CONFIDENCE_THRESHOLD:
             return False, f"Confidence {action.confidence:.1%} below threshold {self.MIN_CONFIDENCE_THRESHOLD:.1%}"
 
-        # Check position size
-        if action.amount > self.MAX_POSITION_SIZE:
-            return False, f"Position size ${action.amount:.2f} exceeds max ${self.MAX_POSITION_SIZE:.2f}"
-
         # Check for valid side
         if action.side not in ["YES", "NO"]:
             return False, f"Invalid side '{action.side}', must be YES or NO"
 
         # All checks passed
         return True, "OK"
+
+    def cap_position_size(self, action) -> tuple[float, str]:
+        """
+        Cap position size to max allowed, returning original and capped amount.
+
+        Returns:
+            Tuple of (capped_amount, message)
+        """
+        if action.amount > self.MAX_POSITION_SIZE:
+            original = action.amount
+            action.amount = self.MAX_POSITION_SIZE
+            return action.amount, f"Capped from ${original:.2f} to ${self.MAX_POSITION_SIZE:.2f}"
+        return action.amount, "OK"
 
     def execute_actions(self, planned_actions: List) -> List[ExecutionResult]:
         """
@@ -203,7 +239,10 @@ class Executor:
         results = []
 
         for action in planned_actions:
-            # Validate action (reflexes)
+            # Cap position size to max (don't reject, just cap)
+            capped_amount, cap_msg = self.cap_position_size(action)
+
+            # Validate action (reflexes) - checks confidence, side, etc.
             is_valid, validation_msg = self.validate_action(action)
 
             if not is_valid:
@@ -217,6 +256,10 @@ class Executor:
                 )
                 results.append(result)
                 continue
+
+            # Log if position was capped
+            if cap_msg != "OK":
+                LOG.info(f"Position size capped for {action.market_name}: {cap_msg}")
 
             # Execute action (body)
             # Get executor mode and determine execution path

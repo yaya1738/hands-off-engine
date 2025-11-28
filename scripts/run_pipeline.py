@@ -61,15 +61,43 @@ def run_pipeline(
         # Step 1: Sync Polymarket Model (Alpha)
         if verbose:
             print_header("STEP 1: Sync Alpha Signals")
-        
+
         input_path = repo_root / 'termux-hands-off' / 'out' / 'polymarket-compact.json'
         output_path = repo_root / 'state' / 'polymarket-model.json'
-        
+
+        # Auto-fetch if data is missing or stale (>2 hours old)
+        should_fetch = False
         if not input_path.exists():
-            raise FileNotFoundError(
-                f"Input data not found: {input_path}\n"
-                "Please ensure polymarket-compact.json exists."
-            )
+            should_fetch = True
+            if verbose:
+                print("⚠ Input data missing, auto-fetching...")
+        else:
+            # Check staleness
+            import os
+            file_age_hours = (datetime.now().timestamp() - os.path.getmtime(input_path)) / 3600
+            if file_age_hours > 2:
+                should_fetch = True
+                if verbose:
+                    print(f"⚠ Input data stale ({file_age_hours:.1f}h old), auto-fetching...")
+
+        if should_fetch:
+            try:
+                # Import and run fetch
+                sys.path.insert(0, str(repo_root / 'scripts'))
+                from fetch_fresh_markets import fetch_active_markets, save_compact_format
+                markets = fetch_active_markets(limit=50)
+                save_compact_format(markets, str(input_path))
+                if verbose:
+                    print(f"✓ Fetched {markets['count']} fresh markets")
+            except Exception as fetch_err:
+                if not input_path.exists():
+                    raise FileNotFoundError(
+                        f"Input data not found and fetch failed: {fetch_err}\n"
+                        "Please ensure Polymarket API is accessible."
+                    )
+                else:
+                    if verbose:
+                        print(f"⚠ Fetch failed ({fetch_err}), using stale data")
         
         model = sync_polymarket_model(input_path, output_path)
         
@@ -238,18 +266,42 @@ def main():
     )
     
     args = parser.parse_args()
-    
-    # Safety check for live mode
+
+    # Safety check for live mode - only prompt if running interactively
     if args.live:
-        print("\n⚠️  WARNING: You are about to run in LIVE mode with REAL MONEY!")
-        print("   This will execute actual trades on Polymarket.")
-        print("\n   Are you sure? Type 'YES' to continue: ", end='')
-        
-        confirmation = input().strip()
-        if confirmation != 'YES':
-            print("✗ Aborted. Use --live only when you're ready for real trading.")
-            return 1
-    
+        # Check if running in autonomous mode (cron, systemd, etc.)
+        import os
+        is_autonomous = (
+            not sys.stdin.isatty() or  # No terminal attached
+            os.getenv("HANDS_OFF_AUTONOMOUS", "0") == "1" or  # Explicit flag
+            os.getenv("CRON_JOB", "") != ""  # Running from cron
+        )
+
+        if is_autonomous:
+            # Autonomous mode - validate state file instead of prompting
+            state_file = Path(__file__).parent.parent / 'state' / 'trading_mode.json'
+            if state_file.exists():
+                import json
+                with open(state_file) as f:
+                    trading_mode = json.load(f)
+                if not trading_mode.get('live_trading_enabled', False):
+                    print("✗ Live trading disabled in state file. Aborting.")
+                    return 1
+                print(f"✓ Autonomous live mode confirmed via state file (reason: {trading_mode.get('reason', 'unknown')})")
+            else:
+                print("✗ No trading_mode.json found. Cannot run live autonomously.")
+                return 1
+        else:
+            # Interactive mode - prompt for confirmation
+            print("\n⚠️  WARNING: You are about to run in LIVE mode with REAL MONEY!")
+            print("   This will execute actual trades on Polymarket.")
+            print("\n   Are you sure? Type 'YES' to continue: ", end='')
+
+            confirmation = input().strip()
+            if confirmation != 'YES':
+                print("✗ Aborted. Use --live only when you're ready for real trading.")
+                return 1
+
     # Run pipeline
     verbose = not args.quiet
     dryrun = not args.live
