@@ -3,7 +3,8 @@
   "required_reading": [
     "AI_POLICY.md",
     "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md",
-    "docs/claude/AI_COORDINATION_ARCHITECTURE.md"
+    "docs/claude/AI_COORDINATION_ARCHITECTURE.md",
+    "docs/DEVELOPMENT_STANDARDS.md"
   ],
   "agent_instruction_files": [
     ".claude/instructions.md",
@@ -60,6 +61,7 @@
     "Use the research report roadmap as the main source of truth.",
     "When changing agent coordination, update ALL files in agent_instruction_files.",
     "Don't assume other AIs did things correctly - verify.",
-    "When creating new docs in monitored_doc_paths, add them to required_reading or optional_docs."
+    "When creating new docs in monitored_doc_paths, add them to required_reading or optional_docs.",
+    "When creating rules, add enforcement. When creating components, add monitoring. See DEVELOPMENT_STANDARDS.md."
   ]
 }

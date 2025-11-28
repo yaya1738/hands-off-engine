@@ -6,9 +6,12 @@
 2. **AI_POLICY.md** - Mandatory policy for all AI agents
 3. **termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md** - Canonical status + roadmap
 4. **docs/claude/AI_COORDINATION_ARCHITECTURE.md** - Multi-agent coordination principles
-5. **ai/coordination/status.json** - Current tasks and agent coordination state
+5. **docs/DEVELOPMENT_STANDARDS.md** - How to build things properly (rules need enforcement, components need monitoring)
+6. **ai/coordination/status.json** - Current tasks and agent coordination state
 
-**Critical:** When changing agent coordination, update ALL files listed in `agent_instruction_files` in knowledge.json.
+**Critical:**
+- When changing agent coordination, update ALL files listed in `agent_instruction_files` in knowledge.json.
+- When creating rules, add enforcement. When creating components, add monitoring.
 
 ## Project Context
 

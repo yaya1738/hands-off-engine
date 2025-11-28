@@ -9,8 +9,10 @@ Before doing any substantial work, you MUST:
    - `AI_POLICY.md`
    - `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
    - `docs/claude/AI_COORDINATION_ARCHITECTURE.md`
+   - `docs/DEVELOPMENT_STANDARDS.md`
 3. Align all work with the roadmap in the research report
 4. When changing agent coordination, update ALL files in `agent_instruction_files`
+5. When creating rules, add enforcement. When creating components, add monitoring.
 
 ## Project Context
 
