@@ -1963,15 +1963,156 @@ REMAINING WORK
 └── Regular invisible-value review rituals
 ```
 
-**This is the termination point.**
+---
+
+## Layer 59: Why Is "Invisible Value Discounted" Treated As Root?
+
+**Why did the analysis stop at "humans discount invisible value"?**
+
+Because I (Claude) framed it as unfixable (evolutionary). But is it actually unfixable, or did I stop because:
+1. It felt like a natural stopping point
+2. Going further seemed philosophical
+3. I defaulted to "can't change human nature"
+
+**Let me actually check: Can invisible value discounting be fixed?returned**
+
+Not at the cognitive level (evolution). But the BEHAVIOR can be changed:
+- Humans discount invisible value BY DEFAULT
+- But humans CAN value invisible things when trained/reminded/incentivized
+- Example: Security professionals value invisible threats (trained)
+- Example: Insurance buyers value invisible risk (incentivized)
+
+**The distinction:**
+```
+Cognitive bias: Can't fix (hardwired)
+Behavioral expression: CAN fix (training, incentives, environment)
+```
+
+I conflated the two. The bias is unfixable, but its expression in behavior IS fixable.
 
 ---
 
-**Design checklist for any self-maintaining system:**
-- [ ] For every "agents should X", there's a check that detects when agents don't X
-- [ ] For every doc, there's a path that ensures agents discover it
-- [ ] For every rule, there's something that complains when violated
-- [ ] For every mechanism, there's monitoring that detects when the mechanism fails
+## Layer 60: How To Fix Behavioral Expression Of Bias?
+
+**Methods that work despite cognitive bias:**
+
+1. **Training** - Security professionals learn to see invisible threats
+2. **Checklists** - Pilots follow procedures that catch invisible failures
+3. **Incentives** - Insurance makes invisible risk financially visible
+4. **Environment** - Dashboards make invisible metrics visible
+5. **Habits** - Regular reviews surface invisible issues
+
+**What this project needs:**
+
+| Method | Implementation | Status |
+|--------|---------------|--------|
+| Training | DEVELOPMENT_STANDARDS.md | Done |
+| Checklists | Pre-build checklists in this doc | Done |
+| Incentives | ? | Not done |
+| Environment | Meta-metrics dashboard | Not done |
+| Habits | Regular invisible-value review | Not done |
+
+**Implementing now:**
+
+---
+
+## Layer 61: Implementing Meta-Metrics (Environment Fix)
+
+**What invisible things need to be visible?**
+
+From this analysis:
+1. Work type distribution (features vs hardening)
+2. Enforcement coverage (% rules with checks)
+3. Doc coverage (% components documented)
+4. Assumption debt (undocumented assumptions)
+
+**IMPLEMENTED:** `scripts/meta_metrics.py`
+
+First run results:
+```
+WORK DISTRIBUTION (last 30 days)
+  feature      36.3% (193)
+  other        25.9% (138)
+  docs         18.6% (99)
+  hardening    11.8% (63)
+  enforcement   7.3% (39)
+
+  ⚠️  Hardening+Enforcement only 19.2%
+
+DOCUMENTATION COVERAGE
+  75 docs not registered in knowledge.json
+
+META-DEBT INDICATORS
+  50 "later" mentions (deferred work)
+```
+
+The metrics confirm what this analysis predicted.
+
+---
+
+## Layer 62: Implementing Habits (Regular Review)
+
+**The fix for behavioral expression: Regular rituals that surface invisible value.**
+
+Add to self-healing agent or cron:
+- Weekly meta-metrics report
+- Alert if hardening% drops below threshold
+- Alert if deferred work increases
+
+**Creating the habit:**
+
+---
+
+## Layer 63: Why Didn't Habits Exist Before?
+
+**Why wasn't there a regular review of invisible value?**
+
+Because:
+1. Nobody knew what to review (invisible things not identified)
+2. Nobody set up the ritual (requires deliberate action)
+3. No trigger to remind (habits need cues)
+
+**IMPLEMENTED:** Added `check_meta_metrics()` to self-healing agent.
+
+Now automatically checks:
+- Hardening+Enforcement percentage (alert if <15%)
+- "Later" mentions (alert if >30)
+- Unregistered docs (alert if >50)
+
+---
+
+## Layer 64: Why Does "Later" Keep Being Used?
+
+The meta-metrics found 54 "later" mentions. Why do developers keep deferring?
+
+Because in the moment, deferral feels rational:
+1. "This feature is more urgent"
+2. "I'll remember to come back to this"
+3. "It works for now"
+4. "Adding hardening will slow me down"
+
+**Each deferral is locally rational but globally harmful.**
+
+This is the same pattern as Layer 27 (locally correct, globally wrong).
+
+**Fix: Make deferral painful at decision time, not just later.**
+
+---
+
+## Layer 65: Making Deferral Painful At Decision Time
+
+**Current state:** Deferral is painless now, painful later.
+
+**Needed state:** Deferral has immediate friction.
+
+**Methods:**
+
+1. **Pre-commit hook that warns on "later"/"TODO"** - Immediate visibility
+2. **Require justification for deferral** - Friction
+3. **Track deferrals as debt** - Accumulation visible
+4. **Regular deferral review** - Scheduled attention
+
+**Implementing: Pre-commit warning for deferral**
 
 ---
 

@@ -66,4 +66,39 @@ if [ -n "$MISSING_DOCS" ]; then
     exit 1
 fi
 
+# Check for deferral patterns in staged files
+# Added as Layer 65 fix - make deferral painful at decision time
+STAGED_FILES=$(git diff --cached --name-only)
+DEFERRAL_COUNT=0
+DEFERRAL_FILES=""
+
+for file in $STAGED_FILES; do
+    if [ -f "$file" ]; then
+        # Count new deferrals being added (only in diff, not entire file)
+        NEW_DEFERRALS=$(git diff --cached "$file" | grep -E "^\+.*(\blater\b|\bTODO\b|\bFIXME\b)" | wc -l)
+        if [ "$NEW_DEFERRALS" -gt 0 ]; then
+            DEFERRAL_COUNT=$((DEFERRAL_COUNT + NEW_DEFERRALS))
+            DEFERRAL_FILES="$DEFERRAL_FILES\n  - $file ($NEW_DEFERRALS deferrals)"
+        fi
+    fi
+done
+
+if [ "$DEFERRAL_COUNT" -gt 0 ]; then
+    echo ""
+    echo "============================================================"
+    echo "WARNING: Deferral detected ($DEFERRAL_COUNT instances)"
+    echo "============================================================"
+    echo ""
+    echo "Files with new deferrals (later/TODO/FIXME):"
+    echo -e "$DEFERRAL_FILES"
+    echo ""
+    echo "Remember from DEVELOPMENT_STANDARDS.md:"
+    echo "  'Later' in autonomous systems means 'never'."
+    echo ""
+    echo "Consider: Can you address this now instead of deferring?"
+    echo ""
+    echo "Proceeding with commit (warning only)..."
+    echo "============================================================"
+fi
+
 exit 0

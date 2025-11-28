@@ -94,6 +94,7 @@ class SelfHealingAgent:
         issues.extend(self.check_instruction_consistency())
         issues.extend(self.check_orphaned_docs())
         issues.extend(self.check_development_standards())
+        issues.extend(self.check_meta_metrics())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -625,6 +626,66 @@ class SelfHealingAgent:
 
         except Exception as e:
             logger.error(f"Error checking development standards: {e}")
+
+        return issues
+
+    def check_meta_metrics(self) -> List[Dict]:
+        """Check meta-metrics for invisible value indicators.
+
+        Added as part of Layer 61-63 fix in root cause analysis.
+        See docs/DEVELOPMENT_STANDARDS.md for context.
+        """
+        issues = []
+
+        try:
+            # Import and run meta-metrics
+            import sys
+            sys.path.insert(0, str(REPO_ROOT / "scripts"))
+            from meta_metrics import generate_report
+
+            report = generate_report()
+
+            # Check hardening percentage
+            wd = report.get("work_distribution", {})
+            percentages = wd.get("percentages", {})
+            hardening_pct = percentages.get("hardening", 0) + percentages.get("enforcement", 0)
+
+            if hardening_pct < 15:
+                issues.append({
+                    "type": "low_hardening",
+                    "description": f"Hardening+Enforcement only {hardening_pct:.1f}% - need more balance with features",
+                    "severity": "medium",
+                    "auto_fixable": False,
+                    "alert_user": True
+                })
+
+            # Check deferred work
+            meta_debt = report.get("meta_debt_indicators", {})
+            later_mentions = meta_debt.get("deferred_work_mentions", 0)
+
+            if later_mentions > 30:
+                issues.append({
+                    "type": "deferred_work_accumulating",
+                    "description": f"{later_mentions} 'later' mentions - deferred work accumulating. Remember: 'later' means 'never'",
+                    "severity": "medium",
+                    "auto_fixable": False,
+                    "alert_user": True
+                })
+
+            # Check unregistered docs
+            doc_coverage = report.get("doc_coverage", {})
+            unregistered = doc_coverage.get("unregistered_docs", 0)
+
+            if isinstance(unregistered, int) and unregistered > 50:
+                issues.append({
+                    "type": "unregistered_docs",
+                    "description": f"{unregistered} docs not registered in knowledge.json",
+                    "severity": "low",
+                    "auto_fixable": False
+                })
+
+        except Exception as e:
+            logger.error(f"Error checking meta-metrics: {e}")
 
         return issues
 
