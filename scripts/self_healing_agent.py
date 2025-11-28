@@ -92,6 +92,7 @@ class SelfHealingAgent:
         issues.extend(self.check_trading_health())
         issues.extend(self.check_unmerged_branches())
         issues.extend(self.check_instruction_consistency())
+        issues.extend(self.check_orphaned_docs())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -477,6 +478,85 @@ class SelfHealingAgent:
 
         except Exception as e:
             logger.error(f"Error checking instruction consistency: {e}")
+
+        return issues
+
+    def check_orphaned_docs(self) -> List[Dict]:
+        """Check for docs in monitored paths that aren't categorized in knowledge.json.
+
+        This enforces the coupling between "doc created" and "bootstrap updated".
+        Any doc in monitored_doc_paths must be listed in either required_reading
+        or optional_docs. Orphaned docs indicate the system isn't following its
+        own rules about documentation categorization.
+        """
+        issues = []
+        knowledge_file = REPO_ROOT / "state" / "knowledge.json"
+
+        if not knowledge_file.exists():
+            return issues
+
+        try:
+            with open(knowledge_file) as f:
+                knowledge = json.load(f)
+
+            # Get all categorized docs
+            required = set(knowledge.get("required_reading", []))
+            optional = set(knowledge.get("optional_docs", []))
+            agent_files = set(knowledge.get("agent_instruction_files", []))
+            monitored_paths = knowledge.get("monitored_doc_paths", [])
+
+            all_known = required | optional | agent_files
+
+            # Find all .md files in monitored paths
+            orphaned = []
+            for monitored_path in monitored_paths:
+                search_path = REPO_ROOT / monitored_path
+                if search_path.exists():
+                    # Find all .md files
+                    for md_file in search_path.rglob("*.md"):
+                        # Get relative path from repo root
+                        rel_path = str(md_file.relative_to(REPO_ROOT))
+
+                        # Skip if already categorized
+                        if rel_path in all_known:
+                            continue
+
+                        # Skip READMEs in subdirectories (typically auto-generated or minor)
+                        if md_file.name == "README.md" and md_file.parent != REPO_ROOT:
+                            # But do require top-level READMEs to be categorized
+                            parent_rel = str(md_file.parent.relative_to(REPO_ROOT))
+                            if parent_rel not in ["docs", ".claude", ".github", "ai"]:
+                                continue
+
+                        # Skip session logs and summaries (ephemeral docs)
+                        if "SESSION" in md_file.name or "SUMMARY" in md_file.name:
+                            continue
+                        if "LOG" in md_file.name and md_file.name != "CHANGELOG.md":
+                            continue
+
+                        # This is an orphaned doc
+                        orphaned.append(rel_path)
+
+            if orphaned:
+                # Limit to first 10 to avoid alert spam
+                sample = orphaned[:10]
+                remaining = len(orphaned) - 10 if len(orphaned) > 10 else 0
+
+                desc = f"{len(orphaned)} docs in monitored paths not categorized in knowledge.json: {sample}"
+                if remaining > 0:
+                    desc += f" (and {remaining} more)"
+
+                issues.append({
+                    "type": "orphaned_docs",
+                    "description": desc,
+                    "severity": "medium",
+                    "auto_fixable": False,
+                    "alert_user": True,
+                    "orphaned_docs": orphaned
+                })
+
+        except Exception as e:
+            logger.error(f"Error checking orphaned docs: {e}")
 
         return issues
 

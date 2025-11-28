@@ -10,10 +10,56 @@
     ".github/copilot-instructions.md",
     "docs/AI_AGENT_LINK_PROTOCOL_v0.1.md"
   ],
+  "optional_docs": [
+    "docs/RISK_MODEL_V1.md",
+    "docs/AUDIT_SYSTEM.md",
+    "docs/POLYMARKET_API_INTEGRATION.md",
+    "docs/AI_INTAKE_IMPLEMENTATION_REPORT.md",
+    "docs/AI_INTAKE_SETUP_GUIDE.md",
+    "docs/CHATGPT_COMMS_PROTOCOL_v0.5.md",
+    "docs/CHATGPT_COMMS_PROTOCOL_v1_ideas.md",
+    "docs/SPARK_PLUG_ARCHITECTURE_v0.1.md",
+    "docs/SPARK_PLUG_PART3_USER_CONNECTOR_v0.1.md",
+    "docs/SPARK_PLUG_v0.4_AI_RUNNER_INTEGRATION.md",
+    "docs/SPARK_PLUG_v0.5_PER_KERNEL_HISTORY_POLICY.md",
+    "docs/TRI_AGENT_SESSION_v0.1.md",
+    "docs/TRI_AGENT_INTERCOM_v0.1.md",
+    "docs/SHADOW_MODE_RUNBOOK.md",
+    "docs/PRODUCTION_DEPLOYMENT.md",
+    "docs/EXECUTION_NOTIFICATIONS.md",
+    "docs/AUTONOMOUS_BOTTLENECKS_RESOLVED.md",
+    "docs/claude/MCP_ARCHITECTURE_CORRECTION.md",
+    "docs/claude/MCP_SETUP_GUIDE.md",
+    "docs/claude/MCP_VERIFICATION_RESULTS.md",
+    "docs/claude/AUTONOMOUS_OPERATION.md",
+    "docs/claude/AUTONOMOUS_CLAUDE_ENGAGEMENT.md",
+    "docs/claude/COPILOT_AGENT_DIGEST.md",
+    "docs/claude/PRODUCTION_STATUS.md",
+    "docs/claude/USER_PROFILE.md",
+    "docs/claude/GITHUB_TEST_MESSAGE.md",
+    "ai/ZERO_TOUCH_ARCHITECTURE.md",
+    "ai/DEPLOYMENT_ZERO_TOUCH.md",
+    "ai/DEPLOYMENT_STATUS.md",
+    "ai/README.md",
+    "ai/README_APPROVAL_SYSTEM.md",
+    "ai/LATEST_RETURN_BRIEFING.md",
+    "ai/USER_RETURN_BRIEFING.md",
+    "ai/USER_COMMUNICATION_EFFICIENCY_PROTOCOL.md",
+    "ai/coordination/FAST_COORDINATION_SYSTEM.md",
+    "ai/coordination/REALTIME_COORDINATION.md",
+    "ai/coordination/USER_PROTOCOL_ALIGNMENT.md"
+  ],
+  "monitored_doc_paths": [
+    "docs/",
+    ".claude/",
+    ".github/",
+    "ai/"
+  ],
   "ai_bootstrap_instructions": [
     "Read ALL docs in required_reading before planning or changing anything.",
     "Use the research report roadmap as the main source of truth.",
     "When changing agent coordination, update ALL files in agent_instruction_files.",
-    "Don't assume other AIs did things correctly - verify."
+    "Don't assume other AIs did things correctly - verify.",
+    "When creating new docs in monitored_doc_paths, add them to required_reading or optional_docs."
   ]
 }
