@@ -86,6 +86,50 @@ When you build something:
 
 ---
 
+## Deepest Root Cause: Velocity Over Hardening
+
+Examining the git history reveals the ultimate cause:
+
+```
+$ git log --oneline --since="2025-11-17" --until="2025-11-19" | wc -l
+62 commits in 2 days
+
+$ git log --oneline | grep -i "batch" | wc -l
+26 feature batches
+```
+
+The system was built with a "batch-per-day" cadence that prioritized:
+- ✅ Feature velocity (26 batches of features)
+- ❌ System hardening (0 batches of enforcement)
+
+**Every batch was feature-focused:**
+- Batch 12: Live Polymarket data ingestion
+- Batch 15: AI Runner with Smart Task Routing
+- Batch 19: LLM Decision Agent
+- Batch 22: Consensus Feedback Engine
+- ...and so on
+
+**No batch was hardening-focused:**
+- No "Batch X: Add enforcement to all rules"
+- No "Batch X: Add monitoring to all components"
+- No "Batch X: Ensure all docs are discoverable"
+
+**The meta-pattern:**
+```
+Velocity pressure → features prioritized → hardening deferred → "later" never comes
+```
+
+**The fix:** Include hardening in every feature batch, not as a separate phase.
+
+When adding a feature:
+- The feature isn't done until it has monitoring
+- The feature isn't done until its rules have enforcement
+- The feature isn't done until its docs are discoverable
+
+"Ship fast" is fine. "Ship fast without hardening" creates meta-debt that compounds.
+
+---
+
 **Design checklist for any self-maintaining system:**
 - [ ] For every "agents should X", there's a check that detects when agents don't X
 - [ ] For every doc, there's a path that ensures agents discover it
