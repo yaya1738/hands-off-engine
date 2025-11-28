@@ -376,8 +376,10 @@ class Executor:
                         )
                         LOG.info(f"   Safety checks: {'; '.join(safety_msgs)}")
 
+                        # Use token_id if available, otherwise fall back to market_id
+                        trade_token_id = getattr(action, 'token_id', None) or action.market_id
                         api_response = trader.place_market_order_usd(
-                            token_id=action.market_id,  # Note: May need token_id mapping
+                            token_id=trade_token_id,
                             usd_amount=action.amount,
                             side=side,
                             order_type=OrderType.FOK,  # Fill-or-kill

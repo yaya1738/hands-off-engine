@@ -11,7 +11,7 @@ import sys
 import os
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
@@ -28,12 +28,13 @@ except ImportError:
 @dataclass
 class PlannedAction:
     """Structured representation of a planned trading action"""
-    market_id: str
+    market_id: str  # Slug for display/logging
     market_name: str
     side: str  # "YES" or "NO"
     amount: float  # Dollar amount to risk
     confidence: float  # 0.0 to 1.0
     reasoning: str  # Why this action makes sense
+    token_id: Optional[str] = None  # Actual CLOB token ID for trading
 
 
 class Decider:
@@ -96,6 +97,7 @@ class Decider:
         for market in model_data.get('markets', []):
             signal = {
                 'market_id': market['market_id'],
+                'token_id': market.get('token_id'),  # Actual CLOB token for trading
                 'market_name': market['question'],
                 'edge': market['model_edge'],
                 'current_odds': market['market_price'],
@@ -104,7 +106,7 @@ class Decider:
                 'fair_price': market['fair_price']
             }
             alpha_signals.append(signal)
-        
+
         return alpha_signals
 
     def plan_actions(self, alpha_signals: List[dict]) -> List[PlannedAction]:
@@ -160,7 +162,8 @@ class Decider:
                 side=signal['side'],
                 amount=amount,
                 confidence=confidence,
-                reasoning=reasoning
+                reasoning=reasoning,
+                token_id=signal.get('token_id')  # Pass through for actual trading
             )
 
             planned_actions.append(action)

@@ -61,6 +61,7 @@ def run_intelligent_alpha(output_path: Path, bankroll: float, verbose: bool = Tr
     for sig in signals:
         markets.append({
             "market_id": sig.market_id,
+            "token_id": sig.token_id,  # Critical for actual trading!
             "question": sig.question,
             "query_category": "intelligent",
             "side": sig.side,
