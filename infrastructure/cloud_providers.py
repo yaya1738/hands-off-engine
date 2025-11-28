@@ -103,9 +103,15 @@ class DigitalOceanAPI(CloudProviderAPI):
         Initialize DigitalOcean API.
 
         Args:
-            api_token: DO API token (or from DO_API_TOKEN env var)
+            api_token: DO API token (checks DO_API_TOKEN, DO_TOKEN env vars)
         """
-        self.api_token = api_token or os.environ.get("DO_API_TOKEN", "")
+        # Check multiple env var patterns (matching existing system conventions)
+        self.api_token = (
+            api_token or
+            os.environ.get("DO_API_TOKEN") or
+            os.environ.get("DO_TOKEN") or
+            ""
+        )
         self.provider = CloudProvider.DIGITALOCEAN
         self._cache: Dict[str, Any] = {}
         self._cache_time: Dict[str, float] = {}
