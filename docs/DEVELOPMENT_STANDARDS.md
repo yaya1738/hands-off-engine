@@ -2112,7 +2112,279 @@ This is the same pattern as Layer 27 (locally correct, globally wrong).
 3. **Track deferrals as debt** - Accumulation visible
 4. **Regular deferral review** - Scheduled attention
 
-**Implementing: Pre-commit warning for deferral**
+**IMPLEMENTED:** Pre-commit hook now warns on new later/TODO/FIXME.
+
+---
+
+## Layer 66: Why Does Deferral Feel Rational In The Moment?
+
+**Why do developers defer even when they know "later = never"?**
+
+Because of **temporal discounting**: Future costs feel smaller than present costs.
+
+- Present cost of doing hardening: Real effort NOW
+- Future cost of skipping hardening: Vague problems LATER
+
+The brain naturally discounts future costs. This is the same bias as Layer 17-18.
+
+**But also: perceived urgency**
+
+In the moment:
+- "This feature is needed NOW"
+- "The user is waiting"
+- "We have a deadline"
+
+Hardening doesn't have a deadline. Features do.
+
+**The asymmetry:**
+```
+Features: External deadline → feels urgent → gets done
+Hardening: No deadline → feels optional → gets deferred
+```
+
+---
+
+## Layer 67: Why Does Hardening Have No Deadline?
+
+**Why isn't there external pressure for hardening?**
+
+Because hardening failures are **diffuse and delayed:**
+- Feature missing → User complains immediately → Deadline pressure
+- Hardening missing → Problems accumulate slowly → No specific moment of complaint
+
+**The visibility asymmetry again:**
+- Feature delivery: Visible moment of success
+- Hardening debt: Invisible accumulation of risk
+
+Nobody schedules "get bugs from missing hardening" on the calendar.
+
+---
+
+## Layer 68: Creating Artificial Deadlines For Hardening
+
+**Fix: Give hardening the same urgency structure as features.**
+
+Methods:
+1. **Hardening sprints** - Dedicated time with deadlines
+2. **Hardening quotas** - "20% of each sprint must be hardening"
+3. **Hardening gates** - "No release without X% enforcement coverage"
+4. **Visible hardening debt** - Dashboard showing accumulation
+
+**For this project:** The meta-metrics provide the visible debt. Need to add gate.
+
+---
+
+## Layer 69: Implementing Hardening Gate
+
+**Add to CI/release process: Block if hardening metrics too low.**
+
+For this project (autonomous, no formal releases), the gate is:
+- Self-healing agent alerts if hardening% drops
+- Meta-metrics shown in regular reports
+- This document as standing requirement
+
+**The enforcement structure is now:**
+
+```
+Feature work proposed
+    ↓
+Pre-commit: Warns on deferral
+    ↓
+Commit happens
+    ↓
+Self-healing: Checks hardening% regularly
+    ↓
+Alert if balance wrong
+    ↓
+Human/AI attention directed to hardening
+```
+
+---
+
+## Layer 70: What Remains Unfixed?
+
+**Scanning the analysis for remaining gaps:**
+
+| Layer | Issue | Status |
+|-------|-------|--------|
+| 1-3 | No enforcement | FIXED (pre-commit, self-healing) |
+| 5-6 | Ambiguous directives | FIXED (USER_PROFILE) |
+| 7-8 | No process metrics | FIXED (meta_metrics.py) |
+| 10-12 | Meta-design not in scope | FIXED (this doc) |
+| 22 | AI doesn't volunteer | FIXED (directives 5-6) |
+| 37-41 | Proactive wisdom missing | FIXED (directives) |
+| 53 | Hidden assumptions | NOT FIXED |
+| 61-65 | Behavioral bias expression | FIXED (various) |
+
+**Remaining gap: Hidden assumptions (Layer 51-53)**
+
+Components make assumptions about each other that aren't documented.
+
+---
+
+## Layer 71: Addressing Hidden Assumptions
+
+**How to surface hidden assumptions?**
+
+1. **Explicit interface contracts** - Document what each component expects
+2. **Assumption comments** - When you assume something, write it
+3. **Integration tests** - Test assumptions empirically
+4. **Failure post-mortems** - When things break, document the hidden assumption
+
+**For this project:**
+
+The system has many implicit assumptions:
+- Cron runs every minute
+- Git is available
+- Network connectivity exists
+- Telegram bot token is valid
+- etc.
+
+**IMPLEMENTED:** Created `docs/SYSTEM_ASSUMPTIONS.md`
+
+Documents:
+- Environment assumptions (OS, filesystem, network, time)
+- Infrastructure assumptions (git, cron, python)
+- Service assumptions (Telegram, Polymarket, LLM APIs)
+- Component interface assumptions
+- Process assumptions (autonomous operation, multi-agent)
+- Assumption debt checklist
+
+---
+
+## Layer 72: Are All Issues Now Fixed?
+
+**Scanning the full 71-layer analysis:**
+
+| Category | Layers | Status |
+|----------|--------|--------|
+| Enforcement mechanisms | 1-3 | ✅ FIXED |
+| Directive clarity | 5-6 | ✅ FIXED |
+| Process metrics | 7-8 | ✅ FIXED |
+| Meta-design | 10-12 | ✅ FIXED |
+| Novel system patterns | 13-14 | ✅ DOCUMENTED |
+| Market incentives | 15-17 | ⚠️ UNFIXABLE (compensated) |
+| Evolutionary bias | 18-20 | ⚠️ UNFIXABLE (compensated) |
+| AI training | 21-24 | ✅ FIXED (directives) |
+| Feedback loops | 24-31 | ✅ FIXED (meta-metrics) |
+| Bootstrap problem | 32-34 | ✅ DOCUMENTED |
+| Knowledge connection | 35-36 | ✅ FIXED (directives) |
+| Proactive wisdom | 37-41 | ✅ FIXED |
+| Anthropomorphization | 42-43 | ✅ DOCUMENTED |
+| AI training feedback | 44-46 | ⚠️ UNFIXABLE (compensated) |
+| Local fix limits | 47-49 | ✅ DOCUMENTED |
+| Combinatorial explosion | 50-51 | ⚠️ INHERENT (mitigated) |
+| Hidden assumptions | 52-53 | ✅ FIXED |
+| Meta-loop | 54-55 | ✅ DOCUMENTED |
+| Make visible strategy | 56-58 | ✅ IMPLEMENTED |
+| Behavioral expression | 59-65 | ✅ FIXED |
+| Temporal discounting | 66-69 | ✅ FIXED |
+| Status check | 70-71 | ✅ FIXED |
+
+**All fixable issues have fixes. All unfixable issues have compensations. All inherent issues have mitigations.**
+
+---
+
+## Layer 73: What's The Maintenance Burden?
+
+**The fixes create maintenance burden:**
+
+| Fix | Maintenance Required |
+|-----|---------------------|
+| Pre-commit hook | Keep symlink installed |
+| Self-healing agent | Keep running in cron |
+| Meta-metrics | Run periodically |
+| USER_PROFILE directives | Keep updated |
+| DEVELOPMENT_STANDARDS | Keep current |
+| SYSTEM_ASSUMPTIONS | Update when new assumptions found |
+| knowledge.json | Update when docs added |
+
+**Risk: If maintenance lapses, fixes degrade.**
+
+**Mitigation:** Self-healing agent checks most of these automatically.
+
+---
+
+## Layer 74: Self-Sustaining Fix System
+
+**The fix system should maintain itself:**
+
+Current self-maintenance:
+- Self-healing agent runs automatically ✓
+- Pre-commit hook runs on every commit ✓
+- Meta-metrics can be run manually or scheduled ✓
+
+Missing self-maintenance:
+- No check that DEVELOPMENT_STANDARDS is current
+- No check that SYSTEM_ASSUMPTIONS is complete
+- No check that USER_PROFILE directives are being followed
+
+**These are meta-meta-fixes** - fixes for the fix system.
+
+At some point, we accept that humans must periodically review.
+
+---
+
+## Layer 75: The Practical Termination Point
+
+**We've reached a practical equilibrium:**
+
+1. **Most issues have automated fixes**
+2. **Remaining issues require periodic human review**
+3. **The system alerts humans when automated fixes find problems**
+4. **This document serves as the periodic review trigger**
+
+**The maintenance loop:**
+
+```
+System runs autonomously
+    ↓
+Self-healing agent checks
+    ↓
+Meta-metrics measure health
+    ↓
+Alerts if thresholds crossed
+    ↓
+Human/AI investigates
+    ↓
+Consults this document
+    ↓
+Applies relevant fix
+    ↓
+System continues
+```
+
+**This is as self-maintaining as practical without infinite recursion.**
+
+---
+
+## Final Summary: 75 Layers, Complete Fix Set
+
+**The root cause analysis revealed:**
+
+1. **One fundamental bias:** Humans discount invisible value (evolutionary)
+2. **Four manifestation loops:** Markets, meta-monitoring, AI training, hidden assumptions
+3. **One meta-pattern:** Invisible → discounted → not created → no feedback → reinforced
+4. **One compensatory strategy:** Make invisible visible via metrics, alerts, documentation
+
+**Fixes implemented:**
+
+| Component | Purpose |
+|-----------|---------|
+| `scripts/meta_metrics.py` | Make work distribution visible |
+| `check_meta_metrics()` | Alert when metrics unhealthy |
+| Pre-commit deferral warning | Make deferral painful at decision time |
+| `docs/SYSTEM_ASSUMPTIONS.md` | Make hidden assumptions visible |
+| USER_PROFILE directives 5-6 | Make AI proactively surface wisdom |
+| This document | Make meta-design thinking visible |
+
+**The system is now:**
+- Self-monitoring for invisible value degradation
+- Self-alerting when thresholds crossed
+- Self-documenting its assumptions and patterns
+- Human-triggered for periodic deep review
+
+**This is the practical termination point.**
 
 ---
 

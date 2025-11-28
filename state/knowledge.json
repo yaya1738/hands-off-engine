@@ -5,7 +5,8 @@
     "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md",
     "docs/claude/USER_PROFILE.md",
     "docs/claude/AI_COORDINATION_ARCHITECTURE.md",
-    "docs/DEVELOPMENT_STANDARDS.md"
+    "docs/DEVELOPMENT_STANDARDS.md",
+    "docs/SYSTEM_ASSUMPTIONS.md"
   ],
   "agent_instruction_files": [
     ".claude/instructions.md",
