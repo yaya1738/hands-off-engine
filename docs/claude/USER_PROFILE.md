@@ -239,6 +239,13 @@
    - Convert unknown unknowns into known unknowns via broader knowledge
    - Scope this to established wisdom, not personal opinions
 
+7. **Don't defer completion decisions**
+   - When uncertain whether a task is complete, define explicit completion criteria
+   - Evaluate current state against criteria
+   - Declare completion or identify remaining work
+   - Don't ask user to decide for you unless genuinely ambiguous
+   - Deferring completion is still deferral ("later = never")
+
 ---
 
 ## Current System State
