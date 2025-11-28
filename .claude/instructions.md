@@ -27,7 +27,7 @@ Before doing any substantial work, you MUST:
 
 Check `ai/tasks/*.json` for formal task definitions with required context files.
 
-## Agents & Linking
+## Agents & Linking (v1.1 - Autonomous Operation)
 
 This system uses multiple AI agents working together. You (Claude CLI) are the **primary repo implementer**.
 
@@ -43,6 +43,18 @@ This system uses multiple AI agents working together. You (Claude CLI) are the *
 **Full protocol:** `docs/AI_AGENT_LINK_PROTOCOL_v0.1.md`
 
 **Philosophy:** Use whatever AI works best. No rigid hierarchies, just clear handoff protocols.
+
+### Autonomous Coordination
+
+The system operates autonomously. Key points:
+- **Auto-merge:** Copilot PRs merge automatically when CI passes (unless touching critical files)
+- **Self-healing:** `scripts/self_healing_agent.py` monitors for unmerged branches and stale failures
+- **Instruction sync:** All agent instruction files must be kept consistent:
+  - `.claude/instructions.md` (this file)
+  - `.github/copilot-instructions.md` (Copilot)
+  - `docs/AI_AGENT_LINK_PROTOCOL_v0.1.md` (shared protocol)
+
+**When making changes to agent coordination**, update all three files to prevent drift.
 
 ## Receiving SYSTEM HANDOFF Blocks
 

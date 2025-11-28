@@ -74,10 +74,35 @@ Check `ai/coordination/status.json` for:
 
 Post updates to `ai/coordination/messages.jsonl` for cross-agent communication.
 
+## Autonomous Operations (Auto-Merge Enabled)
+
+The system operates autonomously. Copilot PRs can be auto-merged when:
+- All CI checks pass (tests, linting, type checks)
+- No changes to critical files (see below)
+- PR is labeled `copilot` or `auto-merge`
+
+The `.github/workflows/auto-merge.yml` workflow handles this automatically.
+
 ## What Requires Human Approval
 
-- Merging PRs
-- Enabling LIVE trading
-- Strategic decisions
-- Security changes
-- Capital allocation changes
+These actions ALWAYS require explicit human approval:
+- Enabling LIVE trading (changing DRYRUN to LIVE)
+- Security changes (API keys, auth, permissions)
+- Capital allocation changes (bankroll %, position limits)
+- Changes to critical files:
+  - `.env*` files
+  - `**/secrets/**`
+  - `.github/workflows/auto-merge.yml` (the auto-merge workflow itself)
+  - `executor/ho_executor.py` (live trade execution)
+  - `state/risk_profile.json` (risk parameters)
+
+## What Can Be Auto-Merged
+
+These can be merged automatically when CI passes:
+- Bug fixes
+- Documentation updates
+- Test additions
+- Logging improvements
+- Non-critical refactors
+- Self-healing agent updates
+- Alpha model improvements (with tests)
