@@ -13,3 +13,6 @@
 {"timestamp": "2025-11-28T03:53:52.695216", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
 {"timestamp": "2025-11-28T03:54:52.717096", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
 {"timestamp": "2025-11-28T03:55:52.732595", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
+{"timestamp": "2025-11-28T04:01:52.646857", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
+{"timestamp": "2025-11-28T04:02:52.664460", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}
+{"timestamp": "2025-11-28T04:03:05.713968", "type": "trading_protection", "reason": "Autonomous protection: degraded", "status": "degraded"}

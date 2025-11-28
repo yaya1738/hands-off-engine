@@ -125,6 +125,11 @@ class AutonomousInfraManager:
         self.log_path = Path("logs/infrastructure")
         self.log_path.mkdir(parents=True, exist_ok=True)
 
+        # Production servers config
+        self.prod_servers_config = Path("config/production_servers.json")
+        self.redundancy_checked = False
+        self.redundancy_action_taken = False
+
         # Signal handlers
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
@@ -203,6 +208,9 @@ class AutonomousInfraManager:
             else:
                 self.last_health = {"status": "unknown", "score": 50}
 
+            # CHECK REDUNDANCY - Single point of failure detection
+            self._check_redundancy_and_act()
+
             # Analyze and make decisions
             decisions = self.provisioner.analyze_and_scale()
 
@@ -265,6 +273,130 @@ class AutonomousInfraManager:
                 return True
 
         return False
+
+    def _check_redundancy_and_act(self):
+        """
+        Check for single-point-of-failure risk and automatically provision backup.
+
+        This is a core autonomous decision - the system detects risk and acts
+        WITHOUT requiring user intervention.
+        """
+        if self.redundancy_action_taken:
+            return  # Already handled
+
+        try:
+            if not self.prod_servers_config.exists():
+                return
+
+            with open(self.prod_servers_config) as f:
+                config = json.load(f)
+
+            servers = config.get("production_servers", [])
+            policy = config.get("redundancy_policy", {})
+
+            min_servers = policy.get("min_trading_servers", 2)
+            require_failover = policy.get("require_failover", True)
+            auto_provision = policy.get("auto_provision_backup", True)
+
+            # Count critical trading servers
+            critical_servers = [s for s in servers if s.get("critical", False)]
+
+            if len(critical_servers) < min_servers and require_failover:
+                # SINGLE POINT OF FAILURE DETECTED
+                print("\n" + "=" * 60)
+                print("🚨 AUTONOMOUS DECISION: Single Point of Failure Detected")
+                print("=" * 60)
+                print(f"   Current trading servers: {len(critical_servers)}")
+                print(f"   Required minimum: {min_servers}")
+                print(f"   Risk: Complete trading halt if primary fails")
+                print()
+
+                if auto_provision and self.auto_provision:
+                    # Check budget before provisioning
+                    if self._within_budget_for_emergency():
+                        print("   DECISION: Provision failover server")
+                        print("   Reason: Protect live trading from hardware failure")
+
+                        if not self.dry_run:
+                            # Provision backup server
+                            success, server, message = self.provisioner.provision_new_server(
+                                role=ServerRole.TRADING_BACKUP,
+                                size=InstanceSize.MEDIUM
+                            )
+
+                            if success:
+                                self.stats["servers_provisioned"] += 1
+                                self.redundancy_action_taken = True
+                                print(f"   ✓ Failover server provisioned: {message}")
+
+                                # Update config with new server
+                                self._register_new_server(server)
+                            else:
+                                print(f"   ✗ Provisioning failed: {message}")
+                                print("   Will retry on next cycle")
+                        else:
+                            print("   [DRY RUN] Would provision failover server")
+                            self.redundancy_action_taken = True
+                    else:
+                        print("   ⚠️  Insufficient budget for failover")
+                        print("   Adding to approval queue for budget increase")
+                        self._request_budget_increase_for_redundancy()
+                else:
+                    print("   Auto-provision disabled - logging for review")
+
+                print("=" * 60 + "\n")
+                self.redundancy_checked = True
+
+        except Exception as e:
+            self._log_error(f"Redundancy check error: {e}")
+
+    def _register_new_server(self, server):
+        """Register a newly provisioned server in config."""
+        try:
+            with open(self.prod_servers_config) as f:
+                config = json.load(f)
+
+            config["production_servers"].append({
+                "id": server.id if hasattr(server, 'id') else f"auto-{datetime.utcnow().strftime('%Y%m%d%H%M')}",
+                "provider": self.provisioner.provider.value,
+                "ip": server.ip if hasattr(server, 'ip') else "pending",
+                "role": "trading_backup",
+                "type": "auto_provisioned",
+                "critical": True,
+                "registered_at": datetime.utcnow().isoformat()
+            })
+
+            with open(self.prod_servers_config, 'w') as f:
+                json.dump(config, f, indent=2)
+
+        except Exception as e:
+            self._log_error(f"Failed to register server: {e}")
+
+    def _request_budget_increase_for_redundancy(self):
+        """Request budget increase through approval queue for redundancy."""
+        try:
+            approval_queue_path = Path("ai/approval_queue.json")
+            if approval_queue_path.exists():
+                with open(approval_queue_path) as f:
+                    queue = json.load(f)
+            else:
+                queue = {"pending_requests": []}
+
+            queue["pending_requests"].append({
+                "id": f"redundancy-{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
+                "type": "infrastructure_budget_increase",
+                "priority": "high",
+                "reason": "Single point of failure - need failover server",
+                "requested_increase": 50.0,
+                "timestamp": datetime.utcnow().isoformat(),
+                "auto_generated": True
+            })
+
+            with open(approval_queue_path, 'w') as f:
+                json.dump(queue, f, indent=2)
+
+        except Exception as e:
+            self._log_error(f"Failed to request budget increase: {e}")
 
     def _check_critical_situations(self):
         """Check for and handle critical situations."""

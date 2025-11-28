@@ -286,6 +286,12 @@ class UnifiedAutonomousSystem:
                 )
 
         # ═══════════════════════════════════════════════════════════════
+        # PHASE 3.5: Redundancy Check - Single Point of Failure Detection
+        # ═══════════════════════════════════════════════════════════════
+
+        self._check_redundancy_autonomous()
+
+        # ═══════════════════════════════════════════════════════════════
         # PHASE 4: Infrastructure Scaling Decisions
         # ═══════════════════════════════════════════════════════════════
 
@@ -466,6 +472,117 @@ class UnifiedAutonomousSystem:
                 "decision": decision
             }
         )
+
+    def _check_redundancy_autonomous(self):
+        """
+        AUTONOMOUS DECISION: Check for single-point-of-failure and act.
+
+        The system detects risk and provisions backup WITHOUT user intervention.
+        This is what autonomous infrastructure management means.
+        """
+        if hasattr(self, '_redundancy_handled') and self._redundancy_handled:
+            return
+
+        try:
+            config_path = Path("config/production_servers.json")
+            if not config_path.exists():
+                return
+
+            with open(config_path) as f:
+                config = json.load(f)
+
+            servers = config.get("production_servers", [])
+            policy = config.get("redundancy_policy", {})
+
+            min_servers = policy.get("min_trading_servers", 2)
+            require_failover = policy.get("require_failover", True)
+            auto_provision = policy.get("auto_provision_backup", True)
+
+            # Count critical trading servers
+            critical_servers = [s for s in servers if s.get("critical", False)]
+
+            if len(critical_servers) < min_servers and require_failover:
+                # ══════════════════════════════════════════════════════════
+                # AUTONOMOUS DECISION: Single Point of Failure Detected
+                # ══════════════════════════════════════════════════════════
+                print("\n" + "=" * 60)
+                print("🚨 AUTONOMOUS DECISION: Single Point of Failure Detected")
+                print("=" * 60)
+                print(f"   Current trading servers: {len(critical_servers)}")
+                print(f"   Existing: {[s['id'] for s in critical_servers]}")
+                print(f"   Required minimum: {min_servers}")
+                print(f"   Risk: Complete trading halt if primary fails")
+                print()
+
+                if auto_provision and self.auto_provision:
+                    current_spend = self.infra_provisioner.get_current_spend()
+                    budget_available = self.infrastructure_budget - current_spend
+
+                    if budget_available >= 20:  # Min cost for backup
+                        print("   DECISION: Provision failover server")
+                        print("   Reason: Protect live trading from single point of failure")
+
+                        if not self.dry_run:
+                            success, server, message = self.infra_provisioner.provision_new_server(
+                                role=ServerRole.TRADING_BACKUP,
+                                size=InstanceSize.SMALL
+                            )
+
+                            if success:
+                                self._redundancy_handled = True
+                                self.stats["servers_provisioned"] = self.stats.get("servers_provisioned", 0) + 1
+                                print(f"   ✓ Failover server provisioned: {message}")
+
+                                # Register new server
+                                self._register_provisioned_server(server, config_path, config)
+                            else:
+                                print(f"   ✗ Provisioning failed: {message}")
+                                print("   Will retry next cycle")
+                        else:
+                            print("   [DRY RUN] Would provision failover server")
+                            self._redundancy_handled = True
+                    else:
+                        print(f"   ⚠️  Budget insufficient (${budget_available:.2f} available)")
+                        print("   Queuing for budget approval...")
+                        self._queue_for_approval(
+                            title="Infrastructure: Failover Server Required",
+                            description="Single point of failure detected. Need backup server to protect trading.",
+                            change_type="infrastructure_budget",
+                            risk_level="high",
+                            action_data={
+                                "type": "provision_failover",
+                                "reason": "single_point_of_failure",
+                                "estimated_cost": 20.0
+                            }
+                        )
+                else:
+                    print("   Auto-provision disabled, queuing for approval...")
+
+                print("=" * 60 + "\n")
+
+        except Exception as e:
+            print(f"   Redundancy check error: {e}")
+
+    def _register_provisioned_server(self, server, config_path: Path, config: dict):
+        """Register a newly provisioned server."""
+        try:
+            new_server = {
+                "id": f"auto-{datetime.utcnow().strftime('%Y%m%d%H%M')}",
+                "provider": self.infra_provisioner.provider.value,
+                "ip": getattr(server, 'ip', 'pending'),
+                "role": "trading_backup",
+                "type": "auto_provisioned",
+                "critical": True,
+                "registered_at": datetime.utcnow().isoformat()
+            }
+            config["production_servers"].append(new_server)
+
+            with open(config_path, 'w') as f:
+                json.dump(config, f, indent=2)
+
+            print(f"   ✓ Server registered: {new_server['id']}")
+        except Exception as e:
+            print(f"   Warning: Failed to register server: {e}")
 
     def _queue_for_approval(
         self,
