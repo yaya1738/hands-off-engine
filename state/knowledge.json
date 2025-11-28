@@ -15,6 +15,7 @@
   ],
   "optional_docs": [
     "docs/RISK_MODEL_V1.md",
+    "docs/DECIDER_V1.md",
     "docs/AUDIT_SYSTEM.md",
     "docs/POLYMARKET_API_INTEGRATION.md",
     "docs/AI_INTAKE_IMPLEMENTATION_REPORT.md",
