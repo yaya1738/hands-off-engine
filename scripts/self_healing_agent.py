@@ -93,6 +93,7 @@ class SelfHealingAgent:
         issues.extend(self.check_unmerged_branches())
         issues.extend(self.check_instruction_consistency())
         issues.extend(self.check_orphaned_docs())
+        issues.extend(self.check_development_standards())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -560,6 +561,73 @@ class SelfHealingAgent:
 
         return issues
 
+    def check_development_standards(self) -> List[Dict]:
+        """Check if DEVELOPMENT_STANDARDS.md is being followed.
+
+        This is the meta-layer enforcement: checking that the design process
+        itself is being followed. Specifically:
+        - DEVELOPMENT_STANDARDS.md exists and is in required_reading
+        - Recent commits show evidence of following standards (enforcement added)
+
+        This prevents the pattern where rules exist but have no enforcement.
+        """
+        issues = []
+        knowledge_file = REPO_ROOT / "state" / "knowledge.json"
+        standards_file = REPO_ROOT / "docs" / "DEVELOPMENT_STANDARDS.md"
+
+        try:
+            # Check 1: DEVELOPMENT_STANDARDS.md exists
+            if not standards_file.exists():
+                issues.append({
+                    "type": "missing_development_standards",
+                    "description": "DEVELOPMENT_STANDARDS.md does not exist - meta-design layer missing",
+                    "severity": "high",
+                    "auto_fixable": False,
+                    "alert_user": True
+                })
+                return issues
+
+            # Check 2: It's in required_reading
+            if knowledge_file.exists():
+                with open(knowledge_file) as f:
+                    knowledge = json.load(f)
+
+                required = knowledge.get("required_reading", [])
+                if "docs/DEVELOPMENT_STANDARDS.md" not in required:
+                    issues.append({
+                        "type": "standards_not_required",
+                        "description": "DEVELOPMENT_STANDARDS.md exists but not in required_reading - agents won't read it",
+                        "severity": "high",
+                        "auto_fixable": False,
+                        "alert_user": True
+                    })
+
+            # Check 3: Pre-commit hook is installed
+            hook_file = REPO_ROOT / ".git" / "hooks" / "pre-commit"
+            if not hook_file.exists():
+                issues.append({
+                    "type": "pre_commit_hook_missing",
+                    "description": "Pre-commit hook not installed - doc categorization not enforced at commit time",
+                    "severity": "medium",
+                    "auto_fixable": True,
+                    "fix_action": "install_pre_commit_hook"
+                })
+            elif hook_file.is_symlink():
+                # Check if symlink is valid
+                if not hook_file.resolve().exists():
+                    issues.append({
+                        "type": "pre_commit_hook_broken",
+                        "description": "Pre-commit hook symlink is broken",
+                        "severity": "medium",
+                        "auto_fixable": True,
+                        "fix_action": "install_pre_commit_hook"
+                    })
+
+        except Exception as e:
+            logger.error(f"Error checking development standards: {e}")
+
+        return issues
+
     def check_unmerged_branches(self) -> List[Dict]:
         """Check for agent branches with unmerged work that should be merged."""
         issues = []
@@ -651,6 +719,8 @@ class SelfHealingAgent:
                 return self.trigger_pipeline()
             elif issue.get("fix_action") == "reset_trading_health":
                 return self.reset_trading_health()
+            elif issue.get("fix_action") == "install_pre_commit_hook":
+                return self.install_pre_commit_hook()
 
         except Exception as e:
             logger.error(f"Error applying fix: {e}")
@@ -764,6 +834,29 @@ class SelfHealingAgent:
 
         except Exception as e:
             logger.error(f"Error rotating log: {e}")
+            return None
+
+    def install_pre_commit_hook(self) -> str:
+        """Install the pre-commit hook for doc categorization enforcement."""
+        try:
+            hook_script = REPO_ROOT / "scripts" / "pre-commit-doc-check.sh"
+            hook_target = REPO_ROOT / ".git" / "hooks" / "pre-commit"
+
+            if not hook_script.exists():
+                logger.error("Pre-commit hook script not found")
+                return None
+
+            # Create symlink
+            if hook_target.exists() or hook_target.is_symlink():
+                hook_target.unlink()
+
+            hook_target.symlink_to(Path("../../scripts/pre-commit-doc-check.sh"))
+
+            logger.info("✓ Installed pre-commit hook for doc categorization")
+            return "Installed pre-commit hook"
+
+        except Exception as e:
+            logger.error(f"Error installing pre-commit hook: {e}")
             return None
 
     def send_telegram_alert(self, issue: Dict):
