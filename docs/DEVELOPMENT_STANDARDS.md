@@ -43,6 +43,15 @@ Before implementing a new feature, component, or rule, answer these questions:
 - [ ] How will we know it broke?
 - [ ] What's the remediation path?
 
+### 5. Future-Proofing
+- [ ] Will this need to grow/evolve? Design for arrays, not single values.
+- [ ] What happens when someone needs to add more of these?
+- [ ] Is there a clear path for extension? (e.g., `required_reading: []` not `primary_doc: ""`)
+- [ ] Did you document how to extend this?
+
+**Example of bad design:** `primary_status_doc: "file.md"` (singular string)
+**Example of good design:** `required_reading: ["file.md"]` (array that can grow)
+
 ---
 
 ## Checklist: When Creating Docs
