@@ -425,16 +425,23 @@ class SelfHealingAgent:
                         "alert_user": True
                     })
 
-            # Check for version consistency
+            # Check for version consistency - look for explicit declarations
+            # Patterns like "Version: 1.1" or "## Version 1.0" (not just any "v1.1" reference)
             versions_found = {}
             for name, content in file_contents.items():
-                # Look for version indicators like "v1.1" or "v0.1"
-                version_match = re.search(r'v(\d+\.\d+)', content)
-                if version_match:
-                    versions_found[name] = version_match.group(1)
+                # Look for explicit version declarations
+                version_patterns = [
+                    r'[Vv]ersion[:\s]+(\d+\.\d+)',  # "Version: 1.1" or "Version 1.1"
+                    r'^#+\s*[Vv]ersion\s+(\d+\.\d+)',  # "## Version 1.0" header
+                ]
+                for pattern in version_patterns:
+                    version_match = re.search(pattern, content, re.MULTILINE)
+                    if version_match:
+                        versions_found[name] = version_match.group(1)
+                        break
 
-            # If copilot still says v0.1 but claude says v1.1, that's a drift
-            if versions_found:
+            # Only flag if we found explicit versions that differ
+            if len(versions_found) >= 2:  # Need at least 2 files with declared versions
                 unique_versions = set(versions_found.values())
                 if len(unique_versions) > 1:
                     issues.append({
