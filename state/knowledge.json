@@ -3,6 +3,7 @@
   "required_reading": [
     "AI_POLICY.md",
     "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md",
+    "docs/claude/USER_PROFILE.md",
     "docs/claude/AI_COORDINATION_ARCHITECTURE.md",
     "docs/DEVELOPMENT_STANDARDS.md"
   ],
@@ -36,7 +37,6 @@
     "docs/claude/AUTONOMOUS_CLAUDE_ENGAGEMENT.md",
     "docs/claude/COPILOT_AGENT_DIGEST.md",
     "docs/claude/PRODUCTION_STATUS.md",
-    "docs/claude/USER_PROFILE.md",
     "docs/claude/GITHUB_TEST_MESSAGE.md",
     "ai/ZERO_TOUCH_ARCHITECTURE.md",
     "ai/DEPLOYMENT_ZERO_TOUCH.md",

@@ -8,6 +8,7 @@ Before doing any substantial work, you MUST:
 2. Read ALL docs listed in `required_reading`:
    - `AI_POLICY.md`
    - `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
+   - `docs/claude/USER_PROFILE.md` (meta-aware principle, self-improvement loop)
    - `docs/claude/AI_COORDINATION_ARCHITECTURE.md`
    - `docs/DEVELOPMENT_STANDARDS.md`
 3. Align all work with the roadmap in the research report
