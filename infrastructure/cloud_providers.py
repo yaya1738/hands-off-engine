@@ -533,6 +533,30 @@ def get_cloud_provider(provider: CloudProvider) -> CloudProviderAPI:
         raise ValueError(f"Unsupported provider: {provider}")
 
 
+def _load_do_token_from_file() -> Optional[str]:
+    """Load DO token from known file locations."""
+    possible_paths = [
+        Path.home() / "hands-off/state/do.env",
+        Path.home() / "hands-off-engine/state/do.env",
+        Path.home() / "hands-off-engine/termux-hands-off/state/do.env",
+        Path("/root/hands-off/state/do.env"),
+        Path("state/do.env"),
+    ]
+
+    for path in possible_paths:
+        if path.exists():
+            try:
+                content = path.read_text().strip()
+                for line in content.split('\n'):
+                    if line.startswith('DO_TOKEN='):
+                        token = line.split('=', 1)[1].strip().strip('"\'')
+                        if token:
+                            return token
+            except Exception:
+                continue
+    return None
+
+
 def get_best_available_provider() -> Tuple[CloudProviderAPI, CloudProvider]:
     """
     Get the best available cloud provider based on configured credentials.
@@ -540,8 +564,17 @@ def get_best_available_provider() -> Tuple[CloudProviderAPI, CloudProvider]:
     Returns:
         Tuple of (API instance, provider enum)
     """
-    # Try DigitalOcean first
-    if os.environ.get("DO_API_TOKEN"):
+    # Try DigitalOcean first - check multiple env var names AND file
+    do_token = (
+        os.environ.get("DO_API_TOKEN") or
+        os.environ.get("DO_TOKEN") or
+        os.environ.get("DIGITALOCEAN_API_KEY") or
+        _load_do_token_from_file()
+    )
+
+    if do_token:
+        # Set it in env for the API class to use
+        os.environ["DO_API_TOKEN"] = do_token
         api = DigitalOceanAPI()
         ok, _ = api.check_api_status()
         if ok:
