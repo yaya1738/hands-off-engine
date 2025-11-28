@@ -133,27 +133,52 @@ def check_doc_coverage(root):
     py_files = list(root.glob("**/*.py"))
     py_files = [f for f in py_files if ".git" not in str(f) and "__pycache__" not in str(f)]
 
-    # Count doc files
-    doc_files = list(root.glob("docs/**/*.md")) + list(root.glob("**/*.md"))
+    # Count doc files in monitored paths only (docs/, .claude/, .github/, ai/)
+    monitored_paths = ["docs", ".claude", ".github", "ai"]
+    doc_files = []
+    for mp in monitored_paths:
+        doc_files.extend(list((root / mp).glob("**/*.md")))
     doc_files = [f for f in doc_files if ".git" not in str(f)]
 
     # Check knowledge.json
     knowledge_file = root / "state" / "knowledge.json"
-    registered_docs = 0
+    registered_docs = []
+    ephemeral_patterns = []
     if knowledge_file.exists():
         try:
             knowledge = json.loads(knowledge_file.read_text())
             required = knowledge.get("required_reading", [])
             optional = knowledge.get("optional_docs", [])
-            registered_docs = len(required) + len(optional)
+            agent_files = knowledge.get("agent_instruction_files", [])
+            registered_docs = required + optional + agent_files
+            # Get ephemeral patterns
+            ephemeral = knowledge.get("ephemeral_docs_excluded", [])
+            for e in ephemeral:
+                # Extract patterns like "SESSION_*" from descriptions
+                if "SESSION" in e.upper():
+                    ephemeral_patterns.append("SESSION")
+                if "SUMMARY" in e.upper():
+                    ephemeral_patterns.append("SUMMARY")
+                if "LOG" in e.upper():
+                    ephemeral_patterns.append("LOG")
         except:
             pass
+
+    # Count unregistered docs (excluding ephemeral)
+    unregistered = 0
+    for f in doc_files:
+        rel_path = str(f.relative_to(root))
+        if rel_path not in registered_docs:
+            # Check if it matches ephemeral patterns
+            is_ephemeral = any(p in rel_path.upper() for p in ephemeral_patterns)
+            if not is_ephemeral:
+                unregistered += 1
 
     return {
         "python_files": len(py_files),
         "markdown_files": len(doc_files),
-        "registered_in_knowledge_json": registered_docs,
-        "unregistered_docs": len(doc_files) - registered_docs if registered_docs > 0 else "unknown"
+        "registered_in_knowledge_json": len(registered_docs),
+        "unregistered_docs": unregistered
     }
 
 def check_meta_debt_indicators(root):

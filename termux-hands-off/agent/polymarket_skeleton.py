@@ -79,7 +79,7 @@ class NaivePriceModel(BaseModel):
 
     - Treats current yes_price as "fair"
     - Uses a simple minimum edge threshold (in basis points)
-    - Only to exercise the plumbing; replace per-category later.
+    - Only to exercise the plumbing; replace per-category when category-specific models are built.
     """
 
     category = Category.OTHER
@@ -123,8 +123,8 @@ REGISTRY: Dict[Category, BaseModel] = {
 
 def infer_category(raw: Dict[str, Any]) -> Category:
     """
-    Dumb keyword-based classifier to get us started.
-    You’ll replace this with something better later.
+    Keyword-based classifier.
+    Enhancement: could use LLM classification for ambiguous cases.
     """
     q = str(raw.get("question", raw.get("title", ""))).lower()
     tags = " ".join(map(str, raw.get("tags", []))).lower()

@@ -103,7 +103,7 @@ def main() -> None:
 
     context: Dict[str, Any] = {
         # edge threshold in basis points before BUY vs HOLD
-        "target_edge_bps": 500.0,  # 5% default; tune later
+        "target_edge_bps": 500.0,  # 5% default; configurable via tuning
     }
 
     analyzed = analyze_markets(markets_raw, context)
