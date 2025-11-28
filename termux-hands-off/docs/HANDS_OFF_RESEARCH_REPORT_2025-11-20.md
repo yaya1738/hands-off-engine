@@ -158,9 +158,15 @@ This file should be **kept short and current**, not bloated.
   - Priorities shift in a material way.
 - Don't try to capture every detail here; use separate docs (`docs/*`, ADRs) for
   deep dives.
+- **When creating new docs:** Add them to `state/knowledge.json`:
+  - `required_reading` if agents MUST read before working
+  - `optional_docs` if useful but not mandatory
+  - See `docs/DEVELOPMENT_STANDARDS.md` for full checklist
 
 **Contract for AIs and agents:**
 
-1. Read `AI_POLICY.md`.
-2. Read this file.
-3. Then propose or execute work that clearly aligns with the roadmap sections above.
+1. Read `state/knowledge.json` for the full required reading list.
+2. Read ALL docs in `required_reading` (includes this file).
+3. When creating new docs, register them in knowledge.json.
+4. When creating rules, add enforcement. See `docs/DEVELOPMENT_STANDARDS.md`.
+5. Then propose or execute work that clearly aligns with the roadmap sections above.
