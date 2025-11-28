@@ -20,6 +20,35 @@ This document covers **process principles**. Without it, agents know what to bui
 
 ---
 
+## Root Cause: Why This Was Missing
+
+When the system was originally designed (Nov 2025), the design approach was:
+
+**Questions asked:**
+- "What should the trading system do?" → Safety, modularity, resilience (product principles)
+- "How should AI agents contribute?" → Read docs, follow patterns, test changes (vague suggestions)
+
+**Questions NOT asked:**
+- "How do we ensure agents actually follow guidelines?"
+- "How do we detect when they don't?"
+- "How do we make the system self-correcting?"
+
+The original design was **outcome-focused** (what we want) but not **mechanism-focused** (how we ensure it happens).
+
+**The lesson:** For any self-maintaining system, you need both:
+1. **Desired behaviors** (rules, principles, guidelines)
+2. **Enforcement mechanisms** (checks, hooks, monitoring)
+
+Without #2, the system can describe how to behave but cannot ensure it behaves that way.
+
+**Design checklist for any self-maintaining system:**
+- [ ] For every "agents should X", there's a check that detects when agents don't X
+- [ ] For every doc, there's a path that ensures agents discover it
+- [ ] For every rule, there's something that complains when violated
+- [ ] For every mechanism, there's monitoring that detects when the mechanism fails
+
+---
+
 ## Core Principle
 
 **Every rule needs enforcement. Every component needs monitoring.**
