@@ -39,6 +39,11 @@
     "docs/claude/COPILOT_AGENT_DIGEST.md",
     "docs/claude/PRODUCTION_STATUS.md",
     "docs/claude/GITHUB_TEST_MESSAGE.md",
+    "docs/claude/MCP_INTEGRATION_SUMMARY.md",
+    "docs/claude/AI_AGENT_COORDINATION_LOG.md",
+    "docs/claude/CASCADE_FAILURE_2025-11-28.md",
+    "docs/claude/RACE_CONDITION_FIX_2025-11-28.md",
+    "docs/AI_AGENT_LINK_PROTOCOL_v0.1.md",
     "ai/ZERO_TOUCH_ARCHITECTURE.md",
     "ai/DEPLOYMENT_ZERO_TOUCH.md",
     "ai/DEPLOYMENT_STATUS.md",
@@ -49,7 +54,16 @@
     "ai/USER_COMMUNICATION_EFFICIENCY_PROTOCOL.md",
     "ai/coordination/FAST_COORDINATION_SYSTEM.md",
     "ai/coordination/REALTIME_COORDINATION.md",
-    "ai/coordination/USER_PROTOCOL_ALIGNMENT.md"
+    "ai/coordination/USER_PROTOCOL_ALIGNMENT.md",
+    "ai/AGENT_COORDINATION_SUMMARY_2025-11-25.md",
+    "ai/history/README.md",
+    "ai/memory/README.md"
+  ],
+  "ephemeral_docs_excluded": [
+    "Session logs (docs/claude/SESSION_*, ai/SESSION_*)",
+    "State files (state/*.md)",
+    "README files in non-monitored paths",
+    "Test/cache files (.pytest_cache/)"
   ],
   "monitored_doc_paths": [
     "docs/",
