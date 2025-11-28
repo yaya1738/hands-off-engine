@@ -2,6 +2,15 @@
 
 > **For Yair Siegel** — A fully autonomous, self-improving system where money grows itself, software improves itself, and hardware manages itself — all in harmony.
 
+## 🟢 System Status: LIVE & AUTONOMOUS
+
+The system runs continuously via GitHub Actions:
+- **Harmony Orchestrator**: Runs every hour to coordinate all domains
+- **Alpha Self-Learning**: Learns from trading outcomes automatically
+- **Software Self-Improvement**: Scans and fixes issues automatically
+
+[![Autonomous Harmony Engine](https://github.com/yaya1738/hands-off-engine/actions/workflows/autonomous-harmony.yml/badge.svg)](https://github.com/yaya1738/hands-off-engine/actions/workflows/autonomous-harmony.yml)
+
 ## Quick Links
 
 | Document | Purpose |
@@ -16,6 +25,7 @@
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                HANDS-OFF ENGINE - Autonomous Harmony            │
+│                     🟢 RUNNING CONTINUOUSLY                     │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
 │  💰 MONEY           🔧 SOFTWARE         💻 HARDWARE             │
@@ -28,6 +38,7 @@
 │  ─────────────────────────────────────────────────────────────  │
 │                    🎯 HARMONY ORCHESTRATOR                      │
 │          Coordinates all domains for maximum benefit            │
+│               ⏰ Runs every hour via GitHub Actions             │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
