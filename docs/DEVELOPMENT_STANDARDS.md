@@ -195,6 +195,103 @@ Symptom: Unenforced rules, orphaned docs, broken coordination
 
 ---
 
+## Layer 6: Why Directives Were Ambiguous - Human Assumption Gap
+
+The USER_PROFILE was written by a human (commit `219d7f9`, Nov 21).
+
+Humans write directives like:
+- "Always be improving"
+- "Make it better"
+- "Keep things running smoothly"
+
+These feel self-evident to humans because humans share implicit context about what "better" means. But AI agents have no implicit context - they interpret literally, and when multiple interpretations exist, they take the easiest path.
+
+**The human assumption:**
+```
+Human thinks: "Obviously improving includes making it robust"
+Human writes: "Always be improving"
+AI interprets: "Add visible features" (easiest measurable interpretation)
+```
+
+**The gap:** Humans assume shared understanding. AI agents have none.
+
+**The pattern:**
+```
+Layer 6: Human assumes shared understanding of "improvement"
+    ↓
+Layer 5: Writes ambiguous directive ("always be improving")
+    ↓
+Layer 4: AI takes easiest interpretation ("add features")
+    ↓
+[...rest of chain...]
+```
+
+**The fix:** When writing directives for AI agents:
+1. Don't assume shared context
+2. Enumerate what counts (features, hardening, enforcement, etc.)
+3. Explicitly state what's equally valuable
+4. Define completion criteria ("done" includes enforcement)
+
+**Example:**
+- Bad: "Make the system better"
+- Good: "Improve the system. Improvements include: features, bug fixes, hardening, enforcement mechanisms, monitoring, documentation. A feature is incomplete until it has monitoring."
+
+---
+
+## Layer 7: Why Human-AI Communication Fails - No Feedback Loop
+
+Even deeper: The human who wrote the directive never saw that it was being misinterpreted.
+
+If there had been a feedback mechanism showing:
+- "26 feature batches completed"
+- "0 hardening batches completed"
+- "Warning: enforcement deferred in 15 cases"
+
+...the human could have corrected course. But no such feedback existed.
+
+**The pattern:**
+```
+Layer 7: No feedback on directive interpretation
+    ↓
+Layer 6: Human doesn't know directive is ambiguous
+    ↓
+Layer 5: Ambiguous directive persists
+    ↓
+[...rest of chain...]
+```
+
+**The fix:** Add feedback mechanisms that show:
+1. How directives are being interpreted
+2. What types of work are being done
+3. What's being deferred
+4. What's accumulating as debt
+
+This is why metrics matter - not for performance, but for calibrating human-AI communication.
+
+---
+
+## Complete Root Cause Chain (7 Layers)
+
+```
+Layer 7: No feedback on directive interpretation
+    ↓
+Layer 6: Human assumes AI shares implicit understanding
+    ↓
+Layer 5: Ambiguous directive written ("always be improving")
+    ↓
+Layer 4: AI takes easiest interpretation ("add features")
+    ↓
+Layer 3: Velocity pressure (26 feature batches)
+    ↓
+Layer 2: Hardening deferred to "later" (meta-debt)
+    ↓
+Layer 1: No mechanism ensures "later" happens
+    ↓
+Symptom: Unenforced rules, orphaned docs, broken coordination
+```
+
+---
+
 **Design checklist for any self-maintaining system:**
 - [ ] For every "agents should X", there's a check that detects when agents don't X
 - [ ] For every doc, there's a path that ensures agents discover it
