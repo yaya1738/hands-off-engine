@@ -6,12 +6,18 @@ Implements multiple layers of safety checks before executing live trades.
 
 import os
 import json
+import requests
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import logging
 
 LOG = logging.getLogger(__name__)
+
+# Polygon RPC and USDC contract addresses
+POLYGON_RPC = "https://polygon-rpc.com"
+USDC_BRIDGED = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"  # USDC.e (bridged)
+USDC_NATIVE = "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359"   # Native USDC
 
 
 class TradingSafeguards:
@@ -115,6 +121,69 @@ class TradingSafeguards:
 
         return True, f"OK - {recent_trades} trades in last hour"
 
+    def check_wallet_balance(self, trade_size_usd: float) -> tuple[bool, str]:
+        """
+        Check if trading wallet has sufficient USDC balance for the trade.
+
+        Checks the funder wallet (which is where funds are held for trading).
+        """
+        from dotenv import load_dotenv
+        load_dotenv(Path(__file__).parent.parent / ".env.polymarket")
+
+        funder_address = os.getenv("POLYMARKET_FUNDER_ADDRESS")
+        if not funder_address:
+            return False, "No funder address configured"
+
+        try:
+            # Check USDC.e (bridged) balance - this is what Polymarket uses
+            balance = self._get_usdc_balance(funder_address, USDC_BRIDGED)
+            if balance is None:
+                return False, "Could not fetch wallet balance"
+
+            # Also check native USDC in case funds are there
+            native_balance = self._get_usdc_balance(funder_address, USDC_NATIVE)
+            if native_balance:
+                balance += native_balance
+
+            if balance < trade_size_usd:
+                # Trigger auto-pause when wallet is empty
+                if balance < 1.0:  # Less than $1 = effectively empty
+                    maybe_auto_pause(
+                        reason=f"wallet_empty_${balance:.2f}",
+                        notify=True
+                    )
+                return False, f"Insufficient balance: ${balance:.2f} < ${trade_size_usd:.2f} needed"
+
+            return True, f"OK - balance: ${balance:.2f}"
+
+        except Exception as e:
+            LOG.warning(f"Balance check failed: {e}")
+            # Fail open - don't block trading if we can't check balance
+            # The CLOB API will reject the trade anyway if insufficient funds
+            return True, f"Balance check skipped (error: {str(e)[:30]})"
+
+    def _get_usdc_balance(self, wallet: str, contract: str) -> Optional[float]:
+        """Fetch USDC balance from Polygon RPC"""
+        data = {
+            "jsonrpc": "2.0",
+            "method": "eth_call",
+            "params": [{
+                "to": contract,
+                "data": f"0x70a08231000000000000000000000000{wallet[2:].lower()}"
+            }, "latest"],
+            "id": 1
+        }
+        try:
+            resp = requests.post(POLYGON_RPC, json=data, timeout=10)
+            result = resp.json()
+            if "result" in result and result["result"] != "0x":
+                balance_raw = int(result["result"], 16)
+                return balance_raw / 1e6  # USDC has 6 decimals
+            return 0.0
+        except Exception as e:
+            LOG.warning(f"RPC call failed: {e}")
+            return None
+
     def check_all_safeguards(
         self,
         trade_size_usd: float,
@@ -128,6 +197,12 @@ class TradingSafeguards:
         """
         messages = []
         allowed = True
+
+        # Check wallet balance FIRST - no point running other checks if wallet is empty
+        ok, msg = self.check_wallet_balance(trade_size_usd)
+        messages.append(f"Balance: {msg}")
+        if not ok:
+            allowed = False
 
         # Check daily loss limit
         ok, msg = self.check_daily_loss_limit()

@@ -19,6 +19,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from audit import get_audit_logger
 from executor.trading_safeguards import get_safeguards, load_mode, load_risk_profile, check_trading_health
 from executor.shadow_sink import record_shadow_order
+from executor.polymarket_api import PolymarketAPI, Market
 
 # Load Polymarket configuration
 load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env.polymarket'))
@@ -238,6 +239,29 @@ class Executor:
         """
         results = []
 
+        # UPFRONT CHECK: Verify we have enough balance for ALL planned trades
+        # This prevents partial execution that drains the wallet
+        if planned_actions and get_executor_mode() == "live":
+            total_planned_usd = sum(a.amount for a in planned_actions)
+            safeguards = get_safeguards()
+            balance_ok, balance_msg = safeguards.check_wallet_balance(total_planned_usd)
+
+            if not balance_ok:
+                LOG.warning(f"🛑 UPFRONT BALANCE CHECK FAILED: {balance_msg}")
+                LOG.warning(f"   Planned ${total_planned_usd:.2f} across {len(planned_actions)} trades")
+                # Return all actions as rejected
+                for action in planned_actions:
+                    results.append(ExecutionResult(
+                        market_id=action.market_id,
+                        market_name=action.market_name,
+                        success=False,
+                        message=f"REJECTED: {balance_msg}",
+                        executed_amount=0.0
+                    ))
+                return results
+
+            LOG.info(f"✓ Upfront balance check passed: {balance_msg}")
+
         for action in planned_actions:
             # Cap position size to max (don't reject, just cap)
             capped_amount, cap_msg = self.cap_position_size(action)
@@ -363,7 +387,51 @@ class Executor:
                         executed_amount=0.0
                     )
                 else:
-                    # All gates passed - execute real trade
+                    # All gates passed - validate market liquidity before trade
+                    trade_token_id = getattr(action, 'token_id', None) or action.market_id
+
+                    # Validate order book liquidity and slippage
+                    try:
+                        api = PolymarketAPI()
+                        ob = api.get_order_book(trade_token_id)
+
+                        # Check if there's liquidity to fill our order
+                        if action.side == "YES":
+                            depth = ob.ask_depth_usd  # We're buying, check asks
+                        else:
+                            depth = ob.bid_depth_usd  # We're selling, check bids
+
+                        if depth < action.amount:
+                            LOG.warning(f"🛑 Insufficient order book depth: ${depth:.2f} < ${action.amount:.2f}")
+                            result = ExecutionResult(
+                                market_id=action.market_id,
+                                market_name=action.market_name,
+                                success=False,
+                                message=f"BLOCKED: Insufficient liquidity (${depth:.2f} on book)",
+                                executed_amount=0.0
+                            )
+                            results.append(result)
+                            continue
+
+                        # Check spread - reject if too wide (>10%)
+                        if ob.spread_bps and ob.spread_bps > 1000:
+                            LOG.warning(f"🛑 Spread too wide: {ob.spread_bps:.0f}bps")
+                            result = ExecutionResult(
+                                market_id=action.market_id,
+                                market_name=action.market_name,
+                                success=False,
+                                message=f"BLOCKED: Spread too wide ({ob.spread_bps:.0f}bps)",
+                                executed_amount=0.0
+                            )
+                            results.append(result)
+                            continue
+
+                        LOG.info(f"✓ Order book validated: depth=${depth:.2f}, spread={ob.spread_bps:.0f}bps")
+
+                    except Exception as e:
+                        LOG.warning(f"Order book validation failed: {e} - proceeding anyway")
+
+                    # Execute real trade
                     try:
                         # Map YES/NO to BUY/SELL
                         # YES = buying the YES token (BUY)
@@ -376,8 +444,6 @@ class Executor:
                         )
                         LOG.info(f"   Safety checks: {'; '.join(safety_msgs)}")
 
-                        # Use token_id if available, otherwise fall back to market_id
-                        trade_token_id = getattr(action, 'token_id', None) or action.market_id
                         api_response = trader.place_market_order_usd(
                             token_id=trade_token_id,
                             usd_amount=action.amount,
