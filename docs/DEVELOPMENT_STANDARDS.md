@@ -41,6 +41,51 @@ The original design was **outcome-focused** (what we want) but not **mechanism-f
 
 Without #2, the system can describe how to behave but cannot ensure it behaves that way.
 
+---
+
+## Deeper Root Cause: Meta-Debt
+
+Tracing the history further (commit `6c261fd` - AI Agent Link Protocol v0.1), the original protocol EXPLICITLY acknowledged:
+
+```
+- ❌ No code enforcement
+- ❌ No automatic routing
+- ❌ User still copies/pastes
+```
+
+And said "Why that's okay" - deferring enforcement to a future version.
+
+**The pattern:**
+1. Define the protocol (v0.1) - "get it working first"
+2. Add enforcement later (v1.0) - "we'll harden it later"
+
+**Why "later" never came:**
+- The protocol wasn't in `required_reading`
+- New agents didn't know it existed
+- There was no mechanism to ensure v1.0 ever got built
+- Each batch of work focused on features, not hardening
+
+**This is meta-debt:** Technical debt for meta-systems.
+
+```
+"We'll add enforcement later"
+    → enforcement never added
+    → system doesn't self-correct
+    → problems accumulate
+    → harder to fix
+```
+
+**The fix:** Enforcement at creation time, not "later."
+
+When you build something:
+- Don't say "we'll add monitoring later" - add it now
+- Don't say "we'll add enforcement later" - add it now
+- Don't say "we'll add docs later" - add them now
+
+"Later" in autonomous systems means "never."
+
+---
+
 **Design checklist for any self-maintaining system:**
 - [ ] For every "agents should X", there's a check that detects when agents don't X
 - [ ] For every doc, there's a path that ensures agents discover it
