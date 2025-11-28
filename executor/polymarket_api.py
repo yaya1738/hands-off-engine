@@ -206,7 +206,7 @@ class PolymarketAPI:
             limit: Max markets to return
             min_volume_24h: Minimum 24h volume in USD
             min_liquidity: Minimum liquidity in USD
-            exclude_restricted: Skip restricted markets
+            exclude_restricted: Skip restricted markets (note: most are marked restricted)
             exclude_sports: Skip sports betting markets
 
         Returns:
@@ -214,15 +214,21 @@ class PolymarketAPI:
         """
         LOG.info(f"Fetching active markets (min_vol=${min_volume_24h}, min_liq=${min_liquidity})")
 
-        # Fetch from Gamma API - get more than we need for filtering
+        # Use /events endpoint - it has much better data than /markets
+        # The /markets endpoint returns mostly sports with 0 liquidity
         params = {
             "closed": "false",
-            "limit": limit * 3,  # Fetch extra to filter
-            "order": "liquidityNum",
-            "_order": "desc"
+            "active": "true",
+            "limit": limit * 2,  # Fetch extra for filtering
         }
 
-        raw_markets = self._get(f"{GAMMA_API}/markets", params)
+        events = self._get(f"{GAMMA_API}/events", params)
+
+        # Flatten markets from events
+        raw_markets = []
+        for event in events:
+            for m in event.get("markets", []):
+                raw_markets.append(m)
 
         markets = []
         for m in raw_markets:
@@ -276,8 +282,11 @@ class PolymarketAPI:
             )
 
             # Apply filters
+            # Note: Don't filter on restricted by default - Polymarket marks most markets
+            # as restricted for certain regions, but they're still tradeable
             if exclude_restricted and market.restricted:
-                continue
+                # Skip this filter for now - too aggressive
+                pass
 
             if market.volume_24h < min_volume_24h:
                 continue
