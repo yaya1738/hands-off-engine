@@ -4,9 +4,13 @@
 
 Before doing any substantial work, you MUST:
 
-1. Read `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
-2. Review `state/knowledge.json` for current canonical docs
+1. Read `state/knowledge.json` for required reading list and bootstrap instructions
+2. Read ALL docs listed in `required_reading`:
+   - `AI_POLICY.md`
+   - `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
+   - `docs/claude/AI_COORDINATION_ARCHITECTURE.md`
 3. Align all work with the roadmap in the research report
+4. When changing agent coordination, update ALL files in `agent_instruction_files`
 
 ## Project Context
 

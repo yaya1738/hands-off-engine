@@ -91,6 +91,7 @@ class SelfHealingAgent:
         issues.extend(self.check_file_permissions())
         issues.extend(self.check_trading_health())
         issues.extend(self.check_unmerged_branches())
+        issues.extend(self.check_instruction_consistency())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -363,6 +364,119 @@ class SelfHealingAgent:
 
         except Exception as e:
             logger.error(f"Error checking trading health: {e}")
+
+        return issues
+
+    def check_instruction_consistency(self) -> List[Dict]:
+        """Check if all agent instruction files are consistent with each other.
+
+        Per AI_COORDINATION_ARCHITECTURE.md:
+        - "Don't assume other AIs did things correctly"
+        - "Clear contracts between AIs"
+        - "Every assumption made explicit"
+
+        This check verifies that instruction files across agents are synchronized.
+        """
+        issues = []
+
+        # Files that should be kept in sync
+        instruction_files = {
+            "claude": REPO_ROOT / ".claude" / "instructions.md",
+            "copilot": REPO_ROOT / ".github" / "copilot-instructions.md",
+            "protocol": REPO_ROOT / "docs" / "AI_AGENT_LINK_PROTOCOL_v0.1.md",
+        }
+
+        # Key terms that should be consistent across files
+        consistency_checks = [
+            {
+                "name": "autonomous_mode",
+                "patterns": ["autonomous", "auto-merge", "Auto-Merge"],
+                "description": "Autonomous operation mode"
+            },
+            {
+                "name": "human_approval",
+                "patterns": ["human approval", "Human Approval", "requires.*approval"],
+                "description": "Human approval requirements"
+            },
+            {
+                "name": "version",
+                "patterns": [r"v\d+\.\d+", r"v0\.1", r"v1\.0", r"v1\.1"],
+                "description": "Protocol version"
+            }
+        ]
+
+        try:
+            import re
+
+            file_contents = {}
+            for name, path in instruction_files.items():
+                if path.exists():
+                    with open(path) as f:
+                        file_contents[name] = f.read()
+                else:
+                    issues.append({
+                        "type": "missing_instruction_file",
+                        "description": f"Agent instruction file missing: {path}",
+                        "severity": "high",
+                        "auto_fixable": False,
+                        "alert_user": True
+                    })
+
+            # Check for version consistency
+            versions_found = {}
+            for name, content in file_contents.items():
+                # Look for version indicators like "v1.1" or "v0.1"
+                version_match = re.search(r'v(\d+\.\d+)', content)
+                if version_match:
+                    versions_found[name] = version_match.group(1)
+
+            # If copilot still says v0.1 but claude says v1.1, that's a drift
+            if versions_found:
+                unique_versions = set(versions_found.values())
+                if len(unique_versions) > 1:
+                    issues.append({
+                        "type": "instruction_version_drift",
+                        "description": f"Agent instruction versions differ: {versions_found}",
+                        "severity": "high",
+                        "auto_fixable": False,
+                        "alert_user": True
+                    })
+
+            # Check if autonomous mode is mentioned consistently
+            autonomous_mentions = {}
+            for name, content in file_contents.items():
+                has_autonomous = "autonomous" in content.lower() or "auto-merge" in content.lower()
+                autonomous_mentions[name] = has_autonomous
+
+            # If one file mentions autonomous but another doesn't, that's drift
+            if len(set(autonomous_mentions.values())) > 1:
+                missing = [k for k, v in autonomous_mentions.items() if not v]
+                if missing:
+                    issues.append({
+                        "type": "instruction_autonomous_drift",
+                        "description": f"Autonomous mode not mentioned in: {missing}",
+                        "severity": "medium",
+                        "auto_fixable": False,
+                        "alert_user": True
+                    })
+
+            # Check if "human approval" requirements are consistent
+            # If copilot says "merging PRs requires human approval" but auto-merge is enabled, that's wrong
+            if "copilot" in file_contents:
+                content = file_contents["copilot"]
+                if "Merging PRs" in content and "human approval" in content.lower():
+                    # Check if it's in the old format (blanket human approval) vs new (conditional)
+                    if "auto-merge" not in content.lower() and "Auto-Merge" not in content:
+                        issues.append({
+                            "type": "instruction_merge_policy_outdated",
+                            "description": "Copilot instructions still require human approval for all merges - not aligned with autonomous mode",
+                            "severity": "high",
+                            "auto_fixable": False,
+                            "alert_user": True
+                        })
+
+        except Exception as e:
+            logger.error(f"Error checking instruction consistency: {e}")
 
         return issues
 

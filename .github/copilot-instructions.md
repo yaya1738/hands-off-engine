@@ -2,10 +2,13 @@
 
 ## Required Reading (Before Any Work)
 
-1. **AI_POLICY.md** - Mandatory policy for all AI agents
-2. **termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md** - Canonical status + roadmap
-3. **state/knowledge.json** - Bootstrap instructions and primary docs
-4. **ai/coordination/status.json** - Current tasks and agent coordination state
+1. **state/knowledge.json** - Bootstrap instructions, required reading list, agent instruction files
+2. **AI_POLICY.md** - Mandatory policy for all AI agents
+3. **termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md** - Canonical status + roadmap
+4. **docs/claude/AI_COORDINATION_ARCHITECTURE.md** - Multi-agent coordination principles
+5. **ai/coordination/status.json** - Current tasks and agent coordination state
+
+**Critical:** When changing agent coordination, update ALL files listed in `agent_instruction_files` in knowledge.json.
 
 ## Project Context
 
