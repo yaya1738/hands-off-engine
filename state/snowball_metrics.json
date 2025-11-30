@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "created_at": "2025-11-30T17:08:00Z",
+  "purpose": "Track cyclical improvement momentum",
+
+  "current_cycle": {
+    "started": "2025-11-30T17:00:00Z",
+    "focus": "Capital recovery and dollar access",
+    "improvements_made": [
+      "Capital recovery monitor - detects when positions resolve",
+      "Payment monitor - detects incoming USDC",
+      "AI Nexus consulting page with USDC payments",
+      "Resolution date alerting for Dec 10",
+      "Dollar access documentation"
+    ]
+  },
+
+  "infrastructure": {
+    "landing_pages": [
+      {"url": "http://138.68.103.156:8080", "purpose": "Polymarket affiliate"},
+      {"url": "http://138.68.103.156:8081", "purpose": "AI Nexus consulting"}
+    ],
+    "monitors": [
+      {"name": "position_monitor", "frequency": "30min", "purpose": "Price spikes"},
+      {"name": "capital_recovery_monitor", "frequency": "30min", "purpose": "Balance recovery"},
+      {"name": "payment_monitor", "frequency": "15min", "purpose": "Incoming USDC"}
+    ],
+    "pipelines": [
+      {"name": "run_pipeline.py", "frequency": "2h", "purpose": "Intelligent alpha trading"}
+    ]
+  },
+
+  "financial_state": {
+    "timestamp": "2025-11-30T17:08:00Z",
+    "polymarket_balance": 8.99,
+    "position_value": 99.0,
+    "total_liquid": 107.99,
+    "trading_enabled": false,
+    "min_trading_threshold": 50.0
+  },
+
+  "recovery_events": {
+    "expected": [
+      {"date": "2025-12-10", "event": "Fed positions resolve", "potential": 71.0},
+      {"date": "2025-12-31", "event": "Pichai position resolves", "potential": 28.0}
+    ],
+    "triggered": []
+  },
+
+  "income_channels": {
+    "trading": {"status": "paused", "reason": "low balance"},
+    "affiliate": {"status": "ready", "blocker": "needs affiliate link"},
+    "consulting": {"status": "active", "page_live": true, "payment_enabled": true}
+  },
+
+  "snowball_principle": "Each optimization enables the next. Capital recovery enables trading. Trading generates capital. Capital enables more positions. Consulting generates immediate cash. Cash enables everything."
+}

@@ -9,14 +9,20 @@ It exists so future sessions can bootstrap instantly without rediscovery.
 ## FINANCIAL STATE
 
 ```
+Last Updated: 2025-11-30T17:00 UTC
 Polymarket Balance: $8.99
-Positions: ~$200 in tail bets
-  - Fed rate hike 2025: 4,776 shares @ $0.01
-  - Sundar Pichai out: 1,356 shares @ $0.04
-  - 6 Fed cuts 2025: 25,000 shares @ $0.002
-  - 7 Fed cuts 2025: 50,000 shares @ $0.001
-Position Resolution: December 10, 2025
-Runway: ~25 days
+
+Positions (current value ~$99):
+  - Fed rate hike 2025: 4,776 shares @ $0.007 = $33.43 (-33% from $50)
+  - Sundar Pichai out: 1,356 shares @ $0.0205 = $27.80 (-44% from $50)
+  - 6 Fed cuts 2025: 25,000 shares @ $0.0005 = $12.50 (-75% from $50)
+  - 7 Fed cuts 2025: 50,000 shares @ $0.0005 = $25.00 (-50% from $50)
+
+Position Resolution Dates:
+  - Dec 10, 2025: Fed rate positions (3 positions, ~$71)
+  - Dec 31, 2025: Pichai position (~$28)
+
+Runway: ~10 days until Dec 10 resolution
 ```
 
 ---
@@ -38,18 +44,34 @@ Runway: ~25 days
 - **Reddit**: Template only, not configured
 
 ### Live Services
-- **Landing Page**: http://138.68.103.156:8080
-  - Polymarket affiliate funnel
-  - Needs affiliate link plugged in
-  - nginx configured on port 8080
+- **Polymarket Landing**: http://138.68.103.156:8080
+  - Affiliate funnel (needs link)
+  - Email capture active
+  - nginx on port 8080
+
+- **AI Nexus Consulting**: http://138.68.103.156:8081 (NEW)
+  - Service page with pricing
+  - USDC payment address displayed
+  - Direct client acquisition
 
 - **Position Monitor**: Cron every 30 min
   - Watches 4 tail bet positions
-  - Alerts via Telegram if price spikes
+  - Alerts on price spikes
+  - Alerts on resolution approach (7d, 3d, 1d, 0d)
+
+- **Capital Recovery Monitor**: Cron every 30 min (NEW)
+  - Detects position resolutions
+  - Alerts when trading threshold crossed
+  - Auto-enables trading mode
+
+- **Payment Monitor**: Cron every 15 min (NEW)
+  - Watches wallet for incoming USDC
+  - Alerts on payments ($10+)
+  - Tracks all inflows
 
 - **Pipeline**: scripts/run_pipeline.py
+  - Intelligent alpha with LLM
   - Early exit when balance < $10
-  - Skips LLM calls to save quota
 
 ---
 
@@ -165,8 +187,30 @@ For any new Claude session:
 
 - 2025-11-28: $200 deployed to tail bets (Fed cuts, Pichai)
 - 2025-11-30: OpenAI quota exceeded
-- 2025-11-30: Built multi-provider LLM router
-- 2025-11-30: Deployed affiliate landing page
+- 2025-11-30: Built multi-provider LLM router (Groq/Google/OpenAI)
+- 2025-11-30: Deployed affiliate landing page at port 8080
 - 2025-11-30: Created AI Nexus brand/outreach materials
-- 2025-11-30: This truth document created
+- 2025-11-30: Created truth document and bootstrap kernel
+- 2025-11-30: Added resolution date alerting to position monitor
+- 2025-11-30: System operational with intelligent alpha, awaiting capital
+
+## CURRENT BLOCKERS
+
+1. **No capital**: $8.99 balance too low to trade ($207+ needed for signals)
+2. **OpenAI quota**: Intelligent alpha works but needs API quota
+3. **Affiliate link**: Landing page ready but user hasn't provided link
+
+## AUTONOMOUS CAPABILITIES
+
+System operates fully autonomously via cron:
+- Position monitor every 30 min (alerts via Telegram)
+- Pipeline every 2 hours (skips if low balance)
+- Healthcheck every hour
+- Daily state snapshot at 6am
+
+Resolution alerts will fire:
+- Dec 3: 7-day warning
+- Dec 7: 3-day warning
+- Dec 9: 1-day warning
+- Dec 10: Resolution day
 

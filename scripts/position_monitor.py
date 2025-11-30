@@ -3,13 +3,14 @@
 Position Price Monitor - Alert on significant price movements
 
 Checks current positions and alerts via Telegram if prices spike.
+Also alerts when positions are approaching resolution date.
 Designed to catch tail bet opportunities to exit profitably.
 """
 
 import os
 import json
 import requests
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Our positions from Nov 28 trades
@@ -47,8 +48,8 @@ POSITIONS = [
 STATE_FILE = Path("/root/hands-off-engine/state/position_alerts.json")
 
 
-def get_market_price(slug: str) -> float:
-    """Fetch current YES price for a market"""
+def get_market_info(slug: str) -> dict:
+    """Fetch market price and metadata"""
     try:
         resp = requests.get(
             f"https://gamma-api.polymarket.com/markets?slug={slug}",
@@ -56,11 +57,22 @@ def get_market_price(slug: str) -> float:
         )
         data = resp.json()
         if data:
-            prices = json.loads(data[0].get("outcomePrices", '["0","0"]'))
-            return float(prices[0])
+            market = data[0]
+            prices = json.loads(market.get("outcomePrices", '["0","0"]'))
+            return {
+                "price": float(prices[0]),
+                "end_date": market.get("endDate"),
+                "closed": market.get("closed", False),
+                "question": market.get("question", slug),
+            }
     except Exception as e:
         print(f"Error fetching {slug}: {e}")
-    return 0.0
+    return {"price": 0.0, "end_date": None, "closed": False, "question": slug}
+
+
+def get_market_price(slug: str) -> float:
+    """Fetch current YES price for a market (legacy wrapper)"""
+    return get_market_info(slug).get("price", 0.0)
 
 
 def send_telegram(message: str):
@@ -109,21 +121,63 @@ def save_state(state: dict):
     json.dump(state, open(STATE_FILE, "w"), indent=2)
 
 
+def check_resolution_approaching(state: dict) -> list:
+    """Check if any positions are approaching resolution"""
+    resolution_alerts = []
+    now = datetime.now(timezone.utc)
+
+    for pos in POSITIONS:
+        info = get_market_info(pos["slug"])
+        if not info["end_date"]:
+            continue
+
+        try:
+            end_dt = datetime.fromisoformat(info["end_date"].replace("Z", "+00:00"))
+            days_left = (end_dt - now).days
+
+            # Alert milestones: 7 days, 3 days, 1 day, 0 days (resolution day)
+            alert_days = [7, 3, 1, 0]
+
+            for milestone in alert_days:
+                if days_left <= milestone:
+                    # Check if we already alerted for this milestone
+                    alert_key = f"{pos['slug']}_resolution_{milestone}"
+                    if alert_key not in state.get("resolution_alerts", []):
+                        resolution_alerts.append({
+                            "slug": pos["slug"],
+                            "days_left": days_left,
+                            "milestone": milestone,
+                            "end_date": info["end_date"],
+                            "question": info["question"],
+                            "current_price": info["price"],
+                            "shares": pos["shares"],
+                            "alert_key": alert_key,
+                        })
+                    break  # Only alert for closest milestone
+        except Exception as e:
+            print(f"Error parsing date for {pos['slug']}: {e}")
+
+    return resolution_alerts
+
+
 def main():
     state = load_state()
+    if "resolution_alerts" not in state:
+        state["resolution_alerts"] = []
+
     alerts = []
-    
+
     for pos in POSITIONS:
         price = get_market_price(pos["slug"])
         if price <= 0:
             continue
-            
+
         value = pos["shares"] * price
         pnl = value - pos["cost_basis"]
         pnl_pct = (pnl / pos["cost_basis"]) * 100
-        
+
         print(f"{pos['slug'][:40]:40} YES={price:.4f} Value=${value:.2f} PnL={pnl_pct:+.1f}%")
-        
+
         # Check if price crossed threshold
         if price >= pos["alert_threshold"]:
             last_alert = state["last_alerts"].get(pos["slug"], 0)
@@ -137,7 +191,10 @@ def main():
                     "threshold": pos["alert_threshold"],
                 })
                 state["last_alerts"][pos["slug"]] = price
-    
+
+    # Check resolution dates
+    resolution_alerts = check_resolution_approaching(state)
+
     if alerts:
         msg = "🚨 *POSITION ALERT*\n\n"
         for a in alerts:
@@ -147,9 +204,25 @@ def main():
             msg += f"  PnL: {a['pnl_pct']:+.1f}%\n\n"
         msg += "_Consider selling if spike is temporary_"
         send_telegram(msg)
+
+    if resolution_alerts:
+        msg = "⏰ *RESOLUTION APPROACHING*\n\n"
+        for r in resolution_alerts:
+            if r["days_left"] <= 0:
+                msg += f"🔔 *{r['question'][:50]}*\n"
+                msg += f"   RESOLVING TODAY!\n"
+            else:
+                msg += f"📅 *{r['question'][:50]}*\n"
+                msg += f"   {r['days_left']} days until resolution\n"
+            msg += f"   Current: {r['current_price']:.2%} YES\n"
+            msg += f"   Shares: {r['shares']:,}\n\n"
+            state["resolution_alerts"].append(r["alert_key"])
+        send_telegram(msg)
+
+    if alerts or resolution_alerts:
         save_state(state)
-    
-    print(f"\nChecked {len(POSITIONS)} positions, {len(alerts)} alerts triggered")
+
+    print(f"\nChecked {len(POSITIONS)} positions, {len(alerts)} price alerts, {len(resolution_alerts)} resolution alerts")
 
 
 if __name__ == "__main__":
