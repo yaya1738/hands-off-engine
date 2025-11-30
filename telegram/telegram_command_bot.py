@@ -56,6 +56,12 @@ class TelegramCommandBot:
             '/task': self.cmd_task,
             '/agents': self.cmd_agents,
             '/help': self.cmd_help,
+            # New unified commands
+            '/balance': self.cmd_balance,
+            '/positions': self.cmd_positions,
+            '/cluster': self.cmd_cluster,
+            '/identity': self.cmd_identity,
+            '/logs': self.cmd_logs,
         }
 
     def process_command(self, command_text: str) -> str:
@@ -408,6 +414,10 @@ Pending Tasks: {len(pending_tasks)}"""
 /status - Full system status
 /metrics - Performance metrics (24h)
 /health - Run health check
+/balance - Trading balance & positions
+/positions - Detailed position list
+/cluster - Server cluster status
+/logs - Recent system logs
 
 **Interact:**
 /task <description> - Request system to do something
@@ -417,10 +427,177 @@ Pending Tasks: {len(pending_tasks)}"""
 
 **Info:**
 /agents - AI coordination status
+/identity - Verify your identity
 /help - This message
 
 You can control the entire system via Telegram.
 No need to launch Claude Code CLI for routine operations."""
+
+    def cmd_balance(self, args) -> str:
+        """Get trading balance and position summary."""
+        try:
+            # Read dollar access file for balance info
+            dollar_file = REPO_ROOT / "finance" / "dollar_access.json"
+            if dollar_file.exists():
+                with open(dollar_file) as f:
+                    data = json.load(f)
+                cash = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("current_balance_usdc", 0)
+                positions = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("positions_value_usdc", 0)
+            else:
+                cash = 0
+                positions = 0
+
+            # Try to get live position data
+            try:
+                result = subprocess.run(
+                    ["python3", str(SCRIPTS_DIR / "position_monitor.py")],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    cwd=str(REPO_ROOT),
+                    env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+                )
+                if "positions" in result.stdout.lower():
+                    live_info = result.stdout.strip().split('\n')[-1]
+                else:
+                    live_info = ""
+            except:
+                live_info = ""
+
+            total = cash + positions
+            gap = max(0, 50 - cash)
+
+            return f"""💰 Trading Balance
+
+Cash: ${cash:.2f}
+Positions: ${positions:.2f}
+Total: ${total:.2f}
+
+Trading threshold: $50
+Gap to trading: ${gap:.2f}
+
+{live_info}
+
+Use /positions for details"""
+
+        except Exception as e:
+            return f"❌ Error getting balance: {str(e)}"
+
+    def cmd_positions(self, args) -> str:
+        """Get detailed position list."""
+        try:
+            result = subprocess.run(
+                ["python3", str(SCRIPTS_DIR / "position_monitor.py")],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=str(REPO_ROOT),
+                env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+            )
+
+            output = result.stdout.strip()
+            if output:
+                # Truncate if too long
+                if len(output) > 3500:
+                    output = output[:3500] + "\n... (truncated)"
+                return f"📊 Positions\n\n{output}"
+            else:
+                return "❌ No position data available"
+
+        except Exception as e:
+            return f"❌ Error getting positions: {str(e)}"
+
+    def cmd_cluster(self, args) -> str:
+        """Get server cluster status."""
+        try:
+            result = subprocess.run(
+                ["doctl", "compute", "droplet", "list", "--format", "Name,Status,PublicIPv4,Memory"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+
+            if result.returncode == 0:
+                output = result.stdout.strip()
+                lines = output.split('\n')
+                active = sum(1 for l in lines if 'active' in l.lower())
+
+                return f"""🖥 Cluster Status
+
+{output}
+
+Active: {active} servers
+"""
+            else:
+                return f"❌ Error getting cluster status: {result.stderr}"
+
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
+
+    def cmd_identity(self, args) -> str:
+        """Run identity verification."""
+        try:
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "security" / "absolute_identity.py")],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                cwd=str(REPO_ROOT)
+            )
+
+            output = result.stdout.strip()
+            if "GRANTED" in output:
+                return f"✅ Identity Verified\n\n{output}"
+            else:
+                return f"❌ Identity Check\n\n{output}"
+
+        except Exception as e:
+            return f"❌ Error running identity check: {str(e)}"
+
+    def cmd_logs(self, args) -> str:
+        """Get recent system logs."""
+        try:
+            log_dir = Path("/var/log/hands-off")
+            if not log_dir.exists():
+                return "❌ No logs directory"
+
+            # Get recent entries from multiple logs
+            logs_output = []
+
+            # Healthcheck log
+            hc_log = log_dir / "healthcheck.log"
+            if hc_log.exists():
+                with open(hc_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("📋 Healthcheck:")
+                        logs_output.append(lines[-1].strip())
+
+            # Pipeline log
+            pipe_log = log_dir / "pipeline.log"
+            if pipe_log.exists():
+                with open(pipe_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("\n📋 Pipeline:")
+                        logs_output.append(lines[-1].strip())
+
+            # Position monitor log
+            pos_log = log_dir / "position_monitor.log"
+            if pos_log.exists():
+                with open(pos_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("\n📋 Positions:")
+                        logs_output.append(lines[-1].strip())
+
+            if logs_output:
+                return "📜 Recent Logs\n\n" + "\n".join(logs_output)
+            else:
+                return "❌ No recent log entries"
+
+        except Exception as e:
+            return f"❌ Error reading logs: {str(e)}"
 
 
 def send_telegram_message(message: str):

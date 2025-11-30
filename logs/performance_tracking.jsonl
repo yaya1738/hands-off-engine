@@ -70,3 +70,10 @@
 {"timestamp": "2025-11-30T12:00:04.438793Z", "total_orders": 16, "total_size_usd": 174.99999999999997, "mode": "dryrun", "orders": 16, "avg_confidence": 0.6999999999999998}
 {"timestamp": "2025-11-30T14:00:04.831000Z", "total_orders": 16, "total_size_usd": 171.49999999999997, "mode": "dryrun", "orders": 16, "avg_confidence": 0.6999999999999998}
 {"timestamp": "2025-11-30T16:00:05.073790Z", "total_orders": 3, "total_size_usd": 150.0, "mode": "dryrun", "orders": 3, "avg_confidence": 0.7000000000000001}
+{"timestamp": "2025-11-30T20:35:55.316284Z", "total_orders": 2, "total_size_usd": 1.088, "mode": "live", "orders": 2, "avg_confidence": 0.6}
+{"timestamp": "2025-11-30T20:36:06.551541Z", "total_orders": 2, "total_size_usd": 1.088, "mode": "live", "orders": 2, "avg_confidence": 0.6}
+{"timestamp": "2025-11-30T20:36:17.760188Z", "total_orders": 2, "total_size_usd": 1.088, "mode": "live", "orders": 2, "avg_confidence": 0.6}
+{"timestamp": "2025-11-30T20:36:28.750761Z", "total_orders": 2, "total_size_usd": 1.088, "mode": "live", "orders": 2, "avg_confidence": 0.6}
+{"timestamp": "2025-11-30T20:36:39.800819Z", "total_orders": 2, "total_size_usd": 1.088, "mode": "live", "orders": 2, "avg_confidence": 0.6}
+{"timestamp": "2025-11-30T20:36:51.029288Z", "total_orders": 2, "total_size_usd": 1.088, "mode": "live", "orders": 2, "avg_confidence": 0.6}
+{"timestamp": "2025-11-30T20:37:02.079128Z", "total_orders": 2, "total_size_usd": 1.088, "mode": "live", "orders": 2, "avg_confidence": 0.6}

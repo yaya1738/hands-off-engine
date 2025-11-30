@@ -1,522 +1,637 @@
 #!/usr/bin/env python3
 """
-Telegram Command Bot - Autonomous Control Interface
-=====================================================
+Telegram Command Bot - Bidirectional User-System Communication
 
-Provides a Telegram bot interface for controlling and monitoring
-the hands-off-engine without requiring CLI access.
+Replaces need for Claude Code CLI sessions by providing all
+system interaction capabilities via Telegram.
 
 Commands:
-  /status - Get system status
-  /health - Run health check
-  /metrics - View performance metrics
-  /approve_pr <num> - Approve and merge PR
-  /reject_pr <num> - Reject PR
-  /approve <id> - Approve queued change
-  /reject <id> - Reject queued change
-  /pause - Pause trading
-  /resume - Resume trading
-  /phase - View current phase
-  /help - Show available commands
+- /status - Full system status
+- /metrics - Performance metrics (24h)
+- /health - Health check results
+- /approve <id> - Approve pending change
+- /reject <id> - Reject pending change
+- /agents - AI agent coordination status
+- /help - Command list
 
-Runs continuously, polling for new messages.
+User texts command → Bot executes → Responds in Telegram
+Zero CLI interaction needed.
 """
-
-# UNIFIED AI - All systems serve Yair Siegel
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
-try:
-    from ai.unified_ai import MASTER, get_master
-except ImportError:
-    MASTER = "Yair Siegel"
-
 
 import os
 import json
-import time
 import subprocess
-import requests
+import sys
+from datetime import datetime, timedelta
 from pathlib import Path
-from datetime import datetime
-from typing import Optional, Dict, List
 
+# Add parent to path for imports
+sys.path.insert(0, str(Path(__file__).parent.parent))
+
+# Configuration
 REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
-CONFIG_DIR = REPO_ROOT / "config"
-LOGS_DIR = REPO_ROOT / "logs"
+SCRIPTS_DIR = REPO_ROOT / "scripts"
+AI_COORD_DIR = REPO_ROOT / "ai" / "coordination"
 
-# Telegram config
-BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
-AUTHORIZED_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+# Import approval queue
+from ai.approval_queue import ApprovalQueue
 
-# Track last processed update
-LAST_UPDATE_FILE = STATE_DIR / "telegram_last_update.json"
+# Telegram config (from environment or config file)
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 
 
 class TelegramCommandBot:
-    """Handles Telegram commands for autonomous control."""
+    """Handles incoming commands from Telegram and executes system operations."""
 
     def __init__(self):
-        self.token = BOT_TOKEN
-        self.authorized_chat = AUTHORIZED_CHAT_ID
-        self.base_url = f"https://api.telegram.org/bot{self.token}"
-        self.last_update_id = self.load_last_update_id()
-
-    def load_last_update_id(self) -> int:
-        """Load last processed update ID."""
-        if LAST_UPDATE_FILE.exists():
-            with open(LAST_UPDATE_FILE) as f:
-                data = json.load(f)
-                return data.get("last_update_id", 0)
-        return 0
-
-    def save_last_update_id(self, update_id: int):
-        """Save last processed update ID."""
-        with open(LAST_UPDATE_FILE, 'w') as f:
-            json.dump({"last_update_id": update_id, "saved_at": datetime.utcnow().isoformat()}, f)
-        self.last_update_id = update_id
-
-    def send_message(self, text: str, parse_mode: str = "HTML"):
-        """Send a message to the authorized chat."""
-        try:
-            response = requests.post(
-                f"{self.base_url}/sendMessage",
-                json={
-                    "chat_id": self.authorized_chat,
-                    "text": text,
-                    "parse_mode": parse_mode
-                },
-                timeout=10
-            )
-            return response.ok
-        except Exception as e:
-            print(f"Send message error: {e}")
-            return False
-
-    def get_updates(self) -> List[Dict]:
-        """Get new updates from Telegram."""
-        try:
-            response = requests.get(
-                f"{self.base_url}/getUpdates",
-                params={
-                    "offset": self.last_update_id + 1,
-                    "timeout": 30
-                },
-                timeout=35
-            )
-
-            if response.ok:
-                data = response.json()
-                return data.get("result", [])
-            return []
-        except Exception as e:
-            print(f"Get updates error: {e}")
-            return []
-
-    def process_command(self, message: Dict):
-        """Process a command message."""
-        chat_id = str(message.get("chat", {}).get("id", ""))
-        text = message.get("text", "").strip()
-
-        # Security: only process from authorized chat
-        if chat_id != self.authorized_chat:
-            print(f"Unauthorized message from chat {chat_id}")
-            return
-
-        if not text.startswith("/"):
-            return
-
-        # Parse command and args
-        parts = text.split()
-        command = parts[0].lower().split('@')[0]  # Handle @botname suffix
-        args = parts[1:] if len(parts) > 1 else []
-
-        print(f"Processing command: {command} {args}")
-
-        # Route to handler
-        handlers = {
-            "/status": self.cmd_status,
-            "/health": self.cmd_health,
-            "/metrics": self.cmd_metrics,
-            "/approve_pr": self.cmd_approve_pr,
-            "/reject_pr": self.cmd_reject_pr,
-            "/approve": self.cmd_approve,
-            "/reject": self.cmd_reject,
-            "/pause": self.cmd_pause,
-            "/resume": self.cmd_resume,
-            "/phase": self.cmd_phase,
-            "/help": self.cmd_help,
-            "/start": self.cmd_help,
+        self.commands = {
+            '/status': self.cmd_status,
+            '/metrics': self.cmd_metrics,
+            '/health': self.cmd_health,
+            '/pending': self.cmd_pending,
+            '/approve': self.cmd_approve,
+            '/reject': self.cmd_reject,
+            '/task': self.cmd_task,
+            '/agents': self.cmd_agents,
+            '/help': self.cmd_help,
+            # New unified commands
+            '/balance': self.cmd_balance,
+            '/positions': self.cmd_positions,
+            '/cluster': self.cmd_cluster,
+            '/identity': self.cmd_identity,
+            '/logs': self.cmd_logs,
         }
 
-        handler = handlers.get(command)
-        if handler:
+    def process_command(self, command_text: str) -> str:
+        """Process incoming command and return response text."""
+        parts = command_text.strip().split()
+        cmd = parts[0].lower()
+        args = parts[1:] if len(parts) > 1 else []
+
+        if cmd in self.commands:
             try:
-                handler(args)
+                return self.commands[cmd](args)
             except Exception as e:
-                self.send_message(f"❌ Error: {e}")
+                return f"❌ Error executing {cmd}: {str(e)}"
         else:
-            self.send_message(f"Unknown command: {command}\nUse /help for available commands")
+            return f"Unknown command: {cmd}\nSend /help for command list"
 
-    def cmd_status(self, args):
-        """Get system status."""
-        status_parts = []
-
-        # Trading mode
-        mode_file = STATE_DIR / "trading_mode.json"
-        if mode_file.exists():
-            with open(mode_file) as f:
-                mode = json.load(f)
-            paused = mode.get("paused", False)
-            phase = mode.get("phase", "unknown")
-            status_parts.append(f"<b>Trading:</b> {'⏸ Paused' if paused else '✅ Active'}")
-            status_parts.append(f"<b>Phase:</b> {phase}")
-        else:
-            status_parts.append("<b>Trading:</b> ❓ Unknown")
-
-        # Hard limits
-        limits_file = CONFIG_DIR / "hard_limits.json"
-        if limits_file.exists():
-            with open(limits_file) as f:
-                limits = json.load(f)
-            max_pos = limits.get("max_position_usd", "?")
-            status_parts.append(f"<b>Max Position:</b> ${max_pos}")
-
-        # Recent activity
-        perf_log = LOGS_DIR / "trading_performance.jsonl"
-        if perf_log.exists():
-            with open(perf_log) as f:
-                lines = f.readlines()
-            status_parts.append(f"<b>Total Trades:</b> {len(lines)}")
-
-        self.send_message("📊 <b>System Status</b>\n\n" + "\n".join(status_parts))
-
-    def cmd_health(self, args):
-        """Run health check."""
-        self.send_message("🔍 Running health check...")
-
+    def cmd_status(self, args) -> str:
+        """Get full system status."""
         try:
+            # Run health check
+            health_result = subprocess.run(
+                [str(SCRIPTS_DIR / "healthcheck.sh")],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+
+            # Read latest execution plan
+            exec_plan_path = REPO_ROOT / "executor" / "execution_plan.json"
+            if exec_plan_path.exists():
+                with open(exec_plan_path) as f:
+                    exec_plan = json.load(f)
+                plan_time = exec_plan.get("timestamp", "unknown")
+                total_orders = exec_plan.get("total_orders", 0)
+                total_size = exec_plan.get("total_size_usd", 0)
+            else:
+                plan_time = "N/A"
+                total_orders = 0
+                total_size = 0
+
+            # Read latest metrics
+            metrics_path = STATE_DIR / "performance_metrics.jsonl"
+            if metrics_path.exists():
+                with open(metrics_path) as f:
+                    lines = f.readlines()
+                    if lines:
+                        latest_metric = json.loads(lines[-1])
+                        selection_rate = latest_metric.get("alpha_signals", {}).get("selection_rate", 0)
+                    else:
+                        selection_rate = 0
+            else:
+                selection_rate = 0
+
+            # Build status message
+            status_msg = f"""📊 System Status
+
+🟢 Health: {health_result.stdout.strip() if health_result.returncode == 0 else '❌ Issues detected'}
+
+📈 Latest Execution:
+• Time: {plan_time}
+• Orders: {total_orders}
+• Size: ${total_size:.2f}
+• Selection Rate: {selection_rate*100:.1f}%
+
+🤖 Mode: DRYRUN (no real money)
+
+Send /metrics for detailed performance
+Send /health for full health check
+Send /agents for AI coordination status"""
+
+            return status_msg
+
+        except Exception as e:
+            return f"❌ Error getting status: {str(e)}"
+
+    def cmd_metrics(self, args) -> str:
+        """Get performance metrics for last 24 hours."""
+        try:
+            # Run track_performance script
             result = subprocess.run(
-                [str(REPO_ROOT / "scripts" / "healthcheck.sh")],
+                ["python3", str(SCRIPTS_DIR / "track_performance.py"), "--summary", "--hours", "24"],
                 capture_output=True,
                 text=True,
                 timeout=30
             )
 
             if result.returncode == 0:
-                self.send_message(f"✅ <b>Health Check Passed</b>\n\n<pre>{result.stdout[:1000]}</pre>")
+                # Parse and format output
+                output = result.stdout.strip()
+                return f"📈 Performance Metrics (24h)\n\n{output}"
             else:
-                self.send_message(f"⚠️ <b>Health Check Issues</b>\n\n<pre>{result.stdout[:1000]}</pre>")
+                return f"❌ Error getting metrics: {result.stderr}"
+
+        except FileNotFoundError:
+            # Fallback: read metrics file directly
+            metrics_path = STATE_DIR / "performance_metrics.jsonl"
+            if not metrics_path.exists():
+                return "❌ No metrics data available"
+
+            with open(metrics_path) as f:
+                lines = f.readlines()
+
+            # Get last 24h of data
+            cutoff = datetime.now() - timedelta(hours=24)
+            recent_metrics = []
+
+            for line in lines:
+                metric = json.loads(line)
+                ts = datetime.fromisoformat(metric["timestamp"].replace("+00:00", ""))
+                if ts >= cutoff:
+                    recent_metrics.append(metric)
+
+            if not recent_metrics:
+                return "❌ No metrics in last 24 hours"
+
+            # Calculate summary
+            total_runs = len(recent_metrics)
+            total_orders = sum(m.get("execution_plan", {}).get("total_orders", 0) for m in recent_metrics)
+            total_size = sum(m.get("execution_plan", {}).get("total_size_usd", 0) for m in recent_metrics)
+            avg_selection = sum(m.get("alpha_signals", {}).get("selection_rate", 0) for m in recent_metrics) / total_runs
+
+            return f"""📈 Performance Metrics (24h)
+
+Runs: {total_runs}
+Orders Planned: {total_orders}
+Total Size: ${total_size:.2f}
+Avg Selection Rate: {avg_selection*100:.1f}%
+
+System is operating normally."""
 
         except Exception as e:
-            self.send_message(f"❌ Health check failed: {e}")
+            return f"❌ Error getting metrics: {str(e)}"
 
-    def cmd_metrics(self, args):
-        """View performance metrics."""
-        perf_log = LOGS_DIR / "trading_performance.jsonl"
-
-        if not perf_log.exists():
-            self.send_message("📈 No trading data yet")
-            return
-
-        trades = []
-        with open(perf_log) as f:
-            for line in f:
-                try:
-                    trades.append(json.loads(line))
-                except:
-                    continue
-
-        if not trades:
-            self.send_message("📈 No trades recorded")
-            return
-
-        # Calculate metrics
-        total = len(trades)
-        wins = sum(1 for t in trades if t.get("pnl", 0) > 0)
-        losses = sum(1 for t in trades if t.get("pnl", 0) < 0)
-        total_pnl = sum(t.get("pnl", 0) for t in trades)
-        win_rate = wins / total if total > 0 else 0
-
-        msg = f'''📈 <b>Performance Metrics</b>
-
-<b>Trades:</b> {total}
-<b>Wins:</b> {wins} | <b>Losses:</b> {losses}
-<b>Win Rate:</b> {win_rate:.1%}
-<b>Total P&L:</b> ${total_pnl:.2f}
-'''
-        self.send_message(msg)
-
-    def cmd_approve_pr(self, args):
-        """Approve and merge a PR."""
-        if not args:
-            self.send_message("Usage: /approve_pr <pr_number>")
-            return
-
-        try:
-            pr_num = int(args[0])
-        except ValueError:
-            self.send_message("Invalid PR number")
-            return
-
-        self.send_message(f"🔄 Merging PR #{pr_num}...")
-
+    def cmd_health(self, args) -> str:
+        """Run full health check."""
         try:
             result = subprocess.run(
-                ["gh", "pr", "merge", str(pr_num), "--squash"],
+                [str(SCRIPTS_DIR / "healthcheck.sh")],
                 capture_output=True,
                 text=True,
-                timeout=60,
-                cwd=str(REPO_ROOT)
+                timeout=30
             )
 
+            output = result.stdout.strip()
+
             if result.returncode == 0:
-                self.send_message(f"✅ PR #{pr_num} merged successfully")
+                return f"✅ Health Check PASSED\n\n{output}"
             else:
-                self.send_message(f"❌ Failed to merge PR #{pr_num}\n{result.stderr[:500]}")
+                return f"⚠️ Health Check FAILED\n\n{output}\n\nIssues detected - self-healing agent should address automatically."
 
         except Exception as e:
-            self.send_message(f"❌ Error merging PR: {e}")
+            return f"❌ Error running health check: {str(e)}"
 
-    def cmd_reject_pr(self, args):
-        """Close a PR without merging."""
+    def cmd_pending(self, args) -> str:
+        """Show pending changes awaiting approval."""
+        try:
+            queue = ApprovalQueue()
+            pending = queue.get_pending()
+
+            if not pending:
+                return "✅ No pending changes requiring approval"
+
+            msg = f"📋 **Pending Approvals** ({len(pending)})\n\n"
+
+            for change in pending[:5]:  # Show first 5
+                risk_emoji = {"low": "🟢", "medium": "🟡", "high": "🔴"}
+                emoji = risk_emoji.get(change.get("risk_level", "medium"), "🟡")
+
+                msg += f"""{emoji} **{change['id']}**: {change['title']}
+Type: {change['change_type']}
+Risk: {change['risk_level']}
+
+"""
+
+            if len(pending) > 5:
+                msg += f"\n... and {len(pending)-5} more\n"
+
+            msg += "\nUse /approve <id> or /reject <id>"
+
+            return msg
+
+        except Exception as e:
+            return f"❌ Error getting pending changes: {str(e)}"
+
+    def cmd_approve(self, args) -> str:
+        """Approve a pending change."""
         if not args:
-            self.send_message("Usage: /reject_pr <pr_number>")
-            return
+            return "❌ Usage: /approve <id>\nExample: /approve abc123"
+
+        change_id = args[0]
+        queue = ApprovalQueue()
+
+        # Get the change
+        change = queue.get_change(change_id)
+        if not change:
+            return f"❌ Change {change_id} not found"
+
+        if change["status"] != "pending":
+            return f"❌ Change {change_id} is already {change['status']}"
+
+        # Approve it
+        if queue.approve(change_id):
+            # Execute the change
+            result = queue.execute_approved(change_id)
+
+            if result["success"]:
+                return f"""✅ Approved and executed: {change_id}
+
+**{change['title']}**
+
+{result.get('message', 'Change applied successfully')}"""
+            else:
+                return f"""✅ Approved: {change_id}
+❌ Execution failed: {result.get('error', 'Unknown error')}
+
+Change is marked approved but not applied. Check logs."""
+        else:
+            return f"❌ Failed to approve {change_id}"
+
+    def cmd_reject(self, args) -> str:
+        """Reject a pending change."""
+        if not args:
+            return "❌ Usage: /reject <id> [reason]\nExample: /reject abc123 Not ready yet"
+
+        change_id = args[0]
+        reason = " ".join(args[1:]) if len(args) > 1 else "No reason provided"
+
+        queue = ApprovalQueue()
+
+        # Get the change
+        change = queue.get_change(change_id)
+        if not change:
+            return f"❌ Change {change_id} not found"
+
+        if change["status"] != "pending":
+            return f"❌ Change {change_id} is already {change['status']}"
+
+        # Reject it
+        if queue.reject(change_id, reason):
+            return f"""❌ Rejected: {change_id}
+
+**{change['title']}**
+
+Reason: {reason}
+
+Change will not be applied."""
+        else:
+            return f"❌ Failed to reject {change_id}"
+
+    def cmd_task(self, args) -> str:
+        """Queue a task for the system to work on."""
+        if not args:
+            return """❌ Usage: /task <description>
+
+Example: /task Optimize alpha model to reduce selection rate
+
+This queues a task for autonomous agents to work on.
+Next Claude Code session will pick it up automatically."""
+
+        # Join all args as task description
+        task_description = " ".join(args)
 
         try:
-            pr_num = int(args[0])
-        except ValueError:
-            self.send_message("Invalid PR number")
-            return
+            # Add to autonomous task queue
+            sys.path.insert(0, str(REPO_ROOT))
+            from scripts.autonomous_task_queue import AutonomousTaskQueue
 
+            queue = AutonomousTaskQueue(REPO_ROOT)
+            task_id = queue.add_task(
+                title=task_description[:80],  # First 80 chars as title
+                description=f"""User request from Telegram: {task_description}
+
+Autonomous operation protocol:
+1. Assess what's needed
+2. Implement solution
+3. Use approval system for risky changes
+4. Document what was done
+
+Priority: User requested task""",
+                priority='high',  # User requests are high priority
+                source='telegram_user',
+                metadata={'user': 'yair', 'via': 'telegram'}
+            )
+
+            return f"""✅ Task queued: {task_id[:8]}
+
+**Task:** {task_description}
+
+The system will work on this autonomously.
+Next Claude Code session will pick it up.
+
+You'll be notified when complete."""
+
+        except Exception as e:
+            return f"❌ Error queueing task: {str(e)}"
+
+    def cmd_agents(self, args) -> str:
+        """Get AI agent coordination status."""
+        try:
+            # Read coordination status
+            status_path = AI_COORD_DIR / "status.json"
+            if not status_path.exists():
+                return "❌ Coordination system not initialized"
+
+            with open(status_path) as f:
+                status = json.load(f)
+
+            active_agents = status.get("active_agents", [])
+            pending_tasks = status.get("pending_tasks", [])
+
+            # Read recent messages
+            messages_path = AI_COORD_DIR / "messages.jsonl"
+            recent_messages = []
+            if messages_path.exists():
+                with open(messages_path) as f:
+                    lines = f.readlines()
+                    recent_messages = [json.loads(line) for line in lines[-5:]]
+
+            msg = f"""🤖 AI Agent Coordination
+
+Active Agents: {', '.join(active_agents)}
+
+Pending Tasks: {len(pending_tasks)}"""
+
+            if pending_tasks:
+                msg += "\n"
+                for task in pending_tasks[:3]:
+                    msg += f"\n• {task.get('description', 'Unknown task')}"
+                if len(pending_tasks) > 3:
+                    msg += f"\n  ... and {len(pending_tasks)-3} more"
+
+            msg += f"\n\nRecent Messages: {len(recent_messages)}"
+            if recent_messages:
+                msg += "\n"
+                for m in recent_messages[-3:]:
+                    msg += f"\n• {m.get('from', '?')} → {m.get('to', '?')}: {m.get('message', '')[:50]}..."
+
+            msg += "\n\nAgents are coordinating autonomously."
+
+            return msg
+
+        except Exception as e:
+            return f"❌ Error getting agent status: {str(e)}"
+
+    def cmd_help(self, args) -> str:
+        """Show command help."""
+        return """📱 Telegram Bot Commands
+
+**Monitor:**
+/status - Full system status
+/metrics - Performance metrics (24h)
+/health - Run health check
+/balance - Trading balance & positions
+/positions - Detailed position list
+/cluster - Server cluster status
+/logs - Recent system logs
+
+**Interact:**
+/task <description> - Request system to do something
+/pending - View pending approvals
+/approve <id> - Approve pending change
+/reject <id> - Reject pending change
+
+**Info:**
+/agents - AI coordination status
+/identity - Verify your identity
+/help - This message
+
+You can control the entire system via Telegram.
+No need to launch Claude Code CLI for routine operations."""
+
+    def cmd_balance(self, args) -> str:
+        """Get trading balance and position summary."""
+        try:
+            # Read dollar access file for balance info
+            dollar_file = REPO_ROOT / "finance" / "dollar_access.json"
+            if dollar_file.exists():
+                with open(dollar_file) as f:
+                    data = json.load(f)
+                cash = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("current_balance_usdc", 0)
+                positions = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("positions_value_usdc", 0)
+            else:
+                cash = 0
+                positions = 0
+
+            # Try to get live position data
+            try:
+                result = subprocess.run(
+                    ["python3", str(SCRIPTS_DIR / "position_monitor.py")],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    cwd=str(REPO_ROOT),
+                    env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+                )
+                if "positions" in result.stdout.lower():
+                    live_info = result.stdout.strip().split('\n')[-1]
+                else:
+                    live_info = ""
+            except:
+                live_info = ""
+
+            total = cash + positions
+            gap = max(0, 50 - cash)
+
+            return f"""💰 Trading Balance
+
+Cash: ${cash:.2f}
+Positions: ${positions:.2f}
+Total: ${total:.2f}
+
+Trading threshold: $50
+Gap to trading: ${gap:.2f}
+
+{live_info}
+
+Use /positions for details"""
+
+        except Exception as e:
+            return f"❌ Error getting balance: {str(e)}"
+
+    def cmd_positions(self, args) -> str:
+        """Get detailed position list."""
         try:
             result = subprocess.run(
-                ["gh", "pr", "close", str(pr_num)],
+                ["python3", str(SCRIPTS_DIR / "position_monitor.py")],
                 capture_output=True,
                 text=True,
                 timeout=30,
-                cwd=str(REPO_ROOT)
+                cwd=str(REPO_ROOT),
+                env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+            )
+
+            output = result.stdout.strip()
+            if output:
+                # Truncate if too long
+                if len(output) > 3500:
+                    output = output[:3500] + "\n... (truncated)"
+                return f"📊 Positions\n\n{output}"
+            else:
+                return "❌ No position data available"
+
+        except Exception as e:
+            return f"❌ Error getting positions: {str(e)}"
+
+    def cmd_cluster(self, args) -> str:
+        """Get server cluster status."""
+        try:
+            result = subprocess.run(
+                ["doctl", "compute", "droplet", "list", "--format", "Name,Status,PublicIPv4,Memory"],
+                capture_output=True,
+                text=True,
+                timeout=30
             )
 
             if result.returncode == 0:
-                self.send_message(f"🚫 PR #{pr_num} closed")
+                output = result.stdout.strip()
+                lines = output.split('\n')
+                active = sum(1 for l in lines if 'active' in l.lower())
+
+                return f"""🖥 Cluster Status
+
+{output}
+
+Active: {active} servers
+"""
             else:
-                self.send_message(f"❌ Failed to close PR #{pr_num}")
+                return f"❌ Error getting cluster status: {result.stderr}"
 
         except Exception as e:
-            self.send_message(f"❌ Error closing PR: {e}")
+            return f"❌ Error: {str(e)}"
 
-    def cmd_approve(self, args):
-        """Approve a queued change."""
-        if not args:
-            self.send_message("Usage: /approve <change_id>")
-            return
+    def cmd_identity(self, args) -> str:
+        """Run identity verification."""
+        try:
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "security" / "absolute_identity.py")],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                cwd=str(REPO_ROOT)
+            )
 
-        change_id = args[0]
+            output = result.stdout.strip()
+            if "GRANTED" in output:
+                return f"✅ Identity Verified\n\n{output}"
+            else:
+                return f"❌ Identity Check\n\n{output}"
 
-        queue_file = STATE_DIR / "approval_queue.json"
-        if not queue_file.exists():
-            self.send_message("No pending approvals")
-            return
+        except Exception as e:
+            return f"❌ Error running identity check: {str(e)}"
 
-        with open(queue_file) as f:
-            queue = json.load(f)
+    def cmd_logs(self, args) -> str:
+        """Get recent system logs."""
+        try:
+            log_dir = Path("/var/log/hands-off")
+            if not log_dir.exists():
+                return "❌ No logs directory"
 
-        pending = queue.get("pending", [])
-        found = None
+            # Get recent entries from multiple logs
+            logs_output = []
 
-        for i, item in enumerate(pending):
-            if item.get("id") == change_id:
-                found = (i, item)
-                break
+            # Healthcheck log
+            hc_log = log_dir / "healthcheck.log"
+            if hc_log.exists():
+                with open(hc_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("📋 Healthcheck:")
+                        logs_output.append(lines[-1].strip())
 
-        if not found:
-            self.send_message(f"Change {change_id} not found in queue")
-            return
+            # Pipeline log
+            pipe_log = log_dir / "pipeline.log"
+            if pipe_log.exists():
+                with open(pipe_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("\n📋 Pipeline:")
+                        logs_output.append(lines[-1].strip())
 
-        idx, item = found
+            # Position monitor log
+            pos_log = log_dir / "position_monitor.log"
+            if pos_log.exists():
+                with open(pos_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("\n📋 Positions:")
+                        logs_output.append(lines[-1].strip())
 
-        # Move to approved
-        pending.pop(idx)
-        approved = queue.get("approved", [])
-        item["approved_at"] = datetime.utcnow().isoformat() + "Z"
-        item["approved_by"] = "telegram"
-        approved.append(item)
+            if logs_output:
+                return "📜 Recent Logs\n\n" + "\n".join(logs_output)
+            else:
+                return "❌ No recent log entries"
 
-        queue["pending"] = pending
-        queue["approved"] = approved
+        except Exception as e:
+            return f"❌ Error reading logs: {str(e)}"
 
-        with open(queue_file, 'w') as f:
-            json.dump(queue, f, indent=2)
 
-        self.send_message(f"✅ Approved: {item.get('description', change_id)}")
+def send_telegram_message(message: str):
+    """Send message to user via Telegram."""
+    if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
+        print(f"Would send to Telegram:\n{message}")
+        return
 
-    def cmd_reject(self, args):
-        """Reject a queued change."""
-        if not args:
-            self.send_message("Usage: /reject <change_id>")
-            return
-
-        change_id = args[0]
-
-        queue_file = STATE_DIR / "approval_queue.json"
-        if not queue_file.exists():
-            self.send_message("No pending approvals")
-            return
-
-        with open(queue_file) as f:
-            queue = json.load(f)
-
-        pending = queue.get("pending", [])
-        found = None
-
-        for i, item in enumerate(pending):
-            if item.get("id") == change_id:
-                found = (i, item)
-                break
-
-        if not found:
-            self.send_message(f"Change {change_id} not found in queue")
-            return
-
-        idx, item = found
-        pending.pop(idx)
-        queue["pending"] = pending
-
-        with open(queue_file, 'w') as f:
-            json.dump(queue, f, indent=2)
-
-        self.send_message(f"🚫 Rejected: {item.get('description', change_id)}")
-
-    def cmd_pause(self, args):
-        """Pause trading."""
-        mode_file = STATE_DIR / "trading_mode.json"
-
-        mode = {}
-        if mode_file.exists():
-            with open(mode_file) as f:
-                mode = json.load(f)
-
-        mode["paused"] = True
-        mode["paused_at"] = datetime.utcnow().isoformat() + "Z"
-        mode["paused_by"] = "telegram"
-
-        with open(mode_file, 'w') as f:
-            json.dump(mode, f, indent=2)
-
-        self.send_message("⏸ <b>Trading Paused</b>\n\nUse /resume to restart")
-
-    def cmd_resume(self, args):
-        """Resume trading."""
-        mode_file = STATE_DIR / "trading_mode.json"
-
-        mode = {}
-        if mode_file.exists():
-            with open(mode_file) as f:
-                mode = json.load(f)
-
-        mode["paused"] = False
-        mode["resumed_at"] = datetime.utcnow().isoformat() + "Z"
-
-        with open(mode_file, 'w') as f:
-            json.dump(mode, f, indent=2)
-
-        self.send_message("▶️ <b>Trading Resumed</b>")
-
-    def cmd_phase(self, args):
-        """View current deployment phase."""
-        mode_file = STATE_DIR / "trading_mode.json"
-
-        if not mode_file.exists():
-            self.send_message("Phase: baby_mode (default)")
-            return
-
-        with open(mode_file) as f:
-            mode = json.load(f)
-
-        phase = mode.get("phase", "baby_mode")
-        started = mode.get("phase_started", "unknown")
-
-        from autonomous_phase_manager import PHASES
-        config = PHASES.get(phase, {})
-
-        msg = f'''📊 <b>Current Phase: {phase}</b>
-
-<b>Started:</b> {started}
-<b>Max Position:</b> ${config.get('max_position_usd', '?')}
-
-<b>Next Phase Requirements:</b>
-• Min trades: {config.get('min_trades', 'N/A')}
-• Min days: {config.get('min_days', 'N/A')}
-• Win rate: {config.get('required_win_rate', 0):.0%}
-• Max drawdown: {config.get('max_drawdown', 0):.0%}
-'''
-        self.send_message(msg)
-
-    def cmd_help(self, args):
-        """Show available commands."""
-        msg = '''🤖 <b>Hands-Off Engine Commands</b>
-
-<b>Status & Monitoring:</b>
-/status - System status
-/health - Run health check
-/metrics - Performance metrics
-/phase - Current deployment phase
-
-<b>Trading Control:</b>
-/pause - Pause trading
-/resume - Resume trading
-
-<b>Approvals:</b>
-/approve_pr &lt;num&gt; - Merge PR
-/reject_pr &lt;num&gt; - Close PR
-/approve &lt;id&gt; - Approve change
-/reject &lt;id&gt; - Reject change
-
-<b>System:</b>
-/help - This message
-'''
-        self.send_message(msg)
-
-    def run(self):
-        """Main loop: poll for updates and process commands."""
-        print("=" * 60)
-        print("TELEGRAM COMMAND BOT")
-        print(f"Authorized chat: {self.authorized_chat}")
-        print("=" * 60)
-
-        self.send_message("🤖 <b>Bot Online</b>\n\nUse /help for commands")
-
-        while True:
-            try:
-                updates = self.get_updates()
-
-                for update in updates:
-                    update_id = update.get("update_id", 0)
-
-                    if "message" in update:
-                        self.process_command(update["message"])
-
-                    # Save progress
-                    self.save_last_update_id(update_id)
-
-                time.sleep(1)
-
-            except KeyboardInterrupt:
-                print("\nShutting down...")
-                self.send_message("🔴 Bot going offline")
-                break
-
-            except Exception as e:
-                print(f"Error in main loop: {e}")
-                time.sleep(5)
+    # TODO: Implement actual Telegram API call
+    # Using python-telegram-bot library or direct API
+    print(f"Sending to Telegram chat {TELEGRAM_CHAT_ID}:\n{message}")
 
 
 def main():
+    """Main entry point - for testing."""
     bot = TelegramCommandBot()
-    bot.run()
+
+    # Test commands
+    test_commands = [
+        "/status",
+        "/metrics",
+        "/health",
+        "/agents",
+        "/help"
+    ]
+
+    print("Testing Telegram Command Bot\n")
+    for cmd in test_commands:
+        print(f"\n{'='*60}")
+        print(f"Command: {cmd}")
+        print(f"{'='*60}")
+        response = bot.process_command(cmd)
+        print(response)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

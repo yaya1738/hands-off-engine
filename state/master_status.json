@@ -1,12 +1,12 @@
 {
-  "timestamp": "2025-11-30T20:21:38.069019",
+  "timestamp": "2025-11-30T20:36:46.627245",
   "hostname": "pm-helper",
-  "uptime_hours": 1.21,
+  "uptime_hours": 1.47,
   "components": {
     "hardware-brain": {
       "status": "crashed",
       "error": "signal only works in main thread of the main interpreter",
-      "restarts": 17
+      "restarts": 20
     },
     "scaling-engine": {
       "status": "running",
@@ -16,7 +16,7 @@
     "self-healer": {
       "status": "crashed",
       "error": "signal only works in main thread of the main interpreter",
-      "restarts": 17
+      "restarts": 20
     },
     "state-sync": {
       "status": "running",
@@ -31,7 +31,7 @@
   },
   "cluster": {
     "start_date": "2025-11-30T19:08:50.960035",
-    "current_date": "2025-11-30T20:21:38.068855",
+    "current_date": "2025-11-30T20:36:46.627085",
     "days_running": 0,
     "current_vcpus": 36,
     "current_ram_gb": 72.0,
