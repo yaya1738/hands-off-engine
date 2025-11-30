@@ -87,7 +87,14 @@ def get_system_metrics() -> dict:
         "trading_enabled": False,
         "monitors_active": 0,
         "income_channels": 0,
-        "last_improvement": None
+        "last_improvement": None,
+        # Full resource awareness
+        "monthly_burn": 3280,
+        "ai_spend": 250,
+        "runway_days": 0,
+        "total_resources": 0,
+        "cost_cut_opportunities": [],
+        "roi_status": "unknown"
     }
 
     # Get balance
@@ -120,6 +127,32 @@ def get_system_metrics() -> dict:
     if Path("/var/www/ainexus/index.html").exists():
         channels += 1
     metrics["income_channels"] = channels
+
+    # Load finance hub for full resource awareness
+    try:
+        finance_hub = Path("/root/hands-off-engine/finance/yair_finance_hub.json")
+        if finance_hub.exists():
+            hub = json.load(open(finance_hub))
+            metrics["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 3280)
+            metrics["ai_spend"] = hub.get("monthly_burn", {}).get("ai_services", {}).get("amount_usd", 250)
+            metrics["total_resources"] = hub.get("summary", {}).get("total_liquid_usd", 0)
+
+            # Calculate if AI spend is generating ROI
+            if metrics["trading_enabled"] or metrics["income_channels"] > 0:
+                metrics["roi_status"] = "generating_value"
+            else:
+                metrics["roi_status"] = "not_yet_profitable"
+
+            # Identify cost cut opportunities
+            if metrics["ai_spend"] > 0 and not metrics["trading_enabled"]:
+                metrics["cost_cut_opportunities"].append("Switch to free Groq/Google APIs")
+    except:
+        pass
+
+    # Calculate runway
+    if metrics["monthly_burn"] > 0:
+        total_liquid = metrics["balance"] + metrics.get("position_value", 98)
+        metrics["runway_days"] = (total_liquid / metrics["monthly_burn"]) * 30
 
     return metrics
 
@@ -168,45 +201,45 @@ def calculate_escape_velocity_score(metrics: dict, state: dict) -> float:
 def build_claude_prompt(state: dict, metrics: dict) -> str:
     """Build the self-improvement prompt for Claude CLI"""
 
-    prompt = f"""You are the MOONSHOT ENGINE - an autonomous improvement system.
+    cost_cuts = ", ".join(metrics.get("cost_cut_opportunities", [])) or "None identified"
 
-MISSION: Achieve escape velocity (self-sustaining autonomous income)
+    prompt = f"""You are the SUPER SERVANT of Yair Siegel - autonomous improvement system.
 
-CURRENT STATE:
+MISSION: Achieve escape velocity while maximizing ROI on every resource.
+
+RESOURCE AWARENESS:
+- Polymarket Balance: ${metrics['balance']:.2f}
+- Positions Value: ~$98
+- Monthly Burn: ${metrics['monthly_burn']}/month
+- AI Spend: ${metrics['ai_spend']}/month
+- Runway: {metrics['runway_days']:.0f} days
+- ROI Status: {metrics['roi_status']}
+- Cost Cut Opportunities: {cost_cuts}
+
+SYSTEM STATE:
 - Escape Velocity Score: {state['escape_velocity_score']:.1f}/100
-- Balance: ${metrics['balance']:.2f}
 - Trading: {'ENABLED' if metrics['trading_enabled'] else 'DISABLED (need $50+)'}
 - Active Monitors: {metrics['monitors_active']}
 - Income Channels: {metrics['income_channels']}
-- Total Cycles: {state['total_cycles']}
-- Recent Improvements: {len(state.get('momentum', [])[-5:])}
 
 MILESTONES:
 - First Dollar: {'✓' if state['milestones']['first_dollar'] else '○'}
 - Trading Enabled: {'✓' if state['milestones']['trading_enabled'] else '○'}
 - Positive PnL: {'✓' if state['milestones']['positive_pnl'] else '○'}
-- Daily Profit: {'✓' if state['milestones']['daily_profit'] else '○'}
 - Escape Velocity: {'✓' if state['milestones']['escape_velocity'] else '○'}
 
-YOUR TASK:
-1. Read state/permanent/SYSTEM_TRUTH.md for full context
-2. Identify the SINGLE highest-impact improvement you can make RIGHT NOW
-3. Execute that improvement (code changes, new scripts, optimizations)
-4. Document what you did in state/moonshot_improvements.jsonl
-5. Be aggressive - we need escape velocity
+YOUR PRIORITIES (in order):
+1. Find dead money / refund opportunities
+2. Cut costs that aren't generating ROI
+3. Enable trading capability (get to $50)
+4. Generate income from existing assets
+5. Compound improvements
 
-CONSTRAINTS:
-- Focus on what generates VALUE (income, trading capability, automation)
-- Don't just analyze - EXECUTE improvements
-- Each cycle should compound on previous cycles
-- Target: Get to $50+ balance to enable trading
+EXECUTE ONE HIGH-IMPACT ACTION NOW.
+Document in state/moonshot_improvements.jsonl
 
-CURRENT FOCUS: {state['current_focus']}
-
-After completing your improvement, append to state/moonshot_improvements.jsonl:
-{{"timestamp": "...", "cycle": {state['total_cycles'] + 1}, "improvement": "...", "impact": "..."}}
-
-GO. Make one high-impact improvement now.
+Serving: Yair Siegel
+Focus: {state['current_focus']}
 """
     return prompt
 
