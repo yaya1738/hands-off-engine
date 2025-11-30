@@ -10,7 +10,8 @@
     "docs/knowledge/MARKET_FUNDAMENTALS.md",
     "docs/knowledge/POLYMARKET_SPECIFIC.md",
     "docs/knowledge/TRADING_STRATEGY.md",
-    "docs/knowledge/NEW_MARKET_EDGE.md"
+    "docs/knowledge/NEW_MARKET_EDGE.md",
+    "ai/integration/AI_NEXUS_PROTOCOL.md"
   ],
   "agent_instruction_files": [
     ".claude/instructions.md",
