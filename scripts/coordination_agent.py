@@ -118,7 +118,7 @@ class CoordinationAgent:
         """Process a message from another AI agent."""
         msg_type = msg.get("type")
         from_agent = msg.get("from")
-        content = msg.get("message")
+        content = msg.get("message", "") or ""
 
         logger.info(f"Processing message from {from_agent}: {content[:100]}")
 
