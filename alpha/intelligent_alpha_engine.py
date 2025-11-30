@@ -310,7 +310,12 @@ class IntelligentAlphaEngine:
         """
         analyses = []
 
+        from datetime import datetime
+        today = datetime.now().strftime("%Y-%m-%d")
+
         prompt = f"""Analyze this Polymarket prediction market:
+
+TODAY'S DATE: {today}
 
 Question: {market.question}
 Current YES Price: {market.last_price or market.mid_price or 0.5:.2f}
@@ -319,21 +324,25 @@ End Date: {market.end_date or 'Unknown'}
 24h Volume: ${market.volume_24h:,.0f}
 Liquidity: ${market.liquidity:,.0f}
 
-CRITICAL: Consider whether this outcome is ACTUALLY POSSIBLE given:
-- Current real-world facts (what has already happened)
-- Time remaining until resolution
-- Physical/logical constraints
+CRITICAL FACTS FOR 2025 FED RATE DECISIONS:
+- Fed has cut rates 2 times in 2025 so far (Sept and Oct, 25bps each)
+- Current Fed rate: 3.75%-4.00%
+- Only ONE FOMC meeting remains in 2025: December 9-10
+- Maximum possible cuts in 2025: 3 (if Dec meeting cuts)
+- Outcomes requiring 4+ cuts in 2025 are IMPOSSIBLE
 
-A market priced at 1-5% might be CORRECTLY priced if the event is nearly impossible - not mispriced.
-Don't assume low prices mean undervaluation. Ask: "Could this realistically still happen?"
+REALITY CHECK: Is this outcome actually possible?
+- Count the remaining events/meetings before the deadline
+- If the required outcome exceeds what's physically possible, fair probability is <1%
+- A market priced at 1% for an impossible outcome is CORRECTLY priced, not undervalued
 
 Provide your analysis:
 1. What is the TRUE probability of YES? (0-100%)
 2. Your confidence level: low, medium, or high
-3. Key reasoning (2-3 sentences) - include WHY this is or isn't possible
-4. Any time-sensitive factors?
+3. Key reasoning - explicitly state if outcome is possible/impossible
+4. Any time constraints?
 
-Format your response as JSON:
+Format as JSON:
 {{"fair_probability": 65, "confidence": "medium", "reasoning": "...", "time_sensitive": false}}
 """
 
