@@ -44,11 +44,25 @@ ACTION_LOG = STATE_DIR / 'pursuit_actions.jsonl'
 class ActivePursuit:
     """
     Active income pursuit - never wait, always act.
+
+    INTEGRATED with reality feedback:
+    - Before action: Check what works, prioritize accordingly
+    - After action: Track outcome, measure conversion
+    - Adapt: Change strategy based on real results
     """
 
     def __init__(self):
         self.state = self._load_state()
         self.actions_taken = []
+        self.reality = self._get_reality_feedback()
+
+    def _get_reality_feedback(self):
+        """Get reality feedback for integration."""
+        try:
+            from autonomous.reality_feedback import RealityFeedback
+            return RealityFeedback()
+        except ImportError:
+            return None
 
     def _load_state(self) -> Dict:
         """Load pursuit state."""
@@ -74,7 +88,7 @@ class ActivePursuit:
             json.dump(self.state, f, indent=2)
 
     def _log_action(self, action_type: str, target: str, result: str, value: float = 0):
-        """Log an action taken."""
+        """Log an action taken and track it for outcome measurement."""
         entry = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "action_type": action_type,
@@ -88,6 +102,46 @@ class ActivePursuit:
             f.write(json.dumps(entry) + "\n")
 
         self.state["total_actions"] = self.state.get("total_actions", 0) + 1
+
+        # REALITY INTEGRATION: Track for outcome measurement
+        if self.reality:
+            self.reality.track_action_outcome(
+                action_type=action_type,
+                action_timestamp=entry["timestamp"],
+                outcome_type="pending",
+                outcome_value=0,
+                conversion=False,
+                notes=f"Action taken: {target}"
+            )
+
+    def _check_what_works(self) -> Dict:
+        """Check reality feedback to prioritize what actually works."""
+        if not self.reality:
+            return {"works": [], "doesnt": [], "unknown": True}
+
+        return {
+            "works": self.reality.state.get("what_works", []),
+            "doesnt": self.reality.state.get("what_doesnt", []),
+            "unknown": False
+        }
+
+    def _adapt_strategy(self):
+        """Adapt strategy based on reality feedback."""
+        if not self.reality:
+            return
+
+        what_works = self.reality.state.get("what_works", [])
+        what_doesnt = self.reality.state.get("what_doesnt", [])
+
+        # Update priorities in state
+        self.state["priority_actions"] = what_works
+        self.state["deprioritized_actions"] = what_doesnt
+        self._save_state()
+
+        if what_works:
+            print(f"\n[ADAPTED] Prioritizing: {what_works}")
+        if what_doesnt:
+            print(f"[ADAPTED] Deprioritizing: {what_doesnt}")
 
     # ========================================================================
     # CHANNEL 1: FREELANCE HUNTING
@@ -442,15 +496,34 @@ class ActivePursuit:
         """
         Run full active pursuit cycle.
 
-        This is the main loop - it never waits, always acts.
+        INTEGRATED LOOP:
+        1. Check reality - what's actually working?
+        2. Adapt strategy - prioritize what works
+        3. Take action - execute with priority
+        4. Measure outcomes - track external results
+        5. Feed back - update what works
         """
         print("\n" + "="*60)
-        print("ACTIVE PURSUIT - NEVER WAIT, ALWAYS ACT")
+        print("ACTIVE PURSUIT - GROUNDED IN REALITY")
         print(f"Master: {MASTER}")
         print(f"Time: {datetime.now(timezone.utc).isoformat()}")
         print("="*60)
 
         all_results = {}
+
+        # STEP 0: Check external reality first
+        print("\n[REALITY CHECK]")
+        if self.reality:
+            self.reality.reality_check()
+            feedback = self._check_what_works()
+            if feedback["works"]:
+                print(f"  PROVEN EFFECTIVE: {feedback['works']}")
+            if feedback["doesnt"]:
+                print(f"  NOT WORKING: {feedback['doesnt']}")
+            if not feedback["works"] and not feedback["doesnt"]:
+                print("  No data yet - all strategies equal priority")
+        else:
+            print("  Reality feedback not available")
 
         # 1. Hunt for opportunities
         all_results['freelance'] = self.hunt_freelance_opportunities()
@@ -480,14 +553,37 @@ class ActivePursuit:
         total_potential = sum(a.get('potential_value', 0) for a in self.actions_taken)
         print(f"  Potential value identified: ${total_potential:.0f}")
 
+        # STEP 6: Adapt strategy based on outcomes
+        print("\n[STRATEGY ADAPTATION]")
+        self._adapt_strategy()
+
+        # Prioritized next actions based on what works
         print("\n" + "="*60)
-        print("NEXT ACTIONS (DO THESE NOW)")
+        print("NEXT ACTIONS (PRIORITIZED BY RESULTS)")
         print("="*60)
-        print("1. GO TO UPWORK → Apply to 5 trading/automation jobs")
-        print("2. GO TO LINKEDIN → Post about services")
-        print("3. GO TO GITHUB → Find projects needing help")
-        print("4. CHECK FIVERR → Respond to any messages")
-        print("5. SEND 3 COLD EMAILS → Use templates in outreach/")
+
+        priority_actions = self.state.get("priority_actions", [])
+        if priority_actions:
+            print(f"  PRIORITY (proven to work): {priority_actions}")
+            print("  → Focus 80% of effort here")
+        else:
+            print("  No proven strategies yet - try all equally:")
+
+        print("\n  1. GO TO UPWORK → Apply to 5 trading/automation jobs")
+        print("  2. GO TO LINKEDIN → Post about services")
+        print("  3. GO TO GITHUB → Find projects needing help")
+        print("  4. CHECK FIVERR → Respond to any messages")
+        print("  5. SEND 3 COLD EMAILS → Use templates in outreach/")
+
+        deprioritized = self.state.get("deprioritized_actions", [])
+        if deprioritized:
+            print(f"\n  DEPRIORITIZED (not working): {deprioritized}")
+            print("  → Reduce effort or change approach")
+
+        # Record when to check outcomes
+        print("\n  ⏰ OUTCOME CHECK: Record any responses/conversions!")
+        print(f"     Track with: python3 autonomous/reality_feedback.py track \\")
+        print(f"       --action 'outreach' --outcome 'client_response' --value 500 --converted")
 
         self.state["last_action"] = datetime.now(timezone.utc).isoformat()
         self._save_state()
