@@ -26,6 +26,10 @@ Standard: Yair Siegel Master Level Operations
 
 Note: All datetime operations use timezone-aware UTC (datetime.now(timezone.utc))
 for Python 3.12+ compatibility.
+
+Note on _utc_now() pattern: Each submodule contains its own private _utc_now()
+helper function rather than importing from __init__.py. This is intentional to
+avoid circular imports, as __init__.py imports from the submodules.
 """
 
 from datetime import datetime, timezone
@@ -36,6 +40,9 @@ def utc_now() -> datetime:
     Get current UTC time as timezone-aware datetime.
 
     This replaces deprecated datetime.utcnow() for Python 3.12+ compatibility.
+
+    Note: This is the public API. Submodules use private _utc_now() functions
+    to avoid circular import issues.
 
     Returns:
         Current UTC time with timezone info
