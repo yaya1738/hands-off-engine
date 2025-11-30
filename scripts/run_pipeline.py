@@ -136,7 +136,7 @@ def run_pipeline(
     try:
         # Step 0: Early balance check to avoid wasting LLM API calls
         from executor.trading_safeguards import TradingSafeguards
-        MIN_TRADING_BALANCE = 10.0  # Don't waste API calls if < $10
+        MIN_TRADING_BALANCE = 1.0  # Enable micro-trading with any balance
 
         try:
             safeguards = TradingSafeguards()

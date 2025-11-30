@@ -9,7 +9,9 @@
         "python.*unified_system",
         "python.*autonomous"
       ],
-      "critical_ports": [8000],
+      "critical_ports": [
+        8000
+      ],
       "min_cpu_headroom": 15.0,
       "min_memory_headroom_gb": 1.0,
       "max_latency_ms": 200.0,
@@ -53,7 +55,10 @@
         "python.*uvicorn",
         "uvicorn.*app"
       ],
-      "critical_ports": [8000, 8001],
+      "critical_ports": [
+        8000,
+        8001
+      ],
       "min_cpu_headroom": 10.0,
       "min_memory_headroom_gb": 0.5,
       "max_latency_ms": 200.0,
@@ -67,7 +72,10 @@
     "enable_auto_protection": true,
     "enable_emergency_halt": true,
     "enable_auto_recovery": true,
-    "alert_channels": ["console", "audit_log"],
+    "alert_channels": [
+      "console",
+      "audit_log"
+    ],
     "maintenance_requires_approval": true,
     "max_consecutive_critical": 3,
     "critical_escalation_interval_seconds": 60,
@@ -82,5 +90,8 @@
     "warning_memory_available_gb": 1.5,
     "warning_disk_percent": 90,
     "warning_latency_ms": 200
-  }
+  },
+  "min_trade_amount": 1.0,
+  "min_balance_for_trading": 5.0,
+  "max_single_trade_pct": 0.25
 }

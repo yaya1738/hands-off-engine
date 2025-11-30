@@ -1,48 +1,35 @@
 {
-  "timestamp": "2025-11-30T15:39:37.589623",
-  "dryrun": true,
-  "total_orders": 3,
-  "total_size_usd": 150.0,
+  "timestamp": "2025-11-30T18:01:05.387706",
+  "dryrun": false,
+  "total_orders": 2,
+  "total_size_usd": 1.088,
   "successful_orders": 0,
   "orders": [
     {
-      "market_id": "fed-rate-hike-in-2025",
-      "token_id": "60487116984468020978247225474488676749601001829886755968952521846780452448915",
-      "question": "Fed rate hike in 2025?",
+      "market_id": "tim-cook-out-as-apple-ceo-in-2025",
+      "token_id": "52037280206803127284847057476966472509485061756266626447432615405338644734115",
+      "question": "Tim Cook out as Apple CEO in 2025?",
       "side": "yes",
-      "size_usd": 50.0,
-      "confidence": 0.9,
+      "size_usd": 0.8,
+      "confidence": 0.3,
       "edge": null,
       "category": "unknown",
-      "reason": "Edge: 99.2%, Current odds: 0.01, Confidence: 90.0%",
+      "reason": "Edge: 46.7%, Current odds: 0.03, Confidence: 30.0%",
       "status": "planned",
-      "execution_error": "REJECTED: Insufficient balance: $8.99 < $150.00 needed"
+      "execution_error": "LIVE MODE BLOCKED: live_trading_disabled"
     },
     {
       "market_id": "will-2-fed-rate-cuts-happen-in-2025",
       "token_id": "11661882248425579028730127122226588074844109517532906275870117904036267401870",
       "question": "Will 2 Fed rate cuts happen in 2025?",
       "side": "yes",
-      "size_usd": 50.0,
-      "confidence": 0.3,
-      "edge": null,
-      "category": "unknown",
-      "reason": "Edge: 38.5%, Current odds: 0.12, Confidence: 30.0%",
-      "status": "planned",
-      "execution_error": "REJECTED: Insufficient balance: $8.99 < $150.00 needed"
-    },
-    {
-      "market_id": "will-nvidia-be-the-largest-company-in-the-world-by-market-cap-on-december-31-2025",
-      "token_id": "94850533403292240972948844256810904078895883844462287088135166537739765648754",
-      "question": "Will NVIDIA be the largest company in the world by market cap on December 31?",
-      "side": "yes",
-      "size_usd": 50.0,
+      "size_usd": 0.28800000000000003,
       "confidence": 0.9,
       "edge": null,
       "category": "unknown",
-      "reason": "Edge: 12.5%, Current odds: 0.62, Confidence: 90.0%",
+      "reason": "Edge: 4.0%, Current odds: 0.11, Confidence: 90.0%",
       "status": "planned",
-      "execution_error": "REJECTED: Insufficient balance: $8.99 < $150.00 needed"
+      "execution_error": "LIVE MODE BLOCKED: live_trading_disabled"
     }
   ]
 }

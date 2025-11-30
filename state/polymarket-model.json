@@ -1,8 +1,43 @@
 {
-  "generated_at": "2025-11-30T16:00:04.488711+00:00",
-  "source_timestamp": "2025-11-30T16:00:04.488931+00:00",
-  "total_markets_analyzed": 0,
-  "markets_selected": 0,
+  "generated_at": "2025-11-30T18:01:04.634580+00:00",
+  "source_timestamp": "2025-11-30T18:01:04.634600+00:00",
+  "total_markets_analyzed": 2,
+  "markets_selected": 2,
   "engine": "intelligent_alpha_v1",
-  "markets": []
+  "markets": [
+    {
+      "market_id": "tim-cook-out-as-apple-ceo-in-2025",
+      "token_id": "52037280206803127284847057476966472509485061756266626447432615405338644734115",
+      "question": "Tim Cook out as Apple CEO in 2025?",
+      "query_category": "intelligent",
+      "side": "YES",
+      "model_edge": 0.467,
+      "model_confidence": 0.3,
+      "fair_price": 0.5,
+      "market_price": 0.033,
+      "best_bid": 0.033,
+      "liquidity": 7107.55878,
+      "reasoning": "No detailed reasoning provided",
+      "reasoning_quality": 20,
+      "order_type": "limit",
+      "recommended_size_usd": 0.4
+    },
+    {
+      "market_id": "will-2-fed-rate-cuts-happen-in-2025",
+      "token_id": "11661882248425579028730127122226588074844109517532906275870117904036267401870",
+      "question": "Will 2 Fed rate cuts happen in 2025?",
+      "query_category": "intelligent",
+      "side": "YES",
+      "model_edge": 0.04,
+      "model_confidence": 0.9,
+      "fair_price": 0.15,
+      "market_price": 0.11,
+      "best_bid": 0.11,
+      "liquidity": 79846.5234,
+      "reasoning": "Analysis 1 (high, p=0.15): Market is asking for 2+ cuts in 2025. Fed has already delivered 2 cuts (Sept/Oct). Only 1 FOMC meeting remains (Dec 9-10). For YES to win, Fed needs 0 additional cuts. Current 0.11 price implies 89...",
+      "reasoning_quality": 57,
+      "order_type": "limit",
+      "recommended_size_usd": 0.4
+    }
+  ]
 }

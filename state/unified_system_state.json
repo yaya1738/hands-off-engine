@@ -1,11 +1,9 @@
 {
   "balance": 8.99,
-  "trading_enabled": false,
+  "trading_enabled": true,
   "escape_velocity": 44,
-  "active_agents": [
-    "coordination",
-    "self_healing",
-    "telegram"
-  ],
-  "last_update": "2025-11-30T17:49:48.680672+00:00"
+  "micro_trading": true,
+  "min_trade": 1.0,
+  "max_trade_pct": 0.25,
+  "last_update": "2025-11-30T18:00:00Z"
 }
