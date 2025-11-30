@@ -1,0 +1,23 @@
+[Unit]
+Description=Hands-Off Infrastructure Monitor - Autonomous Cluster Management
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+Environment=PYTHONPATH=/root/hands-off-engine
+ExecStart=/usr/bin/python3 /root/hands-off-engine/autonomous/infra_manager.py monitor 300
+Restart=always
+RestartSec=30
+StandardOutput=append:/var/log/hands-off/infra-monitor.log
+StandardError=append:/var/log/hands-off/infra-monitor.log
+
+# Never kill this service abruptly
+TimeoutStopSec=60
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

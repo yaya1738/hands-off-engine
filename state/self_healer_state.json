@@ -1,0 +1,75 @@
+{
+  "last_save": "2025-11-30T19:15:07.462067",
+  "hostname": "pm-helper",
+  "uptime_hours": 0.10402585222222221,
+  "healing_actions": [
+    {
+      "timestamp": "2025-11-30T19:08:54.993064",
+      "action_type": "restart_process",
+      "target": "hardware-brain",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T19:09:07.055229",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T19:10:19.124659",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T19:11:31.195439",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T19:12:43.261218",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T19:13:55.335647",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T19:14:07.404342",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    }
+  ],
+  "restart_counts": {
+    "hardware-brain": [
+      "2025-11-30T19:08:54.993059"
+    ],
+    "position-monitor": [
+      "2025-11-30T19:09:07.055224",
+      "2025-11-30T19:10:19.124645",
+      "2025-11-30T19:11:31.195433",
+      "2025-11-30T19:12:43.261212",
+      "2025-11-30T19:13:55.335641"
+    ]
+  }
+}

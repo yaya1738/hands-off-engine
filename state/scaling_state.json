@@ -1,0 +1,20 @@
+{
+  "start_date": "2025-11-30T19:08:50.960035",
+  "current_date": "2025-11-30T19:13:54.656774",
+  "days_running": 0,
+  "current_vcpus": 28,
+  "current_ram_gb": 56.0,
+  "current_nodes": 4,
+  "current_monthly_cost": 384.0,
+  "target_vcpus": 24,
+  "target_ram_gb": 48.0,
+  "target_multiplier": 6.0,
+  "vcpu_pct": 116.7,
+  "ram_pct": 116.7,
+  "overall_pct": 116.7,
+  "nodes_to_add": 0,
+  "last_provision": "2025-11-30T19:08:54.256049",
+  "provisions_today": 1,
+  "blocked_by_tier": false,
+  "tier_increase_requested": false
+}

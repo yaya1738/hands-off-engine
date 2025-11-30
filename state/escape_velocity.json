@@ -47,5 +47,7 @@
     "income_multiplier": 1.0,
     "intelligence_multiplier": 1.0
   },
-  "compound_multiplier": 1.08
+  "compound_multiplier": 1.1016000000000001,
+  "last_self_improvement": "2025-11-30T18:39:17.415528+00:00",
+  "self_modification_count": 1
 }
