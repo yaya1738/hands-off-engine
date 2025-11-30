@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-11-30T17:20:24.910071+00:00",
+  "current_state": {
+    "balance": 8.99,
+    "income_channels": 2,
+    "automation_percent": 75,
+    "escape_score": 0,
+    "positions": 98.05
+  },
+  "target_state": {
+    "trading_enabled": true,
+    "balance_usd": 200.0,
+    "income_streams": 3,
+    "daily_profit_target": 10.0,
+    "automation_coverage": 100,
+    "escape_velocity_score": 80,
+    "human_intervention_needed": false
+  },
+  "gaps": {
+    "balance_gap": 191.01,
+    "income_gap": 1,
+    "automation_gap": 25,
+    "velocity_gap": 80
+  },
+  "collapse_progress": 48.79137931034483,
+  "vector_results": {
+    "automation": [
+      "Cron jobs: 12",
+      "\u2713 position_monitor: ACTIVE",
+      "\u2713 capital_recovery: ACTIVE",
+      "\u2713 payment_monitor: ACTIVE",
+      "\u2713 moonshot_loop: ACTIVE",
+      "\u2713 daily_digest: ACTIVE"
+    ],
+    "intelligence": [
+      "Signals ready: 3",
+      "Total size: $150.00",
+      "Top: Fed rate hike in 2025?..."
+    ],
+    "momentum": [
+      "Velocity: $0.00/period",
+      "Multiplier: 1.04x",
+      "Cycles: 0",
+      "Escape score: 0.0%"
+    ],
+    "income_channels": [
+      "\u2713 Polymarket Affiliate: LIVE",
+      "\u2713 AI Nexus Consulting: LIVE",
+      "\u2713 USDC payment address: VISIBLE"
+    ],
+    "capital_awareness": [
+      "Polymarket: $8.99",
+      "Positions: $98.05"
+    ]
+  }
+}

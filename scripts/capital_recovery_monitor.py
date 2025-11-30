@@ -103,6 +103,24 @@ def log_event(event: str):
         f.write(f"[{timestamp}] {event}\n")
 
 
+def trigger_singularity_if_ready(balance: float):
+    """Check and trigger singularity when threshold crossed"""
+    if balance >= MIN_TRADING_BALANCE:
+        try:
+            import subprocess
+            result = subprocess.run(
+                ['python3', 'autonomous/singularity_trigger.py'],
+                cwd='/root/hands-off-engine',
+                capture_output=True,
+                text=True,
+                timeout=120
+            )
+            if 'SINGULARITY TRIGGERED' in result.stdout:
+                print("[SINGULARITY] Trigger executed!")
+        except Exception as e:
+            print(f"[SINGULARITY] Error: {e}")
+
+
 def check_recovery():
     """Main recovery check logic"""
     state = load_state()
@@ -111,6 +129,11 @@ def check_recovery():
 
     now = datetime.now(timezone.utc)
     print(f"[{now.isoformat()}] Balance: ${current_balance:.2f} (was ${previous_balance:.2f})")
+
+    # Check for singularity trigger
+    if current_balance >= MIN_TRADING_BALANCE and previous_balance < MIN_TRADING_BALANCE:
+        print("[SINGULARITY] Trading threshold crossed! Triggering...")
+        trigger_singularity_if_ready(current_balance)
 
     events = []
 
