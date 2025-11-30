@@ -1,0 +1,30 @@
+{
+  "last_run": "2025-11-30T21:50:18.800229+00:00",
+  "total_fetches": 5,
+  "successful_fetches": 5,
+  "failed_fetches": 0,
+  "alerts_generated": 0,
+  "cache_hits": 0,
+  "sources_status": {
+    "polymarket_active": {
+      "last_success": "2025-11-30T21:50:11.479839+00:00",
+      "status": "ok"
+    },
+    "coingecko_prices": {
+      "last_success": "2025-11-30T21:50:11.541616+00:00",
+      "status": "ok"
+    },
+    "btc_dominance": {
+      "last_success": "2025-11-30T21:50:11.647136+00:00",
+      "status": "ok"
+    },
+    "fear_greed": {
+      "last_success": "2025-11-30T21:50:11.651000+00:00",
+      "status": "ok"
+    },
+    "crypto_news": {
+      "last_success": "2025-11-30T21:50:18.797656+00:00",
+      "status": "ok"
+    }
+  }
+}
