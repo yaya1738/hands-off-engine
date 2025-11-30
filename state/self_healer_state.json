@@ -1,7 +1,7 @@
 {
-  "last_save": "2025-11-30T19:15:07.462067",
+  "last_save": "2025-11-30T20:21:35.135892",
   "hostname": "pm-helper",
-  "uptime_hours": 0.10402585222222221,
+  "uptime_hours": 1.211713026111111,
   "healing_actions": [
     {
       "timestamp": "2025-11-30T19:08:54.993064",
@@ -58,18 +58,78 @@
       "reason": "Service was activating",
       "success": false,
       "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T20:02:11.902306",
+      "action_type": "restart_process",
+      "target": "hardware-brain",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T20:02:23.946060",
+      "action_type": "restart_process",
+      "target": "scaling-engine",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T20:09:36.362961",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T20:10:48.465927",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T20:12:00.534239",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T20:13:12.611798",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T20:14:24.688086",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
     }
   ],
   "restart_counts": {
     "hardware-brain": [
-      "2025-11-30T19:08:54.993059"
+      "2025-11-30T19:08:54.993059",
+      "2025-11-30T20:02:11.902302"
     ],
     "position-monitor": [
-      "2025-11-30T19:09:07.055224",
-      "2025-11-30T19:10:19.124645",
-      "2025-11-30T19:11:31.195433",
-      "2025-11-30T19:12:43.261212",
-      "2025-11-30T19:13:55.335641"
+      "2025-11-30T20:09:36.362956",
+      "2025-11-30T20:10:48.465920",
+      "2025-11-30T20:12:00.534233",
+      "2025-11-30T20:13:12.611792",
+      "2025-11-30T20:14:24.688081"
+    ],
+    "scaling-engine": [
+      "2025-11-30T20:02:23.946054"
     ]
   }
 }

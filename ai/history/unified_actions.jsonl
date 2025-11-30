@@ -74,3 +74,266 @@
 {"timestamp": "2025-11-30T19:15:05.225783+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
 {"timestamp": "2025-11-30T19:15:08.344841+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
 {"timestamp": "2025-11-30T19:15:08.344995+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:16:06.306624+00:00", "agent": "MegaCoordinator", "action": "[Iteration 2] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:16:07.867366+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 28 vCPU, 56.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:16:07.867653+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 116.7% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:16:07.867838+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:17:21.251980+00:00", "agent": "MegaCoordinator", "action": "[Iteration 3] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:17:22.646736+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 28 vCPU, 56.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:17:22.646941+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 116.7% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:17:22.647114+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:18:23.756023+00:00", "agent": "MegaCoordinator", "action": "[Iteration 4] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:18:25.331191+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 28 vCPU, 56.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:18:25.331515+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 116.7% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:18:25.331636+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:19:38.952049+00:00", "agent": "MegaCoordinator", "action": "[Iteration 5] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:19:40.240054+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:19:40.240249+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:19:40.240394+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:19:40.240565+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:20:42.732672+00:00", "agent": "MegaCoordinator", "action": "[Iteration 6] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:20:44.639223+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:20:44.639485+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:20:44.639646+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:21:58.309008+00:00", "agent": "MegaCoordinator", "action": "[Iteration 7] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:21:59.657407+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:21:59.657716+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:21:59.657936+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:23:01.051357+00:00", "agent": "MegaCoordinator", "action": "[Iteration 8] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:23:02.406581+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:23:02.406926+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:23:02.407117+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:24:15.924317+00:00", "agent": "MegaCoordinator", "action": "[Iteration 9] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:24:17.319420+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:24:17.319699+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:24:17.319978+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:25:18.896200+00:00", "agent": "MegaCoordinator", "action": "[Iteration 10] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:25:20.751589+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:25:20.752037+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:25:20.752338+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:25:20.752537+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:26:35.965280+00:00", "agent": "MegaCoordinator", "action": "[Iteration 11] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:26:37.589686+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:26:37.589986+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:26:37.590220+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:27:39.015875+00:00", "agent": "MegaCoordinator", "action": "[Iteration 12] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:27:40.887842+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:27:40.888102+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:27:40.888353+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:28:42.275642+00:00", "agent": "MegaCoordinator", "action": "[Iteration 13] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:28:44.406558+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:28:44.406780+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:28:44.406987+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:29:45.649090+00:00", "agent": "MegaCoordinator", "action": "[Iteration 14] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:29:48.176279+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:29:48.176643+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:29:48.176845+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:30:49.448918+00:00", "agent": "MegaCoordinator", "action": "[Iteration 15] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:30:51.216364+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:30:51.216622+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:30:51.216840+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:30:51.217026+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:31:54.199433+00:00", "agent": "MegaCoordinator", "action": "[Iteration 16] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:31:56.060443+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:31:56.060710+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:31:56.060903+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:32:57.496150+00:00", "agent": "MegaCoordinator", "action": "[Iteration 17] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:32:59.991108+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:32:59.991400+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:32:59.991652+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:34:01.683712+00:00", "agent": "MegaCoordinator", "action": "[Iteration 18] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:34:03.294604+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:34:03.294935+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:34:03.295152+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:35:04.594035+00:00", "agent": "MegaCoordinator", "action": "[Iteration 19] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:35:06.834470+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:35:06.834885+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:35:06.835313+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:36:08.402822+00:00", "agent": "MegaCoordinator", "action": "[Iteration 20] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:36:09.856136+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:36:09.856408+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:36:09.856759+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:36:09.856946+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:37:13.343485+00:00", "agent": "MegaCoordinator", "action": "[Iteration 21] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:37:14.605216+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:37:14.605472+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:37:14.605633+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:38:16.754814+00:00", "agent": "MegaCoordinator", "action": "[Iteration 22] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:38:18.588345+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:38:18.588603+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:38:18.588787+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:39:22.133348+00:00", "agent": "MegaCoordinator", "action": "[Iteration 23] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:39:26.043048+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:39:26.043305+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:39:26.043489+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:40:27.297571+00:00", "agent": "MegaCoordinator", "action": "[Iteration 24] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:40:28.587276+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:40:28.587561+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:40:28.587736+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:41:30.601871+00:00", "agent": "MegaCoordinator", "action": "[Iteration 25] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:41:32.355806+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:41:32.356109+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:41:32.356287+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:41:32.356425+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:42:35.106217+00:00", "agent": "MegaCoordinator", "action": "[Iteration 26] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:42:37.341314+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:42:37.341568+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:42:37.341773+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:43:39.012722+00:00", "agent": "MegaCoordinator", "action": "[Iteration 27] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:43:40.642163+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:43:40.642418+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:43:40.642620+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:44:42.506569+00:00", "agent": "MegaCoordinator", "action": "[Iteration 28] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:44:43.880314+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:44:43.880521+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:44:43.880700+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:45:45.291234+00:00", "agent": "MegaCoordinator", "action": "[Iteration 29] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:45:46.588369+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:45:46.588630+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:45:46.588843+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:46:48.242298+00:00", "agent": "MegaCoordinator", "action": "[Iteration 30] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:46:49.928150+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:46:49.928443+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:46:49.928599+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:46:49.928754+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:47:53.313878+00:00", "agent": "MegaCoordinator", "action": "[Iteration 31] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:47:54.589808+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:47:54.589976+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:47:54.590094+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:48:56.218182+00:00", "agent": "MegaCoordinator", "action": "[Iteration 32] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:48:57.756910+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:48:57.757396+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:48:57.757650+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:49:59.136358+00:00", "agent": "MegaCoordinator", "action": "[Iteration 33] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:50:00.385962+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:50:00.386362+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:50:00.386628+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:51:02.230228+00:00", "agent": "MegaCoordinator", "action": "[Iteration 34] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:51:03.543848+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:51:03.544163+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:51:03.544654+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:52:05.680753+00:00", "agent": "MegaCoordinator", "action": "[Iteration 35] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:52:07.332653+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:52:07.332911+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:52:07.333236+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:52:07.333659+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:53:10.339620+00:00", "agent": "MegaCoordinator", "action": "[Iteration 36] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:53:11.976428+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:53:11.976766+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:53:11.976951+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:54:14.047015+00:00", "agent": "MegaCoordinator", "action": "[Iteration 37] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:54:15.259598+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:54:15.259798+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:54:15.260079+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:55:16.512664+00:00", "agent": "MegaCoordinator", "action": "[Iteration 38] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:55:18.432011+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:55:18.432270+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:55:18.432430+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:56:19.671594+00:00", "agent": "MegaCoordinator", "action": "[Iteration 39] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:56:21.267851+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:56:21.268381+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:56:21.268634+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:57:23.235689+00:00", "agent": "MegaCoordinator", "action": "[Iteration 40] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:57:27.050119+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:57:27.050392+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:57:27.050557+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:57:27.050721+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:58:29.841982+00:00", "agent": "MegaCoordinator", "action": "[Iteration 41] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:58:31.284212+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:58:31.284484+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:58:31.284668+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:59:32.941634+00:00", "agent": "MegaCoordinator", "action": "[Iteration 42] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:59:34.467872+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:59:34.468075+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T19:59:34.468209+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:00:02.212518+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:00:05.324443+00:00", "agent": "trading-pipeline", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:00:36.014628+00:00", "agent": "MegaCoordinator", "action": "[Iteration 43] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:00:37.654606+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 44 vCPU, 88.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:00:37.654935+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 183.3% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:00:37.655181+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:01:39.131982+00:00", "agent": "MegaCoordinator", "action": "[Iteration 44] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:01:39.722747+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 4 vCPU, 8.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:01:39.723013+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 16.7% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:01:39.723186+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:01:41.360141+00:00", "agent": "MegaCoordinator", "action": "NOTIFICATION [high]: WARNING: Only 1 healthy nodes", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:02:41.404162+00:00", "agent": "MegaCoordinator", "action": "[Iteration 45] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:02:44.673803+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:02:44.674086+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:02:44.674311+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 70%, System 65%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:02:44.674491+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:03:47.147125+00:00", "agent": "MegaCoordinator", "action": "[Iteration 46] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:03:48.663191+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:03:48.663416+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:03:48.663659+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:04:50.113487+00:00", "agent": "MegaCoordinator", "action": "[Iteration 47] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:04:51.507779+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:04:51.508095+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:04:51.508291+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:05:53.553767+00:00", "agent": "MegaCoordinator", "action": "[Iteration 48] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:05:54.840881+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:05:54.841337+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:05:54.841642+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:06:56.885638+00:00", "agent": "MegaCoordinator", "action": "[Iteration 49] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:06:58.419490+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:06:58.419848+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:06:58.420037+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:07:59.955991+00:00", "agent": "MegaCoordinator", "action": "[Iteration 50] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:08:01.380343+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:08:01.380568+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:08:01.380750+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:08:01.380926+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:09:04.669918+00:00", "agent": "MegaCoordinator", "action": "[Iteration 51] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:09:05.989537+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:09:05.989810+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:09:05.990019+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:10:07.165854+00:00", "agent": "MegaCoordinator", "action": "[Iteration 52] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:10:08.459296+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:10:08.459652+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:10:08.459831+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:11:09.938929+00:00", "agent": "MegaCoordinator", "action": "[Iteration 53] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:11:11.373763+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:11:11.373978+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:11:11.374139+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:12:13.138631+00:00", "agent": "MegaCoordinator", "action": "[Iteration 54] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:12:14.468954+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:12:14.469279+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:12:14.469439+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:13:15.629216+00:00", "agent": "MegaCoordinator", "action": "[Iteration 55] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:13:16.955251+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:13:16.955496+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:13:16.955829+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:13:16.956084+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:14:19.258572+00:00", "agent": "MegaCoordinator", "action": "[Iteration 56] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:14:21.462001+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:14:21.462243+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:14:21.462493+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:15:23.177342+00:00", "agent": "MegaCoordinator", "action": "[Iteration 57] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:15:25.756535+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:15:25.756858+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:15:25.757044+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:16:26.960410+00:00", "agent": "MegaCoordinator", "action": "[Iteration 58] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:16:28.947638+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:16:28.947844+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:16:28.947984+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:17:42.540476+00:00", "agent": "MegaCoordinator", "action": "[Iteration 59] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:17:44.460704+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:17:44.460986+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:17:44.461377+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:18:45.938429+00:00", "agent": "MegaCoordinator", "action": "[Iteration 60] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:18:47.532219+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:18:47.532728+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:18:47.532914+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:18:47.533063+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:20:02.736489+00:00", "agent": "MegaCoordinator", "action": "[Iteration 61] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:20:05.244381+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:20:05.244776+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:20:05.244962+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:21:06.479322+00:00", "agent": "MegaCoordinator", "action": "[Iteration 62] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:21:08.043522+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:21:08.043797+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:21:08.043984+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:22:21.258039+00:00", "agent": "MegaCoordinator", "action": "[Iteration 63] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:22:23.276859+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 36 vCPU, 72.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:22:23.277093+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 150.0% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-11-30T20:22:23.277322+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}

@@ -1,0 +1,1 @@
+{"is_master": true, "confidence": 0.6, "signals": ["root_on_known_host:pm-helper", "env:USER=root", "env:HOME=/root", "cwd:/root/hands-off-engine"], "identity": "Yair Siegel", "timestamp": "2025-11-30T19:59:36.829847"}
