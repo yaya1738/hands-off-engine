@@ -9,6 +9,7 @@ Commands:
 - /status - Full system status
 - /metrics - Performance metrics (24h)
 - /health - Health check results
+- /hardware - Hardware health and upgrade status
 - /approve <id> - Approve pending change
 - /reject <id> - Reject pending change
 - /agents - AI agent coordination status
@@ -50,6 +51,7 @@ class TelegramCommandBot:
             '/status': self.cmd_status,
             '/metrics': self.cmd_metrics,
             '/health': self.cmd_health,
+            '/hardware': self.cmd_hardware,
             '/pending': self.cmd_pending,
             '/approve': self.cmd_approve,
             '/reject': self.cmd_reject,
@@ -208,6 +210,90 @@ System is operating normally."""
 
         except Exception as e:
             return f"❌ Error running health check: {str(e)}"
+
+    def cmd_hardware(self, args) -> str:
+        """Get hardware health and upgrade recommendations."""
+        try:
+            # Try to use hardware monitoring module
+            try:
+                from hardware.hardware_collector import HardwareCollector
+                from hardware.hardware_analyzer import HardwareAnalyzer, analyze_hardware_health
+
+                collector = HardwareCollector()
+                analyzer = HardwareAnalyzer()
+
+                # Collect metrics
+                metrics = collector.collect_all()
+                health = analyzer.analyze(metrics)
+
+                # Build response
+                status_emoji = {
+                    'pristine': '✨',
+                    'optimal': '🟢',
+                    'healthy': '🟢',
+                    'degraded': '🟡',
+                    'warning': '🟠',
+                    'critical': '🔴',
+                    'failed': '💀'
+                }
+
+                emoji = status_emoji.get(health.overall_status.value, '❓')
+
+                msg = f"""💻 Hardware Health Report
+
+{emoji} **Overall: {health.overall_status.value.upper()}** (Score: {health.overall_score:.0f}/100)
+
+**Components:**
+• CPU: {health.cpu_health.status.value} ({health.cpu_health.score:.0f}%)
+• Memory: {health.memory_health.status.value} ({health.memory_health.score:.0f}%)
+• Disk: {health.disk_health.status.value} ({health.disk_health.score:.0f}%)
+• Network: {health.network_health.status.value} ({health.network_health.score:.0f}%)
+• Thermal: {health.thermal_health.status.value} ({health.thermal_health.score:.0f}%)
+
+**Trading Risk:** {health.trading_impact_risk}
+**Trend:** {health.degradation_trend}"""
+
+                if health.time_to_critical_estimate:
+                    msg += f"\n⚠️ **Time to Critical:** {health.time_to_critical_estimate}"
+
+                if health.active_alerts:
+                    msg += f"\n\n🚨 **Active Alerts:** {len(health.active_alerts)}"
+                    for alert in health.active_alerts[:3]:
+                        msg += f"\n• {alert.message}"
+
+                # Add resource limits info
+                resource_limits_path = REPO_ROOT / "config" / "resource_limits.json"
+                if resource_limits_path.exists():
+                    with open(resource_limits_path) as f:
+                        limits = json.load(f)
+                    auto_scale = limits.get("auto_scale", {})
+                    if auto_scale.get("enabled"):
+                        msg += "\n\n⚙️ **Auto-scaling:** Enabled"
+                        if auto_scale.get("require_human_approval"):
+                            msg += " (requires approval)"
+                    else:
+                        msg += "\n\n⚙️ **Auto-scaling:** Disabled"
+
+                msg += "\n\nHardware is managed autonomously."
+                return msg
+
+            except ImportError:
+                # Fallback: basic system info
+                import os
+                load_avg = os.getloadavg()
+
+                msg = f"""💻 Hardware Status (Basic)
+
+**CPU Load Average:** {load_avg[0]:.2f}, {load_avg[1]:.2f}, {load_avg[2]:.2f}
+
+Full hardware monitoring module not available.
+Install with: pip install psutil
+
+Hardware management is autonomous when module is available."""
+                return msg
+
+        except Exception as e:
+            return f"❌ Error getting hardware status: {str(e)}"
 
     def cmd_pending(self, args) -> str:
         """Show pending changes awaiting approval."""
@@ -408,6 +494,7 @@ Pending Tasks: {len(pending_tasks)}"""
 /status - Full system status
 /metrics - Performance metrics (24h)
 /health - Run health check
+/hardware - Hardware health & upgrade status
 
 **Interact:**
 /task <description> - Request system to do something
@@ -420,7 +507,8 @@ Pending Tasks: {len(pending_tasks)}"""
 /help - This message
 
 You can control the entire system via Telegram.
-No need to launch Claude Code CLI for routine operations."""
+No need to launch Claude Code CLI for routine operations.
+Hardware is managed autonomously with human approval for upgrades."""
 
 
 def send_telegram_message(message: str):

@@ -1,0 +1,99 @@
+{
+  "version": "1.0.0",
+  "description": "Resource limits for autonomous hardware management and auto-scaling",
+  "standard": "Yair Siegel Master Level Operations",
+  "last_updated": "2025-11-30T18:00:00Z",
+
+  "cpu": {
+    "warning_threshold": 80,
+    "critical_threshold": 95,
+    "scale_up_threshold": 90,
+    "scale_down_threshold": 20,
+    "sustained_period_seconds": 300,
+    "description": "CPU usage thresholds for scaling decisions"
+  },
+
+  "memory": {
+    "warning_threshold": 80,
+    "critical_threshold": 95,
+    "scale_up_threshold": 90,
+    "scale_down_threshold": 30,
+    "min_available_gb": 0.5,
+    "description": "Memory usage thresholds for scaling decisions"
+  },
+
+  "disk": {
+    "warning_threshold": 80,
+    "critical_threshold": 95,
+    "cleanup_threshold": 85,
+    "min_available_gb": 5,
+    "description": "Disk usage thresholds for alerts and cleanup"
+  },
+
+  "network": {
+    "warning_latency_ms": 100,
+    "critical_latency_ms": 500,
+    "max_error_rate_percent": 1,
+    "description": "Network thresholds for trading system protection"
+  },
+
+  "auto_scale": {
+    "enabled": true,
+    "require_human_approval": true,
+    "auto_approve_upgrades_under_usd": 50,
+    "never_auto_approve_downgrades": true,
+    "cooldown_minutes": 30,
+    "max_scale_operations_per_day": 3,
+    "description": "Auto-scaling behavior configuration"
+  },
+
+  "droplet_sizes": {
+    "upgrade_path": [
+      "s-1vcpu-1gb",
+      "s-1vcpu-2gb",
+      "s-2vcpu-2gb",
+      "s-2vcpu-4gb",
+      "s-4vcpu-8gb",
+      "s-8vcpu-16gb"
+    ],
+    "preferred_region": "nyc1",
+    "backup_regions": ["nyc3", "sfo3"],
+    "description": "DigitalOcean droplet sizing configuration"
+  },
+
+  "process_limits": {
+    "max_cpu_per_process": 50,
+    "runaway_threshold_minutes": 10,
+    "auto_kill_runaway": false,
+    "protected_processes": [
+      "python.*telegram",
+      "python.*executor",
+      "python.*unified_system"
+    ],
+    "description": "Per-process resource limits"
+  },
+
+  "cost_limits": {
+    "monthly_budget_usd": 500,
+    "alert_at_percent": 80,
+    "halt_at_percent": 100,
+    "track_revenue_offset": true,
+    "description": "Cost management for infrastructure"
+  },
+
+  "health_check": {
+    "interval_seconds": 60,
+    "consecutive_failures_for_alert": 3,
+    "auto_restart_failed_services": true,
+    "notify_on_recovery": true,
+    "description": "Health check frequency and behavior"
+  },
+
+  "notifications": {
+    "channels": ["telegram", "console", "audit_log"],
+    "alert_levels": ["critical", "warning"],
+    "daily_summary": true,
+    "daily_summary_time_utc": "09:00",
+    "description": "Notification configuration for hardware events"
+  }
+}
