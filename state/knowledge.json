@@ -9,7 +9,8 @@
     "docs/SYSTEM_ASSUMPTIONS.md",
     "docs/knowledge/MARKET_FUNDAMENTALS.md",
     "docs/knowledge/POLYMARKET_SPECIFIC.md",
-    "docs/knowledge/TRADING_STRATEGY.md"
+    "docs/knowledge/TRADING_STRATEGY.md",
+    "docs/knowledge/NEW_MARKET_EDGE.md"
   ],
   "agent_instruction_files": [
     ".claude/instructions.md",
