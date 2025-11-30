@@ -1,0 +1,190 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-30",
+  "master": "Yair Siegel",
+
+  "partners": {
+    "digitalocean": {
+      "name": "DigitalOcean",
+      "type": "infrastructure",
+      "billing_cycle": "hourly",
+      "billing_method": "prepaid_credit",
+      "account_email": "siegel.yaz@gmail.com",
+      "droplet_limit": 10,
+      "pricing": {
+        "s-1vcpu-1gb": {"hourly": 0.00744, "monthly": 5},
+        "s-1vcpu-2gb": {"hourly": 0.01488, "monthly": 10},
+        "s-2vcpu-2gb": {"hourly": 0.02232, "monthly": 15},
+        "s-2vcpu-4gb": {"hourly": 0.02976, "monthly": 20},
+        "s-4vcpu-8gb": {"hourly": 0.05952, "monthly": 40},
+        "s-8vcpu-16gb": {"hourly": 0.11905, "monthly": 80},
+        "s-8vcpu-16gb-amd": {"hourly": 0.14286, "monthly": 96}
+      },
+      "current_usage": {
+        "droplets": 4,
+        "estimated_monthly": 384
+      },
+      "terms": {
+        "billing_frequency": "Monthly, charged on account anniversary",
+        "payment_due": "Charged to card on file immediately",
+        "overdue_action": "Droplets destroyed after grace period",
+        "grace_period_days": 7,
+        "min_balance_warning": 50,
+        "droplet_billing": "Billed from creation until destruction (even if powered off)"
+      },
+      "critical_rules": [
+        "HOURLY BILLING: Each droplet costs money every hour it exists",
+        "DESTROYED = FREE: Only way to stop billing is to destroy droplet",
+        "POWERED OFF = STILL BILLED: Stopping a droplet does NOT stop billing",
+        "SNAPSHOTS COST: $0.05/GB/month for snapshots"
+      ]
+    },
+
+    "anthropic": {
+      "name": "Anthropic (Claude)",
+      "type": "ai_provider",
+      "billing_cycle": "monthly",
+      "billing_method": "postpaid",
+      "pricing": {
+        "claude-3-opus": {"input_per_1k": 0.015, "output_per_1k": 0.075},
+        "claude-3-sonnet": {"input_per_1k": 0.003, "output_per_1k": 0.015},
+        "claude-3-haiku": {"input_per_1k": 0.00025, "output_per_1k": 0.00125},
+        "claude_code_pro": {"monthly": 100, "type": "subscription"}
+      },
+      "terms": {
+        "billing_frequency": "Monthly",
+        "payment_due": "Net 30",
+        "rate_limits": "Varies by plan",
+        "usage_tracking": "Per-token"
+      },
+      "critical_rules": [
+        "TOKEN-BASED: Pay per input/output token",
+        "CONTEXT = COST: Longer conversations cost more",
+        "RATE LIMITS: Can be throttled if exceeded"
+      ]
+    },
+
+    "openai": {
+      "name": "OpenAI",
+      "type": "ai_provider",
+      "billing_cycle": "monthly",
+      "billing_method": "prepaid_credit",
+      "pricing": {
+        "gpt-4-turbo": {"input_per_1k": 0.01, "output_per_1k": 0.03},
+        "gpt-4o": {"input_per_1k": 0.005, "output_per_1k": 0.015},
+        "gpt-3.5-turbo": {"input_per_1k": 0.0005, "output_per_1k": 0.0015}
+      },
+      "terms": {
+        "billing_frequency": "Prepaid credits, auto-recharge optional",
+        "payment_due": "Immediate (prepaid)",
+        "rate_limits": "TPM and RPM limits by tier"
+      },
+      "critical_rules": [
+        "PREPAID: Must have credits to use",
+        "QUOTA EXCEEDED: API calls fail when credits exhausted",
+        "RATE LIMITS: Different tiers have different limits"
+      ]
+    },
+
+    "groq": {
+      "name": "Groq",
+      "type": "ai_provider",
+      "billing_cycle": "none",
+      "billing_method": "free_tier",
+      "pricing": {
+        "llama-3.1-70b": {"input_per_1k": 0, "output_per_1k": 0}
+      },
+      "terms": {
+        "billing_frequency": "Free tier",
+        "rate_limits": "30 RPM, 14,400 RPD",
+        "daily_token_limit": 500000
+      },
+      "critical_rules": [
+        "FREE BUT LIMITED: Rate limits apply",
+        "NO COST: $0 for inference",
+        "RATE LIMIT = FAIL: Requests rejected when limit hit"
+      ]
+    },
+
+    "google_ai": {
+      "name": "Google AI (Gemini)",
+      "type": "ai_provider",
+      "billing_cycle": "none",
+      "billing_method": "free_tier",
+      "pricing": {
+        "gemini-1.5-flash": {"input_per_1k": 0, "output_per_1k": 0}
+      },
+      "terms": {
+        "billing_frequency": "Free tier",
+        "rate_limits": "60 RPM",
+        "daily_token_limit": 1000000
+      },
+      "critical_rules": [
+        "FREE BUT LIMITED: Rate limits apply",
+        "NO COST: $0 for inference",
+        "GENEROUS LIMITS: Higher than Groq"
+      ]
+    },
+
+    "polymarket": {
+      "name": "Polymarket",
+      "type": "trading_platform",
+      "billing_cycle": "per_trade",
+      "billing_method": "usdc_wallet",
+      "pricing": {
+        "trading_fee": "0%",
+        "gas_fee": "Variable (Polygon network)",
+        "withdrawal_fee": "Variable"
+      },
+      "terms": {
+        "min_trade": 1,
+        "settlement": "On market resolution",
+        "currency": "USDC"
+      },
+      "critical_rules": [
+        "USDC REQUIRED: Must have USDC in wallet to trade",
+        "NO TRADING FEES: 0% on trades",
+        "GAS FEES: Small Polygon gas fees on transactions",
+        "LOCKED UNTIL RESOLUTION: Funds locked in positions until market resolves"
+      ]
+    },
+
+    "coingecko": {
+      "name": "CoinGecko API",
+      "type": "data_provider",
+      "billing_cycle": "none",
+      "billing_method": "free_tier",
+      "pricing": {"cost": 0},
+      "terms": {
+        "rate_limits": "10-30 calls/minute",
+        "attribution": "Required"
+      },
+      "critical_rules": [
+        "FREE: No cost",
+        "RATE LIMITED: Will block if exceeded"
+      ]
+    },
+
+    "github": {
+      "name": "GitHub",
+      "type": "code_hosting",
+      "billing_cycle": "monthly",
+      "billing_method": "free_tier",
+      "pricing": {"cost": 0},
+      "terms": {
+        "private_repos": "Unlimited (free)",
+        "actions_minutes": "2000/month free"
+      },
+      "critical_rules": [
+        "FREE: No cost for current usage",
+        "ACTIONS: Limited free minutes"
+      ]
+    }
+  },
+
+  "cost_tracking": {
+    "log_file": "finance/cost_log.jsonl",
+    "alert_threshold_daily": 10,
+    "alert_threshold_monthly": 200
+  }
+}
