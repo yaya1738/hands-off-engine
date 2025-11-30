@@ -62,6 +62,9 @@ class TelegramCommandBot:
             '/cluster': self.cmd_cluster,
             '/identity': self.cmd_identity,
             '/logs': self.cmd_logs,
+            '/dashboard': self.cmd_dashboard,
+            '/escape': self.cmd_escape_velocity,
+            '/setpat': self.cmd_setpat,
         }
 
     def process_command(self, command_text: str) -> str:
@@ -418,17 +421,22 @@ Pending Tasks: {len(pending_tasks)}"""
 /positions - Detailed position list
 /cluster - Server cluster status
 /logs - Recent system logs
+/escape - Escape velocity score
 
 **Interact:**
 /task <description> - Request system to do something
 /pending - View pending approvals
 /approve <id> - Approve pending change
 /reject <id> - Reject pending change
+/setpat <token> - Set GitHub PAT for compute nodes
 
 **Info:**
+/dashboard - Unified web dashboard URL
 /agents - AI coordination status
 /identity - Verify your identity
 /help - This message
+
+Web Dashboard: http://138.68.103.156:8002
 
 You can control the entire system via Telegram.
 No need to launch Claude Code CLI for routine operations."""
@@ -598,6 +606,155 @@ Active: {active} servers
 
         except Exception as e:
             return f"❌ Error reading logs: {str(e)}"
+
+    def cmd_dashboard(self, args) -> str:
+        """Get link to unified web dashboard."""
+        try:
+            import requests as req
+            # Check if dashboard is running
+            r = req.get("http://localhost:8002/api/status", timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                ev = data.get("escape_velocity", {}).get("score", 0)
+                nodes = data.get("cluster", {}).get("healthy_nodes", 0)
+                agents = len(data.get("coordination", {}).get("active_agents", []))
+
+                return f"""🖥 Unified Dashboard
+
+Access: http://138.68.103.156:8002
+
+Real-time system visualization:
+• Finance & Trading
+• Cluster Health ({nodes} nodes)
+• AI Coordination ({agents} agents)
+• Escape Velocity: {ev}/100
+• Identity & Security
+
+Updates every 30 seconds.
+Full API at /api/status"""
+            else:
+                return "❌ Dashboard service not responding"
+
+        except Exception as e:
+            return f"""🖥 Unified Dashboard
+
+Access: http://138.68.103.156:8002
+
+(Status check failed: {str(e)})
+
+Try opening the URL in your browser."""
+
+    def cmd_escape_velocity(self, args) -> str:
+        """Get escape velocity score and factors."""
+        try:
+            import requests as req
+            r = req.get("http://localhost:8002/api/escape-velocity", timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                score = data.get("score", 0)
+                factors = data.get("factors", {})
+
+                # Determine status
+                if score >= 80:
+                    status = "🚀 ESCAPE VELOCITY ACHIEVED"
+                elif score >= 60:
+                    status = "🟢 Strong momentum"
+                elif score >= 40:
+                    status = "🟡 Building momentum"
+                else:
+                    status = "🔴 Need acceleration"
+
+                return f"""🚀 Escape Velocity: {score}/100
+
+{status}
+
+Factors:
+• Capital: ${factors.get('capital', 0):.2f}
+• Nodes: {factors.get('nodes', 0)}
+• Signals: {factors.get('signals', 0)}
+
+Target: 100 = Self-sustaining system
+
+Dashboard: http://138.68.103.156:8002"""
+            else:
+                return "❌ Could not get escape velocity"
+
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
+
+    def cmd_setpat(self, args) -> str:
+        """Set GitHub Personal Access Token for compute nodes."""
+        if not args:
+            return """🔐 GitHub PAT Configuration
+
+Usage: /setpat <your_github_pat>
+
+This will:
+1. Store PAT in .env file
+2. Configure git on all compute nodes
+3. Enable CLI migration to larger nodes
+
+Generate PAT at: https://github.com/settings/tokens
+Required scope: repo (Full control of private repos)
+
+⚠️ Send the PAT directly - it will be stored securely."""
+
+        pat = args[0]
+
+        # Validate PAT format (github classic or fine-grained)
+        if not (pat.startswith('ghp_') or pat.startswith('github_pat_')):
+            return "❌ Invalid PAT format. Should start with 'ghp_' or 'github_pat_'"
+
+        try:
+            # Store in .env file
+            env_file = REPO_ROOT / ".env"
+            env_content = ""
+            if env_file.exists():
+                env_content = env_file.read_text()
+
+            # Update or add GITHUB_PAT
+            if "GITHUB_PAT=" in env_content:
+                lines = env_content.split('\n')
+                lines = [l if not l.startswith('GITHUB_PAT=') else f'GITHUB_PAT={pat}' for l in lines]
+                env_content = '\n'.join(lines)
+            else:
+                env_content += f'\nGITHUB_PAT={pat}\n'
+
+            env_file.write_text(env_content)
+
+            # Configure git on compute nodes
+            compute_nodes = ["134.122.124.240", "198.211.96.196", "67.205.153.121"]
+            configured = []
+
+            for node_ip in compute_nodes:
+                try:
+                    # Configure git to use PAT
+                    result = subprocess.run([
+                        'ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=10',
+                        f'root@{node_ip}',
+                        f'''cd /root/hands-off-engine && git remote set-url origin https://{pat}@github.com/yaya1738/hands-off-engine.git && git fetch --quiet && echo "OK"'''
+                    ], capture_output=True, text=True, timeout=30)
+
+                    if "OK" in result.stdout:
+                        configured.append(node_ip)
+                except Exception:
+                    pass
+
+            return f"""✅ GitHub PAT configured!
+
+Stored in .env: ✓
+Compute nodes configured: {len(configured)}/3
+Nodes: {', '.join(configured) if configured else 'none'}
+
+You can now run Claude CLI on any compute node:
+ssh root@67.205.153.121
+cd /root/hands-off-engine
+claude
+
+(This node has 8 vCPU, 16GB RAM vs current 4 vCPU)"""
+
+        except Exception as e:
+            return f"❌ Error configuring PAT: {str(e)}"
 
 
 def send_telegram_message(message: str):

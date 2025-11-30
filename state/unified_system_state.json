@@ -1,14 +1,55 @@
 {
+  "timestamp": "2025-11-30T21:06:46.285718+00:00",
+  "master": "Yair Siegel",
   "balance": 8.99,
-  "trading_enabled": true,
-  "escape_velocity": 44,
+  "positions_value": 95.66,
+  "total_value": 104.65,
+  "trading_enabled": false,
   "micro_trading": true,
   "min_trade": 1.0,
   "max_trade_pct": 0.25,
-  "last_update": "2025-11-30T20:36:31.104659+00:00",
-  "total_vcpus": 36,
-  "total_ram_gb": 72.0,
-  "healthy_nodes": 5,
-  "scaling_progress": 150.0,
+  "trading_threshold": 50.0,
+  "gap_to_trading": 41.01,
+  "mini_singularity_threshold": 25.0,
+  "gap_to_mini": 16.01,
+  "total_vcpus": 28,
+  "total_ram_gb": 56.0,
+  "healthy_nodes": 4,
+  "bottleneck_node": "pm-helper",
+  "idle_nodes": [
+    "ho-compute-2 (134.122.124.240)",
+    "ho-compute-2 (198.211.96.196)",
+    "ho-scale (67.205.153.121)"
+  ],
+  "idle_capacity_vcpus": 24,
+  "idle_capacity_ram_gb": 48.0,
+  "hardware_status": "24 vCPU idle while pm-helper bottlenecked",
+  "automation_processes": 16,
+  "cron_jobs": 9,
+  "monitors_fixed": [
+    "capital_recovery_monitor",
+    "payment_monitor",
+    "singularity_trigger"
+  ],
+  "income_channels": 4,
+  "income_flowing": 0,
+  "outreach_status": "materials ready, awaiting user deployment",
+  "escape_velocity": 44,
+  "signals_count": 12,
+  "signals_avg_edge": 2.8,
+  "blockers": [
+    "Capital: $41.01 gap to trading ($16.01 to mini)",
+    "Income: Materials ready, user needs to deploy Upwork/Fiverr",
+    "Hardware: GitHub PAT needed to run CLI on compute node"
+  ],
+  "active_agents": [
+    "copilot",
+    "claude-code",
+    "chatgpt",
+    "claude-web"
+  ],
+  "distribution_ready": true,
+  "last_update": "2025-11-30T21:10:16.787675+00:00",
+  "scaling_progress": 116.7,
   "hardware_health": 100.0
 }

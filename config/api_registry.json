@@ -51,12 +51,16 @@
       "notes": "Server infrastructure"
     },
     "github": {
-      "status": "working",
-      "access_method": "SSH key",
-      "capabilities": ["push", "pull", "branches"],
+      "status": "partial",
+      "access_method": "SSH key (pm-helper only)",
+      "env_var": "GITHUB_PAT",
+      "env_file": ".env",
+      "capabilities": ["push", "pull", "branches", "api"],
       "repo": "yaya1738/hands-off-engine",
       "cost": "free",
-      "notes": "Need PAT for API calls (issues, PRs)"
+      "notes": "PAT needed for: compute nodes, API calls, CLI migration",
+      "action_needed": "Generate PAT at https://github.com/settings/tokens with 'repo' scope",
+      "telegram_command": "/setpat <token>"
     }
   },
 
