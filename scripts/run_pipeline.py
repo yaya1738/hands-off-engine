@@ -131,6 +131,31 @@ def run_pipeline(
     }
     
     try:
+        # Step 0: Early balance check to avoid wasting LLM API calls
+        from executor.trading_safeguards import TradingSafeguards
+        MIN_TRADING_BALANCE = 10.0  # Don't waste API calls if < $10
+
+        try:
+            safeguards = TradingSafeguards()
+            ok, msg = safeguards.check_wallet_balance(MIN_TRADING_BALANCE)
+            # Parse balance from message like "Wallet: $8.99"
+            import re
+            match = re.search(r'\$(\d+\.?\d*)', msg)
+            if match:
+                balance = float(match.group(1))
+                if balance < MIN_TRADING_BALANCE:
+                    if verbose:
+                        print(f"⏸️  SKIPPING PIPELINE: Balance ${balance:.2f} < ${MIN_TRADING_BALANCE} minimum")
+                        print(f"   No point generating signals we can't trade.")
+                        print(f"   Position monitor still running for exit opportunities.")
+                    results['success'] = True
+                    results['skipped'] = f"Low balance: ${balance:.2f}"
+                    return results
+        except Exception as e:
+            # If balance check fails, continue anyway
+            if verbose:
+                print(f"⚠️  Balance check failed ({e}), continuing...")
+
         # Step 1: Sync Polymarket Model (Alpha)
         if verbose:
             engine_type = "Intelligent (LLM)" if intelligent else "Simple (hash)"
