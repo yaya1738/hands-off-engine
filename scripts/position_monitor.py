@@ -64,11 +64,29 @@ def get_market_price(slug: str) -> float:
 
 
 def send_telegram(message: str):
-    """Send alert via Telegram"""
+    """Send alert via Telegram using system notify"""
+    # Try the termux notify.py first (has config)
+    try:
+        import subprocess
+        result = subprocess.run(
+            ["python3", "termux-hands-off/agent/notify.py"],
+            input=message,
+            capture_output=True,
+            text=True,
+            cwd="/root/hands-off-engine",
+            timeout=30
+        )
+        if result.returncode == 0:
+            print(f"[TELEGRAM] Sent: {message[:50]}...")
+            return
+    except Exception as e:
+        pass
+
+    # Fallback to env vars
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not token or not chat_id:
-        print(f"[ALERT] {message}")
+        print(f"[ALERT - NO TELEGRAM] {message}")
         return
     try:
         requests.post(
