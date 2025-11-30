@@ -152,3 +152,27 @@ Historical session logs and coordination docs are in `docs/claude/`:
 - `AUTONOMOUS_OPERATION.md` - Autonomous mode documentation
 - `MCP_*.md` - MCP setup guides and verification results
 - `ai/SESSION_INSIGHTS_*.md` - Session-to-session continuity
+
+---
+
+## CRITICAL: Read First
+
+Before doing ANYTHING in a new session:
+
+1. **Read the truth document**: `state/permanent/SYSTEM_TRUTH.md`
+2. **Load bootstrap kernel**: `ai/memory/kernels/system_bootstrap.json`
+
+These contain the complete system state. Do not rediscover. Execute.
+
+### Quick Status Check
+```bash
+# Financial state
+source .env.polymarket && python3 -c "from executor.trading_safeguards import TradingSafeguards; print(TradingSafeguards().check_wallet_balance(0))"
+
+# API status  
+cat config/api_registry.json | python3 -c "import json,sys; d=json.load(sys.stdin); print('Working:', list(d['configured_working'].keys()))"
+
+# Live services
+curl -s http://138.68.103.156:8080 | head -3 && echo "Landing page: UP"
+```
+

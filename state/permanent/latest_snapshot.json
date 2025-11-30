@@ -1,0 +1,17 @@
+{
+  "generated": "2025-11-30T16:48:59.896334Z",
+  "polymarket_balance": 0,
+  "api_status": {
+    "openai": true,
+    "telegram": true
+  },
+  "recent_commits": [
+    "11b4948 feat: system decides - AI consulting income path",
+    "d562ba2 research: income opportunities to extend runway",
+    "682d345 docs: embed session learnings into Claude instructions",
+    "c3d7a54 chore: session wrap-up optimizations",
+    "ffdf44e feat: optimize system efficiency"
+  ],
+  "server_ip": "138.68.103.156",
+  "landing_page": "http://138.68.103.156:8080"
+}

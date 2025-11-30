@@ -1,4 +1,4 @@
-# AI Integration Service Packages
+# ◈ AI Nexus | Service Packages
 
 ## Package 1: AI Workflow Audit ($500)
 **What you get:**

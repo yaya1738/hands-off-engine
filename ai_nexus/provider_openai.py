@@ -8,7 +8,7 @@ def call_chatgpt(
     agent_id: str,
     prior_messages: List[Dict],
     session_goal: str,
-    model: str = "gpt-4-turbo-preview",
+    model: str = "gpt-4o-mini",
     max_tokens: int = 2048
 ) -> Dict:
     """

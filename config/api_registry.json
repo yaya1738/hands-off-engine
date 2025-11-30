@@ -1,0 +1,146 @@
+{
+  "api_registry": {
+    "version": "1.0",
+    "updated": "2025-11-30",
+    "description": "Master registry of all APIs available to AI Nexus"
+  },
+
+  "configured_working": {
+    "openai": {
+      "status": "working",
+      "env_var": "OPENAI_API_KEY",
+      "env_file": ".env",
+      "capabilities": ["chat", "embeddings", "images", "tts", "whisper"],
+      "models": ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"],
+      "cost": "pay-per-token",
+      "notes": "Primary LLM for intelligent alpha"
+    },
+    "anthropic": {
+      "status": "working",
+      "env_var": "ANTHROPIC_API_KEY",
+      "env_file": "claude_cli_config",
+      "capabilities": ["chat", "code", "analysis"],
+      "models": ["claude-3-opus", "claude-3-sonnet", "claude-3-haiku"],
+      "cost": "pay-per-token",
+      "notes": "Used via Claude CLI for complex reasoning"
+    },
+    "telegram": {
+      "status": "working",
+      "env_var": "TELEGRAM_BOT_TOKEN",
+      "env_file": ".env.social.template",
+      "capabilities": ["send_messages", "receive_commands", "notifications"],
+      "bot_username": "@pm_alerts_autobot",
+      "cost": "free",
+      "notes": "Primary user notification channel"
+    },
+    "polymarket": {
+      "status": "working",
+      "env_var": "POLYMARKET_PRIVATE_KEY",
+      "env_file": ".env.polymarket",
+      "capabilities": ["trading", "market_data", "positions"],
+      "balance": "$8.99",
+      "cost": "trading fees only",
+      "notes": "Main trading venue"
+    },
+    "digitalocean": {
+      "status": "working",
+      "env_var": "DO_API_TOKEN",
+      "env_file": ".env",
+      "capabilities": ["droplets", "domains", "spaces"],
+      "cost": "infrastructure costs",
+      "notes": "Server infrastructure"
+    },
+    "github": {
+      "status": "working",
+      "access_method": "SSH key",
+      "capabilities": ["push", "pull", "branches"],
+      "repo": "yaya1738/hands-off-engine",
+      "cost": "free",
+      "notes": "Need PAT for API calls (issues, PRs)"
+    }
+  },
+
+  "configured_not_working": {
+    "twitter": {
+      "status": "template_only",
+      "env_var": "TWITTER_BEARER_TOKEN",
+      "action_needed": "User needs to create app at developer.twitter.com"
+    },
+    "reddit": {
+      "status": "template_only",
+      "env_var": "REDDIT_CLIENT_ID",
+      "action_needed": "User needs to create app at reddit.com/prefs/apps"
+    }
+  },
+
+  "recommended_additions": {
+    "free_tier": [
+      {
+        "provider": "groq",
+        "url": "console.groq.com",
+        "why": "Free tier, extremely fast inference, good for quick queries",
+        "models": ["llama-3.1-70b", "mixtral-8x7b"],
+        "free_limit": "Generous free tier"
+      },
+      {
+        "provider": "google_ai",
+        "url": "aistudio.google.com",
+        "why": "Free tier includes Gemini Pro, multimodal",
+        "models": ["gemini-1.5-pro", "gemini-1.5-flash"],
+        "free_limit": "60 requests/min free"
+      },
+      {
+        "provider": "mistral",
+        "url": "console.mistral.ai",
+        "why": "Free tier, strong reasoning, European provider",
+        "models": ["mistral-large", "mistral-small"],
+        "free_limit": "Limited free tier"
+      },
+      {
+        "provider": "together_ai",
+        "url": "api.together.xyz",
+        "why": "Free $25 credit, access to many open models",
+        "models": ["llama", "mixtral", "qwen"],
+        "free_limit": "$25 free credit"
+      },
+      {
+        "provider": "huggingface",
+        "url": "huggingface.co",
+        "why": "Free inference API for open models",
+        "models": ["many open source"],
+        "free_limit": "Rate limited free tier"
+      }
+    ],
+    "paid_valuable": [
+      {
+        "provider": "perplexity",
+        "url": "perplexity.ai",
+        "why": "Real-time web search + LLM, great for research"
+      },
+      {
+        "provider": "replicate",
+        "url": "replicate.com",
+        "why": "Run any ML model, good for image/video generation"
+      }
+    ],
+    "for_income": [
+      {
+        "provider": "stripe",
+        "url": "stripe.com",
+        "why": "Accept payments for services",
+        "action": "User creates account, system gets API keys"
+      },
+      {
+        "provider": "gumroad",
+        "url": "gumroad.com",
+        "why": "Sell digital products (signals, reports)",
+        "action": "User creates account"
+      }
+    ]
+  },
+
+  "mcp_servers": {
+    "configured": ["github-mcp-server", "playwright-mcp"],
+    "recommended": ["filesystem", "brave-search", "memory"]
+  }
+}
