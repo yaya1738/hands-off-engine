@@ -878,10 +878,37 @@ class SelfHealingAgent:
                 return self.reset_trading_health()
             elif issue.get("fix_action") == "install_pre_commit_hook":
                 return self.install_pre_commit_hook()
+            elif issue.get("fix_action") == "self_improve":
+                return self.trigger_self_improvement(issue.get("context", ""))
 
         except Exception as e:
             logger.error(f"Error applying fix: {e}")
+            # Fallback: try self-improvement for persistent issues
+            if issue.get("attempts", 0) >= 2:
+                logger.info("Multiple fix attempts failed - triggering self-improvement")
+                self.trigger_self_improvement(f"Fix failed: {issue['description']}")
             return None
+
+    def trigger_self_improvement(self, context: str = "") -> str:
+        """Trigger autonomous self-improvement via moonshot loop."""
+        logger.info(f"Self-improvement triggered: {context[:100]}")
+
+        try:
+            result = subprocess.run(
+                ["python3", "autonomous/moonshot_loop.py"],
+                capture_output=True, text=True, timeout=300,
+                cwd=str(REPO_ROOT),
+                env={**os.environ, "IMPROVEMENT_CONTEXT": context}
+            )
+
+            if result.returncode == 0:
+                logger.info("Self-improvement cycle completed")
+                return "self_improvement_triggered"
+
+        except Exception as e:
+            logger.warning(f"Self-improvement error: {e}")
+
+        return None
 
     def reinstall_cron(self) -> str:
         """Reinstall cron jobs from auto_setup_cron.py."""

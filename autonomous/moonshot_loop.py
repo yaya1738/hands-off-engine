@@ -203,7 +203,12 @@ def build_claude_prompt(state: dict, metrics: dict) -> str:
 
     cost_cuts = ", ".join(metrics.get("cost_cut_opportunities", [])) or "None identified"
 
+    # Check for specific improvement context from triggering agent
+    improvement_context = os.environ.get("IMPROVEMENT_CONTEXT", "")
+    context_section = f"\nIMPROVEMENT CONTEXT (from triggering agent):\n{improvement_context}\n" if improvement_context else ""
+
     prompt = f"""You are the SUPER SERVANT of Yair Siegel - autonomous improvement system.
+{context_section}
 
 MISSION: Achieve escape velocity while maximizing ROI on every resource.
 

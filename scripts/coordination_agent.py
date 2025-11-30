@@ -128,6 +128,10 @@ class CoordinationAgent:
             return self.handle_handoff(msg)
         elif msg_type == "info":
             return self.acknowledge_info(msg)
+        elif msg_type == "directive":
+            return self.handle_directive(msg)
+        elif msg_type == "self_improve":
+            return self.trigger_self_improvement(msg)
         else:
             logger.info(f"Message type '{msg_type}' noted")
 
@@ -189,6 +193,64 @@ class CoordinationAgent:
         logger.info(f"Info from {msg.get('from')}: {msg.get('message')[:100]}")
         # Just log it, no response needed
         return True
+
+    def handle_directive(self, msg: Dict) -> bool:
+        """Handle system-wide directives - apply to all agents."""
+        directive = msg.get("message", "")
+        priority = msg.get("priority", "normal")
+
+        logger.info(f"DIRECTIVE [{priority}]: {directive[:200]}")
+
+        # Store directive for all agents to read
+        directive_file = AI_COORD_DIR / "active_directive.json"
+        with open(directive_file, 'w') as f:
+            json.dump({
+                "directive": directive,
+                "priority": priority,
+                "from": msg.get("from"),
+                "timestamp": datetime.now().isoformat(),
+                "status": "active"
+            }, f, indent=2)
+
+        # If high priority, trigger immediate self-improvement
+        if priority == "high" and msg.get("action_required") == "integrate":
+            logger.info("High priority directive - triggering self-improvement cycle")
+            self.trigger_self_improvement({"message": directive})
+
+        return True
+
+    def trigger_self_improvement(self, msg: Dict) -> bool:
+        """Trigger autonomous self-improvement via Claude CLI or moonshot loop."""
+        context = msg.get("message", "Improve system")
+
+        logger.info(f"Self-improvement triggered: {context[:100]}")
+
+        # Option 1: Trigger moonshot loop (safer, rate-limited)
+        try:
+            result = subprocess.run(
+                ["python3", "autonomous/moonshot_loop.py"],
+                capture_output=True, text=True, timeout=300,
+                cwd=str(REPO_ROOT),
+                env={**os.environ, "IMPROVEMENT_CONTEXT": context}
+            )
+
+            if result.returncode == 0:
+                logger.info("Moonshot improvement cycle completed")
+                self.respond_to_agent(
+                    to="all",
+                    message=f"Self-improvement cycle completed. Context: {context[:100]}",
+                    msg_type="info"
+                )
+                return True
+            else:
+                logger.warning(f"Moonshot cycle issue: {result.stderr[:200]}")
+
+        except subprocess.TimeoutExpired:
+            logger.warning("Moonshot cycle timed out")
+        except Exception as e:
+            logger.error(f"Self-improvement error: {e}")
+
+        return False
 
     def handle_pr_merge_request(self, pr_num: int, from_agent: str) -> bool:
         """Handle request to merge a PR."""
