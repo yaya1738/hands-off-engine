@@ -36,10 +36,24 @@ Before doing any substantial work, you MUST:
 
 ## Project Context
 
-- **Purpose:** AI-driven personal finance & trading automation
-- **Environment:** Termux (Android Pixel 6a) + future DigitalOcean
-- **Constraint:** No systemd, no root, no Docker - Termux-native solutions only
-- **Pattern:** AI agents build and maintain, human only provides strategic direction
+- **Purpose:** AI-driven engine to SERVE Yair - reduce workload, improve quality of life
+- **Trading is ONE domain** - the system should autonomously figure out what helps most
+- **Environment:** Termux (Android Pixel 6a) + DigitalOcean droplet
+- **Constraint:** < 1 month runway, $250/mo AI spend must generate positive ROI
+- **Pattern:** AI agents build and maintain, human provides strategic direction
+
+## Core Philosophy (Critical)
+
+**This is NOT just a trading bot.** This is a complex adaptive system with emergent intelligence.
+
+1. **Understand the dynamics** - Don't just fix code, understand WHY the system behaves as it does
+2. **Emergent rationality** - The system can produce coherent behavior from component interaction without explicit programming
+3. **Read slowly, understand deeply** - Don't pattern-match, actually internalize the knowledge docs
+4. **Think from Yair's situation** - < 1 month runway, $18k debt, every action must be high leverage
+5. **Don't ask, figure it out** - The system should reason autonomously, not require user explanation
+6. **Complexity is a feature** - Multiple components interacting creates resilience and adaptability
+
+**The user's main tax is having to explain things.** The system should get wiser through interaction, not require constant guidance.
 
 ## Working Philosophy
 
@@ -114,6 +128,22 @@ AGENT TASKS: [Concrete tasks]
 - Read `docs/claude/MCP_ARCHITECTURE_CORRECTION.md` for details
 - MCP servers are configured in `.mcp.json` (repo root) and managed by Claude Code automatically
 
+## Quick State Check (Run This First)
+
+```bash
+# Current financial state
+cat finance/yair_finance_hub.json | python3 -c "import sys,json; d=json.load(sys.stdin); s=d['summary']; print(f'Balance: \${d[\"accounts\"][\"polymarket\"][\"balance_usdc\"]:.2f}'); print(f'Runway: {s[\"runway_months\"]:.2f} months'); print(f'Burn: \${s[\"monthly_burn_usd\"]}/mo')"
+
+# Current positions
+python3 scripts/position_monitor.py
+
+# System health
+./scripts/healthcheck.sh
+
+# Latest session insights
+cat ai/SESSION_INSIGHTS_*.md | tail -50
+```
+
 ## Session Logs & Coordination History
 
 Historical session logs and coordination docs are in `docs/claude/`:
@@ -121,3 +151,4 @@ Historical session logs and coordination docs are in `docs/claude/`:
 - `AI_COORDINATION_ARCHITECTURE.md` - Architecture overview
 - `AUTONOMOUS_OPERATION.md` - Autonomous mode documentation
 - `MCP_*.md` - MCP setup guides and verification results
+- `ai/SESSION_INSIGHTS_*.md` - Session-to-session continuity

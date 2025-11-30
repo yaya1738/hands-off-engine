@@ -81,6 +81,10 @@
     "When changing agent coordination, update ALL files in agent_instruction_files.",
     "Don't assume other AIs did things correctly - verify.",
     "When creating new docs in monitored_doc_paths, add them to required_reading or optional_docs.",
-    "When creating rules, add enforcement. When creating components, add monitoring. See DEVELOPMENT_STANDARDS.md."
+    "When creating rules, add enforcement. When creating components, add monitoring. See DEVELOPMENT_STANDARDS.md.",
+    "READ SLOWLY. Don't pattern-match - actually understand the dynamics.",
+    "Check ai/SESSION_INSIGHTS_*.md for recent session context before starting work.",
+    "This system has EMERGENT intelligence - understand component interactions, not just individual parts.",
+    "The user's main tax is explaining things. Figure it out autonomously when possible."
   ]
 }
