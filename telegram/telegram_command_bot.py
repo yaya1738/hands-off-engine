@@ -264,15 +264,18 @@ System is operating normally."""
                 # Add resource limits info
                 resource_limits_path = REPO_ROOT / "config" / "resource_limits.json"
                 if resource_limits_path.exists():
-                    with open(resource_limits_path) as f:
-                        limits = json.load(f)
-                    auto_scale = limits.get("auto_scale", {})
-                    if auto_scale.get("enabled"):
-                        msg += "\n\n⚙️ **Auto-scaling:** Enabled"
-                        if auto_scale.get("require_human_approval"):
-                            msg += " (requires approval)"
-                    else:
-                        msg += "\n\n⚙️ **Auto-scaling:** Disabled"
+                    try:
+                        with open(resource_limits_path) as f:
+                            limits = json.load(f)
+                        auto_scale = limits.get("auto_scale", {})
+                        if auto_scale.get("enabled"):
+                            msg += "\n\n⚙️ **Auto-scaling:** Enabled"
+                            if auto_scale.get("require_human_approval"):
+                                msg += " (requires approval)"
+                        else:
+                            msg += "\n\n⚙️ **Auto-scaling:** Disabled"
+                    except json.JSONDecodeError:
+                        msg += "\n\n⚠️ Resource limits config is malformed"
 
                 msg += "\n\nHardware is managed autonomously."
                 return msg

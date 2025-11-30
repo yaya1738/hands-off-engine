@@ -15,83 +15,73 @@ from pathlib import Path
 from unittest.mock import patch, MagicMock
 from dataclasses import asdict
 
-# Add parent directory to path
+# Add parent directory to path for imports
 import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../..'))
 
 
+# Shared fixture for config path
+@pytest.fixture
+def resource_limits_path():
+    """Path to resource limits configuration file."""
+    return Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
+
+
+@pytest.fixture
+def resource_limits(resource_limits_path):
+    """Load resource limits configuration."""
+    with open(resource_limits_path) as f:
+        return json.load(f)
+
+
 class TestResourceLimitsConfiguration:
     """Tests for resource limits configuration file"""
 
-    def test_resource_limits_file_exists(self):
+    def test_resource_limits_file_exists(self, resource_limits_path):
         """Test that resource_limits.json exists"""
-        config_path = Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
-        assert config_path.exists(), "config/resource_limits.json should exist"
+        assert resource_limits_path.exists(), "config/resource_limits.json should exist"
 
-    def test_resource_limits_valid_json(self):
+    def test_resource_limits_valid_json(self, resource_limits):
         """Test that resource_limits.json is valid JSON"""
-        config_path = Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
-        with open(config_path) as f:
-            limits = json.load(f)
-        assert isinstance(limits, dict)
+        assert isinstance(resource_limits, dict)
 
-    def test_resource_limits_has_required_sections(self):
+    def test_resource_limits_has_required_sections(self, resource_limits):
         """Test that resource_limits.json has all required sections"""
-        config_path = Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
-        with open(config_path) as f:
-            limits = json.load(f)
-
         required_sections = ["cpu", "memory", "disk", "auto_scale", "droplet_sizes"]
         for section in required_sections:
-            assert section in limits, f"Missing required section: {section}"
+            assert section in resource_limits, f"Missing required section: {section}"
 
-    def test_resource_limits_cpu_thresholds(self):
+    def test_resource_limits_cpu_thresholds(self, resource_limits):
         """Test CPU threshold configuration"""
-        config_path = Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
-        with open(config_path) as f:
-            limits = json.load(f)
-
-        cpu = limits["cpu"]
+        cpu = resource_limits["cpu"]
         assert "warning_threshold" in cpu
         assert "critical_threshold" in cpu
         assert cpu["warning_threshold"] < cpu["critical_threshold"]
         assert 0 <= cpu["warning_threshold"] <= 100
         assert 0 <= cpu["critical_threshold"] <= 100
 
-    def test_resource_limits_memory_thresholds(self):
+    def test_resource_limits_memory_thresholds(self, resource_limits):
         """Test memory threshold configuration"""
-        config_path = Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
-        with open(config_path) as f:
-            limits = json.load(f)
-
-        memory = limits["memory"]
+        memory = resource_limits["memory"]
         assert "warning_threshold" in memory
         assert "critical_threshold" in memory
         assert memory["warning_threshold"] < memory["critical_threshold"]
         assert "min_available_gb" in memory
         assert memory["min_available_gb"] > 0
 
-    def test_resource_limits_auto_scale_config(self):
+    def test_resource_limits_auto_scale_config(self, resource_limits):
         """Test auto-scaling configuration"""
-        config_path = Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
-        with open(config_path) as f:
-            limits = json.load(f)
-
-        auto_scale = limits["auto_scale"]
+        auto_scale = resource_limits["auto_scale"]
         assert "enabled" in auto_scale
         assert "require_human_approval" in auto_scale
         assert "never_auto_approve_downgrades" in auto_scale
         # Safety: downgrades should never be auto-approved
         assert auto_scale["never_auto_approve_downgrades"] is True
 
-    def test_resource_limits_droplet_upgrade_path(self):
+    def test_resource_limits_droplet_upgrade_path(self, resource_limits):
         """Test droplet upgrade path configuration"""
-        config_path = Path(__file__).parent.parent.parent / "config" / "resource_limits.json"
-        with open(config_path) as f:
-            limits = json.load(f)
-
-        droplet_sizes = limits["droplet_sizes"]
+        droplet_sizes = resource_limits["droplet_sizes"]
         assert "upgrade_path" in droplet_sizes
         assert isinstance(droplet_sizes["upgrade_path"], list)
         assert len(droplet_sizes["upgrade_path"]) > 0
@@ -171,7 +161,7 @@ class TestHardwareKernel:
 
         kernel = HardwareKernel(kernel_path=tmp_path, node_id="test_node")
 
-        # Add some decisions
+        # Add some decisions using direct assignment (test-only, bypasses record_decision)
         kernel.decisions = [
             DecisionOutcome("d1", "alert", "action1", "2025-01-01", True, "ok"),
             DecisionOutcome("d2", "alert", "action2", "2025-01-01", True, "ok"),
@@ -179,8 +169,9 @@ class TestHardwareKernel:
         ]
 
         rate = kernel.get_decision_success_rate()
-        # 2 out of 3 = 66.67%
-        assert abs(rate - 66.67) < 1
+        # Calculate expected: 2 successful out of 3 total
+        expected_rate = (2 / 3) * 100
+        assert abs(rate - expected_rate) < 0.1
 
 
 class TestTelegramHardwareCommand:
