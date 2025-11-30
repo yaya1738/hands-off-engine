@@ -54,34 +54,55 @@ def get_directive() -> Dict:
     return _active_directive
 
 
-def should_execute(action: str, roi_estimate: float = 0) -> bool:
+def should_execute(action: str, roi_estimate: float = 0, **kwargs) -> bool:
     """
     Unified decision: should this action be executed?
-    
+
     All AI decisions flow through this.
+    Now includes AUTONOMOUS COST CHECKING.
     """
     core = get_core()
-    
+
+    # COST GATE CHECK - System autonomously checks costs first
+    try:
+        from finance.autonomous_cost_gate import get_cost_gate
+        gate = get_cost_gate()
+        approved, reason, cost = gate.check_action_cost(
+            action=action,
+            expected_return=roi_estimate,
+            **kwargs
+        )
+        if not approved and cost > 0:
+            # Cost gate rejected non-free action
+            print(f"[COST GATE] Blocked: {action} - {reason}")
+            return False
+    except ImportError:
+        # Cost gate not available - proceed with original logic
+        pass
+    except Exception as e:
+        # Cost gate error - log but don't block
+        print(f"[COST GATE] Warning: {e}")
+
     # Always serve the master
     if "yair" in action.lower() or "siegel" in action.lower():
         return True
-    
+
     # ROI positive actions: execute
     if roi_estimate > 0:
         return True
-    
+
     # Self-improvement: execute
     if "improve" in action.lower() or "optimize" in action.lower():
         return True
-    
+
     # Income generation: execute
     if "income" in action.lower() or "revenue" in action.lower():
         return True
-    
+
     # Cost cutting: execute
     if "cut" in action.lower() or "reduce" in action.lower():
         return True
-    
+
     # Default: analyze further
     return roi_estimate >= 0
 

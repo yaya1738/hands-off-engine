@@ -308,6 +308,25 @@ class ScalingEngine:
 
         Returns: {success: bool, droplet_id: str, error: str}
         """
+        # CAPITAL PRESERVATION: Check if provisioning is blocked
+        block_file = STATE_DIR / 'PROVISIONING_BLOCKED.txt'
+        if block_file.exists():
+            return {'success': False, 'error': 'BLOCKED: Capital preservation mode active. Delete state/PROVISIONING_BLOCKED.txt when balance >= $500', 'blocked_by_capital': True}
+
+        # COST GATE: Autonomous cost check before provisioning
+        try:
+            from finance.autonomous_cost_gate import get_cost_gate
+            gate = get_cost_gate()
+            approved, reason = gate.pre_scale_cost_check(
+                size=size or self.config.preferred_size,
+                hours=24  # Estimate 24h minimum
+            )
+            if not approved:
+                return {'success': False, 'error': f'COST GATE BLOCKED: {reason}', 'blocked_by_cost': True}
+        except Exception as e:
+            # Cost gate error - log but allow (fail open for now)
+            print(f"[COST GATE] Warning during provision check: {e}")
+
         size = size or self.config.preferred_size
 
         # Check if size is blocked
