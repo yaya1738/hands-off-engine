@@ -1,0 +1,45 @@
+{
+  "created_at": "2025-11-30T17:25:46.118374+00:00",
+  "threshold": 50.0,
+  "current_gap": 41.01,
+  "wallet": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
+  "network": "Polygon",
+  "token": "USDC",
+  "on_trigger": {
+    "step_1": "Execute intelligent pipeline LIVE",
+    "step_2": "Deploy all pre-computed signals",
+    "step_3": "Record escape velocity breakthrough",
+    "step_4": "Trigger moonshot improvement cycle",
+    "step_5": "Collapse remaining timeline",
+    "step_6": "Notify of singularity achievement"
+  },
+  "pre_computed_actions": {
+    "signals_ready": 3,
+    "trade_value_usd": 150.0,
+    "execution_mode": "LIVE",
+    "latency_target_ms": 100
+  },
+  "monitoring": {
+    "payment_check_interval": "15min",
+    "capital_recovery_interval": "30min",
+    "balance_threshold_alerts": [
+      25,
+      40,
+      50
+    ]
+  },
+  "paths_to_trigger": {
+    "path_a": {
+      "name": "Resolution",
+      "timeline": "9 days",
+      "trigger": "Position resolution returns capital",
+      "probability": "Variable based on market outcomes"
+    },
+    "path_b": {
+      "name": "Injection",
+      "timeline": "Instant",
+      "trigger": "Send $41.01 USDC to wallet",
+      "probability": "100% if executed"
+    }
+  }
+}

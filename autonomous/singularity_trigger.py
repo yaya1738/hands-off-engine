@@ -26,6 +26,7 @@ sys.path.insert(0, '/root/hands-off-engine')
 
 TRIGGER_STATE = Path("/root/hands-off-engine/state/singularity_trigger.json")
 TRADING_THRESHOLD = 50.0
+MINIMUM_VIABLE_THRESHOLD = 25.0  # Can do small trades at $25
 
 
 def log(msg: str):
@@ -145,20 +146,42 @@ def execute_singularity():
     return actions
 
 
+def execute_mini_singularity(balance: float):
+    """Execute smaller singularity at $25 threshold"""
+    log("MINI-SINGULARITY: Executing limited trading capability...")
+
+    actions = []
+
+    # Run pipeline with smaller bankroll
+    try:
+        result = subprocess.run([
+            'python3', 'scripts/run_pipeline.py',
+            '--intelligent', '--live', '--bankroll', str(balance)
+        ], cwd='/root/hands-off-engine', capture_output=True, text=True, timeout=300)
+
+        if 'Executed' in result.stdout or 'LIVE' in result.stdout:
+            actions.append("✓ Mini pipeline executed")
+    except Exception as e:
+        actions.append(f"✗ Mini pipeline: {e}")
+
+    return actions
+
+
 def check_and_trigger():
     """Check if singularity conditions are met"""
 
     state = load_state()
 
-    # Already triggered?
+    # Already triggered full singularity?
     if state.get("triggered"):
-        log("Singularity already triggered. Monitoring for next breakthrough.")
+        log("Full singularity already triggered. Monitoring for next breakthrough.")
         return state
 
     # Check balance
     balance = get_balance()
     log(f"Current balance: ${balance:.2f}")
-    log(f"Threshold: ${TRADING_THRESHOLD:.2f}")
+    log(f"Full threshold: ${TRADING_THRESHOLD:.2f}")
+    log(f"Mini threshold: ${MINIMUM_VIABLE_THRESHOLD:.2f}")
 
     if balance >= TRADING_THRESHOLD:
         log("")
@@ -215,15 +238,42 @@ def check_and_trigger():
         log("SINGULARITY COMPLETE")
         log("=" * 60)
 
+    elif balance >= MINIMUM_VIABLE_THRESHOLD and not state.get("mini_triggered"):
+        log("")
+        log("⚡ MINI-THRESHOLD CROSSED - LIMITED TRADING ENABLED ⚡")
+        log("")
+
+        send_telegram(
+            f"*⚡ MINI-SINGULARITY ⚡*\n\n"
+            f"Balance: ${balance:.2f}\n"
+            f"Executing limited trades...",
+            priority="normal"
+        )
+
+        actions = execute_mini_singularity(balance)
+        state["mini_triggered"] = True
+        state["mini_trigger_time"] = datetime.now(timezone.utc).isoformat()
+        state["mini_actions"] = actions
+        save_state(state)
+
+        send_telegram(
+            f"*Mini-Singularity Complete*\n\n"
+            f"Actions: {len(actions)}\n"
+            f"Gap to full: ${TRADING_THRESHOLD - balance:.2f}"
+        )
+
     else:
         gap = TRADING_THRESHOLD - balance
-        log(f"Gap to singularity: ${gap:.2f}")
+        mini_gap = MINIMUM_VIABLE_THRESHOLD - balance
+        log(f"Gap to full singularity: ${gap:.2f}")
+        log(f"Gap to mini singularity: ${mini_gap:.2f}")
         log("Waiting for capital...")
 
         # Update monitoring state
         state["last_check"] = datetime.now(timezone.utc).isoformat()
         state["last_balance"] = balance
         state["gap_to_trigger"] = gap
+        state["gap_to_mini"] = mini_gap
         save_state(state)
 
     return state
