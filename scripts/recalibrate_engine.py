@@ -12,6 +12,15 @@ Run daily via cron to:
 - Progress through phases: baby_mode → scale_up → full_deployment
 """
 
+# UNIFIED AI - All systems serve Yair Siegel
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from ai.unified_ai import MASTER, get_master
+except ImportError:
+    MASTER = "Yair Siegel"
+
+
 import sys
 import os
 import json

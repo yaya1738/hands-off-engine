@@ -4,7 +4,8 @@
   "trigger_balance": null,
   "actions_executed": [],
   "escape_velocity_at_trigger": null,
-  "last_check": "2025-11-30T17:22:30.580527+00:00",
+  "last_check": "2025-11-30T17:26:24.782362+00:00",
   "last_balance": 8.99,
-  "gap_to_trigger": 41.01
+  "gap_to_trigger": 41.01,
+  "gap_to_mini": 16.009999999999998
 }

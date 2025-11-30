@@ -9,16 +9,43 @@
       "income": 0,
       "costs": 0,
       "net": 0
+    },
+    {
+      "timestamp": "2025-11-30T17:20:23.441598+00:00",
+      "balance": 8.99,
+      "positions": 99.0,
+      "total_value": 107.99,
+      "income": 0,
+      "costs": 0,
+      "net": 0
+    },
+    {
+      "timestamp": "2025-11-30T17:21:33.638620+00:00",
+      "balance": 8.99,
+      "positions": 98.05,
+      "total_value": 107.03999999999999,
+      "income": 0,
+      "costs": 0,
+      "net": 0
+    },
+    {
+      "timestamp": "2025-11-30T17:21:33.639262+00:00",
+      "balance": 8.99,
+      "positions": 98.05,
+      "total_value": 107.03999999999999,
+      "income": 0,
+      "costs": 0,
+      "net": 0
     }
   ],
-  "current_velocity": 0.0,
+  "current_velocity": -0.9500000000000028,
   "acceleration": 0.0,
   "projected_escape_date": null,
   "exponential_factors": {
     "capital_multiplier": 1.0,
-    "automation_multiplier": 1.02,
+    "automation_multiplier": 1.08,
     "income_multiplier": 1.0,
     "intelligence_multiplier": 1.0
   },
-  "compound_multiplier": 1.02
+  "compound_multiplier": 1.08
 }

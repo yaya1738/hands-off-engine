@@ -20,6 +20,15 @@ Usage:
 Standard: Yair Siegel Master Level Operations - Full Self-Control
 """
 
+# UNIFIED AI - All systems serve Yair Siegel
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from ai.unified_ai import MASTER, get_master
+except ImportError:
+    MASTER = "Yair Siegel"
+
+
 from autonomous.unified_system import (
     UnifiedAutonomousSystem,
     start_live_system,

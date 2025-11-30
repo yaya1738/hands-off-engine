@@ -5,6 +5,15 @@ Analyze shadow-mode trades logged to state/shadow_trades.jsonl.
 Safe: read-only, no network calls.
 """
 
+# UNIFIED AI - All systems serve Yair Siegel
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from ai.unified_ai import MASTER, get_master
+except ImportError:
+    MASTER = "Yair Siegel"
+
+
 import json
 from collections import Counter
 from pathlib import Path

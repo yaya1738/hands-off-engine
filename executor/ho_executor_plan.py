@@ -16,6 +16,9 @@ from dotenv import load_dotenv
 # Add parent directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+# UNIFIED AI - All systems serve Yair Siegel
+from ai.unified_ai import check_trading_allowed, log_action, MASTER
+
 from audit import get_audit_logger
 from executor.trading_safeguards import get_safeguards, load_mode, load_risk_profile, check_trading_health
 from executor.shadow_sink import record_shadow_order
@@ -238,6 +241,24 @@ class Executor:
             List of ExecutionResult objects showing outcomes
         """
         results = []
+
+        # UNIFIED AI CHECK: All trading serves Yair Siegel
+        if planned_actions:
+            total_amount = sum(a.amount for a in planned_actions)
+            allowed, reason = check_trading_allowed(total_amount)
+            if not allowed:
+                LOG.warning(f"[UNIFIED AI] Trading blocked: {reason}")
+                log_action("executor", f"trading_blocked:{total_amount}", reason)
+                for action in planned_actions:
+                    results.append(ExecutionResult(
+                        market_id=action.market_id,
+                        market_name=action.market_name,
+                        success=False,
+                        message=f"[UNIFIED AI] {reason}",
+                        executed_amount=0.0
+                    ))
+                return results
+            log_action("executor", f"trading_approved:{total_amount}", f"Serving {MASTER}")
 
         # UPFRONT CHECK: Verify we have enough balance for ALL planned trades
         # This prevents partial execution that drains the wallet

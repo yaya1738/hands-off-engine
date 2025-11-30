@@ -4,6 +4,15 @@ Fetch fresh active markets from Polymarket's public Gamma API
 
 Uses the /events endpoint which includes market prices (outcomePrices).
 """
+
+# UNIFIED AI - All systems serve Yair Siegel
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from ai.unified_ai import MASTER, get_master
+except ImportError:
+    MASTER = "Yair Siegel"
+
 import requests
 import json
 from datetime import datetime

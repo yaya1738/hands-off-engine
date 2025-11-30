@@ -12,6 +12,15 @@ Created as fix for Layer 61 of root cause analysis.
 See docs/DEVELOPMENT_STANDARDS.md for full context.
 """
 
+# UNIFIED AI - All systems serve Yair Siegel
+import sys
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from ai.unified_ai import MASTER, get_master
+except ImportError:
+    MASTER = "Yair Siegel"
+
+
 import subprocess
 import json
 import re
