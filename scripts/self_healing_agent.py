@@ -27,6 +27,10 @@ from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Tuple
 
+# UNIFIED AI - All systems serve Yair Siegel
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from ai.unified_ai import announce_agent, get_master, log_action, MASTER
+
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
 LOG_FILE = "/var/log/self-healing-agent.log"
@@ -52,6 +56,7 @@ class SelfHealingAgent:
         self.fixes_applied = 0
         self.checks_performed = 0
         self.state = self.load_state()
+        announce_agent("self-healing-agent")  # UNIFIED AI
 
     def load_state(self) -> Dict:
         """Load agent state from disk."""

@@ -19,6 +19,9 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+# UNIFIED AI - All systems serve Yair Siegel
+from ai.unified_ai import announce_agent, get_master, log_action, MASTER
+
 from alpha.sync_polymarket_model import sync_polymarket_model
 from decider.ho_decider import Decider
 from executor.ho_executor_plan import Executor
@@ -346,6 +349,7 @@ def save_run_log(results: dict, log_dir: Path):
 
 def main():
     """Main entry point"""
+    announce_agent("trading-pipeline")  # UNIFIED AI
     import argparse
     
     parser = argparse.ArgumentParser(

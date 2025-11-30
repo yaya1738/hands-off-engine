@@ -17,6 +17,7 @@ Runs continuously or triggered by GitHub webhooks.
 """
 
 import os
+import sys
 import json
 import time
 import logging
@@ -24,6 +25,10 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Optional
+
+# UNIFIED AI - All systems serve Yair Siegel
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from ai.unified_ai import announce_agent, get_master, should_execute, log_action, MASTER
 
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
@@ -50,6 +55,7 @@ class CoordinationAgent:
         self.agent_name = "coordination-agent"
         self.processed_message_ids = set()
         self.load_processed_messages()
+        announce_agent(self.agent_name)  # UNIFIED AI
 
     def load_processed_messages(self):
         """Load IDs of already processed messages."""

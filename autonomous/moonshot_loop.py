@@ -24,6 +24,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 import time
 
+# UNIFIED AI - All systems serve Yair Siegel
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from ai.unified_ai import announce_agent, get_master, log_action, MASTER
+
 MOONSHOT_STATE = Path("/root/hands-off-engine/state/moonshot_state.json")
 MOONSHOT_LOG = Path("/var/log/hands-off/moonshot.log")
 MAX_CYCLES_PER_DAY = 12  # Rate limit
@@ -338,6 +342,7 @@ def trigger_next_cycle():
 
 def main():
     """Main moonshot loop entry point"""
+    announce_agent("moonshot-loop")  # UNIFIED AI
 
     # Load environment
     env_file = Path("/root/hands-off-engine/.env.polymarket")
