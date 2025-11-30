@@ -46,6 +46,8 @@ CRITICAL_SCRIPTS = {
     "capital_recovery_monitor",
     "payment_monitor",
     "self_healing_agent",
+    "threat_analysis",  # Proactive threat detection
+    "backup_critical",  # Data backup
 
     # Coordination - system must coordinate
     "coordination_agent",
