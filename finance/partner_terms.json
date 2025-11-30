@@ -1,5 +1,5 @@
 {
-  "version": "1.0",
+  "version": "2.0",
   "last_updated": "2025-11-30",
   "master": "Yair Siegel",
 
@@ -7,178 +7,272 @@
     "digitalocean": {
       "name": "DigitalOcean",
       "type": "infrastructure",
-      "billing_cycle": "hourly",
-      "billing_method": "prepaid_credit",
       "account_email": "siegel.yaz@gmail.com",
       "droplet_limit": 10,
+
+      "charge_timing": {
+        "meter_starts": "INSTANT - the second droplet is created",
+        "meter_stops": "ONLY when droplet is DESTROYED (not powered off)",
+        "billing_unit": "hour",
+        "billing_granularity": "Partial hours rounded UP to full hour",
+        "accrual_method": "Hourly - cost accumulates every hour droplet exists",
+        "invoice_date": "Monthly on account anniversary",
+        "charge_date": "Same day as invoice - auto-charged to card",
+        "payment_method": "Card on file (auto-charge)",
+        "prepaid_credit": true,
+        "credit_deduction": "Real-time as usage accrues"
+      },
+
       "pricing": {
-        "s-1vcpu-1gb": {"hourly": 0.00744, "monthly": 5},
-        "s-1vcpu-2gb": {"hourly": 0.01488, "monthly": 10},
-        "s-2vcpu-2gb": {"hourly": 0.02232, "monthly": 15},
-        "s-2vcpu-4gb": {"hourly": 0.02976, "monthly": 20},
-        "s-4vcpu-8gb": {"hourly": 0.05952, "monthly": 40},
-        "s-8vcpu-16gb": {"hourly": 0.11905, "monthly": 80},
-        "s-8vcpu-16gb-amd": {"hourly": 0.14286, "monthly": 96}
+        "s-1vcpu-1gb": {"hourly": 0.00744, "monthly": 5, "per_second": 0.00000207},
+        "s-1vcpu-2gb": {"hourly": 0.01488, "monthly": 10, "per_second": 0.00000413},
+        "s-2vcpu-2gb": {"hourly": 0.02232, "monthly": 15, "per_second": 0.00000620},
+        "s-2vcpu-4gb": {"hourly": 0.02976, "monthly": 20, "per_second": 0.00000827},
+        "s-4vcpu-8gb": {"hourly": 0.05952, "monthly": 40, "per_second": 0.00001653},
+        "s-8vcpu-16gb": {"hourly": 0.11905, "monthly": 80, "per_second": 0.00003307},
+        "s-8vcpu-16gb-amd": {"hourly": 0.14286, "monthly": 96, "per_second": 0.00003968}
       },
-      "current_usage": {
-        "droplets": 4,
-        "estimated_monthly": 384
+
+      "additional_charges": {
+        "snapshot": {"per_gb_month": 0.05, "billed": "monthly with invoice"},
+        "bandwidth_overage": {"per_gb": 0.01, "free_quota_gb": 1000},
+        "floating_ip": {"hourly": 0.00595, "monthly": 4, "when_unassigned": "still billed"},
+        "volumes": {"per_gb_month": 0.10, "billed": "monthly"}
       },
-      "terms": {
-        "billing_frequency": "Monthly, charged on account anniversary",
-        "payment_due": "Charged to card on file immediately",
-        "overdue_action": "Droplets destroyed after grace period",
-        "grace_period_days": 7,
-        "min_balance_warning": 50,
-        "droplet_billing": "Billed from creation until destruction (even if powered off)"
-      },
-      "critical_rules": [
-        "HOURLY BILLING: Each droplet costs money every hour it exists",
-        "DESTROYED = FREE: Only way to stop billing is to destroy droplet",
-        "POWERED OFF = STILL BILLED: Stopping a droplet does NOT stop billing",
-        "SNAPSHOTS COST: $0.05/GB/month for snapshots"
+
+      "critical_timing_rules": [
+        "CREATE = START BILLING: Charges begin the INSTANT you create",
+        "DESTROY = STOP BILLING: This is the ONLY way to stop charges",
+        "POWER OFF ≠ FREE: Powered-off droplets STILL COST MONEY",
+        "PARTIAL HOUR = FULL HOUR: 1 minute = charged for full hour",
+        "CREDIT BURNS IN REAL-TIME: Check balance regularly"
       ]
     },
 
     "anthropic": {
       "name": "Anthropic (Claude)",
       "type": "ai_provider",
-      "billing_cycle": "monthly",
-      "billing_method": "postpaid",
+
+      "charge_timing": {
+        "meter_starts": "Per API call - when request is processed",
+        "meter_stops": "When response is complete",
+        "billing_unit": "token",
+        "billing_granularity": "Exact token count (input + output separate)",
+        "accrual_method": "Per-request - cost calculated per API call",
+        "invoice_date": "Monthly (1st of month for previous month)",
+        "charge_date": "Net 30 from invoice",
+        "payment_method": "Invoice/card",
+        "subscription_charge": "Claude Code Pro: Monthly on signup anniversary"
+      },
+
       "pricing": {
         "claude-3-opus": {"input_per_1k": 0.015, "output_per_1k": 0.075},
-        "claude-3-sonnet": {"input_per_1k": 0.003, "output_per_1k": 0.015},
+        "claude-3.5-sonnet": {"input_per_1k": 0.003, "output_per_1k": 0.015},
         "claude-3-haiku": {"input_per_1k": 0.00025, "output_per_1k": 0.00125},
-        "claude_code_pro": {"monthly": 100, "type": "subscription"}
+        "claude_code_pro": {"monthly": 100, "type": "subscription", "charge_day": "signup_anniversary"}
       },
-      "terms": {
-        "billing_frequency": "Monthly",
-        "payment_due": "Net 30",
-        "rate_limits": "Varies by plan",
-        "usage_tracking": "Per-token"
-      },
-      "critical_rules": [
-        "TOKEN-BASED: Pay per input/output token",
-        "CONTEXT = COST: Longer conversations cost more",
-        "RATE LIMITS: Can be throttled if exceeded"
+
+      "critical_timing_rules": [
+        "IMMEDIATE ACCRUAL: Each API call adds to monthly bill",
+        "OUTPUT COSTS MORE: Output tokens 5x cost of input",
+        "CONTEXT = COST: Longer conversations = more input tokens = more cost",
+        "SUBSCRIPTION: Claude Code Pro charges monthly regardless of usage"
       ]
     },
 
     "openai": {
       "name": "OpenAI",
       "type": "ai_provider",
-      "billing_cycle": "monthly",
-      "billing_method": "prepaid_credit",
+
+      "charge_timing": {
+        "meter_starts": "Per API call - when request is processed",
+        "meter_stops": "When response is complete",
+        "billing_unit": "token",
+        "billing_granularity": "Exact token count",
+        "accrual_method": "PREPAID DEDUCTION - credits deducted in real-time",
+        "credit_check": "BEFORE each request - fails if insufficient",
+        "auto_recharge": "Optional - triggers at threshold",
+        "payment_method": "Prepaid credits"
+      },
+
       "pricing": {
         "gpt-4-turbo": {"input_per_1k": 0.01, "output_per_1k": 0.03},
         "gpt-4o": {"input_per_1k": 0.005, "output_per_1k": 0.015},
+        "gpt-4o-mini": {"input_per_1k": 0.00015, "output_per_1k": 0.0006},
         "gpt-3.5-turbo": {"input_per_1k": 0.0005, "output_per_1k": 0.0015}
       },
-      "terms": {
-        "billing_frequency": "Prepaid credits, auto-recharge optional",
-        "payment_due": "Immediate (prepaid)",
-        "rate_limits": "TPM and RPM limits by tier"
-      },
-      "critical_rules": [
-        "PREPAID: Must have credits to use",
-        "QUOTA EXCEEDED: API calls fail when credits exhausted",
-        "RATE LIMITS: Different tiers have different limits"
+
+      "critical_timing_rules": [
+        "PREPAID ONLY: Must have credits BEFORE making requests",
+        "REAL-TIME DEDUCTION: Credits deducted immediately per call",
+        "ZERO CREDITS = FAIL: API returns error when credits exhausted",
+        "NO GRACE PERIOD: Unlike postpaid, service stops immediately"
       ]
     },
 
     "groq": {
       "name": "Groq",
       "type": "ai_provider",
-      "billing_cycle": "none",
-      "billing_method": "free_tier",
+
+      "charge_timing": {
+        "meter_starts": "N/A - FREE",
+        "meter_stops": "N/A - FREE",
+        "billing_unit": "none",
+        "cost": 0,
+        "rate_limit_reset": "Per minute (RPM) and per day (RPD)"
+      },
+
       "pricing": {
-        "llama-3.1-70b": {"input_per_1k": 0, "output_per_1k": 0}
+        "llama-3.1-70b": {"input_per_1k": 0, "output_per_1k": 0},
+        "llama-3.1-8b": {"input_per_1k": 0, "output_per_1k": 0},
+        "mixtral-8x7b": {"input_per_1k": 0, "output_per_1k": 0}
       },
-      "terms": {
-        "billing_frequency": "Free tier",
-        "rate_limits": "30 RPM, 14,400 RPD",
-        "daily_token_limit": 500000
+
+      "rate_limits": {
+        "requests_per_minute": 30,
+        "requests_per_day": 14400,
+        "tokens_per_day": 500000,
+        "reset_time": "Rolling window for RPM, midnight UTC for daily"
       },
-      "critical_rules": [
-        "FREE BUT LIMITED: Rate limits apply",
-        "NO COST: $0 for inference",
-        "RATE LIMIT = FAIL: Requests rejected when limit hit"
+
+      "critical_timing_rules": [
+        "FREE: $0 cost always",
+        "RATE LIMITED: Hit limit = requests rejected until reset",
+        "RPM RESETS: Every 60 seconds",
+        "DAILY RESETS: Midnight UTC"
       ]
     },
 
     "google_ai": {
       "name": "Google AI (Gemini)",
       "type": "ai_provider",
-      "billing_cycle": "none",
-      "billing_method": "free_tier",
+
+      "charge_timing": {
+        "meter_starts": "N/A - FREE tier",
+        "meter_stops": "N/A - FREE tier",
+        "billing_unit": "none",
+        "cost": 0,
+        "rate_limit_reset": "Per minute (RPM)"
+      },
+
       "pricing": {
-        "gemini-1.5-flash": {"input_per_1k": 0, "output_per_1k": 0}
+        "gemini-1.5-flash": {"input_per_1k": 0, "output_per_1k": 0},
+        "gemini-1.5-pro": {"input_per_1k": 0, "output_per_1k": 0}
       },
-      "terms": {
-        "billing_frequency": "Free tier",
-        "rate_limits": "60 RPM",
-        "daily_token_limit": 1000000
+
+      "rate_limits": {
+        "requests_per_minute": 60,
+        "tokens_per_day": 1000000,
+        "reset_time": "Rolling window for RPM"
       },
-      "critical_rules": [
-        "FREE BUT LIMITED: Rate limits apply",
-        "NO COST: $0 for inference",
-        "GENEROUS LIMITS: Higher than Groq"
+
+      "critical_timing_rules": [
+        "FREE: $0 cost in free tier",
+        "HIGHER LIMITS: 2x Groq's RPM",
+        "USE SECOND: After Groq rate limited, fall back here"
       ]
     },
 
     "polymarket": {
       "name": "Polymarket",
       "type": "trading_platform",
-      "billing_cycle": "per_trade",
-      "billing_method": "usdc_wallet",
+
+      "charge_timing": {
+        "meter_starts": "INSTANT on trade execution",
+        "meter_stops": "On market resolution OR position sale",
+        "billing_unit": "per_transaction",
+        "trading_fee": 0,
+        "gas_timing": "IMMEDIATE - paid with each transaction",
+        "fund_lock": "USDC locked until resolution/sale"
+      },
+
       "pricing": {
         "trading_fee": "0%",
-        "gas_fee": "Variable (Polygon network)",
-        "withdrawal_fee": "Variable"
+        "gas_fee_polygon": {"average": 0.001, "max": 0.01, "unit": "USD"},
+        "withdrawal_gas": {"average": 0.01, "unit": "USD"}
       },
-      "terms": {
-        "min_trade": 1,
-        "settlement": "On market resolution",
-        "currency": "USDC"
+
+      "capital_flow": {
+        "buy": "USDC immediately locked in position",
+        "sell": "USDC immediately returned to wallet",
+        "resolution_win": "Payout at market close",
+        "resolution_lose": "Position worth $0"
       },
-      "critical_rules": [
-        "USDC REQUIRED: Must have USDC in wallet to trade",
-        "NO TRADING FEES: 0% on trades",
-        "GAS FEES: Small Polygon gas fees on transactions",
-        "LOCKED UNTIL RESOLUTION: Funds locked in positions until market resolves"
+
+      "critical_timing_rules": [
+        "NO TRADING FEES: 0% - only gas",
+        "GAS IMMEDIATE: Small fee paid on each transaction",
+        "FUNDS LOCKED: Capital tied up until resolution",
+        "RESOLUTION = SETTLEMENT: No action needed, auto-settles"
       ]
     },
 
     "coingecko": {
       "name": "CoinGecko API",
       "type": "data_provider",
-      "billing_cycle": "none",
-      "billing_method": "free_tier",
-      "pricing": {"cost": 0},
-      "terms": {
-        "rate_limits": "10-30 calls/minute",
-        "attribution": "Required"
+
+      "charge_timing": {
+        "cost": 0,
+        "billing_unit": "none",
+        "rate_limit_reset": "Rolling per-minute window"
       },
-      "critical_rules": [
+
+      "rate_limits": {
+        "calls_per_minute": 30,
+        "demo_api_limit": 10000
+      },
+
+      "critical_timing_rules": [
         "FREE: No cost",
-        "RATE LIMITED: Will block if exceeded"
+        "RATE LIMITED: Will block temporarily if exceeded"
       ]
     },
 
     "github": {
       "name": "GitHub",
       "type": "code_hosting",
-      "billing_cycle": "monthly",
-      "billing_method": "free_tier",
-      "pricing": {"cost": 0},
-      "terms": {
-        "private_repos": "Unlimited (free)",
-        "actions_minutes": "2000/month free"
+
+      "charge_timing": {
+        "cost": 0,
+        "billing_unit": "none",
+        "actions_reset": "Monthly on billing cycle"
       },
-      "critical_rules": [
-        "FREE: No cost for current usage",
-        "ACTIONS: Limited free minutes"
+
+      "free_tier": {
+        "private_repos": "Unlimited",
+        "actions_minutes": 2000,
+        "storage_gb": 500,
+        "packages_gb": 500
+      },
+
+      "critical_timing_rules": [
+        "FREE: No cost for current usage pattern",
+        "ACTIONS: 2000 free minutes/month, then blocked"
       ]
+    }
+  },
+
+  "billing_calendar": {
+    "digitalocean": {
+      "type": "continuous",
+      "description": "Charges accrue every hour, invoice monthly",
+      "check_frequency": "hourly"
+    },
+    "anthropic": {
+      "type": "accrual",
+      "description": "Usage tracked, invoiced monthly",
+      "invoice_day": 1
+    },
+    "openai": {
+      "type": "prepaid",
+      "description": "Credits deducted in real-time",
+      "check_frequency": "per_request"
+    },
+    "groq": {"type": "free", "description": "No billing"},
+    "google_ai": {"type": "free", "description": "No billing"},
+    "polymarket": {
+      "type": "per_transaction",
+      "description": "Gas paid per trade, funds locked until resolution"
     }
   },
 
