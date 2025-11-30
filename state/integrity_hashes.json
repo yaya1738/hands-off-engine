@@ -18,5 +18,9 @@
   "/root/hands-off-engine/autonomous/script_manager.py": {
     "hash": "2272966c0d5109270cea87401434993fcbb94d05c5aae0558d114dbffa78f311",
     "registered_at": "2025-11-30T23:11:25.223683+00:00"
+  },
+  "/root/hands-off-engine/autonomous/harm_prevention.py": {
+    "hash": "7ad5cc0ab73662a9f36f6b4c97e6f186fc2cca1d7b12e4e879a6e551e4fe5c0c",
+    "registered_at": "2025-11-30T23:18:18.414907+00:00"
   }
 }

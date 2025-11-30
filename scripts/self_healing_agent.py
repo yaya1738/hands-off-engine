@@ -853,6 +853,42 @@ class SelfHealingAgent:
 
         logger.info(f"Attempting to fix: {issue['description']}")
 
+        # HARM PREVENTION - Validate "helpful" fix before executing
+        try:
+            from autonomous.harm_prevention import get_harm_prevention, ChangeType
+            hp = get_harm_prevention()
+
+            # Map issue type to change type
+            change_type_map = {
+                "git_lock": ChangeType.FILE_MODIFICATION,
+                "log_rotation": ChangeType.RESOURCE_CLEANUP,
+                "stale_data": ChangeType.AUTO_HEAL,
+                "stale_plan": ChangeType.AUTO_HEAL,
+                "disk_space": ChangeType.RESOURCE_CLEANUP,
+                "permissions": ChangeType.CONFIG_CHANGE,
+                "trading_health_blocked": ChangeType.AUTO_HEAL,
+                "cron_missing": ChangeType.AUTO_HEAL,
+            }
+
+            change_type = change_type_map.get(issue["type"], ChangeType.AUTO_HEAL)
+            target = issue.get("fix_cmd", [issue["description"]])[0] if "fix_cmd" in issue else issue["description"]
+
+            allowed, reason, record = hp.validate_change(
+                change_type=change_type,
+                target=str(target),
+                intention=f"Auto-heal: {issue['description']}",
+                description=f"Self-healing fix for {issue['type']}"
+            )
+
+            if not allowed:
+                logger.warning(f"[HARM-PREVENTION] Fix blocked: {reason}")
+                return None
+
+        except ImportError:
+            pass  # Harm prevention not available, proceed
+        except Exception as e:
+            logger.warning(f"[HARM-PREVENTION] Check error: {e}")
+
         try:
             # Execute fix command if provided
             if "fix_cmd" in issue:

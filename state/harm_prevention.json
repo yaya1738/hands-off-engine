@@ -1,0 +1,14 @@
+{
+  "master": "Yair Siegel",
+  "enabled": true,
+  "total_changes": 1,
+  "harmful_changes": 0,
+  "rollbacks": 0,
+  "learned_patterns": [],
+  "rate_limit": {
+    "max_changes_per_hour": 10,
+    "current_hour_changes": 1,
+    "hour_start": "2025-11-30T23:17:33.363661+00:00"
+  },
+  "last_updated": "2025-11-30T23:17:33.364796+00:00"
+}
