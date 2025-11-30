@@ -34,7 +34,7 @@ I built an autonomous AI system that runs 24/7 without intervention—multi-agen
 **Timeline:** 5-7 business days
 
 ## Price
-$500
+$199 (Limited Launch Pricing - normally $500)
 
 ## Tags
 AI Integration, Workflow Automation, ChatGPT, Business Process Automation, Consulting

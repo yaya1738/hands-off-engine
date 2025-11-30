@@ -1,6 +1,6 @@
 # ◈ AI Nexus | Service Packages
 
-## Package 1: AI Workflow Audit ($500)
+## Package 1: AI Workflow Audit ($199 - Launch Pricing)
 **What you get:**
 - 1-hour discovery call
 - Analysis of your current processes

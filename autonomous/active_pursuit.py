@@ -64,6 +64,55 @@ class ActivePursuit:
         except ImportError:
             return None
 
+    def _get_conversion_optimizer(self):
+        """Get conversion optimizer for adaptation."""
+        try:
+            from autonomous.conversion_optimizer import ConversionOptimizer
+            return ConversionOptimizer()
+        except ImportError:
+            return None
+
+    def run_conversion_adaptation(self) -> Dict:
+        """
+        Run conversion optimization cycle.
+
+        THE KEY INSIGHT: 85 visitors with 0 conversions means something is wrong.
+        This method diagnoses and adapts.
+        """
+        print("\n[CONVERSION OPTIMIZATION]")
+        optimizer = self._get_conversion_optimizer()
+
+        if not optimizer:
+            print("  ✗ Conversion optimizer not available")
+            return {}
+
+        # Get diagnosis
+        diagnosis = optimizer.diagnose_conversion_gap()
+
+        print(f"  Current conversion rate: {diagnosis['conversion_rate']}")
+        print(f"  Issues identified: {len(diagnosis['likely_issues'])}")
+
+        for issue in diagnosis["likely_issues"][:2]:
+            print(f"    → {issue['severity'].upper()}: {issue['issue']}")
+
+        # Check if we have an active experiment
+        current = optimizer.state.get("current_test")
+        if current:
+            print(f"\n  Active experiment: {current.get('lever', 'unknown')}")
+            print(f"    Testing: {current.get('variation', 'unknown')}")
+            print(f"    Started: {current.get('timestamp', 'unknown')[:10]}")
+        else:
+            # Start new experiment
+            print("\n  Starting new experiment...")
+            result = optimizer.adapt_now()
+            exp = result["experiment"]
+            print(f"    Testing: {exp['lever']} → {exp['variation']}")
+            for action in result["instructions"]["actions"]:
+                print(f"    ACTION: {action}")
+            return result
+
+        return {"current_test": current, "diagnosis": diagnosis}
+
     def _load_state(self) -> Dict:
         """Load pursuit state."""
         if PURSUIT_FILE.exists():
@@ -524,6 +573,9 @@ class ActivePursuit:
                 print("  No data yet - all strategies equal priority")
         else:
             print("  Reality feedback not available")
+
+        # STEP 0.5: Run conversion optimization
+        all_results['conversion'] = self.run_conversion_adaptation()
 
         # 1. Hunt for opportunities
         all_results['freelance'] = self.hunt_freelance_opportunities()
