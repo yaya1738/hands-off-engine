@@ -1,0 +1,10 @@
+{
+  "status": "error",
+  "task_type": "strategic_planning",
+  "task_id": "capital_increase_001",
+  "error": {
+    "type": "UnsupportedTaskType",
+    "message": "Task type 'strategic_planning' is not supported",
+    "stage": "dispatch"
+  }
+}

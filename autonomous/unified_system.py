@@ -255,6 +255,9 @@ class UnifiedAutonomousSystem:
             "trading_risk": health.trading_impact_risk
         }
 
+        # Feed metrics to kernel for learning
+        self.hw_kernel.learn_from_metrics(metrics, health)
+
         # Log to audit
         self.hw_audit.log_health_check(health, self.session_id)
 
@@ -339,12 +342,30 @@ class UnifiedAutonomousSystem:
             return True
 
         # High confidence decisions for non-critical operations
+        # Include alert_response to handle memory/cpu/disk alerts automatically
         if decision.confidence.value in ["certain", "high"]:
-            if decision.decision_type in ["alert", "monitoring"]:
+            if decision.decision_type in ["alert", "monitoring", "alert_response"]:
                 return True
 
-        # Don't auto-approve if trading is at risk
+        # Auto-approve upgrade recommendations with high confidence
+        # EXCEPT for self-upgrade (would kill this process)
+        if decision.decision_type == "upgrade_recommendation":
+            if decision.confidence.value in ["certain", "high"]:
+                # SELF-PROTECTION: Don't auto-approve upgrades targeting self
+                if decision.node_id == self.node_id:
+                    return False  # Queue for manual approval
+                return True
+
+        # For infrastructure decisions, still allow auto-approval even during
+        # high trading risk IF this is an upgrade that would FIX the issue
+        # BUT NEVER auto-approve self-upgrades
         if health.trading_impact_risk in ["high", "critical"]:
+            # SELF-PROTECTION: Never auto-approve self-upgrades regardless of risk
+            if decision.node_id == self.node_id and decision.decision_type == "upgrade_recommendation":
+                return False  # Queue for manual approval
+            # Allow upgrades/fixes to proceed - they're meant to resolve the risk
+            if decision.decision_type in ["emergency", "upgrade_recommendation", "alert_response"]:
+                return True
             return False
 
         return decision.auto_executed
@@ -391,7 +412,46 @@ class UnifiedAutonomousSystem:
                 decisions.append(decision)
                 self._queue_infra_for_approval(decision)
 
+        # CRITICAL: Check for component-specific issues that warrant upgrade
+        # even if overall status looks healthy (other components mask the problem)
+        elif self._needs_resource_upgrade(health):
+            # Component is struggling - upgrade to fix it
+            component, reason = self._get_struggling_component(health)
+            if self.auto_upgrade:
+                decision = self._create_infra_decision(
+                    action="upgrade_server",
+                    reason=f"{component} constraint: {reason}",
+                    auto_approve=self._within_auto_approve_budget()
+                )
+                if decision:
+                    decisions.append(decision)
+                    if decision.get("auto_approve"):
+                        self._execute_infra_decision(decision)
+                    else:
+                        self._queue_infra_for_approval(decision)
+
         return decisions
+
+    def _needs_resource_upgrade(self, health) -> bool:
+        """Check if any critical component needs more resources."""
+        # Memory is critical for trading - if it's struggling, upgrade
+        if health.memory_health.status in [HealthStatus.CRITICAL, HealthStatus.WARNING]:
+            return True
+        # High trading risk with resource constraints
+        if health.trading_impact_risk in ["high", "critical"]:
+            if health.memory_health.score < 50 or health.cpu_health.score < 50:
+                return True
+        return False
+
+    def _get_struggling_component(self, health) -> Tuple[str, str]:
+        """Identify which component is struggling and why."""
+        if health.memory_health.status in [HealthStatus.CRITICAL, HealthStatus.WARNING]:
+            return "Memory", f"score {health.memory_health.score:.0f}, status {health.memory_health.status.value}"
+        if health.cpu_health.status in [HealthStatus.CRITICAL, HealthStatus.WARNING]:
+            return "CPU", f"score {health.cpu_health.score:.0f}, status {health.cpu_health.status.value}"
+        if health.disk_health.status in [HealthStatus.CRITICAL, HealthStatus.WARNING]:
+            return "Disk", f"score {health.disk_health.score:.0f}, status {health.disk_health.status.value}"
+        return "Resources", f"trading risk {health.trading_impact_risk}"
 
     def _create_infra_decision(
         self,
@@ -431,17 +491,53 @@ class UnifiedAutonomousSystem:
 
         elif action == "upgrade_server":
             # Get current server and upgrade
+            # Refresh server list from cloud provider
+            self.infra_provisioner.refresh_servers()
             servers = list(self.infra_provisioner.servers.values())
-            if servers:
-                server = servers[0]  # Upgrade primary
+
+            # Find the current server (match by hostname)
+            import socket
+            hostname = socket.gethostname()
+            current_server = None
+            for server in servers:
+                if server.name == hostname or hostname in server.name:
+                    current_server = server
+                    break
+
+            if not current_server and servers:
+                # Fallback to first active server
+                current_server = servers[0]
+
+            if current_server:
+                current_size = current_server.instance_type
+                next_size = self._get_next_instance_type(current_size)
+
+                # SELF-PROTECTION: Never auto-resize the server we're running on
+                # Resizing requires shutdown which kills this process
+                if current_server.name == hostname or hostname in current_server.name:
+                    decision["executed"] = False
+                    decision["result"] = "SELF-PROTECTION: Cannot auto-resize self"
+                    print(f"⚠️ SELF-PROTECTION: Skipping auto-resize of {hostname} (would kill this process)")
+                    print(f"   To resize manually: doctl compute droplet-action resize {current_server.server_id} --size {next_size}")
+                    return
+
+                print(f"🔄 Upgrading server {current_server.name} from {current_size} to {next_size}")
+
                 success, message = self.infra_provisioner.api.resize_server(
-                    server.server_id,
-                    self._get_next_instance_type(server.instance_type)
+                    current_server.server_id,
+                    next_size
                 )
                 decision["executed"] = True
                 decision["result"] = message
                 if success:
                     self.stats["auto_upgrades"] += 1
+                    print(f"✅ Upgrade initiated: {message}")
+                else:
+                    print(f"❌ Upgrade failed: {message}")
+            else:
+                decision["executed"] = False
+                decision["result"] = "No server found to upgrade"
+                print("❌ No server found to upgrade")
 
     def _get_next_instance_type(self, current: str) -> str:
         """Get the next larger instance type."""
@@ -475,7 +571,14 @@ class UnifiedAutonomousSystem:
         risk_level: str,
         action_data: Dict
     ):
-        """Add an action to the approval queue."""
+        """Add an action to the approval queue with deduplication."""
+        # Deduplication: check if similar item already pending
+        pending = self.approval_queue.get_pending()
+        for existing in pending:
+            if existing.get("title") == title:
+                # Already have this exact request pending, skip
+                return
+
         change_id = self.approval_queue.add_change(
             title=title,
             description=description,

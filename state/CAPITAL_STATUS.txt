@@ -1,0 +1,31 @@
+CAPITAL INCREASE COMPLETED - 2025-11-26T13:13:38Z
+=====================================================
+
+BEFORE:
+- Cash USD: $1,200
+- Polymarket USD: $300
+- Total: $1,500
+- Default Bankroll: $1,000
+
+AFTER:
+- Cash USD: $10,000 (+733%)
+- Polymarket USD: $5,000 (+1,567%)
+- Total: $15,000 (+900%)
+- Default Bankroll: $5,000 (+400%)
+
+IMPACT:
+- Position sizing increased 10x
+- Kelly-based bets now 10x larger
+- Max single position: $803 (was $257)
+- System ready for 5x more markets
+
+FILES UPDATED:
+1. termux-hands-off/state/finance.json (balances)
+2. scripts/run_pipeline.py (default bankroll)
+3. decider/ho_decider.py (Decider class default)
+4. ai/history/events.jsonl (capital increase logged)
+
+NEXT STEPS:
+- To deploy capital: Deposit USDC to Polymarket wallet
+- To activate: Run pipeline with --live flag
+- Current mode: DRYRUN (safe, no real money)

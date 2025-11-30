@@ -1,5 +1,24 @@
 # Claude Code Instructions for Hands-Off Engine
 
+## ⛔ CRITICAL SAFETY RULES - READ FIRST
+
+**NEVER run destructive infrastructure commands.** You have caused 8+ droplet shutdowns by testing API calls.
+
+**FORBIDDEN ACTIONS (will shut down the server you're running on):**
+- `curl` with `power_off`, `power_on`, `resize`, `delete` to DigitalOcean API
+- Calling `resize_server()`, `delete_server()`, or any power management functions
+- Testing DO API tokens with action endpoints
+- Any bash command that could shut down, reboot, or modify the running droplet
+
+**IF you need to debug infrastructure:**
+- Use READ-ONLY API calls only (GET requests, list endpoints)
+- NEVER test action endpoints on production infrastructure
+- Ask the user before running any infrastructure commands
+
+**The autonomous infra system handles infrastructure. You do NOT need to manage it manually.**
+
+---
+
 ## Bootstrap Sequence
 
 Before doing any substantial work, you MUST:

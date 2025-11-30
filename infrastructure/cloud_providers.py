@@ -14,6 +14,13 @@ Standard: Yair Siegel Master Level Operations - Full Self-Control
 
 import json
 import os
+
+# Load environment variables from .env.polymarket
+try:
+    from dotenv import load_dotenv
+    load_dotenv(os.path.join(os.path.dirname(__file__), '..', '.env.polymarket'))
+except ImportError:
+    pass  # dotenv not installed, rely on system env vars
 import time
 import hashlib
 import hmac
@@ -83,6 +90,22 @@ class CloudProviderAPI(ABC):
     def check_api_status(self) -> Tuple[bool, str]:
         """Check if API is accessible. Returns (ok, message)."""
         pass
+
+
+def _get_self_hostname() -> str:
+    """Get hostname of the current machine for self-protection."""
+    import socket
+    return socket.gethostname()
+
+
+def _is_self_server(server_id: str, server_name: str = "") -> bool:
+    """Check if a server ID/name refers to the current machine (self-protection)."""
+    hostname = _get_self_hostname()
+    if server_id == hostname or hostname in server_id:
+        return True
+    if server_name and (server_name == hostname or hostname in server_name):
+        return True
+    return False
 
 
 class DigitalOceanAPI(CloudProviderAPI):
@@ -216,6 +239,14 @@ class DigitalOceanAPI(CloudProviderAPI):
 
     def delete_server(self, server_id: str) -> Tuple[bool, str]:
         """Delete a droplet."""
+        # SELF-PROTECTION: Check if this is the server we're running on
+        # First try to get server info to check by name
+        server = self.get_server(server_id)
+        server_name = server.name if server else ""
+        if _is_self_server(server_id, server_name):
+            hostname = _get_self_hostname()
+            return False, f"SELF-PROTECTION: Cannot delete {hostname} (would kill this process)"
+
         success, data, message = self._request("DELETE", f"/droplets/{server_id}")
         if success:
             return True, f"Droplet {server_id} deleted"
@@ -223,6 +254,10 @@ class DigitalOceanAPI(CloudProviderAPI):
 
     def resize_server(self, server_id: str, new_instance_type: str) -> Tuple[bool, str]:
         """Resize a droplet (requires power off first)."""
+        # SAFETY BLOCK: Prevent autonomous shutdowns - this has caused 8+ unwanted shutdowns
+        # To resize, do it manually via DigitalOcean console
+        return False, "BLOCKED: Resize disabled to prevent autonomous shutdowns. Use DO console manually."
+
         # Power off first
         success, _, message = self._request(
             "POST",
@@ -347,7 +382,7 @@ class DigitalOceanAPI(CloudProviderAPI):
                 memory_gb=size.get("memory", 1024) / 1024,
                 storage_gb=size.get("disk", 25)
             ),
-            role=ServerRole.GENERAL,
+            role=self._detect_server_role(droplet.get("name", ""), droplet.get("tags", [])),
             region=droplet.get("region", {}).get("slug", ""),
             ip_address=ip_address,
             private_ip=private_ip,
@@ -358,6 +393,41 @@ class DigitalOceanAPI(CloudProviderAPI):
             tags={t: "true" for t in droplet.get("tags", [])},
             metadata={"droplet_id": droplet.get("id")}
         )
+
+    def _detect_server_role(self, name: str, tags: List[str]) -> ServerRole:
+        """Detect server role from name and tags."""
+        name_lower = name.lower()
+
+        # Check tags first (explicit role assignment)
+        for tag in tags:
+            tag_lower = tag.lower()
+            if "trading-primary" in tag_lower or "primary" in tag_lower:
+                return ServerRole.TRADING_PRIMARY
+            elif "trading-backup" in tag_lower or "backup" in tag_lower:
+                return ServerRole.TRADING_BACKUP
+            elif "alpha" in tag_lower:
+                return ServerRole.ALPHA_ENGINE
+            elif "nexus" in tag_lower or "ai" in tag_lower:
+                return ServerRole.AI_NEXUS
+            elif "db" in tag_lower or "database" in tag_lower:
+                return ServerRole.DATABASE
+            elif "monitor" in tag_lower:
+                return ServerRole.MONITORING
+
+        # Detect from name patterns
+        if "helper" in name_lower:
+            # pm-helper is the main trading/operations server
+            return ServerRole.TRADING_PRIMARY
+        elif "recovery" in name_lower or "backup" in name_lower:
+            return ServerRole.TRADING_BACKUP
+        elif "clone" in name_lower or "test" in name_lower:
+            # Test/clone servers are not production
+            return ServerRole.GENERAL
+        elif "agent" in name_lower:
+            # pm-agent variants - old trading agents
+            return ServerRole.TRADING_BACKUP
+
+        return ServerRole.GENERAL
 
     def _slug_to_size(self, slug: str) -> InstanceSize:
         """Convert DO slug to InstanceSize."""

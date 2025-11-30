@@ -60,11 +60,13 @@ class HardwareCollector:
         self.node_id = node_id or self._generate_node_id()
         self.hostname = socket.gethostname()
         self.trading_process_patterns = trading_process_patterns or [
-            "python.*trading",
+            "python.*unified_system",
+            "python.*autonomous",
+            "python.*telegram",
+            "python.*self_healing",
+            "python.*uvicorn",
             "python.*executor",
-            "python.*decider",
             "python.*alpha",
-            "node.*trading",
         ]
         self._last_cpu_times = None
         self._last_cpu_time = None
@@ -182,6 +184,14 @@ class HardwareCollector:
 
         except Exception as e:
             pass
+
+        # SAFETY: If no previous sample exists, estimate CPU usage from load average
+        # This prevents reporting 0% CPU on first call after reboot
+        if usage_percent == 0.0 and load_1 > 0 and core_count > 0:
+            # Load average 1.0 per core = ~100% CPU, scale accordingly
+            load_per_core = load_1 / core_count
+            # Cap at 100%, load can exceed 1.0 per core when overloaded
+            usage_percent = min(100.0, load_per_core * 100.0)
 
         # CPU frequency
         try:

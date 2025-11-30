@@ -1,0 +1,177 @@
+{
+  "markets": [
+    {
+      "question": "Will Bitcoin reach $120k by end of Q1 2026?",
+      "side": "YES",
+      "model_confidence": 0.72,
+      "model_edge": 0.14,
+      "query_category": "crypto",
+      "reasoning": "Bull market momentum + institutional adoption + halving cycle",
+      "market_price": 0.58,
+      "fair_value": 0.72,
+      "recommended_stake": 0.08
+    },
+    {
+      "question": "Will Ethereum ETF see $10B+ inflows in 2025?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.12,
+      "query_category": "crypto",
+      "reasoning": "Following Bitcoin ETF success pattern",
+      "market_price": 0.56,
+      "fair_value": 0.68,
+      "recommended_stake": 0.06
+    },
+    {
+      "question": "Will Solana reach $500 by end of 2025?",
+      "side": "NO",
+      "model_confidence": 0.65,
+      "model_edge": 0.11,
+      "query_category": "crypto",
+      "reasoning": "Aggressive target requires 3x from current, market cap constraints",
+      "market_price": 0.58,
+      "fair_value": 0.35,
+      "recommended_stake": 0.05
+    },
+    {
+      "question": "Will a crypto spot ETF get approved for XRP in 2025?",
+      "side": "YES",
+      "model_confidence": 0.7,
+      "model_edge": 0.13,
+      "query_category": "crypto",
+      "reasoning": "Ripple legal clarity + ETF approval momentum",
+      "market_price": 0.57,
+      "fair_value": 0.7,
+      "recommended_stake": 0.07
+    },
+    {
+      "question": "Will Bitcoin dominance fall below 50% in 2025?",
+      "side": "NO",
+      "model_confidence": 0.66,
+      "model_edge": 0.1,
+      "query_category": "crypto",
+      "reasoning": "BTC ETF flows maintaining dominance, altseason delayed",
+      "market_price": 0.54,
+      "fair_value": 0.46,
+      "recommended_stake": 0.05
+    },
+    {
+      "question": "Will Base (Coinbase L2) surpass 10M daily active users in 2025?",
+      "side": "YES",
+      "model_confidence": 0.69,
+      "model_edge": 0.11,
+      "query_category": "crypto",
+      "reasoning": "Coinbase user base + consumer app momentum",
+      "market_price": 0.58,
+      "fair_value": 0.69,
+      "recommended_stake": 0.06
+    },
+    {
+      "question": "Will a major US bank launch crypto custody in 2025?",
+      "side": "YES",
+      "model_confidence": 0.74,
+      "model_edge": 0.16,
+      "query_category": "crypto",
+      "reasoning": "Regulatory clarity + client demand + competitive pressure",
+      "market_price": 0.58,
+      "fair_value": 0.74,
+      "recommended_stake": 0.09
+    },
+    {
+      "question": "Will crypto market cap exceed $5 trillion in 2025?",
+      "side": "YES",
+      "model_confidence": 0.71,
+      "model_edge": 0.15,
+      "query_category": "crypto",
+      "reasoning": "Current $2.5T + bull market + institutional inflows",
+      "market_price": 0.56,
+      "fair_value": 0.71,
+      "recommended_stake": 0.08
+    },
+    {
+      "question": "Will Coinbase stock (COIN) reach $500 in 2025?",
+      "side": "YES",
+      "model_confidence": 0.67,
+      "model_edge": 0.12,
+      "query_category": "crypto",
+      "reasoning": "Crypto bull market correlation + Base success",
+      "market_price": 0.55,
+      "fair_value": 0.67,
+      "recommended_stake": 0.06
+    },
+    {
+      "question": "Will a Bitcoin mining company enter S&P 500 in 2025?",
+      "side": "NO",
+      "model_confidence": 0.7,
+      "model_edge": 0.14,
+      "query_category": "crypto",
+      "reasoning": "Market cap and profitability requirements too high",
+      "market_price": 0.44,
+      "fair_value": 0.3,
+      "recommended_stake": 0.07
+    },
+    {
+      "question": "Will DeFi TVL exceed $200B in 2025?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.11,
+      "query_category": "crypto",
+      "reasoning": "Current $85B + yield opportunities + institutional entry",
+      "market_price": 0.57,
+      "fair_value": 0.68,
+      "recommended_stake": 0.06
+    },
+    {
+      "question": "Will Lightning Network capacity reach 10,000 BTC in 2025?",
+      "side": "YES",
+      "model_confidence": 0.69,
+      "model_edge": 0.13,
+      "query_category": "crypto",
+      "reasoning": "Current ~5,000 BTC + adoption growth + wallet integration",
+      "market_price": 0.56,
+      "fair_value": 0.69,
+      "recommended_stake": 0.07
+    },
+    {
+      "question": "Will Tether (USDT) lose #1 stablecoin position in 2025?",
+      "side": "NO",
+      "model_confidence": 0.73,
+      "model_edge": 0.15,
+      "query_category": "crypto",
+      "reasoning": "Network effects too strong, USDC hasn't caught up",
+      "market_price": 0.42,
+      "fair_value": 0.27,
+      "recommended_stake": 0.08
+    },
+    {
+      "question": "Will crypto become a top 3 issue in 2026 US midterms?",
+      "side": "NO",
+      "model_confidence": 0.66,
+      "model_edge": 0.1,
+      "query_category": "politics",
+      "reasoning": "Economy, healthcare, immigration remain dominant",
+      "market_price": 0.44,
+      "fair_value": 0.34,
+      "recommended_stake": 0.05
+    },
+    {
+      "question": "Will SEC approve multiple crypto ETFs (beyond BTC/ETH) in 2025?",
+      "side": "YES",
+      "model_confidence": 0.71,
+      "model_edge": 0.14,
+      "query_category": "crypto",
+      "reasoning": "Approval momentum + political pressure + precedent set",
+      "market_price": 0.57,
+      "fair_value": 0.71,
+      "recommended_stake": 0.08
+    }
+  ],
+  "metadata": {
+    "generated": "2025-11-27T13:30:00Z",
+    "focus": "crypto_markets",
+    "average_edge": 0.127,
+    "average_confidence": 0.692,
+    "signal_count": 15,
+    "target_audience": "crypto_traders"
+  }
+}

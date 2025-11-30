@@ -346,18 +346,29 @@ class HardwareDecisionEngine:
         decisions = []
 
         if alert.severity == HealthStatus.CRITICAL:
-            decision = create_hardware_decision(
-                node_id=metrics.node_id,
-                decision_type="alert_response",
-                action=f"respond_to_{alert.component.value}_alert",
-                reason=alert.message,
-                triggered_by=f"alert_{alert.alert_id}",
-                ai_reasoning=f"Alert: {alert.metric_name} at {alert.current_value} exceeds threshold {alert.threshold_value}",
-                confidence=DecisionConfidence.HIGH,
-                auto_executed=False,
-                requires_approval=True
+            # Check if we already have a recent decision for this alert type (deduplication)
+            alert_key = f"{alert.component.value}_{alert.metric_name}"
+            recent_cutoff = datetime.utcnow() - timedelta(minutes=5)
+
+            already_handled = any(
+                d.action == f"respond_to_{alert.component.value}_alert"
+                and d.created_at > recent_cutoff
+                for d in self.pending_decisions + self.executed_decisions[-20:]
             )
-            decisions.append(decision)
+
+            if not already_handled:
+                decision = create_hardware_decision(
+                    node_id=metrics.node_id,
+                    decision_type="alert_response",
+                    action=f"respond_to_{alert.component.value}_alert",
+                    reason=alert.message,
+                    triggered_by=f"alert_{alert.alert_id}",
+                    ai_reasoning=f"Alert: {alert.metric_name} at {alert.current_value} exceeds threshold {alert.threshold_value}",
+                    confidence=DecisionConfidence.HIGH,
+                    auto_executed=True,  # Auto-execute alert responses
+                    requires_approval=False  # Don't spam approval queue
+                )
+                decisions.append(decision)
 
         return decisions
 
@@ -369,37 +380,49 @@ class HardwareDecisionEngine:
         """Check for upgrade opportunities during healthy operation."""
         decisions = []
 
-        # Memory upgrade check
-        if metrics.memory.total_gb < 8 and metrics.memory.swap_percent > 10:
-            decision = create_hardware_decision(
-                node_id=metrics.node_id,
-                decision_type="upgrade_recommendation",
-                action="recommend_memory_upgrade",
-                reason=f"Swap usage {metrics.memory.swap_percent}% with only {metrics.memory.total_gb}GB RAM",
-                triggered_by="optimization_opportunity",
-                ai_reasoning="System would benefit from additional RAM to reduce swap usage",
-                confidence=DecisionConfidence.MEDIUM,
-                auto_executed=False,
-                requires_approval=True
-            )
-            decisions.append(decision)
+        # Check for recent pending upgrade recommendations to avoid spam
+        recent_cutoff = datetime.utcnow() - timedelta(hours=24)
+        pending_actions = set()
+        for d in self.pending_decisions:
+            if d.decision_type == "upgrade_recommendation":
+                pending_actions.add(d.action)
+        for d in self.executed_decisions[-50:]:
+            if d.decision_type == "upgrade_recommendation" and d.created_at > recent_cutoff:
+                pending_actions.add(d.action)
 
-        # Storage upgrade check
-        for disk in metrics.disks:
-            if disk.mount_point == "/" and disk.usage_percent > 70:
-                remaining_gb = disk.available_gb
+        # Memory upgrade check (skip if already recommended in last 24h)
+        if metrics.memory.total_gb < 8 and metrics.memory.swap_percent > 10:
+            if "recommend_memory_upgrade" not in pending_actions:
                 decision = create_hardware_decision(
                     node_id=metrics.node_id,
                     decision_type="upgrade_recommendation",
-                    action="recommend_storage_upgrade",
-                    reason=f"Root partition at {disk.usage_percent}% with {remaining_gb:.1f}GB remaining",
-                    triggered_by="storage_planning",
-                    ai_reasoning="Plan storage expansion to maintain headroom for growth",
-                    confidence=DecisionConfidence.LOW,
+                    action="recommend_memory_upgrade",
+                    reason=f"Swap usage {metrics.memory.swap_percent}% with only {metrics.memory.total_gb}GB RAM",
+                    triggered_by="optimization_opportunity",
+                    ai_reasoning="System would benefit from additional RAM to reduce swap usage",
+                    confidence=DecisionConfidence.MEDIUM,
                     auto_executed=False,
                     requires_approval=True
                 )
                 decisions.append(decision)
+
+        # Storage upgrade check (skip if already recommended in last 24h)
+        for disk in metrics.disks:
+            if disk.mount_point == "/" and disk.usage_percent > 70:
+                if "recommend_storage_upgrade" not in pending_actions:
+                    remaining_gb = disk.available_gb
+                    decision = create_hardware_decision(
+                        node_id=metrics.node_id,
+                        decision_type="upgrade_recommendation",
+                        action="recommend_storage_upgrade",
+                        reason=f"Root partition at {disk.usage_percent}% with {remaining_gb:.1f}GB remaining",
+                        triggered_by="storage_planning",
+                        ai_reasoning="Plan storage expansion to maintain headroom for growth",
+                        confidence=DecisionConfidence.LOW,
+                        auto_executed=False,
+                        requires_approval=True
+                    )
+                    decisions.append(decision)
 
         return decisions
 
@@ -501,14 +524,50 @@ class HardwareDecisionEngine:
 
     def _execute_memory_cleanup(self, decision: HardwareDecision) -> bool:
         """Execute emergency memory cleanup."""
-        # Clear caches
+        import subprocess
+        cleanup_actions = []
+
         try:
+            # 1. Clear page cache (requires root)
             cache_path = Path("/proc/sys/vm/drop_caches")
             if cache_path.exists():
-                # Would need root: echo 1 > /proc/sys/vm/drop_caches
-                pass
+                try:
+                    subprocess.run(["sync"], timeout=30)
+                    with open("/proc/sys/vm/drop_caches", "w") as f:
+                        f.write("1")
+                    cleanup_actions.append("Cleared page cache")
+                except PermissionError:
+                    cleanup_actions.append("Page cache clear skipped (no permission)")
+
+            # 2. Clear Python's internal caches
+            import gc
+            gc.collect()
+            cleanup_actions.append("Python GC collected")
+
+            # 3. Clear old log files
+            log_dir = Path("/var/log/hands-off")
+            if log_dir.exists():
+                import time
+                cutoff = time.time() - 86400 * 3  # 3 days
+                for log_file in log_dir.glob("*.log.*"):
+                    if log_file.stat().st_mtime < cutoff:
+                        log_file.unlink()
+                        cleanup_actions.append(f"Removed old log: {log_file.name}")
+
+            # 4. Clear Python bytecode cache
+            pycache_dirs = list(Path("/root/hands-off-engine").rglob("__pycache__"))
+            for pycache in pycache_dirs[:5]:  # Limit to prevent long runs
+                import shutil
+                try:
+                    shutil.rmtree(pycache)
+                    cleanup_actions.append(f"Cleared pycache: {pycache}")
+                except:
+                    pass
+
+            decision.outcome = f"Memory cleanup: {', '.join(cleanup_actions[:5])}"
             return True
-        except:
+        except Exception as e:
+            decision.outcome = f"Memory cleanup failed: {e}"
             return False
 
     def _execute_disk_cleanup(self, decision: HardwareDecision) -> bool:

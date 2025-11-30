@@ -306,18 +306,35 @@ class HardwareAnalyzer:
         # Usage analysis
         usage_percent = (memory.used_gb / memory.total_gb * 100) if memory.total_gb > 0 else 0
 
-        if usage_percent > 95:
-            issues.append(f"Memory critical at {usage_percent:.1f}% ({memory.available_gb:.2f}GB available)")
-            recommendations.append("Immediate attention required - OOM risk")
-            score -= 50
-        elif usage_percent > 85:
-            issues.append(f"Memory elevated at {usage_percent:.1f}%")
-            recommendations.append("Consider adding RAM or optimizing processes")
-            score -= 25
-        elif usage_percent > 75:
-            score -= 10
+        # PRIMARY CHECK: Available memory in absolute terms
+        # This is the most important metric - low available memory = OOM risk
+        if memory.available_gb < 0.3:
+            issues.append(f"CRITICAL: Only {memory.available_gb:.2f}GB available - OOM imminent")
+            recommendations.append("URGENT: System will crash without intervention")
+            score -= 70
+        elif memory.available_gb < 0.5:
+            issues.append(f"CRITICAL: Only {memory.available_gb:.2f}GB available")
+            recommendations.append("Immediate attention required - high OOM risk")
+            score -= 55
+        elif memory.available_gb < 1.0:
+            issues.append(f"Low available memory: {memory.available_gb:.2f}GB")
+            recommendations.append("System at risk - consider upgrade")
+            score -= 40
+        elif memory.available_gb < 2.0:
+            issues.append(f"Limited available memory: {memory.available_gb:.2f}GB")
+            score -= 20
 
-        # Swap usage
+        # SECONDARY: Percentage-based check (less important than absolute)
+        if usage_percent > 95:
+            issues.append(f"Memory usage at {usage_percent:.1f}%")
+            score -= 25
+        elif usage_percent > 85:
+            issues.append(f"Memory usage elevated at {usage_percent:.1f}%")
+            score -= 15
+        elif usage_percent > 75:
+            score -= 5
+
+        # Swap usage - indicates memory pressure
         if memory.swap_percent > 50:
             issues.append(f"High swap usage: {memory.swap_percent:.1f}%")
             recommendations.append("System is memory constrained")
@@ -326,20 +343,13 @@ class HardwareAnalyzer:
             issues.append(f"Swap in use: {memory.swap_percent:.1f}%")
             score -= 15
 
-        # OOM kills
+        # OOM kills - critical indicator
         if memory.oom_kills_recent > 0:
             issues.append(f"Recent OOM kills detected: {memory.oom_kills_recent}")
             recommendations.append("Critical: processes being killed due to memory")
             score -= 40
 
-        # Available memory absolute check
-        if memory.available_gb < 1.0:
-            issues.append(f"Very low available memory: {memory.available_gb:.2f}GB")
-            score -= 25
-        elif memory.available_gb < 2.0:
-            score -= 10
-
-        # Pristine bonus
+        # Pristine bonus - only if truly healthy
         if usage_percent < 60 and memory.swap_percent < 5 and memory.available_gb > 4.0:
             score = min(100, score + 10)
 

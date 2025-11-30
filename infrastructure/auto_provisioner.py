@@ -123,6 +123,27 @@ class AutoProvisioner:
             self.collector = None
             self.analyzer = None
 
+    def _get_self_hostname(self) -> str:
+        """Get the hostname of this machine."""
+        import socket
+        return socket.gethostname()
+
+    def _is_self(self, server_id_or_name: str) -> bool:
+        """Check if target server is the one we're running on (self-protection)."""
+        hostname = self._get_self_hostname()
+        # Check direct match
+        if server_id_or_name == hostname:
+            return True
+        # Check if hostname is contained in server name
+        if hostname in server_id_or_name:
+            return True
+        # Check if server_id matches a server whose name matches our hostname
+        if server_id_or_name in self.servers:
+            server = self.servers[server_id_or_name]
+            if server.name == hostname or hostname in server.name:
+                return True
+        return False
+
     def _load_state(self):
         """Load persisted state."""
         state_file = self.state_path / "provisioner_state.json"
@@ -176,22 +197,42 @@ class AutoProvisioner:
             except:
                 pass
 
-        # Check each server for scaling needs
+        # Check CURRENT server for scaling needs (upgrade/downgrade)
+        # We only have local health metrics, so we can only make decisions about THIS machine
+        import socket
+        current_hostname = socket.gethostname()
+
         for server in self.servers.values():
-            server_decisions = self._analyze_server(server, health)
-            decisions.extend(server_decisions)
+            # Only analyze servers we're running on (have metrics for)
+            if self._is_current_server(server, current_hostname):
+                server_decisions = self._analyze_server(server, health)
+                decisions.extend(server_decisions)
+                break  # Only one current server
 
         # Check if we need more servers (horizontal scaling)
         horizontal_decisions = self._check_horizontal_scaling(health)
         decisions.extend(horizontal_decisions)
 
+        # Check for idle servers to terminate (cost optimization)
+        idle_decisions = self._check_idle_servers()
+        decisions.extend(idle_decisions)
+
         # Check budget
         self._enforce_budget(decisions)
 
-        # Auto-execute approved decisions
+        # SAFETY: Never auto-execute destructive decisions
+        # Downgrades and terminations can kill the system - require explicit human approval
+        # Only upgrades and provisions can be auto-executed (they add resources, don't remove)
         for decision in decisions:
             if decision.auto_approved and not decision.requires_approval:
-                self._execute_decision(decision)
+                # Block auto-execution of destructive actions
+                if decision.action in [InfrastructureAction.DOWNGRADE_SERVER,
+                                       InfrastructureAction.TERMINATE_SERVER]:
+                    decision.auto_approved = False
+                    decision.requires_approval = True
+                    decision.execution_result = "SAFETY: Destructive actions require human approval"
+                else:
+                    self._execute_decision(decision)
 
         self.pending_decisions.extend(
             d for d in decisions if not d.executed and d.requires_approval
@@ -262,6 +303,22 @@ class AutoProvisioner:
                 decision.requires_approval = not self.AUTO_APPROVE_TRADING_CRITICAL
                 decisions.append(decision)
 
+        # Check if server is overprovisioned (can downgrade to save money)
+        # Only consider downgrade if ALL resources are underutilized
+        if (cpu_score > 90 and mem_score > 85 and disk_score > 80 and
+            health.trading_impact_risk in ["none", "low"]):
+            decision = self._create_downgrade_decision(
+                server=server,
+                reason=f"Server overprovisioned (CPU:{cpu_score:.0f}%, MEM:{mem_score:.0f}%, DISK:{disk_score:.0f}% health scores)",
+                trigger_metrics={
+                    "cpu_score": cpu_score,
+                    "memory_score": mem_score,
+                    "disk_score": disk_score
+                }
+            )
+            if decision:
+                decisions.append(decision)
+
         return decisions
 
     def _check_horizontal_scaling(
@@ -290,6 +347,117 @@ class AutoProvisioner:
                 decisions.append(decision)
 
         return decisions
+
+    def _check_idle_servers(self) -> List[ScalingDecision]:
+        """
+        Check for idle/unused servers that should be terminated to save costs.
+
+        Detects:
+        - Servers that are powered off (still costing money)
+        - Servers not running the hands-off-engine (not us)
+        - Servers with no active workload
+
+        SAFETY: Never terminates the server we're currently running on.
+        """
+        import socket
+        decisions = []
+
+        # Get current hostname to protect ourselves
+        current_hostname = socket.gethostname()
+
+        # Refresh server list
+        self.refresh_servers()
+
+        for server in self.servers.values():
+            # CRITICAL SAFETY: Never terminate ourselves
+            if self._is_current_server(server, current_hostname):
+                continue
+
+            # Check if server should be terminated
+            should_terminate, reason = self._should_terminate_server(server)
+
+            if should_terminate:
+                decision = create_scaling_decision(
+                    action=InfrastructureAction.TERMINATE_SERVER,
+                    reason=reason,
+                    trigger_metrics={
+                        "server_name": server.name,
+                        "server_status": server.status,
+                        "monthly_cost": server.monthly_cost
+                    },
+                    trading_impact="none"  # Idle servers have no trading impact
+                )
+                decision.target_server = server.server_id
+                decision.cost_change = -server.monthly_cost  # Negative = savings
+                decision.projected_monthly_cost = self.get_current_spend() - server.monthly_cost
+
+                # SAFETY: Never auto-approve terminations
+                # All server deletions require human approval
+                decision.auto_approved = False
+                decision.requires_approval = True
+
+                decisions.append(decision)
+
+        return decisions
+
+    def _is_current_server(self, server: Server, current_hostname: str) -> bool:
+        """
+        Check if a server is the one we're currently running on.
+
+        SAFETY CRITICAL: This prevents self-termination.
+        """
+        # Match by hostname
+        if server.name == current_hostname:
+            return True
+        if current_hostname in server.name:
+            return True
+        if server.name in current_hostname:
+            return True
+
+        # Match by IP if we can determine our own IP
+        try:
+            import subprocess
+            result = subprocess.run(
+                ["hostname", "-I"],
+                capture_output=True, text=True, timeout=5
+            )
+            our_ips = result.stdout.strip().split()
+            if server.ip_address in our_ips:
+                return True
+            if server.private_ip and server.private_ip in our_ips:
+                return True
+        except:
+            pass
+
+        return False
+
+    def _should_terminate_server(self, server: Server) -> tuple:
+        """
+        Determine if a server should be terminated.
+
+        Returns:
+            (should_terminate: bool, reason: str)
+        """
+        # Powered off servers are definitely idle but still cost money
+        if server.status == "off":
+            return True, f"Server '{server.name}' is powered off but still costing ${server.monthly_cost}/mo"
+
+        # Check server age - very old idle servers are likely abandoned
+        if server.created_at:
+            from datetime import datetime, timezone
+            age_days = (datetime.now(timezone.utc) - server.created_at.replace(tzinfo=timezone.utc)).days
+
+            # If server has been around for a while and has a recovery/test/clone name
+            # it's likely an abandoned attempt
+            abandoned_keywords = ['recovery', 'reco', 'test', 'clone', 'backup', 'old', 'temp']
+            name_lower = server.name.lower()
+
+            if age_days > 7 and any(kw in name_lower for kw in abandoned_keywords):
+                return True, f"Server '{server.name}' appears abandoned (age: {age_days} days, name suggests temporary use)"
+
+        # Don't terminate active servers without more evidence
+        # Future: Could SSH in and check actual CPU/memory usage
+        return False, ""
 
     def _create_upgrade_decision(
         self,
@@ -352,6 +520,73 @@ class AutoProvisioner:
             decision.trading_impact = "critical"
         return decision
 
+    def _create_downgrade_decision(
+        self,
+        server: Server,
+        reason: str,
+        trigger_metrics: Dict[str, Any]
+    ) -> Optional[ScalingDecision]:
+        """Create a downgrade decision for an overprovisioned server."""
+        # Find next size down
+        current_size = self._get_instance_size(server.instance_type)
+        prev_size = self._get_previous_size(current_size)
+
+        if not prev_size:
+            return None  # Already at minimum size
+
+        # Get new instance type
+        new_instance_type = self._get_instance_type_for_size(prev_size)
+        if not new_instance_type:
+            return None
+
+        new_instance = DIGITALOCEAN_INSTANCES.get(new_instance_type)
+        if not new_instance:
+            return None
+
+        # Calculate cost savings (negative cost_change)
+        cost_change = new_instance.monthly_cost - server.monthly_cost
+
+        decision = create_scaling_decision(
+            action=InfrastructureAction.DOWNGRADE_SERVER,
+            reason=reason,
+            trigger_metrics=trigger_metrics,
+            trading_impact="low"
+        )
+        decision.target_server = server.server_id
+        decision.new_instance_type = new_instance_type
+        decision.new_spec = new_instance.spec
+        decision.current_monthly_cost = server.monthly_cost
+        decision.projected_monthly_cost = new_instance.monthly_cost
+        decision.cost_change = cost_change  # Negative = savings
+
+        # SAFETY: Never auto-approve downgrades - they can crash the system
+        # Downgrades always require human approval regardless of cost savings
+        decision.auto_approved = False
+        decision.requires_approval = True
+
+        return decision
+
+    def _get_previous_size(self, current: InstanceSize) -> Optional[InstanceSize]:
+        """Get the next size down."""
+        size_order = [
+            InstanceSize.NANO,
+            InstanceSize.MICRO,
+            InstanceSize.SMALL,
+            InstanceSize.MEDIUM,
+            InstanceSize.LARGE,
+            InstanceSize.XLARGE,
+            InstanceSize.XXLARGE,
+        ]
+
+        try:
+            idx = size_order.index(current)
+            if idx > 0:
+                return size_order[idx - 1]
+        except ValueError:
+            pass
+
+        return None
+
     def _execute_decision(self, decision: ScalingDecision) -> bool:
         """Execute a scaling decision."""
         if self.dry_run:
@@ -366,6 +601,9 @@ class AutoProvisioner:
         try:
             if decision.action == InfrastructureAction.UPGRADE_SERVER:
                 success, result = self._execute_upgrade(decision)
+
+            elif decision.action == InfrastructureAction.DOWNGRADE_SERVER:
+                success, result = self._execute_downgrade(decision)
 
             elif decision.action == InfrastructureAction.PROVISION_SERVER:
                 success, result = self._execute_provision(decision)
@@ -397,12 +635,47 @@ class AutoProvisioner:
         if not decision.target_server or not decision.new_instance_type:
             return False, "Missing target server or new instance type"
 
+        # SELF-PROTECTION: Never resize the server we're running on
+        if self._is_self(decision.target_server):
+            hostname = self._get_self_hostname()
+            return False, f"SELF-PROTECTION: Cannot auto-upgrade {hostname} (would kill this process). Use DO console manually."
+
         # Create snapshot first for rollback
         snapshot_name = f"pre-upgrade-{decision.target_server}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
         if hasattr(self.api, 'create_snapshot'):
             self.api.create_snapshot(decision.target_server, snapshot_name)
 
         # Resize the server
+        success, message = self.api.resize_server(
+            decision.target_server,
+            decision.new_instance_type
+        )
+
+        if success:
+            # Update local state
+            if decision.target_server in self.servers:
+                self.servers[decision.target_server].instance_type = decision.new_instance_type
+                if decision.new_spec:
+                    self.servers[decision.target_server].spec = decision.new_spec
+
+        return success, message
+
+    def _execute_downgrade(self, decision: ScalingDecision) -> Tuple[bool, str]:
+        """Execute a server downgrade to save costs."""
+        if not decision.target_server or not decision.new_instance_type:
+            return False, "Missing target server or new instance type"
+
+        # SELF-PROTECTION: Never resize the server we're running on
+        if self._is_self(decision.target_server):
+            hostname = self._get_self_hostname()
+            return False, f"SELF-PROTECTION: Cannot auto-downgrade {hostname} (would kill this process). Use DO console manually."
+
+        # Create snapshot first for safety
+        snapshot_name = f"pre-downgrade-{decision.target_server}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        if hasattr(self.api, 'create_snapshot'):
+            self.api.create_snapshot(decision.target_server, snapshot_name)
+
+        # Resize the server (same API as upgrade, just smaller size)
         success, message = self.api.resize_server(
             decision.target_server,
             decision.new_instance_type
@@ -445,6 +718,11 @@ class AutoProvisioner:
         """Execute server termination."""
         if not decision.target_server:
             return False, "No target server specified"
+
+        # SELF-PROTECTION: Never delete the server we're running on
+        if self._is_self(decision.target_server):
+            hostname = self._get_self_hostname()
+            return False, f"SELF-PROTECTION: Cannot auto-terminate {hostname} (would kill this process). Manual action required."
 
         success, message = self.api.delete_server(decision.target_server)
 

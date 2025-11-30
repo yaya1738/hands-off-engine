@@ -251,6 +251,7 @@ def run_pipeline(
             for action, result in zip(planned_actions, execution_results):
                 orders.append({
                     'market_id': action.market_id,
+                    'token_id': getattr(action, 'token_id', None),  # Critical for CLOB trading
                     'question': action.market_name,
                     'side': action.side.lower(),
                     'size_usd': action.amount,

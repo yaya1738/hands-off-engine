@@ -1,14 +1,14 @@
 {
   "version": "2.0",
-  "last_updated": "2025-11-27T18:58:27.676585Z",
+  "last_updated": "2025-11-28T11:57:41.250131Z",
   "owner": "yair_siegel",
   "source": "direct_input",
   "accounts": {
     "polymarket": {
       "type": "prediction_market",
       "wallet_address": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
-      "balance_usdc": 241.363222,
-      "last_updated": "2025-11-27T18:58:27.676585Z",
+      "balance_usdc": 8.993226,
+      "last_updated": "2025-11-28T11:57:41.250131Z",
       "balance_matic": 0.0
     },
     "robinhood": {

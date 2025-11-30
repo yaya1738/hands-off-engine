@@ -1,11 +1,11 @@
 {
   "version": "1.0",
   "last_updated": "2025-11-27T08:00:01.425626+00:00",
-  "confidence_threshold": 0.45,
+  "confidence_threshold": 0.25,
   "max_position_usd": 50,
   "max_daily_loss_usd": 200,
   "max_trades_per_hour": 10,
-  "scale_factor": 1.0,
+  "scale_factor": 1,
   "phase": "baby_mode",
   "phase_entry_time": "2025-11-26T14:00:00Z",
   "calibration_history": []

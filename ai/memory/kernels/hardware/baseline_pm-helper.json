@@ -1,0 +1,15 @@
+{
+  "cpu_usage_mean": 32.99634730538922,
+  "cpu_usage_std": 32.805343268713344,
+  "cpu_load_mean": 44.1911377245509,
+  "cpu_load_std": 73.72000961693449,
+  "memory_usage_mean": 24.887000193162063,
+  "memory_usage_std": 22.939356104346476,
+  "disk_usage_mean": {},
+  "network_latency_mean": 0.03042744427192502,
+  "network_latency_std": 0.14081585430175134,
+  "cpu_temp_mean": 0.0,
+  "cpu_temp_std": 0.0,
+  "samples_collected": 334,
+  "last_updated": "2025-11-28T08:22:52.269726"
+}

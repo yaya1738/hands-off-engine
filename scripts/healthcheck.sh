@@ -82,12 +82,8 @@ echo "[$(date)] ✓ All health checks passed"
 echo "  Execution plan age: ${AGE_MINS} minutes"
 echo "  Status: Healthy"
 
-# Run master orchestrator (unified coordination for Yair's sphere)
-if [ -f "$REPO_ROOT/scripts/master_orchestrator.py" ]; then
-    python3 "$REPO_ROOT/scripts/master_orchestrator.py" 2>/dev/null || true
-elif [ -f "$REPO_ROOT/scripts/claude_orchestrator.py" ]; then
-    # Fallback to legacy orchestrator
-    python3 "$REPO_ROOT/scripts/claude_orchestrator.py" 2>/dev/null || true
-fi
+# NOTE: Orchestrator removed from healthcheck - caused cascade failure 2025-11-28
+# See docs/claude/CASCADE_FAILURE_2025-11-28.md
+# Orchestrator should run on its own schedule, not from health checks
 
 exit 0

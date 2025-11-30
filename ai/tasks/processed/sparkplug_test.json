@@ -1,0 +1,9 @@
+{
+  "task_type": "sparkplug_autokernel_refresh",
+  "task_id": "sparkplug_live_test",
+  "mode": "explicit",
+  "kernels": [
+    {"kernel_id": "risk_model_v2", "mode": "cpu"}
+  ],
+  "dry_run": false
+}

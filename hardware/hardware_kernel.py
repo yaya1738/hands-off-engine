@@ -111,7 +111,13 @@ class HardwareKernel:
             kernel_path: Path to kernel storage directory
             node_id: Unique identifier for this node
         """
-        self.kernel_path = kernel_path or Path("ai/memory/kernels/hardware")
+        # Handle both string and Path inputs, ensure we have a Path object
+        if kernel_path is None:
+            self.kernel_path = Path("ai/memory/kernels/hardware")
+        elif isinstance(kernel_path, str):
+            self.kernel_path = Path(kernel_path)
+        else:
+            self.kernel_path = kernel_path
         self.kernel_path.mkdir(parents=True, exist_ok=True)
         self.node_id = node_id
 
@@ -130,13 +136,14 @@ class HardwareKernel:
         self.thresholds = self._load_thresholds()
         self.upgrades = self._load_upgrades()
 
-        # Metric buffers for baseline learning
-        self._cpu_usage_buffer: List[float] = []
-        self._cpu_load_buffer: List[float] = []
-        self._memory_usage_buffer: List[float] = []
-        self._network_latency_buffer: List[float] = []
-        self._cpu_temp_buffer: List[float] = []
+        # Metric buffers for baseline learning - load from state if available
         self._buffer_max_size = 1000
+        saved_state = self._load_json(self.state_file, {})
+        self._cpu_usage_buffer: List[float] = saved_state.get("cpu_usage_buffer", [])
+        self._cpu_load_buffer: List[float] = saved_state.get("cpu_load_buffer", [])
+        self._memory_usage_buffer: List[float] = saved_state.get("memory_usage_buffer", [])
+        self._network_latency_buffer: List[float] = saved_state.get("network_latency_buffer", [])
+        self._cpu_temp_buffer: List[float] = saved_state.get("cpu_temp_buffer", [])
 
     def _load_json(self, file_path: Path, default: Any = None) -> Any:
         """Load JSON file with default fallback."""
@@ -209,6 +216,15 @@ class HardwareKernel:
             for t in self.thresholds.values()
         })
         self._save_json(self.upgrades_file, [asdict(u) for u in self.upgrades])
+        # Save buffers so learning survives restarts
+        self._save_json(self.state_file, {
+            "cpu_usage_buffer": self._cpu_usage_buffer[-500:],  # Keep last 500
+            "cpu_load_buffer": self._cpu_load_buffer[-500:],
+            "memory_usage_buffer": self._memory_usage_buffer[-500:],
+            "network_latency_buffer": self._network_latency_buffer[-500:],
+            "cpu_temp_buffer": self._cpu_temp_buffer[-500:],
+            "last_saved": datetime.utcnow().isoformat()
+        })
 
     def learn_from_metrics(self, metrics: HardwareMetrics, health: HardwareHealth):
         """

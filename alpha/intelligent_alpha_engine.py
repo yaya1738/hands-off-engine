@@ -319,10 +319,18 @@ End Date: {market.end_date or 'Unknown'}
 24h Volume: ${market.volume_24h:,.0f}
 Liquidity: ${market.liquidity:,.0f}
 
+CRITICAL: Consider whether this outcome is ACTUALLY POSSIBLE given:
+- Current real-world facts (what has already happened)
+- Time remaining until resolution
+- Physical/logical constraints
+
+A market priced at 1-5% might be CORRECTLY priced if the event is nearly impossible - not mispriced.
+Don't assume low prices mean undervaluation. Ask: "Could this realistically still happen?"
+
 Provide your analysis:
 1. What is the TRUE probability of YES? (0-100%)
 2. Your confidence level: low, medium, or high
-3. Key reasoning (2-3 sentences)
+3. Key reasoning (2-3 sentences) - include WHY this is or isn't possible
 4. Any time-sensitive factors?
 
 Format your response as JSON:
@@ -389,28 +397,18 @@ Format your response as JSON:
 
         return None
 
-    def _heuristic_analysis(self, market: Market) -> Dict:
-        """Fallback heuristic analysis when AI is unavailable"""
-        price = market.mid_price or market.last_price or 0.5
+    def _heuristic_analysis(self, market: Market) -> Optional[Dict]:
+        """Fallback when AI is unavailable - returns None to skip rather than guess.
 
-        # Simple contrarian heuristic - extreme prices often revert
-        if price > 0.85:
-            fair = price - 0.05
-            side_bias = "NO"
-        elif price < 0.15:
-            fair = price + 0.05
-            side_bias = "YES"
-        else:
-            fair = price
-            side_bias = "NEUTRAL"
+        The old heuristic bet YES on anything <15% assuming it was underpriced.
+        This led to betting on impossible outcomes (7 Fed rate cuts with 1 month left).
 
-        return {
-            "fair_probability": fair * 100,
-            "confidence": "low",
-            "reasoning": f"Heuristic analysis - price {price:.2f} suggests {side_bias} bias",
-            "time_sensitive": False,
-            "source": "heuristic"
-        }
+        Better to return no signal than a bad signal based on price alone.
+        """
+        # Don't generate signals without real analysis
+        # A market at 1% might be correctly priced, not mispriced
+        LOG.info(f"Skipping {market.question[:50]} - no AI analysis available, refusing to guess")
+        return None
 
     def build_consensus_signal(self, market: Market, analyses: List[Dict]) -> Optional[IntelligentSignal]:
         """

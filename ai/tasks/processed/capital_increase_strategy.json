@@ -1,0 +1,45 @@
+{
+  "task_id": "capital_increase_001",
+  "task_type": "strategic_planning",
+  "created_at": "2025-11-26T12:30:00Z",
+  "priority": "high",
+  "title": "Capital Increase Strategy for Trading System",
+  "description": "Develop comprehensive strategy to increase available trading capital for hands-off-engine system",
+  "objectives": [
+    "Analyze current capital state ($1500 -> target $15000+)",
+    "Identify capital sources (earnings, transfers, optimization)",
+    "Create actionable implementation plan",
+    "Assess risk and timeline for each approach"
+  ],
+  "context": {
+    "current_state": {
+      "cash_usd": 1200,
+      "polymarket_usd": 300,
+      "total": 1500,
+      "target": 15000
+    },
+    "available_systems": [
+      "Spark Plug kernels (risk_model_v2, trading_philosophy)",
+      "AI Runner task processor",
+      "Autonomous task queue",
+      "Decider/Executor pipeline"
+    ]
+  },
+  "required_kernels": [
+    "risk_model_v2",
+    "trading_philosophy",
+    "ai_coordination"
+  ],
+  "output_requirements": {
+    "format": "structured_plan",
+    "include": [
+      "Capital sources analysis",
+      "Risk-adjusted pathways",
+      "Implementation timeline",
+      "Success metrics"
+    ]
+  },
+  "execution_mode": "cpu_session",
+  "agents": ["chatgpt", "claude_cli"],
+  "max_rounds": 3
+}

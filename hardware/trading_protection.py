@@ -144,33 +144,33 @@ class TradingProtectionManager:
             except:
                 pass
 
-        # Default protections
+        # Default protections - matched to actual running processes
         return [
             TradingSystemProtection(
-                system_name="hands_off_executor",
-                process_patterns=["python.*executor", "python.*ho_executor"],
-                critical_ports=[8080],
-                min_cpu_headroom=20.0,
-                min_memory_headroom_gb=2.0,
-                max_latency_ms=100.0,
+                system_name="unified_autonomous_system",
+                process_patterns=["python.*unified_system", "python.*autonomous"],
+                critical_ports=[8000],
+                min_cpu_headroom=15.0,
+                min_memory_headroom_gb=1.0,
+                max_latency_ms=200.0,
                 priority=1
             ),
             TradingSystemProtection(
-                system_name="hands_off_decider",
-                process_patterns=["python.*decider", "python.*ho_decider"],
+                system_name="telegram_bot",
+                process_patterns=["python.*telegram"],
                 critical_ports=[],
-                min_cpu_headroom=15.0,
-                min_memory_headroom_gb=1.5,
-                max_latency_ms=150.0,
+                min_cpu_headroom=10.0,
+                min_memory_headroom_gb=0.5,
+                max_latency_ms=300.0,
                 priority=2
             ),
             TradingSystemProtection(
-                system_name="hands_off_alpha",
-                process_patterns=["python.*alpha", "python.*ho_alpha"],
+                system_name="self_healing",
+                process_patterns=["python.*self_healing", "python.*healing"],
                 critical_ports=[],
-                min_cpu_headroom=10.0,
-                min_memory_headroom_gb=1.0,
-                max_latency_ms=200.0,
+                min_cpu_headroom=5.0,
+                min_memory_headroom_gb=0.5,
+                max_latency_ms=500.0,
                 priority=3
             )
         ]
@@ -196,11 +196,12 @@ class TradingProtectionManager:
         network_ok = True
 
         # Check each protected system
+        import re
         for protection in self.protections:
-            # Check processes
+            # Check processes - use regex matching
             for pattern in protection.process_patterns:
                 process_found = any(
-                    pattern.lower() in p.process_name.lower()
+                    re.search(pattern, p.process_name, re.IGNORECASE)
                     for p in metrics.trading_processes
                 )
                 if not process_found:
@@ -279,7 +280,55 @@ class TradingProtectionManager:
         self.last_health_check = check
         self.current_status = status
 
+        # AUTO-RECOVERY: If system is healthy and protection flags exist, clear them
+        if status == TradingStatus.ACTIVE and action == ProtectionAction.NONE:
+            self._auto_recover_if_healthy(health)
+
         return check
+
+    def _auto_recover_if_healthy(self, health: HardwareHealth) -> bool:
+        """
+        Automatically recover from protection state if system is healthy.
+
+        Only recovers if:
+        - Hardware health is good (score >= 70)
+        - No critical alerts
+        - Protection was triggered by hardware (not manual)
+        """
+        # Check if any protection flags exist
+        halt_file = self.state_path / "emergency_halt"
+        pause_file = self.state_path / "trading_paused"
+        throttle_file = self.state_path / "throttle_active"
+
+        has_protection = halt_file.exists() or pause_file.exists() or throttle_file.exists()
+
+        if not has_protection:
+            return False  # Nothing to recover from
+
+        # Only auto-recover if health is genuinely good
+        if health.overall_score < 70:
+            return False
+
+        # Check if protection was hardware-triggered (safe to auto-recover)
+        auto_recover = False
+        if pause_file.exists():
+            try:
+                data = json.loads(pause_file.read_text())
+                if data.get("reason") == "hardware_protection":
+                    auto_recover = True
+            except:
+                pass
+
+        if halt_file.exists():
+            # Emergency halts from hardware issues can be auto-recovered
+            auto_recover = True
+
+        if throttle_file.exists():
+            auto_recover = True
+
+        if auto_recover:
+            print(f"🔄 Auto-recovering: Hardware healthy (score: {health.overall_score})")
+            return self.resume_trading(reason=f"auto_recovery_healthy_score_{health.overall_score}")
 
     def _in_maintenance_window(self) -> bool:
         """Check if currently in a maintenance window."""

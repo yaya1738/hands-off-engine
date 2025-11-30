@@ -4,5 +4,7 @@
   "last_changed": "2025-11-26T14:34:46.009260+00:00",
   "auto_paused": false,
   "pause_count_today": 0,
-  "last_resume": null
+  "last_resume": null,
+  "balance_warning": "Wallet has $8.99 - trades require $50 minimum",
+  "last_balance_check": "2025-11-28T11:59:03.310407+00:00"
 }

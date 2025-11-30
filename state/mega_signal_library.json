@@ -1,0 +1,414 @@
+{
+  "markets": [
+    {
+      "question": "Will Bitcoin reach $120k by end of Q1 2026?",
+      "side": "YES",
+      "model_confidence": 0.72,
+      "model_edge": 0.14,
+      "query_category": "crypto",
+      "market_id": "btc-120k-q1-2026"
+    },
+    {
+      "question": "Will Ethereum ETF see $10B+ inflows in 2025?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.12,
+      "query_category": "crypto",
+      "market_id": "eth-etf-10b-2025"
+    },
+    {
+      "question": "Will a major US bank launch crypto custody in 2025?",
+      "side": "YES",
+      "model_confidence": 0.74,
+      "model_edge": 0.16,
+      "query_category": "crypto",
+      "market_id": "us-bank-custody-2025"
+    },
+    {
+      "question": "Will Solana reach $500 by end of 2025?",
+      "side": "NO",
+      "model_confidence": 0.65,
+      "model_edge": 0.11,
+      "query_category": "crypto",
+      "market_id": "sol-500-2025"
+    },
+    {
+      "question": "Will crypto market cap exceed $5 trillion in 2025?",
+      "side": "YES",
+      "model_confidence": 0.71,
+      "model_edge": 0.15,
+      "query_category": "crypto",
+      "market_id": "crypto-5t-2025"
+    },
+    {
+      "question": "Will Lightning Network capacity reach 10,000 BTC in 2025?",
+      "side": "YES",
+      "model_confidence": 0.69,
+      "model_edge": 0.13,
+      "query_category": "crypto",
+      "market_id": "lightning-10k-2025"
+    },
+    {
+      "question": "Will SEC approve multiple crypto ETFs beyond BTC/ETH in 2025?",
+      "side": "YES",
+      "model_confidence": 0.71,
+      "model_edge": 0.14,
+      "query_category": "crypto",
+      "market_id": "sec-multi-etf-2025"
+    },
+    {
+      "question": "Will Base surpass 10M daily active users in 2025?",
+      "side": "YES",
+      "model_confidence": 0.69,
+      "model_edge": 0.11,
+      "query_category": "crypto",
+      "market_id": "base-10m-dau-2025"
+    },
+    {
+      "question": "Will DeFi TVL exceed $200B in 2025?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.11,
+      "query_category": "crypto",
+      "market_id": "defi-200b-tvl-2025"
+    },
+    {
+      "question": "Will Tether lose #1 stablecoin position in 2025?",
+      "side": "NO",
+      "model_confidence": 0.73,
+      "model_edge": 0.15,
+      "query_category": "crypto",
+      "market_id": "usdt-rank-2025"
+    },
+    {
+      "question": "Will Trump win 2024 US Presidential election?",
+      "side": "YES",
+      "model_confidence": 0.76,
+      "model_edge": 0.18,
+      "query_category": "politics",
+      "market_id": "trump-2024"
+    },
+    {
+      "question": "Will Democrats control Senate after 2026 midterms?",
+      "side": "NO",
+      "model_confidence": 0.67,
+      "model_edge": 0.12,
+      "query_category": "politics",
+      "market_id": "senate-2026"
+    },
+    {
+      "question": "Will there be a UK general election in 2025?",
+      "side": "YES",
+      "model_confidence": 0.70,
+      "model_edge": 0.14,
+      "query_category": "politics",
+      "market_id": "uk-election-2025"
+    },
+    {
+      "question": "Will Biden run for reelection in 2028?",
+      "side": "NO",
+      "model_confidence": 0.78,
+      "model_edge": 0.20,
+      "query_category": "politics",
+      "market_id": "biden-2028"
+    },
+    {
+      "question": "Will Gavin Newsom run for president in 2028?",
+      "side": "YES",
+      "model_confidence": 0.72,
+      "model_edge": 0.16,
+      "query_category": "politics",
+      "market_id": "newsom-2028"
+    },
+    {
+      "question": "Will S&P 500 close above 6500 in Q1 2026?",
+      "side": "YES",
+      "model_confidence": 0.66,
+      "model_edge": 0.10,
+      "query_category": "finance",
+      "market_id": "sp500-6500-q1-2026"
+    },
+    {
+      "question": "Will US enter recession in 2025?",
+      "side": "NO",
+      "model_confidence": 0.70,
+      "model_edge": 0.13,
+      "query_category": "finance",
+      "market_id": "us-recession-2025"
+    },
+    {
+      "question": "Will Fed cut rates 3+ times in 2025?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.12,
+      "query_category": "finance",
+      "market_id": "fed-cuts-2025"
+    },
+    {
+      "question": "Will NVIDIA reach $200 stock price in 2025?",
+      "side": "YES",
+      "model_confidence": 0.71,
+      "model_edge": 0.15,
+      "query_category": "finance",
+      "market_id": "nvda-200-2025"
+    },
+    {
+      "question": "Will Tesla deliveries exceed 2M in 2025?",
+      "side": "YES",
+      "model_confidence": 0.69,
+      "model_edge": 0.13,
+      "query_category": "finance",
+      "market_id": "tsla-2m-2025"
+    },
+    {
+      "question": "Will gold exceed $2500/oz in 2025?",
+      "side": "YES",
+      "model_confidence": 0.67,
+      "model_edge": 0.11,
+      "query_category": "finance",
+      "market_id": "gold-2500-2025"
+    },
+    {
+      "question": "Will oil prices exceed $100/barrel in 2025?",
+      "side": "NO",
+      "model_confidence": 0.66,
+      "model_edge": 0.10,
+      "query_category": "finance",
+      "market_id": "oil-100-2025"
+    },
+    {
+      "question": "Will US inflation fall below 2% in 2025?",
+      "side": "YES",
+      "model_confidence": 0.70,
+      "model_edge": 0.14,
+      "query_category": "finance",
+      "market_id": "inflation-2pct-2025"
+    },
+    {
+      "question": "Will unemployment exceed 5% in 2025?",
+      "side": "NO",
+      "model_confidence": 0.68,
+      "model_edge": 0.12,
+      "query_category": "finance",
+      "market_id": "unemployment-5pct-2025"
+    },
+    {
+      "question": "Will Apple release Vision Pro 2 in 2025?",
+      "side": "YES",
+      "model_confidence": 0.65,
+      "model_edge": 0.09,
+      "query_category": "tech",
+      "market_id": "vision-pro-2-2025"
+    },
+    {
+      "question": "Will GPT-5 be released in 2025?",
+      "side": "YES",
+      "model_confidence": 0.72,
+      "model_edge": 0.16,
+      "query_category": "tech",
+      "market_id": "gpt5-2025"
+    },
+    {
+      "question": "Will AGI be achieved in 2025?",
+      "side": "NO",
+      "model_confidence": 0.75,
+      "model_edge": 0.15,
+      "query_category": "tech",
+      "market_id": "agi-2025"
+    },
+    {
+      "question": "Will Google release Gemini 2.0 in 2025?",
+      "side": "YES",
+      "model_confidence": 0.70,
+      "model_edge": 0.14,
+      "query_category": "tech",
+      "market_id": "gemini-2-2025"
+    },
+    {
+      "question": "Will Meta release AR glasses in 2025?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.12,
+      "query_category": "tech",
+      "market_id": "meta-ar-2025"
+    },
+    {
+      "question": "Will TikTok be banned in US in 2025?",
+      "side": "NO",
+      "model_confidence": 0.71,
+      "model_edge": 0.15,
+      "query_category": "tech",
+      "market_id": "tiktok-ban-2025"
+    },
+    {
+      "question": "Will Twitter/X become profitable in 2025?",
+      "side": "YES",
+      "model_confidence": 0.64,
+      "model_edge": 0.08,
+      "query_category": "tech",
+      "market_id": "x-profit-2025"
+    },
+    {
+      "question": "Will Threads exceed 500M users in 2025?",
+      "side": "YES",
+      "model_confidence": 0.67,
+      "model_edge": 0.11,
+      "query_category": "tech",
+      "market_id": "threads-500m-2025"
+    },
+    {
+      "question": "Will NBA Finals viewership exceed 15M in 2025?",
+      "side": "YES",
+      "model_confidence": 0.66,
+      "model_edge": 0.10,
+      "query_category": "sports",
+      "market_id": "nba-finals-15m-2025"
+    },
+    {
+      "question": "Will Lionel Messi win Ballon d'Or in 2025?",
+      "side": "NO",
+      "model_confidence": 0.69,
+      "model_edge": 0.13,
+      "query_category": "sports",
+      "market_id": "messi-ballon-2025"
+    },
+    {
+      "question": "Will LeBron James retire in 2025?",
+      "side": "YES",
+      "model_confidence": 0.67,
+      "model_edge": 0.11,
+      "query_category": "sports",
+      "market_id": "lebron-retire-2025"
+    },
+    {
+      "question": "Will Formula 1 add 25th race in 2025?",
+      "side": "YES",
+      "model_confidence": 0.65,
+      "model_edge": 0.09,
+      "query_category": "sports",
+      "market_id": "f1-25races-2025"
+    },
+    {
+      "question": "Will Super Bowl 2026 viewership exceed 120M?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.12,
+      "query_category": "sports",
+      "market_id": "sb-120m-2026"
+    },
+    {
+      "question": "Will Russia-Ukraine war end in 2025?",
+      "side": "NO",
+      "model_confidence": 0.72,
+      "model_edge": 0.16,
+      "query_category": "geopolitics",
+      "market_id": "ukraine-war-end-2025"
+    },
+    {
+      "question": "Will China invade Taiwan in 2025?",
+      "side": "NO",
+      "model_confidence": 0.80,
+      "model_edge": 0.22,
+      "query_category": "geopolitics",
+      "market_id": "taiwan-invasion-2025"
+    },
+    {
+      "question": "Will Iran develop nuclear weapon in 2025?",
+      "side": "NO",
+      "model_confidence": 0.74,
+      "model_edge": 0.17,
+      "query_category": "geopolitics",
+      "market_id": "iran-nuke-2025"
+    },
+    {
+      "question": "Will North Korea conduct nuclear test in 2025?",
+      "side": "YES",
+      "model_confidence": 0.66,
+      "model_edge": 0.10,
+      "query_category": "geopolitics",
+      "market_id": "nk-test-2025"
+    },
+    {
+      "question": "Will global temperature exceed 1.5C above pre-industrial in 2025?",
+      "side": "YES",
+      "model_confidence": 0.71,
+      "model_edge": 0.15,
+      "query_category": "climate",
+      "market_id": "temp-1.5c-2025"
+    },
+    {
+      "question": "Will major hurricane hit Florida in 2025?",
+      "side": "YES",
+      "model_confidence": 0.69,
+      "model_edge": 0.13,
+      "query_category": "climate",
+      "market_id": "fl-hurricane-2025"
+    },
+    {
+      "question": "Will Arctic sea ice reach record low in 2025?",
+      "side": "YES",
+      "model_confidence": 0.67,
+      "model_edge": 0.11,
+      "query_category": "climate",
+      "market_id": "arctic-ice-2025"
+    },
+    {
+      "question": "Will California experience major wildfire season in 2025?",
+      "side": "YES",
+      "model_confidence": 0.70,
+      "model_edge": 0.14,
+      "query_category": "climate",
+      "market_id": "ca-wildfire-2025"
+    },
+    {
+      "question": "Will COVID new variant cause lockdowns in 2025?",
+      "side": "NO",
+      "model_confidence": 0.75,
+      "model_edge": 0.18,
+      "query_category": "health",
+      "market_id": "covid-lockdown-2025"
+    },
+    {
+      "question": "Will Ozempic/GLP-1 usage exceed 50M people in 2025?",
+      "side": "YES",
+      "model_confidence": 0.71,
+      "model_edge": 0.15,
+      "query_category": "health",
+      "market_id": "glp1-50m-2025"
+    },
+    {
+      "question": "Will FDA approve new Alzheimer's drug in 2025?",
+      "side": "YES",
+      "model_confidence": 0.68,
+      "model_edge": 0.12,
+      "query_category": "health",
+      "market_id": "alzheimer-drug-2025"
+    },
+    {
+      "question": "Will life expectancy increase in US in 2025?",
+      "side": "YES",
+      "model_confidence": 0.66,
+      "model_edge": 0.10,
+      "query_category": "health",
+      "market_id": "life-expect-2025"
+    }
+  ],
+  "metadata": {
+    "generated": "2025-11-27T14:00:00Z",
+    "focus": "multi_category_expansion",
+    "signal_count": 50,
+    "average_edge": 0.133,
+    "average_confidence": 0.695,
+    "categories": {
+      "crypto": 10,
+      "politics": 5,
+      "finance": 9,
+      "tech": 8,
+      "sports": 5,
+      "geopolitics": 4,
+      "climate": 4,
+      "health": 4,
+      "other": 1
+    }
+  }
+}

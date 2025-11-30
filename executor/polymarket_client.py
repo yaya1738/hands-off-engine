@@ -123,7 +123,7 @@ class PolymarketTrader:
 
         self.logger.info(
             "Placed market order: %s %s $%.2f on token %s",
-            side, order_type.value, usd_amount, token_id
+            side, order_type if isinstance(order_type, str) else order_type.value, usd_amount, token_id
         )
         return resp
 
