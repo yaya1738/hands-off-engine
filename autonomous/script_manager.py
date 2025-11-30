@@ -325,13 +325,24 @@ class ScriptManager:
             return True
         return False
 
-    def disable_script(self, name: str) -> bool:
-        """Disable a script."""
+    def disable_script(self, name: str) -> Tuple[bool, str]:
+        """Disable a script (with self-preservation check)."""
+        # SELF-PRESERVATION CHECK
+        try:
+            import sys
+            sys.path.insert(0, str(BASE_DIR))
+            from autonomous.self_preservation import block_self_harm
+            allowed, reason = block_self_harm("disable_script", name)
+            if not allowed:
+                return False, reason
+        except Exception as e:
+            print(f"[DEBUG] Self-preservation check error: {e}")
+
         if name in self.registry.get("scripts", {}):
             self.registry["scripts"][name]["enabled"] = False
             self._save_registry()
-            return True
-        return False
+            return True, f"Disabled: {name}"
+        return False, f"Script not found: {name}"
 
     def set_schedule(self, name: str, schedule: str) -> bool:
         """Set script schedule (cron expression or 'manual')."""
@@ -392,7 +403,18 @@ class ScriptManager:
             return False, str(e)
 
     def remove_cron_job(self, script_name: str) -> Tuple[bool, str]:
-        """Remove a cron job for a script."""
+        """Remove a cron job for a script (with self-preservation check)."""
+        # SELF-PRESERVATION CHECK
+        try:
+            import sys
+            sys.path.insert(0, str(BASE_DIR))
+            from autonomous.self_preservation import block_self_harm
+            allowed, reason = block_self_harm("remove_cron", script_name)
+            if not allowed:
+                return False, reason
+        except Exception as e:
+            print(f"[DEBUG] Self-preservation check error: {e}")
+
         try:
             result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
             if result.returncode != 0:
@@ -557,10 +579,8 @@ def main():
         if not args.name:
             print("Error: --name required")
             return
-        if manager.disable_script(args.name):
-            print(f"Disabled: {args.name}")
-        else:
-            print(f"Script not found: {args.name}")
+        success, msg = manager.disable_script(args.name)
+        print(msg)
 
     elif args.command == "cron-list":
         jobs = manager.get_cron_jobs()
