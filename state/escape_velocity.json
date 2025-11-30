@@ -1,0 +1,24 @@
+{
+  "created_at": "2025-11-30T17:16:16.853082+00:00",
+  "measurements": [
+    {
+      "timestamp": "2025-11-30T17:16:16.853121+00:00",
+      "balance": 8.99,
+      "positions": 99.0,
+      "total_value": 107.99,
+      "income": 0,
+      "costs": 0,
+      "net": 0
+    }
+  ],
+  "current_velocity": 0.0,
+  "acceleration": 0.0,
+  "projected_escape_date": null,
+  "exponential_factors": {
+    "capital_multiplier": 1.0,
+    "automation_multiplier": 1.02,
+    "income_multiplier": 1.0,
+    "intelligence_multiplier": 1.0
+  },
+  "compound_multiplier": 1.02
+}

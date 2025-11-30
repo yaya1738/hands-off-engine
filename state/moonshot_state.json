@@ -1,0 +1,17 @@
+{
+  "total_cycles": 0,
+  "cycles_today": 0,
+  "last_cycle": null,
+  "last_cycle_date": null,
+  "escape_velocity_score": 0.0,
+  "improvements_made": [],
+  "current_focus": "capital_recovery",
+  "milestones": {
+    "first_dollar": true,
+    "trading_enabled": false,
+    "positive_pnl": false,
+    "daily_profit": false,
+    "escape_velocity": false
+  },
+  "momentum": []
+}
