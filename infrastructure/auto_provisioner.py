@@ -17,7 +17,7 @@ import json
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
+from typing import Dict, List, Optional, Tuple, Any, Callable
 from dataclasses import asdict
 import os
 
@@ -75,6 +75,9 @@ class AutoProvisioner:
     AUTO_APPROVE_COST_INCREASE = 50.0    # Auto-approve if monthly cost increase < $50
     AUTO_APPROVE_TRADING_CRITICAL = True # Always auto-approve if trading is at risk
 
+    # Retry settings
+    MAX_RETRY_DELAY_SECONDS = 60         # Cap on exponential backoff delay
+
     def __init__(
         self,
         provider: Optional[CloudProvider] = None,
@@ -122,6 +125,74 @@ class AutoProvisioner:
         else:
             self.collector = None
             self.analyzer = None
+
+        # Load resource limits configuration for optimized scaling
+        self.resource_limits = self._load_resource_limits()
+
+        # Scaling operation tracking for rate limiting
+        self._last_scale_operation: Optional[datetime] = None
+        self._scale_operations_today: int = 0
+        self._operations_date: Optional[str] = None
+
+    def _load_resource_limits(self) -> Dict[str, Any]:
+        """Load resource limits from config file."""
+        config_path = Path(__file__).parent.parent / "config" / "resource_limits.json"
+        try:
+            if config_path.exists():
+                return json.loads(config_path.read_text())
+        except (json.JSONDecodeError, IOError) as e:
+            # Log configuration load failure for debugging
+            import sys
+            print(f"[AutoProvisioner] Warning: Failed to load resource_limits.json: {e}", file=sys.stderr)
+        # Return sensible defaults
+        return {
+            "auto_scale": {
+                "cooldown_minutes": 30,
+                "max_scale_operations_per_day": 3,
+                "enabled": True,
+                "require_human_approval": True
+            }
+        }
+
+    def _check_cooldown(self) -> Tuple[bool, str]:
+        """Check if we're still in cooldown period after last scaling operation."""
+        if self._last_scale_operation is None:
+            return True, "No recent operations"
+
+        cooldown_minutes = self.resource_limits.get("auto_scale", {}).get("cooldown_minutes", 30)
+        cooldown_delta = timedelta(minutes=cooldown_minutes)
+        time_since_last = datetime.utcnow() - self._last_scale_operation
+
+        if time_since_last < cooldown_delta:
+            remaining = cooldown_delta - time_since_last
+            return False, f"Cooldown active: {remaining.seconds // 60}m remaining"
+
+        return True, "Cooldown expired"
+
+    def _check_daily_limit(self) -> Tuple[bool, str]:
+        """Check if we've hit the daily scaling operation limit."""
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+
+        # Reset counter if new day
+        if self._operations_date != today:
+            self._operations_date = today
+            self._scale_operations_today = 0
+
+        max_ops = self.resource_limits.get("auto_scale", {}).get("max_scale_operations_per_day", 3)
+
+        if self._scale_operations_today >= max_ops:
+            return False, f"Daily limit reached: {self._scale_operations_today}/{max_ops} operations"
+
+        return True, f"Within limit: {self._scale_operations_today}/{max_ops} operations"
+
+    def _record_scale_operation(self):
+        """Record a scaling operation for rate limiting."""
+        self._last_scale_operation = datetime.utcnow()
+        today = datetime.utcnow().strftime("%Y-%m-%d")
+        if self._operations_date != today:
+            self._operations_date = today
+            self._scale_operations_today = 0
+        self._scale_operations_today += 1
 
     def _get_self_hostname(self) -> str:
         """Get the hostname of this machine."""
@@ -587,32 +658,111 @@ class AutoProvisioner:
 
         return None
 
+    def _execute_with_retry(
+        self,
+        operation: Callable[[ScalingDecision], Tuple[bool, str]],
+        decision: ScalingDecision,
+        max_retries: int = 3,
+        base_delay: float = 2.0
+    ) -> Tuple[bool, str]:
+        """
+        Execute an operation with exponential backoff retry.
+
+        Args:
+            operation: The operation function to execute
+            decision: The scaling decision
+            max_retries: Maximum number of retry attempts
+            base_delay: Base delay in seconds for exponential backoff
+
+        Returns:
+            Tuple of (success, result_message)
+        """
+        last_error = ""
+        for attempt in range(max_retries):
+            try:
+                success, result = operation(decision)
+                if success:
+                    return success, result
+                last_error = result
+
+                # Don't retry if it's a permission/safety error
+                if "SELF-PROTECTION" in result or "BLOCKED" in result:
+                    return False, result
+
+            except Exception as e:
+                last_error = f"Attempt {attempt + 1} failed: {str(e)}"
+
+            # Exponential backoff before retry
+            if attempt < max_retries - 1:
+                delay = base_delay * (2 ** attempt)
+                time.sleep(min(delay, self.MAX_RETRY_DELAY_SECONDS))
+
+        return False, f"Failed after {max_retries} attempts. Last error: {last_error}"
+
+    def _preflight_check(self, decision: ScalingDecision) -> Tuple[bool, str]:
+        """
+        Perform pre-flight checks before executing a scaling operation.
+
+        Returns:
+            Tuple of (can_proceed, reason)
+        """
+        # Check if auto-scaling is enabled
+        if not self.resource_limits.get("auto_scale", {}).get("enabled", True):
+            return False, "Auto-scaling is disabled in configuration"
+
+        # Check cooldown
+        cooldown_ok, cooldown_msg = self._check_cooldown()
+        if not cooldown_ok:
+            return False, cooldown_msg
+
+        # Check daily limit
+        limit_ok, limit_msg = self._check_daily_limit()
+        if not limit_ok:
+            return False, limit_msg
+
+        # Check API connectivity
+        try:
+            api_ok, api_msg = self.api.check_api_status()
+            if not api_ok:
+                return False, f"API not available: {api_msg}"
+        except Exception as e:
+            return False, f"API check failed: {str(e)}"
+
+        return True, "Pre-flight checks passed"
+
     def _execute_decision(self, decision: ScalingDecision) -> bool:
-        """Execute a scaling decision."""
+        """Execute a scaling decision with pre-flight checks and retry logic."""
         if self.dry_run:
             decision.executed = True
             decision.executed_at = datetime.utcnow()
             decision.execution_result = "DRY RUN - would have executed"
             return True
 
+        # Perform pre-flight checks
+        preflight_ok, preflight_msg = self._preflight_check(decision)
+        if not preflight_ok:
+            decision.executed = False
+            decision.execution_result = f"BLOCKED: {preflight_msg}"
+            return False
+
         success = False
         result = ""
 
         try:
             if decision.action == InfrastructureAction.UPGRADE_SERVER:
-                success, result = self._execute_upgrade(decision)
+                success, result = self._execute_with_retry(self._execute_upgrade, decision)
 
             elif decision.action == InfrastructureAction.DOWNGRADE_SERVER:
-                success, result = self._execute_downgrade(decision)
+                success, result = self._execute_with_retry(self._execute_downgrade, decision)
 
             elif decision.action == InfrastructureAction.PROVISION_SERVER:
-                success, result = self._execute_provision(decision)
+                success, result = self._execute_with_retry(self._execute_provision, decision)
 
             elif decision.action == InfrastructureAction.TERMINATE_SERVER:
-                success, result = self._execute_terminate(decision)
+                success, result = self._execute_with_retry(self._execute_terminate, decision)
 
             elif decision.action == InfrastructureAction.SCALE_HORIZONTALLY:
-                success, result = self._execute_horizontal_scale(decision)
+                success, result = self._execute_with_retry(self._execute_horizontal_scale, decision)
 
         except Exception as e:
             result = f"Error: {str(e)}"
@@ -623,6 +773,10 @@ class AutoProvisioner:
         decision.rollback_available = success
 
         self.executed_decisions.append(decision)
+
+        # Record operation for rate limiting (only if actually executed)
+        if success:
+            self._record_scale_operation()
 
         # Update budget
         if success and decision.cost_change > 0:

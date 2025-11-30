@@ -285,5 +285,93 @@ class TestInfrastructureTypes:
             assert instance.spec.memory_gb == 4
 
 
+class TestAutoProvisionerOptimizations:
+    """Tests for auto-provisioner optimizations and rate limiting"""
+
+    def test_resource_limits_loaded(self):
+        """Test that resource limits are loaded from config"""
+        from infrastructure.auto_provisioner import AutoProvisioner
+        from infrastructure.infra_types import CloudProvider
+
+        provisioner = AutoProvisioner(
+            provider=CloudProvider.LOCAL,
+            dry_run=True
+        )
+
+        # Should have loaded resource limits
+        assert provisioner.resource_limits is not None
+        assert "auto_scale" in provisioner.resource_limits
+
+    def test_cooldown_check_no_operations(self):
+        """Test cooldown check when no operations have occurred"""
+        from infrastructure.auto_provisioner import AutoProvisioner
+        from infrastructure.infra_types import CloudProvider
+
+        provisioner = AutoProvisioner(
+            provider=CloudProvider.LOCAL,
+            dry_run=True
+        )
+
+        # Should allow operation when no previous operations
+        can_proceed, _ = provisioner._check_cooldown()
+        assert can_proceed is True
+
+    def test_daily_limit_check_initial(self):
+        """Test daily limit check at start of day"""
+        from infrastructure.auto_provisioner import AutoProvisioner
+        from infrastructure.infra_types import CloudProvider
+
+        provisioner = AutoProvisioner(
+            provider=CloudProvider.LOCAL,
+            dry_run=True
+        )
+
+        # Should be within limit initially
+        can_proceed, _ = provisioner._check_daily_limit()
+        assert can_proceed is True
+
+    def test_preflight_check_passes(self):
+        """Test preflight check passes under normal conditions"""
+        from infrastructure.auto_provisioner import AutoProvisioner
+        from infrastructure.infra_types import CloudProvider, create_scaling_decision, InfrastructureAction
+
+        provisioner = AutoProvisioner(
+            provider=CloudProvider.LOCAL,
+            dry_run=True
+        )
+
+        decision = create_scaling_decision(
+            action=InfrastructureAction.UPGRADE_SERVER,
+            reason="Test upgrade",
+            trigger_metrics={},
+            trading_impact="low"
+        )
+
+        # Pre-flight should pass for local/mock provider
+        can_proceed, msg = provisioner._preflight_check(decision)
+        assert can_proceed is True
+        assert "passed" in msg.lower()
+
+    def test_record_scale_operation(self):
+        """Test that scale operations are recorded for rate limiting"""
+        from infrastructure.auto_provisioner import AutoProvisioner
+        from infrastructure.infra_types import CloudProvider
+
+        provisioner = AutoProvisioner(
+            provider=CloudProvider.LOCAL,
+            dry_run=True
+        )
+
+        # Initially no operations
+        assert provisioner._scale_operations_today == 0
+
+        # Record an operation
+        provisioner._record_scale_operation()
+
+        # Should now have 1 operation
+        assert provisioner._scale_operations_today == 1
+        assert provisioner._last_scale_operation is not None
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
