@@ -61,7 +61,8 @@
     "ai/coordination/USER_PROTOCOL_ALIGNMENT.md",
     "ai/AGENT_COORDINATION_SUMMARY_2025-11-25.md",
     "ai/history/README.md",
-    "ai/memory/README.md"
+    "ai/memory/README.md",
+    "ai/INCOME_RESEARCH_2025-11-30.md"
   ],
   "ephemeral_docs_excluded": [
     "Session logs (docs/claude/SESSION_*, ai/SESSION_*)",
