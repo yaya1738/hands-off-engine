@@ -19,7 +19,24 @@ Components:
 - autonomous_infra_manager: Master controller for full autonomy
 
 Standard: Yair Siegel Master Level Operations - Full Self-Control
+
+Note: All datetime operations use timezone-aware UTC (datetime.now(timezone.utc))
+for Python 3.12+ compatibility.
 """
+
+from datetime import datetime, timezone
+
+
+def utc_now() -> datetime:
+    """
+    Get current UTC time as timezone-aware datetime.
+
+    This replaces deprecated datetime.utcnow() for Python 3.12+ compatibility.
+
+    Returns:
+        Current UTC time with timezone info
+    """
+    return datetime.now(timezone.utc)
 
 from infrastructure.infra_types import (
     CloudProvider,
@@ -55,6 +72,9 @@ from infrastructure.autonomous_infra_manager import (
 )
 
 __all__ = [
+    # Utilities
+    'utc_now',
+
     # Types
     'CloudProvider',
     'InstanceSize',

@@ -21,11 +21,16 @@ import os
 import signal
 import subprocess
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field, asdict
 from enum import Enum
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     HealthStatus,
@@ -261,7 +266,7 @@ class TradingProtectionManager:
             issues.append("In scheduled maintenance window")
 
         check = TradingHealthCheck(
-            timestamp=datetime.utcnow(),
+            timestamp=_utc_now(),
             system_name="trading_systems",
             status=status,
             processes_healthy=all_processes_healthy,
@@ -332,7 +337,7 @@ class TradingProtectionManager:
 
     def _in_maintenance_window(self) -> bool:
         """Check if currently in a maintenance window."""
-        now = datetime.utcnow()
+        now = _utc_now()
         for window in self.maintenance_windows:
             if window.start_time <= now <= window.end_time:
                 return True
@@ -356,8 +361,8 @@ class TradingProtectionManager:
             ProtectionEvent record
         """
         event = ProtectionEvent(
-            event_id=f"protect_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
-            timestamp=datetime.utcnow(),
+            event_id=f"protect_{_utc_now().strftime('%Y%m%d%H%M%S')}",
+            timestamp=_utc_now(),
             action=action,
             reason=reason,
             triggered_by=triggered_by,
@@ -400,7 +405,7 @@ class TradingProtectionManager:
         """Send protection alert."""
         alert_file = self.state_path / "alerts.jsonl"
         alert = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utc_now().isoformat(),
             "type": "trading_protection",
             "reason": reason,
             "status": self.current_status.value
@@ -417,7 +422,7 @@ class TradingProtectionManager:
         throttle_file = self.state_path / "throttle_active"
         throttle_file.write_text(json.dumps({
             "active": True,
-            "since": datetime.utcnow().isoformat(),
+            "since": _utc_now().isoformat(),
             "level": "medium"
         }))
         print("⚠️ Trading throttled")
@@ -427,7 +432,7 @@ class TradingProtectionManager:
         pause_file = self.state_path / "trading_paused"
         pause_file.write_text(json.dumps({
             "paused": True,
-            "since": datetime.utcnow().isoformat(),
+            "since": _utc_now().isoformat(),
             "reason": "hardware_protection"
         }))
         print("⏸️ Trading paused")
@@ -437,7 +442,7 @@ class TradingProtectionManager:
         shutdown_file = self.state_path / "shutdown_requested"
         shutdown_file.write_text(json.dumps({
             "requested": True,
-            "time": datetime.utcnow().isoformat(),
+            "time": _utc_now().isoformat(),
             "type": "graceful"
         }))
         print("🛑 Graceful shutdown initiated")
@@ -448,7 +453,7 @@ class TradingProtectionManager:
         halt_file = self.state_path / "emergency_halt"
         halt_file.write_text(json.dumps({
             "halted": True,
-            "time": datetime.utcnow().isoformat()
+            "time": _utc_now().isoformat()
         }))
 
         # Also create pause file for belt-and-suspenders
@@ -477,8 +482,8 @@ class TradingProtectionManager:
 
             # Record resume event
             event = ProtectionEvent(
-                event_id=f"resume_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
-                timestamp=datetime.utcnow(),
+                event_id=f"resume_{_utc_now().strftime('%Y%m%d%H%M%S')}",
+                timestamp=_utc_now(),
                 action=ProtectionAction.NONE,
                 reason=reason,
                 triggered_by="manual",
@@ -571,7 +576,7 @@ class TradingProtectionManager:
             return True, "In maintenance window"
 
         # Check for upcoming maintenance
-        now = datetime.utcnow()
+        now = _utc_now()
         for window in self.maintenance_windows:
             if window.start_time <= now + timedelta(minutes=estimated_duration_minutes):
                 return True, f"Maintenance window starting soon ({window.window_id})"
@@ -591,11 +596,11 @@ class TradingProtectionManager:
             "last_health_check": asdict(self.last_health_check) if self.last_health_check else None,
             "active_maintenance_windows": [
                 asdict(w) for w in self.maintenance_windows
-                if w.start_time <= datetime.utcnow() <= w.end_time
+                if w.start_time <= _utc_now() <= w.end_time
             ],
             "upcoming_maintenance": [
                 asdict(w) for w in self.maintenance_windows
-                if w.start_time > datetime.utcnow()
+                if w.start_time > _utc_now()
             ],
             "recent_protection_events": [
                 asdict(e) for e in self.protection_events[-10:]

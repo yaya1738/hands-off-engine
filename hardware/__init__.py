@@ -23,7 +23,24 @@ Modules:
 - hardware_dashboard: CLI dashboard and alerting
 
 Standard: Yair Siegel Master Level Operations
+
+Note: All datetime operations use timezone-aware UTC (datetime.now(timezone.utc))
+for Python 3.12+ compatibility.
 """
+
+from datetime import datetime, timezone
+
+
+def utc_now() -> datetime:
+    """
+    Get current UTC time as timezone-aware datetime.
+
+    This replaces deprecated datetime.utcnow() for Python 3.12+ compatibility.
+
+    Returns:
+        Current UTC time with timezone info
+    """
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     HealthStatus,
@@ -77,6 +94,9 @@ from hardware.hardware_audit import (
 )
 
 __all__ = [
+    # Utilities
+    'utc_now',
+
     # Types and Enums
     'HealthStatus',
     'ComponentType',

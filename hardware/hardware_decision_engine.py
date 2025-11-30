@@ -15,11 +15,16 @@ Standard: Yair Siegel Master Level Operations
 """
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import asdict
 import os
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     HealthStatus,
@@ -348,7 +353,7 @@ class HardwareDecisionEngine:
         if alert.severity == HealthStatus.CRITICAL:
             # Check if we already have a recent decision for this alert type (deduplication)
             alert_key = f"{alert.component.value}_{alert.metric_name}"
-            recent_cutoff = datetime.utcnow() - timedelta(minutes=5)
+            recent_cutoff = _utc_now() - timedelta(minutes=5)
 
             already_handled = any(
                 d.action == f"respond_to_{alert.component.value}_alert"
@@ -381,7 +386,7 @@ class HardwareDecisionEngine:
         decisions = []
 
         # Check for recent pending upgrade recommendations to avoid spam
-        recent_cutoff = datetime.utcnow() - timedelta(hours=24)
+        recent_cutoff = _utc_now() - timedelta(hours=24)
         pending_actions = set()
         for d in self.pending_decisions:
             if d.decision_type == "upgrade_recommendation":
@@ -508,7 +513,7 @@ class HardwareDecisionEngine:
             outcome = f"Execution failed: {str(e)}"
 
         decision.executed = True
-        decision.executed_at = datetime.utcnow()
+        decision.executed_at = _utc_now()
         decision.success = success
         decision.outcome = outcome
         decision.add_audit_entry("executed", {"success": success, "outcome": outcome})
@@ -598,7 +603,7 @@ class HardwareDecisionEngine:
         for decision in self.pending_decisions:
             if decision.decision_id == decision_id:
                 decision.approval_status = "approved"
-                decision.approved_at = datetime.utcnow()
+                decision.approved_at = _utc_now()
                 decision.approved_by = "user"
                 decision.add_audit_entry("approved", {})
 
@@ -647,7 +652,7 @@ class HardwareDecisionEngine:
 
     def _save_decisions(self):
         """Save decisions to log."""
-        log_file = self.decision_log_path / f"decisions_{datetime.utcnow().strftime('%Y-%m-%d')}.jsonl"
+        log_file = self.decision_log_path / f"decisions_{_utc_now().strftime('%Y-%m-%d')}.jsonl"
 
         # Append new executed decisions
         with open(log_file, "a") as f:

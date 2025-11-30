@@ -15,9 +15,14 @@ Standard: Yair Siegel Master Level Operations
 """
 
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import dataclass, field
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     HealthStatus,
@@ -49,7 +54,7 @@ class MetricHistory:
         """Add a value to history."""
         self.values.append((timestamp, value))
         # Prune old values
-        cutoff = datetime.utcnow() - timedelta(hours=self.max_history_hours)
+        cutoff = _utc_now() - timedelta(hours=self.max_history_hours)
         self.values = [(ts, v) for ts, v in self.values if ts > cutoff]
 
     def get_trend(self) -> str:
@@ -294,7 +299,7 @@ class HardwareAnalyzer:
             issues=issues,
             recommendations=recommendations,
             trend=trend,
-            last_updated=datetime.utcnow()
+            last_updated=_utc_now()
         )
 
     def _analyze_memory(self, memory: MemoryMetrics, node_id: str) -> ComponentHealth:
@@ -372,7 +377,7 @@ class HardwareAnalyzer:
             issues=issues,
             recommendations=recommendations,
             trend=trend,
-            last_updated=datetime.utcnow()
+            last_updated=_utc_now()
         )
 
     def _analyze_disks(self, disks: List[DiskMetrics], node_id: str) -> ComponentHealth:
@@ -390,7 +395,7 @@ class HardwareAnalyzer:
                 issues=["No disk metrics available"],
                 recommendations=[],
                 trend="stable",
-                last_updated=datetime.utcnow()
+                last_updated=_utc_now()
             )
 
         worst_score = 100.0
@@ -458,7 +463,7 @@ class HardwareAnalyzer:
             issues=issues,
             recommendations=recommendations,
             trend=trend,
-            last_updated=datetime.utcnow()
+            last_updated=_utc_now()
         )
 
     def _analyze_networks(self, networks: List[NetworkMetrics], node_id: str) -> ComponentHealth:
@@ -476,7 +481,7 @@ class HardwareAnalyzer:
                 issues=["No network metrics available"],
                 recommendations=[],
                 trend="stable",
-                last_updated=datetime.utcnow()
+                last_updated=_utc_now()
             )
 
         for net in networks:
@@ -535,7 +540,7 @@ class HardwareAnalyzer:
             issues=issues,
             recommendations=recommendations,
             trend=trend,
-            last_updated=datetime.utcnow()
+            last_updated=_utc_now()
         )
 
     def _analyze_thermal(self, thermal: ThermalMetrics, node_id: str) -> ComponentHealth:
@@ -600,7 +605,7 @@ class HardwareAnalyzer:
             issues=issues,
             recommendations=recommendations,
             trend=trend,
-            last_updated=datetime.utcnow()
+            last_updated=_utc_now()
         )
 
     def _check_all_thresholds(self, metrics: HardwareMetrics) -> List[HardwareAlert]:

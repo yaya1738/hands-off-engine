@@ -17,9 +17,14 @@ Standard: Yair Siegel Master Level Operations
 import json
 import time
 import sys
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     HealthStatus,
@@ -114,7 +119,7 @@ class HardwareDashboard:
 
     def show_header(self):
         """Show dashboard header."""
-        timestamp = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+        timestamp = _utc_now().strftime("%Y-%m-%d %H:%M:%S UTC")
         print(self._color("=" * 70, "blue"))
         print(self._color(f"  HARDWARE HEALTH DASHBOARD - {timestamp}", "bold"))
         print(self._color("  Standard: Yair Siegel Master Level Operations", "cyan"))
@@ -330,7 +335,7 @@ class HardwareDashboard:
         self.show_kernel_summary()
 
         print(f"\n{self._color('='*70, 'blue')}")
-        print(f"Report generated at {datetime.utcnow().isoformat()}")
+        print(f"Report generated at {_utc_now().isoformat()}")
 
     def approve_decision(self, decision_id: str) -> bool:
         """Approve a pending decision."""
@@ -433,7 +438,7 @@ def main():
         health = dashboard.analyzer.analyze(metrics)
         from dataclasses import asdict
         result = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utc_now().isoformat(),
             "overall_status": health.overall_status.value,
             "overall_score": health.overall_score,
             "components": {

@@ -19,11 +19,16 @@ import socket
 import time
 import subprocess
 import platform
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import json
 import re
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     CPUMetrics,
@@ -95,7 +100,7 @@ class HardwareCollector:
         start_time = time.time()
 
         metrics = HardwareMetrics(
-            timestamp=datetime.utcnow(),
+            timestamp=_utc_now(),
             node_id=self.node_id,
             hostname=self.hostname,
             cpu=self._collect_cpu(),
@@ -578,13 +583,13 @@ class HardwareCollector:
         battery_status = None
         on_battery = False
         uptime = 0.0
-        last_reboot = datetime.utcnow()
+        last_reboot = _utc_now()
 
         # Uptime
         try:
             with open("/proc/uptime", "r") as f:
                 uptime = float(f.read().split()[0])
-                last_reboot = datetime.fromtimestamp(time.time() - uptime)
+                last_reboot = datetime.fromtimestamp(time.time() - uptime, tz=timezone.utc)
         except:
             pass
 

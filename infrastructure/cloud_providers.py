@@ -25,13 +25,18 @@ import time
 import hashlib
 import hmac
 from abc import ABC, abstractmethod
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import asdict
 import urllib.request
 import urllib.error
 import urllib.parse
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from infrastructure.infra_types import (
     CloudProvider,
@@ -557,7 +562,7 @@ class MockCloudAPI(CloudProviderAPI):
             region=request.region,
             ip_address=f"10.0.0.{self._next_id}",
             status="active",
-            created_at=datetime.utcnow(),
+            created_at=_utc_now(),
             monthly_cost=instance.monthly_cost if instance else 20.0
         )
 

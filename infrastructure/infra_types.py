@@ -8,10 +8,15 @@ Standard: Yair Siegel Master Level Operations - Full Self-Control
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional, Any
 from uuid import uuid4
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 
 class CloudProvider(Enum):
@@ -315,7 +320,7 @@ def create_scaling_decision(
     """Create a new scaling decision."""
     return ScalingDecision(
         decision_id=f"scale_{uuid4().hex[:12]}",
-        timestamp=datetime.utcnow(),
+        timestamp=_utc_now(),
         action=action,
         reason=reason,
         trigger_metrics=trigger_metrics,
@@ -334,7 +339,7 @@ def create_provisioning_request(
     """Create a new provisioning request."""
     return ProvisioningRequest(
         request_id=f"prov_{uuid4().hex[:12]}",
-        timestamp=datetime.utcnow(),
+        timestamp=_utc_now(),
         action=action,
         provider=provider,
         instance_type=instance_type,

@@ -15,10 +15,15 @@ Standard: Yair Siegel Master Level Operations
 """
 
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import asdict
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 # Import existing audit system
 import sys
@@ -87,7 +92,7 @@ class HardwareAuditLogger:
     ):
         """Log an event to both audit systems."""
         event = {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utc_now().isoformat(),
             "event_type": event_type,
             "component": self.component,
             "severity": severity,
@@ -104,13 +109,13 @@ class HardwareAuditLogger:
             )
 
         # Also log to hardware-specific log
-        log_file = self.log_path / f"hardware_{datetime.utcnow().strftime('%Y-%m-%d')}.jsonl"
+        log_file = self.log_path / f"hardware_{_utc_now().strftime('%Y-%m-%d')}.jsonl"
         with open(log_file, "a") as f:
             f.write(json.dumps(event, default=str) + "\n")
 
     def _generate_session_id(self) -> str:
         """Generate a session ID for audit logging."""
-        return f"hw_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        return f"hw_{_utc_now().strftime('%Y%m%d_%H%M%S')}"
 
     def log_health_check(
         self,

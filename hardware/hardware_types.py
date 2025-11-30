@@ -15,10 +15,15 @@ Standard: Yair Siegel Master Level Operations
 """
 
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 from enum import Enum
 from typing import Dict, List, Optional, Any
 from uuid import uuid4
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 
 class HealthStatus(Enum):
@@ -335,7 +340,7 @@ class HardwareDecision:
     def add_audit_entry(self, action: str, details: Dict[str, Any]):
         """Add entry to audit trail."""
         self.audit_trail.append({
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utc_now().isoformat(),
             "action": action,
             "details": details
         })
@@ -410,7 +415,7 @@ def create_hardware_decision(
     """Create a new hardware decision with proper defaults."""
     return HardwareDecision(
         decision_id=f"hw_dec_{uuid4().hex[:12]}",
-        timestamp=datetime.utcnow(),
+        timestamp=_utc_now(),
         node_id=node_id,
         decision_type=decision_type,
         action=action,
@@ -437,7 +442,7 @@ def create_upgrade_recommendation(
     """Create a new upgrade recommendation."""
     return HardwareUpgradeRecommendation(
         recommendation_id=f"hw_upg_{uuid4().hex[:12]}",
-        timestamp=datetime.utcnow(),
+        timestamp=_utc_now(),
         node_id=node_id,
         component=component,
         current_spec=current_spec,
@@ -466,7 +471,7 @@ def create_alert(
     """Create a new hardware alert."""
     return HardwareAlert(
         alert_id=f"hw_alert_{uuid4().hex[:12]}",
-        timestamp=datetime.utcnow(),
+        timestamp=_utc_now(),
         component=component,
         metric_name=metric_name,
         current_value=current_value,

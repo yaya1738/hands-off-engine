@@ -25,10 +25,15 @@ import signal
 import sys
 import time
 import threading
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import asdict
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from infrastructure.infra_types import (
     CloudProvider,
@@ -138,7 +143,7 @@ class AutonomousInfraManager:
         """Start the autonomous infrastructure manager."""
         self.running = True
         self._stop_event.clear()
-        self.stats["start_time"] = datetime.utcnow().isoformat()
+        self.stats["start_time"] = _utc_now().isoformat()
 
         print("=" * 60)
         print("🚀 AUTONOMOUS INFRASTRUCTURE MANAGER")
@@ -194,7 +199,7 @@ class AutonomousInfraManager:
     def _check_and_act(self):
         """Perform one check cycle and take action if needed."""
         self.stats["checks"] += 1
-        self.last_check = datetime.utcnow()
+        self.last_check = _utc_now()
 
         try:
             # Get hardware health
@@ -339,7 +344,7 @@ class AutonomousInfraManager:
 
     def _print_status(self, decisions: List[ScalingDecision]):
         """Print status update."""
-        timestamp = datetime.utcnow().strftime("%H:%M:%S")
+        timestamp = _utc_now().strftime("%H:%M:%S")
         status = self.last_health.get("status", "unknown") if self.last_health else "unknown"
         score = self.last_health.get("score", 0) if self.last_health else 0
 
@@ -370,10 +375,10 @@ class AutonomousInfraManager:
 
     def _log_action(self, decision: ScalingDecision):
         """Log an action to file."""
-        log_file = self.log_path / f"actions_{datetime.utcnow().strftime('%Y-%m-%d')}.jsonl"
+        log_file = self.log_path / f"actions_{_utc_now().strftime('%Y-%m-%d')}.jsonl"
         with open(log_file, "a") as f:
             f.write(json.dumps({
-                "timestamp": datetime.utcnow().isoformat(),
+                "timestamp": _utc_now().isoformat(),
                 "action": decision.action.value,
                 "reason": decision.reason,
                 "cost_change": decision.cost_change,
@@ -384,7 +389,7 @@ class AutonomousInfraManager:
         """Log an error."""
         log_file = self.log_path / "errors.log"
         with open(log_file, "a") as f:
-            f.write(f"[{datetime.utcnow().isoformat()}] {error}\n")
+            f.write(f"[{_utc_now().isoformat()}] {error}\n")
 
     def _save_stats(self):
         """Save statistics to file."""
@@ -406,7 +411,7 @@ class AutonomousInfraManager:
         decisions = self.provisioner.analyze_and_scale()
 
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utc_now().isoformat(),
             "infrastructure": status,
             "hardware_health": health,
             "decisions": [

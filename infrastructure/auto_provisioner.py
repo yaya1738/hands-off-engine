@@ -15,11 +15,16 @@ Standard: Yair Siegel Master Level Operations - Full Self-Control
 
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple, Any
 from dataclasses import asdict
 import os
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from infrastructure.infra_types import (
     CloudProvider,
@@ -161,7 +166,7 @@ class AutoProvisioner:
         state_file.write_text(json.dumps({
             "current_spend": self.budget.current_spend,
             "trading_revenue": self.budget.trading_revenue_this_month,
-            "last_updated": datetime.utcnow().isoformat()
+            "last_updated": _utc_now().isoformat()
         }, indent=2))
 
     def refresh_servers(self) -> List[Server]:
@@ -591,7 +596,7 @@ class AutoProvisioner:
         """Execute a scaling decision."""
         if self.dry_run:
             decision.executed = True
-            decision.executed_at = datetime.utcnow()
+            decision.executed_at = _utc_now()
             decision.execution_result = "DRY RUN - would have executed"
             return True
 
@@ -618,7 +623,7 @@ class AutoProvisioner:
             result = f"Error: {str(e)}"
 
         decision.executed = True
-        decision.executed_at = datetime.utcnow()
+        decision.executed_at = _utc_now()
         decision.execution_result = result
         decision.rollback_available = success
 
@@ -641,7 +646,7 @@ class AutoProvisioner:
             return False, f"SELF-PROTECTION: Cannot auto-upgrade {hostname} (would kill this process). Use DO console manually."
 
         # Create snapshot first for rollback
-        snapshot_name = f"pre-upgrade-{decision.target_server}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        snapshot_name = f"pre-upgrade-{decision.target_server}-{_utc_now().strftime('%Y%m%d%H%M')}"
         if hasattr(self.api, 'create_snapshot'):
             self.api.create_snapshot(decision.target_server, snapshot_name)
 
@@ -671,7 +676,7 @@ class AutoProvisioner:
             return False, f"SELF-PROTECTION: Cannot auto-downgrade {hostname} (would kill this process). Use DO console manually."
 
         # Create snapshot first for safety
-        snapshot_name = f"pre-downgrade-{decision.target_server}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+        snapshot_name = f"pre-downgrade-{decision.target_server}-{_utc_now().strftime('%Y%m%d%H%M')}"
         if hasattr(self.api, 'create_snapshot'):
             self.api.create_snapshot(decision.target_server, snapshot_name)
 
@@ -701,7 +706,7 @@ class AutoProvisioner:
             instance_type=instance_type,
             region="nyc1",  # Default region
             role=ServerRole.GENERAL,
-            name=f"hands-off-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+            name=f"hands-off-{_utc_now().strftime('%Y%m%d%H%M')}"
         )
 
         # Add trading setup script
@@ -804,7 +809,7 @@ echo "Hands-Off Engine setup complete"
 
     def _log_decisions(self, decisions: List[ScalingDecision]):
         """Log decisions to file."""
-        log_file = self.state_path / f"decisions_{datetime.utcnow().strftime('%Y-%m-%d')}.jsonl"
+        log_file = self.state_path / f"decisions_{_utc_now().strftime('%Y-%m-%d')}.jsonl"
         with open(log_file, "a") as f:
             for decision in decisions:
                 f.write(json.dumps(asdict(decision), default=str) + "\n")
@@ -814,7 +819,7 @@ echo "Hands-Off Engine setup complete"
         for decision in self.pending_decisions:
             if decision.decision_id == decision_id:
                 decision.approved_by = "user"
-                decision.approved_at = datetime.utcnow()
+                decision.approved_at = _utc_now()
                 decision.approval_status = "approved"
                 decision.requires_approval = False
 
@@ -863,7 +868,7 @@ echo "Hands-Off Engine setup complete"
             instance_type=instance_type,
             region=region,
             role=role,
-            name=f"hands-off-{role.value}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
+            name=f"hands-off-{role.value}-{_utc_now().strftime('%Y%m%d%H%M')}"
         )
         request.user_data = self._get_server_setup_script()
 

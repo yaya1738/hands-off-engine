@@ -15,11 +15,16 @@ Standard: Yair Siegel Master Level Operations
 """
 
 import json
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, field, asdict
 import statistics
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     HealthStatus,
@@ -223,7 +228,7 @@ class HardwareKernel:
             "memory_usage_buffer": self._memory_usage_buffer[-500:],
             "network_latency_buffer": self._network_latency_buffer[-500:],
             "cpu_temp_buffer": self._cpu_temp_buffer[-500:],
-            "last_saved": datetime.utcnow().isoformat()
+            "last_saved": _utc_now().isoformat()
         })
 
     def learn_from_metrics(self, metrics: HardwareMetrics, health: HardwareHealth):
@@ -287,7 +292,7 @@ class HardwareKernel:
             self.baseline.cpu_temp_std = statistics.stdev(self._cpu_temp_buffer) if len(self._cpu_temp_buffer) > 1 else 0
 
         self.baseline.samples_collected = len(self._cpu_usage_buffer)
-        self.baseline.last_updated = datetime.utcnow().isoformat()
+        self.baseline.last_updated = _utc_now().isoformat()
 
     def _detect_anomalies(self, metrics: HardwareMetrics, health: HardwareHealth):
         """Detect and record anomaly patterns."""
@@ -345,7 +350,7 @@ class HardwareKernel:
 
         # Create new pattern
         pattern = AnomalyPattern(
-            pattern_id=f"anomaly_{len(self.anomalies) + 1}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
+            pattern_id=f"anomaly_{len(self.anomalies) + 1}_{_utc_now().strftime('%Y%m%d%H%M%S')}",
             component=anomaly["component"],
             description=anomaly["description"],
             signature={
@@ -353,7 +358,7 @@ class HardwareKernel:
                 "value": anomaly["value"],
                 "z_score": anomaly["z_score"]
             },
-            first_seen=datetime.utcnow().isoformat()
+            first_seen=_utc_now().isoformat()
         )
         self.anomalies.append(pattern)
 
@@ -374,7 +379,7 @@ class HardwareKernel:
             decision_id=decision.decision_id,
             decision_type=decision.decision_type,
             action=decision.action,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=_utc_now().isoformat(),
             success=success,
             impact=impact
         )
@@ -406,11 +411,11 @@ class HardwareKernel:
             Upgrade record ID
         """
         upgrade = UpgradeRecord(
-            upgrade_id=f"upgrade_{len(self.upgrades) + 1}_{datetime.utcnow().strftime('%Y%m%d')}",
+            upgrade_id=f"upgrade_{len(self.upgrades) + 1}_{_utc_now().strftime('%Y%m%d')}",
             component=component.value,
             from_spec=from_spec,
             to_spec=to_spec,
-            timestamp=datetime.utcnow().isoformat(),
+            timestamp=_utc_now().isoformat(),
             cost=cost
         )
         self.upgrades.append(upgrade)
@@ -580,7 +585,7 @@ class HardwareKernel:
             upgrade_history=[asdict(u) for u in self.upgrades],
             upgrade_outcomes={u.upgrade_id: u.outcome for u in self.upgrades},
             optimal_maintenance_windows=[],  # Future: learned maintenance windows
-            last_updated=datetime.utcnow(),
+            last_updated=_utc_now(),
             version="1.0.0"
         )
 

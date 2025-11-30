@@ -20,11 +20,16 @@ import time
 import signal
 import sys
 import argparse
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import asdict
 import threading
+
+
+def _utc_now() -> datetime:
+    """Get current UTC time as timezone-aware datetime."""
+    return datetime.now(timezone.utc)
 
 from hardware.hardware_types import (
     HealthStatus,
@@ -93,7 +98,7 @@ class AutonomousHardwareMonitor:
         self.last_health: Optional[HardwareHealth] = None
         self.last_metrics: Optional[HardwareMetrics] = None
         self.consecutive_critical_count = 0
-        self.session_id = f"hw_monitor_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
+        self.session_id = f"hw_monitor_{_utc_now().strftime('%Y%m%d_%H%M%S')}"
 
         # Statistics
         self.stats = {
@@ -123,7 +128,7 @@ class AutonomousHardwareMonitor:
         """Start the autonomous monitoring loop."""
         self.running = True
         self._stop_event.clear()
-        self.stats["start_time"] = datetime.utcnow().isoformat()
+        self.stats["start_time"] = _utc_now().isoformat()
 
         print(f"🚀 Autonomous Hardware Monitor starting...")
         print(f"   Node: {self.node_id}")
@@ -187,7 +192,7 @@ class AutonomousHardwareMonitor:
 
     def _monitoring_cycle(self):
         """Execute one monitoring cycle."""
-        cycle_start = datetime.utcnow()
+        cycle_start = _utc_now()
 
         # Collect metrics
         metrics = self.collector.collect_all()
@@ -318,7 +323,7 @@ class AutonomousHardwareMonitor:
         decisions: List[HardwareDecision]
     ):
         """Print status line."""
-        timestamp = datetime.utcnow().strftime("%H:%M:%S")
+        timestamp = _utc_now().strftime("%H:%M:%S")
         status_emoji = {
             HealthStatus.PRISTINE: "✨",
             HealthStatus.OPTIMAL: "🟢",
@@ -365,7 +370,7 @@ class AutonomousHardwareMonitor:
             trading_check = self.trading_protection.check_trading_health(metrics, health)
 
         return {
-            "timestamp": datetime.utcnow().isoformat(),
+            "timestamp": _utc_now().isoformat(),
             "node_id": self.node_id,
             "health": {
                 "overall_status": health.overall_status.value,
@@ -403,7 +408,7 @@ def create_hardware_monitoring_task() -> Dict[str, Any]:
     """
     return {
         "task_type": "hardware_monitoring",
-        "task_id": f"hw_monitor_{datetime.utcnow().strftime('%Y%m%d_%H%M%S')}",
+        "task_id": f"hw_monitor_{_utc_now().strftime('%Y%m%d_%H%M%S')}",
         "description": "Autonomous hardware health monitoring and protection",
         "mode": "continuous",
         "config": {
@@ -411,7 +416,7 @@ def create_hardware_monitoring_task() -> Dict[str, Any]:
             "auto_execute": False,
             "trading_protection": True
         },
-        "created_at": datetime.utcnow().isoformat()
+        "created_at": _utc_now().isoformat()
     }
 
 
