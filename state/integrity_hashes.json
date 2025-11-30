@@ -1,0 +1,22 @@
+{
+  "/root/hands-off-engine/.env": {
+    "hash": "390509f9b547b59ee93d4fa6819a746eb4931f2abdde28b1982485302981291b",
+    "registered_at": "2025-11-30T23:11:25.222154+00:00"
+  },
+  "/root/hands-off-engine/.env.polymarket": {
+    "hash": "8c94ab56384a13089c52a7203e955fac6e4e1a13dffe878a57c44c35f061d9e8",
+    "registered_at": "2025-11-30T23:11:25.222515+00:00"
+  },
+  "/root/hands-off-engine/autonomous/self_preservation.py": {
+    "hash": "b950d4ae5c72431f160e5ac69b0f00d76e3484c72dd1e2e2fe618808f9fb578b",
+    "registered_at": "2025-11-30T23:11:25.222836+00:00"
+  },
+  "/root/hands-off-engine/autonomous/system_immunity.py": {
+    "hash": "ef7676f49dd25c66f2ecffeb15e8bf3b989881b62f93e102d8946f70f6f82bc7",
+    "registered_at": "2025-11-30T23:11:25.223355+00:00"
+  },
+  "/root/hands-off-engine/autonomous/script_manager.py": {
+    "hash": "2272966c0d5109270cea87401434993fcbb94d05c5aae0558d114dbffa78f311",
+    "registered_at": "2025-11-30T23:11:25.223683+00:00"
+  }
+}
