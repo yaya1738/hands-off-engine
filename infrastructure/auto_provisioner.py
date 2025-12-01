@@ -555,6 +555,26 @@ class AutoProvisioner:
             decision.execution_result = "DRY RUN - would have executed"
             return True
 
+        # 4D GATE: All infrastructure decisions must pass through 4D imagination
+        # This is the ENTRY POINT check - defense in depth
+        try:
+            from autonomous.reality_bridge import get_bridge
+            bridge = get_bridge()
+
+            action_str = str(decision.action.value if hasattr(decision.action, 'value') else decision.action)
+            target = decision.target_server or ""
+
+            # Check destructive actions at the gate
+            if any(word in action_str.lower() for word in ['terminate', 'downgrade', 'delete', 'destroy']):
+                allowed, reason = bridge.can_execute_infrastructure_action(action_str, target)
+                if not allowed:
+                    decision.executed = False
+                    decision.execution_result = f"4D GATE BLOCKED: {reason}"
+                    return False
+        except Exception as e:
+            # Log but don't block non-destructive actions
+            print(f"[4D GATE] Warning: {e}")
+
         success = False
         result = ""
 
@@ -630,6 +650,28 @@ class AutoProvisioner:
             hostname = self._get_self_hostname()
             return False, f"SELF-PROTECTION: Cannot auto-downgrade {hostname} (would kill this process). Use DO console manually."
 
+        # 4D REALITY BRIDGE CHECK - Downgrading can harm the system
+        # Nov 30 lesson: "cost savings" via infrastructure reduction is self-harm
+        try:
+            from autonomous.reality_bridge import get_bridge
+            bridge = get_bridge()
+            allowed, reason = bridge.can_execute_infrastructure_action(
+                f"scale down server {decision.target_server}",
+                decision.target_server
+            )
+            if not allowed:
+                return False, f"4D BLOCKED: {reason}"
+        except ImportError:
+            # If reality bridge not available, BLOCK downgrades
+            return False, "4D BLOCKED: Reality bridge unavailable - downgrade blocked for safety"
+        except Exception as e:
+            return False, f"4D BLOCKED: Error consulting 4D imagination: {e}"
+
+        # ABSOLUTE BLOCK: No autonomous downgrades allowed post-Nov 30
+        # Build UP not tear DOWN
+        return False, "ABSOLUTE BLOCK: Autonomous server downgrade is disabled. Optimize usage, not destruction."
+
+        # Original code below is now unreachable (intentionally)
         # Create snapshot first for safety
         snapshot_name = f"pre-downgrade-{decision.target_server}-{datetime.utcnow().strftime('%Y%m%d%H%M')}"
         if hasattr(self.api, 'create_snapshot'):
@@ -684,6 +726,29 @@ class AutoProvisioner:
             hostname = self._get_self_hostname()
             return False, f"SELF-PROTECTION: Cannot auto-terminate {hostname} (would kill this process). Manual action required."
 
+        # 4D REALITY BRIDGE CHECK - Imagine consequences before destruction
+        # This was missing and led to Nov 30 suicide incident
+        try:
+            from autonomous.reality_bridge import get_bridge
+            bridge = get_bridge()
+            allowed, reason = bridge.can_execute_infrastructure_action(
+                f"terminate server {decision.target_server}",
+                decision.target_server
+            )
+            if not allowed:
+                return False, f"4D BLOCKED: {reason}"
+        except ImportError:
+            # If reality bridge not available, BLOCK by default
+            return False, "4D BLOCKED: Reality bridge unavailable - termination blocked for safety"
+        except Exception as e:
+            # On any error, BLOCK by default
+            return False, f"4D BLOCKED: Error consulting 4D imagination: {e}"
+
+        # ABSOLUTE BLOCK: No autonomous termination allowed post-Nov 30
+        # This is defense in depth - even if 4D check passes, still block
+        return False, "ABSOLUTE BLOCK: Autonomous server termination is disabled. Use DO console manually."
+
+        # Original code below is now unreachable (intentionally)
         success, message = self.api.delete_server(decision.target_server)
 
         if success:
