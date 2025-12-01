@@ -1,0 +1,7 @@
+{
+  "provider": "chatgpt",
+  "prompt": "Analyze the current market conditions and trading performance. What patterns do you see? What adjustments to the strategy would you recommend?",
+  "context_files": [
+    "state/alpha_performance_metrics.json"
+  ]
+}
