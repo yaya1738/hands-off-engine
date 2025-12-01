@@ -13,7 +13,7 @@ Enables:
 import os
 import sys
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any
 
@@ -31,7 +31,7 @@ def log_action(action: str, status: str, details: Dict[str, Any] = None):
     log_file = log_dir / "github_setup.jsonl"
     
     log_entry = {
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(timezone.utc).isoformat() + "Z",
         "script": "configure_security",
         "action": action,
         "status": status,

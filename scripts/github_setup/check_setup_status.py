@@ -13,7 +13,7 @@ Returns JSON with current state of:
 import os
 import sys
 import json
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional
 
@@ -166,7 +166,7 @@ def main():
     if not token:
         result = {
             "error": "GITHUB_TOKEN or ADMIN_TOKEN environment variable not set",
-            "timestamp": datetime.utcnow().isoformat() + "Z"
+            "timestamp": datetime.now(timezone.utc).isoformat() + "Z"
         }
         print(json.dumps(result, indent=2))
         sys.exit(1)
@@ -175,7 +175,7 @@ def main():
     if not owner or not repo:
         result = {
             "error": "Could not determine repository owner/name",
-            "timestamp": datetime.utcnow().isoformat() + "Z"
+            "timestamp": datetime.now(timezone.utc).isoformat() + "Z"
         }
         print(json.dumps(result, indent=2))
         sys.exit(1)
@@ -183,7 +183,7 @@ def main():
     # Check all configuration items
     status = {
         "repository": f"{owner}/{repo}",
-        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "timestamp": datetime.now(timezone.utc).isoformat() + "Z",
         "branch_protection": check_branch_protection(token, owner, repo),
         "environments": check_environments(token, owner, repo),
         "security": check_security_features(token, owner, repo),
