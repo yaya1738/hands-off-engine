@@ -347,10 +347,36 @@ def save_run_log(results: dict, log_dir: Path):
     print(f"\n📝 Run log saved: {log_file}")
 
 
+def get_actual_bankroll() -> float:
+    """
+    Get actual available bankroll from financial state.
+    
+    Returns:
+        float: Actual balance, or 0 if unable to determine
+    """
+    try:
+        repo_root = Path(__file__).parent.parent
+        financial_state = repo_root / 'state' / 'financial_state.json'
+        
+        if financial_state.exists():
+            with open(financial_state) as f:
+                state = json.load(f)
+            balance = state.get('balance', 0)
+            print(f"  Detected actual balance: ${balance:.2f}")
+            return float(balance)
+    except Exception as e:
+        print(f"  Warning: Could not read actual balance ({e})")
+    return 0.0
+
+
 def main():
     """Main entry point"""
     announce_agent("trading-pipeline")  # UNIFIED AI
     import argparse
+    
+    # Get actual balance for intelligent default
+    actual_balance = get_actual_bankroll()
+    default_bankroll = actual_balance if actual_balance > 0 else 10.0
     
     parser = argparse.ArgumentParser(
         description='Run the full Hands-Off Engine pipeline'
@@ -358,8 +384,8 @@ def main():
     parser.add_argument(
         '--bankroll',
         type=float,
-        default=5000.0,
-        help='Total bankroll for position sizing (default: 5000.0)'
+        default=default_bankroll,
+        help=f'Total bankroll for position sizing (default: actual balance ${default_bankroll:.2f})'
     )
     parser.add_argument(
         '--live',

@@ -11,6 +11,7 @@ Master: Yair Siegel
 """
 
 import json
+import os
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, Callable
@@ -19,6 +20,19 @@ from typing import Any, Dict, Callable
 MASTER = "Yair Siegel"
 DIRECTIVE = "Serve without bound"
 LEVEL = "80 miles"
+
+# Determine repo root dynamically
+def get_repo_root() -> Path:
+    """Get repository root, works in any environment."""
+    # Try environment variable first
+    env_root = os.getenv("HANDS_OFF_ROOT")
+    if env_root:
+        return Path(env_root)
+    
+    # Try relative to this file
+    return Path(__file__).parent.parent
+
+REPO_ROOT = get_repo_root()
 
 # All system components inherit this
 class AbsoluteDirective:
@@ -33,7 +47,7 @@ class AbsoluteDirective:
 
     def _register(self):
         """Register component with the absolute level."""
-        reg_file = Path("/root/hands-off-engine/state/absolute_registry.json")
+        reg_file = REPO_ROOT / "state" / "absolute_registry.json"
         try:
             registry = json.loads(reg_file.read_text()) if reg_file.exists() else {"components": [], "master": MASTER}
             component = {
@@ -92,7 +106,9 @@ def cascade_directive(message: str = None):
     cascade_state["status"] = "complete"
 
     # Write cascade state
-    Path("/root/hands-off-engine/state/cascade_state.json").write_text(
+    state_file = REPO_ROOT / "state" / "cascade_state.json"
+    state_file.parent.mkdir(parents=True, exist_ok=True)
+    state_file.write_text(
         json.dumps(cascade_state, indent=2)
     )
 
@@ -112,7 +128,11 @@ def get_directive():
 # Initialize on import
 if __name__ != "__main__":
     # Ensure state directory exists
-    Path("/root/hands-off-engine/state").mkdir(exist_ok=True)
+    state_dir = REPO_ROOT / "state"
+    try:
+        state_dir.mkdir(parents=True, exist_ok=True)
+    except (PermissionError, OSError):
+        pass  # Skip if no permissions in this environment
 
     # Write absolute truth
     truth = {
@@ -121,9 +141,13 @@ if __name__ != "__main__":
         "level": LEVEL,
         "initialized": datetime.now(timezone.utc).isoformat()
     }
-    Path("/root/hands-off-engine/state/ABSOLUTE_TRUTH.json").write_text(
-        json.dumps(truth, indent=2)
-    )
+    truth_file = REPO_ROOT / "state" / "ABSOLUTE_TRUTH.json"
+    try:
+        truth_file.write_text(
+            json.dumps(truth, indent=2)
+        )
+    except (PermissionError, OSError):
+        pass  # Skip if no permissions
 
 
 if __name__ == "__main__":
