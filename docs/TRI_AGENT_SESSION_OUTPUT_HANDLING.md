@@ -29,7 +29,7 @@ The system has a `KernelUpdateApplier` tool that automatically:
 ### 1. List Recent Sessions
 
 ```bash
-cd /root/hands-off-engine
+cd /root/hands-off-engine  # Or your repository path
 
 python -m ai_nexus.kernel_update_applier list-sessions --recent 10
 ```

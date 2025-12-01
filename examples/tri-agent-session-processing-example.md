@@ -16,7 +16,7 @@ A tri-agent session was run to review the risk model parameters. The session pro
 ### 1. Run the Tri-Agent Session
 
 ```bash
-cd /root/hands-off-engine
+cd /root/hands-off-engine  # Or your repository path
 
 python -m ai_nexus.tri_agent_session_runner \
     --conversation-id 20251201_risk_review \

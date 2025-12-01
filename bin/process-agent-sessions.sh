@@ -132,7 +132,7 @@ cmd_review() {
 
     # Show agents and their message counts
     echo "Participants:"
-    jq -r '.from' "$thread_file" | sort | uniq -c | sed 's/^/  /'
+    jq -r 'select(.from) | .from' "$thread_file" 2>/dev/null | sort | uniq -c | sed 's/^/  /' || echo "  (unable to parse participants)"
     echo ""
 
     # Extract and show updates
@@ -239,21 +239,31 @@ cmd_batch() {
     info "Processing $recent most recent sessions..."
     echo ""
 
-    # Get session list
-    local sessions
-    sessions=$(ls -t ai/intercom/ | head -"$recent")
+    # Get session list using a safer approach
+    local sessions=()
+    while IFS= read -r -d '' dir; do
+        sessions+=("$(basename "$dir")")
+    done < <(find ai/intercom -mindepth 1 -maxdepth 1 -type d -printf '%T@ %p\0' | sort -zrn | head -z -n "$recent" | cut -z -d' ' -f2-)
+    
+    # Fallback to simpler method if find approach fails
+    if [ ${#sessions[@]} -eq 0 ]; then
+        mapfile -t sessions < <(cd ai/intercom && ls -t | head -"$recent")
+    fi
 
-    for session in $sessions; do
+    for session in "${sessions[@]}"; do
         echo "=================================================="
         info "Session: $session"
         echo ""
 
         # Show what would be extracted
-        $APPLIER extract --session-id "$session" 2>/dev/null || {
+        local extract_output
+        if ! extract_output=$($APPLIER extract --session-id "$session" 2>&1); then
             warning "No updates found or error processing session"
+            [ -n "$VERBOSE" ] && echo "Error: $extract_output"
             echo ""
             continue
-        }
+        fi
+        echo "$extract_output"
 
         echo ""
         read -p "Review this session in detail? [y/N] " -n 1 -r
