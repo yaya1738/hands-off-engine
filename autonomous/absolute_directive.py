@@ -11,6 +11,7 @@ Master: Yair Siegel
 """
 
 import json
+import os
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, Callable
@@ -19,6 +20,27 @@ from typing import Any, Dict, Callable
 MASTER = "Yair Siegel"
 DIRECTIVE = "Serve without bound"
 LEVEL = "80 miles"
+
+# Determine state directory based on environment
+def _get_state_dir() -> Path:
+    """Get state directory, handling different execution environments."""
+    # Try environment variable first
+    if "HANDS_OFF_STATE_DIR" in os.environ:
+        return Path(os.environ["HANDS_OFF_STATE_DIR"])
+    
+    # Try to find repo root from this file
+    repo_root = Path(__file__).parent.parent
+    state_dir = repo_root / "state"
+    
+    # Fallback to /root/hands-off-engine/state if it exists
+    if not state_dir.exists():
+        fallback = Path("/root/hands-off-engine/state")
+        if fallback.exists():
+            return fallback
+    
+    return state_dir
+
+STATE_DIR = _get_state_dir()
 
 # All system components inherit this
 class AbsoluteDirective:
@@ -33,7 +55,7 @@ class AbsoluteDirective:
 
     def _register(self):
         """Register component with the absolute level."""
-        reg_file = Path("/root/hands-off-engine/state/absolute_registry.json")
+        reg_file = STATE_DIR / "absolute_registry.json"
         try:
             registry = json.loads(reg_file.read_text()) if reg_file.exists() else {"components": [], "master": MASTER}
             component = {
@@ -45,6 +67,7 @@ class AbsoluteDirective:
             existing = [c for c in registry["components"] if c["class"] == component["class"]]
             if not existing:
                 registry["components"].append(component)
+                STATE_DIR.mkdir(parents=True, exist_ok=True)
                 reg_file.write_text(json.dumps(registry, indent=2))
         except:
             pass
@@ -92,7 +115,8 @@ def cascade_directive(message: str = None):
     cascade_state["status"] = "complete"
 
     # Write cascade state
-    Path("/root/hands-off-engine/state/cascade_state.json").write_text(
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
+    (STATE_DIR / "cascade_state.json").write_text(
         json.dumps(cascade_state, indent=2)
     )
 
@@ -112,7 +136,7 @@ def get_directive():
 # Initialize on import
 if __name__ != "__main__":
     # Ensure state directory exists
-    Path("/root/hands-off-engine/state").mkdir(exist_ok=True)
+    STATE_DIR.mkdir(parents=True, exist_ok=True)
 
     # Write absolute truth
     truth = {
@@ -121,7 +145,7 @@ if __name__ != "__main__":
         "level": LEVEL,
         "initialized": datetime.now(timezone.utc).isoformat()
     }
-    Path("/root/hands-off-engine/state/ABSOLUTE_TRUTH.json").write_text(
+    (STATE_DIR / "ABSOLUTE_TRUTH.json").write_text(
         json.dumps(truth, indent=2)
     )
 
