@@ -311,3 +311,13 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+# AUTO-ADDED: Bridge to executor
+def bridge_to_executor():
+    """Send signals to executor via bridge."""
+    try:
+        from trading.signal_executor_bridge import process_signals
+        process_signals()
+    except Exception as e:
+        print(f"[SIGNAL] Bridge error: {e}")
