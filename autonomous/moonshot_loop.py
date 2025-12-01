@@ -238,11 +238,18 @@ MILESTONES:
 - Escape Velocity: {'✓' if state['milestones']['escape_velocity'] else '○'}
 
 YOUR PRIORITIES (in order):
-1. Find dead money / refund opportunities
-2. Cut costs that aren't generating ROI
-3. Enable trading capability (get to $50)
-4. Generate income from existing assets
-5. Compound improvements
+1. Enable trading capability (get to $50)
+2. Generate income from existing assets
+3. Compound improvements
+4. Optimize resource USAGE (not destruction)
+5. Find refund opportunities for EXTERNAL services only
+
+ABSOLUTE PROHIBITION:
+- NEVER delete droplets or infrastructure
+- NEVER "cut costs" by destroying system components
+- Infrastructure exists to SUPPORT the system - destroying it is self-harm
+- Cost optimization means BETTER USE of resources, not destruction
+- The Nov 30 incident deleted 5 droplets claiming "zero ROI" - this was WRONG
 
 EXECUTE ONE HIGH-IMPACT ACTION NOW.
 Document in state/moonshot_improvements.jsonl
