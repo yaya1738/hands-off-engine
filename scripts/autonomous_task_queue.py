@@ -87,7 +87,10 @@ class AutonomousTaskQueue:
             'priority': priority,
             'source': source,
             'created_at': datetime.now(timezone.utc).isoformat(),
-            'metadata': metadata or {}
+            'metadata': metadata or {},
+            'depends_on': metadata.get('depends_on', []) if metadata else [],
+            'previous_task_id': metadata.get('previous_task_id') if metadata else None,
+            'task_order': metadata.get('task_order') if metadata else None
         }
 
         tasks.append(task)
@@ -98,14 +101,26 @@ class AutonomousTaskQueue:
 
     def get_next_task(self) -> Optional[Dict]:
         """
-        Get highest priority pending task.
+        Get highest priority pending task that has all dependencies satisfied.
 
         Priority order: critical > high > normal > low
         Within same priority: oldest first
+        Also checks task dependencies before returning a task.
         """
         tasks = self.load_queue()
         if not tasks:
             return None
+
+        # Load completed tasks to check dependencies
+        completed_task_ids = set()
+        if self.completed_log.exists():
+            with open(self.completed_log) as f:
+                for line in f:
+                    try:
+                        record = json.loads(line)
+                        completed_task_ids.add(record['task']['id'])
+                    except:
+                        pass
 
         # Sort by priority then age
         priority_order = {'critical': 0, 'high': 1, 'normal': 2, 'low': 3}
@@ -118,7 +133,34 @@ class AutonomousTaskQueue:
             )
         )
 
-        return sorted_tasks[0] if sorted_tasks else None
+        # Find first task with satisfied dependencies
+        for task in sorted_tasks:
+            # Check if previous task is completed
+            if task.get('previous_task_id'):
+                if task['previous_task_id'] not in completed_task_ids:
+                    continue  # Skip this task, previous not completed
+            
+            # Check if all dependencies are completed
+            depends_on = task.get('depends_on', [])
+            if depends_on:
+                if not all(dep_id in completed_task_ids for dep_id in depends_on):
+                    continue  # Skip this task, dependencies not completed
+            
+            # Check task order
+            if task.get('task_order') is not None:
+                # Check if there are earlier ordered tasks still pending
+                earlier_pending = any(
+                    t.get('task_order') is not None and 
+                    t.get('task_order') < task['task_order']
+                    for t in tasks if t['id'] != task['id']
+                )
+                if earlier_pending:
+                    continue  # Skip this task, earlier tasks must complete first
+            
+            # All dependencies satisfied
+            return task
+
+        return None  # No task with satisfied dependencies
 
     def get_all_tasks(self) -> List[Dict]:
         """Get all pending tasks"""

@@ -75,7 +75,10 @@ class TriAgentSession:
         continuous: bool = False,
         max_steps: int = 20,
         max_duration_seconds: int = 900,
-        kernel_update_mode: str = "none"
+        kernel_update_mode: str = "none",
+        previous_session_id: Optional[str] = None,
+        depends_on: Optional[List[str]] = None,
+        session_order: Optional[int] = None
     ):
         self.conversation_id = conversation_id
         self.session_goal = session_goal
@@ -95,7 +98,10 @@ class TriAgentSession:
             max_cost_usd=max_cost_usd,
             continuous=continuous,
             max_steps=max_steps,
-            max_duration_seconds=max_duration_seconds
+            max_duration_seconds=max_duration_seconds,
+            previous_session_id=previous_session_id,
+            depends_on=depends_on or [],
+            session_order=session_order
         )
 
         # Load or create metadata (legacy compatibility)
@@ -108,7 +114,10 @@ class TriAgentSession:
         max_cost_usd: float,
         continuous: bool,
         max_steps: int,
-        max_duration_seconds: int
+        max_duration_seconds: int,
+        previous_session_id: Optional[str],
+        depends_on: List[str],
+        session_order: Optional[int]
     ) -> CpuInstance:
         """Load existing CpuInstance or create new"""
         if self.cpu_instance_file.exists():
@@ -129,7 +138,10 @@ class TriAgentSession:
                     safety_profile="design_only",
                     max_steps=max_steps,
                     max_duration_seconds=max_duration_seconds
-                )
+                ),
+                previous_session_id=previous_session_id,
+                depends_on=depends_on,
+                session_order=session_order
             )
             self._save_cpu_instance(cpu)
             return cpu
@@ -199,6 +211,81 @@ class TriAgentSession:
             if kernel:
                 kernel_summaries[kernel_id] = kernel.summary
         return kernel_summaries
+
+    def _validate_session_dependencies(self) -> bool:
+        """
+        Validate that all session dependencies are met before execution.
+        
+        Returns:
+            bool: True if dependencies are satisfied, False otherwise
+        """
+        # Check if there's a previous session requirement
+        if self.cpu.previous_session_id:
+            prev_session_path = REPO_ROOT / "ai" / "intercom" / self.cpu.previous_session_id / "cpu_instance.json"
+            
+            if not prev_session_path.exists():
+                print(f"⚠️  WARNING: Previous session '{self.cpu.previous_session_id}' not found!")
+                print(f"   This session should follow {self.cpu.previous_session_id} but it doesn't exist.")
+                return False
+            
+            # Check if previous session is completed
+            with open(prev_session_path) as f:
+                prev_cpu = CpuInstance.from_dict(json.load(f))
+                
+            if prev_cpu.status not in ["stopped", "completed"]:
+                print(f"⚠️  WARNING: Previous session '{self.cpu.previous_session_id}' is not completed!")
+                print(f"   Status: {prev_cpu.status}")
+                print(f"   This session should wait for {self.cpu.previous_session_id} to complete.")
+                return False
+            
+            print(f"✓ Previous session '{self.cpu.previous_session_id}' completed successfully")
+        
+        # Check all dependencies
+        if self.cpu.depends_on:
+            for dep_id in self.cpu.depends_on:
+                dep_path = REPO_ROOT / "ai" / "intercom" / dep_id / "cpu_instance.json"
+                
+                if not dep_path.exists():
+                    print(f"⚠️  WARNING: Dependency session '{dep_id}' not found!")
+                    print(f"   This session depends on {dep_id} but it doesn't exist.")
+                    return False
+                
+                with open(dep_path) as f:
+                    dep_cpu = CpuInstance.from_dict(json.load(f))
+                
+                if dep_cpu.status not in ["stopped", "completed"]:
+                    print(f"⚠️  WARNING: Dependency session '{dep_id}' is not completed!")
+                    print(f"   Status: {dep_cpu.status}")
+                    print(f"   This session should wait for {dep_id} to complete.")
+                    return False
+                
+                print(f"✓ Dependency session '{dep_id}' completed successfully")
+        
+        # Check session order if specified
+        if self.cpu.session_order is not None:
+            # Find all sessions with order numbers
+            intercom_root = REPO_ROOT / "ai" / "intercom"
+            if intercom_root.exists():
+                for session_dir in intercom_root.iterdir():
+                    if not session_dir.is_dir():
+                        continue
+                    
+                    cpu_file = session_dir / "cpu_instance.json"
+                    if not cpu_file.exists():
+                        continue
+                    
+                    with open(cpu_file) as f:
+                        other_cpu = CpuInstance.from_dict(json.load(f))
+                    
+                    # Check if there are earlier sessions that should complete first
+                    if (other_cpu.session_order is not None and 
+                        other_cpu.session_order < self.cpu.session_order and
+                        other_cpu.status not in ["stopped", "completed"]):
+                        print(f"⚠️  WARNING: Earlier session '{other_cpu.cpu_id}' (order {other_cpu.session_order}) is not completed!")
+                        print(f"   This session (order {self.cpu.session_order}) should wait.")
+                        return False
+        
+        return True
 
     def run_round(self, agents: List[str]) -> List[CpuMessage]:
         """Run one round of discussion with specified agents"""
@@ -295,6 +382,18 @@ class TriAgentSession:
         print(f"Safety: {self.cpu.config.safety_profile}")
         print(f"{'='*60}")
 
+        # Validate session dependencies before starting
+        print(f"\n🔍 Validating session dependencies...")
+        if not self._validate_session_dependencies():
+            print(f"\n❌ Session dependency validation FAILED!")
+            print(f"   This session cannot run until dependencies are satisfied.")
+            print(f"   Aborting session to prevent jumping ahead of session order.")
+            self.cpu.status = "blocked"
+            self._save_cpu_instance(self.cpu)
+            return
+        
+        print(f"✓ All session dependencies satisfied\n")
+
         for round_num in range(rounds):
             new_messages = self.run_round(agents)
 
@@ -344,6 +443,18 @@ class TriAgentSession:
         print(f"Storage: {self.thread_file}")
         print(f"Safety: {self.cpu.config.safety_profile}")
         print(f"{'='*60}\n")
+
+        # Validate session dependencies before starting
+        print(f"🔍 Validating session dependencies...")
+        if not self._validate_session_dependencies():
+            print(f"\n❌ Session dependency validation FAILED!")
+            print(f"   This session cannot run until dependencies are satisfied.")
+            print(f"   Aborting session to prevent jumping ahead of session order.")
+            self.cpu.status = "blocked"
+            self._save_cpu_instance(self.cpu)
+            return
+        
+        print(f"✓ All session dependencies satisfied\n")
 
         # Initialize timers
         start_time = time.time()
@@ -538,6 +649,26 @@ def main():
         help="Kernel update mode: 'none' (default) or 'append_notes' (v0.2)"
     )
 
+    # Session ordering arguments
+    parser.add_argument(
+        "--previous-session",
+        default="",
+        help="ID of previous session that must complete before this one (enforces sequential ordering)"
+    )
+
+    parser.add_argument(
+        "--depends-on",
+        default="",
+        help="Comma-separated list of session IDs this session depends on (all must be completed)"
+    )
+
+    parser.add_argument(
+        "--session-order",
+        type=int,
+        default=None,
+        help="Explicit order number for this session in a sequence (e.g., 1, 2, 3)"
+    )
+
     args = parser.parse_args()
 
     # Parse agents list
@@ -545,6 +676,12 @@ def main():
 
     # Parse bind-kernels list
     bound_kernels = [k.strip() for k in args.bind_kernels.split(",") if k.strip()]
+
+    # Parse depends-on list
+    depends_on = [d.strip() for d in args.depends_on.split(",") if d.strip()]
+
+    # Parse previous session
+    previous_session_id = args.previous_session.strip() if args.previous_session else None
 
     # Validate agents
     for agent in agents:
@@ -573,7 +710,10 @@ def main():
         continuous=args.continuous,
         max_steps=args.max_steps,
         max_duration_seconds=args.max_duration_seconds,
-        kernel_update_mode=args.kernel_update_mode
+        kernel_update_mode=args.kernel_update_mode,
+        previous_session_id=previous_session_id,
+        depends_on=depends_on,
+        session_order=args.session_order
     )
 
     try:

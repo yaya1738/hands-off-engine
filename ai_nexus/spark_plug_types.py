@@ -67,6 +67,11 @@ class CpuInstance:
     duration_seconds: float = 0.0                    # Total duration in seconds (v0.2)
     kernel_updates_applied: bool = False             # Whether kernel updates were written (v0.2)
 
+    # Session ordering and dependency tracking
+    previous_session_id: Optional[str] = None        # ID of previous session that must complete first
+    depends_on: List[str] = field(default_factory=list)  # List of session IDs this depends on
+    session_order: Optional[int] = None              # Explicit order number if part of a sequence
+
     def to_dict(self) -> Dict:
         data = asdict(self)
         data['config'] = self.config.to_dict()
