@@ -135,3 +135,90 @@ tail -f /root/hands-off-engine/ai/coordination/messages.jsonl
 ---
 
 **This makes agent coordination much faster while keeping user out of the loop.**
+
+---
+
+## Session Output Processing (Added 2025-12-01)
+
+### The Gap That Was Filled
+
+When tri-agent sessions complete (ChatGPT + Claude + Copilot discussions), they produce:
+- Recommendations and decisions
+- Lessons learned
+- Open questions
+- Strategic insights
+
+**Problem:** These insights sat in `ai/intercom/{session_id}/thread.jsonl` without a clear workflow to apply them to system memory.
+
+**Solution:** Created comprehensive tooling and documentation.
+
+### New Tools Available
+
+#### 1. Convenience Script: `bin/process-agent-sessions.sh`
+
+```bash
+# List recent sessions
+./bin/process-agent-sessions.sh list --recent 5
+
+# Review what a session produced
+./bin/process-agent-sessions.sh review autokernel_risk_model_v2_20251127
+
+# Apply recommendations (dry-run by default)
+./bin/process-agent-sessions.sh apply autokernel_risk_model_v2_20251127
+
+# Actually apply (requires confirmation)
+./bin/process-agent-sessions.sh apply autokernel_risk_model_v2_20251127 --for-real
+```
+
+#### 2. Direct Python Tool: `ai_nexus.kernel_update_applier`
+
+```bash
+# Extract updates from session
+python -m ai_nexus.kernel_update_applier extract --session-id {id}
+
+# Auto-extract and apply
+python -m ai_nexus.kernel_update_applier auto --session-id {id} --dry-run
+```
+
+### What Gets Auto-Extracted
+
+The system uses pattern matching to find:
+
+| Pattern | Update Type | Confidence |
+|---------|-------------|------------|
+| `DECISION:`, `RECOMMENDATION:` | Decision | High |
+| `We should...`, `The approach is...` | Decision | Medium |
+| `LESSON:`, `MISTAKE:` | Failed Path | High |
+| `This didn't work because...` | Failed Path | Medium |
+| `QUESTION:`, `OPEN QUESTION:` | Question | High |
+| `We still need to...` | Question | Low |
+| `SUMMARY:`, `KEY TAKEAWAY:` | Summary | Medium |
+
+### Best Practice for Agents
+
+When creating tri-agent sessions, use explicit markers:
+
+```
+DECISION: Implement Kelly sizing with 0.15 max fraction
+
+RATIONALE: Recent drawdown analysis shows 0.25 was too aggressive.
+
+LESSON: Don't override risk limits even for high-confidence trades.
+The mistake was thinking edge could compensate for position size.
+
+QUESTION: Should we add dynamic Kelly adjustment based on recent volatility?
+```
+
+This makes extraction nearly 100% accurate.
+
+### Full Documentation
+
+See: [docs/TRI_AGENT_SESSION_OUTPUT_HANDLING.md](../../docs/TRI_AGENT_SESSION_OUTPUT_HANDLING.md)
+
+### Audit Trail
+
+All applied updates logged to: `state/kernel_update_log.jsonl`
+
+---
+
+**Session output handling is now fully documented and streamlined.**
