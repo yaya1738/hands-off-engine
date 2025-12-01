@@ -7,6 +7,9 @@ using AI Nexus backend providers.
 
 Now aligned with CpuInstance abstraction (Part 1 of Spark Plug Architecture).
 
+v0.2: Added session ordering enforcement to prevent sessions from jumping
+ahead of their dependencies.
+
 Usage:
     python -m ai_nexus.tri_agent_session_runner \\
         --conversation-id 20251125_risk_model_tuning \\
@@ -45,6 +48,7 @@ from ai_nexus.spark_plug_types import (
 )
 from ai_nexus.memory_kernels import load_kernel, list_kernels, append_kernel_update
 from ai_nexus.spark_plug_types import KernelUpdate
+from ai_nexus.session_ordering import SessionOrderingManager
 import time
 
 # Agent provider mapping
@@ -75,7 +79,9 @@ class TriAgentSession:
         continuous: bool = False,
         max_steps: int = 20,
         max_duration_seconds: int = 900,
-        kernel_update_mode: str = "none"
+        kernel_update_mode: str = "none",
+        depends_on: Optional[List[str]] = None,
+        enforce_ordering: bool = True
     ):
         self.conversation_id = conversation_id
         self.session_goal = session_goal
@@ -84,9 +90,26 @@ class TriAgentSession:
         self.metadata_file = self.intercom_dir / "metadata.json"
         self.cpu_instance_file = self.intercom_dir / "cpu_instance.json"
         self.kernel_update_mode = kernel_update_mode
+        self.depends_on = depends_on or []
+        self.enforce_ordering = enforce_ordering
+        
+        # Initialize session ordering manager
+        self.ordering_manager = SessionOrderingManager() if enforce_ordering else None
 
         # Ensure directory exists
         self.intercom_dir.mkdir(parents=True, exist_ok=True)
+        
+        # Register session with ordering system
+        if self.enforce_ordering and self.ordering_manager:
+            self.ordering_manager.register_session(
+                session_id=conversation_id,
+                depends_on=self.depends_on,
+                metadata={
+                    "goal": session_goal,
+                    "bound_kernels": bound_kernels or [],
+                    "mode": "continuous" if continuous else "burst"
+                }
+            )
 
         # Load or create CpuInstance
         self.cpu = self._load_or_create_cpu_instance(
@@ -281,6 +304,28 @@ class TriAgentSession:
 
     def run_session(self, agents: List[str], rounds: int):
         """Run multiple rounds of discussion"""
+        # Check session ordering prerequisites
+        if self.enforce_ordering and self.ordering_manager:
+            can_start, reason = self.ordering_manager.can_start_session(self.conversation_id)
+            if not can_start:
+                print(f"\n{'='*60}")
+                print(f"SESSION ORDERING VIOLATION")
+                print(f"{'='*60}")
+                print(f"Cannot start session '{self.conversation_id}'")
+                print(f"Reason: {reason}")
+                print(f"\nPlease ensure prerequisite sessions complete first:")
+                for dep_id in self.depends_on:
+                    status = self.ordering_manager.get_session_status(dep_id)
+                    if status:
+                        print(f"  - {dep_id}: {status['status']}")
+                    else:
+                        print(f"  - {dep_id}: not registered")
+                print(f"{'='*60}\n")
+                return
+            
+            # Mark session as started
+            self.ordering_manager.start_session(self.conversation_id)
+        
         print(f"\n{'='*60}")
         print(f"TRI-AGENT BACKEND SESSION (CPU-ALIGNED)")
         print(f"{'='*60}")
@@ -291,41 +336,54 @@ class TriAgentSession:
         print(f"Agents: {', '.join(agents)}")
         print(f"Rounds: {rounds}")
         print(f"Bound Kernels: {', '.join(self.cpu.bound_kernels) if self.cpu.bound_kernels else 'none'}")
+        if self.depends_on:
+            print(f"Dependencies: {', '.join(self.depends_on)}")
         print(f"Storage: {self.thread_file}")
         print(f"Safety: {self.cpu.config.safety_profile}")
         print(f"{'='*60}")
 
-        for round_num in range(rounds):
-            new_messages = self.run_round(agents)
+        try:
+            for round_num in range(rounds):
+                new_messages = self.run_round(agents)
 
-        # Mark CPU as stopped
-        self.cpu.status = "stopped"
-        self._save_cpu_instance(self.cpu)
+            # Mark CPU as stopped
+            self.cpu.status = "stopped"
+            self._save_cpu_instance(self.cpu)
+            
+            # Mark session as completed
+            if self.enforce_ordering and self.ordering_manager:
+                self.ordering_manager.complete_session(self.conversation_id, success=True)
 
-        # Print summary
-        all_messages = self.load_thread()
-        print(f"\n{'='*60}")
-        print(f"SESSION COMPLETE")
-        print(f"{'='*60}")
-        print(f"CPU ID: {self.cpu.cpu_id}")
-        print(f"Total messages: {len(all_messages)}")
-        print(f"Rounds completed: {self.metadata['rounds_completed']}")
-        print(f"\nLast message from each agent:")
-        print(f"{'='*60}\n")
+            # Print summary
+            all_messages = self.load_thread()
+            print(f"\n{'='*60}")
+            print(f"SESSION COMPLETE")
+            print(f"{'='*60}")
+            print(f"CPU ID: {self.cpu.cpu_id}")
+            print(f"Total messages: {len(all_messages)}")
+            print(f"Rounds completed: {self.metadata['rounds_completed']}")
+            print(f"\nLast message from each agent:")
+            print(f"{'='*60}\n")
 
-        for agent_id in agents:
-            agent_messages = [m for m in all_messages if m.from_ == agent_id]
-            if agent_messages:
-                last = agent_messages[-1]
-                content_preview = last.content[:150]
-                if len(last.content) > 150:
-                    content_preview += "..."
-                print(f"[{agent_id}]:")
-                print(f"  {content_preview}\n")
+            for agent_id in agents:
+                agent_messages = [m for m in all_messages if m.from_ == agent_id]
+                if agent_messages:
+                    last = agent_messages[-1]
+                    content_preview = last.content[:150]
+                    if len(last.content) > 150:
+                        content_preview += "..."
+                    print(f"[{agent_id}]:")
+                    print(f"  {content_preview}\n")
 
-        print(f"Full thread: {self.thread_file}")
-        print(f"CPU Instance: {self.cpu_instance_file}")
-        print(f"{'='*60}\n")
+            print(f"Full thread: {self.thread_file}")
+            print(f"CPU Instance: {self.cpu_instance_file}")
+            print(f"{'='*60}\n")
+        
+        except Exception as e:
+            # Mark session as failed
+            if self.enforce_ordering and self.ordering_manager:
+                self.ordering_manager.complete_session(self.conversation_id, success=False)
+            raise e
 
     def run_continuous_session(self, agents: List[str]):
         """Run continuous CPU loop with safety caps (v0.2)"""
@@ -537,6 +595,19 @@ def main():
         default="none",
         help="Kernel update mode: 'none' (default) or 'append_notes' (v0.2)"
     )
+    
+    # v0.2.1: Session ordering
+    parser.add_argument(
+        "--depends-on",
+        default="",
+        help="Comma-separated list of session IDs that must complete before this one (optional)"
+    )
+    
+    parser.add_argument(
+        "--no-ordering",
+        action="store_true",
+        help="Disable session ordering enforcement (not recommended)"
+    )
 
     args = parser.parse_args()
 
@@ -545,6 +616,9 @@ def main():
 
     # Parse bind-kernels list
     bound_kernels = [k.strip() for k in args.bind_kernels.split(",") if k.strip()]
+    
+    # Parse depends-on list
+    depends_on = [d.strip() for d in args.depends_on.split(",") if d.strip()]
 
     # Validate agents
     for agent in agents:
@@ -573,7 +647,9 @@ def main():
         continuous=args.continuous,
         max_steps=args.max_steps,
         max_duration_seconds=args.max_duration_seconds,
-        kernel_update_mode=args.kernel_update_mode
+        kernel_update_mode=args.kernel_update_mode,
+        depends_on=depends_on,
+        enforce_ordering=not args.no_ordering
     )
 
     try:

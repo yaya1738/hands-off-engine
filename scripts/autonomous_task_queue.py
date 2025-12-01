@@ -63,7 +63,8 @@ class AutonomousTaskQueue:
         description: str,
         priority: str = 'normal',
         source: str = 'orchestrator',
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
+        depends_on: Optional[List[str]] = None
     ) -> str:
         """
         Add a new autonomous task.
@@ -74,6 +75,7 @@ class AutonomousTaskQueue:
             priority: 'critical', 'high', 'normal', 'low'
             source: What created this task (orchestrator, healthcheck, etc.)
             metadata: Additional context
+            depends_on: List of task IDs that must complete before this one
 
         Returns:
             task_id
@@ -87,7 +89,8 @@ class AutonomousTaskQueue:
             'priority': priority,
             'source': source,
             'created_at': datetime.now(timezone.utc).isoformat(),
-            'metadata': metadata or {}
+            'metadata': metadata or {},
+            'depends_on': depends_on or []
         }
 
         tasks.append(task)
@@ -98,20 +101,34 @@ class AutonomousTaskQueue:
 
     def get_next_task(self) -> Optional[Dict]:
         """
-        Get highest priority pending task.
+        Get highest priority pending task that has all dependencies met.
 
         Priority order: critical > high > normal > low
         Within same priority: oldest first
+        Only returns tasks whose dependencies are completed.
         """
         tasks = self.load_queue()
         if not tasks:
+            return None
+
+        # Get completed task IDs
+        completed_ids = self._get_completed_task_ids()
+
+        # Filter to tasks with all dependencies met
+        ready_tasks = []
+        for task in tasks:
+            depends_on = task.get('depends_on', [])
+            if all(dep_id in completed_ids for dep_id in depends_on):
+                ready_tasks.append(task)
+
+        if not ready_tasks:
             return None
 
         # Sort by priority then age
         priority_order = {'critical': 0, 'high': 1, 'normal': 2, 'low': 3}
 
         sorted_tasks = sorted(
-            tasks,
+            ready_tasks,
             key=lambda t: (
                 priority_order.get(t.get('priority', 'normal'), 2),
                 t.get('created_at', '')
@@ -119,6 +136,24 @@ class AutonomousTaskQueue:
         )
 
         return sorted_tasks[0] if sorted_tasks else None
+    
+    def _get_completed_task_ids(self) -> set:
+        """Get set of completed task IDs from completion log"""
+        if not self.completed_log.exists():
+            return set()
+        
+        completed_ids = set()
+        with open(self.completed_log, 'r') as f:
+            for line in f:
+                try:
+                    record = json.loads(line)
+                    task = record.get('task', {})
+                    if task_id := task.get('id'):
+                        completed_ids.add(task_id)
+                except:
+                    continue
+        
+        return completed_ids
 
     def get_all_tasks(self) -> List[Dict]:
         """Get all pending tasks"""
