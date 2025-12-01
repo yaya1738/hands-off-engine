@@ -26,6 +26,16 @@ def test_session_order_enforcement():
     
     validator = SessionOrderValidator()
     
+    # Clean up any previous test sessions to ensure clean state
+    state = validator.load_order_state()
+    state['active_sessions'] = [s for s in state.get('active_sessions', []) 
+                                 if not s['session_id'].startswith('test-')]
+    state['completed_sessions'] = [s for s in state.get('completed_sessions', []) 
+                                    if not s['session_id'].startswith('test-')]
+    state['session_dependencies'] = {k: v for k, v in state.get('session_dependencies', {}).items() 
+                                     if not k.startswith('test-')}
+    validator.save_order_state(state)
+    
     # Scenario: Three sessions with dependencies
     # s1 -> s2 -> s3  (linear dependency chain)
     

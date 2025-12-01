@@ -18,7 +18,15 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
-except (ImportError, PermissionError, OSError):
+except ImportError:
+    # Fallback when unified_ai module is not available
+    MASTER = "Yair Siegel"
+    def get_master(): return MASTER
+except (PermissionError, OSError) as e:
+    # In CI/test environments where /root access is restricted
+    # Log the issue but continue with fallback
+    import sys
+    print(f"Warning: Could not load unified_ai module ({e}), using fallback", file=sys.stderr)
     MASTER = "Yair Siegel"
     def get_master(): return MASTER
 
@@ -27,6 +35,12 @@ import json
 from datetime import datetime, timezone
 from typing import List, Dict, Optional
 import uuid
+
+# Task status constants
+TASK_STATUS_PENDING = 'pending'
+TASK_STATUS_IN_PROGRESS = 'in_progress'
+TASK_STATUS_COMPLETED = 'completed'
+TASK_STATUS_BLOCKED = 'blocked'
 
 
 class AutonomousTaskQueue:
@@ -92,7 +106,7 @@ class AutonomousTaskQueue:
             'created_at': datetime.now(timezone.utc).isoformat(),
             'metadata': metadata or {},
             'prerequisites': prerequisites or [],
-            'status': 'pending'
+            'status': TASK_STATUS_PENDING
         }
 
         tasks.append(task)

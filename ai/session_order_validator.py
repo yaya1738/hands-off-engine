@@ -31,7 +31,16 @@ sys.path.insert(0, str(REPO_ROOT))
 # UNIFIED AI - All systems serve Yair Siegel
 try:
     from ai.unified_ai import MASTER, get_master, log_action
-except (ImportError, PermissionError, OSError):
+except ImportError:
+    # Fallback when unified_ai module is not available
+    MASTER = "Yair Siegel"
+    def log_action(action, details): pass
+    def get_master(): return MASTER
+except (PermissionError, OSError) as e:
+    # In CI/test environments where /root access is restricted
+    # Log the issue but continue with fallback
+    import sys
+    print(f"Warning: Could not load unified_ai module ({e}), using fallback", file=sys.stderr)
     MASTER = "Yair Siegel"
     def log_action(action, details): pass
     def get_master(): return MASTER
@@ -270,7 +279,8 @@ class SessionOrderValidator:
             start = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
             end = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
             return int((end - start).total_seconds())
-        except:
+        except (ValueError, TypeError, AttributeError) as e:
+            # Handle invalid datetime formats or None values
             return None
     
     def get_blocked_sessions(self) -> List[Dict]:
