@@ -59,9 +59,33 @@ def should_execute(action: str, roi_estimate: float = 0, **kwargs) -> bool:
     Unified decision: should this action be executed?
 
     All AI decisions flow through this.
-    Now includes AUTONOMOUS COST CHECKING.
+    Now includes:
+    - 4D REALITY BRIDGE CHECK (consults 4D imagination before 3D action)
+    - AUTONOMOUS COST CHECKING
     """
     core = get_core()
+
+    # 4D REALITY BRIDGE CHECK - Consult 4D imagination before any infrastructure action
+    # This prevents Nov 30-style suicide by imagining consequences before acting
+    try:
+        from autonomous.reality_bridge import get_bridge
+        bridge = get_bridge()
+
+        # Check if this is an infrastructure action
+        infra_keywords = ["droplet", "server", "infrastructure", "scale", "provision", "terminate", "delete", "destroy"]
+        if any(kw in action.lower() for kw in infra_keywords):
+            target = kwargs.get("target", "")
+            allowed, reason = bridge.can_execute_infrastructure_action(action, target)
+            if not allowed:
+                print(f"[4D REALITY BRIDGE] Blocked: {action} - {reason}")
+                return False
+            print(f"[4D REALITY BRIDGE] Allowed: {action} - {reason}")
+    except ImportError:
+        # Reality bridge not available - proceed with other checks
+        pass
+    except Exception as e:
+        # Reality bridge error - log but don't block (yet)
+        print(f"[4D REALITY BRIDGE] Warning: {e}")
 
     # COST GATE CHECK - System autonomously checks costs first
     try:
