@@ -96,10 +96,20 @@ Location: Configuration files
    # 1. Immediately revoke the credential
    # (Go to the service provider and regenerate)
    
-   # 2. Remove it from git history (if committed)
-   git filter-branch --force --index-filter \
-     "git rm --cached --ignore-unmatch path/to/secret" \
-     --prune-empty --tag-name-filter cat -- --all
+   # 2. Remove it from git history
+   # Option A: Using BFG Repo-Cleaner (recommended, faster)
+   # Download from: https://rtyley.github.io/bfg-repo-cleaner/
+   # java -jar bfg.jar --delete-files secret-file.txt
+   # git reflog expire --expire=now --all && git gc --prune=now --aggressive
+   
+   # Option B: Using git filter-repo (recommended, modern)
+   # Install: pip install git-filter-repo
+   # git filter-repo --path path/to/secret --invert-paths
+   
+   # Option C: Using git filter-branch (deprecated but still works)
+   # git filter-branch --force --index-filter \
+   #   "git rm --cached --ignore-unmatch path/to/secret" \
+   #   --prune-empty --tag-name-filter cat -- --all
    
    # 3. Force push (CAUTION: coordinate with team)
    git push --force --all

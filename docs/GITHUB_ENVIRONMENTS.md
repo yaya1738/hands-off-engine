@@ -181,7 +181,7 @@ Configure Telegram notifications for production deployments:
 
 ```yaml
 - name: Notify deployment
-  if: environment == 'production'
+  if: github.event.inputs.environment == 'production'
   run: |
     python telegram/notify.py "🚀 LIVE deployment initiated"
 ```
