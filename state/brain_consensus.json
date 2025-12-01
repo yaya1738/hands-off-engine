@@ -1,243 +1,108 @@
 {
-  "generated_at": "2025-11-18T20:24:02.096610Z",
-  "source": "state/brain_feedback.json",
+  "generated_at": "2025-11-19T02:47:00Z",
+  "source": "Batch 22 Consensus Engine",
+  "run_id": "run_001",
   "agents": {
-    "rules_engine": {
-      "recommendations": [
-        "Address 1 critical issue(s) immediately",
-        "Error rate 12.0% exceeds threshold"
-      ],
-      "priority_items": [
+    "rules": {
+      "status": "ok",
+      "issues": [
         {
-          "type": "critical_issues",
-          "count": 1,
-          "priority": 1
+          "severity": "high",
+          "message": "Polymarket API rate limit approaching threshold",
+          "confidence": 0.92,
+          "details": "Current usage: 850/1000 requests per hour"
         },
         {
-          "type": "high_error_rate",
-          "value": 0.12,
-          "priority": 1
+          "severity": "medium",
+          "message": "Stale market data detected in cache",
+          "confidence": 0.78,
+          "details": "3 markets with data >15 minutes old"
         }
-      ],
-      "confidence": 0.9,
-      "severity_assessment": "critical",
-      "notes": [
-        "Rules engine flagged 1 critical issues"
       ]
     },
-    "llm_agent_1_conservative": {
-      "recommendations": [
-        "Conduct thorough review of all reported issues",
-        "Implement fixes incrementally with testing",
-        "Increase monitoring during remediation"
-      ],
-      "priority_items": [
+    "llm_1": {
+      "status": "ok",
+      "issues": [
         {
-          "type": "comprehensive_review",
-          "priority": 1
+          "severity": "high",
+          "message": "Polymarket API rate limit approaching threshold",
+          "confidence": 0.88,
+          "details": "Risk of service degradation"
         },
         {
-          "type": "incremental_remediation",
-          "priority": 2
+          "severity": "low",
+          "message": "Minor logging inconsistency detected",
+          "confidence": 0.65,
+          "details": "Timestamp format varies across modules"
         }
-      ],
-      "confidence": 0.65,
-      "severity_assessment": "critical",
-      "notes": [
-        "LLM Agent 1: Conservative safety-focused analysis"
       ]
     },
-    "llm_agent_2_optimistic": {
-      "recommendations": [
-        "Group similar issues for batch resolution",
-        "Prioritize high-impact quick wins",
-        "Address 4 fixable issues in parallel"
-      ],
-      "priority_items": [
+    "llm_2": {
+      "status": "ok",
+      "issues": [
         {
-          "type": "batch_fixes",
-          "count": 4,
-          "priority": 2
+          "severity": "medium",
+          "message": "Polymarket API performance degraded",
+          "confidence": 0.71,
+          "details": "Average response time increased by 25%"
+        },
+        {
+          "severity": "medium",
+          "message": "Stale market data in cache subsystem",
+          "confidence": 0.69,
+          "details": "Cache invalidation may need tuning"
         }
-      ],
-      "confidence": 0.85,
-      "severity_assessment": "high",
-      "notes": [
-        "LLM Agent 2: Optimistic efficiency-focused analysis"
       ]
     },
     "heuristics": {
-      "recommendations": [
-        "Elevated error_rate: 12.00%",
-        "Elevated success_rate: 88.00%",
-        "Elevated cache_hit_rate: 76.00%"
-      ],
-      "priority_items": [
+      "status": "ok",
+      "issues": [
         {
-          "type": "elevated_error_rate",
-          "value": 0.12,
-          "priority": 2
+          "severity": "high",
+          "message": "Polymarket API rate limit nearing capacity",
+          "confidence": 0.90,
+          "details": "Threshold: 85% of limit reached"
         },
         {
-          "type": "elevated_success_rate",
-          "value": 0.88,
-          "priority": 2
-        },
-        {
-          "type": "elevated_cache_hit_rate",
-          "value": 0.76,
-          "priority": 2
+          "severity": "low",
+          "message": "Configuration drift detected",
+          "confidence": 0.62,
+          "details": "Dev and prod configs have diverged"
         }
-      ],
-      "confidence": 0.8,
-      "severity_assessment": "medium",
-      "notes": [
-        "Heuristics Agent: Statistical analysis",
-        "Issue rate normal: 6"
       ]
     }
   },
-  "consensus": {
-    "agreement_score": 0.495,
-    "confidence": "high",
-    "average_confidence": 0.8,
-    "priority_items": [
-      {
-        "type": "critical_issues",
-        "count": 1,
-        "priority": 1,
-        "source_agent": "rules_engine",
-        "agent_confidence": 0.9
-      },
-      {
-        "type": "high_error_rate",
-        "value": 0.12,
-        "priority": 1,
-        "source_agent": "rules_engine",
-        "agent_confidence": 0.9
-      },
-      {
-        "type": "comprehensive_review",
-        "priority": 1,
-        "source_agent": "llm_agent_1_conservative",
-        "agent_confidence": 0.65
-      },
-      {
-        "type": "batch_fixes",
-        "count": 4,
-        "priority": 2,
-        "source_agent": "llm_agent_2_optimistic",
-        "agent_confidence": 0.85
-      },
-      {
-        "type": "elevated_error_rate",
-        "value": 0.12,
-        "priority": 2,
-        "source_agent": "heuristics",
-        "agent_confidence": 0.8
-      },
-      {
-        "type": "elevated_success_rate",
-        "value": 0.88,
-        "priority": 2,
-        "source_agent": "heuristics",
-        "agent_confidence": 0.8
-      },
-      {
-        "type": "elevated_cache_hit_rate",
-        "value": 0.76,
-        "priority": 2,
-        "source_agent": "heuristics",
-        "agent_confidence": 0.8
-      },
-      {
-        "type": "incremental_remediation",
-        "priority": 2,
-        "source_agent": "llm_agent_1_conservative",
-        "agent_confidence": 0.65
-      }
-    ],
-    "contradictions": [
-      {
-        "type": "severity_disagreement",
-        "details": {
-          "rules_engine": "critical",
-          "llm_agent_1_conservative": "critical",
-          "llm_agent_2_optimistic": "high",
-          "heuristics": "medium"
-        },
-        "description": "Agents disagree on severity assessment"
-      },
-      {
-        "type": "approach_disagreement",
-        "details": {
-          "llm_agent_1_conservative": "conservative",
-          "llm_agent_2_optimistic": "aggressive"
-        },
-        "description": "Agents disagree on remediation approach"
-      }
-    ],
-    "final_recommendations": [
-      "Low consensus (agreement: 49%) - manual review required",
-      "Address 1 critical issue(s) immediately",
-      "Error rate 12.0% exceeds threshold",
-      "Conduct thorough review of all reported issues",
-      "Implement fixes incrementally with testing",
-      "Increase monitoring during remediation"
-    ],
-    "stability_score": 0.986,
-    "agent_count": 4
-  },
-  "issues_detected": [
-    {
-      "severity": "critical",
-      "type": "data_inconsistency",
-      "description": "Portfolio state mismatch detected between cache and reality",
-      "fixable": false,
-      "impact": "high"
-    },
+  "issues": [
     {
       "severity": "high",
-      "type": "performance_degradation",
-      "description": "API response time increased by 300% over baseline",
-      "fixable": true,
-      "impact": "medium"
-    },
-    {
-      "severity": "high",
-      "type": "error",
-      "description": "Failed to fetch market data for 3 consecutive intervals",
-      "fixable": true,
-      "impact": "high"
+      "message": "Polymarket API rate limit approaching threshold",
+      "confidence": 0.90,
+      "agent_agreement": 0.75,
+      "supporting_agents": ["rules", "llm_1", "heuristics"],
+      "recommendation": "Implement request throttling and caching"
     },
     {
       "severity": "medium",
-      "type": "warning",
-      "description": "Memory usage approaching threshold (85%)",
-      "fixable": true,
-      "impact": "low"
-    },
-    {
-      "severity": "medium",
-      "type": "configuration_drift",
-      "description": "Risk parameters differ from policy baseline",
-      "fixable": true,
-      "impact": "medium"
+      "message": "Stale market data detected in cache",
+      "confidence": 0.74,
+      "agent_agreement": 0.50,
+      "supporting_agents": ["rules", "llm_2"],
+      "recommendation": "Reduce cache TTL for high-volatility markets"
     },
     {
       "severity": "low",
-      "type": "info",
-      "description": "Scheduled maintenance window approaching",
-      "fixable": false,
-      "impact": "low"
+      "message": "Minor configuration inconsistencies",
+      "confidence": 0.64,
+      "agent_agreement": 0.50,
+      "supporting_agents": ["llm_1", "heuristics"],
+      "recommendation": "Audit and normalize configuration files"
     }
   ],
-  "notes": [
-    "Rules engine flagged 1 critical issues",
-    "LLM Agent 1: Conservative safety-focused analysis",
-    "LLM Agent 2: Optimistic efficiency-focused analysis",
-    "Heuristics Agent: Statistical analysis",
-    "Issue rate normal: 6"
-  ],
-  "errors": []
+  "consensus_score": 0.76,
+  "total_agent_checks": 4,
+  "metadata": {
+    "batch": 22,
+    "pipeline_version": "1.0",
+    "execution_mode": "DRYRUN"
+  }
 }
