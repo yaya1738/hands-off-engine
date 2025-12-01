@@ -1,0 +1,70 @@
+{
+  "markets": [
+    {
+      "id": "market-001",
+      "question": "Will Bitcoin reach $100,000 by end of 2025?",
+      "category": "crypto",
+      "closes_at": "2025-12-31T23:59:59Z",
+      "yes_price": 0.45,
+      "no_price": 0.55,
+      "volume": 125000.0,
+      "fair_yes": 0.62,
+      "edge": 0.17,
+      "rec": "buy_yes",
+      "notes": "Strong positive edge"
+    },
+    {
+      "id": "market-002",
+      "question": "Will Democrats win Senate majority in 2026?",
+      "category": "politics",
+      "closes_at": "2026-11-04T23:59:59Z",
+      "yes_price": 0.52,
+      "no_price": 0.48,
+      "volume": 85000.0,
+      "fair_yes": 0.65,
+      "edge": 0.13,
+      "rec": "buy_yes",
+      "notes": "Moderate positive edge"
+    },
+    {
+      "id": "market-003",
+      "question": "Will Lakers win NBA Championship 2025?",
+      "category": "sports",
+      "closes_at": "2025-06-30T23:59:59Z",
+      "yes_price": 0.28,
+      "no_price": 0.72,
+      "volume": 45000.0,
+      "fair_yes": 0.22,
+      "edge": -0.06,
+      "rec": "buy_no",
+      "notes": "Negative edge, overpriced YES"
+    },
+    {
+      "id": "market-004",
+      "question": "Will CPI exceed 3.5% in Q2 2025?",
+      "category": "macro",
+      "closes_at": "2025-07-15T23:59:59Z",
+      "yes_price": 0.38,
+      "no_price": 0.62,
+      "volume": 92000.0,
+      "fair_yes": 0.39,
+      "edge": 0.01,
+      "rec": "hold",
+      "notes": "Minimal edge, hold"
+    },
+    {
+      "id": "market-005",
+      "question": "Will new AI model exceed GPT-4 by mid-2025?",
+      "category": "other",
+      "closes_at": "2025-07-01T23:59:59Z",
+      "yes_price": 0.71,
+      "no_price": 0.29,
+      "volume": 38000.0,
+      "fair_yes": 0.70,
+      "edge": -0.01,
+      "rec": "hold",
+      "notes": "Essentially fair priced"
+    }
+  ],
+  "generated_at": "2025-01-15T12:00:00Z"
+}
