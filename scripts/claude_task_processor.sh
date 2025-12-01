@@ -153,23 +153,15 @@ Remember: Each session should leave the system better than you found it.
 ''')
 PYTHON_EOF
 
-TASK_PROMPT=$(cat "$TASK_PROMPT_FILE")
-rm -f "$TASK_PROMPT_FILE"
-
-if [ $? -ne 0 ]; then
-    log "Failed to get task from queue"
-    exit 1
-fi
-
 log "Invoking Claude CLI with task prompt..."
 
-# Invoke Claude CLI in non-interactive mode
-# --print: Output response to stdout
-# --allowedTools: Restrict to safe tools for autonomous operation
+# Invoke Claude CLI - pipe from file to avoid bash special char issues
 timeout 1800 claude --print \
     --allowedTools "Read,Write,Edit,Glob,Grep,Bash" \
-    "$TASK_PROMPT" \
+    < "$TASK_PROMPT_FILE" \
     >> "$LOG_DIR/claude_session.log" 2>&1
+
+rm -f "$TASK_PROMPT_FILE"
 
 EXIT_CODE=$?
 
