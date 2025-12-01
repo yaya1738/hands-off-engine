@@ -7,6 +7,14 @@
 
 ---
 
+## Status Legend
+
+- ✅ **ACTIVE/COMPLETE** - Implementation done and verified
+- ⚠️ **PARTIAL/PENDING** - In progress or partially implemented
+- ❌ **NOT STARTED** - Identified but not yet addressed
+
+---
+
 ## Overview
 
 This document maps audit findings from `ai/AGENT_AUDIT_SUMMARY_2025-12-01.md` to their integration points across the Hands-Off Engine. It ensures that insights discovered during audits are actually incorporated into system behavior, documentation, and processes.
@@ -386,8 +394,14 @@ python3 scripts/meta_metrics.py
 
 ### Report Propagation Status
 ```bash
-# Generate weekly report
-python3 scripts/audit_propagation_report.py --week $(date +%Y-W%V)
+# View current propagation status
+cat docs/AUDIT_PROPAGATION_MAP.md
+
+# Check audit summary
+cat ai/AGENT_AUDIT_SUMMARY_2025-12-01.md
+
+# Note: Automated report generation script (audit_propagation_report.py) 
+# is planned but not yet implemented
 ```
 
 ---

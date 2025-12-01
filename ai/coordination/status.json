@@ -37,7 +37,9 @@
       "completed_at": "2025-12-01T18:35:19.205745Z",
       "artifacts": [
         "ai/AGENT_AUDIT_SUMMARY_2025-12-01.md",
-        "Updated state/knowledge.json"
+        "docs/AUDIT_PROPAGATION_MAP.md",
+        "state/knowledge.json (Added 2 docs to optional_docs)",
+        "ai/coordination/messages.jsonl (Added audit_summary message)"
       ]
     },
     {
