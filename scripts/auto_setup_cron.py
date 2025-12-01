@@ -1,245 +1,231 @@
 #!/usr/bin/env python3
 """
-Auto-Setup Cron Jobs - Autonomous Scheduling Configuration
-============================================================
+Auto Setup Cron - Install all autonomous operation cron jobs
 
-This script automatically configures all necessary cron jobs for the
-hands-off-engine to run autonomously without manual crontab editing.
-
-Jobs configured:
-1. Main trading pipeline (hourly)
-2. Social media promotion (every 4 hours)
-3. Health check monitoring (every 15 minutes)
-4. Daily recalibration (08:00 UTC)
-5. Performance reporting (daily)
-6. Coordination agent (every 5 minutes)
+This script installs the cron jobs needed for fully autonomous operation:
+- Trading pipeline (hourly)
+- Health monitoring (every 15 min)
+- Phase progression (daily)
+- Coordination agent (every 5 min)
+- Claude orchestrator (every 30 min)
+- Self-improvement cycle (every 6 hours)
 
 Usage:
-    python3 scripts/auto_setup_cron.py --install    # Install all crons
-    python3 scripts/auto_setup_cron.py --remove     # Remove all crons
-    python3 scripts/auto_setup_cron.py --status     # Show current status
+    python3 auto_setup_cron.py --install   # Install cron jobs
+    python3 auto_setup_cron.py --remove    # Remove cron jobs
+    python3 auto_setup_cron.py --show      # Show what would be installed
 """
 
-# UNIFIED AI - All systems serve Yair Siegel
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
-try:
-    from ai.unified_ai import MASTER, get_master
-except ImportError:
-    MASTER = "Yair Siegel"
-
-
+import argparse
 import subprocess
-import os
 import sys
 from pathlib import Path
-from datetime import datetime
 
 REPO_ROOT = Path(__file__).parent.parent
-VENV_PYTHON = "/usr/bin/python3"  # Use system Python or venv if available
 
-# Define all cron jobs with schedule and command
-CRON_JOBS = {
-    "trading_pipeline": {
-        "schedule": "0 * * * *",  # Every hour at :00
-        "command": f"cd {REPO_ROOT} && HANDS_OFF_EXECUTOR_MODE=shadow ./scripts/run_and_notify.sh >> /var/log/hands-off/trading.log 2>&1",
-        "description": "Main trading pipeline (shadow mode)"
+# Cron job definitions
+CRON_JOBS = [
+    # Trading pipeline - run hourly at minute 0
+    {
+        "schedule": "0 * * * *",
+        "command": f"cd {REPO_ROOT} && HANDS_OFF_EXECUTOR_MODE=shadow python3 scripts/run_pipeline.py >> /var/log/hands-off/pipeline.log 2>&1",
+        "description": "Trading pipeline (hourly)"
     },
-    "social_promotion": {
-        "schedule": "0 */4 * * *",  # Every 4 hours
-        "command": f"cd {REPO_ROOT} && {VENV_PYTHON} api/social_promotion.py >> /var/log/hands-off/social.log 2>&1",
-        "description": "Social media promotion cycle"
-    },
-    "health_check": {
-        "schedule": "*/15 * * * *",  # Every 15 minutes
+    # Health check - every 15 minutes
+    {
+        "schedule": "*/15 * * * *",
         "command": f"cd {REPO_ROOT} && ./scripts/healthcheck.sh >> /var/log/hands-off/health.log 2>&1",
-        "description": "System health monitoring"
+        "description": "Health monitoring (15 min)"
     },
-    "daily_recalibration": {
-        "schedule": "0 8 * * *",  # Daily at 08:00 UTC
-        "command": f"cd {REPO_ROOT} && {VENV_PYTHON} scripts/recalibrate_engine.py >> /var/log/hands-off/recalibrate.log 2>&1",
-        "description": "Daily model recalibration"
+    # Phase progression - daily at midnight UTC
+    {
+        "schedule": "0 0 * * *",
+        "command": f"cd {REPO_ROOT} && python3 scripts/autonomous_phase_manager.py >> /var/log/hands-off/phase.log 2>&1",
+        "description": "Phase progression (daily)"
     },
-    "performance_report": {
-        "schedule": "0 20 * * *",  # Daily at 20:00 UTC
-        "command": f"cd {REPO_ROOT} && {VENV_PYTHON} scripts/track_performance.py --notify >> /var/log/hands-off/performance.log 2>&1",
-        "description": "Daily performance report"
+    # Coordination agent - every 5 minutes
+    {
+        "schedule": "*/5 * * * *",
+        "command": f"cd {REPO_ROOT} && python3 scripts/coordination_agent.py --once >> /var/log/hands-off/coordination.log 2>&1",
+        "description": "Coordination agent (5 min)"
     },
-    "coordination_agent": {
-        "schedule": "*/5 * * * *",  # Every 5 minutes
-        "command": f"cd {REPO_ROOT} && {VENV_PYTHON} scripts/coordination_agent.py --once >> /var/log/hands-off/coordination.log 2>&1",
-        "description": "AI coordination agent"
+    # Claude orchestrator - every 30 minutes
+    {
+        "schedule": "*/30 * * * *",
+        "command": f"cd {REPO_ROOT} && python3 scripts/claude_orchestrator.py >> /var/log/hands-off/orchestrator.log 2>&1",
+        "description": "Claude orchestrator (30 min)"
     },
-    "phase_progression": {
-        "schedule": "0 0 * * *",  # Daily at midnight
-        "command": f"cd {REPO_ROOT} && {VENV_PYTHON} scripts/autonomous_phase_manager.py >> /var/log/hands-off/phases.log 2>&1",
-        "description": "Auto phase progression check"
-    }
-}
+    # Self-improvement kernel refresh - every 6 hours
+    {
+        "schedule": "0 */6 * * *",
+        "command": f"cd {REPO_ROOT} && python3 -c \"from ai_nexus.spark_plug_autokernel import refresh_all_kernels; refresh_all_kernels()\" >> /var/log/hands-off/self-improve.log 2>&1",
+        "description": "Self-improvement cycle (6 hours)"
+    },
+    # Revenue tracking - every 4 hours
+    {
+        "schedule": "0 */4 * * *",
+        "command": f"cd {REPO_ROOT} && python3 revenue/master_revenue_engine.py >> /var/log/hands-off/revenue.log 2>&1",
+        "description": "Revenue tracking (4 hours)"
+    },
+    # Performance metrics - every hour at minute 30
+    {
+        "schedule": "30 * * * *",
+        "command": f"cd {REPO_ROOT} && python3 scripts/track_performance.py >> /var/log/hands-off/metrics.log 2>&1",
+        "description": "Performance metrics (hourly)"
+    },
+]
 
-# Marker to identify our cron entries
-CRON_MARKER = "# HANDS-OFF-ENGINE AUTO-MANAGED"
+CRON_MARKER = "# HANDS-OFF-ENGINE AUTONOMOUS CRON"
 
 
 def get_current_crontab() -> str:
-    """Get current crontab contents."""
+    """Get current crontab content"""
     try:
-        result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
+        result = subprocess.run(
+            ["crontab", "-l"],
+            capture_output=True,
+            text=True
+        )
         return result.stdout if result.returncode == 0 else ""
     except Exception:
         return ""
 
 
-def set_crontab(content: str) -> bool:
-    """Set new crontab contents."""
-    try:
-        process = subprocess.Popen(['crontab', '-'], stdin=subprocess.PIPE, text=True)
-        process.communicate(input=content)
-        return process.returncode == 0
-    except Exception as e:
-        print(f"Error setting crontab: {e}")
-        return False
-
-
-def ensure_log_directory():
-    """Create log directory if it doesn't exist."""
-    log_dir = Path("/var/log/hands-off")
-    try:
-        log_dir.mkdir(parents=True, exist_ok=True)
-        print(f"✓ Log directory ready: {log_dir}")
-    except PermissionError:
-        # Try with sudo
-        subprocess.run(['sudo', 'mkdir', '-p', str(log_dir)], check=True)
-        subprocess.run(['sudo', 'chmod', '777', str(log_dir)], check=True)
-        print(f"✓ Log directory created (with sudo): {log_dir}")
-
-
 def install_cron_jobs():
-    """Install all autonomous cron jobs."""
-    print("=" * 60)
-    print("HANDS-OFF-ENGINE: Auto-Installing Cron Jobs")
-    print("=" * 60)
+    """Install all cron jobs"""
+    print("Installing autonomous operation cron jobs...")
+    print()
 
-    # Ensure log directory exists
-    ensure_log_directory()
+    # Get existing crontab (without our jobs)
+    existing = get_current_crontab()
 
-    # Get current crontab
-    current = get_current_crontab()
+    # Remove any existing hands-off cron jobs
+    lines = existing.split('\n')
+    cleaned_lines = []
+    skip_next = False
 
-    # Remove any existing hands-off entries
-    lines = [line for line in current.split('\n')
-             if CRON_MARKER not in line and 'hands-off-engine' not in line.lower()]
+    for line in lines:
+        if CRON_MARKER in line:
+            skip_next = True
+            continue
+        if skip_next:
+            skip_next = False
+            continue
+        if line.strip():
+            cleaned_lines.append(line)
 
-    # Add new entries
-    new_entries = ["\n", f"{CRON_MARKER} - DO NOT EDIT BELOW THIS LINE"]
-    new_entries.append(f"# Installed: {datetime.utcnow().isoformat()}Z")
-    new_entries.append("")
+    # Build new crontab
+    new_crontab_lines = cleaned_lines + ["", CRON_MARKER]
 
-    for job_id, job in CRON_JOBS.items():
-        new_entries.append(f"# {job['description']}")
-        new_entries.append(f"{job['schedule']} {job['command']} {CRON_MARKER}")
-        new_entries.append("")
+    for job in CRON_JOBS:
+        comment = f"# {job['description']}"
+        cron_line = f"{job['schedule']} {job['command']}"
+        new_crontab_lines.extend([comment, cron_line])
 
-    new_entries.append(f"# END {CRON_MARKER}")
+    new_crontab = '\n'.join(new_crontab_lines) + '\n'
 
-    # Combine and set
-    new_crontab = '\n'.join(lines) + '\n'.join(new_entries)
+    # Install new crontab
+    try:
+        process = subprocess.Popen(
+            ["crontab", "-"],
+            stdin=subprocess.PIPE,
+            text=True
+        )
+        process.communicate(input=new_crontab)
 
-    if set_crontab(new_crontab):
-        print("\n✓ All cron jobs installed successfully!\n")
-        print("Installed jobs:")
-        for job_id, job in CRON_JOBS.items():
-            print(f"  • {job_id}: {job['schedule']} - {job['description']}")
-        print("\n" + "=" * 60)
-        return True
-    else:
-        print("\n✗ Failed to install cron jobs")
+        if process.returncode == 0:
+            print(f"Installed {len(CRON_JOBS)} cron jobs:")
+            for job in CRON_JOBS:
+                print(f"  - {job['description']}")
+            print()
+            print("Cron jobs are now active!")
+            return True
+        else:
+            print("ERROR: Failed to install crontab")
+            return False
+
+    except Exception as e:
+        print(f"ERROR: {e}")
         return False
 
 
 def remove_cron_jobs():
-    """Remove all hands-off cron jobs."""
-    print("Removing HANDS-OFF-ENGINE cron jobs...")
+    """Remove all hands-off cron jobs"""
+    print("Removing hands-off cron jobs...")
 
-    current = get_current_crontab()
+    existing = get_current_crontab()
 
-    # Remove all hands-off entries
-    lines = [line for line in current.split('\n')
-             if CRON_MARKER not in line and 'hands-off-engine' not in line.lower()]
+    # Remove our jobs
+    lines = existing.split('\n')
+    cleaned_lines = []
+    skip_next = False
 
-    # Clean up empty lines at end
-    while lines and not lines[-1].strip():
-        lines.pop()
+    for line in lines:
+        if CRON_MARKER in line:
+            skip_next = True
+            continue
+        if skip_next:
+            skip_next = False
+            continue
+        if line.strip():
+            cleaned_lines.append(line)
 
-    if set_crontab('\n'.join(lines) + '\n'):
-        print("✓ All HANDS-OFF-ENGINE cron jobs removed")
+    new_crontab = '\n'.join(cleaned_lines) + '\n' if cleaned_lines else ""
+
+    try:
+        if new_crontab.strip():
+            process = subprocess.Popen(
+                ["crontab", "-"],
+                stdin=subprocess.PIPE,
+                text=True
+            )
+            process.communicate(input=new_crontab)
+        else:
+            subprocess.run(["crontab", "-r"], capture_output=True)
+
+        print("Hands-off cron jobs removed")
         return True
-    else:
-        print("✗ Failed to remove cron jobs")
+
+    except Exception as e:
+        print(f"ERROR: {e}")
         return False
 
 
-def show_status():
-    """Show current cron job status."""
+def show_cron_jobs():
+    """Show what would be installed"""
+    print("Cron jobs that will be installed:")
     print("=" * 60)
-    print("HANDS-OFF-ENGINE: Cron Job Status")
+    print()
+
+    for job in CRON_JOBS:
+        print(f"{job['description']}")
+        print(f"  Schedule: {job['schedule']}")
+        print(f"  Command:  {job['command'][:80]}...")
+        print()
+
     print("=" * 60)
-
-    current = get_current_crontab()
-
-    # Find our jobs
-    our_jobs = [line for line in current.split('\n')
-                if CRON_MARKER in line or 'hands-off-engine' in line.lower()]
-
-    if our_jobs:
-        print("\n✓ Found installed cron jobs:\n")
-        for line in our_jobs:
-            if line.strip() and not line.startswith('#'):
-                # Parse schedule from line
-                parts = line.split()
-                if len(parts) >= 5:
-                    schedule = ' '.join(parts[:5])
-                    print(f"  Schedule: {schedule}")
-    else:
-        print("\n⚠ No HANDS-OFF-ENGINE cron jobs found")
-        print("  Run: python3 scripts/auto_setup_cron.py --install")
-
-    print("\n" + "=" * 60)
-
-    # Also show log file status
-    log_dir = Path("/var/log/hands-off")
-    if log_dir.exists():
-        print("\nLog files:")
-        for log_file in log_dir.glob("*.log"):
-            size = log_file.stat().st_size
-            mtime = datetime.fromtimestamp(log_file.stat().st_mtime)
-            print(f"  • {log_file.name}: {size} bytes, last modified {mtime}")
+    print(f"Total: {len(CRON_JOBS)} cron jobs")
 
 
 def main():
-    if len(sys.argv) < 2:
-        print(__doc__)
-        sys.exit(1)
+    parser = argparse.ArgumentParser(description="Manage autonomous operation cron jobs")
+    parser.add_argument("--install", action="store_true", help="Install cron jobs")
+    parser.add_argument("--remove", action="store_true", help="Remove cron jobs")
+    parser.add_argument("--show", action="store_true", help="Show what would be installed")
 
-    action = sys.argv[1].lower()
+    args = parser.parse_args()
 
-    if action in ['--install', '-i', 'install']:
+    if args.install:
         success = install_cron_jobs()
         sys.exit(0 if success else 1)
-
-    elif action in ['--remove', '-r', 'remove', '--uninstall']:
+    elif args.remove:
         success = remove_cron_jobs()
         sys.exit(0 if success else 1)
-
-    elif action in ['--status', '-s', 'status']:
-        show_status()
-        sys.exit(0)
-
+    elif args.show:
+        show_cron_jobs()
     else:
-        print(f"Unknown action: {action}")
-        print("Use --install, --remove, or --status")
-        sys.exit(1)
+        parser.print_help()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
