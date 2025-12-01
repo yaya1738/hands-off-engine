@@ -194,8 +194,8 @@ class SystemAuditor:
                 if 'DRYRUN' in content or 'dryrun' in content:
                     dryrun_found = True
                     self.log(f"DRYRUN references found in {file.name}", 'passed')
-            except Exception:
-                # Skip files that can't be read
+            except (OSError, PermissionError, UnicodeDecodeError):
+                # Skip files that can't be read (permissions, encoding issues, etc.)
                 pass
         
         if not dryrun_found:
@@ -306,8 +306,8 @@ class SystemAuditor:
             py_version = sys.version.split()[0]
             self.log(f"Python version: {py_version}", 'info')
             self.add_section('Environment', f"- Python: {py_version}")
-        except Exception:
-            # Skip if version check fails
+        except (AttributeError, IndexError):
+            # Skip if version string format is unexpected
             pass
     
     def audit_ai_coordination(self):
