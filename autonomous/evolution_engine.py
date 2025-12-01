@@ -49,6 +49,13 @@ try:
 except ImportError:
     ENDPOINTS_AVAILABLE = False
 
+# Import architecture awareness for system self-understanding
+try:
+    from autonomous.architecture_awareness import ArchitectureMap, inject_architecture_awareness
+    ARCH_AWARE = True
+except ImportError:
+    ARCH_AWARE = False
+
 BASE_DIR = Path("/root/hands-off-engine")
 STATE_DIR = BASE_DIR / "state"
 
@@ -145,6 +152,8 @@ class EvolutionEngine:
         self.actuators = ActuatorHub() if ACTUATORS_AVAILABLE else None
         # Initialize process cycler for endpoint execution with feedback
         self.process_cycler = ProcessCycler() if ENDPOINTS_AVAILABLE else None
+        # Initialize architecture awareness for system self-understanding
+        self.architecture = ArchitectureMap() if ARCH_AWARE else None
 
     def _load_state(self) -> Dict:
         if EVOLUTION_STATE.exists():
@@ -243,6 +252,20 @@ class EvolutionEngine:
             intel["system_health"] = "stable"
         else:
             intel["system_health"] = "critical"
+
+        # Architecture awareness - understand system structure
+        if self.architecture:
+            try:
+                arch_health = self.architecture.get_system_health()
+                intel["architecture"] = {
+                    "components_healthy": sum(1 for c in arch_health.get("components", {}).values() if c.get("exists")),
+                    "total_components": len(arch_health.get("components", {})),
+                }
+                # Get available external connections
+                external = self.architecture.architecture.get("external_connections", {})
+                intel["external_connections"] = list(external.keys())
+            except:
+                pass
 
         return intel
 
