@@ -1,0 +1,111 @@
+name: ✨ Feature Request
+description: Suggest a new feature or enhancement
+title: "[Feature]: "
+labels: ["enhancement", "needs-triage"]
+assignees:
+  - yaya1738
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! Please provide as much detail as possible.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature Description
+      description: A clear and concise description of the feature
+      placeholder: Describe the feature...
+    validations:
+      required: true
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Explain the problem this feature would solve or the value it would add
+      placeholder: |
+        **Problem:** Currently, users have to...
+        **Solution:** This feature would allow...
+        **Value:** This would improve...
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-implementation
+    attributes:
+      label: Proposed Implementation
+      description: If you have ideas on how to implement this, share them here
+      placeholder: |
+        This could be implemented by:
+        1. Adding a new module...
+        2. Modifying existing...
+        3. Integrating with...
+    validations:
+      required: false
+
+  - type: dropdown
+    id: component
+    attributes:
+      label: Component
+      description: Which component would this feature affect?
+      options:
+        - Alpha (edge detection)
+        - Decider (decision making)
+        - Executor (trade execution)
+        - Fetchers (data fetching)
+        - AI coordination
+        - Automation/CI
+        - Documentation
+        - Infrastructure
+        - New component
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How important is this feature?
+      options:
+        - Critical (blocking autonomous operation)
+        - High (significant value add)
+        - Medium (nice to have)
+        - Low (future enhancement)
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+      description: Have you considered any alternative solutions or workarounds?
+      options:
+        - label: I've considered alternatives and this is the best approach
+          required: false
+        - label: There's a workaround but it's not ideal
+          required: false
+        - label: No alternatives exist
+          required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, screenshots, or examples
+      placeholder: Links to similar features, example code, etc.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Checklist
+      options:
+        - label: This feature aligns with the Hands-Off Engine philosophy (autonomous operation)
+          required: true
+        - label: I've checked that this feature doesn't already exist
+          required: true
+        - label: I've considered the security implications (if applicable)
+          required: false

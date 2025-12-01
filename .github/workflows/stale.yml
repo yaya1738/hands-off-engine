@@ -1,0 +1,77 @@
+name: Stale Issue Management
+
+# Mark and close stale issues and PRs to keep the repo clean
+on:
+  schedule:
+    # Run daily at 00:00 UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch:  # Allow manual triggers
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Mark/close stale issues and PRs
+        uses: actions/stale@v9
+        with:
+          # General settings
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          days-before-stale: 30
+          days-before-close: 7
+          
+          # Stale issue settings
+          stale-issue-message: |
+            This issue has been automatically marked as stale because it has not had recent activity for 30 days.
+            
+            It will be closed in 7 days if no further activity occurs.
+            
+            If this issue is still relevant:
+            - Comment to keep it open
+            - Add the `priority-high` or `agent-coordination` label to exempt it
+            
+            Thank you for your contribution!
+          stale-issue-label: 'stale'
+          close-issue-message: |
+            This issue was automatically closed due to inactivity.
+            
+            If this issue is still relevant, please reopen it or create a new issue with updated information.
+          
+          # Stale PR settings
+          stale-pr-message: |
+            This pull request has been automatically marked as stale because it has not had recent activity for 30 days.
+            
+            It will be closed in 7 days if no further activity occurs.
+            
+            If this PR is still relevant:
+            - Push new commits or comment to keep it open
+            - Add the `priority-high` label to exempt it
+            
+            Thank you for your contribution!
+          stale-pr-label: 'stale'
+          close-pr-message: |
+            This pull request was automatically closed due to inactivity.
+            
+            If this PR is still relevant, please rebase and reopen it or create a new PR.
+          
+          # Labels to exempt from stale marking
+          exempt-issue-labels: 'agent-coordination,priority-high,priority-critical,pinned,security'
+          exempt-pr-labels: 'priority-high,priority-critical,pinned,security,work-in-progress'
+          
+          # Milestones to exempt
+          exempt-milestones: true
+          
+          # Other settings
+          operations-per-run: 100
+          remove-stale-when-updated: true
+          ascending: false  # Process newest first
+
+      - name: Report stale cleanup summary
+        if: always()
+        run: |
+          echo "✅ Stale issue/PR cleanup completed"
+          echo "Timestamp: $(date -u)"

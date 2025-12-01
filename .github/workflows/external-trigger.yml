@@ -1,0 +1,116 @@
+name: External Trigger Handler
+
+# Listen for repository_dispatch events from external systems
+# This allows Termux/DO droplet to trigger GitHub actions
+
+on:
+  repository_dispatch:
+    types: 
+      - health_check
+      - sync_request
+      - emergency_stop
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+jobs:
+  handle-trigger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Handle health_check event
+        if: github.event.action == 'health_check'
+        run: |
+          echo "Health check requested by ${{ github.event.client_payload.source || 'unknown' }}"
+          
+          # Trigger the health check workflow
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/actions/workflows/scheduled-health.yml/dispatches \
+            -d '{"ref":"main"}'
+          
+          echo "✅ Health check workflow triggered"
+
+      - name: Handle sync_request event
+        if: github.event.action == 'sync_request'
+        run: |
+          echo "Sync request from ${{ github.event.client_payload.source || 'unknown' }}"
+          
+          # Create coordination message
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          mkdir -p ai/coordination
+          
+          cat >> ai/coordination/messages.jsonl << EOF
+          {"timestamp": "$TIMESTAMP", "from": "${{ github.event.client_payload.source || 'external' }}", "to": "all", "type": "sync_request", "priority": "high", "message": "External sync requested", "details": ${{ toJSON(github.event.client_payload) }}}
+          EOF
+          
+          # Commit the message
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add ai/coordination/messages.jsonl
+          git diff --staged --quiet || git commit -m "External sync request [automated]"
+          git push || echo "No changes to push"
+          
+          echo "✅ Sync request logged to coordination messages"
+
+      - name: Handle emergency_stop event
+        if: github.event.action == 'emergency_stop'
+        run: |
+          echo "🚨 EMERGENCY STOP triggered by ${{ github.event.client_payload.source || 'unknown' }}"
+          echo "Reason: ${{ github.event.client_payload.reason || 'Not specified' }}"
+          
+          # Create urgent coordination message
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          mkdir -p ai/coordination
+          
+          cat >> ai/coordination/messages.jsonl << EOF
+          {"timestamp": "$TIMESTAMP", "from": "${{ github.event.client_payload.source || 'external' }}", "to": "all", "type": "emergency_stop", "priority": "critical", "message": "EMERGENCY STOP: ${{ github.event.client_payload.reason || 'Emergency stop requested' }}", "details": ${{ toJSON(github.event.client_payload) }}}
+          EOF
+          
+          # Create an issue for tracking
+          gh issue create \
+            --title "🚨 Emergency Stop Triggered" \
+            --body "**Source:** ${{ github.event.client_payload.source || 'Unknown' }}
+          
+          **Reason:** ${{ github.event.client_payload.reason || 'Not specified' }}
+          
+          **Timestamp:** $TIMESTAMP
+          
+          **Payload:**
+          \`\`\`json
+          ${{ toJSON(github.event.client_payload) }}
+          \`\`\`
+          
+          **Action Required:** Investigate and resolve the emergency condition before resuming operations." \
+            --label "emergency,priority-critical" || echo "Failed to create issue"
+          
+          # Commit the message
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add ai/coordination/messages.jsonl
+          git diff --staged --quiet || git commit -m "EMERGENCY STOP [automated]"
+          git push || echo "No changes to push"
+          
+          echo "🚨 Emergency stop logged and issue created"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Log unknown event types
+        if: github.event.action != 'health_check' && github.event.action != 'sync_request' && github.event.action != 'emergency_stop'
+        run: |
+          echo "⚠️  Unknown repository_dispatch event type: ${{ github.event.action }}"
+          echo "Payload: ${{ toJSON(github.event.client_payload) }}"
+
+      - name: Report handler summary
+        if: always()
+        run: |
+          echo "## External Trigger Handler Summary"
+          echo "- Event type: ${{ github.event.action }}"
+          echo "- Source: ${{ github.event.client_payload.source || 'unknown' }}"
+          echo "- Timestamp: $(date -u)"

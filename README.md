@@ -1,5 +1,9 @@
 # Hands-Off Engine
 
+[![CI Tests](https://github.com/yaya1738/hands-off-engine/actions/workflows/ci.yml/badge.svg)](https://github.com/yaya1738/hands-off-engine/actions/workflows/ci.yml)
+[![Pre-commit Checks](https://github.com/yaya1738/hands-off-engine/actions/workflows/pre-commit.yml/badge.svg)](https://github.com/yaya1738/hands-off-engine/actions/workflows/pre-commit.yml)
+[![Health Check](https://github.com/yaya1738/hands-off-engine/actions/workflows/scheduled-health.yml/badge.svg)](https://github.com/yaya1738/hands-off-engine/actions/workflows/scheduled-health.yml)
+
 This repository is the canonical codebase for my "Hands-Off" personal finance, trading,
 and automation engine. It is designed to be driven primarily by AI coding agents
 (LLMs) with minimal manual involvement.

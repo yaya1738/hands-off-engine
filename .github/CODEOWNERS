@@ -1,0 +1,26 @@
+# Default owners for everything
+* @yaya1738
+
+# Critical files require explicit review (not auto-merged)
+executor/ho_executor.py @yaya1738
+executor/ho_executor_plan.py @yaya1738
+state/risk_profile.json @yaya1738
+.github/workflows/auto-merge.yml @yaya1738
+
+# State files
+state/*.json @yaya1738
+state/*.env @yaya1738
+
+# Security and secrets
+.env* @yaya1738
+**/secrets/** @yaya1738
+vault.json @yaya1738
+
+# AI coordination and instructions
+.github/copilot-instructions.md @yaya1738
+.claude/instructions.md @yaya1738
+ai/coordination/ @yaya1738
+
+# Infrastructure and deployment
+.github/workflows/ @yaya1738
+infrastructure/ @yaya1738

@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 💬 Agent Command
+    url: https://github.com/yaya1738/hands-off-engine/issues/new?template=agent_task.yml
+    about: Use `/plan` or `/task` commands for quick agent coordination
+  - name: 📚 Documentation
+    url: https://github.com/yaya1738/hands-off-engine/tree/main/docs
+    about: Browse project documentation
+  - name: 🔧 AI Coordination
+    url: https://github.com/yaya1738/hands-off-engine/tree/main/ai/coordination
+    about: View AI agent coordination messages

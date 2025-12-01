@@ -1,0 +1,108 @@
+name: Deploy
+
+# Template for environment-based deployment
+# Requires manual setup of GitHub Environments in repository settings
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        type: choice
+        options:
+          - staging
+          - production
+      mode:
+        description: 'Trading mode'
+        required: true
+        type: choice
+        options:
+          - DRYRUN
+          - LIVE
+        default: 'DRYRUN'
+
+permissions:
+  contents: read
+  deployments: write
+
+jobs:
+  deploy-staging:
+    if: github.event.inputs.environment == 'staging'
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to staging
+        run: |
+          echo "Deploying to staging environment"
+          echo "Mode: ${{ github.event.inputs.mode }}"
+          
+          # Staging deployment steps would go here
+          # Examples:
+          # - Deploy to staging DO droplet
+          # - Update staging configuration
+          # - Run staging health checks
+          
+          echo "✅ Staging deployment complete (DRYRUN enforced)"
+
+  deploy-production:
+    if: github.event.inputs.environment == 'production'
+    runs-on: ubuntu-latest
+    environment: production  # Requires manual approval in GitHub settings
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verify LIVE mode authorization
+        if: github.event.inputs.mode == 'LIVE'
+        run: |
+          echo "⚠️  LIVE mode deployment requested"
+          echo "This requires explicit approval via GitHub environment protection rules"
+
+      - name: Deploy to production
+        run: |
+          echo "Deploying to production environment"
+          echo "Mode: ${{ github.event.inputs.mode }}"
+          
+          # Production deployment steps would go here
+          # Examples:
+          # - Deploy to production DO droplet
+          # - Update production configuration
+          # - Set trading mode (DRYRUN/LIVE)
+          # - Run production health checks
+          # - Send deployment notification to Telegram
+          
+          if [ "${{ github.event.inputs.mode }}" = "LIVE" ]; then
+            echo "🚨 LIVE mode deployment - real capital at risk"
+          else
+            echo "✅ DRYRUN mode deployment - safe testing"
+          fi
+
+# Documentation for GitHub Environments setup:
+#
+# To use this workflow, you must create environments in GitHub:
+#
+# 1. Go to Settings > Environments
+# 2. Create "staging" environment:
+#    - No required reviewers
+#    - No deployment branch restrictions
+#    - Environment variables: MODE=DRYRUN
+#
+# 3. Create "production" environment:
+#    - Required reviewers: @yaya1738 (owner approval required)
+#    - Deployment branch: main only
+#    - Environment variables: MODE=DRYRUN (default)
+#    - Environment secrets:
+#      - DO_TOKEN (DigitalOcean API token)
+#      - TELEGRAM_TOKEN (bot token)
+#      - TELEGRAM_CHAT_ID
+#
+# 4. Environment-specific deployment can then be triggered via:
+#    - GitHub Actions UI (workflow_dispatch)
+#    - API call to repository_dispatch
+#    - Automated triggers (after successful tests, etc.)

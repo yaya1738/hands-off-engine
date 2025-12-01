@@ -1,0 +1,148 @@
+name: 🤖 Agent Task
+description: Task for AI agents (Copilot, Claude, ChatGPT)
+title: "[Agent Task]: "
+labels: ["agent-task", "automation"]
+assignees: []
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This template is for tasks that should be handled by AI coding agents.
+        The task will be routed to the appropriate agent based on priority and type.
+
+  - type: textarea
+    id: task-description
+    attributes:
+      label: Task Description
+      description: Clear description of what needs to be done
+      placeholder: |
+        Implement X feature...
+        Fix Y bug in Z component...
+        Refactor A to improve B...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority Level
+      description: How urgent is this task?
+      options:
+        - P0 - Critical (blocks autonomous operation)
+        - P1 - High (important for system health)
+        - P2 - Medium (improvement, not urgent)
+        - P3 - Low (nice to have)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: target-agent
+    attributes:
+      label: Target Agent
+      description: Which AI agent should handle this? (Or "Auto" to let system decide)
+      options:
+        - Auto (system decides)
+        - Copilot (best for PRs and code changes)
+        - Claude Code (best for complex refactoring)
+        - ChatGPT (best for research and planning)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: task-type
+    attributes:
+      label: Task Type
+      description: What kind of task is this?
+      options:
+        - Code implementation
+        - Bug fix
+        - Refactoring
+        - Testing
+        - Documentation
+        - Research/Analysis
+        - Infrastructure/CI
+        - Monitoring/Alerts
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context & Links
+      description: |
+        Provide context, links to related files, issues, or documentation
+      placeholder: |
+        Related files:
+        - `alpha/sync_polymarket_model.py`
+        - `docs/SYSTEM_BLUEPRINT.md`
+        
+        Related issues: #123
+        
+        Background: This is needed because...
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know when this task is complete?
+      placeholder: |
+        - [ ] Tests pass
+        - [ ] Documentation updated
+        - [ ] Feature works as described
+        - [ ] No regressions introduced
+    validations:
+      required: true
+
+  - type: textarea
+    id: constraints
+    attributes:
+      label: Constraints & Requirements
+      description: Any specific requirements or constraints for this task?
+      placeholder: |
+        - Must maintain DRYRUN safety
+        - Must not break existing API
+        - Must follow DEVELOPMENT_STANDARDS.md
+        - Must work on both Termux and DO droplet
+    validations:
+      required: false
+
+  - type: dropdown
+    id: estimated-complexity
+    attributes:
+      label: Estimated Complexity
+      description: Rough estimate of task complexity
+      options:
+        - XS - Trivial (< 1 hour)
+        - S - Simple (1-4 hours)
+        - M - Medium (4-8 hours)
+        - L - Large (1-2 days)
+        - XL - Very Large (> 2 days)
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-Task Checklist
+      description: Verify before agent starts work
+      options:
+        - label: Task is well-defined and actionable
+          required: true
+        - label: Acceptance criteria are clear
+          required: true
+        - label: This follows the zero-touch automation philosophy
+          required: false
+        - label: Related docs are linked (if applicable)
+          required: false
+
+  - type: textarea
+    id: additional-notes
+    attributes:
+      label: Additional Notes
+      description: Any other information for the agent
+      placeholder: Potential gotchas, helpful tips, etc.
+    validations:
+      required: false

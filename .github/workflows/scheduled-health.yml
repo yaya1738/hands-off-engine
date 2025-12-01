@@ -1,0 +1,119 @@
+name: Scheduled Health Check
+
+# Run every 6 hours to monitor system health
+on:
+  schedule:
+    # Run at 0:00, 6:00, 12:00, 18:00 UTC
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # Allow manual triggers
+  repository_dispatch:
+    types: [health_check]
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check critical state files
+        id: check_files
+        run: |
+          echo "Checking for critical state files..."
+          MISSING_FILES=""
+          
+          # Check for important state files
+          STATE_FILES=(
+            "state/knowledge.json"
+            "AI_POLICY.md"
+            "docs/DEVELOPMENT_STANDARDS.md"
+            ".github/workflows/auto-merge.yml"
+          )
+          
+          for file in "${STATE_FILES[@]}"; do
+            if [ ! -f "$file" ]; then
+              MISSING_FILES="${MISSING_FILES}\n- $file"
+              echo "❌ Missing: $file"
+            else
+              echo "✅ Found: $file"
+            fi
+          done
+          
+          if [ -n "$MISSING_FILES" ]; then
+            echo "has_missing=true" >> $GITHUB_OUTPUT
+            echo "missing_files<<EOF" >> $GITHUB_OUTPUT
+            echo -e "$MISSING_FILES" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+          else
+            echo "has_missing=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check DO droplet health endpoint
+        id: check_droplet
+        run: |
+          # Try to ping health endpoint if available
+          # Note: This requires DO_HEALTH_URL secret to be configured
+          if [ -n "${{ secrets.DO_HEALTH_URL }}" ]; then
+            echo "Checking DO droplet health..."
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" "${{ secrets.DO_HEALTH_URL }}" || echo "000")
+            echo "status=$STATUS" >> $GITHUB_OUTPUT
+            
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ DO droplet is healthy (HTTP $STATUS)"
+            else
+              echo "⚠️  DO droplet returned HTTP $STATUS"
+            fi
+          else
+            echo "No DO_HEALTH_URL configured, skipping droplet check"
+            echo "status=skipped" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Post to coordination messages
+        if: steps.check_files.outputs.has_missing == 'true' || (steps.check_droplet.outputs.status != '200' && steps.check_droplet.outputs.status != 'skipped')
+        run: |
+          # Create coordination message if issues detected
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Create coordination directory if it doesn't exist
+          mkdir -p ai/coordination
+          
+          # Append to messages.jsonl
+          cat >> ai/coordination/messages.jsonl << EOF
+          {"timestamp": "$TIMESTAMP", "from": "github-health-check", "to": "all", "type": "alert", "priority": "medium", "message": "Health check detected issues", "details": {"missing_files": "${{ steps.check_files.outputs.has_missing }}", "droplet_status": "${{ steps.check_droplet.outputs.status }}"}}
+          EOF
+          
+          echo "✅ Posted health alert to coordination messages"
+
+      - name: Commit coordination message
+        if: steps.check_files.outputs.has_missing == 'true' || (steps.check_droplet.outputs.status != '200' && steps.check_droplet.outputs.status != 'skipped')
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git add ai/coordination/messages.jsonl
+          git diff --staged --quiet || git commit -m "Health check: Posted coordination alert [automated]"
+          git push || echo "No changes to push"
+
+      - name: Trigger repository dispatch for severe issues
+        if: steps.check_files.outputs.has_missing == 'true'
+        run: |
+          # For severe issues, trigger repository_dispatch to notify other systems
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/dispatches \
+            -d '{"event_type":"health_alert","client_payload":{"severity":"high","missing_files":true}}'
+
+      - name: Report health summary
+        if: always()
+        run: |
+          echo "## Health Check Summary"
+          echo "- Critical files: ${{ steps.check_files.outputs.has_missing == 'true' && '⚠️  Some missing' || '✅ All present' }}"
+          echo "- DO droplet: ${{ steps.check_droplet.outputs.status == '200' && '✅ Healthy' || steps.check_droplet.outputs.status == 'skipped' && '⊘ Not configured' || '⚠️  Issue detected' }}"
+          echo "- Timestamp: $(date -u)"

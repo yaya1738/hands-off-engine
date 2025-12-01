@@ -1,0 +1,77 @@
+name: Discussion to Issue
+
+# Convert GitHub Discussions to Issues when marked as actionable
+on:
+  discussion:
+    types: [labeled]
+
+permissions:
+  issues: write
+  discussions: write
+
+jobs:
+  convert-to-issue:
+    runs-on: ubuntu-latest
+    if: github.event.label.name == 'actionable'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create issue from discussion
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const discussion = context.payload.discussion;
+            
+            // Extract discussion details
+            const title = `[From Discussion] ${discussion.title}`;
+            const body = `
+            **Original Discussion:** ${discussion.html_url}
+            **Author:** @${discussion.user.login}
+            **Category:** ${discussion.category.name}
+            
+            ---
+            
+            ${discussion.body}
+            
+            ---
+            
+            *This issue was automatically created from a discussion marked as actionable.*
+            `;
+            
+            // Determine labels based on discussion category
+            const labels = ['from-discussion'];
+            const category = discussion.category.name.toLowerCase();
+            
+            if (category.includes('bug') || category.includes('issue')) {
+              labels.push('bug');
+            } else if (category.includes('feature') || category.includes('idea')) {
+              labels.push('enhancement');
+            } else if (category.includes('question') || category.includes('help')) {
+              labels.push('question');
+            }
+            
+            // Create the issue
+            const issue = await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: labels
+            });
+            
+            console.log(`Created issue #${issue.data.number} from discussion #${discussion.number}`);
+            
+            // Comment on the discussion with link to issue
+            await github.rest.discussions.createDiscussionComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              discussion_number: discussion.number,
+              body: `✅ This discussion has been converted to issue #${issue.data.number} for tracking.`
+            });
+
+      - name: Report conversion
+        if: always()
+        run: |
+          echo "Discussion #${{ github.event.discussion.number }} converted to issue"

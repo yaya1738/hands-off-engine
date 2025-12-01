@@ -1,0 +1,135 @@
+name: Project Automation
+
+# Automatically manage GitHub Projects board
+# Note: Requires a GitHub Project to be created manually in the repository
+
+on:
+  issues:
+    types: [opened, labeled, closed, reopened]
+  pull_request:
+    types: [opened, labeled, closed, merged]
+
+permissions:
+  issues: write
+  pull-requests: write
+  repository-projects: write
+
+jobs:
+  manage-project:
+    runs-on: ubuntu-latest
+    # Note: This workflow requires a project to exist. If no project exists, it will skip gracefully.
+
+    steps:
+      - name: Add new issues to project
+        if: github.event.action == 'opened' && github.event_name == 'issues'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Note: This is a template. You'll need to:
+            // 1. Create a GitHub Project in your repository
+            // 2. Get the project ID
+            // 3. Update this script with the actual project ID
+            
+            console.log('New issue created: #' + context.issue.number);
+            console.log('To enable project automation, create a GitHub Project and update this workflow with its ID');
+            
+            // Example of how to add to project (requires project ID):
+            // await github.graphql(`
+            //   mutation {
+            //     addProjectV2ItemById(input: {projectId: "PROJECT_ID", contentId: "ISSUE_NODE_ID"}) {
+            //       item { id }
+            //     }
+            //   }
+            // `);
+
+      - name: Move issues based on labels
+        if: github.event.action == 'labeled' && github.event_name == 'issues'
+        run: |
+          echo "Issue #${{ github.event.issue.number }} labeled with: ${{ github.event.label.name }}"
+          
+          # Template for label-based column movement
+          case "${{ github.event.label.name }}" in
+            "in-progress")
+              echo "Would move to: In Progress column"
+              ;;
+            "blocked")
+              echo "Would move to: Blocked column"
+              ;;
+            "needs-review")
+              echo "Would move to: Review column"
+              ;;
+            *)
+              echo "No specific column for this label"
+              ;;
+          esac
+
+      - name: Move PRs when merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        run: |
+          echo "PR #${{ github.event.pull_request.number }} was merged"
+          echo "Would move related issues to: Done column"
+
+      - name: Close related issues when PR merged
+        if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            
+            // Extract issue references from PR body (e.g., "Closes #123" or "Fixes #456")
+            const issueRegex = /(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)/gi;
+            const matches = [...(pr.body || '').matchAll(issueRegex)];
+            
+            for (const match of matches) {
+              const issueNumber = parseInt(match[1]);
+              console.log(`PR references issue #${issueNumber}`);
+              
+              try {
+                await github.rest.issues.createComment({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: issueNumber,
+                  body: `✅ Fixed by PR #${pr.number}`
+                });
+                console.log(`Added comment to issue #${issueNumber}`);
+              } catch (error) {
+                console.log(`Could not comment on issue #${issueNumber}: ${error.message}`);
+              }
+            }
+
+      - name: Report automation summary
+        if: always()
+        run: |
+          echo "## Project Automation Summary"
+          echo "- Event: ${{ github.event_name }}"
+          echo "- Action: ${{ github.event.action }}"
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            echo "- Issue: #${{ github.event.issue.number }}"
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "- PR: #${{ github.event.pull_request.number }}"
+          fi
+
+# Documentation for GitHub Projects setup:
+#
+# To fully enable this workflow:
+#
+# 1. Create a GitHub Project:
+#    - Go to repository Projects tab
+#    - Click "New project"
+#    - Choose "Board" template
+#    - Create columns: Backlog, In Progress, Blocked, Review, Done
+#
+# 2. Get Project ID:
+#    - Open the project
+#    - Project ID is in the URL: /projects/<ID>
+#
+# 3. Update this workflow:
+#    - Replace PROJECT_ID placeholders with actual ID
+#    - Enable GraphQL mutations for project management
+#
+# 4. Configure automation rules:
+#    - Issues with "in-progress" label → In Progress
+#    - Issues with "blocked" label → Blocked
+#    - PRs with "needs-review" label → Review
+#    - Merged PRs → Done
+#    - Closed issues → Done

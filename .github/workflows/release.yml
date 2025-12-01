@@ -1,0 +1,160 @@
+name: Release Automation
+
+# Automated release management using conventional commits
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type (major, minor, patch)'
+        required: false
+        type: choice
+        options:
+          - auto
+          - major
+          - minor
+          - patch
+        default: 'auto'
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    # Only run on main branch
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for changelog generation
+
+      - name: Determine version bump
+        id: version
+        run: |
+          # Get the latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Extract version numbers
+          CURRENT_VERSION=${LATEST_TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          
+          # Determine version bump based on commits since last tag
+          RELEASE_TYPE="${{ github.event.inputs.release_type }}"
+          
+          if [ "$RELEASE_TYPE" = "auto" ] || [ -z "$RELEASE_TYPE" ]; then
+            # Auto-detect from conventional commits
+            if git log $LATEST_TAG..HEAD --format=%s | grep -q "^feat!:\|^fix!:\|^BREAKING CHANGE:"; then
+              RELEASE_TYPE="major"
+            elif git log $LATEST_TAG..HEAD --format=%s | grep -q "^feat:"; then
+              RELEASE_TYPE="minor"
+            elif git log $LATEST_TAG..HEAD --format=%s | grep -q "^fix:"; then
+              RELEASE_TYPE="patch"
+            else
+              # Default to patch if no conventional commits found
+              RELEASE_TYPE="patch"
+            fi
+          fi
+          
+          echo "Release type: $RELEASE_TYPE"
+          
+          # Calculate new version
+          if [ "$RELEASE_TYPE" = "major" ]; then
+            NEW_VERSION="$((MAJOR + 1)).0.0"
+          elif [ "$RELEASE_TYPE" = "minor" ]; then
+            NEW_VERSION="$MAJOR.$((MINOR + 1)).0"
+          else
+            NEW_VERSION="$MAJOR.$MINOR.$((PATCH + 1))"
+          fi
+          
+          echo "new_version=$NEW_VERSION" >> $GITHUB_OUTPUT
+          echo "release_type=$RELEASE_TYPE" >> $GITHUB_OUTPUT
+          echo "latest_tag=$LATEST_TAG" >> $GITHUB_OUTPUT
+
+      - name: Check if release needed
+        id: check_release
+        run: |
+          # Check if there are new commits since last tag
+          COMMITS_SINCE_TAG=$(git rev-list ${{ steps.version.outputs.latest_tag }}..HEAD --count)
+          echo "Commits since last tag: $COMMITS_SINCE_TAG"
+          
+          if [ "$COMMITS_SINCE_TAG" -gt 0 ]; then
+            echo "needs_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "needs_release=false" >> $GITHUB_OUTPUT
+            echo "No new commits since last release, skipping"
+          fi
+
+      - name: Generate changelog
+        if: steps.check_release.outputs.needs_release == 'true'
+        id: changelog
+        run: |
+          # Generate changelog from conventional commits
+          CHANGELOG_FILE="CHANGELOG_v${{ steps.version.outputs.new_version }}.md"
+          
+          echo "# Release v${{ steps.version.outputs.new_version }}" > $CHANGELOG_FILE
+          echo "" >> $CHANGELOG_FILE
+          echo "**Release Type:** ${{ steps.version.outputs.release_type }}" >> $CHANGELOG_FILE
+          echo "**Date:** $(date -u +"%Y-%m-%d")" >> $CHANGELOG_FILE
+          echo "" >> $CHANGELOG_FILE
+          
+          # Parse commits by type
+          echo "## Changes" >> $CHANGELOG_FILE
+          echo "" >> $CHANGELOG_FILE
+          
+          # Features
+          if git log ${{ steps.version.outputs.latest_tag }}..HEAD --format=%s | grep -q "^feat:"; then
+            echo "### ✨ Features" >> $CHANGELOG_FILE
+            git log ${{ steps.version.outputs.latest_tag }}..HEAD --format="- %s" | grep "^- feat:" | sed 's/^- feat: /- /' >> $CHANGELOG_FILE
+            echo "" >> $CHANGELOG_FILE
+          fi
+          
+          # Bug fixes
+          if git log ${{ steps.version.outputs.latest_tag }}..HEAD --format=%s | grep -q "^fix:"; then
+            echo "### 🐛 Bug Fixes" >> $CHANGELOG_FILE
+            git log ${{ steps.version.outputs.latest_tag }}..HEAD --format="- %s" | grep "^- fix:" | sed 's/^- fix: /- /' >> $CHANGELOG_FILE
+            echo "" >> $CHANGELOG_FILE
+          fi
+          
+          # Other changes
+          echo "### 📝 Other Changes" >> $CHANGELOG_FILE
+          git log ${{ steps.version.outputs.latest_tag }}..HEAD --format="- %s" | grep -v "^- feat:\|^- fix:" >> $CHANGELOG_FILE || echo "- Minor updates" >> $CHANGELOG_FILE
+          
+          echo "changelog_file=$CHANGELOG_FILE" >> $GITHUB_OUTPUT
+
+      - name: Create Git tag
+        if: steps.check_release.outputs.needs_release == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          git tag -a "v${{ steps.version.outputs.new_version }}" -m "Release v${{ steps.version.outputs.new_version }}"
+          git push origin "v${{ steps.version.outputs.new_version }}"
+
+      - name: Create GitHub Release
+        if: steps.check_release.outputs.needs_release == 'true'
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.version.outputs.new_version }}
+          release_name: Release v${{ steps.version.outputs.new_version }}
+          body_path: ${{ steps.changelog.outputs.changelog_file }}
+          draft: false
+          prerelease: false
+
+      - name: Report release summary
+        if: always()
+        run: |
+          if [ "${{ steps.check_release.outputs.needs_release }}" = "true" ]; then
+            echo "✅ Created release v${{ steps.version.outputs.new_version }}"
+            echo "Release type: ${{ steps.version.outputs.release_type }}"
+          else
+            echo "⊘ No release needed (no new commits)"
+          fi
