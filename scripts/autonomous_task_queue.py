@@ -18,8 +18,9 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
-except ImportError:
+except (ImportError, PermissionError, OSError):
     MASTER = "Yair Siegel"
+    def get_master(): return MASTER
 
 
 import json
@@ -63,7 +64,8 @@ class AutonomousTaskQueue:
         description: str,
         priority: str = 'normal',
         source: str = 'orchestrator',
-        metadata: Optional[Dict] = None
+        metadata: Optional[Dict] = None,
+        prerequisites: Optional[List[str]] = None
     ) -> str:
         """
         Add a new autonomous task.
@@ -74,6 +76,7 @@ class AutonomousTaskQueue:
             priority: 'critical', 'high', 'normal', 'low'
             source: What created this task (orchestrator, healthcheck, etc.)
             metadata: Additional context
+            prerequisites: List of task IDs that must be completed first
 
         Returns:
             task_id
@@ -87,31 +90,49 @@ class AutonomousTaskQueue:
             'priority': priority,
             'source': source,
             'created_at': datetime.now(timezone.utc).isoformat(),
-            'metadata': metadata or {}
+            'metadata': metadata or {},
+            'prerequisites': prerequisites or [],
+            'status': 'pending'
         }
 
         tasks.append(task)
         self.save_queue(tasks)
 
         print(f"✓ Added autonomous task: {title}")
+        if prerequisites:
+            print(f"  Prerequisites: {', '.join(prerequisites)}")
         return task['id']
 
     def get_next_task(self) -> Optional[Dict]:
         """
-        Get highest priority pending task.
+        Get highest priority pending task that has all prerequisites met.
 
         Priority order: critical > high > normal > low
         Within same priority: oldest first
+        Only returns tasks whose prerequisites are completed.
         """
         tasks = self.load_queue()
         if not tasks:
+            return None
+
+        # Get completed task IDs
+        completed_ids = self._get_completed_task_ids()
+
+        # Filter to only tasks with prerequisites met
+        available_tasks = []
+        for task in tasks:
+            prerequisites = task.get('prerequisites', [])
+            if all(prereq_id in completed_ids for prereq_id in prerequisites):
+                available_tasks.append(task)
+
+        if not available_tasks:
             return None
 
         # Sort by priority then age
         priority_order = {'critical': 0, 'high': 1, 'normal': 2, 'low': 3}
 
         sorted_tasks = sorted(
-            tasks,
+            available_tasks,
             key=lambda t: (
                 priority_order.get(t.get('priority', 'normal'), 2),
                 t.get('created_at', '')
@@ -119,6 +140,24 @@ class AutonomousTaskQueue:
         )
 
         return sorted_tasks[0] if sorted_tasks else None
+    
+    def _get_completed_task_ids(self) -> set:
+        """Get set of completed task IDs from completion log"""
+        if not self.completed_log.exists():
+            return set()
+        
+        completed_ids = set()
+        with open(self.completed_log) as f:
+            for line in f:
+                try:
+                    record = json.loads(line)
+                    task_id = record.get('task', {}).get('id')
+                    if task_id:
+                        completed_ids.add(task_id)
+                except json.JSONDecodeError:
+                    continue
+        
+        return completed_ids
 
     def get_all_tasks(self) -> List[Dict]:
         """Get all pending tasks"""
@@ -164,6 +203,29 @@ class AutonomousTaskQueue:
 
         print(f"✓ Completed task: {task['title']}")
 
+    def get_blocked_tasks(self) -> List[Dict]:
+        """
+        Get tasks that are blocked by unmet prerequisites
+        
+        Returns:
+            List of tasks with their missing prerequisites
+        """
+        tasks = self.load_queue()
+        completed_ids = self._get_completed_task_ids()
+        blocked = []
+        
+        for task in tasks:
+            prerequisites = task.get('prerequisites', [])
+            if prerequisites:
+                missing = [p for p in prerequisites if p not in completed_ids]
+                if missing:
+                    blocked.append({
+                        **task,
+                        'missing_prerequisites': missing
+                    })
+        
+        return blocked
+
     def remove_task(self, task_id: str):
         """Remove task from queue without completing (if no longer relevant)"""
         tasks = self.load_queue()
@@ -182,6 +244,16 @@ class AutonomousTaskQueue:
         print(f"\n{'='*60}")
         print(f"AUTONOMOUS TASK QUEUE ({len(tasks)} pending)")
         print('='*60)
+        
+        # Check for blocked tasks
+        blocked_tasks = self.get_blocked_tasks()
+        if blocked_tasks:
+            print(f"\n⚠️  BLOCKED TASKS ({len(blocked_tasks)}):")
+            for task in blocked_tasks:
+                print(f"\n  [{task['id'][:8]}...] {task['title']}")
+                print(f"  Missing prerequisites: {', '.join(task['missing_prerequisites'][:3])}")
+                if len(task['missing_prerequisites']) > 3:
+                    print(f"  ... and {len(task['missing_prerequisites']) - 3} more")
 
         # Group by priority
         for priority in ['critical', 'high', 'normal', 'low']:
@@ -191,9 +263,15 @@ class AutonomousTaskQueue:
                 print(f"\n{priority.upper()} PRIORITY:")
                 for task in priority_tasks:
                     age = self._get_task_age(task)
-                    print(f"\n  [{task['id'][:8]}...] {task['title']}")
+                    is_blocked = task['id'] in [b['id'] for b in blocked_tasks]
+                    status_icon = "⏸️" if is_blocked else "▶️"
+                    
+                    print(f"\n  {status_icon} [{task['id'][:8]}...] {task['title']}")
                     print(f"  Source: {task['source']} | Age: {age}")
                     print(f"  {task['description'][:150]}...")
+                    
+                    if task.get('prerequisites'):
+                        print(f"  Prerequisites: {len(task['prerequisites'])} required")
 
         print(f"\n{'='*60}\n")
 

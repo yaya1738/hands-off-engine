@@ -32,7 +32,8 @@
       "id": "multi-agent-coordination-established",
       "assigned_to": "claude-code",
       "status": "completed",
-      "description": "Establish coordination protocol alongside existing autonomous system"
+      "description": "Establish coordination protocol alongside existing autonomous system",
+      "prerequisites": []
     },
     {
       "id": "zero-touch-architecture",
@@ -46,7 +47,8 @@
         "coordination-agent",
         "automated-reporting"
       ],
-      "completed_at": "2025-11-23T07:11:00Z"
+      "completed_at": "2025-11-23T07:11:00Z",
+      "prerequisites": []
     },
     {
       "id": "alpha-model-optimization",
@@ -54,13 +56,15 @@
       "status": "completed",
       "description": "Optimize alpha model - reduced selection rate from 90%+ to 40-50%",
       "priority": "medium",
-      "completed_at": "2025-11-23T07:25:00Z"
+      "completed_at": "2025-11-23T07:25:00Z",
+      "prerequisites": []
     },
     {
       "id": "system-health-monitoring",
       "assigned_to": "self-healing-agent",
       "status": "ongoing",
-      "description": "Continuous health monitoring and optimization (running 24/7)"
+      "description": "Continuous health monitoring and optimization (running 24/7)",
+      "prerequisites": []
     },
     {
       "id": "user-protocol-alignment",
@@ -74,7 +78,8 @@
         "Align autonomous workflows to Telegram-only user interface",
         "Use GitHub Issues only for agent coordination",
         "Confirm or propose adjustments"
-      ]
+      ],
+      "prerequisites": []
     },
     {
       "id": "pr-consolidation",
@@ -82,14 +87,17 @@
       "status": "in_progress",
       "description": "Merge foundational PRs in correct order: #7 (audit) -> #10 (roadmap) -> #13 (multi-AI)",
       "priority": "high",
-      "started_at": "2025-11-26T12:00:00Z"
+      "started_at": "2025-11-26T12:00:00Z",
+      "prerequisites": [],
+      "notes": "PRs must be merged in dependency order to avoid conflicts"
     },
     {
       "id": "risk-model-v1-documentation",
       "assigned_to": "copilot",
       "status": "pending",
       "description": "Create docs/RISK_MODEL_V1.md to lock minimal safe risk model per Tier 1 roadmap",
-      "priority": "high"
+      "priority": "high",
+      "prerequisites": []
     }
   ],
   "coordination_protocol_version": "1.0-hybrid",
@@ -111,5 +119,15 @@
       "task_handoffs",
       "audit_logging"
     ]
+  },
+  "session_order_enforcement": {
+    "enabled": true,
+    "validation_file": "ai/coordination/session_order.json",
+    "validator_module": "ai.session_order_validator",
+    "enforcement_rules": {
+      "require_prerequisite_completion": true,
+      "allow_parallel_independent_sessions": true,
+      "block_dependency_violations": true
+    }
   }
 }
