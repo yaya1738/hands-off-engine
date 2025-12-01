@@ -17,6 +17,7 @@
   "agent_instruction_files": [
     ".claude/instructions.md",
     ".github/copilot-instructions.md",
+    ".github/.instructions.md",
     "docs/AI_AGENT_LINK_PROTOCOL_v0.1.md"
   ],
   "optional_docs": [
@@ -70,7 +71,9 @@
     "docs/BATCH_11_SPEC.md",
     "docs/BATCH_11_STATUS_REPORT.md",
     "docs/BATCH_17_SPEC.md",
-    "docs/BATCH_17_STATUS_REPORT.md"
+    "docs/BATCH_17_STATUS_REPORT.md",
+    "docs/GITHUB_SPARK_INTEGRATION.md",
+    "docs/TELEGRAM_COPILOT_INTEGRATION.md"
   ],
   "ephemeral_docs_excluded": [
     "Session logs (docs/claude/SESSION_*, ai/SESSION_*)",
