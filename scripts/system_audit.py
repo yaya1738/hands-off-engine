@@ -191,7 +191,8 @@ class SystemAuditor:
         for file in executor_files:
             try:
                 content = file.read_text()
-                if 'DRYRUN' in content or 'dryrun' in content:
+                # Case-insensitive search for DRYRUN references
+                if 'dryrun' in content.lower():
                     dryrun_found = True
                     self.log(f"DRYRUN references found in {file.name}", 'passed')
             except (OSError, PermissionError, UnicodeDecodeError):
@@ -345,14 +346,20 @@ class SystemAuditor:
         ledger_file = self.repo_root / 'ledger.jsonl'
         if ledger_file.exists():
             try:
+                # Count entries without loading all into memory
+                entry_count = 0
+                latest_entry = None
                 with open(ledger_file, 'r') as f:
-                    entries = [json.loads(line) for line in f if line.strip()]
-                self.log(f"Ledger has {len(entries)} entries", 'info')
-                self.add_section('Financial', f"- Ledger entries: {len(entries)}")
+                    for line in f:
+                        if line.strip():
+                            entry_count += 1
+                            latest_entry = json.loads(line)
                 
-                if entries:
-                    latest = entries[-1]
-                    timestamp = latest.get('timestamp', 'unknown')
+                self.log(f"Ledger has {entry_count} entries", 'info')
+                self.add_section('Financial', f"- Ledger entries: {entry_count}")
+                
+                if latest_entry:
+                    timestamp = latest_entry.get('timestamp', 'unknown')
                     self.log(f"Latest ledger entry: {timestamp}", 'info')
             except Exception as e:
                 self.log(f"Error reading ledger: {e}", 'errors')
