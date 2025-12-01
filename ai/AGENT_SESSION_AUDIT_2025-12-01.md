@@ -92,7 +92,7 @@ Make risk limits visible to user in notifications and status reports so they und
 
 **Evidence:**
 
-1. **RISK_MODEL_V1.md (119 lines) - Created 2025-11-26**
+1. **docs/RISK_MODEL_V1.md (119 lines) - Created 2025-11-26**
    - Comprehensive documentation of all risk parameters
    - Clear rationale for each limit
    - Position sizing formula documented
