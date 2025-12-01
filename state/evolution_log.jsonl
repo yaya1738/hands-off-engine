@@ -1,0 +1,22 @@
+{"timestamp": "2025-12-01T00:39:56.969964+00:00", "cycle": 1, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972093+00:00", "cycle": 1, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972240+00:00", "cycle": 1, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972322+00:00", "cycle": 1, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972391+00:00", "cycle": 1, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972450+00:00", "cycle": 1, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972502+00:00", "cycle": 1, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972592+00:00", "cycle": 1, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972862+00:00", "cycle": 1, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:39:56.972993+00:00", "cycle": 1, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:39:57.039953+00:00", "cycle": 1, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.670437+00:00", "cycle": 2, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.671731+00:00", "cycle": 2, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.671840+00:00", "cycle": 2, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.671884+00:00", "cycle": 2, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.671916+00:00", "cycle": 2, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.671945+00:00", "cycle": 2, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.671973+00:00", "cycle": 2, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.672018+00:00", "cycle": 2, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.672093+00:00", "cycle": 2, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.672162+00:00", "cycle": 2, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:40:27.748785+00:00", "cycle": 2, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
