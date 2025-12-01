@@ -1,0 +1,14 @@
+{
+  "cycles": 2,
+  "endpoints": {
+    "conversion": {
+      "executions": 2,
+      "successes": 2
+    }
+  },
+  "last_cycle": {
+    "endpoint": "conversion",
+    "timestamp": "2025-12-01T02:25:00.016733+00:00",
+    "success": true
+  }
+}

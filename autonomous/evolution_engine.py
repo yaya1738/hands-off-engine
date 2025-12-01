@@ -42,6 +42,13 @@ try:
 except ImportError:
     ACTUATORS_AVAILABLE = False
 
+# Import process endpoints for proper cycling
+try:
+    from autonomous.process_endpoints import ProcessCycler, ENDPOINT_REGISTRY
+    ENDPOINTS_AVAILABLE = True
+except ImportError:
+    ENDPOINTS_AVAILABLE = False
+
 BASE_DIR = Path("/root/hands-off-engine")
 STATE_DIR = BASE_DIR / "state"
 
@@ -136,6 +143,8 @@ class EvolutionEngine:
         self.cycle_count = self.state.get("cycles", 0)
         # Initialize actuators for real-world actions
         self.actuators = ActuatorHub() if ACTUATORS_AVAILABLE else None
+        # Initialize process cycler for endpoint execution with feedback
+        self.process_cycler = ProcessCycler() if ENDPOINTS_AVAILABLE else None
 
     def _load_state(self) -> Dict:
         if EVOLUTION_STATE.exists():
@@ -306,18 +315,41 @@ class EvolutionEngine:
         return action, reason
 
     def execute_action(self, action: str) -> bool:
-        """Execute the decided action."""
+        """Execute the decided action via process endpoint cycling."""
         if action not in CAPABILITIES:
             self._log("error", f"Unknown action: {action}")
             return False
 
         cap = CAPABILITIES[action]
 
-        # Handle actuator-based actions
+        # Use process cycler for proper endpoint execution with feedback
+        if self.process_cycler and ENDPOINTS_AVAILABLE and action in ENDPOINT_REGISTRY:
+            self._log("cycle", f"Executing via process endpoint: {action}")
+            result = self.process_cycler.execute_endpoint(action)
+            success = result.get("success", False)
+
+            # Log result with feedback
+            if success:
+                feedback = result.get("feedback", {})
+                self._log("success", f"{cap['name']} completed | feedback: {str(feedback)[:100]}")
+            else:
+                self._log("warning", f"{cap['name']} failed: {result.get('error', 'unknown')}")
+
+            # Store feedback in state for next cycle analysis
+            if result.get("feedback"):
+                self.state["last_feedback"] = {
+                    "action": action,
+                    "feedback": result.get("feedback"),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                }
+
+            return success
+
+        # Fallback: Handle actuator-based actions directly
         if "actuator" in cap:
             return self._execute_actuator_action(action, cap)
 
-        # Handle script-based actions
+        # Fallback: Handle script-based actions directly
         script = BASE_DIR / cap.get("script", "")
 
         if not script.exists():
