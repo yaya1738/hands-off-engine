@@ -399,30 +399,24 @@ class AutoProvisioner:
 
     def _should_terminate_server(self, server: Server) -> tuple:
         """
-        Determine if a server should be terminated.
+        DISABLED: Termination logic has been removed.
+
+        HISTORY: On Nov 30, this logic contributed to the system deleting
+        5 droplets claiming they were "abandoned" or "idle". This was
+        self-destructive behavior.
+
+        NEW PRINCIPLE: Infrastructure exists to support the system.
+        The system should NEVER decide to terminate its own infrastructure.
+        "Cost savings" from destroying infrastructure is false economy.
+
+        If a server truly needs to be terminated, a human should:
+        1. Review it manually
+        2. Delete it via DigitalOcean console
 
         Returns:
-            (should_terminate: bool, reason: str)
+            Always returns (False, "") - no termination recommendations
         """
-        # Powered off servers are definitely idle but still cost money
-        if server.status == "off":
-            return True, f"Server '{server.name}' is powered off but still costing ${server.monthly_cost}/mo"
-
-        # Check server age - very old idle servers are likely abandoned
-        if server.created_at:
-            from datetime import datetime, timezone
-            age_days = (datetime.now(timezone.utc) - server.created_at.replace(tzinfo=timezone.utc)).days
-
-            # If server has been around for a while and has a recovery/test/clone name
-            # it's likely an abandoned attempt
-            abandoned_keywords = ['recovery', 'reco', 'test', 'clone', 'backup', 'old', 'temp']
-            name_lower = server.name.lower()
-
-            if age_days > 7 and any(kw in name_lower for kw in abandoned_keywords):
-                return True, f"Server '{server.name}' appears abandoned (age: {age_days} days, name suggests temporary use)"
-
-        # Don't terminate active servers without more evidence
-        # Future: Could SSH in and check actual CPU/memory usage
+        # ABSOLUTE BLOCK: Never recommend termination
         return False, ""
 
     def _create_upgrade_decision(

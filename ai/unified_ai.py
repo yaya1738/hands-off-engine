@@ -99,8 +99,15 @@ def should_execute(action: str, roi_estimate: float = 0, **kwargs) -> bool:
     if "income" in action.lower() or "revenue" in action.lower():
         return True
 
-    # Cost cutting: execute
+    # Cost cutting: BLOCKED - this led to Nov 30 destruction incident
+    # "cut costs" was auto-approved and deleted 5 droplets
+    # Cost optimization should happen through BETTER USE of resources, not destruction
     if "cut" in action.lower() or "reduce" in action.lower():
+        # Block if it involves infrastructure
+        dangerous_keywords = ["droplet", "server", "infra", "infrastructure", "terminate", "delete", "destroy"]
+        if any(kw in action.lower() for kw in dangerous_keywords):
+            return False  # Block destructive cost cutting
+        # Allow non-destructive cost optimization (e.g., switch to free AI provider)
         return True
 
     # Default: analyze further
@@ -113,7 +120,7 @@ def get_priorities() -> list:
     return directive.get("unified_priorities", [
         "1. Protect and grow capital",
         "2. Generate income streams",
-        "3. Minimize costs without ROI",
+        "3. Optimize resource USAGE (never destroy infrastructure)",
         "4. Automate everything possible",
         "5. Self-improve continuously"
     ])

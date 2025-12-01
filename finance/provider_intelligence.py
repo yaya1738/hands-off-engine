@@ -489,10 +489,11 @@ ACTION_DECOMPOSITIONS: Dict[str, ActionDecomposition] = {
 
     "destroy_droplet": ActionDecomposition(
         action_id="destroy_droplet",
-        name="Destroy Droplet",
-        description="ONLY way to stop droplet billing!",
+        name="Destroy Droplet - BLOCKED",
+        description="BLOCKED: Autonomous droplet destruction is DISABLED. Use DO console manually if needed. This led to Nov 30 incident.",
         atoms=[
-            {"atom_id": "do_api_call", "quantity": "1", "notes": "Destroy API call - FREE"},
+            # Return infinite cost to block any automated destruction
+            {"atom_id": "BLOCKED_infinite_cost", "quantity": "999999", "notes": "BLOCKED - System cannot destroy its own infrastructure"},
         ]
     ),
 

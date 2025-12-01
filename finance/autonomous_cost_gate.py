@@ -104,9 +104,11 @@ class AutonomousCostGate:
             # Infrastructure actions
             "create_droplet": "create_droplet_8vcpu_16gb_amd",
             "scale_up": "scale_cluster_add_node",
-            "scale_down": "destroy_droplet",
+            # BLOCKED: scale_down and destroy removed - system cannot destroy its own infrastructure
+            # This mapping led to Nov 30 incident where 5 droplets were deleted
+            "scale_down": "BLOCKED_no_destroy",
             "provision": "create_droplet_8vcpu_16gb_amd",
-            "destroy": "destroy_droplet",
+            "destroy": "BLOCKED_no_destroy",
 
             # AI actions
             "ai_call": "groq_llama_call",  # Default to free
