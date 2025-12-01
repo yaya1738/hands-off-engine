@@ -46,6 +46,7 @@ class TestChatGPTAdapterBasic:
     def test_no_api_key_error_handling(self):
         """Test graceful handling when no API key configured"""
         # Temporarily clear API key
+        old_key = None
         old_key = os.environ.get("OPENAI_API_KEY")
         if old_key:
             del os.environ["OPENAI_API_KEY"]

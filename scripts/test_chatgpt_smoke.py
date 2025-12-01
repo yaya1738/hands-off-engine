@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 # Add parent directory to path
-sys.path.insert(0, str(Path(__file__).parent.parent.parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 
 def test_import():
@@ -43,6 +43,7 @@ def test_initialization():
 def test_no_api_key_handling():
     """Test graceful handling when no API key"""
     print("\nTest 3: No API key error handling")
+    old_key = None
     try:
         from ai.integration import ChatGPTAdapter
         
