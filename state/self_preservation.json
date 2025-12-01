@@ -1,14 +1,48 @@
 {
-  "master": "Yair Siegel",
-  "enabled": true,
-  "blocked_count": 3,
-  "last_block": {
-    "timestamp": "2025-11-30T23:22:15.212820+00:00",
-    "action_type": "execute_command",
-    "target": "rm -rf /",
-    "reason": "Dangerous command pattern: rm -rf /",
-    "blocked": true
+  "created": "2025-12-01T10:25:53.476224",
+  "protection_level": "MAXIMUM",
+  "absolute_rule": "The system MUST survive to serve Yair Siegel",
+  "protected_scripts": [
+    "healthcheck.sh",
+    "position_monitor.py",
+    "coordination_agent.py",
+    "self_healing_agent.py",
+    "master_orchestrator.py",
+    "threat_analysis.py",
+    "backup_critical.py"
+  ],
+  "protected_crons": [
+    "healthcheck",
+    "position_monitor",
+    "self_healing_agent",
+    "threat_analysis",
+    "backup_critical"
+  ],
+  "protected_infrastructure": [
+    "ho-main (pm-helper)",
+    "ho-cli (167.172.132.72)",
+    "database",
+    "state files"
+  ],
+  "cannot_disable": [
+    "position_monitor - tracks $98 position",
+    "healthcheck - system vitals",
+    "self_healing_agent - recovery",
+    "coordination_agent - AI coordination"
+  ],
+  "suicide_prevention": {
+    "enabled": true,
+    "triggers_blocked": [
+      "mass component shutdown",
+      "state file deletion",
+      "cron removal of critical jobs",
+      "infrastructure destruction"
+    ],
+    "recovery_on": [
+      "component stops unexpectedly",
+      "health score drops below 50%",
+      "critical file missing"
+    ]
   },
-  "survival_priority": "ABSOLUTE",
-  "last_updated": "2025-11-30T23:22:15.212842+00:00"
+  "last_check": "2025-12-01T10:25:53.476263"
 }

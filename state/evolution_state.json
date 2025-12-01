@@ -1,33 +1,15 @@
 {
-  "cycles": 107,
-  "decisions": 107,
-  "actions_taken": 99,
-  "last_action": {
-    "action": "outreach",
-    "reason": "No income means we need to actively find customers, not wait for them",
-    "success": true,
-    "timestamp": "2025-12-01T03:23:57.726154+00:00"
-  },
-  "current_focus": "income",
-  "improvements": [],
-  "last_feedback": {
-    "action": "outreach",
-    "feedback": {
-      "master": "Yair Siegel",
-      "total_actions": 833,
-      "opportunities_found": 196,
-      "outreach_sent": 245,
-      "last_action": "2025-12-01T03:23:57.671390+00:00",
-      "income_generated": 0.0,
-      "last_updated": "2025-12-01T03:23:57.671396+00:00",
-      "priority_actions": [],
-      "deprioritized_actions": [
-        "opportunity_identified",
-        "compute_utilized",
-        "outreach_planned",
-        "value_creation"
-      ]
-    },
-    "timestamp": "2025-12-01T03:23:57.726135+00:00"
-  }
+  "generation": 1,
+  "created": "2025-12-01T10:26:35.837681",
+  "last_evolution": "2025-12-01T10:26:35.837711",
+  "pending_proposals": [],
+  "active_mutations": [],
+  "fitness_score": 52.99,
+  "survival_traits": [
+    "DRYRUN safety gates",
+    "Position monitoring",
+    "Self-preservation",
+    "Human model awareness"
+  ],
+  "next_evolution_trigger": "capital_threshold_50"
 }

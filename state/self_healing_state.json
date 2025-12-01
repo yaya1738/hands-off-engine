@@ -1,6 +1,6 @@
 {
   "total_fixes": 11,
-  "last_check": "2025-12-01T10:18:23.676388",
+  "last_check": "2025-12-01T10:23:25.200290",
   "issues_detected": [
     "Hands-off-engine cron job missing",
     "Hands-off-engine cron job missing",
@@ -1925,6 +1925,7 @@
     "20 agent branches have unmerged work - auto-merge may not be working",
     "20 agent branches have unmerged work - auto-merge may not be working",
     "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
     "20 agent branches have unmerged work - auto-merge may not be working"
   ],
   "auto_fixed": [
@@ -1981,5 +1982,8 @@
     "Triggered pipeline run",
     "Triggered pipeline run",
     "Triggered pipeline run"
-  ]
+  ],
+  "healing_cycles": 1,
+  "last_cycle": "2025-12-01T10:25:23.181929",
+  "status": "active"
 }

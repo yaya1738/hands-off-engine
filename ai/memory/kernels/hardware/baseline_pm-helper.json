@@ -1,15 +1,15 @@
 {
-  "cpu_usage_mean": 5.1692,
-  "cpu_usage_std": 4.704447255946652,
-  "cpu_load_mean": 0.22532,
-  "cpu_load_std": 0.21703733043603998,
-  "memory_usage_mean": 15.755612903225806,
-  "memory_usage_std": 0.9988687936153248,
+  "cpu_usage_mean": 5.26224,
+  "cpu_usage_std": 4.752275318529336,
+  "cpu_load_mean": 0.22944,
+  "cpu_load_std": 0.2179109257737472,
+  "memory_usage_mean": 15.778064516129032,
+  "memory_usage_std": 1.0361706984438463,
   "disk_usage_mean": {},
-  "network_latency_mean": 0.0187530517578125,
-  "network_latency_std": 0.0079647281766699,
+  "network_latency_mean": 0.018812179565429688,
+  "network_latency_std": 0.007966032285446652,
   "cpu_temp_mean": 0.0,
   "cpu_temp_std": 0.0,
   "samples_collected": 1000,
-  "last_updated": "2025-12-01T10:18:09.897584"
+  "last_updated": "2025-12-01T10:27:15.628818"
 }

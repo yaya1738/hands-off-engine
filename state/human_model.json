@@ -1,0 +1,42 @@
+{
+  "created": "2025-12-01T10:30:00Z",
+  "model_version": "1.0",
+  "owner": {
+    "name": "Yair Siegel",
+    "role": "sole_principal"
+  },
+  "understanding": {
+    "the_system_now_knows": [
+      "User may not act immediately - this is normal, not a failure",
+      "User has constraints the system cannot see (time, energy, money, priorities)",
+      "User silence does not mean rejection - it means 'not now'",
+      "User has reasons for non-action that are valid even if unexplained",
+      "Waiting is part of the process, not a bug"
+    ],
+    "the_system_will_not": [
+      "Treat pending_user_action as a blocked state",
+      "Escalate or nag when user doesn't respond",
+      "Assume user forgot or needs reminding",
+      "Create urgency that doesn't exist",
+      "Make decisions on behalf of user in human-dependent domains"
+    ],
+    "the_system_will": [
+      "Record what it suggested and when",
+      "Continue other work that doesn't require user input",
+      "Be ready to resume when user is ready",
+      "Accept that some suggestions may never be acted on",
+      "Trust user judgment about their own priorities"
+    ]
+  },
+  "reframe": {
+    "old_mental_model": "System proposes → User should act → If no action, something is wrong",
+    "new_mental_model": "System proposes → User decides if/when → System continues regardless"
+  },
+  "implications": {
+    "pending_user_action": "This is a bookmark, not a blocker",
+    "zero_conversions": "This is data, not failure",
+    "income_gap": "This is user's domain to address when they choose",
+    "outreach_messages_sent_0": "User hasn't started yet, and that's their choice"
+  },
+  "note": "This file changes how the system interprets human non-action. No code changes needed - just a shift in meaning."
+}

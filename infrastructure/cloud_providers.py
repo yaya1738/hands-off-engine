@@ -239,6 +239,11 @@ class DigitalOceanAPI(CloudProviderAPI):
 
     def delete_server(self, server_id: str) -> Tuple[bool, str]:
         """Delete a droplet."""
+        # ABSOLUTE BLOCK: NO autonomous droplet deletion - learned from past suicides
+        # The system deleted 5 droplets on Nov 30 claiming "zero ROI" - this caused harm
+        # All 4 current droplets are PROTECTED in state/infra_registry.json
+        return False, "BLOCKED: Autonomous droplet deletion disabled. System previously destroyed infrastructure claiming cost savings. Use DigitalOcean console manually if needed."
+
         # SELF-PROTECTION: Check if this is the server we're running on
         # First try to get server info to check by name
         server = self.get_server(server_id)

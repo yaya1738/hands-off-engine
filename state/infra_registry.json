@@ -1,56 +1,55 @@
 {
-  "assets": {
-    "524521199": {
+  "created": "2025-12-01T10:27:35.505949",
+  "protection_level": "CRITICAL",
+  "absolute_rule": "NO droplet destruction without explicit user approval",
+  "protected_droplets": [
+    {
       "id": "524521199",
       "name": "pm-helper",
-      "type": "droplet",
-      "protection_level": "PROTECTED",
-      "protection_reason": "Unknown infrastructure - protected by default",
-      "created": "<nil>",
-      "last_active": "2025-11-30T22:48:02.043554+00:00",
-      "idle_hours": 0,
-      "destruction_blocked": true,
-      "block_reason": "Not idle long enough (0h < 72h required)"
+      "role": "MASTER - runs all coordination",
+      "protection": "CRITICAL - NEVER destroy",
+      "cost": "$48/mo"
     },
-    "533580773": {
-      "id": "533580773",
+    {
+      "id": "533588771",
       "name": "ho-compute-2",
-      "type": "droplet",
-      "protection_level": "PROTECTED",
-      "protection_reason": "Compute node",
-      "created": "<nil>",
-      "last_active": "2025-11-30T22:48:02.043554+00:00",
-      "idle_hours": 0,
-      "destruction_blocked": true,
-      "block_reason": "Not idle long enough (0h < 72h required)"
+      "role": "Compute node",
+      "protection": "PROTECTED - requires approval",
+      "cost": "$112/mo"
     },
-    "533580779": {
-      "id": "533580779",
+    {
+      "id": "533588783",
       "name": "ho-compute-2",
-      "type": "droplet",
-      "protection_level": "PROTECTED",
-      "protection_reason": "Compute node",
-      "created": "<nil>",
-      "last_active": "2025-11-30T22:48:02.043554+00:00",
-      "idle_hours": 0,
-      "destruction_blocked": true,
-      "block_reason": "Not idle long enough (0h < 72h required)"
+      "role": "Compute node",
+      "protection": "PROTECTED - requires approval",
+      "cost": "$112/mo"
     },
-    "533581028": {
-      "id": "533581028",
-      "name": "ho-scale-1764540252",
-      "type": "droplet",
-      "protection_level": "PROTECTED",
-      "protection_reason": "Scaling node",
-      "created": "<nil>",
-      "last_active": "2025-11-30T22:48:02.043554+00:00",
-      "idle_hours": 0,
-      "destruction_blocked": true,
-      "block_reason": "Not idle long enough (0h < 72h required)"
+    {
+      "id": "533589133",
+      "name": "ho-scale-1764543864",
+      "role": "Scale node",
+      "protection": "PROTECTED - requires approval",
+      "cost": "$112/mo"
     }
+  ],
+  "destruction_rules": {
+    "CRITICAL": "NEVER - system dies without this",
+    "PROTECTED": "Only with explicit user command",
+    "STANDARD": "Auto-scale can manage",
+    "TEMPORARY": "Can be destroyed after task complete"
   },
-  "destruction_requests": [],
-  "approved_destructions": [],
-  "last_scan": "2025-11-30T22:48:02.043918+00:00",
-  "last_updated": "2025-11-30T22:48:02.043927+00:00"
+  "auto_destroy_blocked": true,
+  "hardware_brain_can_destroy": false,
+  "scaling_engine_can_destroy": false,
+  "allowed_operations": [
+    "create new droplets",
+    "resize existing droplets",
+    "reboot droplets"
+  ],
+  "blocked_operations": [
+    "destroy any droplet",
+    "delete droplet",
+    "doctl compute droplet delete"
+  ],
+  "last_updated": "2025-12-01T10:27:35.506011"
 }
