@@ -35,6 +35,13 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
+# Import actuators for real-world actions
+try:
+    from autonomous.actuators import ActuatorHub
+    ACTUATORS_AVAILABLE = True
+except ImportError:
+    ACTUATORS_AVAILABLE = False
+
 BASE_DIR = Path("/root/hands-off-engine")
 STATE_DIR = BASE_DIR / "state"
 
@@ -98,6 +105,16 @@ CAPABILITIES = {
         "script": "finance/cost_gate.py",
         "args": ["audit"],
     },
+    "notify": {
+        "name": "Notify Owner",
+        "description": "Send Telegram notification to Yair",
+        "actuator": "telegram",
+    },
+    "check_trading": {
+        "name": "Check Trading Status",
+        "description": "Check Polymarket health and readiness",
+        "actuator": "polymarket_status",
+    },
 }
 
 # Decision weights based on current state
@@ -117,6 +134,8 @@ class EvolutionEngine:
     def __init__(self):
         self.state = self._load_state()
         self.cycle_count = self.state.get("cycles", 0)
+        # Initialize actuators for real-world actions
+        self.actuators = ActuatorHub() if ACTUATORS_AVAILABLE else None
 
     def _load_state(self) -> Dict:
         if EVOLUTION_STATE.exists():
@@ -293,7 +312,13 @@ class EvolutionEngine:
             return False
 
         cap = CAPABILITIES[action]
-        script = BASE_DIR / cap["script"]
+
+        # Handle actuator-based actions
+        if "actuator" in cap:
+            return self._execute_actuator_action(action, cap)
+
+        # Handle script-based actions
+        script = BASE_DIR / cap.get("script", "")
 
         if not script.exists():
             self._log("error", f"Script not found: {script}")
@@ -302,7 +327,7 @@ class EvolutionEngine:
         self._log("execute", f"Running {cap['name']}: {cap['description']}")
 
         try:
-            cmd = ["python3", str(script)] + cap["args"]
+            cmd = ["python3", str(script)] + cap.get("args", [])
             result = subprocess.run(
                 cmd,
                 capture_output=True,
@@ -324,6 +349,35 @@ class EvolutionEngine:
             return False
         except Exception as e:
             self._log("error", f"{cap['name']} failed: {str(e)}")
+            return False
+
+    def _execute_actuator_action(self, action: str, cap: Dict) -> bool:
+        """Execute actions via actuator hub (real-world actions)."""
+        if not self.actuators:
+            self._log("error", "Actuators not available")
+            return False
+
+        actuator_type = cap.get("actuator")
+        self._log("actuator", f"Using {actuator_type} actuator: {cap['description']}")
+
+        try:
+            if actuator_type == "telegram":
+                result = self.actuators.notify(f"🧬 Evolution cycle {self.cycle_count}: {cap['description']}")
+                self._log("success" if result else "error", f"Telegram: {'sent' if result else 'failed'}")
+                return result
+
+            elif actuator_type == "polymarket_status":
+                status = self.actuators.status()
+                healthy = status.get("polymarket", {}).get("healthy", False)
+                self._log("success" if healthy else "warning", f"Polymarket health: {healthy}")
+                return healthy
+
+            else:
+                self._log("error", f"Unknown actuator type: {actuator_type}")
+                return False
+
+        except Exception as e:
+            self._log("error", f"Actuator error: {str(e)}")
             return False
 
     def record_decision(self, action: str, reason: str, intel: Dict):
