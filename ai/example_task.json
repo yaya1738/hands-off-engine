@@ -1,0 +1,10 @@
+{
+  "id": "test_echo",
+  "priority": 1,
+  "goal": "Test the AI runner with a simple echo command",
+  "context": {
+    "files": [],
+    "notes": "This is a safe test task that just echoes a message to verify the AI runner is working correctly."
+  },
+  "mode": "plan-and-execute"
+}
