@@ -1,0 +1,188 @@
+name: Mark Copilot PRs Ready for Review
+
+# Automatically mark draft PRs from trusted sources as ready for review
+# This bridges the gap between draft PR creation and auto-merge workflow
+# 
+# Marks ready when:
+# 1. PR is opened as a draft
+# 2. PR is from Copilot or other trusted sources
+# 3. This triggers the existing auto-merge workflow's ready_for_review handler
+
+on:
+  # When a PR is opened (draft or not)
+  pull_request:
+    types: [opened]
+  # Manual trigger to process existing draft PRs
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: 'PR number to mark ready (leave empty to process all draft PRs from trusted authors)'
+        required: false
+        type: number
+
+permissions:
+  contents: write
+  pull-requests: write
+
+# Trusted bot authors that can auto-mark ready (case-insensitive matching used in script)
+env:
+  TRUSTED_AUTHORS: "copilot,github-actions[bot],dependabot[bot]"
+
+jobs:
+  mark-ready:
+    runs-on: ubuntu-latest
+    # Only run for draft PRs when triggered by pull_request event
+    # Always run for workflow_dispatch
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == true)
+
+    steps:
+      - name: Mark draft PRs ready for review
+        run: |
+          # Handle workflow_dispatch (manual trigger)
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            PR_NUM="${{ github.event.inputs.pr_number }}"
+            
+            if [ -z "$PR_NUM" ]; then
+              echo "No PR number provided, processing all open draft PRs from trusted authors..."
+              
+              # Get all open draft PRs
+              DRAFT_PRS=$(gh pr list --state open --json number,isDraft,author --jq '.[] | select(.isDraft == true) | {number: .number, author: .author.login}')
+              
+              if [ -z "$DRAFT_PRS" ]; then
+                echo "No draft PRs found"
+                exit 0
+              fi
+              
+              echo "$DRAFT_PRS" | jq -c '.' | while read -r pr_data; do
+                PR_NUMBER=$(echo "$pr_data" | jq -r '.number')
+                AUTHOR=$(echo "$pr_data" | jq -r '.author')
+                AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
+                
+                # Check if author is trusted
+                IS_TRUSTED="false"
+                for trusted in $(echo "$TRUSTED_AUTHORS" | tr ',' ' '); do
+                  trusted_lower=$(echo "$trusted" | tr '[:upper:]' '[:lower:]')
+                  if [ "$AUTHOR_LOWER" == "$trusted_lower" ]; then
+                    IS_TRUSTED="true"
+                    break
+                  fi
+                done
+                
+                if [ "$IS_TRUSTED" == "true" ]; then
+                  echo "Processing PR #$PR_NUMBER from trusted author $AUTHOR..."
+                  
+                  # Get PR node ID
+                  PR_NODE_ID=$(gh pr view $PR_NUMBER --json id --jq '.id')
+                  
+                  # Mark ready using GraphQL
+                  gh api graphql -f query='
+                    mutation($id: ID!) {
+                      markPullRequestReadyForReview(input: {pullRequestId: $id}) {
+                        pullRequest {
+                          isDraft
+                        }
+                      }
+                    }
+                  ' -f id="$PR_NODE_ID" && echo "✅ PR #$PR_NUMBER marked as ready for review" || echo "⚠️ Failed to mark PR #$PR_NUMBER ready"
+                else
+                  echo "Skipping PR #$PR_NUMBER from untrusted author $AUTHOR"
+                fi
+              done
+              
+              exit 0
+            else
+              # Process specific PR
+              echo "Processing specific PR #$PR_NUM..."
+              PR_INFO=$(gh pr view $PR_NUM --json isDraft,author,id 2>/dev/null) || {
+                echo "Failed to get PR info for #$PR_NUM"
+                exit 1
+              }
+              
+              IS_DRAFT=$(echo "$PR_INFO" | jq -r '.isDraft')
+              AUTHOR=$(echo "$PR_INFO" | jq -r '.author.login')
+              PR_NODE_ID=$(echo "$PR_INFO" | jq -r '.id')
+              
+              if [ "$IS_DRAFT" != "true" ]; then
+                echo "PR #$PR_NUM is not a draft, skipping"
+                exit 0
+              fi
+              
+              AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
+              
+              # Check if author is trusted
+              IS_TRUSTED="false"
+              for trusted in $(echo "$TRUSTED_AUTHORS" | tr ',' ' '); do
+                trusted_lower=$(echo "$trusted" | tr '[:upper:]' '[:lower:]')
+                if [ "$AUTHOR_LOWER" == "$trusted_lower" ]; then
+                  IS_TRUSTED="true"
+                  break
+                fi
+              done
+              
+              if [ "$IS_TRUSTED" != "true" ]; then
+                echo "Author $AUTHOR is not trusted, skipping"
+                exit 0
+              fi
+              
+              echo "Marking PR #$PR_NUM as ready for review..."
+              
+              # Mark ready using GraphQL
+              gh api graphql -f query='
+                mutation($id: ID!) {
+                  markPullRequestReadyForReview(input: {pullRequestId: $id}) {
+                    pullRequest {
+                      isDraft
+                    }
+                  }
+                }
+              ' -f id="$PR_NODE_ID"
+              
+              echo "✅ PR #$PR_NUM marked as ready for review"
+            fi
+            
+            exit 0
+          fi
+          
+          # Handle pull_request event (automatic trigger)
+          PR_NUM="${{ github.event.pull_request.number }}"
+          AUTHOR="${{ github.event.pull_request.user.login }}"
+          AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
+          PR_NODE_ID="${{ github.event.pull_request.node_id }}"
+          
+          echo "Draft PR #$PR_NUM opened by: $AUTHOR"
+          
+          # Check if author is trusted (case-insensitive)
+          IS_TRUSTED="false"
+          for trusted in $(echo "$TRUSTED_AUTHORS" | tr ',' ' '); do
+            trusted_lower=$(echo "$trusted" | tr '[:upper:]' '[:lower:]')
+            if [ "$AUTHOR_LOWER" == "$trusted_lower" ]; then
+              IS_TRUSTED="true"
+              break
+            fi
+          done
+          
+          if [ "$IS_TRUSTED" != "true" ]; then
+            echo "Author $AUTHOR is not trusted, skipping"
+            exit 0
+          fi
+          
+          echo "Author $AUTHOR is trusted, marking PR as ready for review..."
+          
+          # Use GraphQL to mark PR ready for review
+          gh api graphql -f query='
+            mutation($id: ID!) {
+              markPullRequestReadyForReview(input: {pullRequestId: $id}) {
+                pullRequest {
+                  isDraft
+                }
+              }
+            }
+          ' -f id="$PR_NODE_ID"
+          
+          echo "✅ PR #$PR_NUM marked as ready for review"
+          echo "This will trigger the auto-merge workflow if checks pass"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
