@@ -96,8 +96,11 @@ def demonstrate_session_audit(log_dir: str = "audit/logs"):
     print("-" * 80)
     print("# List all sessions:")
     print("  python3 audit/audit_viewer.py --list-sessions")
-    print("\n# Show summary for a specific session:")
-    print(f"  python3 audit/audit_viewer.py --session {sessions[0]} --summary")
+    
+    if sessions:  # Only show session-specific examples if sessions exist
+        print("\n# Show summary for a specific session:")
+        print(f"  python3 audit/audit_viewer.py --session {sessions[0]} --summary")
+    
     print("\n# Show summaries for all sessions:")
     print("  python3 audit/audit_viewer.py --all-sessions")
     print("\n# Show events for a specific component:")
