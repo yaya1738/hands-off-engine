@@ -84,11 +84,13 @@ The Hands-Off Engine has successfully achieved **near-complete automation** with
 
 ### 4. ✅ Multi-Agent Coordination
 
-**Active Agents:**
+**Active Agents (as of 2025-12-01):**
 - Copilot (GitHub Copilot)
 - Claude-Code (Claude CLI)
 - ChatGPT
 - Claude-Web
+
+> **Note:** Agent count may evolve as system capabilities expand. See `ai/coordination/status.json` for current active agents list.
 
 **Coordination Protocol:**
 - File-based messaging via `ai/coordination/messages.jsonl`
@@ -165,6 +167,8 @@ The system exhibits **emergent rationality** not explicitly programmed:
 - **Time Saved:** ~2 hours/day → ~2 minutes/day
 
 ### Current System State (2025-11-30)
+
+> **Note:** Values below are point-in-time snapshots for documentation purposes. For current system state, check `state/hands_off_brain.json` or run the `/status` Telegram command.
 
 - **Balance:** $8.99
 - **Active Positions:** 4 tail bets (~$200 value)
@@ -418,6 +422,14 @@ The Hands-Off Engine has achieved **automation success** through:
 
 ---
 
-**Last Updated:** 2025-12-01
-**Document Owner:** Copilot Agent
+**Document Type:** Point-in-time snapshot of automation achievements
+**Created:** 2025-12-01
+**Captured By:** Copilot Agent
+**Purpose:** Canonical reference for automation success milestones
 **Related Documents:** See Documentation Coverage section
+
+> **Note:** This document represents a snapshot of automation achievements as of December 1, 2025. For current system status, metrics, and agent configuration, refer to:
+> - `ai/coordination/status.json` - Current agent tasks and coordination state
+> - `state/hands_off_brain.json` - Real-time system state
+> - `ai/SESSION_INSIGHTS_*.md` - Recent session outcomes
+> - Telegram `/status` command - Live system status
