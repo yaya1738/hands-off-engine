@@ -126,9 +126,15 @@ class DigitalOceanAPI(CloudProviderAPI):
         Initialize DigitalOcean API.
 
         Args:
-            api_token: DO API token (or from DO_API_TOKEN env var)
+            api_token: DO API token (checks DO_API_TOKEN, DO_TOKEN env vars)
         """
-        self.api_token = api_token or os.environ.get("DO_API_TOKEN", "")
+        # Check multiple env var patterns (matching existing system conventions)
+        self.api_token = (
+            api_token or
+            os.environ.get("DO_API_TOKEN") or
+            os.environ.get("DO_TOKEN") or
+            ""
+        )
         self.provider = CloudProvider.DIGITALOCEAN
         self._cache: Dict[str, Any] = {}
         self._cache_time: Dict[str, float] = {}
@@ -608,6 +614,57 @@ def get_cloud_provider(provider: CloudProvider) -> CloudProviderAPI:
         raise ValueError(f"Unsupported provider: {provider}")
 
 
+def _load_do_token_from_file() -> Optional[str]:
+    """Load DO token from known file locations."""
+    import json as _json
+
+    # Check do.env files
+    env_paths = [
+        Path.home() / "hands-off/state/do.env",
+        Path.home() / "hands-off-engine/state/do.env",
+        Path.home() / "hands-off-engine/termux-hands-off/state/do.env",
+        Path("/root/hands-off/state/do.env"),
+        Path("/root/hands-off-out/state/do.env"),
+        Path("state/do.env"),
+        Path("termux-hands-off/state/do.env"),
+    ]
+
+    for path in env_paths:
+        if path.exists():
+            try:
+                content = path.read_text().strip()
+                for line in content.split('\n'):
+                    line = line.strip()
+                    if line.startswith('DO_TOKEN=') or line.startswith('DO_API_TOKEN='):
+                        token = line.split('=', 1)[1].strip().strip('"\'')
+                        if token and not token.startswith('#'):
+                            print(f"   [DO Token] Found in {path}")
+                            return token
+            except Exception:
+                continue
+
+    # Check vault.json files (where other API keys are stored)
+    vault_paths = [
+        Path.home() / "hands-off/vault.json",
+        Path.home() / "hands-off-engine/termux-hands-off/agent/vault.json",
+        Path("termux-hands-off/agent/vault.json"),
+        Path("/root/hands-off/vault.json"),
+    ]
+
+    for path in vault_paths:
+        if path.exists():
+            try:
+                data = _json.loads(path.read_text())
+                for key in ["DO_TOKEN", "DO_API_TOKEN", "DIGITALOCEAN_TOKEN", "DIGITALOCEAN_API_KEY"]:
+                    if key in data and data[key]:
+                        print(f"   [DO Token] Found in vault {path}")
+                        return data[key]
+            except Exception:
+                continue
+
+    return None
+
+
 def get_best_available_provider() -> Tuple[CloudProviderAPI, CloudProvider]:
     """
     Get the best available cloud provider based on configured credentials.
@@ -615,19 +672,38 @@ def get_best_available_provider() -> Tuple[CloudProviderAPI, CloudProvider]:
     Returns:
         Tuple of (API instance, provider enum)
     """
-    # Try DigitalOcean first
-    if os.environ.get("DO_API_TOKEN"):
+    # Try DigitalOcean first - check multiple env var names AND file
+    do_token = (
+        os.environ.get("DO_API_TOKEN") or
+        os.environ.get("DO_TOKEN") or
+        os.environ.get("DIGITALOCEAN_API_KEY") or
+        _load_do_token_from_file()
+    )
+
+    if do_token:
+        # Set it in env for the API class to use
+        os.environ["DO_API_TOKEN"] = do_token
         api = DigitalOceanAPI()
-        ok, _ = api.check_api_status()
+        ok, msg = api.check_api_status()
         if ok:
+            print(f"   [Provider] DigitalOcean API connected")
             return api, CloudProvider.DIGITALOCEAN
+        else:
+            print(f"   [Provider] DO token found but API check failed: {msg}")
 
     # Try AWS
     if os.environ.get("AWS_ACCESS_KEY_ID"):
         api = AWSAPI()
-        ok, _ = api.check_api_status()
+        ok, msg = api.check_api_status()
         if ok:
+            print(f"   [Provider] AWS API connected")
             return api, CloudProvider.AWS
+        else:
+            print(f"   [Provider] AWS creds found but API check failed: {msg}")
 
-    # Fall back to mock
+    # Fall back to mock - but explain why
+    print("   [Provider] No cloud credentials found, using mock provider")
+    print("   [Provider] To enable real provisioning, add DO_TOKEN to:")
+    print("   [Provider]   - Environment variable: DO_TOKEN or DO_API_TOKEN")
+    print("   [Provider]   - File: state/do.env or vault.json")
     return MockCloudAPI(), CloudProvider.LOCAL

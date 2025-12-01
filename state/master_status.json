@@ -1,7 +1,7 @@
 {
-  "timestamp": "2025-12-01T11:11:47.633169",
+  "timestamp": "2025-12-01T12:19:33.700597",
   "hostname": "pm-helper",
-  "uptime_hours": 16.05,
+  "uptime_hours": 17.18,
   "components": {
     "hardware-brain": {
       "status": "stopped"
@@ -27,7 +27,7 @@
   },
   "cluster": {
     "start_date": "2025-11-30T19:08:50.960035",
-    "current_date": "2025-12-01T11:11:47.632940",
+    "current_date": "2025-12-01T12:19:33.700452",
     "days_running": 0,
     "current_vcpus": 28,
     "current_ram_gb": 56.0,

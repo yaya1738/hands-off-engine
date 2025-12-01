@@ -1,0 +1,28 @@
+{
+  "production_servers": [
+    {
+      "id": "do138",
+      "provider": "digitalocean",
+      "ip": "138.68.103.156",
+      "role": "primary_trading",
+      "type": "manual",
+      "critical": true,
+      "registered_at": "2025-11-28T00:00:00Z"
+    },
+    {
+      "id": "auto-202511280403",
+      "provider": "local",
+      "ip": "pending",
+      "role": "trading_backup",
+      "type": "auto_provisioned",
+      "critical": true,
+      "registered_at": "2025-11-28T04:03:05.715107"
+    }
+  ],
+  "redundancy_policy": {
+    "min_trading_servers": 2,
+    "require_failover": true,
+    "auto_provision_backup": true,
+    "max_single_point_of_failure_hours": 24
+  }
+}

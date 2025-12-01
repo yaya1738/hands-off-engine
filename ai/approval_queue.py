@@ -231,9 +231,38 @@ class ApprovalQueue:
 def send_approval_notification(change_id: str, change: Dict):
     """Send Telegram notification for pending approval."""
     import requests
+    from pathlib import Path
 
-    bot_token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    bot_token = None
+    chat_id = None
+
+    # Check existing credential locations (matching system patterns)
+    tg_env_paths = [
+        Path.home() / "hands-off/state/tg/bots/handsoff.env",
+        Path("termux-hands-off/state/tg/bots/handsoff.env"),
+        Path("/root/hands-off/state/tg/bots/handsoff.env"),
+        Path("state/tg/bots/handsoff.env"),
+    ]
+
+    for env_path in tg_env_paths:
+        if env_path.exists():
+            try:
+                for line in env_path.read_text().splitlines():
+                    line = line.strip()
+                    if line.startswith("TOKEN="):
+                        bot_token = line.split("=", 1)[1].strip()
+                    elif line.startswith("CHAT_ID="):
+                        chat_id = line.split("=", 1)[1].strip()
+                if bot_token and chat_id:
+                    break
+            except Exception:
+                continue
+
+    # Fallback to env vars (multiple patterns)
+    if not bot_token:
+        bot_token = os.getenv("TG_BOT_TOKEN") or os.getenv("TELEGRAM_BOT_TOKEN") or os.getenv("TOKEN")
+    if not chat_id:
+        chat_id = os.getenv("TG_CHAT_ID") or os.getenv("TELEGRAM_CHAT_ID") or os.getenv("CHAT_ID")
 
     if not bot_token or not chat_id:
         print(f"Telegram not configured. Change {change_id} pending approval.")

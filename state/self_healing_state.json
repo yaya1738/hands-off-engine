@@ -1,6 +1,6 @@
 {
-  "total_fixes": 11,
-  "last_check": "2025-12-01T11:08:39.750109",
+  "total_fixes": 12,
+  "last_check": "2025-12-01T12:19:04.932618",
   "issues_detected": [
     "Hands-off-engine cron job missing",
     "Hands-off-engine cron job missing",
@@ -1935,7 +1935,22 @@
     "20 agent branches have unmerged work - auto-merge may not be working",
     "20 agent branches have unmerged work - auto-merge may not be working",
     "20 agent branches have unmerged work - auto-merge may not be working",
-    "20 agent branches have unmerged work - auto-merge may not be working"
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "Execution plan is 3.0h old - pipeline may not be running",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "20 agent branches have unmerged work - auto-merge may not be working",
+    "19 agent branches have unmerged work - auto-merge may not be working"
   ],
   "auto_fixed": [
     "Reset trading health (archived trading_performance.jsonl.healed_20251128_030407)",
@@ -1987,6 +2002,7 @@
     "Refreshed market data",
     "Refreshed market data",
     "Refreshed market data",
+    "Triggered pipeline run",
     "Triggered pipeline run",
     "Triggered pipeline run",
     "Triggered pipeline run",

@@ -38,6 +38,29 @@ Data Fetchers → Alpha Model → Decider (Brain) → Executor (Body) → Audit 
 - `ai/` - AI coordination, intake handler, multi-agent messaging
 - `ai_nexus/` - Multi-brain orchestration, cost tracking, self-financing
 
+## Integration Patterns (CRITICAL - Read Before Building)
+
+Before adding ANY external service integration:
+
+1. **Search existing patterns first:**
+   ```bash
+   grep -r "SERVICE_NAME" --include="*.sh" --include="*.py" .
+   ```
+
+2. **Credential Storage Locations:**
+   | Service | Variable | Location |
+   |---------|----------|----------|
+   | DigitalOcean | `DO_TOKEN` | `~/hands-off/state/do.env` |
+   | Telegram | `TOKEN`, `CHAT_ID` | `state/tg/bots/handsoff.env` |
+   | Exchanges | `OKX_API_KEY`, `KRAKEN_API_KEY` | `vault.json` |
+
+3. **Match existing patterns exactly** - don't assume standard conventions
+
+4. **Reference files:**
+   - `termux-hands-off/agent/do_api.sh` - DigitalOcean pattern
+   - `termux-hands-off/agent/agent.py` - Exchange API pattern
+   - `termux-hands-off/agent/notify.py` - Telegram pattern
+
 ## Coding Standards
 
 ### Python

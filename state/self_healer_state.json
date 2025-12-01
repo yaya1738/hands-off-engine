@@ -1,7 +1,7 @@
 {
-  "last_save": "2025-12-01T11:12:07.301933",
+  "last_save": "2025-12-01T12:19:46.797526",
   "hostname": "pm-helper",
-  "uptime_hours": 16.05398137111111,
+  "uptime_hours": 17.181619035555556,
   "healing_actions": [
     {
       "timestamp": "2025-11-30T19:08:54.993064",
@@ -706,6 +706,70 @@
       "reason": "Process not running",
       "success": true,
       "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T11:13:09.362041",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T11:14:21.429329",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T11:15:33.504624",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T12:10:48.220866",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T12:12:00.298429",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T12:13:12.428989",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T12:14:24.504181",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T12:15:36.577902",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
     }
   ],
   "restart_counts": {
@@ -714,11 +778,11 @@
       "2025-11-30T20:02:11.902302"
     ],
     "position-monitor": [
-      "2025-12-01T10:13:06.233226",
-      "2025-12-01T10:14:18.305322",
-      "2025-12-01T10:15:30.382408",
-      "2025-12-01T11:10:45.188169",
-      "2025-12-01T11:11:57.281447"
+      "2025-12-01T12:10:48.220861",
+      "2025-12-01T12:12:00.298424",
+      "2025-12-01T12:13:12.428984",
+      "2025-12-01T12:14:24.504175",
+      "2025-12-01T12:15:36.577896"
     ],
     "scaling-engine": [
       "2025-11-30T23:00:45.281896",

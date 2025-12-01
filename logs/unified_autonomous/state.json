@@ -1,20 +1,20 @@
 {
-  "node_id": "pm-helper",
-  "session_id": "unified_20251128_065457",
+  "node_id": "runsc",
+  "session_id": "unified_20251128_040149",
   "stats": {
-    "checks": 87,
-    "hw_decisions": 52,
-    "infra_decisions": 21,
+    "checks": 2,
+    "hw_decisions": 0,
+    "infra_decisions": 0,
     "auto_upgrades": 0,
     "servers_provisioned": 0,
     "approvals_requested": 0,
-    "trading_protections": 22,
-    "start_time": "2025-11-28T06:54:57.445588"
+    "trading_protections": 2,
+    "start_time": "2025-11-28T04:01:49.580161"
   },
-  "last_check": "2025-11-28T08:22:52.210718",
+  "last_check": "2025-11-28T04:02:52.649352",
   "last_health": {
-    "status": "optimal",
-    "score": 86.0,
-    "trading_risk": "critical"
+    "status": "pristine",
+    "score": 100.0,
+    "trading_risk": "none"
   }
 }
