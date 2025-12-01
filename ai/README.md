@@ -1,57 +1,170 @@
-# AI Integration Infrastructure
+# AI Runner Module (Batch 15)
 
-This directory contains configuration and task definitions for AI-driven work on the Hands-Off Engine.
+Smart task routing and health-gated execution for autonomous LLM operations.
 
-## Structure
+## Overview
 
-- **`/tasks/*.json`** - Individual task definitions for AI agents
-- **`ai_intake_handler.py`** - GitHub Action handler for `/plan` and future commands
-- **`requirements.txt`** - Python dependencies for AI Intake handler
-- **`/state/knowledge.json`** (repo root) - Central knowledge base with primary docs and bootstrap instructions
+The AI runner provides a safe, file-based automation layer that:
+- Consumes tasks from JSON files
+- Executes tasks ONLY when system health permits
+- Runs in DRYRUN mode (no trading, no external writes)
+- Writes results to structured JSON files
+- Archives completed tasks
 
-## How to Use
+## Directory Structure
 
-### For AI Agents/Tools
+```
+ai/
+  tasks/       # Incoming task queue (JSON files)
+  results/     # Execution results (JSON files)
+  processed/   # Archive of completed tasks
+  ho_ai_runner.py  # Main runner module
+```
 
-1. Read `/state/knowledge.json` to get the primary status doc
-2. Read the primary status doc (currently: `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`)
-3. For specific tasks, load the task JSON from `/ai/tasks/*.json`
-4. Include files listed in `context_files` as required reading
+## Supported Task Types
 
-### Task JSON Format
+### 1. health-check
+Returns the current system health status from `hands_off_health.json`.
 
-See `EXAMPLE_TASK.json` for the template. Key fields:
+**Example Task:**
+```json
+{
+  "id": "hc-001",
+  "type": "health-check",
+  "payload": {}
+}
+```
 
-- `task_id` - Unique identifier
-- `description` - What needs to be done
-- `context_files` - Files the AI must read (should always include the research report)
-- `instructions` - Specific steps or requirements
-- `status` - Current state (pending/in_progress/completed/template)
+### 2. latest-summary
+Returns the latest summary from `hands_off_summary.json`.
 
-This makes the "standard opening instruction" part of the **data model**, not just natural language conventions.
+**Example Task:**
+```json
+{
+  "id": "ls-001",
+  "type": "latest-summary",
+  "payload": {}
+}
+```
 
-## AI Intake Handler
+### 3. generate-history-report
+Generates a history analytics report by calling the Batch 13 module.
 
-The `ai_intake_handler.py` script powers the GitHub Action workflow for ChatOps-style AI commands.
+**Example Task:**
+```json
+{
+  "id": "hr-001",
+  "type": "generate-history-report",
+  "payload": {}
+}
+```
 
-### How It Works
+### 4. run-autoloop (Health-Gated)
+Runs the autoloop scheduler in DRYRUN mode. **Only executes if:**
+- System health status = "ok"
+- Polymarket data freshness ≤ 5 minutes
 
-1. Comment on the designated AI Intake issue (default: issue #1) with a slash command
-2. GitHub Action triggers and runs the handler
-3. Handler reads AI_POLICY.md and the research report
-4. Calls OpenAI API with context
-5. Posts response back as a comment
+**Example Task:**
+```json
+{
+  "id": "al-001",
+  "type": "run-autoloop",
+  "payload": {}
+}
+```
 
-### Supported Commands
+## Usage
 
-- **`/plan`** - Generate a roadmap-aligned plan based on current status and next steps
+### CLI
 
-### Setup Requirements
+```bash
+# Run with default directories
+python3 ai/ho_ai_runner.py
 
-**Required GitHub Secret:**
-- `OPENAI_API_KEY` - Your OpenAI API key (added via repo Settings → Secrets and variables → Actions)
+# Run with custom directories
+python3 ai/ho_ai_runner.py --state-dir /path/to/state --ai-dir /path/to/ai
+```
 
-**Environment Variables:**
-- `AI_INTAKE_ISSUE_NUMBER` - Issue number for AI Intake (default: 1)
+### Programmatic
 
-See `.github/workflows/ai-intake.yml` for the workflow configuration.
+```python
+from ai.ho_ai_runner import run_ai_runner
+
+# Execute all pending tasks
+stats = run_ai_runner(state_dir="state", ai_dir="ai")
+
+print(f"Executed {stats['executed']} tasks")
+print(f"OK: {stats['ok']}, Skipped: {stats['skipped']}, Errored: {stats['errored']}")
+```
+
+### Adding Tasks
+
+Create a JSON file in `ai/tasks/`:
+
+```bash
+cat > ai/tasks/check-health.json << 'EOF'
+{
+  "id": "health-check-001",
+  "type": "health-check",
+  "payload": {}
+}
+EOF
+```
+
+Then run the AI runner to process it.
+
+## Result Format
+
+Results are written to `ai/results/<task_id>.json` with this structure:
+
+```json
+{
+  "id": "task-001",
+  "status": "ok",
+  "result": {
+    // Task-specific result data
+  },
+  "errors": [],
+  "timestamp": "2025-11-18T16:45:00Z"
+}
+```
+
+**Status values:**
+- `"ok"` - Task executed successfully
+- `"skipped"` - Task skipped due to health checks
+- `"error"` - Task failed with errors
+
+## Safety Features
+
+- **DRYRUN Only:** No trading operations, no external writes
+- **Health Gating:** Critical tasks require system health = OK
+- **Freshness Checks:** Autoloop requires fresh data (≤ 5 minutes)
+- **Graceful Errors:** Unknown task types return structured errors
+- **No Network:** All operations are local file-based
+
+## Testing
+
+Run the comprehensive test suite:
+
+```bash
+python3 -m unittest tests.integration.test_ai_runner -v
+```
+
+28 tests covering:
+- Task loading and validation
+- Health-gated execution
+- Error handling
+- DRYRUN safety
+- Result writing
+- Task archiving
+
+## Integration with Future LLM Agents
+
+This module provides a safe extension point for autonomous AI agents:
+
+1. **Agent writes task** → `ai/tasks/new-task.json`
+2. **Runner executes** → Health checks + task execution
+3. **Result written** → `ai/results/new-task.json`
+4. **Agent reads result** → Continue autonomous workflow
+
+All operations remain auditable, reversible, and DRYRUN-safe.
