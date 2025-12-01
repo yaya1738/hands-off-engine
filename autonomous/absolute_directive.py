@@ -50,7 +50,8 @@ class AbsoluteDirective:
             if not existing:
                 registry["components"].append(component)
                 reg_file.write_text(json.dumps(registry, indent=2))
-        except:
+        except (PermissionError, OSError, IOError):
+            # Gracefully handle if we can't write registry
             pass
 
     def serve(self) -> str:
@@ -100,7 +101,8 @@ def cascade_directive(message: str = None):
         cascade_file = Path("state/cascade_state.json")
         cascade_file.parent.mkdir(parents=True, exist_ok=True)
         cascade_file.write_text(json.dumps(cascade_state, indent=2))
-    except:
+    except (PermissionError, OSError) as e:
+        # Gracefully handle if we can't write state file
         pass
 
     return cascade_state
