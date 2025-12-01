@@ -19,6 +19,7 @@ Usage:
 """
 
 import argparse
+import json
 import sys
 from pathlib import Path
 from typing import Optional
@@ -161,7 +162,6 @@ def main():
         # Parse metadata if provided
         metadata = None
         if args.metadata:
-            import json
             try:
                 metadata = json.loads(args.metadata)
             except json.JSONDecodeError as e:

@@ -30,9 +30,9 @@ import sys
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Optional
 
-# Import audit system
+# Import audit system conditionally
 try:
-    from audit import AuditLogger
+    from audit import AuditLogger, FinancialLedger
     from ai_nexus import ClaudeProvider
     AUDIT_AVAILABLE = True
 except ImportError:
@@ -51,7 +51,6 @@ class ClaudeOrchestrator:
         
         # Initialize audit logging if available
         if AUDIT_AVAILABLE:
-            from audit import AuditLogger, FinancialLedger
             self.audit_logger = AuditLogger()
             self.ledger = FinancialLedger()
             self.claude_provider = ClaudeProvider(self.audit_logger, self.ledger)

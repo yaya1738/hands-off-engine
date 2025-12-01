@@ -18,6 +18,7 @@ Usage:
 """
 
 import argparse
+import inspect
 import json
 import sys
 from datetime import datetime, timezone, timedelta
@@ -67,7 +68,6 @@ class ClaudeAuditChecker:
                 return False
             
             # Check if log_action is implemented correctly
-            import inspect
             log_action_sig = inspect.signature(ClaudeProvider.log_action)
             expected_params = ['self', 'action', 'files_changed', 'lines_added', 
                              'lines_removed', 'tokens_used', 'session_id', 'metadata']
