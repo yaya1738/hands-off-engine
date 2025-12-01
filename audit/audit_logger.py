@@ -152,6 +152,23 @@ class AuditLogger:
         events.sort(key=lambda e: e.timestamp)
         return events
 
+    def get_all_sessions(self) -> List[str]:
+        """
+        Get list of all session IDs that have audit logs
+
+        Returns:
+            List of session IDs
+        """
+        session_ids = set()
+        
+        # Find all session_*.jsonl files
+        for log_file in self.log_dir.glob("session_*.jsonl"):
+            # Extract session ID from filename
+            session_id = log_file.stem.replace("session_", "")
+            session_ids.add(session_id)
+        
+        return sorted(list(session_ids))
+
     def get_session_summary(self, session_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Get summary statistics for a session
