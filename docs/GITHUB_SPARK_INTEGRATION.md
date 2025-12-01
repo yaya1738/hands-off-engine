@@ -58,13 +58,13 @@ Sparks can trigger workflows via `repository_dispatch` events:
 fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
   method: 'POST',
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3+json'
   },
   body: JSON.stringify({
     event_type: 'spark_emergency_stop',
     client_payload: {
-      user: 'username',
+      user: 'AUTHENTICATED_USERNAME',
       reason: 'Manual emergency stop'
     }
   })
@@ -76,13 +76,13 @@ fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
 fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
   method: 'POST',
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3+json'
   },
   body: JSON.stringify({
     event_type: 'spark_approve_trade',
     client_payload: {
-      user: 'username',
+      user: 'AUTHENTICATED_USERNAME',
       trade_id: 'trade_12345'
     }
   })
@@ -94,13 +94,13 @@ fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
 fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
   method: 'POST',
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3+json'
   },
   body: JSON.stringify({
     event_type: 'spark_health_check',
     client_payload: {
-      user: 'username'
+      user: 'AUTHENTICATED_USERNAME'
     }
   })
 })
@@ -116,7 +116,7 @@ Spark apps can fetch data from the repository using GitHub's API:
 // Fetch current positions
 const response = await fetch('https://api.github.com/repos/yaya1738/hands-off-engine/contents/state/polymarket-model.json', {
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3.raw'
   }
 })
@@ -127,7 +127,7 @@ const positions = await response.json()
 // Fetch recent coordination messages
 const response = await fetch('https://api.github.com/repos/yaya1738/hands-off-engine/contents/ai/coordination/messages.jsonl', {
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3.raw'
   }
 })

@@ -50,12 +50,12 @@ Data: Fetch from `logs/` directory or recent execution history
   fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
     method: 'POST',
     headers: {
-      'Authorization': 'token YOUR_TOKEN',
+      'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
       'Accept': 'application/vnd.github.v3+json'
     },
     body: JSON.stringify({
       event_type: 'spark_emergency_stop',
-      client_payload: { user: 'USER', reason: 'Manual stop from dashboard' }
+      client_payload: { user: 'AUTHENTICATED_USERNAME', reason: 'Manual stop from dashboard' }
     })
   })
   ```

@@ -42,6 +42,12 @@ jobs:
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           TRADE_ID="${{ github.event.client_payload.trade_id }}"
           
+          # Validate trade ID (alphanumeric, underscore, hyphen only)
+          if [[ ! "$TRADE_ID" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            echo "❌ Invalid trade ID format: $TRADE_ID"
+            exit 1
+          fi
+          
           # Log trade approval
           mkdir -p ai/coordination
           echo "{\"timestamp\": \"${TIMESTAMP}\", \"action\": \"trade_approval\", \"source\": \"spark_app\", \"trade_id\": \"${TRADE_ID}\", \"approved_by\": \"${{ github.event.client_payload.user }}\"}" >> ai/coordination/messages.jsonl

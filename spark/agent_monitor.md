@@ -92,7 +92,7 @@ Fetch from GitHub repository:
 // Get coordination status
 fetch('https://api.github.com/repos/yaya1738/hands-off-engine/contents/ai/coordination/status.json', {
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3.raw'
   }
 })
@@ -100,7 +100,7 @@ fetch('https://api.github.com/repos/yaya1738/hands-off-engine/contents/ai/coordi
 // Get recent coordination messages
 fetch('https://api.github.com/repos/yaya1738/hands-off-engine/contents/ai/coordination/messages.jsonl', {
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3.raw'
   }
 })
@@ -108,7 +108,7 @@ fetch('https://api.github.com/repos/yaya1738/hands-off-engine/contents/ai/coordi
 // Get Copilot tasks
 fetch('https://api.github.com/repos/yaya1738/hands-off-engine/contents/ai/coordination/copilot_tasks.jsonl', {
   headers: {
-    'Authorization': 'token YOUR_TOKEN',
+    'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
     'Accept': 'application/vnd.github.v3.raw'
   }
 })
