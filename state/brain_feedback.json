@@ -1,0 +1,23 @@
+{
+  "generated_at": "2025-11-18T20:02:25.177949Z",
+  "source": "state/brain_actions.json",
+  "success_rate": 0.667,
+  "summary": {
+    "actions_total": 5,
+    "actions_successful": 2,
+    "actions_failed": 1,
+    "stub_count": 2,
+    "unknown_types": []
+  },
+  "issues": [
+    "Action 'action-005' (position-update) failed: Database connection timeout after 5 seconds"
+  ],
+  "anomalies": [
+    "Data timestamp: 2025-11-18T14:30:00Z"
+  ],
+  "recommendations": [
+    "Consider implementing real modules for stubbed actions to improve system capability",
+    "Review failure reasons and add error handling or retry logic",
+    "Focus on fixing failures in: position-update"
+  ]
+}
