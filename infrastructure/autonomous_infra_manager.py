@@ -234,8 +234,10 @@ class AutonomousInfraManager:
             should_execute = self.auto_scale
 
         elif decision.action == InfrastructureAction.TERMINATE_SERVER:
-            # Be more careful with terminations
-            should_execute = self.auto_scale and decision.cost_change < 0
+            # ABSOLUTE BLOCK: System should never terminate its own infrastructure
+            # This logic led to Nov 30 incident where 5 droplets were destroyed
+            # "cost savings" is not a valid reason to destroy infrastructure
+            should_execute = False
 
         # Execute if appropriate
         if should_execute and not decision.executed:

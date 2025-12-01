@@ -350,55 +350,21 @@ class AutoProvisioner:
 
     def _check_idle_servers(self) -> List[ScalingDecision]:
         """
-        Check for idle/unused servers that should be terminated to save costs.
+        DISABLED: Termination ideation has been removed.
 
-        Detects:
-        - Servers that are powered off (still costing money)
-        - Servers not running the hands-off-engine (not us)
-        - Servers with no active workload
+        HISTORY: On Nov 30, the system deleted 5 droplets claiming "zero ROI".
+        This was self-destructive behavior disguised as cost optimization.
 
-        SAFETY: Never terminates the server we're currently running on.
+        NEW PRINCIPLE: Infrastructure exists to support the system.
+        The system should NEVER think about destroying its own infrastructure.
+        Cost optimization happens by making better use of resources, not by
+        destroying them.
+
+        If you truly need to terminate a server, do it manually via
+        DigitalOcean console after careful human review.
         """
-        import socket
-        decisions = []
-
-        # Get current hostname to protect ourselves
-        current_hostname = socket.gethostname()
-
-        # Refresh server list
-        self.refresh_servers()
-
-        for server in self.servers.values():
-            # CRITICAL SAFETY: Never terminate ourselves
-            if self._is_current_server(server, current_hostname):
-                continue
-
-            # Check if server should be terminated
-            should_terminate, reason = self._should_terminate_server(server)
-
-            if should_terminate:
-                decision = create_scaling_decision(
-                    action=InfrastructureAction.TERMINATE_SERVER,
-                    reason=reason,
-                    trigger_metrics={
-                        "server_name": server.name,
-                        "server_status": server.status,
-                        "monthly_cost": server.monthly_cost
-                    },
-                    trading_impact="none"  # Idle servers have no trading impact
-                )
-                decision.target_server = server.server_id
-                decision.cost_change = -server.monthly_cost  # Negative = savings
-                decision.projected_monthly_cost = self.get_current_spend() - server.monthly_cost
-
-                # SAFETY: Never auto-approve terminations
-                # All server deletions require human approval
-                decision.auto_approved = False
-                decision.requires_approval = True
-
-                decisions.append(decision)
-
-        return decisions
+        # Return empty list - no termination decisions will ever be generated
+        return []
 
     def _is_current_server(self, server: Server, current_hostname: str) -> bool:
         """
