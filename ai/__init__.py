@@ -1,1 +1,1 @@
-# Hands-Off Engine AI Module
+# AI modules package
