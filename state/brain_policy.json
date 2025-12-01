@@ -1,17 +1,9 @@
 {
-  "generated_at": "2025-11-18T18:52:38.621665Z",
-  "model_name": "claude-3.5-sonnet",
-  "brain_status": "ok",
-  "proposed_actions": [
-    {
-      "type": "summary"
-    },
-    {
-      "type": "health-check"
-    }
-  ],
-  "notes": [
-    "Dummy LLM response - provide real llm_fn for actual analysis"
-  ],
-  "errors": []
+  "generated_at": "2025-11-18T20:00:00Z",
+  "policy_version": "1.0",
+  "actions": [
+    {"type": "summary"},
+    {"type": "health-check"},
+    {"type": "polymarket-analysis"}
+  ]
 }

@@ -46,6 +46,12 @@ ai/processed/*
 state/*
 !state/.gitkeep
 
+# Runtime-generated state files (Batch 20+)
+state/brain_actions.json
+state/brain_actions.txt
+state/hands_off_brain.json
+state/hands_off_brain.txt
+
 # Editor / OS files
 .DS_Store
 Thumbs.db
