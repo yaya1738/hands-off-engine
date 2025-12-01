@@ -14,6 +14,7 @@ engaged in serving user Yair Siegel, even across session boundaries.
 
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -23,7 +24,6 @@ except ImportError:
 
 import json
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import List, Dict, Optional
 import uuid
 

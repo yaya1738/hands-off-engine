@@ -14,6 +14,7 @@ Run daily via cron to:
 
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -25,7 +26,6 @@ import sys
 import os
 import json
 import logging
-from pathlib import Path
 from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Tuple
 

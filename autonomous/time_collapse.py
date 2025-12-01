@@ -16,6 +16,7 @@ The future is just unexplored present potential.
 
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -29,7 +30,6 @@ import json
 import subprocess
 import threading
 from datetime import datetime, timezone
-from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 sys.path.insert(0, '/root/hands-off-engine')

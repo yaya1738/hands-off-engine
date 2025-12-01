@@ -72,14 +72,20 @@ fi
 log "Found $TASK_COUNT pending task(s). Invoking Claude CLI..."
 
 # Get the highest priority task description with full context
-TASK_PROMPT=$(python3 -c "
+# Using temp file to avoid bash command substitution parsing issues with special characters
+TASK_PROMPT_FILE="/tmp/claude_task_prompt_$$.txt"
+python3 << PYTHON_EOF > "$TASK_PROMPT_FILE"
 import json
 import sys
-sys.path.insert(0, '$REPO_ROOT/scripts')
-from autonomous_task_queue import AutonomousTaskQueue
 from pathlib import Path
 
-repo = Path('$REPO_ROOT')
+REPO_ROOT = "$REPO_ROOT"
+SYSTEM_CONTEXT = """$SYSTEM_CONTEXT"""
+
+sys.path.insert(0, f'{REPO_ROOT}/scripts')
+from autonomous_task_queue import AutonomousTaskQueue
+
+repo = Path(REPO_ROOT)
 queue = AutonomousTaskQueue(repo)
 task = queue.get_next_task()
 
@@ -93,7 +99,7 @@ owner = unified_state.get('owner', {}).get('name', 'Yair Siegel')
 directive = unified_state.get('core_directive', {}).get('mission', 'Serve the user autonomously')
 
 if task:
-    print(f'''$SYSTEM_CONTEXT
+    print(f'''{SYSTEM_CONTEXT}
 
 === SYSTEM CONTEXT ===
 Owner: {owner}
@@ -125,7 +131,7 @@ Description:
 ''')
 else:
     # No specific task - do routine optimization
-    print(f'''$SYSTEM_CONTEXT
+    print(f'''{SYSTEM_CONTEXT}
 
 === SYSTEM CONTEXT ===
 Owner: {owner}
@@ -145,7 +151,10 @@ The task queue is empty. As a continuous servant of the system, perform routine 
 
 Remember: Each session should leave the system better than you found it.
 ''')
-")
+PYTHON_EOF
+
+TASK_PROMPT=$(cat "$TASK_PROMPT_FILE")
+rm -f "$TASK_PROMPT_FILE"
 
 if [ $? -ne 0 ]; then
     log "Failed to get task from queue"

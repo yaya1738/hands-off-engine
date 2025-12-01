@@ -12,6 +12,7 @@ Sends a comprehensive daily summary at 8am including:
 
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -24,7 +25,6 @@ import sys
 import json
 import requests
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
 
 sys.path.insert(0, '/root/hands-off-engine')
 

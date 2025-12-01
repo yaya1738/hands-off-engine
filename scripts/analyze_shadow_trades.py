@@ -7,6 +7,7 @@ Safe: read-only, no network calls.
 
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
+from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -16,7 +17,6 @@ except ImportError:
 
 import json
 from collections import Counter
-from pathlib import Path
 from statistics import mean
 
 SHADOW_PATH = Path("state/shadow_trades.jsonl")
