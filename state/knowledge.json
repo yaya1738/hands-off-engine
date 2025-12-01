@@ -21,6 +21,7 @@
   ],
   "optional_docs": [
     "docs/AUTOMATION_SUCCESS_METRICS.md",
+    "docs/AUTOMATION_TROUBLESHOOTING_GUIDE.md",
     "docs/RISK_MODEL_V1.md",
     "docs/AUDIT_SYSTEM.md",
     "docs/POLYMARKET_API_INTEGRATION.md",
