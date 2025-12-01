@@ -305,6 +305,314 @@ class SystemDoctor:
 
         return symptoms
 
+    def check_cron_jobs(self) -> List[Symptom]:
+        """Check if scheduled jobs are configured."""
+        symptoms = []
+
+        try:
+            result = subprocess.run(
+                ["crontab", "-l"],
+                capture_output=True, text=True, timeout=5
+            )
+            if result.returncode != 0:
+                symptoms.append(Symptom(
+                    component="scheduler",
+                    severity="warning",
+                    symptom="No cron jobs configured",
+                    details="System may not run autonomously"
+                ))
+            else:
+                lines = [l for l in result.stdout.split('\n') if l.strip() and not l.startswith('#')]
+                if len(lines) < 3:
+                    symptoms.append(Symptom(
+                        component="scheduler",
+                        severity="info",
+                        symptom=f"Only {len(lines)} cron jobs active",
+                        details="Consider adding more automation"
+                    ))
+        except:
+            pass
+
+        return symptoms
+
+    def check_log_files(self) -> List[Symptom]:
+        """Check log file health."""
+        symptoms = []
+        log_dir = Path("/var/log/hands-off")
+
+        if not log_dir.exists():
+            symptoms.append(Symptom(
+                component="logging",
+                severity="warning",
+                symptom="Log directory missing",
+                details=str(log_dir)
+            ))
+            return symptoms
+
+        # Check for oversized logs
+        for log_file in log_dir.glob("*.log"):
+            try:
+                size_mb = log_file.stat().st_size / (1024 * 1024)
+                if size_mb > 100:
+                    symptoms.append(Symptom(
+                        component="logging",
+                        severity="warning",
+                        symptom=f"Large log file: {log_file.name}",
+                        details=f"Size: {size_mb:.1f} MB"
+                    ))
+            except:
+                pass
+
+        return symptoms
+
+    def check_git_status(self) -> List[Symptom]:
+        """Check git repository health."""
+        symptoms = []
+
+        try:
+            # Check for uncommitted changes
+            result = subprocess.run(
+                ["git", "-C", str(BASE_DIR), "status", "--porcelain"],
+                capture_output=True, text=True, timeout=10
+            )
+            if result.stdout.strip():
+                lines = len(result.stdout.strip().split('\n'))
+                if lines > 50:
+                    symptoms.append(Symptom(
+                        component="git",
+                        severity="warning",
+                        symptom=f"{lines} uncommitted changes",
+                        details="Consider committing or cleaning"
+                    ))
+
+            # Check if ahead of remote
+            result = subprocess.run(
+                ["git", "-C", str(BASE_DIR), "status", "-sb"],
+                capture_output=True, text=True, timeout=10
+            )
+            if "ahead" in result.stdout:
+                symptoms.append(Symptom(
+                    component="git",
+                    severity="info",
+                    symptom="Unpushed commits",
+                    details="Local ahead of remote"
+                ))
+
+        except:
+            pass
+
+        return symptoms
+
+    def check_memory(self) -> List[Symptom]:
+        """Check memory usage."""
+        symptoms = []
+
+        try:
+            with open('/proc/meminfo', 'r') as f:
+                meminfo = {}
+                for line in f:
+                    parts = line.split(':')
+                    if len(parts) == 2:
+                        key = parts[0].strip()
+                        val = parts[1].strip().split()[0]
+                        meminfo[key] = int(val)
+
+            total = meminfo.get('MemTotal', 1)
+            available = meminfo.get('MemAvailable', 0)
+            used_pct = ((total - available) / total) * 100
+
+            if used_pct > 90:
+                symptoms.append(Symptom(
+                    component="memory",
+                    severity="critical",
+                    symptom="Memory usage critical",
+                    details=f"Used: {used_pct:.0f}%"
+                ))
+            elif used_pct > 80:
+                symptoms.append(Symptom(
+                    component="memory",
+                    severity="warning",
+                    symptom="Memory usage high",
+                    details=f"Used: {used_pct:.0f}%"
+                ))
+
+        except:
+            pass
+
+        return symptoms
+
+    def check_network(self) -> List[Symptom]:
+        """Check network connectivity."""
+        symptoms = []
+
+        endpoints = [
+            ("telegram", "api.telegram.org"),
+            ("polymarket", "clob.polymarket.com"),
+            ("github", "github.com"),
+        ]
+
+        for name, host in endpoints:
+            try:
+                result = subprocess.run(
+                    ["ping", "-c", "1", "-W", "3", host],
+                    capture_output=True, timeout=5
+                )
+                if result.returncode != 0:
+                    symptoms.append(Symptom(
+                        component=f"network_{name}",
+                        severity="warning",
+                        symptom=f"Cannot reach {name}",
+                        details=f"Host: {host}"
+                    ))
+            except:
+                pass
+
+        return symptoms
+
+    def check_python_imports(self) -> List[Symptom]:
+        """Check if critical Python modules are importable."""
+        symptoms = []
+
+        critical_modules = [
+            ("py_clob_client", "Polymarket trading"),
+            ("requests", "HTTP requests"),
+            ("dotenv", "Environment loading"),
+        ]
+
+        for module, purpose in critical_modules:
+            try:
+                __import__(module)
+            except ImportError:
+                symptoms.append(Symptom(
+                    component=f"python_{module}",
+                    severity="warning",
+                    symptom=f"Module not installed: {module}",
+                    details=f"Required for: {purpose}"
+                ))
+
+        return symptoms
+
+    def check_env_files(self) -> List[Symptom]:
+        """Check environment file health."""
+        symptoms = []
+
+        env_files = [
+            (".env", ["OPENAI_API_KEY"]),
+            (".env.polymarket", ["POLYMARKET_PRIVATE_KEY", "POLYMARKET_FUNDER_ADDRESS"]),
+        ]
+
+        for filename, required_keys in env_files:
+            filepath = BASE_DIR / filename
+            if not filepath.exists():
+                symptoms.append(Symptom(
+                    component="env",
+                    severity="warning",
+                    symptom=f"Missing env file: {filename}",
+                ))
+            else:
+                content = filepath.read_text()
+                for key in required_keys:
+                    if key not in content:
+                        symptoms.append(Symptom(
+                            component="env",
+                            severity="warning",
+                            symptom=f"Missing key in {filename}",
+                            details=f"Key: {key}"
+                        ))
+
+        return symptoms
+
+    def check_evolution_progress(self) -> List[Symptom]:
+        """Check if evolution engine is making progress."""
+        symptoms = []
+
+        evolution_file = STATE_DIR / "evolution_state.json"
+        if evolution_file.exists():
+            try:
+                data = json.loads(evolution_file.read_text())
+                cycles = data.get("cycles", 0)
+                actions = data.get("actions_taken", 0)
+
+                if cycles > 0:
+                    success_rate = actions / cycles
+                    if success_rate < 0.5:
+                        symptoms.append(Symptom(
+                            component="evolution",
+                            severity="warning",
+                            symptom="Low evolution success rate",
+                            details=f"{success_rate*100:.0f}% actions succeed"
+                        ))
+
+                last_action = data.get("last_action", {})
+                if last_action:
+                    last_time = last_action.get("timestamp", "")
+                    if last_time:
+                        try:
+                            last_dt = datetime.fromisoformat(last_time.replace('Z', '+00:00'))
+                            age_hours = (datetime.now(timezone.utc) - last_dt).total_seconds() / 3600
+                            if age_hours > 2:
+                                symptoms.append(Symptom(
+                                    component="evolution",
+                                    severity="warning",
+                                    symptom="Evolution engine stale",
+                                    details=f"Last action: {age_hours:.1f} hours ago"
+                                ))
+                        except:
+                            pass
+
+            except:
+                pass
+
+        return symptoms
+
+    def check_trading_positions(self) -> List[Symptom]:
+        """Check trading position health."""
+        symptoms = []
+
+        try:
+            from autonomous.actuators import ActuatorHub
+            hub = ActuatorHub()
+
+            if hub.polymarket.trader:
+                orders = hub.polymarket.get_open_orders()
+                if len(orders) > 20:
+                    symptoms.append(Symptom(
+                        component="trading",
+                        severity="info",
+                        symptom=f"Many open orders: {len(orders)}",
+                        details="Consider consolidating"
+                    ))
+
+        except:
+            pass
+
+        return symptoms
+
+    def check_outreach_progress(self) -> List[Symptom]:
+        """Check outreach effectiveness."""
+        symptoms = []
+
+        pursuit_file = STATE_DIR / "active_pursuit.json"
+        if pursuit_file.exists():
+            try:
+                data = json.loads(pursuit_file.read_text())
+                total = data.get("total_actions", 0)
+                income = data.get("income_generated", 0)
+                outreach = data.get("outreach_sent", 0)
+
+                if outreach > 50 and income == 0:
+                    symptoms.append(Symptom(
+                        component="outreach",
+                        severity="warning",
+                        symptom="Outreach not converting",
+                        details=f"{outreach} sent, $0 income"
+                    ))
+
+            except:
+                pass
+
+        return symptoms
+
     def full_examination(self) -> List[Symptom]:
         """Run all checks and collect symptoms."""
         print("\n🩺 SYSTEM DOCTOR - Full Examination")
@@ -313,12 +621,28 @@ class SystemDoctor:
         all_symptoms = []
 
         checks = [
+            # Core System
             ("Processes", self.check_processes),
             ("State Files", self.check_state_files),
             ("Actuators", self.check_actuators),
+            # Business Health
             ("Finances", self.check_finances),
-            ("Endpoints", self.check_endpoints),
+            ("Outreach Progress", self.check_outreach_progress),
+            ("Evolution Progress", self.check_evolution_progress),
+            # Infrastructure
             ("Disk Space", self.check_disk_space),
+            ("Memory", self.check_memory),
+            ("Network", self.check_network),
+            # Operations
+            ("Endpoints", self.check_endpoints),
+            ("Cron Jobs", self.check_cron_jobs),
+            ("Log Files", self.check_log_files),
+            # Development
+            ("Git Status", self.check_git_status),
+            ("Python Imports", self.check_python_imports),
+            ("Env Files", self.check_env_files),
+            # Trading
+            ("Trading Positions", self.check_trading_positions),
         ]
 
         for name, check_fn in checks:
