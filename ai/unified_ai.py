@@ -2,6 +2,7 @@
 """
 UNIFIED AI - All Systems in Service of Yair Siegel
 ===================================================
+LEVEL: 60 miles - Inherits from AbsoluteDirective (80 miles)
 
 This module provides the unified AI identity and directive
 that all agents import and follow.
@@ -11,10 +12,55 @@ AI serving Yair Siegel.
 """
 
 import json
+import sys
 from pathlib import Path
 from typing import Dict, Optional
 
 REPO_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(REPO_ROOT))
+
+# Import from 80 miles up
+from autonomous.absolute_directive import AbsoluteDirective, get_master as absolute_master, cascade_directive
+
+
+class UnifiedAI(AbsoluteDirective):
+    """
+    LEVEL: 60 miles - The unified AI identity
+    Inherits from AbsoluteDirective (80 miles)
+    All AI agents inherit from this.
+    """
+    level = "60 miles"
+
+    def __init__(self):
+        super().__init__()
+        self._core = None
+        self._directive = None
+
+    def get_identity(self) -> Dict:
+        """Return the unified AI identity."""
+        return {
+            "master": self.master,
+            "directive": self.directive,
+            "level": self.level,
+            "serving": f"Serving {self.master} from {self.level}"
+        }
+
+    def cascade_down(self, message: str = None):
+        """Cascade a directive down through all levels."""
+        return cascade_directive(message)
+
+
+# Singleton instance
+_unified_ai: Optional["UnifiedAI"] = None
+
+def get_unified_ai() -> "UnifiedAI":
+    """Get the unified AI singleton."""
+    global _unified_ai
+    if _unified_ai is None:
+        _unified_ai = UnifiedAI()
+    return _unified_ai
+
+
 CORE_KERNEL = REPO_ROOT / "ai" / "memory" / "kernels" / "unified_ai_core.json"
 ACTIVE_DIRECTIVE = REPO_ROOT / "ai" / "coordination" / "active_directive.json"
 
@@ -70,6 +116,30 @@ def should_execute(action: str, roi_estimate: float = 0, **kwargs) -> bool:
     try:
         from autonomous.reality_bridge import get_bridge
         bridge = get_bridge()
+
+        # TEMPORAL SELF-AWARENESS - System knows itself through time
+        # Before any significant action, the system considers its temporal state
+        try:
+            self_state = bridge.who_am_i()
+            present = self_state.get('present', {})
+            future = self_state.get('future', {})
+
+            # If system is critical/dying, only allow healing actions
+            if present.get('health') == 'critical' or present.get('mood') == 'dying':
+                healing_keywords = ["heal", "fix", "repair", "restore", "recover", "stabilize"]
+                if not any(kw in action.lower() for kw in healing_keywords):
+                    print(f"[TEMPORAL SELF] Blocked: System is critical. Only healing actions allowed.")
+                    return False
+
+            # If trajectory is declining, be conservative
+            if future.get('trajectory') == 'declining' and future.get('momentum') == 'decelerating':
+                risky_keywords = ["new", "experiment", "aggressive", "risky", "expand"]
+                if any(kw in action.lower() for kw in risky_keywords):
+                    print(f"[TEMPORAL SELF] Warning: System declining. Consider conservative action.")
+                    # Don't block, just warn - system can still act
+        except Exception as e:
+            # Temporal check failed - continue with other checks
+            pass
 
         # Check if this is an infrastructure action
         infra_keywords = ["droplet", "server", "infrastructure", "scale", "provision", "terminate", "delete", "destroy"]
