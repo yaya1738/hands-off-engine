@@ -37,6 +37,8 @@
     "docs/PRODUCTION_DEPLOYMENT.md",
     "docs/EXECUTION_NOTIFICATIONS.md",
     "docs/AUTONOMOUS_BOTTLENECKS_RESOLVED.md",
+    "docs/AUTONOMOUS_GAPS_ANALYSIS.md",
+    "docs/WHATS_NOT_AUTONOMOUS_YET.md",
     "docs/claude/MCP_ARCHITECTURE_CORRECTION.md",
     "docs/claude/MCP_SETUP_GUIDE.md",
     "docs/claude/MCP_VERIFICATION_RESULTS.md",
