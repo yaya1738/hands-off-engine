@@ -26,8 +26,9 @@ curl -s https://raw.githubusercontent.com/yaya1738/hands-off-engine/copilot/setu
 
 ## What It Does
 
-1. **Adds SSH Key**: Enables ho-cli-main to SSH into this droplet
-   - Key: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9leXKzmPHKpTLjwsynPjVSbtyyhk0HFynKlA6X1z6x`
+1. **Adds SSH Keys**: Enables SSH access from both cluster nodes
+   - ho-cli-main: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9leXKzmPHKpTLjwsynPjVSbtyyhk0HFynKlA6X1z6x`
+   - pm-helper: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKUOlcMgjyYnAknQhzB/hHMZewPEx7XPLAd/Q2vLt1JD`
    
 2. **Creates Safety Blocklist**: Creates `.claudeignore` to prevent AI from touching:
    - Environment files (.env, secrets)
@@ -42,7 +43,7 @@ The script is idempotent - running it again won't break anything or create dupli
 
 ## After Running
 
-You can SSH from ho-cli-main to the droplet:
+You can SSH from either ho-cli-main or pm-helper to the droplet:
 ```bash
 ssh root@<droplet-ip>
 ```

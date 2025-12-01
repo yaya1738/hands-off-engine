@@ -15,14 +15,18 @@ echo "=== Hands-Off SSH & Safety Setup ==="
 echo "Timestamp: $(date -Iseconds)"
 echo ""
 
-# 1. Setup SSH access from ho-cli-main
+# 1. Setup SSH access from ho-cli-main and pm-helper
 echo "[1/2] Setting up SSH access..."
 mkdir -p /root/.ssh
 chmod 700 /root/.ssh
 
-# Add ho-cli-main public key
+# Add ho-cli-main public key (primary CLI access)
 HO_CLI_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9leXKzmPHKpTLjwsynPjVSbtyyhk0HFynKlA6X1z6x root@ho-cli-main"
 
+# Add pm-helper public key (original primary node)
+PM_HELPER_KEY="ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKUOlcMgjyYnAknQhzB/hHMZewPEx7XPLAd/Q2vLt1JD handsoff-do138"
+
+# Add keys if not present
 if [ -f /root/.ssh/authorized_keys ]; then
     if grep -q "root@ho-cli-main" /root/.ssh/authorized_keys 2>/dev/null; then
         echo "  ✓ ho-cli-main key already present"
@@ -30,9 +34,17 @@ if [ -f /root/.ssh/authorized_keys ]; then
         echo "$HO_CLI_KEY" >> /root/.ssh/authorized_keys
         echo "  ✓ Added ho-cli-main key"
     fi
+    
+    if grep -q "handsoff-do138" /root/.ssh/authorized_keys 2>/dev/null; then
+        echo "  ✓ pm-helper key already present"
+    else
+        echo "$PM_HELPER_KEY" >> /root/.ssh/authorized_keys
+        echo "  ✓ Added pm-helper key"
+    fi
 else
     echo "$HO_CLI_KEY" > /root/.ssh/authorized_keys
-    echo "  ✓ Created authorized_keys with ho-cli-main key"
+    echo "$PM_HELPER_KEY" >> /root/.ssh/authorized_keys
+    echo "  ✓ Created authorized_keys with both keys"
 fi
 
 chmod 600 /root/.ssh/authorized_keys
@@ -126,9 +138,9 @@ fi
 echo ""
 echo "=== Setup Complete! ==="
 echo ""
-echo "✓ SSH access from ho-cli-main enabled"
+echo "✓ SSH access from ho-cli-main and pm-helper enabled"
 echo "✓ AI safety blocklist in place"
 echo ""
-echo "You can now SSH from ho-cli-main to this droplet:"
+echo "You can now SSH from either node to this droplet:"
 echo "  ssh root@$(curl -s ifconfig.me 2>/dev/null || echo '<this-droplet-ip>')"
 echo ""
