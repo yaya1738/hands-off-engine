@@ -7,6 +7,7 @@ This script shows how to:
 2. Get summaries for individual sessions
 3. Get summaries for all sessions
 """
+import argparse
 import sys
 from pathlib import Path
 
@@ -16,7 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "audit"))
 from audit_logger import AuditLogger
 
 
-def demonstrate_session_audit():
+def demonstrate_session_audit(log_dir: str = "audit/logs"):
     """Demonstrate the session audit functionality"""
     
     print("=" * 80)
@@ -24,7 +25,7 @@ def demonstrate_session_audit():
     print("=" * 80)
     
     # Initialize logger
-    logger = AuditLogger(log_dir="audit/logs")
+    logger = AuditLogger(log_dir=log_dir)
     
     # 1. List all sessions
     print("\n1. LISTING ALL AVAILABLE SESSIONS")
@@ -105,4 +106,14 @@ def demonstrate_session_audit():
 
 
 if __name__ == "__main__":
-    demonstrate_session_audit()
+    parser = argparse.ArgumentParser(
+        description="Demonstrate agent session audit functionality"
+    )
+    parser.add_argument(
+        "--log-dir",
+        default="audit/logs",
+        help="Audit log directory (default: audit/logs)"
+    )
+    args = parser.parse_args()
+    
+    demonstrate_session_audit(log_dir=args.log_dir)
