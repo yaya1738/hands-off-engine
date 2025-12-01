@@ -275,6 +275,9 @@ class SessionOrderValidator:
     
     def _calculate_duration(self, start_time: str, end_time: str) -> Optional[int]:
         """Calculate session duration in seconds"""
+        if not start_time or not end_time:
+            return None
+        
         try:
             start = datetime.fromisoformat(start_time.replace('Z', '+00:00'))
             end = datetime.fromisoformat(end_time.replace('Z', '+00:00'))
@@ -449,7 +452,7 @@ def main():
             return
         
         session_id = sys.argv[2]
-        prerequisites = sys.argv[3].split(',') if len(sys.argv) > 3 else None
+        prerequisites = [p.strip() for p in sys.argv[3].split(',') if p.strip()] if len(sys.argv) > 3 and sys.argv[3] else None
         
         if validate_session_order(session_id, prerequisites):
             print(f"✓ Session {session_id} can proceed")
@@ -464,7 +467,7 @@ def main():
         
         session_id = sys.argv[2]
         agent = sys.argv[3]
-        dependencies = sys.argv[4].split(',') if len(sys.argv) > 4 and sys.argv[4] else None
+        dependencies = [d.strip() for d in sys.argv[4].split(',') if d.strip()] if len(sys.argv) > 4 and sys.argv[4] else None
         description = sys.argv[5] if len(sys.argv) > 5 else None
         
         register_session(session_id, agent, dependencies, description=description)

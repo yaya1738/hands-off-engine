@@ -35,12 +35,20 @@ import json
 from datetime import datetime, timezone
 from typing import List, Dict, Optional
 import uuid
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
 
 # Task status constants
 TASK_STATUS_PENDING = 'pending'
 TASK_STATUS_IN_PROGRESS = 'in_progress'
 TASK_STATUS_COMPLETED = 'completed'
 TASK_STATUS_BLOCKED = 'blocked'
+
+# Display constants
+MAX_PREREQUISITES_DISPLAY = 3
 
 
 class AutonomousTaskQueue:
@@ -162,13 +170,14 @@ class AutonomousTaskQueue:
         
         completed_ids = set()
         with open(self.completed_log) as f:
-            for line in f:
+            for line_num, line in enumerate(f, 1):
                 try:
                     record = json.loads(line)
                     task_id = record.get('task', {}).get('id')
                     if task_id:
                         completed_ids.add(task_id)
-                except json.JSONDecodeError:
+                except json.JSONDecodeError as e:
+                    logger.warning(f"Malformed JSON at line {line_num} in {self.completed_log}: {e}")
                     continue
         
         return completed_ids
@@ -265,9 +274,10 @@ class AutonomousTaskQueue:
             print(f"\n⚠️  BLOCKED TASKS ({len(blocked_tasks)}):")
             for task in blocked_tasks:
                 print(f"\n  [{task['id'][:8]}...] {task['title']}")
-                print(f"  Missing prerequisites: {', '.join(task['missing_prerequisites'][:3])}")
-                if len(task['missing_prerequisites']) > 3:
-                    print(f"  ... and {len(task['missing_prerequisites']) - 3} more")
+                prereqs_to_show = task['missing_prerequisites'][:MAX_PREREQUISITES_DISPLAY]
+                print(f"  Missing prerequisites: {', '.join(prereqs_to_show)}")
+                if len(task['missing_prerequisites']) > MAX_PREREQUISITES_DISPLAY:
+                    print(f"  ... and {len(task['missing_prerequisites']) - MAX_PREREQUISITES_DISPLAY} more")
 
         # Group by priority
         for priority in ['critical', 'high', 'normal', 'low']:
