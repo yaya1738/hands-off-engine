@@ -23,12 +23,14 @@ jobs:
           # Create timestamp
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           
-          # Sanitize issue title for JSON (escape quotes and backslashes)
-          TITLE=$(echo "${{ github.event.issue.title }}" | sed 's/\\/\\\\/g' | sed 's/"/\\"/g')
+          # Sanitize issue title for JSON using jq
+          TITLE=$(echo "${{ github.event.issue.title }}" | jq -Rs .)
+          # Remove surrounding quotes from jq output
+          TITLE=${TITLE:1:-1}
           
           # Append task assignment to coordination log
           mkdir -p ai/coordination
-          echo "{\"timestamp\": \"${TIMESTAMP}\", \"issue\": ${{ github.event.issue.number }}, \"status\": \"assigned\", \"agent\": \"copilot\", \"title\": \"${TITLE}\"}" >> ai/coordination/copilot_tasks.jsonl
+          echo "{\"timestamp\": \"${TIMESTAMP}\", \"issue\": ${{ github.event.issue.number }}, \"status\": \"assigned\", \"agent\": \"copilot\", \"title\": ${TITLE}}" >> ai/coordination/copilot_tasks.jsonl
           
           # Log assignment
           echo "📝 Task #${{ github.event.issue.number }} logged to coordination system"

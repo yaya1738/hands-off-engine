@@ -143,7 +143,12 @@ const messages = messagesText.split('\n').filter(l => l).map(JSON.parse)
    - Create a fine-grained personal access token
    - Limit to `yaya1738/hands-off-engine` repository
    - Grant read access for data fetching
-   - Grant write access for triggering workflows
+   - Grant write access for triggering workflows (`repository_dispatch`)
+   - **Required scopes:**
+     - `repo` - Full repository access
+     - For repository_dispatch webhooks, the token needs workflow dispatch permissions
+   - Set appropriate expiration (recommend 90 days max)
+   - Rotate tokens regularly
 
 2. **Emergency Stop:** The emergency stop button should require confirmation
    - Use a modal/dialog before triggering

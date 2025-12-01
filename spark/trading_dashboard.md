@@ -50,7 +50,7 @@ Data: Fetch from `logs/` directory or recent execution history
   fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
     method: 'POST',
     headers: {
-      'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',
+      'Authorization': 'token GITHUB_PERSONAL_ACCESS_TOKEN',  // Requires: repo scope, workflow dispatch
       'Accept': 'application/vnd.github.v3+json'
     },
     body: JSON.stringify({
@@ -59,6 +59,10 @@ Data: Fetch from `logs/` directory or recent execution history
     })
   })
   ```
+
+**Note:** The GitHub Personal Access Token must have:
+- `repo` scope for repository access
+- Workflow dispatch permissions
 
 ### Refresh Button
 - Manual refresh data (in addition to auto-refresh)
