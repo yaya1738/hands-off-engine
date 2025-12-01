@@ -78,6 +78,7 @@ class SystemDoctor:
         self.symptoms: List[Symptom] = []
         self.diagnoses: List[Diagnosis] = []
         self.treatments: List[Treatment] = []
+        self._sensitive_data: Dict = {}  # Privileged data collected during examination
 
     def _load_state(self) -> Dict:
         if DOCTOR_STATE.exists():
@@ -522,6 +523,357 @@ class SystemDoctor:
 
         return symptoms
 
+    # ═══════════════════════════════════════════════════════════
+    # SENSITIVE DATA ACCESS - Privileged health checks
+    # ═══════════════════════════════════════════════════════════
+
+    def check_wallet_balance(self) -> List[Symptom]:
+        """Check actual wallet balance on Polygon."""
+        symptoms = []
+
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(BASE_DIR / ".env.polymarket")
+
+            wallet_address = os.environ.get("POLYMARKET_FUNDER_ADDRESS")
+            if not wallet_address:
+                symptoms.append(Symptom(
+                    component="wallet",
+                    severity="critical",
+                    symptom="No wallet address configured",
+                ))
+                return symptoms
+
+            # Check USDC balance via Polygon RPC
+            import urllib.request
+            import json as json_module
+
+            rpc_url = "https://polygon-rpc.com"
+            # USDC contract on Polygon
+            usdc_contract = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
+
+            # balanceOf(address) call
+            data = {
+                "jsonrpc": "2.0",
+                "method": "eth_call",
+                "params": [{
+                    "to": usdc_contract,
+                    "data": f"0x70a08231000000000000000000000000{wallet_address[2:]}"
+                }, "latest"],
+                "id": 1
+            }
+
+            req = urllib.request.Request(
+                rpc_url,
+                data=json_module.dumps(data).encode(),
+                headers={"Content-Type": "application/json"}
+            )
+
+            with urllib.request.urlopen(req, timeout=10) as response:
+                result = json_module.loads(response.read())
+                if "result" in result:
+                    balance_wei = int(result["result"], 16)
+                    balance_usdc = balance_wei / 1e6  # USDC has 6 decimals
+
+                    # Store in sensitive data
+                    self._sensitive_data["wallet_usdc"] = balance_usdc
+                    self._sensitive_data["wallet_address"] = wallet_address
+
+                    if balance_usdc < 1:
+                        symptoms.append(Symptom(
+                            component="wallet",
+                            severity="critical",
+                            symptom="Wallet nearly empty",
+                            details=f"USDC: ${balance_usdc:.2f}"
+                        ))
+                    elif balance_usdc < 10:
+                        symptoms.append(Symptom(
+                            component="wallet",
+                            severity="warning",
+                            symptom="Low wallet balance",
+                            details=f"USDC: ${balance_usdc:.2f}"
+                        ))
+
+        except Exception as e:
+            symptoms.append(Symptom(
+                component="wallet",
+                severity="warning",
+                symptom="Could not check wallet balance",
+                details=str(e)[:100]
+            ))
+
+        return symptoms
+
+    def check_polymarket_positions(self) -> List[Symptom]:
+        """Check actual Polymarket positions and their value."""
+        symptoms = []
+
+        try:
+            from autonomous.actuators import ActuatorHub
+            hub = ActuatorHub()
+
+            if not hub.polymarket.trader:
+                symptoms.append(Symptom(
+                    component="polymarket",
+                    severity="warning",
+                    symptom="Polymarket trader not initialized",
+                ))
+                return symptoms
+
+            # Get positions
+            positions = []
+            try:
+                # Check for gamma API or positions
+                pm = hub.polymarket
+                if hasattr(pm, 'get_positions'):
+                    positions = pm.get_positions()
+            except:
+                pass
+
+            # Get open orders
+            orders = hub.polymarket.get_open_orders()
+
+            # Get trades
+            trades = hub.polymarket.get_trades()
+
+            # Store sensitive data
+            self._sensitive_data["polymarket"] = {
+                "positions": len(positions),
+                "open_orders": len(orders),
+                "trades": len(trades),
+                "recent_trades": trades[-5:] if trades else [],
+            }
+
+            # Calculate exposure
+            total_exposure = sum(float(o.get("size", 0)) for o in orders)
+            if total_exposure > 100:
+                symptoms.append(Symptom(
+                    component="polymarket",
+                    severity="info",
+                    symptom=f"High trading exposure",
+                    details=f"Open orders: ${total_exposure:.2f}"
+                ))
+
+        except Exception as e:
+            symptoms.append(Symptom(
+                component="polymarket",
+                severity="warning",
+                symptom="Could not check Polymarket positions",
+                details=str(e)[:100]
+            ))
+
+        return symptoms
+
+    def check_api_credentials(self) -> List[Symptom]:
+        """Validate API credentials work (without exposing them)."""
+        symptoms = []
+
+        # Check OpenAI
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(BASE_DIR / ".env")
+
+            openai_key = os.environ.get("OPENAI_API_KEY", "")
+            if openai_key:
+                # Just validate format
+                if not openai_key.startswith("sk-"):
+                    symptoms.append(Symptom(
+                        component="api_openai",
+                        severity="warning",
+                        symptom="OpenAI key format invalid",
+                    ))
+                else:
+                    self._sensitive_data["openai_configured"] = True
+            else:
+                symptoms.append(Symptom(
+                    component="api_openai",
+                    severity="warning",
+                    symptom="OpenAI API key not configured",
+                ))
+
+        except:
+            pass
+
+        # Check Telegram
+        try:
+            tg_env = Path("/root/hands-off/state/tg/bots/handsoff.env")
+            if tg_env.exists():
+                content = tg_env.read_text()
+                if "BOT_TOKEN=" in content:
+                    self._sensitive_data["telegram_configured"] = True
+                else:
+                    symptoms.append(Symptom(
+                        component="api_telegram",
+                        severity="warning",
+                        symptom="Telegram bot token missing",
+                    ))
+            else:
+                symptoms.append(Symptom(
+                    component="api_telegram",
+                    severity="warning",
+                    symptom="Telegram config file not found",
+                ))
+        except:
+            pass
+
+        # Check Polymarket credentials
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(BASE_DIR / ".env.polymarket")
+
+            pk = os.environ.get("POLYMARKET_PRIVATE_KEY", "")
+            if pk and pk.startswith("0x") and len(pk) == 66:
+                self._sensitive_data["polymarket_configured"] = True
+            else:
+                symptoms.append(Symptom(
+                    component="api_polymarket",
+                    severity="warning",
+                    symptom="Polymarket private key format invalid",
+                ))
+        except:
+            pass
+
+        return symptoms
+
+    def check_financial_runway(self) -> List[Symptom]:
+        """Calculate financial runway based on burn rate."""
+        symptoms = []
+
+        try:
+            # Get current balance
+            wallet_balance = self._sensitive_data.get("wallet_usdc", 0)
+
+            # Load finance hub data
+            finance_file = BASE_DIR / "finance" / "finance_hub.json"
+            if finance_file.exists():
+                data = json.loads(finance_file.read_text())
+                monthly_burn = data.get("monthly_burn", 0)
+                income = data.get("income", {}).get("total", 0)
+
+                net_burn = monthly_burn - income
+                if net_burn > 0 and wallet_balance > 0:
+                    runway_months = wallet_balance / net_burn
+                    self._sensitive_data["runway_months"] = runway_months
+
+                    if runway_months < 1:
+                        symptoms.append(Symptom(
+                            component="runway",
+                            severity="critical",
+                            symptom="Less than 1 month runway",
+                            details=f"Runway: {runway_months:.1f} months"
+                        ))
+                    elif runway_months < 3:
+                        symptoms.append(Symptom(
+                            component="runway",
+                            severity="warning",
+                            symptom="Short runway",
+                            details=f"Runway: {runway_months:.1f} months"
+                        ))
+
+                self._sensitive_data["monthly_burn"] = monthly_burn
+                self._sensitive_data["income"] = income
+
+        except Exception as e:
+            pass
+
+        return symptoms
+
+    def check_database_integrity(self) -> List[Symptom]:
+        """Check state file integrity and corruption."""
+        symptoms = []
+
+        critical_state_files = [
+            "evolution_state.json",
+            "reality_feedback.json",
+            "doctor_state.json",
+            "endpoint_registry.json",
+        ]
+
+        for filename in critical_state_files:
+            filepath = STATE_DIR / filename
+            if filepath.exists():
+                try:
+                    content = filepath.read_text()
+                    json.loads(content)  # Validate JSON
+                except json.JSONDecodeError:
+                    symptoms.append(Symptom(
+                        component="database",
+                        severity="critical",
+                        symptom=f"Corrupted state file: {filename}",
+                        details="Invalid JSON"
+                    ))
+                except Exception as e:
+                    symptoms.append(Symptom(
+                        component="database",
+                        severity="warning",
+                        symptom=f"Cannot read state file: {filename}",
+                        details=str(e)[:50]
+                    ))
+
+        return symptoms
+
+    def check_secret_exposure(self) -> List[Symptom]:
+        """Check for accidentally exposed secrets in logs or state."""
+        symptoms = []
+
+        secret_patterns = [
+            (r"sk-[a-zA-Z0-9]{20,}", "OpenAI key"),
+            (r"0x[a-fA-F0-9]{64}", "Private key"),
+            (r"ghp_[a-zA-Z0-9]{36}", "GitHub token"),
+        ]
+
+        import re
+
+        # Check log files
+        log_dir = Path("/var/log/hands-off")
+        if log_dir.exists():
+            for log_file in log_dir.glob("*.log"):
+                try:
+                    content = log_file.read_text()[-10000:]  # Last 10KB
+                    for pattern, name in secret_patterns:
+                        if re.search(pattern, content):
+                            symptoms.append(Symptom(
+                                component="security",
+                                severity="critical",
+                                symptom=f"Potential {name} exposure in logs",
+                                details=f"File: {log_file.name}"
+                            ))
+                except:
+                    pass
+
+        # Check state files for secrets
+        for state_file in STATE_DIR.glob("*.json"):
+            try:
+                content = state_file.read_text()
+                for pattern, name in secret_patterns:
+                    if re.search(pattern, content):
+                        symptoms.append(Symptom(
+                            component="security",
+                            severity="critical",
+                            symptom=f"Potential {name} in state file",
+                            details=f"File: {state_file.name}"
+                        ))
+            except:
+                pass
+
+        return symptoms
+
+    def get_sensitive_summary(self) -> Dict:
+        """Get summary of sensitive data collected during examination."""
+        return {
+            "wallet_usdc": self._sensitive_data.get("wallet_usdc", "unknown"),
+            "wallet_address": self._sensitive_data.get("wallet_address", "unknown")[:10] + "..." if self._sensitive_data.get("wallet_address") else "unknown",
+            "polymarket": self._sensitive_data.get("polymarket", {}),
+            "runway_months": self._sensitive_data.get("runway_months", "unknown"),
+            "monthly_burn": self._sensitive_data.get("monthly_burn", 0),
+            "income": self._sensitive_data.get("income", 0),
+            "credentials": {
+                "openai": self._sensitive_data.get("openai_configured", False),
+                "telegram": self._sensitive_data.get("telegram_configured", False),
+                "polymarket": self._sensitive_data.get("polymarket_configured", False),
+            },
+        }
+
     def check_evolution_progress(self) -> List[Symptom]:
         """Check if evolution engine is making progress."""
         symptoms = []
@@ -643,6 +995,13 @@ class SystemDoctor:
             ("Env Files", self.check_env_files),
             # Trading
             ("Trading Positions", self.check_trading_positions),
+            # Sensitive Data Access (privileged)
+            ("Wallet Balance", self.check_wallet_balance),
+            ("Polymarket Positions", self.check_polymarket_positions),
+            ("API Credentials", self.check_api_credentials),
+            ("Financial Runway", self.check_financial_runway),
+            ("Database Integrity", self.check_database_integrity),
+            ("Secret Exposure", self.check_secret_exposure),
         ]
 
         for name, check_fn in checks:
@@ -835,6 +1194,25 @@ class SystemDoctor:
         warnings = len([s for s in self.symptoms if s.severity == "warning"])
         report.append(f"  Critical issues: {critical}")
         report.append(f"  Warnings: {warnings}")
+
+        # Sensitive Data Summary
+        if self._sensitive_data:
+            report.append("\n🔐 SENSITIVE DATA (Privileged Access)")
+            report.append("-" * 40)
+            sensitive = self.get_sensitive_summary()
+            if sensitive.get("wallet_usdc") != "unknown":
+                report.append(f"  Wallet USDC: ${sensitive['wallet_usdc']:.2f}" if isinstance(sensitive['wallet_usdc'], (int, float)) else f"  Wallet USDC: {sensitive['wallet_usdc']}")
+            if sensitive.get("wallet_address"):
+                report.append(f"  Wallet: {sensitive['wallet_address']}")
+            if sensitive.get("runway_months") != "unknown":
+                report.append(f"  Runway: {sensitive['runway_months']:.1f} months" if isinstance(sensitive['runway_months'], (int, float)) else f"  Runway: {sensitive['runway_months']}")
+            report.append(f"  Monthly Burn: ${sensitive.get('monthly_burn', 0)}")
+            report.append(f"  Income: ${sensitive.get('income', 0)}")
+            creds = sensitive.get("credentials", {})
+            report.append(f"  Credentials: OpenAI={'✓' if creds.get('openai') else '✗'} Telegram={'✓' if creds.get('telegram') else '✗'} Polymarket={'✓' if creds.get('polymarket') else '✗'}")
+            pm = sensitive.get("polymarket", {})
+            if pm:
+                report.append(f"  Polymarket: {pm.get('positions', 0)} positions, {pm.get('open_orders', 0)} orders, {pm.get('trades', 0)} trades")
 
         # Symptoms
         if self.symptoms:

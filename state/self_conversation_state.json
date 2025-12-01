@@ -1,0 +1,12 @@
+{
+  "total_conversations": 1,
+  "total_insights": 32,
+  "total_actions_taken": 0,
+  "last_conversation": "2025-12-01T00:48:09.990969+00:00",
+  "best_insights": [
+    "IMMEDIATE ACTION: Post the sample_audit_report.md as a real case study. Tweet about it. LinkedIn post. Show don't tell.",
+    "BROKEN: Our outreach is passive. We create templates but don't send them. We identify opportunities but don't apply. Action gap is real.",
+    "WORKING: The monitoring infrastructure is solid. Self-healing works. The system stays up. That's actually valuable - we should emphasize it."
+  ],
+  "last_updated": "2025-12-01T00:48:09.990986+00:00"
+}

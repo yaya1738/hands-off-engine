@@ -1,0 +1,33 @@
+{
+  "balance": 7.99,
+  "positions_value": 98.05,
+  "total_value": 106.04,
+  "last_updated": "2025-12-01T12:00:00+00:00",
+  "source": "wallet_check",
+  "positions": [
+    {
+      "id": "pending_1",
+      "value": 98.05,
+      "status": "active",
+      "resolution_date": "2025-12-10",
+      "note": "Position from prior trading"
+    },
+    {
+      "id": "bruno_mars_spotify_2025",
+      "market": "Bruno Mars top Spotify artist 2025",
+      "shares": 1000,
+      "cost": 1.0,
+      "entry_price": 0.001,
+      "status": "active",
+      "created": "2025-12-01T09:42:52.750728+00:00",
+      "note": "Trade executed in previous session before DRYRUN enforcement"
+    }
+  ],
+  "last_trade": {
+    "order_id": "0xfa0eea9b7b21d8527ead590678ae10fc9a8e3cb300662ef286d5aec677231f59",
+    "tx_hash": "0x3c016285869e16b40d14c8c962ed0b5e52b734943f3696f605b1559f37b0a6d4",
+    "timestamp": "2025-12-01T09:42:52.750781+00:00"
+  },
+  "system_mode": "DRYRUN",
+  "mode_note": "Live trading disabled per roadmap Tier 1.4. All new trades will be DRYRUN until enabled."
+}

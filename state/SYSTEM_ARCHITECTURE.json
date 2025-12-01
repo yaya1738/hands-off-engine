@@ -60,6 +60,13 @@
           "script": "scripts/self_healing_agent.py",
           "purpose": "Detect and fix system issues",
           "feedback": "state/self_healing_state.json"
+        },
+        "doctor": {
+          "script": "autonomous/system_doctor.py",
+          "purpose": "Comprehensive health examination, diagnosis, and treatment",
+          "checks": ["processes", "state_files", "actuators", "finances", "outreach", "evolution", "disk", "memory", "network", "endpoints", "cron", "logs", "git", "python", "env", "trading"],
+          "feedback": "state/doctor_state.json",
+          "diagnosis_log": "state/diagnosis_log.jsonl"
         }
       },
       "preparation": {
@@ -109,7 +116,9 @@
           "state/helicopter_state.json",
           "state/self_conversation.jsonl",
           "state/peanut_gallery.jsonl",
-          "state/contingency_plans.json"
+          "state/contingency_plans.json",
+          "state/doctor_state.json",
+          "state/diagnosis_log.jsonl"
         ],
         "writes_to": [
           "state/evolution_state.json",

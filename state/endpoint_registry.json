@@ -1,14 +1,26 @@
 {
-  "cycles": 2,
+  "cycles": 39,
   "endpoints": {
     "conversion": {
+      "executions": 16,
+      "successes": 16
+    },
+    "outreach": {
+      "executions": 19,
+      "successes": 19
+    },
+    "notify": {
       "executions": 2,
       "successes": 2
+    },
+    "cost_audit": {
+      "executions": 2,
+      "successes": 0
     }
   },
   "last_cycle": {
-    "endpoint": "conversion",
-    "timestamp": "2025-12-01T02:25:00.016733+00:00",
+    "endpoint": "outreach",
+    "timestamp": "2025-12-01T03:23:57.725225+00:00",
     "success": true
   }
 }

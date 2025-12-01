@@ -15,3 +15,819 @@
 {"timestamp": "2025-11-30T23:32:06.585907+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
 {"timestamp": "2025-11-30T23:32:06.585953+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
 {"timestamp": "2025-11-30T23:32:06.585996+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:39.635220+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-11-30T23:43:39.635391+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-11-30T23:43:39.635467+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-11-30T23:43:39.635523+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-11-30T23:43:39.640241+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:39.640396+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:39.640472+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:39.640526+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:47.625475+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-11-30T23:43:47.625628+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-11-30T23:43:47.625703+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-11-30T23:43:47.625769+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-11-30T23:43:47.625833+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-11-30T23:43:47.625893+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:47.625969+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:47.626027+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-11-30T23:43:47.626070+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:14.666872+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-11-30T23:44:14.667379+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-11-30T23:44:14.667951+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-11-30T23:44:14.668328+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-11-30T23:44:14.673327+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:14.673841+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:14.674410+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:14.674747+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:15.842176+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-11-30T23:44:15.843472+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-11-30T23:44:15.844717+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-11-30T23:44:15.845316+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-11-30T23:44:15.845828+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-11-30T23:44:15.846269+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:15.846686+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:15.847122+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-11-30T23:44:15.847740+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T00:41:58.153785+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:41:58.154342+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T00:41:58.154936+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T00:41:58.155392+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:41:58.162109+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T00:41:58.162825+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T00:41:58.163812+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T00:41:58.164385+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T00:42:30.197435+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T00:42:30.198129+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T00:42:30.198799+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T00:42:30.199257+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T00:42:30.199680+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T00:42:30.200212+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T00:42:30.200724+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T00:42:30.201370+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T00:42:30.201927+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:00.613726+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:44:00.614263+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T00:44:00.614791+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T00:44:00.615241+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:44:00.621774+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:00.622429+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:00.623097+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:00.623541+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:13.660946+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T00:44:13.661696+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T00:44:13.662343+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T00:44:13.662851+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T00:44:13.663324+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T00:44:13.663766+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:13.664237+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:13.664747+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T00:44:13.665181+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:14.238771+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:47:14.239123+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T00:47:14.239510+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T00:47:14.239790+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:47:14.245440+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:14.246136+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:14.246659+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:14.247169+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:15.961300+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T00:47:15.962041+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T00:47:15.962621+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T00:47:15.963191+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T00:47:15.963702+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T00:47:15.964202+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:15.964735+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:15.965239+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T00:47:15.965716+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:46.294541+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:48:46.295022+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T00:48:46.295504+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T00:48:46.295995+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T00:48:46.302150+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:46.302632+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:46.303134+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:46.303429+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:47.465009+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T00:48:47.465721+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T00:48:47.466245+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T00:48:47.466759+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T00:48:47.467322+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T00:48:47.467849+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:47.468300+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:47.468770+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T00:48:47.469230+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:18.951704+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:02:18.952177+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:02:18.952701+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:02:18.953046+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:02:18.958527+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:18.959188+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:18.959782+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:18.960226+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:50.055994+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:02:50.056726+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:02:50.057610+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:02:50.058184+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:02:50.058681+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:02:50.059225+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:50.059687+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:50.060136+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:02:50.060628+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:11:51.046462+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:11:51.046836+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:11:51.047323+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:11:51.047782+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:11:51.053935+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:11:51.054451+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:11:51.054911+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:11:51.055186+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:12:23.049322+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:12:23.050276+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:12:23.050826+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:12:23.051305+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:12:23.051616+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:12:23.052151+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:12:23.052750+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:12:23.053226+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:12:23.053642+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:13:53.509513+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:13:53.510018+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:13:53.510433+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:13:53.510828+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:13:53.516820+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:13:53.517461+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:13:53.518046+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:13:53.518468+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:14:24.880274+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:14:24.881118+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:14:24.881790+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:14:24.882387+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:14:24.882887+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:14:24.883377+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:14:24.883763+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:14:24.884326+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:14:24.884925+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:25.883498+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:24:25.884049+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:24:25.884588+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:24:25.885055+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:24:25.891873+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:25.892468+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:25.893023+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:25.893445+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:56.866538+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:24:56.867460+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:24:56.868400+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:24:56.868853+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:24:56.869407+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:24:56.869939+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:56.870423+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:56.870854+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:24:56.871219+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:27.263126+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:26:27.263662+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:26:27.264176+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:26:27.264658+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:26:27.271103+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:27.271791+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:27.272229+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:27.272704+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:39.223734+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:26:39.224440+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:26:39.225020+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:26:39.225612+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:26:39.226115+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:26:39.226542+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:39.226988+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:39.227405+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:26:39.228036+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:39.731885+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:30:39.732227+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:30:39.732552+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:30:39.732831+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:30:39.739124+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:39.739844+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:39.740381+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:39.740893+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:40.869872+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:30:40.870578+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:30:40.871161+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:30:40.871729+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:30:40.872438+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:30:40.872891+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:40.873528+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:40.873967+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:30:40.874389+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:11.245295+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:32:11.245987+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:32:11.246596+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:32:11.247062+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:32:11.253626+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:11.254412+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:11.255042+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:11.255575+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:13.928890+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:32:13.929747+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:32:13.930309+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:32:13.930786+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:32:13.931267+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:32:13.931738+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:13.932200+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:13.932665+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:32:13.933149+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:44.371739+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:33:44.372237+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:33:44.372709+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:33:44.373339+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:33:44.380392+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:44.381083+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:44.381778+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:44.382260+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:45.052090+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:33:45.052745+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:33:45.053458+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:33:45.053971+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:33:45.054514+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:33:45.055054+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:45.055541+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:45.055992+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:33:45.056552+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:15.502833+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:35:15.503469+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:35:15.504063+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:35:15.504600+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:35:15.511265+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:15.511899+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:15.512499+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:15.512981+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:16.451641+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:35:16.452398+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:35:16.452886+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:35:16.453471+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:35:16.454081+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:35:16.454595+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:16.454988+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:16.455558+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:35:16.455961+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:17.015754+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:38:17.016262+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:38:17.016750+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:38:17.017185+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:38:17.023008+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:17.023539+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:17.024152+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:17.024618+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:18.061400+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:38:18.062057+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:38:18.123076+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:38:18.125053+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:38:18.138101+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:38:18.164627+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:18.165312+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:18.165861+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:38:18.168335+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:48.772113+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:42:48.772645+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:42:48.773204+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:42:48.773792+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:42:48.780862+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:48.781725+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:48.782377+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:48.783289+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:58.282505+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:42:58.283207+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:42:58.283726+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:42:58.284302+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:42:58.284802+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:42:58.285330+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:58.285915+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:58.286378+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:42:58.286858+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:58.778612+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:45:58.779080+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:45:58.779612+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:45:58.780007+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:45:58.786940+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:58.787724+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:58.788442+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:58.788937+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:59.741191+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:45:59.742128+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:45:59.742954+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:45:59.743452+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:45:59.743797+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:45:59.744078+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:59.744368+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:59.744950+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:45:59.745470+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:00.409977+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:49:00.410683+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:49:00.411487+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:49:00.412485+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:49:00.419242+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:00.420063+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:00.421021+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:00.421882+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:01.579416+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:49:01.580145+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:49:01.580870+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:49:01.581419+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:49:01.582106+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:49:01.582593+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:01.583070+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:01.583511+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:49:01.583961+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:32.229252+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:54:32.229809+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:54:32.230352+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:54:32.230756+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:54:32.237158+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:32.237802+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:32.238316+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:32.238750+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:33.419133+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:54:33.419849+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:54:33.420443+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:54:33.420988+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:54:33.421515+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:54:33.422040+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:33.422518+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:33.422921+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:54:33.423336+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:33.975994+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:57:33.976557+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:57:33.977075+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:57:33.977592+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:57:33.983637+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:33.984332+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:33.984949+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:33.985501+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:35.829737+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:57:35.830568+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:57:35.831239+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:57:35.831716+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:57:35.832202+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:57:35.832663+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:35.833053+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:35.833388+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:57:35.833732+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:06.273860+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:59:06.274528+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T01:59:06.275022+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T01:59:06.275454+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T01:59:06.282617+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:06.283337+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:06.283989+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:06.284426+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:16.718730+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T01:59:16.719477+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T01:59:16.719996+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T01:59:16.720475+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T01:59:16.720948+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T01:59:16.721450+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:16.721887+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:16.722332+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T01:59:16.722747+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:17.264516+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:02:17.265059+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:02:17.265618+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:02:17.266183+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:02:17.273087+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:17.273830+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:17.274531+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:17.274994+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:18.374294+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:02:18.375180+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:02:18.375857+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:02:18.376463+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:02:18.377074+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:02:18.377736+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:18.378403+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:18.378926+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:02:18.379439+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:48.567931+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:06:48.568442+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:06:48.568911+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:06:48.569468+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:06:48.576107+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:48.576719+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:48.577369+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:48.577842+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:49.431198+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:06:49.431853+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:06:49.432301+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:06:49.432761+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:06:49.433294+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:06:49.433592+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:49.433849+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:49.434254+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:06:49.434737+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:50.300928+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:12:50.301536+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:12:50.302031+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:12:50.302487+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:12:50.308438+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:50.309162+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:50.309733+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:50.310230+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:51.329602+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:12:51.330391+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:12:51.331003+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:12:51.331495+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:12:51.331959+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:12:51.332530+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:51.332953+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:51.333273+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:12:51.333880+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:21.782167+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:14:21.782751+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:14:21.783374+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:14:21.783808+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:14:21.790506+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:21.791182+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:21.792029+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:21.792645+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:26.312478+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:14:26.313385+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:14:26.314225+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:14:26.314822+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:14:26.315393+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:14:26.315912+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:26.317378+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:26.319070+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:14:26.319569+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:26.889988+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:17:26.890652+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:17:26.891203+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:17:26.891779+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:17:26.899173+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:26.899931+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:26.900912+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:26.901522+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:27.825789+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:17:27.826580+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:17:27.827215+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:17:27.827895+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:17:27.828538+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:17:27.829046+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:27.830379+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:27.831168+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:17:27.831637+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:58.316446+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:18:58.317163+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:18:58.317633+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:18:58.318053+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:18:58.324801+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:58.325577+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:58.326182+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:58.326626+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:59.570810+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:18:59.571555+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:18:59.572326+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:18:59.572940+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:18:59.573582+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:18:59.574325+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:59.574935+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:59.576277+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:18:59.576843+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:30.441032+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:23:30.441583+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:23:30.441963+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:23:30.442242+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:23:30.448090+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:30.448797+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:30.449379+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:30.449802+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:31.489606+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:23:31.490212+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:23:31.490704+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:23:31.491129+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:23:31.491543+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:23:31.492028+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:31.492474+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:31.492843+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:23:31.493240+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:55.976136+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:28:55.976594+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:28:55.977040+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:28:55.977554+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:28:55.984151+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:55.984851+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:55.985399+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:55.985820+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:57.083845+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:28:57.084385+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:28:57.084953+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:28:57.085474+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:28:57.085977+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:28:57.086473+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:57.086918+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:57.087342+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:28:57.087755+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:31:57.692297+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:31:57.692948+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:31:57.693540+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:31:57.694026+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:31:57.700781+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:31:57.701482+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:31:57.702236+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:31:57.702744+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:32:06.348181+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:32:06.349002+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:32:06.349703+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:32:06.350222+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:32:06.350792+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:32:06.351260+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:32:06.351739+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:32:06.352543+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:32:06.353017+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:07.189364+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:38:07.189885+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:38:07.190419+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:38:07.191184+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:38:07.197722+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:07.198405+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:07.199239+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:07.199715+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:08.079119+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:38:08.079911+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:38:08.080469+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:38:08.080999+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:38:08.081559+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:38:08.082059+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:08.082530+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:08.083018+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:38:08.083488+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:38.498831+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:39:38.499423+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:39:38.499947+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:39:38.500389+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:39:38.506632+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:38.507261+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:38.507837+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:38.508326+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:39.198299+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:39:39.199053+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:39:39.199747+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:39:39.200289+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:39:39.201708+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:39:39.202225+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:39.202737+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:39.203244+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:39:39.203637+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:09.696839+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:41:09.697485+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:41:09.698044+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:41:09.698688+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:41:09.705396+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:09.706011+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:09.706677+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:09.707153+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:10.459507+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:41:10.460182+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:41:10.460773+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:41:10.461350+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:41:10.461814+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:41:10.462330+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:10.462720+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:10.463140+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:41:10.463591+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:40.985292+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:42:40.986143+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:42:40.986851+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:42:40.988066+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:42:40.995303+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:40.996098+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:40.996811+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:40.997409+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:41.841025+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:42:41.841825+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:42:41.842415+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:42:41.842922+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:42:41.843388+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:42:41.843820+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:41.844252+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:41.844670+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:42:41.845107+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:12.314029+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:44:12.317840+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:44:12.318578+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:44:12.319182+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:44:12.327237+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:12.327889+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:12.329635+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:12.330160+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:13.324626+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:44:13.325369+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:44:13.326048+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:44:13.326538+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:44:13.327097+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:44:13.327582+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:13.327983+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:13.328435+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:44:13.329642+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:43.809672+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:45:43.810367+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:45:43.811109+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:45:43.811725+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:45:43.818286+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:43.818984+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:43.819514+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:43.819990+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:44.694778+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:45:44.695562+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:45:44.696354+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:45:44.696890+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:45:44.697481+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:45:44.697963+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:44.698713+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:44.699249+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:45:44.699693+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:15.107682+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:47:15.108276+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:47:15.108888+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:47:15.109522+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:47:15.116567+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:15.117419+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:15.118141+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:15.118702+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:23.365801+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:47:23.366564+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:47:23.367198+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:47:23.367719+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:47:23.368191+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:47:23.368652+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:23.369175+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:23.369559+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:47:23.369948+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:54.119849+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:51:54.120562+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:51:54.120992+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:51:54.121399+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:51:54.127721+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:54.128630+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:54.129299+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:54.129794+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:55.145326+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:51:55.146102+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:51:55.146780+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:51:55.147216+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:51:55.147620+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:51:55.148008+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:55.148605+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:55.149000+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:51:55.149409+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:55.728315+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:54:55.728752+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:54:55.729191+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:54:55.729597+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:54:55.736162+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:55.736884+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:55.737400+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:55.737946+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:56.377111+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:54:56.377941+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:54:56.379634+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:54:56.380161+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:54:56.380739+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:54:56.381237+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:56.381654+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:56.382431+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:54:56.382846+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:56.907673+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:57:56.908207+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T02:57:56.908713+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T02:57:56.909150+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T02:57:56.915307+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:56.915929+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:56.916446+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:56.916840+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:57.765556+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T02:57:57.766232+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T02:57:57.766799+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T02:57:57.767325+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T02:57:57.768166+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T02:57:57.768695+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:57.769222+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:57.769688+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T02:57:57.770160+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:28.954500+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:05:28.955056+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T03:05:28.955533+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T03:05:28.956266+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:05:28.963208+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:28.964014+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:28.964715+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:28.965260+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:40.256241+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T03:05:40.257257+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T03:05:40.258316+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T03:05:40.258876+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T03:05:40.259386+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T03:05:40.259972+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:40.260447+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:40.260885+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T03:05:40.261357+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.044484+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:10:11.045051+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T03:10:11.045628+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T03:10:11.046214+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:10:11.052778+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.053502+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.054189+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.054670+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.819092+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T03:10:11.819932+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T03:10:11.820603+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T03:10:11.821060+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T03:10:11.821554+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T03:10:11.822069+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.822558+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.822954+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T03:10:11.823459+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:42.505006+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:14:42.505558+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T03:14:42.506139+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T03:14:42.506544+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:14:42.512554+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:42.513155+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:42.513789+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:42.514289+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:43.923092+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T03:14:43.923809+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T03:14:43.924457+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T03:14:43.924946+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T03:14:43.925464+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T03:14:43.925968+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:43.926458+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:43.926948+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T03:14:43.927331+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:44.413398+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:17:44.413922+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T03:17:44.414425+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T03:17:44.415061+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:17:44.421834+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:44.422465+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:44.423107+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:44.423541+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:45.346793+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T03:17:45.347525+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T03:17:45.348133+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T03:17:45.348632+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T03:17:45.348942+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T03:17:45.349264+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:45.349555+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:45.349830+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T03:17:45.350086+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:15.772942+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:19:15.773603+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T03:19:15.774178+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T03:19:15.774665+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:19:15.781677+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:15.782390+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:15.782928+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:15.783372+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:16.809806+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T03:19:16.810481+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T03:19:16.811094+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T03:19:16.811594+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T03:19:16.812076+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T03:19:16.812696+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:16.813212+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:16.813556+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T03:19:16.813863+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:17.402418+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:22:17.402784+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T03:22:17.403085+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T03:22:17.403342+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:22:17.409114+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:17.409624+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:17.410131+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:17.410441+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:26.573497+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T03:22:26.574136+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T03:22:26.574709+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T03:22:26.575188+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T03:22:26.575699+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T03:22:26.576205+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:26.576802+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:26.577281+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T03:22:26.577767+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.016277+00:00", "action_type": "opportunity_identified", "target": "Trading Bot Development", "result": "Action: Post on Upwork/Fiverr", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:23:57.017016+00:00", "action_type": "opportunity_identified", "target": "DevOps Automation", "result": "Action: Cold outreach to startups", "potential_value": 800}
+{"timestamp": "2025-12-01T03:23:57.017885+00:00", "action_type": "opportunity_identified", "target": "AI Integration Consulting", "result": "Action: LinkedIn outreach", "potential_value": 500}
+{"timestamp": "2025-12-01T03:23:57.018692+00:00", "action_type": "opportunity_identified", "target": "System Audit", "result": "Action: Offer to GitHub projects", "potential_value": 1000}
+{"timestamp": "2025-12-01T03:23:57.029942+00:00", "action_type": "compute_utilized", "target": "market_analysis", "result": "Find best opportunities", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.030673+00:00", "action_type": "compute_utilized", "target": "signal_generation", "result": "Instant execution when capital arrives", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.031741+00:00", "action_type": "compute_utilized", "target": "pattern_detection", "result": "Improve prediction accuracy", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.032311+00:00", "action_type": "compute_utilized", "target": "content_generation", "result": "Attract clients", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.666467+00:00", "action_type": "outreach_planned", "target": "Upwork", "result": "Apply to 5 relevant jobs", "potential_value": 200}
+{"timestamp": "2025-12-01T03:23:57.667139+00:00", "action_type": "outreach_planned", "target": "Fiverr", "result": "Update gig and respond to inquiries", "potential_value": 200}
+{"timestamp": "2025-12-01T03:23:57.667767+00:00", "action_type": "outreach_planned", "target": "LinkedIn", "result": "Post about AI Nexus services", "potential_value": 200}
+{"timestamp": "2025-12-01T03:23:57.668333+00:00", "action_type": "outreach_planned", "target": "GitHub", "result": "Contribute to active projects", "potential_value": 200}
+{"timestamp": "2025-12-01T03:23:57.668908+00:00", "action_type": "outreach_planned", "target": "Direct", "result": "Cold email to 3 potential clients", "potential_value": 200}
+{"timestamp": "2025-12-01T03:23:57.669549+00:00", "action_type": "value_creation", "target": "Improve trading signals", "result": "Better win rate when trading resumes", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.669979+00:00", "action_type": "value_creation", "target": "Document system capabilities", "result": "Productized service offering", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.670443+00:00", "action_type": "value_creation", "target": "Build demo/showcase", "result": "Client conversion tool", "potential_value": 0}
+{"timestamp": "2025-12-01T03:23:57.670835+00:00", "action_type": "value_creation", "target": "Optimize infrastructure", "result": "More runway, less burn", "potential_value": 0}

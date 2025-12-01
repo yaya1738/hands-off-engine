@@ -69,6 +69,8 @@ INPUTS = {
     "gallery": STATE_DIR / "peanut_gallery.jsonl",
     "pursuit": STATE_DIR / "active_pursuit.json",
     "conversion": STATE_DIR / "conversion_optimizer.json",
+    "doctor": STATE_DIR / "doctor_state.json",
+    "diagnosis": STATE_DIR / "diagnosis_log.jsonl",
 }
 
 # Evolution state
@@ -129,14 +131,20 @@ CAPABILITIES = {
         "description": "Check Polymarket health and readiness",
         "actuator": "polymarket_status",
     },
+    "doctor": {
+        "name": "System Doctor",
+        "description": "Run comprehensive health examination and diagnosis",
+        "script": "autonomous/system_doctor.py",
+        "args": ["examine"],
+    },
 }
 
 # Decision weights based on current state
 PRIORITIES = {
-    "no_income": ["outreach", "conversion"],
-    "low_balance": ["cost_audit", "outreach"],
-    "system_issues": ["self_heal", "reality_check"],
-    "healthy": ["outreach", "conversion", "reality_check"],
+    "no_income": ["outreach", "conversion", "doctor"],
+    "low_balance": ["cost_audit", "outreach", "doctor"],
+    "system_issues": ["doctor", "self_heal", "reality_check"],
+    "healthy": ["outreach", "conversion", "reality_check", "doctor"],
 }
 
 
@@ -267,6 +275,32 @@ class EvolutionEngine:
             except:
                 pass
 
+        # Doctor data - system health examination
+        if INPUTS["doctor"].exists():
+            try:
+                doctor_data = json.loads(INPUTS["doctor"].read_text())
+                intel["doctor"] = {
+                    "examinations": doctor_data.get("examinations", 0),
+                    "issues_found": doctor_data.get("issues_found", 0),
+                    "treatments_applied": doctor_data.get("treatments_applied", 0),
+                }
+            except:
+                pass
+
+        # Latest diagnosis
+        if INPUTS["diagnosis"].exists():
+            try:
+                lines = INPUTS["diagnosis"].read_text().strip().split('\n')
+                if lines and lines[-1]:
+                    latest = json.loads(lines[-1])
+                    intel["latest_diagnosis"] = {
+                        "root_cause": latest.get("root_cause", "unknown"),
+                        "priority": latest.get("priority", 0),
+                        "affected": latest.get("affected", []),
+                    }
+            except:
+                pass
+
         return intel
 
     def extract_insights(self, intel: Dict) -> List[str]:
@@ -332,6 +366,13 @@ class EvolutionEngine:
             reason = "System health needs attention"
         elif action == "cost_audit":
             reason = f"Balance at ${intel.get('balance', 0)} - need to optimize spending"
+        elif action == "doctor":
+            doctor_data = intel.get("doctor", {})
+            issues = doctor_data.get("issues_found", 0)
+            if issues > 0:
+                reason = f"Doctor found {issues} issues - need comprehensive health check"
+            else:
+                reason = "Regular health examination to catch issues early"
         else:
             reason = "Continuous improvement requires action"
 

@@ -1,0 +1,31 @@
+{
+  "created": "2025-12-01T03:28:12.120458+00:00",
+  "cycles": 0,
+  "status": "offline",
+  "fuel_tank": {
+    "current_level": 8.99,
+    "pending_fuel": 98.05,
+    "capacity": 10000.0,
+    "last_refuel": null
+  },
+  "turbine": {
+    "rpm": 0,
+    "signals_generated": 0,
+    "signals_executed": 0,
+    "last_rotation": null
+  },
+  "generator": {
+    "output_watts": 0.0,
+    "total_generated": 0.0,
+    "total_consumed": 0.0,
+    "trades_executed": 0,
+    "trades_won": 0,
+    "last_generation": null
+  },
+  "grid": {
+    "connected": true,
+    "total_transferred": 5.0,
+    "last_transfer": "2025-12-01T03:28:13.233033+00:00"
+  },
+  "updated": "2025-12-01T03:28:21.796255+00:00"
+}

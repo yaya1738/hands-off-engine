@@ -20,3 +20,1166 @@
 {"timestamp": "2025-12-01T00:40:27.672093+00:00", "cycle": 2, "category": "act", "content": "Executing: conversion", "data": {}}
 {"timestamp": "2025-12-01T00:40:27.672162+00:00", "cycle": 2, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
 {"timestamp": "2025-12-01T00:40:27.748785+00:00", "cycle": 2, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.839583+00:00", "cycle": 3, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.841529+00:00", "cycle": 3, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.841690+00:00", "cycle": 3, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.841754+00:00", "cycle": 3, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.841799+00:00", "cycle": 3, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.841856+00:00", "cycle": 3, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.841898+00:00", "cycle": 3, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.841952+00:00", "cycle": 3, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.842049+00:00", "cycle": 3, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T00:41:57.842153+00:00", "cycle": 3, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T00:42:30.262594+00:00", "cycle": 3, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.294958+00:00", "cycle": 4, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.296742+00:00", "cycle": 4, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.296904+00:00", "cycle": 4, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.296981+00:00", "cycle": 4, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.297029+00:00", "cycle": 4, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.297072+00:00", "cycle": 4, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.297115+00:00", "cycle": 4, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.297223+00:00", "cycle": 4, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.297327+00:00", "cycle": 4, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T00:44:00.297429+00:00", "cycle": 4, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T00:44:13.722194+00:00", "cycle": 4, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.812897+00:00", "cycle": 5, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814250+00:00", "cycle": 5, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814392+00:00", "cycle": 5, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814478+00:00", "cycle": 5, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814532+00:00", "cycle": 5, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814565+00:00", "cycle": 5, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814595+00:00", "cycle": 5, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814637+00:00", "cycle": 5, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814740+00:00", "cycle": 5, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.814849+00:00", "cycle": 5, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:45:43.877155+00:00", "cycle": 5, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.967808+00:00", "cycle": 6, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.969525+00:00", "cycle": 6, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.969686+00:00", "cycle": 6, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.969755+00:00", "cycle": 6, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.969801+00:00", "cycle": 6, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.969844+00:00", "cycle": 6, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.969887+00:00", "cycle": 6, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.969945+00:00", "cycle": 6, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.970058+00:00", "cycle": 6, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T00:47:13.970187+00:00", "cycle": 6, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T00:47:16.014380+00:00", "cycle": 6, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.028600+00:00", "cycle": 7, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.030747+00:00", "cycle": 7, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.030918+00:00", "cycle": 7, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.030999+00:00", "cycle": 7, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.031056+00:00", "cycle": 7, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.031109+00:00", "cycle": 7, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.031161+00:00", "cycle": 7, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.031226+00:00", "cycle": 7, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.031365+00:00", "cycle": 7, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T00:48:46.031502+00:00", "cycle": 7, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T00:48:47.514463+00:00", "cycle": 7, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.605006+00:00", "cycle": 8, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.606743+00:00", "cycle": 8, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.606889+00:00", "cycle": 8, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.607045+00:00", "cycle": 8, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.607097+00:00", "cycle": 8, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.607142+00:00", "cycle": 8, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.607185+00:00", "cycle": 8, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.607241+00:00", "cycle": 8, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.607339+00:00", "cycle": 8, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.607445+00:00", "cycle": 8, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:50:17.663592+00:00", "cycle": 8, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.750712+00:00", "cycle": 9, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752245+00:00", "cycle": 9, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752458+00:00", "cycle": 9, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752524+00:00", "cycle": 9, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752568+00:00", "cycle": 9, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752611+00:00", "cycle": 9, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752653+00:00", "cycle": 9, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752710+00:00", "cycle": 9, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752811+00:00", "cycle": 9, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.752918+00:00", "cycle": 9, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:51:47.815182+00:00", "cycle": 9, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.905255+00:00", "cycle": 10, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.906909+00:00", "cycle": 10, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907078+00:00", "cycle": 10, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907198+00:00", "cycle": 10, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907273+00:00", "cycle": 10, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907338+00:00", "cycle": 10, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907403+00:00", "cycle": 10, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907465+00:00", "cycle": 10, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907570+00:00", "cycle": 10, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.907722+00:00", "cycle": 10, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:53:17.974503+00:00", "cycle": 10, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.058147+00:00", "cycle": 11, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060197+00:00", "cycle": 11, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060380+00:00", "cycle": 11, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060459+00:00", "cycle": 11, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060526+00:00", "cycle": 11, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060574+00:00", "cycle": 11, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060616+00:00", "cycle": 11, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060683+00:00", "cycle": 11, "category": "decision", "content": "Action: cost_audit | Reason: Balance at $0.0 - need to optimize spending", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060806+00:00", "cycle": 11, "category": "act", "content": "Executing: cost_audit", "data": {}}
+{"timestamp": "2025-12-01T00:54:48.060955+00:00", "cycle": 11, "category": "error", "content": "Script not found: /root/hands-off-engine/finance/cost_gate.py", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.113272+00:00", "cycle": 12, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.114933+00:00", "cycle": 12, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115076+00:00", "cycle": 12, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115133+00:00", "cycle": 12, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115178+00:00", "cycle": 12, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115221+00:00", "cycle": 12, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115266+00:00", "cycle": 12, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115346+00:00", "cycle": 12, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115474+00:00", "cycle": 12, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.115592+00:00", "cycle": 12, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:56:18.178966+00:00", "cycle": 12, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.229272+00:00", "cycle": 13, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231003+00:00", "cycle": 13, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231154+00:00", "cycle": 13, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231237+00:00", "cycle": 13, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231290+00:00", "cycle": 13, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231342+00:00", "cycle": 13, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231398+00:00", "cycle": 13, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231466+00:00", "cycle": 13, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231567+00:00", "cycle": 13, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.231666+00:00", "cycle": 13, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:57:48.293422+00:00", "cycle": 13, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.384241+00:00", "cycle": 14, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386190+00:00", "cycle": 14, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386454+00:00", "cycle": 14, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386534+00:00", "cycle": 14, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386582+00:00", "cycle": 14, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386627+00:00", "cycle": 14, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386671+00:00", "cycle": 14, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386738+00:00", "cycle": 14, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386838+00:00", "cycle": 14, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.386937+00:00", "cycle": 14, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T00:59:18.454879+00:00", "cycle": 14, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.545529+00:00", "cycle": 15, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547428+00:00", "cycle": 15, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547557+00:00", "cycle": 15, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547613+00:00", "cycle": 15, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547659+00:00", "cycle": 15, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547716+00:00", "cycle": 15, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547759+00:00", "cycle": 15, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547817+00:00", "cycle": 15, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.547931+00:00", "cycle": 15, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.548057+00:00", "cycle": 15, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:00:48.614171+00:00", "cycle": 15, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.677301+00:00", "cycle": 16, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679407+00:00", "cycle": 16, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679558+00:00", "cycle": 16, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679622+00:00", "cycle": 16, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679670+00:00", "cycle": 16, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679715+00:00", "cycle": 16, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679757+00:00", "cycle": 16, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679814+00:00", "cycle": 16, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.679924+00:00", "cycle": 16, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:02:18.680034+00:00", "cycle": 16, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:02:50.107629+00:00", "cycle": 16, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.198174+00:00", "cycle": 17, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200194+00:00", "cycle": 17, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200342+00:00", "cycle": 17, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200392+00:00", "cycle": 17, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200429+00:00", "cycle": 17, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200476+00:00", "cycle": 17, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200518+00:00", "cycle": 17, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200574+00:00", "cycle": 17, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200673+00:00", "cycle": 17, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.200786+00:00", "cycle": 17, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:04:20.263784+00:00", "cycle": 17, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.309247+00:00", "cycle": 18, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311096+00:00", "cycle": 18, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311252+00:00", "cycle": 18, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311329+00:00", "cycle": 18, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311399+00:00", "cycle": 18, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311470+00:00", "cycle": 18, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311648+00:00", "cycle": 18, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311722+00:00", "cycle": 18, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311829+00:00", "cycle": 18, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.311953+00:00", "cycle": 18, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:05:50.383032+00:00", "cycle": 18, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.421291+00:00", "cycle": 19, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423127+00:00", "cycle": 19, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423265+00:00", "cycle": 19, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423323+00:00", "cycle": 19, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423368+00:00", "cycle": 19, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423411+00:00", "cycle": 19, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423453+00:00", "cycle": 19, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423509+00:00", "cycle": 19, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423608+00:00", "cycle": 19, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.423786+00:00", "cycle": 19, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:07:20.488941+00:00", "cycle": 19, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.533279+00:00", "cycle": 20, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535128+00:00", "cycle": 20, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535299+00:00", "cycle": 20, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535370+00:00", "cycle": 20, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535417+00:00", "cycle": 20, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535461+00:00", "cycle": 20, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535506+00:00", "cycle": 20, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535573+00:00", "cycle": 20, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535676+00:00", "cycle": 20, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.535780+00:00", "cycle": 20, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:08:50.599837+00:00", "cycle": 20, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.613291+00:00", "cycle": 21, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.614963+00:00", "cycle": 21, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615102+00:00", "cycle": 21, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615160+00:00", "cycle": 21, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615205+00:00", "cycle": 21, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615247+00:00", "cycle": 21, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615290+00:00", "cycle": 21, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615349+00:00", "cycle": 21, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615499+00:00", "cycle": 21, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.615611+00:00", "cycle": 21, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:10:20.679775+00:00", "cycle": 21, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.770598+00:00", "cycle": 22, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.773315+00:00", "cycle": 22, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.773544+00:00", "cycle": 22, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.773633+00:00", "cycle": 22, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.773695+00:00", "cycle": 22, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.773756+00:00", "cycle": 22, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.773832+00:00", "cycle": 22, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.773908+00:00", "cycle": 22, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.774040+00:00", "cycle": 22, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:11:50.774190+00:00", "cycle": 22, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:12:23.111406+00:00", "cycle": 22, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.201271+00:00", "cycle": 23, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203285+00:00", "cycle": 23, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203452+00:00", "cycle": 23, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203545+00:00", "cycle": 23, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203607+00:00", "cycle": 23, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203656+00:00", "cycle": 23, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203703+00:00", "cycle": 23, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203771+00:00", "cycle": 23, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203878+00:00", "cycle": 23, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:13:53.203987+00:00", "cycle": 23, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:14:24.944354+00:00", "cycle": 23, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.991569+00:00", "cycle": 24, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993325+00:00", "cycle": 24, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993489+00:00", "cycle": 24, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993541+00:00", "cycle": 24, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993576+00:00", "cycle": 24, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993606+00:00", "cycle": 24, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993635+00:00", "cycle": 24, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993677+00:00", "cycle": 24, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993774+00:00", "cycle": 24, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:15:54.993861+00:00", "cycle": 24, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:15:55.054748+00:00", "cycle": 24, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.125732+00:00", "cycle": 25, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127433+00:00", "cycle": 25, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127601+00:00", "cycle": 25, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127682+00:00", "cycle": 25, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127733+00:00", "cycle": 25, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127777+00:00", "cycle": 25, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127821+00:00", "cycle": 25, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127877+00:00", "cycle": 25, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.127977+00:00", "cycle": 25, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.128085+00:00", "cycle": 25, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:17:25.192430+00:00", "cycle": 25, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.276903+00:00", "cycle": 26, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.278810+00:00", "cycle": 26, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.278944+00:00", "cycle": 26, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.279011+00:00", "cycle": 26, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.279057+00:00", "cycle": 26, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.279115+00:00", "cycle": 26, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.279175+00:00", "cycle": 26, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.279239+00:00", "cycle": 26, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.279362+00:00", "cycle": 26, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.279479+00:00", "cycle": 26, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:18:55.340352+00:00", "cycle": 26, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.373270+00:00", "cycle": 27, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.374998+00:00", "cycle": 27, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375135+00:00", "cycle": 27, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375231+00:00", "cycle": 27, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375289+00:00", "cycle": 27, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375334+00:00", "cycle": 27, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375377+00:00", "cycle": 27, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375432+00:00", "cycle": 27, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375549+00:00", "cycle": 27, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.375650+00:00", "cycle": 27, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:20:25.433751+00:00", "cycle": 27, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.469425+00:00", "cycle": 28, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.471531+00:00", "cycle": 28, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.471725+00:00", "cycle": 28, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.471792+00:00", "cycle": 28, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.471842+00:00", "cycle": 28, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.471886+00:00", "cycle": 28, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.471929+00:00", "cycle": 28, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.472003+00:00", "cycle": 28, "category": "decision", "content": "Action: self_heal | Reason: System health needs attention", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.472118+00:00", "cycle": 28, "category": "act", "content": "Executing: self_heal", "data": {}}
+{"timestamp": "2025-12-01T01:21:55.472232+00:00", "cycle": 28, "category": "execute", "content": "Running Self Healing: Fix system issues", "data": {}}
+{"timestamp": "2025-12-01T01:22:55.532523+00:00", "cycle": 28, "category": "timeout", "content": "Self Healing timed out after 60s", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.612610+00:00", "cycle": 29, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614376+00:00", "cycle": 29, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614483+00:00", "cycle": 29, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614532+00:00", "cycle": 29, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614585+00:00", "cycle": 29, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614633+00:00", "cycle": 29, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614680+00:00", "cycle": 29, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614740+00:00", "cycle": 29, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.614868+00:00", "cycle": 29, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:24:25.615015+00:00", "cycle": 29, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:24:56.918389+00:00", "cycle": 29, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.969182+00:00", "cycle": 30, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971210+00:00", "cycle": 30, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971371+00:00", "cycle": 30, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971432+00:00", "cycle": 30, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971481+00:00", "cycle": 30, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971528+00:00", "cycle": 30, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971576+00:00", "cycle": 30, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971639+00:00", "cycle": 30, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971751+00:00", "cycle": 30, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:26:26.971857+00:00", "cycle": 30, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:26:39.291217+00:00", "cycle": 30, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.382045+00:00", "cycle": 31, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384320+00:00", "cycle": 31, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384484+00:00", "cycle": 31, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384561+00:00", "cycle": 31, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384620+00:00", "cycle": 31, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384673+00:00", "cycle": 31, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384723+00:00", "cycle": 31, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384794+00:00", "cycle": 31, "category": "decision", "content": "Action: self_heal | Reason: System health needs attention", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.384912+00:00", "cycle": 31, "category": "act", "content": "Executing: self_heal", "data": {}}
+{"timestamp": "2025-12-01T01:28:09.385029+00:00", "cycle": 31, "category": "execute", "content": "Running Self Healing: Fix system issues", "data": {}}
+{"timestamp": "2025-12-01T01:29:09.397451+00:00", "cycle": 31, "category": "timeout", "content": "Self Healing timed out after 60s", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.423402+00:00", "cycle": 32, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.425694+00:00", "cycle": 32, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.425835+00:00", "cycle": 32, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.425893+00:00", "cycle": 32, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.425940+00:00", "cycle": 32, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.426000+00:00", "cycle": 32, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.426064+00:00", "cycle": 32, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.426128+00:00", "cycle": 32, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.426225+00:00", "cycle": 32, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:30:39.426310+00:00", "cycle": 32, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:30:40.925818+00:00", "cycle": 32, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.937384+00:00", "cycle": 33, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.939707+00:00", "cycle": 33, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.939895+00:00", "cycle": 33, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.939970+00:00", "cycle": 33, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.940037+00:00", "cycle": 33, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.940086+00:00", "cycle": 33, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.940150+00:00", "cycle": 33, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.940221+00:00", "cycle": 33, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.940341+00:00", "cycle": 33, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:32:10.940472+00:00", "cycle": 33, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:32:13.989321+00:00", "cycle": 33, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.046854+00:00", "cycle": 34, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049198+00:00", "cycle": 34, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049493+00:00", "cycle": 34, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049574+00:00", "cycle": 34, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049626+00:00", "cycle": 34, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049687+00:00", "cycle": 34, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049733+00:00", "cycle": 34, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049791+00:00", "cycle": 34, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.049923+00:00", "cycle": 34, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:33:44.050050+00:00", "cycle": 34, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:33:45.110107+00:00", "cycle": 34, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.196381+00:00", "cycle": 35, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.198495+00:00", "cycle": 35, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.198637+00:00", "cycle": 35, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.198714+00:00", "cycle": 35, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.198770+00:00", "cycle": 35, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.198816+00:00", "cycle": 35, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.198860+00:00", "cycle": 35, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.198924+00:00", "cycle": 35, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.199065+00:00", "cycle": 35, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:35:15.199166+00:00", "cycle": 35, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:35:16.508281+00:00", "cycle": 35, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.591397+00:00", "cycle": 36, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593207+00:00", "cycle": 36, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593434+00:00", "cycle": 36, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593498+00:00", "cycle": 36, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593532+00:00", "cycle": 36, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593563+00:00", "cycle": 36, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593591+00:00", "cycle": 36, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593649+00:00", "cycle": 36, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593770+00:00", "cycle": 36, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.593876+00:00", "cycle": 36, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:36:46.655471+00:00", "cycle": 36, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.746422+00:00", "cycle": 37, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.748519+00:00", "cycle": 37, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.748683+00:00", "cycle": 37, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.748748+00:00", "cycle": 37, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.748796+00:00", "cycle": 37, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.748847+00:00", "cycle": 37, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.748893+00:00", "cycle": 37, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.748971+00:00", "cycle": 37, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.749085+00:00", "cycle": 37, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:38:16.749246+00:00", "cycle": 37, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:38:18.235174+00:00", "cycle": 37, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.263613+00:00", "cycle": 38, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.265768+00:00", "cycle": 38, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.265905+00:00", "cycle": 38, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.265953+00:00", "cycle": 38, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.265986+00:00", "cycle": 38, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.266016+00:00", "cycle": 38, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.266043+00:00", "cycle": 38, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.266083+00:00", "cycle": 38, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.266155+00:00", "cycle": 38, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.266235+00:00", "cycle": 38, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:39:48.323124+00:00", "cycle": 38, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.341265+00:00", "cycle": 39, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343417+00:00", "cycle": 39, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343577+00:00", "cycle": 39, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343653+00:00", "cycle": 39, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343712+00:00", "cycle": 39, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343758+00:00", "cycle": 39, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343801+00:00", "cycle": 39, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343862+00:00", "cycle": 39, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.343979+00:00", "cycle": 39, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.344105+00:00", "cycle": 39, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:41:18.405774+00:00", "cycle": 39, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.465611+00:00", "cycle": 40, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.467746+00:00", "cycle": 40, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.467901+00:00", "cycle": 40, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.467993+00:00", "cycle": 40, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.468050+00:00", "cycle": 40, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.468107+00:00", "cycle": 40, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.468160+00:00", "cycle": 40, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.468234+00:00", "cycle": 40, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.468365+00:00", "cycle": 40, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:42:48.468471+00:00", "cycle": 40, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:42:58.335165+00:00", "cycle": 40, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.342995+00:00", "cycle": 41, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.345322+00:00", "cycle": 41, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.345676+00:00", "cycle": 41, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.345804+00:00", "cycle": 41, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.345860+00:00", "cycle": 41, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.345904+00:00", "cycle": 41, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.345962+00:00", "cycle": 41, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.346018+00:00", "cycle": 41, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.346172+00:00", "cycle": 41, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.346281+00:00", "cycle": 41, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:44:28.414851+00:00", "cycle": 41, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.480945+00:00", "cycle": 42, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.483501+00:00", "cycle": 42, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.483706+00:00", "cycle": 42, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.483832+00:00", "cycle": 42, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.483907+00:00", "cycle": 42, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.483970+00:00", "cycle": 42, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.484031+00:00", "cycle": 42, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.484101+00:00", "cycle": 42, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.484229+00:00", "cycle": 42, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:45:58.484366+00:00", "cycle": 42, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:45:59.808499+00:00", "cycle": 42, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.897253+00:00", "cycle": 43, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899427+00:00", "cycle": 43, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899574+00:00", "cycle": 43, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899637+00:00", "cycle": 43, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899682+00:00", "cycle": 43, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899722+00:00", "cycle": 43, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899761+00:00", "cycle": 43, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899817+00:00", "cycle": 43, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.899923+00:00", "cycle": 43, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.900026+00:00", "cycle": 43, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:47:29.972975+00:00", "cycle": 43, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.015119+00:00", "cycle": 44, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.017535+00:00", "cycle": 44, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.017819+00:00", "cycle": 44, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.017914+00:00", "cycle": 44, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.017966+00:00", "cycle": 44, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.018018+00:00", "cycle": 44, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.018065+00:00", "cycle": 44, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.018126+00:00", "cycle": 44, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.018244+00:00", "cycle": 44, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:49:00.018375+00:00", "cycle": 44, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:49:01.654661+00:00", "cycle": 44, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.685292+00:00", "cycle": 45, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687207+00:00", "cycle": 45, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687341+00:00", "cycle": 45, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687399+00:00", "cycle": 45, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687444+00:00", "cycle": 45, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687488+00:00", "cycle": 45, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687531+00:00", "cycle": 45, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687592+00:00", "cycle": 45, "category": "decision", "content": "Action: cost_audit | Reason: Balance at $0.0 - need to optimize spending", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687712+00:00", "cycle": 45, "category": "act", "content": "Executing: cost_audit", "data": {}}
+{"timestamp": "2025-12-01T01:50:31.687832+00:00", "cycle": 45, "category": "error", "content": "Script not found: /root/hands-off-engine/finance/cost_gate.py", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.746831+00:00", "cycle": 46, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.748935+00:00", "cycle": 46, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749106+00:00", "cycle": 46, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749258+00:00", "cycle": 46, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749315+00:00", "cycle": 46, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749381+00:00", "cycle": 46, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749432+00:00", "cycle": 46, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749520+00:00", "cycle": 46, "category": "decision", "content": "Action: self_heal | Reason: System health needs attention", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749653+00:00", "cycle": 46, "category": "act", "content": "Executing: self_heal", "data": {}}
+{"timestamp": "2025-12-01T01:52:01.749912+00:00", "cycle": 46, "category": "execute", "content": "Running Self Healing: Fix system issues", "data": {}}
+{"timestamp": "2025-12-01T01:53:01.800795+00:00", "cycle": 46, "category": "timeout", "content": "Self Healing timed out after 60s", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.891621+00:00", "cycle": 47, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893383+00:00", "cycle": 47, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893503+00:00", "cycle": 47, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893560+00:00", "cycle": 47, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893605+00:00", "cycle": 47, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893648+00:00", "cycle": 47, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893690+00:00", "cycle": 47, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893744+00:00", "cycle": 47, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.893843+00:00", "cycle": 47, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:54:31.894041+00:00", "cycle": 47, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:54:33.481726+00:00", "cycle": 47, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.569205+00:00", "cycle": 48, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571256+00:00", "cycle": 48, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571444+00:00", "cycle": 48, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571529+00:00", "cycle": 48, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571604+00:00", "cycle": 48, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571653+00:00", "cycle": 48, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571699+00:00", "cycle": 48, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571784+00:00", "cycle": 48, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.571908+00:00", "cycle": 48, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.572029+00:00", "cycle": 48, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T01:56:03.647369+00:00", "cycle": 48, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.662197+00:00", "cycle": 49, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664078+00:00", "cycle": 49, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664223+00:00", "cycle": 49, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664284+00:00", "cycle": 49, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664331+00:00", "cycle": 49, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664381+00:00", "cycle": 49, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664428+00:00", "cycle": 49, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664487+00:00", "cycle": 49, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664654+00:00", "cycle": 49, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:57:33.664794+00:00", "cycle": 49, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:57:35.897250+00:00", "cycle": 49, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.946589+00:00", "cycle": 50, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.948406+00:00", "cycle": 50, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.948582+00:00", "cycle": 50, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.948661+00:00", "cycle": 50, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.948709+00:00", "cycle": 50, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.948752+00:00", "cycle": 50, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.948795+00:00", "cycle": 50, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.948870+00:00", "cycle": 50, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.949002+00:00", "cycle": 50, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T01:59:05.949116+00:00", "cycle": 50, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T01:59:16.785402+00:00", "cycle": 50, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.845171+00:00", "cycle": 51, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847005+00:00", "cycle": 51, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847158+00:00", "cycle": 51, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847218+00:00", "cycle": 51, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847264+00:00", "cycle": 51, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847306+00:00", "cycle": 51, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847337+00:00", "cycle": 51, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847380+00:00", "cycle": 51, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847499+00:00", "cycle": 51, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.847601+00:00", "cycle": 51, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:00:46.913886+00:00", "cycle": 51, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.950431+00:00", "cycle": 52, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952142+00:00", "cycle": 52, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952306+00:00", "cycle": 52, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952386+00:00", "cycle": 52, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952445+00:00", "cycle": 52, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952498+00:00", "cycle": 52, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952556+00:00", "cycle": 52, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952616+00:00", "cycle": 52, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952715+00:00", "cycle": 52, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:02:16.952828+00:00", "cycle": 52, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T02:02:18.437540+00:00", "cycle": 52, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.516267+00:00", "cycle": 53, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518184+00:00", "cycle": 53, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518354+00:00", "cycle": 53, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518417+00:00", "cycle": 53, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518461+00:00", "cycle": 53, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518507+00:00", "cycle": 53, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518585+00:00", "cycle": 53, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518661+00:00", "cycle": 53, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518786+00:00", "cycle": 53, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.518906+00:00", "cycle": 53, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:03:48.581806+00:00", "cycle": 53, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.806727+00:00", "cycle": 54, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.808663+00:00", "cycle": 54, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.808846+00:00", "cycle": 54, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.808928+00:00", "cycle": 54, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.808992+00:00", "cycle": 54, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.809055+00:00", "cycle": 54, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.809112+00:00", "cycle": 54, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.809237+00:00", "cycle": 54, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.809440+00:00", "cycle": 54, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.809581+00:00", "cycle": 54, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:04:48.880324+00:00", "cycle": 54, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.105398+00:00", "cycle": 55, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.107720+00:00", "cycle": 55, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.107886+00:00", "cycle": 55, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.107969+00:00", "cycle": 55, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.108030+00:00", "cycle": 55, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.108078+00:00", "cycle": 55, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.108123+00:00", "cycle": 55, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.108188+00:00", "cycle": 55, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.108314+00:00", "cycle": 55, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.108411+00:00", "cycle": 55, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:05:18.181023+00:00", "cycle": 55, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.266911+00:00", "cycle": 56, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268198+00:00", "cycle": 56, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268329+00:00", "cycle": 56, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268405+00:00", "cycle": 56, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268465+00:00", "cycle": 56, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268514+00:00", "cycle": 56, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268562+00:00", "cycle": 56, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268621+00:00", "cycle": 56, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268775+00:00", "cycle": 56, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:06:48.268903+00:00", "cycle": 56, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T02:06:49.504352+00:00", "cycle": 56, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.525352+00:00", "cycle": 57, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527189+00:00", "cycle": 57, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527365+00:00", "cycle": 57, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527438+00:00", "cycle": 57, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527490+00:00", "cycle": 57, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527537+00:00", "cycle": 57, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527584+00:00", "cycle": 57, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527653+00:00", "cycle": 57, "category": "decision", "content": "Action: cost_audit | Reason: Balance at $0.0 - need to optimize spending", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527776+00:00", "cycle": 57, "category": "act", "content": "Executing: cost_audit", "data": {}}
+{"timestamp": "2025-12-01T02:08:19.527902+00:00", "cycle": 57, "category": "error", "content": "Script not found: /root/hands-off-engine/finance/cost_gate.py", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.612962+00:00", "cycle": 58, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614391+00:00", "cycle": 58, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614552+00:00", "cycle": 58, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614622+00:00", "cycle": 58, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614687+00:00", "cycle": 58, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614733+00:00", "cycle": 58, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614776+00:00", "cycle": 58, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614832+00:00", "cycle": 58, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.614943+00:00", "cycle": 58, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.615061+00:00", "cycle": 58, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:09:49.683544+00:00", "cycle": 58, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.761286+00:00", "cycle": 59, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.762647+00:00", "cycle": 59, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.762774+00:00", "cycle": 59, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.762832+00:00", "cycle": 59, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.762879+00:00", "cycle": 59, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.762925+00:00", "cycle": 59, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.762967+00:00", "cycle": 59, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.763025+00:00", "cycle": 59, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.763127+00:00", "cycle": 59, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.763237+00:00", "cycle": 59, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:11:19.834653+00:00", "cycle": 59, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.925298+00:00", "cycle": 60, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.926877+00:00", "cycle": 60, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927040+00:00", "cycle": 60, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927109+00:00", "cycle": 60, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927154+00:00", "cycle": 60, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927197+00:00", "cycle": 60, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927241+00:00", "cycle": 60, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927296+00:00", "cycle": 60, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927446+00:00", "cycle": 60, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:12:49.927568+00:00", "cycle": 60, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T02:12:51.389189+00:00", "cycle": 60, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.462903+00:00", "cycle": 61, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464322+00:00", "cycle": 61, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464458+00:00", "cycle": 61, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464525+00:00", "cycle": 61, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464633+00:00", "cycle": 61, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464686+00:00", "cycle": 61, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464750+00:00", "cycle": 61, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464817+00:00", "cycle": 61, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.464919+00:00", "cycle": 61, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:14:21.465019+00:00", "cycle": 61, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T02:14:26.391281+00:00", "cycle": 61, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.475628+00:00", "cycle": 62, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.477509+00:00", "cycle": 62, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.477642+00:00", "cycle": 62, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.477698+00:00", "cycle": 62, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.477743+00:00", "cycle": 62, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.477787+00:00", "cycle": 62, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.477830+00:00", "cycle": 62, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.477926+00:00", "cycle": 62, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.478100+00:00", "cycle": 62, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.478209+00:00", "cycle": 62, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:15:56.542205+00:00", "cycle": 62, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.545295+00:00", "cycle": 63, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.546864+00:00", "cycle": 63, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547075+00:00", "cycle": 63, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547148+00:00", "cycle": 63, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547196+00:00", "cycle": 63, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547240+00:00", "cycle": 63, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547288+00:00", "cycle": 63, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547359+00:00", "cycle": 63, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547480+00:00", "cycle": 63, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:17:26.547580+00:00", "cycle": 63, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T02:17:27.904768+00:00", "cycle": 63, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.954368+00:00", "cycle": 64, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.955860+00:00", "cycle": 64, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956025+00:00", "cycle": 64, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956099+00:00", "cycle": 64, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956157+00:00", "cycle": 64, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956209+00:00", "cycle": 64, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956259+00:00", "cycle": 64, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956323+00:00", "cycle": 64, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956429+00:00", "cycle": 64, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:18:57.956530+00:00", "cycle": 64, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T02:18:59.644646+00:00", "cycle": 64, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.733287+00:00", "cycle": 65, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.734758+00:00", "cycle": 65, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.734927+00:00", "cycle": 65, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.734999+00:00", "cycle": 65, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.735047+00:00", "cycle": 65, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.735091+00:00", "cycle": 65, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.735152+00:00", "cycle": 65, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.735214+00:00", "cycle": 65, "category": "decision", "content": "Action: notify | Reason: Continuous improvement requires action", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.735315+00:00", "cycle": 65, "category": "act", "content": "Executing: notify", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.735364+00:00", "cycle": 65, "category": "actuator", "content": "Using telegram actuator: Send Telegram notification to Yair", "data": {}}
+{"timestamp": "2025-12-01T02:20:29.910291+00:00", "cycle": 65, "category": "success", "content": "Telegram: sent", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.993291+00:00", "cycle": 66, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.994899+00:00", "cycle": 66, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995067+00:00", "cycle": 66, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995145+00:00", "cycle": 66, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995195+00:00", "cycle": 66, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995254+00:00", "cycle": 66, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995310+00:00", "cycle": 66, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995377+00:00", "cycle": 66, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995485+00:00", "cycle": 66, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:21:59.995604+00:00", "cycle": 66, "category": "execute", "content": "Running Conversion Optimization: Run conversion experiments", "data": {}}
+{"timestamp": "2025-12-01T02:22:00.089341+00:00", "cycle": 66, "category": "success", "content": "Conversion Optimization completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.119720+00:00", "cycle": 67, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121373+00:00", "cycle": 67, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121565+00:00", "cycle": 67, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121646+00:00", "cycle": 67, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121706+00:00", "cycle": 67, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121759+00:00", "cycle": 67, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121813+00:00", "cycle": 67, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121872+00:00", "cycle": 67, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.121995+00:00", "cycle": 67, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:23:30.122111+00:00", "cycle": 67, "category": "execute", "content": "Running Active Outreach: Reach out to potential customers", "data": {}}
+{"timestamp": "2025-12-01T02:23:31.542580+00:00", "cycle": 67, "category": "success", "content": "Active Outreach completed successfully", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.262349+00:00", "cycle": 68, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.264860+00:00", "cycle": 68, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265018+00:00", "cycle": 68, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265083+00:00", "cycle": 68, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265171+00:00", "cycle": 68, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265253+00:00", "cycle": 68, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265312+00:00", "cycle": 68, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265389+00:00", "cycle": 68, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265520+00:00", "cycle": 68, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.265574+00:00", "cycle": 68, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:24:25.346800+00:00", "cycle": 68, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.943659+00:00", "cycle": 69, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.945670+00:00", "cycle": 69, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.945829+00:00", "cycle": 69, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.945905+00:00", "cycle": 69, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.945954+00:00", "cycle": 69, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.946003+00:00", "cycle": 69, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.946049+00:00", "cycle": 69, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.946109+00:00", "cycle": 69, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.946223+00:00", "cycle": 69, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:24:59.946272+00:00", "cycle": 69, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:25:00.017550+00:00", "cycle": 69, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.437265+00:00", "cycle": 69, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.438981+00:00", "cycle": 69, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439145+00:00", "cycle": 69, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439214+00:00", "cycle": 69, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439265+00:00", "cycle": 69, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439314+00:00", "cycle": 69, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439363+00:00", "cycle": 69, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439426+00:00", "cycle": 69, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439530+00:00", "cycle": 69, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.439580+00:00", "cycle": 69, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:25:55.503109+00:00", "cycle": 69, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.541269+00:00", "cycle": 70, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.542908+00:00", "cycle": 70, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543067+00:00", "cycle": 70, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543131+00:00", "cycle": 70, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543179+00:00", "cycle": 70, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543222+00:00", "cycle": 70, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543266+00:00", "cycle": 70, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543326+00:00", "cycle": 70, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543454+00:00", "cycle": 70, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.543510+00:00", "cycle": 70, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:27:25.609493+00:00", "cycle": 70, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.697225+00:00", "cycle": 71, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.698760+00:00", "cycle": 71, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.698902+00:00", "cycle": 71, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.698960+00:00", "cycle": 71, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.699021+00:00", "cycle": 71, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.699087+00:00", "cycle": 71, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.699132+00:00", "cycle": 71, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.699192+00:00", "cycle": 71, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.699297+00:00", "cycle": 71, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:28:55.699345+00:00", "cycle": 71, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:28:57.161501+00:00", "cycle": 71, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 527, 'opportunities_found': 124, 'outreach_sent': 155, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.243739+00:00", "cycle": 72, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.245559+00:00", "cycle": 72, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.245755+00:00", "cycle": 72, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.245847+00:00", "cycle": 72, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.245920+00:00", "cycle": 72, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.246009+00:00", "cycle": 72, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.246074+00:00", "cycle": 72, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.246155+00:00", "cycle": 72, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.246303+00:00", "cycle": 72, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.246372+00:00", "cycle": 72, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:30:27.312172+00:00", "cycle": 72, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.386317+00:00", "cycle": 73, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.387901+00:00", "cycle": 73, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388057+00:00", "cycle": 73, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388129+00:00", "cycle": 73, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388176+00:00", "cycle": 73, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388221+00:00", "cycle": 73, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388265+00:00", "cycle": 73, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388325+00:00", "cycle": 73, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388446+00:00", "cycle": 73, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:31:57.388494+00:00", "cycle": 73, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:32:06.420933+00:00", "cycle": 73, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 544, 'opportunities_found': 128, 'outreach_sent': 160, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.465262+00:00", "cycle": 74, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467075+00:00", "cycle": 74, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467219+00:00", "cycle": 74, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467278+00:00", "cycle": 74, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467330+00:00", "cycle": 74, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467385+00:00", "cycle": 74, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467445+00:00", "cycle": 74, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467506+00:00", "cycle": 74, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467617+00:00", "cycle": 74, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.467666+00:00", "cycle": 74, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:33:36.536473+00:00", "cycle": 74, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.597319+00:00", "cycle": 75, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.598924+00:00", "cycle": 75, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599129+00:00", "cycle": 75, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599227+00:00", "cycle": 75, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599303+00:00", "cycle": 75, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599361+00:00", "cycle": 75, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599412+00:00", "cycle": 75, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599486+00:00", "cycle": 75, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599608+00:00", "cycle": 75, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.599656+00:00", "cycle": 75, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:35:06.676693+00:00", "cycle": 75, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.765355+00:00", "cycle": 76, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.767500+00:00", "cycle": 76, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.767676+00:00", "cycle": 76, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.767767+00:00", "cycle": 76, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.767833+00:00", "cycle": 76, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.767879+00:00", "cycle": 76, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.767924+00:00", "cycle": 76, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.767988+00:00", "cycle": 76, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.768092+00:00", "cycle": 76, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.768134+00:00", "cycle": 76, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:36:36.840566+00:00", "cycle": 76, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.858455+00:00", "cycle": 77, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860163+00:00", "cycle": 77, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860315+00:00", "cycle": 77, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860379+00:00", "cycle": 77, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860446+00:00", "cycle": 77, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860502+00:00", "cycle": 77, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860546+00:00", "cycle": 77, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860603+00:00", "cycle": 77, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860709+00:00", "cycle": 77, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:38:06.860757+00:00", "cycle": 77, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:38:08.143810+00:00", "cycle": 77, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 561, 'opportunities_found': 132, 'outreach_sent': 165, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.201253+00:00", "cycle": 78, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.202857+00:00", "cycle": 78, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203006+00:00", "cycle": 78, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203102+00:00", "cycle": 78, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203170+00:00", "cycle": 78, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203215+00:00", "cycle": 78, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203259+00:00", "cycle": 78, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203317+00:00", "cycle": 78, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203420+00:00", "cycle": 78, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:39:38.203469+00:00", "cycle": 78, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:39:39.264428+00:00", "cycle": 78, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 578, 'opportunities_found': 136, 'outreach_sent': 170, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.353252+00:00", "cycle": 79, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.354874+00:00", "cycle": 79, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355016+00:00", "cycle": 79, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355112+00:00", "cycle": 79, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355178+00:00", "cycle": 79, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355250+00:00", "cycle": 79, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355308+00:00", "cycle": 79, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355379+00:00", "cycle": 79, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355542+00:00", "cycle": 79, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:41:09.355606+00:00", "cycle": 79, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:41:10.551838+00:00", "cycle": 79, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 595, 'opportunities_found': 140, 'outreach_sent': 175, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.581958+00:00", "cycle": 80, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.583908+00:00", "cycle": 80, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.584071+00:00", "cycle": 80, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.584159+00:00", "cycle": 80, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.584226+00:00", "cycle": 80, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.584277+00:00", "cycle": 80, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.584345+00:00", "cycle": 80, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.584412+00:00", "cycle": 80, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.585038+00:00", "cycle": 80, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:42:40.585214+00:00", "cycle": 80, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:42:41.915507+00:00", "cycle": 80, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 612, 'opportunities_found': 144, 'outreach_sent': 180, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.006071+00:00", "cycle": 81, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.007415+00:00", "cycle": 81, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.007554+00:00", "cycle": 81, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.007618+00:00", "cycle": 81, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.007687+00:00", "cycle": 81, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.007739+00:00", "cycle": 81, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.007799+00:00", "cycle": 81, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.007866+00:00", "cycle": 81, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.008002+00:00", "cycle": 81, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:44:12.008054+00:00", "cycle": 81, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:44:13.385554+00:00", "cycle": 81, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 629, 'opportunities_found': 148, 'outreach_sent': 185, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.476077+00:00", "cycle": 82, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478017+00:00", "cycle": 82, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478172+00:00", "cycle": 82, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478248+00:00", "cycle": 82, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478305+00:00", "cycle": 82, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478354+00:00", "cycle": 82, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478399+00:00", "cycle": 82, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478470+00:00", "cycle": 82, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478594+00:00", "cycle": 82, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:45:43.478669+00:00", "cycle": 82, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:45:44.755055+00:00", "cycle": 82, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 646, 'opportunities_found': 152, 'outreach_sent': 190, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.765877+00:00", "cycle": 83, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767370+00:00", "cycle": 83, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767489+00:00", "cycle": 83, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767550+00:00", "cycle": 83, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767612+00:00", "cycle": 83, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767671+00:00", "cycle": 83, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767729+00:00", "cycle": 83, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767802+00:00", "cycle": 83, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.767986+00:00", "cycle": 83, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:47:14.768058+00:00", "cycle": 83, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:47:23.427013+00:00", "cycle": 83, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 663, 'opportunities_found': 156, 'outreach_sent': 195, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.492402+00:00", "cycle": 84, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494367+00:00", "cycle": 84, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494500+00:00", "cycle": 84, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494560+00:00", "cycle": 84, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494605+00:00", "cycle": 84, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494650+00:00", "cycle": 84, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494681+00:00", "cycle": 84, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494722+00:00", "cycle": 84, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494799+00:00", "cycle": 84, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.494834+00:00", "cycle": 84, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:48:53.569505+00:00", "cycle": 84, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.660015+00:00", "cycle": 85, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.661839+00:00", "cycle": 85, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662003+00:00", "cycle": 85, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662083+00:00", "cycle": 85, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662135+00:00", "cycle": 85, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662182+00:00", "cycle": 85, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662225+00:00", "cycle": 85, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662285+00:00", "cycle": 85, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662396+00:00", "cycle": 85, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.662444+00:00", "cycle": 85, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:50:23.722990+00:00", "cycle": 85, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.813497+00:00", "cycle": 86, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.814815+00:00", "cycle": 86, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.814957+00:00", "cycle": 86, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.815016+00:00", "cycle": 86, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.815080+00:00", "cycle": 86, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.815228+00:00", "cycle": 86, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.815320+00:00", "cycle": 86, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.815399+00:00", "cycle": 86, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.815529+00:00", "cycle": 86, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:51:53.815580+00:00", "cycle": 86, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:51:55.206104+00:00", "cycle": 86, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 680, 'opportunities_found': 160, 'outreach_sent': 200, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.296678+00:00", "cycle": 87, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.298535+00:00", "cycle": 87, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.298723+00:00", "cycle": 87, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.298837+00:00", "cycle": 87, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.298914+00:00", "cycle": 87, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.298985+00:00", "cycle": 87, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.299049+00:00", "cycle": 87, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.299114+00:00", "cycle": 87, "category": "decision", "content": "Action: check_trading | Reason: Continuous improvement requires action", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.299219+00:00", "cycle": 87, "category": "act", "content": "Executing: check_trading", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.299307+00:00", "cycle": 87, "category": "actuator", "content": "Using polymarket_status actuator: Check Polymarket health and readiness", "data": {}}
+{"timestamp": "2025-12-01T02:53:25.419650+00:00", "cycle": 87, "category": "success", "content": "Polymarket health: True", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.447771+00:00", "cycle": 88, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449118+00:00", "cycle": 88, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449284+00:00", "cycle": 88, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449343+00:00", "cycle": 88, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449389+00:00", "cycle": 88, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449434+00:00", "cycle": 88, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449476+00:00", "cycle": 88, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449533+00:00", "cycle": 88, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449653+00:00", "cycle": 88, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:54:55.449705+00:00", "cycle": 88, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:54:56.445020+00:00", "cycle": 88, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 697, 'opportunities_found': 164, 'outreach_sent': 205, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.469267+00:00", "cycle": 89, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.470692+00:00", "cycle": 89, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.470805+00:00", "cycle": 89, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.470864+00:00", "cycle": 89, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.470909+00:00", "cycle": 89, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.470952+00:00", "cycle": 89, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.470995+00:00", "cycle": 89, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.471070+00:00", "cycle": 89, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.471168+00:00", "cycle": 89, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.471215+00:00", "cycle": 89, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T02:56:26.533405+00:00", "cycle": 89, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.612493+00:00", "cycle": 90, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614050+00:00", "cycle": 90, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614197+00:00", "cycle": 90, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614281+00:00", "cycle": 90, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614351+00:00", "cycle": 90, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614407+00:00", "cycle": 90, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614456+00:00", "cycle": 90, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614517+00:00", "cycle": 90, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614643+00:00", "cycle": 90, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:57:56.614697+00:00", "cycle": 90, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T02:57:57.831601+00:00", "cycle": 90, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 714, 'opportunities_found': 168, 'outreach_sent': 210, 'l", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.922331+00:00", "cycle": 91, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.923585+00:00", "cycle": 91, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.923750+00:00", "cycle": 91, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.923829+00:00", "cycle": 91, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.923879+00:00", "cycle": 91, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.924006+00:00", "cycle": 91, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.924063+00:00", "cycle": 91, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.924124+00:00", "cycle": 91, "category": "decision", "content": "Action: notify | Reason: Continuous improvement requires action", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.924232+00:00", "cycle": 91, "category": "act", "content": "Executing: notify", "data": {}}
+{"timestamp": "2025-12-01T02:59:27.924280+00:00", "cycle": 91, "category": "cycle", "content": "Executing via process endpoint: notify", "data": {}}
+{"timestamp": "2025-12-01T02:59:28.091842+00:00", "cycle": 91, "category": "success", "content": "Notify Owner completed | feedback: {}", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.182479+00:00", "cycle": 92, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184100+00:00", "cycle": 92, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184261+00:00", "cycle": 92, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184333+00:00", "cycle": 92, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184386+00:00", "cycle": 92, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184432+00:00", "cycle": 92, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184512+00:00", "cycle": 92, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184594+00:00", "cycle": 92, "category": "decision", "content": "Action: notify | Reason: Continuous improvement requires action", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184750+00:00", "cycle": 92, "category": "act", "content": "Executing: notify", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.184835+00:00", "cycle": 92, "category": "cycle", "content": "Executing via process endpoint: notify", "data": {}}
+{"timestamp": "2025-12-01T03:00:58.397852+00:00", "cycle": 92, "category": "success", "content": "Notify Owner completed | feedback: {}", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.485264+00:00", "cycle": 93, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.486952+00:00", "cycle": 93, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487144+00:00", "cycle": 93, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487249+00:00", "cycle": 93, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487327+00:00", "cycle": 93, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487392+00:00", "cycle": 93, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487453+00:00", "cycle": 93, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487543+00:00", "cycle": 93, "category": "decision", "content": "Action: cost_audit | Reason: Balance at $0.0 - need to optimize spending", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487688+00:00", "cycle": 93, "category": "act", "content": "Executing: cost_audit", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.487812+00:00", "cycle": 93, "category": "cycle", "content": "Executing via process endpoint: cost_audit", "data": {}}
+{"timestamp": "2025-12-01T03:02:28.488556+00:00", "cycle": 93, "category": "warning", "content": "Cost Audit failed: Script not found: finance/cost_gate.py", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.501291+00:00", "cycle": 94, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.502768+00:00", "cycle": 94, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.502902+00:00", "cycle": 94, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.502962+00:00", "cycle": 94, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.503033+00:00", "cycle": 94, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.503092+00:00", "cycle": 94, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.503153+00:00", "cycle": 94, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.503239+00:00", "cycle": 94, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.503377+00:00", "cycle": 94, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.503441+00:00", "cycle": 94, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:03:58.568720+00:00", "cycle": 94, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.641251+00:00", "cycle": 95, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.642721+00:00", "cycle": 95, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.642861+00:00", "cycle": 95, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.642945+00:00", "cycle": 95, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.643004+00:00", "cycle": 95, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.643063+00:00", "cycle": 95, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.643108+00:00", "cycle": 95, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.643168+00:00", "cycle": 95, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.643322+00:00", "cycle": 95, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:05:28.643383+00:00", "cycle": 95, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:05:40.326704+00:00", "cycle": 95, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 731, 'opportunities_found': 172, 'outreach_sent': 215, 'l", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.417262+00:00", "cycle": 96, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.418544+00:00", "cycle": 96, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.418660+00:00", "cycle": 96, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.418736+00:00", "cycle": 96, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.418785+00:00", "cycle": 96, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.418832+00:00", "cycle": 96, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.418882+00:00", "cycle": 96, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.418965+00:00", "cycle": 96, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.419073+00:00", "cycle": 96, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.419122+00:00", "cycle": 96, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:07:10.484926+00:00", "cycle": 96, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.575650+00:00", "cycle": 97, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577341+00:00", "cycle": 97, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577521+00:00", "cycle": 97, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577592+00:00", "cycle": 97, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577650+00:00", "cycle": 97, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577696+00:00", "cycle": 97, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577737+00:00", "cycle": 97, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577797+00:00", "cycle": 97, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577921+00:00", "cycle": 97, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.577973+00:00", "cycle": 97, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:08:40.636796+00:00", "cycle": 97, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.727322+00:00", "cycle": 98, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.728679+00:00", "cycle": 98, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.728793+00:00", "cycle": 98, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.728850+00:00", "cycle": 98, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.728896+00:00", "cycle": 98, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.728941+00:00", "cycle": 98, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.728983+00:00", "cycle": 98, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.729039+00:00", "cycle": 98, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.729250+00:00", "cycle": 98, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:10:10.729316+00:00", "cycle": 98, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:10:11.885493+00:00", "cycle": 98, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 748, 'opportunities_found': 176, 'outreach_sent': 220, 'l", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.917600+00:00", "cycle": 99, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.918994+00:00", "cycle": 99, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919133+00:00", "cycle": 99, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919193+00:00", "cycle": 99, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919246+00:00", "cycle": 99, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919292+00:00", "cycle": 99, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919335+00:00", "cycle": 99, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919393+00:00", "cycle": 99, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919501+00:00", "cycle": 99, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.919549+00:00", "cycle": 99, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:11:41.985097+00:00", "cycle": 99, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.037353+00:00", "cycle": 100, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.039228+00:00", "cycle": 100, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.039416+00:00", "cycle": 100, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.039534+00:00", "cycle": 100, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.039601+00:00", "cycle": 100, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.039649+00:00", "cycle": 100, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.039701+00:00", "cycle": 100, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.039798+00:00", "cycle": 100, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.040169+00:00", "cycle": 100, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.040255+00:00", "cycle": 100, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:13:12.112928+00:00", "cycle": 100, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.203546+00:00", "cycle": 101, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205386+00:00", "cycle": 101, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205549+00:00", "cycle": 101, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205628+00:00", "cycle": 101, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205687+00:00", "cycle": 101, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205749+00:00", "cycle": 101, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205802+00:00", "cycle": 101, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205862+00:00", "cycle": 101, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.205969+00:00", "cycle": 101, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:14:42.206028+00:00", "cycle": 101, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:14:43.979348+00:00", "cycle": 101, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 765, 'opportunities_found': 180, 'outreach_sent': 225, 'l", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.021298+00:00", "cycle": 102, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.022687+00:00", "cycle": 102, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.022812+00:00", "cycle": 102, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.022870+00:00", "cycle": 102, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.022916+00:00", "cycle": 102, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.022973+00:00", "cycle": 102, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.023040+00:00", "cycle": 102, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.023116+00:00", "cycle": 102, "category": "decision", "content": "Action: cost_audit | Reason: Balance at $0.0 - need to optimize spending", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.023276+00:00", "cycle": 102, "category": "act", "content": "Executing: cost_audit", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.023333+00:00", "cycle": 102, "category": "cycle", "content": "Executing via process endpoint: cost_audit", "data": {}}
+{"timestamp": "2025-12-01T03:16:14.024073+00:00", "cycle": 102, "category": "warning", "content": "Cost Audit failed: Script not found: finance/cost_gate.py", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.114757+00:00", "cycle": 103, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.116821+00:00", "cycle": 103, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117028+00:00", "cycle": 103, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117118+00:00", "cycle": 103, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117261+00:00", "cycle": 103, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117355+00:00", "cycle": 103, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117413+00:00", "cycle": 103, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117483+00:00", "cycle": 103, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117630+00:00", "cycle": 103, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:17:44.117705+00:00", "cycle": 103, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:17:45.398803+00:00", "cycle": 103, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 782, 'opportunities_found': 184, 'outreach_sent': 230, 'l", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.489271+00:00", "cycle": 104, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.490967+00:00", "cycle": 104, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491160+00:00", "cycle": 104, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491251+00:00", "cycle": 104, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491316+00:00", "cycle": 104, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491390+00:00", "cycle": 104, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491441+00:00", "cycle": 104, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491510+00:00", "cycle": 104, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491668+00:00", "cycle": 104, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:19:15.491735+00:00", "cycle": 104, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:19:16.868025+00:00", "cycle": 104, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 799, 'opportunities_found': 188, 'outreach_sent': 235, 'l", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.953295+00:00", "cycle": 105, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955109+00:00", "cycle": 105, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955266+00:00", "cycle": 105, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955332+00:00", "cycle": 105, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955380+00:00", "cycle": 105, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955434+00:00", "cycle": 105, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955500+00:00", "cycle": 105, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955580+00:00", "cycle": 105, "category": "decision", "content": "Action: conversion | Reason: 0 visitors with 0 conversions - need to improve offer", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955755+00:00", "cycle": 105, "category": "act", "content": "Executing: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:20:46.955804+00:00", "cycle": 105, "category": "cycle", "content": "Executing via process endpoint: conversion", "data": {}}
+{"timestamp": "2025-12-01T03:20:47.020287+00:00", "cycle": 105, "category": "success", "content": "Conversion Optimization completed | feedback: {'master': 'Yair Siegel', 'total_experiments': 1, 'conversions': 0, 'best_combination': None, 'curre", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.110914+00:00", "cycle": 106, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.112633+00:00", "cycle": 106, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.112785+00:00", "cycle": 106, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.112851+00:00", "cycle": 106, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.112900+00:00", "cycle": 106, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.112946+00:00", "cycle": 106, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.112990+00:00", "cycle": 106, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.113050+00:00", "cycle": 106, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.113230+00:00", "cycle": 106, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:22:17.113288+00:00", "cycle": 106, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:22:26.629268+00:00", "cycle": 106, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 816, 'opportunities_found': 192, 'outreach_sent': 240, 'l", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.676214+00:00", "cycle": 107, "category": "gather", "content": "Gathering intelligence from all sources...", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678268+00:00", "cycle": 107, "category": "intel", "content": "Balance: $0.0, Income: $0.0, Health: critical", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678427+00:00", "cycle": 107, "category": "analyze", "content": "Extracting insights...", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678526+00:00", "cycle": 107, "category": "insight", "content": "CRITICAL: Zero income - all efforts must focus on first sale", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678607+00:00", "cycle": 107, "category": "insight", "content": "WARNING: Balance critical - runway very short", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678663+00:00", "cycle": 107, "category": "insight", "content": "PREP: War room has significant prep work ready", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678715+00:00", "cycle": 107, "category": "decide", "content": "Deciding next action...", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678786+00:00", "cycle": 107, "category": "decision", "content": "Action: outreach | Reason: No income means we need to actively find customers, not wait for them", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678916+00:00", "cycle": 107, "category": "act", "content": "Executing: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:23:56.678972+00:00", "cycle": 107, "category": "cycle", "content": "Executing via process endpoint: outreach", "data": {}}
+{"timestamp": "2025-12-01T03:23:57.726018+00:00", "cycle": 107, "category": "success", "content": "Active Outreach completed | feedback: {'master': 'Yair Siegel', 'total_actions': 833, 'opportunities_found': 196, 'outreach_sent': 245, 'l", "data": {}}

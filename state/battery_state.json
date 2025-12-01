@@ -1,0 +1,29 @@
+{
+  "total_energy": 35.7,
+  "power_mode": "survival",
+  "last_charge": null,
+  "last_drain": null,
+  "cycles": 1,
+  "cells": {
+    "financial": {
+      "current": 8.993226,
+      "last_updated": "2025-12-01T02:57:19.179765+00:00"
+    },
+    "computational": {
+      "current": 88.11743167331123,
+      "last_updated": "2025-12-01T02:57:19.179777+00:00"
+    },
+    "operational": {
+      "current": 0,
+      "last_updated": "2025-12-01T02:57:19.179781+00:00"
+    },
+    "momentum": {
+      "current": 98.65168539325842,
+      "last_updated": "2025-12-01T02:57:19.179786+00:00"
+    },
+    "morale": {
+      "current": 40,
+      "last_updated": "2025-12-01T02:57:19.179791+00:00"
+    }
+  }
+}

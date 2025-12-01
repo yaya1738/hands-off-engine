@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-11-30T20:33:53.999448Z",
+  "timestamp": "2025-11-30T20:49:00.397627Z",
   "count": 145,
   "markets": [
     {
@@ -10,7 +10,7 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 817.1046620000001,
-      "liquidity": 37919.69443,
+      "liquidity": 37950.18669,
       "outcomes": [
         "Yes",
         "No"
@@ -33,7 +33,7 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 3701.03,
-      "liquidity": 242323.8314,
+      "liquidity": 242886.81128,
       "outcomes": [
         "Yes",
         "No"
@@ -56,7 +56,7 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 9031.940839000003,
-      "liquidity": 81886.8711,
+      "liquidity": 85797.5523,
       "outcomes": [
         "Yes",
         "No"
@@ -79,7 +79,7 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 5452,
-      "liquidity": 239104.68543,
+      "liquidity": 242660.92653,
       "outcomes": [
         "Yes",
         "No"
@@ -102,7 +102,7 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2408.05358,
-      "liquidity": 54959.7821,
+      "liquidity": 55203.0767,
       "outcomes": [
         "Yes",
         "No"
@@ -125,7 +125,7 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 830.960722,
-      "liquidity": 133326.78379,
+      "liquidity": 135573.54119,
       "outcomes": [
         "Yes",
         "No"
@@ -148,7 +148,7 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2596.718,
-      "liquidity": 253734.90443,
+      "liquidity": 256860.4585,
       "outcomes": [
         "Yes",
         "No"
@@ -171,17 +171,17 @@
       "end_date": "2025-12-10T12:00:00Z",
       "category": "unknown",
       "volume_24h": 991.468,
-      "liquidity": 191245.84497,
+      "liquidity": 191246.15658,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0015,
-        0.9985
+        0.001,
+        0.999
       ],
-      "yes_price": 0.0015,
-      "no_price": 0.9985,
+      "yes_price": 0.001,
+      "no_price": 0.999,
       "active": true,
       "closed": false,
       "restricted": true
@@ -194,17 +194,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 135.947893,
-      "liquidity": 5744.12196,
+      "liquidity": 7068.3861,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.034,
-        0.966
+        0.0335,
+        0.9665
       ],
-      "yes_price": 0.034,
-      "no_price": 0.966,
+      "yes_price": 0.0335,
+      "no_price": 0.9665,
       "active": true,
       "closed": false,
       "restricted": true
@@ -217,17 +217,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 258.035195,
-      "liquidity": 1477.96428,
+      "liquidity": 2062.23436,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.041,
-        0.959
+        0.0385,
+        0.9615
       ],
-      "yes_price": 0.041,
-      "no_price": 0.959,
+      "yes_price": 0.0385,
+      "no_price": 0.9615,
       "active": true,
       "closed": false,
       "restricted": true
@@ -240,17 +240,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 814.333665,
-      "liquidity": 5270.18371,
+      "liquidity": 6284.49606,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0205,
-        0.9795
+        0.02,
+        0.98
       ],
-      "yes_price": 0.0205,
-      "no_price": 0.9795,
+      "yes_price": 0.02,
+      "no_price": 0.98,
       "active": true,
       "closed": false,
       "restricted": true
@@ -263,7 +263,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 6467.13025,
+      "liquidity": 6377.82613,
       "outcomes": [
         "Yes",
         "No"
@@ -286,17 +286,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 698.87421,
+      "liquidity": 698.38973,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.031,
-        0.969
+        0.0315,
+        0.9685
       ],
-      "yes_price": 0.031,
-      "no_price": 0.969,
+      "yes_price": 0.0315,
+      "no_price": 0.9685,
       "active": true,
       "closed": false,
       "restricted": true
@@ -309,7 +309,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 120.54,
-      "liquidity": 8163.10793,
+      "liquidity": 9323.42088,
       "outcomes": [
         "Yes",
         "No"
@@ -332,7 +332,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 47151.95258799997,
-      "liquidity": 78890.5791,
+      "liquidity": 79579.8168,
       "outcomes": [
         "Yes",
         "No"
@@ -355,7 +355,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 28662.253371000003,
-      "liquidity": 137100.12601,
+      "liquidity": 137658.45765,
       "outcomes": [
         "Yes",
         "No"
@@ -378,17 +378,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 8269.355354999998,
-      "liquidity": 41239.11619,
+      "liquidity": 41512.30789,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.2465,
-        0.7535
+        0.2475,
+        0.7525
       ],
-      "yes_price": 0.2465,
-      "no_price": 0.7535,
+      "yes_price": 0.2475,
+      "no_price": 0.7525,
       "active": true,
       "closed": false,
       "restricted": true
@@ -401,17 +401,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 17456.034242,
-      "liquidity": 65570.03157,
+      "liquidity": 66740.15573,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.1275,
-        0.8725
+        0.128,
+        0.872
       ],
-      "yes_price": 0.1275,
-      "no_price": 0.8725,
+      "yes_price": 0.128,
+      "no_price": 0.872,
       "active": true,
       "closed": false,
       "restricted": true
@@ -424,7 +424,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 53769.15500000002,
-      "liquidity": 394038.07749,
+      "liquidity": 392530.17783,
       "outcomes": [
         "Yes",
         "No"
@@ -470,7 +470,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 74858.34400000001,
-      "liquidity": 526154.34759,
+      "liquidity": 527634.77351,
       "outcomes": [
         "Yes",
         "No"
@@ -493,7 +493,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 27380.345,
-      "liquidity": 200674.72404,
+      "liquidity": 202154.3015,
       "outcomes": [
         "Yes",
         "No"
@@ -516,7 +516,7 @@
       "end_date": "2026-02-28T12:00:00Z",
       "category": "unknown",
       "volume_24h": 11443.209246999999,
-      "liquidity": 109827.47569,
+      "liquidity": 72851.35597,
       "outcomes": [
         "Yes",
         "No"
@@ -539,7 +539,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 332.216409,
-      "liquidity": 37964.34546,
+      "liquidity": 38123.84464,
       "outcomes": [
         "Yes",
         "No"
@@ -562,7 +562,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 14710.099736000016,
-      "liquidity": 54109.212,
+      "liquidity": 54606.2147,
       "outcomes": [
         "Yes",
         "No"
@@ -585,17 +585,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 19521.057851,
-      "liquidity": 64519.62465,
+      "liquidity": 65406.84669,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0185,
-        0.9815
+        0.018,
+        0.982
       ],
-      "yes_price": 0.0185,
-      "no_price": 0.9815,
+      "yes_price": 0.018,
+      "no_price": 0.982,
       "active": true,
       "closed": false,
       "restricted": true
@@ -608,7 +608,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 5941.31,
-      "liquidity": 83866.76309,
+      "liquidity": 86700.72679,
       "outcomes": [
         "Yes",
         "No"
@@ -631,7 +631,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 17845.112775999998,
-      "liquidity": 68353.62032,
+      "liquidity": 77465.64701,
       "outcomes": [
         "Yes",
         "No"
@@ -654,7 +654,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 13459.068670999999,
-      "liquidity": 137595.00441,
+      "liquidity": 137970.2446,
       "outcomes": [
         "Yes",
         "No"
@@ -677,7 +677,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 4922.116,
-      "liquidity": 160211.28106,
+      "liquidity": 161579.5056,
       "outcomes": [
         "Yes",
         "No"
@@ -700,7 +700,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 126251.86382,
+      "liquidity": 126822.51534,
       "outcomes": [
         "Yes",
         "No"
@@ -723,7 +723,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 8301.222500000002,
-      "liquidity": 47340.38508,
+      "liquidity": 49822.99407,
       "outcomes": [
         "Yes",
         "No"
@@ -746,7 +746,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2994.96,
-      "liquidity": 189543.16894,
+      "liquidity": 190118.24359,
       "outcomes": [
         "Yes",
         "No"
@@ -769,7 +769,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 3945.081,
-      "liquidity": 43995.43516,
+      "liquidity": 44529.76241,
       "outcomes": [
         "Yes",
         "No"
@@ -792,7 +792,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 1992,
-      "liquidity": 140569.88681,
+      "liquidity": 143046.24624,
       "outcomes": [
         "Yes",
         "No"
@@ -815,7 +815,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 12535.023,
-      "liquidity": 99184.54343,
+      "liquidity": 103010.29729,
       "outcomes": [
         "Yes",
         "No"
@@ -838,7 +838,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 82537.65636099776,
-      "liquidity": 189364.15195,
+      "liquidity": 189365.80052,
       "outcomes": [
         "Yes",
         "No"
@@ -861,7 +861,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 67306.23935399999,
-      "liquidity": 206653.60274,
+      "liquidity": 207150.43672,
       "outcomes": [
         "Yes",
         "No"
@@ -884,7 +884,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 39499.118503,
-      "liquidity": 235626.45731,
+      "liquidity": 278781.81329,
       "outcomes": [
         "Yes",
         "No"
@@ -907,17 +907,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 63357.761915,
-      "liquidity": 319217.13973,
+      "liquidity": 321040.99938,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.013,
-        0.987
+        0.0125,
+        0.9875
       ],
-      "yes_price": 0.013,
-      "no_price": 0.987,
+      "yes_price": 0.0125,
+      "no_price": 0.9875,
       "active": true,
       "closed": false,
       "restricted": true
@@ -930,7 +930,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 70118.37118100001,
-      "liquidity": 261579.75237,
+      "liquidity": 259427.19882,
       "outcomes": [
         "Yes",
         "No"
@@ -953,7 +953,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 46335.64644900001,
-      "liquidity": 58883.55749,
+      "liquidity": 48486.67921,
       "outcomes": [
         "Yes",
         "No"
@@ -976,7 +976,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 90443.861679,
-      "liquidity": 146727.3272,
+      "liquidity": 157086.7842,
       "outcomes": [
         "Yes",
         "No"
@@ -999,7 +999,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2609.181502,
-      "liquidity": 75769.98685,
+      "liquidity": 75779.72975,
       "outcomes": [
         "Yes",
         "No"
@@ -1022,7 +1022,7 @@
       "end_date": null,
       "category": "unknown",
       "volume_24h": 69215.89440300001,
-      "liquidity": 90246.37993,
+      "liquidity": 101726.37993,
       "outcomes": [
         "Yes",
         "No"
@@ -1045,7 +1045,7 @@
       "end_date": null,
       "category": "unknown",
       "volume_24h": 15044.942281000001,
-      "liquidity": 114664.26001,
+      "liquidity": 114424.36001,
       "outcomes": [
         "Yes",
         "No"
@@ -1068,7 +1068,7 @@
       "end_date": "2026-01-01T05:00:00Z",
       "category": "unknown",
       "volume_24h": 30430.344684999996,
-      "liquidity": 79911.76338,
+      "liquidity": 74829.00394,
       "outcomes": [
         "Yes",
         "No"
@@ -1091,7 +1091,7 @@
       "end_date": "2026-01-01T05:00:00Z",
       "category": "unknown",
       "volume_24h": 74762.84799,
-      "liquidity": 123025.0695,
+      "liquidity": 125480.5964,
       "outcomes": [
         "Yes",
         "No"
@@ -1114,17 +1114,17 @@
       "end_date": "2026-01-01T05:00:00Z",
       "category": "unknown",
       "volume_24h": 24583.737113,
-      "liquidity": 76005.6538,
+      "liquidity": 78161.7534,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.19,
-        0.81
+        0.185,
+        0.815
       ],
-      "yes_price": 0.19,
-      "no_price": 0.81,
+      "yes_price": 0.185,
+      "no_price": 0.815,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1137,7 +1137,7 @@
       "end_date": "2026-01-01T05:00:00Z",
       "category": "unknown",
       "volume_24h": 26804.156016999998,
-      "liquidity": 154047.3343,
+      "liquidity": 145995.5855,
       "outcomes": [
         "Yes",
         "No"
@@ -1160,7 +1160,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 26720.156779,
-      "liquidity": 236202.43107,
+      "liquidity": 239671.28963,
       "outcomes": [
         "Yes",
         "No"
@@ -1183,7 +1183,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 7203.313526999999,
-      "liquidity": 126235.55557,
+      "liquidity": 128223.70069,
       "outcomes": [
         "Yes",
         "No"
@@ -1206,7 +1206,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 9489.479331999999,
-      "liquidity": 108507.17139,
+      "liquidity": 108497.17275,
       "outcomes": [
         "Yes",
         "No"
@@ -1229,7 +1229,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 13351.582723000001,
-      "liquidity": 300467.068,
+      "liquidity": 302429.88916,
       "outcomes": [
         "Yes",
         "No"
@@ -1252,17 +1252,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 45105.926244,
-      "liquidity": 153374.89867,
+      "liquidity": 157407.48797,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.036,
-        0.964
+        0.0365,
+        0.9635
       ],
-      "yes_price": 0.036,
-      "no_price": 0.964,
+      "yes_price": 0.0365,
+      "no_price": 0.9635,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1275,7 +1275,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2581.91,
-      "liquidity": 78001.36109,
+      "liquidity": 75875.33669,
       "outcomes": [
         "Yes",
         "No"
@@ -1298,7 +1298,7 @@
       "end_date": "2025-12-31T00:00:00Z",
       "category": "unknown",
       "volume_24h": 16496.503232,
-      "liquidity": 74934.94902,
+      "liquidity": 80183.68837,
       "outcomes": [
         "Yes",
         "No"
@@ -1321,7 +1321,7 @@
       "end_date": null,
       "category": "unknown",
       "volume_24h": 28519.995168,
-      "liquidity": 102673.74838,
+      "liquidity": 105823.4799,
       "outcomes": [
         "Yes",
         "No"
@@ -1344,7 +1344,7 @@
       "end_date": "2025-12-31T00:00:00Z",
       "category": "unknown",
       "volume_24h": 2340.236,
-      "liquidity": 81946.52569,
+      "liquidity": 81957.52211,
       "outcomes": [
         "Yes",
         "No"
@@ -1367,17 +1367,17 @@
       "end_date": "2026-01-01T04:00:00Z",
       "category": "unknown",
       "volume_24h": 28071.994603999996,
-      "liquidity": 139389.35098,
+      "liquidity": 139389.95842,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.005,
-        0.995
+        0.0045,
+        0.9955
       ],
-      "yes_price": 0.005,
-      "no_price": 0.995,
+      "yes_price": 0.0045,
+      "no_price": 0.9955,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1390,7 +1390,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 247.454355,
-      "liquidity": 38798.44658,
+      "liquidity": 38798.49597,
       "outcomes": [
         "Yes",
         "No"
@@ -1413,7 +1413,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 29016.962172000003,
-      "liquidity": 113218.0192,
+      "liquidity": 113293.01858,
       "outcomes": [
         "Yes",
         "No"
@@ -1436,17 +1436,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 51526.407249999975,
-      "liquidity": 291975.34,
+      "liquidity": 285500.54394,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0305,
-        0.9695
+        0.0365,
+        0.9635
       ],
-      "yes_price": 0.0305,
-      "no_price": 0.9695,
+      "yes_price": 0.0365,
+      "no_price": 0.9635,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1459,17 +1459,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 135972.72983200004,
-      "liquidity": 68124.16646,
+      "liquidity": 72062.84634,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0525,
-        0.9475
+        0.053,
+        0.947
       ],
-      "yes_price": 0.0525,
-      "no_price": 0.9475,
+      "yes_price": 0.053,
+      "no_price": 0.947,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1482,7 +1482,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 90942.28399999996,
-      "liquidity": 728010.59177,
+      "liquidity": 725426.29531,
       "outcomes": [
         "Yes",
         "No"
@@ -1505,7 +1505,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 89167.94399999992,
-      "liquidity": 669652.11445,
+      "liquidity": 671038.70763,
       "outcomes": [
         "Yes",
         "No"
@@ -1528,7 +1528,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 59323.719000000005,
-      "liquidity": 869900.18827,
+      "liquidity": 869668.3965,
       "outcomes": [
         "Yes",
         "No"
@@ -1551,7 +1551,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 84273.842,
-      "liquidity": 698162.03142,
+      "liquidity": 699721.68721,
       "outcomes": [
         "Yes",
         "No"
@@ -1574,7 +1574,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 124312.59,
-      "liquidity": 835358.4026,
+      "liquidity": 835133.02845,
       "outcomes": [
         "Yes",
         "No"
@@ -1597,17 +1597,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 113366.404603,
-      "liquidity": 122001.99674,
+      "liquidity": 120079.009,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0605,
-        0.9395
+        0.0455,
+        0.9545
       ],
-      "yes_price": 0.0605,
-      "no_price": 0.9395,
+      "yes_price": 0.0455,
+      "no_price": 0.9545,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1620,7 +1620,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 89932.87999999998,
-      "liquidity": 870085.99717,
+      "liquidity": 871886.16129,
       "outcomes": [
         "Yes",
         "No"
@@ -1643,17 +1643,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 66801.20725299999,
-      "liquidity": 102292.35163,
+      "liquidity": 102847.0333,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.843,
-        0.157
+        0.849,
+        0.151
       ],
-      "yes_price": 0.843,
-      "no_price": 0.157,
+      "yes_price": 0.849,
+      "no_price": 0.151,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1666,7 +1666,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 58741.87985599999,
-      "liquidity": 217456.9177,
+      "liquidity": 217350.12527,
       "outcomes": [
         "Yes",
         "No"
@@ -1689,7 +1689,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 40,
-      "liquidity": 2188.3891,
+      "liquidity": 3101.7558,
       "outcomes": [
         "Yes",
         "No"
@@ -1712,7 +1712,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 557.224,
-      "liquidity": 8870.30212,
+      "liquidity": 10635.93924,
       "outcomes": [
         "Yes",
         "No"
@@ -1735,7 +1735,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 70,
-      "liquidity": 6357.55796,
+      "liquidity": 6640.41864,
       "outcomes": [
         "Yes",
         "No"
@@ -1758,7 +1758,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2168.5699999999997,
-      "liquidity": 2781.89951,
+      "liquidity": 3608.60281,
       "outcomes": [
         "Yes",
         "No"
@@ -1781,7 +1781,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 3754,
-      "liquidity": 2159.53568,
+      "liquidity": 3265.80157,
       "outcomes": [
         "Yes",
         "No"
@@ -1804,7 +1804,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 40,
-      "liquidity": 8431.28846,
+      "liquidity": 8575.92806,
       "outcomes": [
         "Yes",
         "No"
@@ -1827,17 +1827,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 6043.474743999996,
-      "liquidity": 22140.6651,
+      "liquidity": 22138.85682,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0135,
-        0.9865
+        0.013,
+        0.987
       ],
-      "yes_price": 0.0135,
-      "no_price": 0.9865,
+      "yes_price": 0.013,
+      "no_price": 0.987,
       "active": true,
       "closed": false,
       "restricted": true
@@ -1850,7 +1850,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 24182.128590000008,
-      "liquidity": 146722.40206,
+      "liquidity": 147585.00293,
       "outcomes": [
         "Yes",
         "No"
@@ -1873,7 +1873,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 12051.438385,
-      "liquidity": 45119.826,
+      "liquidity": 44519.96874,
       "outcomes": [
         "Yes",
         "No"
@@ -1896,7 +1896,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 593063.8352290005,
-      "liquidity": 820781.1145,
+      "liquidity": 827980.4831,
       "outcomes": [
         "Yes",
         "No"
@@ -1919,7 +1919,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 6858.809074999999,
-      "liquidity": 39441.22494,
+      "liquidity": 39280.21482,
       "outcomes": [
         "Yes",
         "No"
@@ -1942,7 +1942,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 600.018892,
-      "liquidity": 20829.99336,
+      "liquidity": 22012.57778,
       "outcomes": [
         "Yes",
         "No"
@@ -1965,7 +1965,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 1486.53849,
+      "liquidity": 1479.02683,
       "outcomes": [
         "Yes",
         "No"
@@ -1988,7 +1988,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 1674.8166,
+      "liquidity": 1674.8172,
       "outcomes": [
         "Yes",
         "No"
@@ -2011,17 +2011,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 951.86596,
+      "liquidity": 945.37557,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0395,
-        0.9605
+        0.039,
+        0.961
       ],
-      "yes_price": 0.0395,
-      "no_price": 0.9605,
+      "yes_price": 0.039,
+      "no_price": 0.961,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2034,7 +2034,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 105,
-      "liquidity": 6887.57398,
+      "liquidity": 6725.35239,
       "outcomes": [
         "Yes",
         "No"
@@ -2057,7 +2057,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 15.051545,
-      "liquidity": 156.3889,
+      "liquidity": 156.1927,
       "outcomes": [
         "Yes",
         "No"
@@ -2080,7 +2080,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 6146,
-      "liquidity": 29685.24142,
+      "liquidity": 29694.27998,
       "outcomes": [
         "Yes",
         "No"
@@ -2103,7 +2103,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 22669.471965000004,
-      "liquidity": 154128.82744,
+      "liquidity": 155666.74015,
       "outcomes": [
         "Yes",
         "No"
@@ -2126,17 +2126,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 39665.107122999994,
-      "liquidity": 35654.86922,
+      "liquidity": 37040.01267,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0385,
-        0.9615
+        0.0425,
+        0.9575
       ],
-      "yes_price": 0.0385,
-      "no_price": 0.9615,
+      "yes_price": 0.0425,
+      "no_price": 0.9575,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2149,7 +2149,7 @@
       "end_date": null,
       "category": "unknown",
       "volume_24h": 5693.081896,
-      "liquidity": 10913.7586,
+      "liquidity": 10874.2686,
       "outcomes": [
         "Yes",
         "No"
@@ -2172,7 +2172,7 @@
       "end_date": "2026-07-01T04:00:00Z",
       "category": "unknown",
       "volume_24h": 3017.17578,
-      "liquidity": 7539.6185,
+      "liquidity": 8447.5149,
       "outcomes": [
         "Yes",
         "No"
@@ -2195,7 +2195,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 17190.529333000002,
-      "liquidity": 38986.65732,
+      "liquidity": 41199.0227,
       "outcomes": [
         "Yes",
         "No"
@@ -2218,7 +2218,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 23234.373000000003,
-      "liquidity": 93912.32016,
+      "liquidity": 94001.26872,
       "outcomes": [
         "Yes",
         "No"
@@ -2241,7 +2241,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 7788.651,
-      "liquidity": 81068.70763,
+      "liquidity": 82306.70593,
       "outcomes": [
         "Yes",
         "No"
@@ -2264,7 +2264,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 7757.034,
-      "liquidity": 99452.07509,
+      "liquidity": 99421.04462,
       "outcomes": [
         "Yes",
         "No"
@@ -2287,7 +2287,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 17375.767,
-      "liquidity": 86995.13091,
+      "liquidity": 86902.18421,
       "outcomes": [
         "Yes",
         "No"
@@ -2310,7 +2310,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 80629.38457099997,
-      "liquidity": 104969.57473,
+      "liquidity": 105509.54227,
       "outcomes": [
         "Yes",
         "No"
@@ -2333,17 +2333,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 109549.08666499994,
-      "liquidity": 90474.10487,
+      "liquidity": 90900.30359,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0045,
-        0.9955
+        0.0035,
+        0.9965
       ],
-      "yes_price": 0.0045,
-      "no_price": 0.9955,
+      "yes_price": 0.0035,
+      "no_price": 0.9965,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2356,7 +2356,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 186576.60001900033,
-      "liquidity": 88473.40947,
+      "liquidity": 89851.51779,
       "outcomes": [
         "Yes",
         "No"
@@ -2379,7 +2379,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 7617.876672000001,
-      "liquidity": 97147.85446,
+      "liquidity": 98397.61985,
       "outcomes": [
         "Yes",
         "No"
@@ -2402,7 +2402,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 39732.11438,
-      "liquidity": 42255.00921,
+      "liquidity": 42058.84856,
       "outcomes": [
         "Yes",
         "No"
@@ -2425,17 +2425,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 169.25,
-      "liquidity": 44082.35348,
+      "liquidity": 44121.43234,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.016,
-        0.984
+        0.015,
+        0.985
       ],
-      "yes_price": 0.016,
-      "no_price": 0.984,
+      "yes_price": 0.015,
+      "no_price": 0.985,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2448,7 +2448,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2,
-      "liquidity": 6217.80854,
+      "liquidity": 6240.09388,
       "outcomes": [
         "Yes",
         "No"
@@ -2471,7 +2471,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 6.3,
-      "liquidity": 8766.47363,
+      "liquidity": 8486.45171,
       "outcomes": [
         "Yes",
         "No"
@@ -2494,7 +2494,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 11.11,
-      "liquidity": 17066.45996,
+      "liquidity": 17066.9858,
       "outcomes": [
         "Yes",
         "No"
@@ -2517,7 +2517,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 3369.21,
-      "liquidity": 17930.53336,
+      "liquidity": 17422.67867,
       "outcomes": [
         "Yes",
         "No"
@@ -2540,7 +2540,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 1946.8000000000009,
-      "liquidity": 4255.54222,
+      "liquidity": 5446.54059,
       "outcomes": [
         "Yes",
         "No"
@@ -2563,7 +2563,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 663780.6094530007,
-      "liquidity": 556404.2795,
+      "liquidity": 552894.8428,
       "outcomes": [
         "Yes",
         "No"
@@ -2586,7 +2586,7 @@
       "end_date": "2025-11-30T12:00:00Z",
       "category": "unknown",
       "volume_24h": 842048.4316159997,
-      "liquidity": 207573.02274,
+      "liquidity": 214785.7146,
       "outcomes": [
         "Yes",
         "No"
@@ -2609,7 +2609,7 @@
       "end_date": "2026-03-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 49771.87149600003,
-      "liquidity": 29124.2359,
+      "liquidity": 29584.0054,
       "outcomes": [
         "Yes",
         "No"
@@ -2632,7 +2632,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 2299.96,
-      "liquidity": 34541.84583,
+      "liquidity": 35999.17323,
       "outcomes": [
         "Yes",
         "No"
@@ -2655,7 +2655,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 3336.3327930000005,
-      "liquidity": 27150.47979,
+      "liquidity": 26983.33645,
       "outcomes": [
         "Yes",
         "No"
@@ -2678,17 +2678,17 @@
       "end_date": "2026-04-01T04:00:00Z",
       "category": "unknown",
       "volume_24h": 5613,
-      "liquidity": 1010.2162,
+      "liquidity": 1488.3347,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.385,
-        0.615
+        0.395,
+        0.605
       ],
-      "yes_price": 0.385,
-      "no_price": 0.615,
+      "yes_price": 0.395,
+      "no_price": 0.605,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2701,7 +2701,7 @@
       "end_date": "2027-01-01T05:00:00Z",
       "category": "unknown",
       "volume_24h": 1016.865788,
-      "liquidity": 921.3013,
+      "liquidity": 923.8997,
       "outcomes": [
         "Yes",
         "No"
@@ -2724,7 +2724,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 7072.3333,
+      "liquidity": 8501.1241,
       "outcomes": [
         "Yes",
         "No"
@@ -2747,17 +2747,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 15564.367037,
-      "liquidity": 31818.2022,
+      "liquidity": 33244.72548,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.021,
-        0.979
+        0.0205,
+        0.9795
       ],
-      "yes_price": 0.021,
-      "no_price": 0.979,
+      "yes_price": 0.0205,
+      "no_price": 0.9795,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2770,17 +2770,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 4831.234816,
-      "liquidity": 4721.59504,
+      "liquidity": 5972.51689,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.9845,
-        0.0155
+        0.984,
+        0.016
       ],
-      "yes_price": 0.9845,
-      "no_price": 0.0155,
+      "yes_price": 0.984,
+      "no_price": 0.016,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2793,7 +2793,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 5333.4837,
+      "liquidity": 5910.66479,
       "outcomes": [
         "Yes",
         "No"
@@ -2816,7 +2816,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 4493.20869,
+      "liquidity": 6097.31933,
       "outcomes": [
         "Yes",
         "No"
@@ -2839,7 +2839,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 8551.926,
+      "liquidity": 9285.21926,
       "outcomes": [
         "Yes",
         "No"
@@ -2862,7 +2862,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 7270.21591,
+      "liquidity": 7573.88711,
       "outcomes": [
         "Yes",
         "No"
@@ -2885,7 +2885,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 8212.82187,
+      "liquidity": 10242.04463,
       "outcomes": [
         "Yes",
         "No"
@@ -2908,7 +2908,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 8476.63906,
+      "liquidity": 10513.7031,
       "outcomes": [
         "Yes",
         "No"
@@ -2931,7 +2931,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 9539.59888,
+      "liquidity": 9943.83291,
       "outcomes": [
         "Yes",
         "No"
@@ -2954,17 +2954,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 1126.11321,
+      "liquidity": 1124.70536,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.029,
-        0.971
+        0.0285,
+        0.9715
       ],
-      "yes_price": 0.029,
-      "no_price": 0.971,
+      "yes_price": 0.0285,
+      "no_price": 0.9715,
       "active": true,
       "closed": false,
       "restricted": true
@@ -2977,7 +2977,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 254.24,
-      "liquidity": 10874.35178,
+      "liquidity": 12154.32169,
       "outcomes": [
         "Yes",
         "No"
@@ -3000,17 +3000,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 1853.070613,
-      "liquidity": 5129.0063,
+      "liquidity": 5054.4979,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.22,
-        0.78
+        0.215,
+        0.785
       ],
-      "yes_price": 0.22,
-      "no_price": 0.78,
+      "yes_price": 0.215,
+      "no_price": 0.785,
       "active": true,
       "closed": false,
       "restricted": true
@@ -3023,17 +3023,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 6718.437695,
-      "liquidity": 20347.74238,
+      "liquidity": 20912.75923,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0205,
-        0.9795
+        0.0185,
+        0.9815
       ],
-      "yes_price": 0.0205,
-      "no_price": 0.9795,
+      "yes_price": 0.0185,
+      "no_price": 0.9815,
       "active": true,
       "closed": false,
       "restricted": true
@@ -3046,7 +3046,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 1211.027016,
-      "liquidity": 18100.71938,
+      "liquidity": 18095.90666,
       "outcomes": [
         "Yes",
         "No"
@@ -3069,7 +3069,7 @@
       "end_date": "2026-06-30T12:00:00Z",
       "category": "unknown",
       "volume_24h": 22.22,
-      "liquidity": 14511.6116,
+      "liquidity": 14319.2525,
       "outcomes": [
         "Yes",
         "No"
@@ -3092,17 +3092,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 173.746084,
-      "liquidity": 5112.67987,
+      "liquidity": 5365.96249,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.038,
-        0.962
+        0.037,
+        0.963
       ],
-      "yes_price": 0.038,
-      "no_price": 0.962,
+      "yes_price": 0.037,
+      "no_price": 0.963,
       "active": true,
       "closed": false,
       "restricted": true
@@ -3115,7 +3115,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 202.05012999999997,
-      "liquidity": 3690.408,
+      "liquidity": 3798.4552,
       "outcomes": [
         "Yes",
         "No"
@@ -3138,17 +3138,17 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 248.233905,
-      "liquidity": 4230.31377,
+      "liquidity": 4264.3249,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.1135,
-        0.8865
+        0.115,
+        0.885
       ],
-      "yes_price": 0.1135,
-      "no_price": 0.8865,
+      "yes_price": 0.115,
+      "no_price": 0.885,
       "active": true,
       "closed": false,
       "restricted": true
@@ -3161,7 +3161,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 188.48411,
-      "liquidity": 7020.36753,
+      "liquidity": 7025.89989,
       "outcomes": [
         "Yes",
         "No"
@@ -3184,7 +3184,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 188.4975,
-      "liquidity": 8317.4118,
+      "liquidity": 8565.52428,
       "outcomes": [
         "Yes",
         "No"
@@ -3207,7 +3207,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 188.4975,
-      "liquidity": 11990.94195,
+      "liquidity": 11752.57118,
       "outcomes": [
         "Yes",
         "No"
@@ -3230,7 +3230,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 154.68,
-      "liquidity": 7089.09463,
+      "liquidity": 7086.52183,
       "outcomes": [
         "Yes",
         "No"
@@ -3253,7 +3253,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 159.22333300000003,
-      "liquidity": 7426.98805,
+      "liquidity": 7313.13376,
       "outcomes": [
         "Yes",
         "No"
@@ -3276,7 +3276,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 265.68,
-      "liquidity": 5929.18161,
+      "liquidity": 5924.40485,
       "outcomes": [
         "Yes",
         "No"
@@ -3299,7 +3299,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 231,
-      "liquidity": 7435.98302,
+      "liquidity": 7315.17231,
       "outcomes": [
         "Yes",
         "No"
@@ -3322,7 +3322,7 @@
       "end_date": "2025-12-31T12:00:00Z",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 8898.70559,
+      "liquidity": 10089.62746,
       "outcomes": [
         "Yes",
         "No"

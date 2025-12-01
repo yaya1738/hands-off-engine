@@ -1,0 +1,40 @@
+{
+  "plans": [
+    {
+      "id": "CONT-001",
+      "created": "2025-12-01T00:32:46.143098+00:00",
+      "trigger": "gallery sentiment turns negative",
+      "plan": "review messaging, prepare pivot",
+      "status": "prepared"
+    },
+    {
+      "id": "CONT-002",
+      "created": "2025-12-01T00:33:46.200199+00:00",
+      "trigger": "system health degrades",
+      "plan": "review messaging, prepare pivot",
+      "status": "prepared"
+    },
+    {
+      "id": "CONT-003",
+      "created": "2025-12-01T00:39:16.492750+00:00",
+      "trigger": "gallery sentiment turns negative",
+      "plan": "review messaging, prepare pivot",
+      "status": "prepared"
+    },
+    {
+      "id": "CONT-004",
+      "created": "2025-12-01T00:42:16.691037+00:00",
+      "trigger": "system health degrades",
+      "plan": "increase capacity, prepare for load",
+      "status": "prepared"
+    },
+    {
+      "id": "CONT-005",
+      "created": "2025-12-01T00:47:17.001993+00:00",
+      "trigger": "first conversion occurs",
+      "plan": "scale up immediately, prepare fulfillment",
+      "status": "prepared"
+    }
+  ],
+  "last_updated": "2025-12-01T00:47:17.002000+00:00"
+}

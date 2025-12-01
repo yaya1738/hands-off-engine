@@ -80,7 +80,11 @@ class TelegramActuator:
 
 
 class PolymarketActuator:
-    """Execute real trades on Polymarket."""
+    """Execute real trades on Polymarket.
+
+    SAFETY: All trades go through the executor safeguards system.
+    Direct trades are BLOCKED by default - must use executor pipeline.
+    """
 
     def __init__(self):
         self.trader = None
@@ -132,12 +136,72 @@ class PolymarketActuator:
         except:
             return []
 
-    def place_market_order(self, token_id: str, usd_amount: float, side: str) -> Dict:
-        """Place a market order."""
+    def _check_trading_mode(self) -> tuple:
+        """Check if live trading is enabled via state file."""
+        mode_file = STATE_DIR / "trading_mode.json"
+        if mode_file.exists():
+            try:
+                mode = json.loads(mode_file.read_text())
+                enabled = mode.get("live_trading_enabled", False)
+                paused = mode.get("auto_paused", False)
+                reason = mode.get("reason", "unknown")
+                if not enabled or paused:
+                    return False, f"Trading disabled: {reason}"
+                return True, "OK"
+            except Exception as e:
+                return False, f"Mode file error: {e}"
+        return False, "No trading_mode.json - defaulting to DRYRUN"
+
+    def _check_safeguards(self, usd_amount: float) -> tuple:
+        """Run safety checks before trade."""
+        try:
+            from executor.trading_safeguards import get_safeguards, load_risk_profile
+
+            # Check risk profile limits
+            risk = load_risk_profile()
+            max_pos = risk.get("max_position_usd", 50)
+            if usd_amount > max_pos:
+                return False, f"Amount ${usd_amount} exceeds max position ${max_pos}"
+
+            # Run safeguards
+            safeguards = get_safeguards()
+            allowed, msgs = safeguards.check_all_safeguards(usd_amount, "actuator_trade")
+            if not allowed:
+                return False, f"Safeguards blocked: {'; '.join(msgs)}"
+
+            return True, "Safeguards OK"
+        except Exception as e:
+            return False, f"Safeguard error: {e}"
+
+    def place_market_order(self, token_id: str, usd_amount: float, side: str, force: bool = False) -> Dict:
+        """Place a market order WITH SAFETY CHECKS.
+
+        Args:
+            token_id: The token to trade
+            usd_amount: Amount in USD
+            side: BUY or SELL
+            force: If True, bypass safety checks (DANGEROUS - requires explicit flag)
+
+        Returns:
+            Dict with result or error
+        """
         if not self.trader:
             return {"error": "Trader not initialized"}
+
+        # SAFETY GATE 1: Check trading mode
+        if not force:
+            mode_ok, mode_msg = self._check_trading_mode()
+            if not mode_ok:
+                return {"error": f"BLOCKED: {mode_msg}", "blocked_by": "trading_mode"}
+
+            # SAFETY GATE 2: Check safeguards
+            safe_ok, safe_msg = self._check_safeguards(usd_amount)
+            if not safe_ok:
+                return {"error": f"BLOCKED: {safe_msg}", "blocked_by": "safeguards"}
+
         try:
-            return self.trader.place_market_order_usd(token_id, usd_amount, side)
+            result = self.trader.place_market_order_usd(token_id, usd_amount, side)
+            return result
         except Exception as e:
             return {"error": str(e)}
 
@@ -217,11 +281,29 @@ class ActuatorHub:
         msg += f"Source: {source}"
         return self.notify(msg)
 
-    def trade(self, token_id: str, usd_amount: float, side: str) -> Dict:
-        """Execute a trade on Polymarket."""
-        result = self.polymarket.place_market_order(token_id, usd_amount, side)
+    def trade(self, token_id: str, usd_amount: float, side: str, force: bool = False) -> Dict:
+        """Execute a trade on Polymarket WITH SAFETY CHECKS.
+
+        Args:
+            token_id: The token to trade
+            usd_amount: Amount in USD
+            side: BUY or SELL
+            force: If True, bypass safety checks (DANGEROUS - requires explicit flag)
+
+        Returns:
+            Dict with result or error
+        """
+        result = self.polymarket.place_market_order(token_id, usd_amount, side, force=force)
         success = "error" not in result
-        self._log("polymarket", f"trade_{side}", success, f"${usd_amount} on {token_id[:20]}")
+
+        # Log the attempt (including blocked trades)
+        blocked_by = result.get("blocked_by", "")
+        log_detail = f"${usd_amount} on {token_id[:20]}"
+        if blocked_by:
+            log_detail += f" [BLOCKED by {blocked_by}]"
+
+        self._log("polymarket", f"trade_{side}", success, log_detail)
+
         if success:
             self.state["trades_executed"] += 1
             self.state["last_action"] = f"trade_{side}"

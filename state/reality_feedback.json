@@ -1,11 +1,37 @@
 {
   "master": "Yair Siegel",
-  "last_reality_check": "2025-11-30T23:38:20.263170+00:00",
+  "last_reality_check": "2025-12-01T03:23:57.013928+00:00",
   "external_balance": 0.0,
   "total_income": 0.0,
-  "conversion_rates": {},
+  "conversion_rates": {
+    "opportunity_identified": {
+      "total": 188,
+      "converted": 0,
+      "rate": 0.0
+    },
+    "compute_utilized": {
+      "total": 188,
+      "converted": 0,
+      "rate": 0.0
+    },
+    "outreach_planned": {
+      "total": 235,
+      "converted": 0,
+      "rate": 0.0
+    },
+    "value_creation": {
+      "total": 188,
+      "converted": 0,
+      "rate": 0.0
+    }
+  },
   "strategy_effectiveness": {},
   "what_works": [],
-  "what_doesnt": [],
-  "last_updated": "2025-11-30T23:38:20.263179+00:00"
+  "what_doesnt": [
+    "opportunity_identified",
+    "compute_utilized",
+    "outreach_planned",
+    "value_creation"
+  ],
+  "last_updated": "2025-12-01T03:23:57.671018+00:00"
 }

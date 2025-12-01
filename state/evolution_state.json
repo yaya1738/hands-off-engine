@@ -1,13 +1,33 @@
 {
-  "cycles": 2,
-  "decisions": 2,
-  "actions_taken": 2,
+  "cycles": 107,
+  "decisions": 107,
+  "actions_taken": 99,
   "last_action": {
-    "action": "conversion",
-    "reason": "0 visitors with 0 conversions - need to improve offer",
+    "action": "outreach",
+    "reason": "No income means we need to actively find customers, not wait for them",
     "success": true,
-    "timestamp": "2025-12-01T00:40:27.749020+00:00"
+    "timestamp": "2025-12-01T03:23:57.726154+00:00"
   },
   "current_focus": "income",
-  "improvements": []
+  "improvements": [],
+  "last_feedback": {
+    "action": "outreach",
+    "feedback": {
+      "master": "Yair Siegel",
+      "total_actions": 833,
+      "opportunities_found": 196,
+      "outreach_sent": 245,
+      "last_action": "2025-12-01T03:23:57.671390+00:00",
+      "income_generated": 0.0,
+      "last_updated": "2025-12-01T03:23:57.671396+00:00",
+      "priority_actions": [],
+      "deprioritized_actions": [
+        "opportunity_identified",
+        "compute_utilized",
+        "outreach_planned",
+        "value_creation"
+      ]
+    },
+    "timestamp": "2025-12-01T03:23:57.726135+00:00"
+  }
 }

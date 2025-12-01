@@ -62,6 +62,8 @@ class TelegramCommandBot:
             '/cluster': self.cmd_cluster,
             '/identity': self.cmd_identity,
             '/logs': self.cmd_logs,
+            '/dashboard': self.cmd_dashboard,
+            '/escape': self.cmd_escape_velocity,
         }
 
     def process_command(self, command_text: str) -> str:
@@ -418,6 +420,7 @@ Pending Tasks: {len(pending_tasks)}"""
 /positions - Detailed position list
 /cluster - Server cluster status
 /logs - Recent system logs
+/escape - Escape velocity score
 
 **Interact:**
 /task <description> - Request system to do something
@@ -426,9 +429,12 @@ Pending Tasks: {len(pending_tasks)}"""
 /reject <id> - Reject pending change
 
 **Info:**
+/dashboard - Unified web dashboard URL
 /agents - AI coordination status
 /identity - Verify your identity
 /help - This message
+
+Web Dashboard: http://138.68.103.156:8002
 
 You can control the entire system via Telegram.
 No need to launch Claude Code CLI for routine operations."""
@@ -598,6 +604,81 @@ Active: {active} servers
 
         except Exception as e:
             return f"❌ Error reading logs: {str(e)}"
+
+    def cmd_dashboard(self, args) -> str:
+        """Get link to unified web dashboard."""
+        try:
+            import requests as req
+            # Check if dashboard is running
+            r = req.get("http://localhost:8002/api/status", timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                ev = data.get("escape_velocity", {}).get("score", 0)
+                nodes = data.get("cluster", {}).get("healthy_nodes", 0)
+                agents = len(data.get("coordination", {}).get("active_agents", []))
+
+                return f"""🖥 Unified Dashboard
+
+Access: http://138.68.103.156:8002
+
+Real-time system visualization:
+• Finance & Trading
+• Cluster Health ({nodes} nodes)
+• AI Coordination ({agents} agents)
+• Escape Velocity: {ev}/100
+• Identity & Security
+
+Updates every 30 seconds.
+Full API at /api/status"""
+            else:
+                return "❌ Dashboard service not responding"
+
+        except Exception as e:
+            return f"""🖥 Unified Dashboard
+
+Access: http://138.68.103.156:8002
+
+(Status check failed: {str(e)})
+
+Try opening the URL in your browser."""
+
+    def cmd_escape_velocity(self, args) -> str:
+        """Get escape velocity score and factors."""
+        try:
+            import requests as req
+            r = req.get("http://localhost:8002/api/escape-velocity", timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                score = data.get("score", 0)
+                factors = data.get("factors", {})
+
+                # Determine status
+                if score >= 80:
+                    status = "🚀 ESCAPE VELOCITY ACHIEVED"
+                elif score >= 60:
+                    status = "🟢 Strong momentum"
+                elif score >= 40:
+                    status = "🟡 Building momentum"
+                else:
+                    status = "🔴 Need acceleration"
+
+                return f"""🚀 Escape Velocity: {score}/100
+
+{status}
+
+Factors:
+• Capital: ${factors.get('capital', 0):.2f}
+• Nodes: {factors.get('nodes', 0)}
+• Signals: {factors.get('signals', 0)}
+
+Target: 100 = Self-sustaining system
+
+Dashboard: http://138.68.103.156:8002"""
+            else:
+                return "❌ Could not get escape velocity"
+
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
 
 
 def send_telegram_message(message: str):

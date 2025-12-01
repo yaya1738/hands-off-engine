@@ -1,6 +1,6 @@
 
 # SYSTEM CONTEXT - AUTO-GENERATED
-# Updated: 2025-11-30T23:21:48.023112+00:00
+# Updated: 2025-11-30T23:26:42.151098+00:00
 
 # SYSTEM CONTEXT - HANDS-OFF ENGINE
 
@@ -13,9 +13,9 @@
 - Infrastructure: 0/0 nodes healthy
 
 ## Protection Layers (ALL ACTIVE)
-1. **Self-Preservation**: unknown - Cannot destroy system
-2. **System Immunity**: unknown - Blocks malicious actions
-3. **Harm Prevention**: unknown - Blocks harmful help
+1. **Self-Preservation**: True - Cannot destroy system
+2. **System Immunity**: True - Blocks malicious actions
+3. **Harm Prevention**: True - Blocks harmful help
 
 ## Active Agents
 healthcheck, position_monitor, threat_analysis
@@ -33,7 +33,7 @@ healthcheck, position_monitor, threat_analysis
 10. Financial decisions require high confidence (>75%).
 
 ## Timestamp
-2025-11-30T23:21:48.012505+00:00
+2025-11-30T23:26:42.014545+00:00
 
 ---
 You are now operating within the hands-off-engine system.
@@ -41,6 +41,8 @@ All actions are logged and validated through protection layers.
 
 
 # END SYSTEM CONTEXT
+
+
 # Claude Code Instructions for Hands-Off Engine
 
 ## ⛔ CRITICAL SAFETY RULES - READ FIRST

@@ -144,6 +144,57 @@ ENDPOINT_REGISTRY: Dict[str, Endpoint] = {
         args=["cycle"],
         feedback_file="state/coordination_state.json",
     ),
+
+    # Doctor
+    "doctor_examine": Endpoint(
+        name="System Doctor Examination",
+        endpoint_type="script",
+        target="autonomous/system_doctor.py",
+        args=["examine"],
+        feedback_file="state/doctor_state.json",
+    ),
+    "doctor_report": Endpoint(
+        name="System Doctor Report",
+        endpoint_type="script",
+        target="autonomous/system_doctor.py",
+        args=["report"],
+        feedback_file="state/diagnosis_log.jsonl",
+    ),
+    "doctor_meeting": Endpoint(
+        name="Doctor Consultation Meeting",
+        endpoint_type="script",
+        target="autonomous/doctor_meeting.py",
+        args=["meeting"],
+        feedback_file="state/meeting_actions.json",
+    ),
+    "sage_session": Endpoint(
+        name="Sage Wisdom Session",
+        endpoint_type="script",
+        target="autonomous/system_sage.py",
+        args=["session"],
+        feedback_file="state/sage_state.json",
+    ),
+    "sage_morning": Endpoint(
+        name="Sage Morning Guidance",
+        endpoint_type="script",
+        target="autonomous/system_sage.py",
+        args=["morning"],
+        feedback_file="state/daily_guidance.json",
+    ),
+    "battery_status": Endpoint(
+        name="Battery Status",
+        endpoint_type="script",
+        target="autonomous/system_battery.py",
+        args=["status"],
+        feedback_file="state/system_battery.json",
+    ),
+    "battery_check": Endpoint(
+        name="Battery Quick Check",
+        endpoint_type="script",
+        target="autonomous/system_battery.py",
+        args=["check"],
+        feedback_file="state/system_battery.json",
+    ),
 }
 
 

@@ -1,0 +1,54 @@
+{
+  "created": "2025-12-01T03:43:22.846794+00:00",
+  "total_deposited": 0.0,
+  "total_withdrawn": 0.0,
+  "updated": "2025-12-01T03:43:22.847147+00:00",
+  "compartments": {
+    "reserve": {
+      "name": "Reserve",
+      "purpose": "Emergency fund - untouchable",
+      "capacity": 1000.0,
+      "contents": 0,
+      "minimum": 0,
+      "locked": true
+    },
+    "operating": {
+      "name": "Operating",
+      "purpose": "Day-to-day operations",
+      "capacity": 500.0,
+      "contents": 8.99,
+      "minimum": 10.0,
+      "locked": false
+    },
+    "trading": {
+      "name": "Trading",
+      "purpose": "Active trading capital",
+      "capacity": 5000.0,
+      "contents": 98.05,
+      "minimum": 0,
+      "locked": false
+    },
+    "growth": {
+      "name": "Growth",
+      "purpose": "Investment for expansion",
+      "capacity": 2000.0,
+      "contents": 0,
+      "minimum": 0,
+      "locked": false
+    },
+    "buffer": {
+      "name": "Buffer",
+      "purpose": "Overflow/temporary",
+      "capacity": 10000.0,
+      "contents": 0,
+      "minimum": 0,
+      "locked": false
+    }
+  },
+  "wall": {
+    "integrity": 100.0,
+    "thickness": 1.0,
+    "material": "standard"
+  },
+  "total_contents": 107.03999999999999
+}

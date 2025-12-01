@@ -1,7 +1,7 @@
 {
-  "last_save": "2025-11-30T20:36:35.880190",
+  "last_save": "2025-12-01T10:18:40.558822",
   "hostname": "pm-helper",
-  "uptime_hours": 1.4619197752777777,
+  "uptime_hours": 15.163219395555556,
   "healing_actions": [
     {
       "timestamp": "2025-11-30T19:08:54.993064",
@@ -114,6 +114,582 @@
       "reason": "Process not running",
       "success": true,
       "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T21:09:39.663568",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T21:10:51.736267",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T21:12:03.849743",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T21:13:15.922142",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T21:14:27.997349",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T22:09:42.789397",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T22:10:54.851494",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T22:12:06.928869",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T22:13:19.029912",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T22:14:31.096993",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T23:00:45.281900",
+      "action_type": "restart_process",
+      "target": "scaling-engine",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T23:01:57.354367",
+      "action_type": "restart_process",
+      "target": "scaling-engine",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T23:10:09.810042",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T23:11:21.868197",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T23:12:33.939461",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T23:13:46.011544",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-11-30T23:14:58.117816",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T00:10:12.565759",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T00:11:24.640850",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T00:12:36.708323",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T00:13:48.779861",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T00:15:00.844504",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T01:10:15.457680",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T01:11:27.545171",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T01:12:39.618025",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T01:13:51.687031",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T01:15:03.800283",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T02:10:18.315408",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T02:11:30.391132",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T02:12:42.486045",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T02:13:54.558538",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T02:15:06.636299",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T03:10:21.169350",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T03:11:33.238791",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T03:12:45.308632",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T03:13:57.389473",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T03:15:09.466883",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T04:10:24.078971",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T04:11:36.158011",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T04:12:48.229407",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T04:14:00.304306",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T04:15:12.416841",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T05:10:26.955173",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T05:11:39.029042",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T05:12:51.107648",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T05:14:03.170542",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T05:15:15.241892",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T06:10:29.712244",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T06:11:41.812704",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T06:12:53.885254",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T06:14:05.961489",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T06:15:18.038266",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T07:10:32.863320",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T07:11:44.935894",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T07:12:57.032402",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T07:14:09.107010",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T07:15:21.177004",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T08:10:35.897322",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T08:11:47.971886",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T08:13:00.053270",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T08:14:12.169830",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T08:15:24.250267",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T09:10:39.000460",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T09:11:51.075396",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T09:13:03.147356",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T09:14:15.224539",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T09:15:27.337985",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T10:10:42.083126",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T10:11:54.161009",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T10:13:06.233231",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T10:14:18.305327",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T10:15:30.382426",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
     }
   ],
   "restart_counts": {
@@ -122,14 +698,15 @@
       "2025-11-30T20:02:11.902302"
     ],
     "position-monitor": [
-      "2025-11-30T20:09:36.362956",
-      "2025-11-30T20:10:48.465920",
-      "2025-11-30T20:12:00.534233",
-      "2025-11-30T20:13:12.611792",
-      "2025-11-30T20:14:24.688081"
+      "2025-12-01T10:10:42.083121",
+      "2025-12-01T10:11:54.161003",
+      "2025-12-01T10:13:06.233226",
+      "2025-12-01T10:14:18.305322",
+      "2025-12-01T10:15:30.382408"
     ],
     "scaling-engine": [
-      "2025-11-30T20:02:23.946054"
+      "2025-11-30T23:00:45.281896",
+      "2025-11-30T23:01:57.354361"
     ]
   }
 }

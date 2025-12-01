@@ -1,12 +1,10 @@
 {
-  "timestamp": "2025-11-30T20:36:46.627245",
+  "timestamp": "2025-12-01T10:18:08.608996",
   "hostname": "pm-helper",
-  "uptime_hours": 1.47,
+  "uptime_hours": 15.16,
   "components": {
     "hardware-brain": {
-      "status": "crashed",
-      "error": "signal only works in main thread of the main interpreter",
-      "restarts": 20
+      "status": "stopped"
     },
     "scaling-engine": {
       "status": "running",
@@ -14,9 +12,7 @@
       "restarts": 5
     },
     "self-healer": {
-      "status": "crashed",
-      "error": "signal only works in main thread of the main interpreter",
-      "restarts": 20
+      "status": "stopped"
     },
     "state-sync": {
       "status": "running",
@@ -31,21 +27,21 @@
   },
   "cluster": {
     "start_date": "2025-11-30T19:08:50.960035",
-    "current_date": "2025-11-30T20:36:46.627085",
+    "current_date": "2025-12-01T10:18:08.608805",
     "days_running": 0,
-    "current_vcpus": 36,
-    "current_ram_gb": 72.0,
-    "current_nodes": 5,
-    "current_monthly_cost": 496.0,
+    "current_vcpus": 28,
+    "current_ram_gb": 56.0,
+    "current_nodes": 4,
+    "current_monthly_cost": 384.0,
     "target_vcpus": 24,
     "target_ram_gb": 48.0,
     "target_multiplier": 6.0,
-    "vcpu_pct": 150.0,
-    "ram_pct": 150.0,
-    "overall_pct": 150.0,
+    "vcpu_pct": 116.7,
+    "ram_pct": 116.7,
+    "overall_pct": 116.7,
     "nodes_to_add": 0,
-    "last_provision": "2025-11-30T20:02:32.952120",
-    "provisions_today": 3,
+    "last_provision": "2025-11-30T23:04:25.958565",
+    "provisions_today": 0,
     "blocked_by_tier": false,
     "tier_increase_requested": false,
     "blocked_sizes": [],
@@ -60,8 +56,8 @@
   },
   "health_score": 60.0,
   "alerts": [
-    "Component hardware-brain is crashed",
-    "Component self-healer is crashed"
+    "Component hardware-brain is stopped",
+    "Component self-healer is stopped"
   ],
   "evolution_generation": 1
 }
