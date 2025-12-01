@@ -37,8 +37,8 @@ except ImportError:
     def log_action(action, details): pass
     def get_master(): return MASTER
 except (PermissionError, OSError) as e:
-    # In CI/test environments where /root access is restricted
-    # Log the issue but continue with fallback
+    # Fallback for restricted environments (e.g., CI/test)
+    # where /root directory access is denied
     import sys
     print(f"Warning: Could not load unified_ai module ({e}), using fallback", file=sys.stderr)
     MASTER = "Yair Siegel"
@@ -452,7 +452,12 @@ def main():
             return
         
         session_id = sys.argv[2]
-        prerequisites = [p.strip() for p in sys.argv[3].split(',') if p.strip()] if len(sys.argv) > 3 and sys.argv[3] else None
+        
+        # Parse prerequisites, filtering out empty strings
+        prerequisites = None
+        if len(sys.argv) > 3 and sys.argv[3]:
+            prereq_list = sys.argv[3].split(',')
+            prerequisites = [p.strip() for p in prereq_list if p.strip()]
         
         if validate_session_order(session_id, prerequisites):
             print(f"✓ Session {session_id} can proceed")
@@ -467,7 +472,13 @@ def main():
         
         session_id = sys.argv[2]
         agent = sys.argv[3]
-        dependencies = [d.strip() for d in sys.argv[4].split(',') if d.strip()] if len(sys.argv) > 4 and sys.argv[4] else None
+        
+        # Parse dependencies, filtering out empty strings
+        dependencies = None
+        if len(sys.argv) > 4 and sys.argv[4]:
+            dep_list = sys.argv[4].split(',')
+            dependencies = [d.strip() for d in dep_list if d.strip()]
+        
         description = sys.argv[5] if len(sys.argv) > 5 else None
         
         register_session(session_id, agent, dependencies, description=description)

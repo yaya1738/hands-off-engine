@@ -23,8 +23,8 @@ except ImportError:
     MASTER = "Yair Siegel"
     def get_master(): return MASTER
 except (PermissionError, OSError) as e:
-    # In CI/test environments where /root access is restricted
-    # Log the issue but continue with fallback
+    # Fallback for restricted environments (e.g., CI/test)
+    # where /root directory access is denied
     import sys
     print(f"Warning: Could not load unified_ai module ({e}), using fallback", file=sys.stderr)
     MASTER = "Yair Siegel"
