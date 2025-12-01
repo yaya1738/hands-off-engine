@@ -148,7 +148,8 @@ class AutonomousTaskQueue:
                 try:
                     record = json.loads(line)
                     task = record.get('task', {})
-                    if task_id := task.get('id'):
+                    task_id = task.get('id')
+                    if task_id:
                         completed_ids.add(task_id)
                 except:
                     continue

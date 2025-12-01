@@ -17,7 +17,7 @@ import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Optional, Set, Tuple
 from dataclasses import dataclass, asdict
 
 # Add repo root to path
@@ -153,7 +153,7 @@ class SessionOrderingManager:
         print(f"✓ Registered session {session_id} with {len(depends_on)} dependencies")
         return True
     
-    def can_start_session(self, session_id: str) -> tuple[bool, Optional[str]]:
+    def can_start_session(self, session_id: str) -> Tuple[bool, Optional[str]]:
         """
         Check if a session can start based on its dependencies
         

@@ -383,7 +383,7 @@ class TriAgentSession:
             # Mark session as failed
             if self.enforce_ordering and self.ordering_manager:
                 self.ordering_manager.complete_session(self.conversation_id, success=False)
-            raise e
+            raise
 
     def run_continuous_session(self, agents: List[str]):
         """Run continuous CPU loop with safety caps (v0.2)"""
