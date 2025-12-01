@@ -64,7 +64,13 @@
     "ai/AGENT_COORDINATION_SUMMARY_2025-11-25.md",
     "ai/history/README.md",
     "ai/memory/README.md",
-    "ai/INCOME_RESEARCH_2025-11-30.md"
+    "ai/INCOME_RESEARCH_2025-11-30.md",
+    "docs/BATCH_9_STATUS_REPORT.md",
+    "docs/BATCH_10_STATUS_REPORT.md",
+    "docs/BATCH_11_SPEC.md",
+    "docs/BATCH_11_STATUS_REPORT.md",
+    "docs/BATCH_17_SPEC.md",
+    "docs/BATCH_17_STATUS_REPORT.md"
   ],
   "ephemeral_docs_excluded": [
     "Session logs (docs/claude/SESSION_*, ai/SESSION_*)",
