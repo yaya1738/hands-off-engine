@@ -104,9 +104,35 @@ Level: 80 miles
 4. Add tests for module imports to catch these issues early
 5. Consider whether `AbsoluteDirective` inheritance is necessary
 
+## Additional Findings
+
+### Other Hardcoded Paths in Repository
+
+Found 18+ files with hardcoded `/root/hands-off-engine` paths:
+- `ai/integrate_all.py`
+- `ai/approval_queue.py`
+- `scripts/position_monitor.py`
+- `scripts/payment_monitor.py`
+- `scripts/capital_recovery_monitor.py`
+- And many others in `scripts/` and `security/`
+
+**Note**: These are likely intentional for the Termux phone node which runs as root. However, they make those scripts non-portable. Consider:
+1. Using environment variables for base path (`HANDS_OFF_ROOT`)
+2. Auto-detecting the repository root using `git rev-parse --show-toplevel`
+3. Using relative paths from a known anchor point
+
+## Test Coverage
+
+Added `tests/test_import_fixes.py` to prevent regression:
+- Tests all critical imports work
+- Tests classes can be instantiated
+- Verifies no unwanted side effects
+- All tests passing ✓
+
 ## Related Files
 
 - `autonomous/absolute_directive.py` - Fixed
 - `ai/unified_ai.py` - Depends on fixed module, now works
 - `autonomous/__init__.py` - Depends on fixed module, now works
 - `autonomous/unified_system.py` - Uses `unified_ai`, now works
+- `tests/test_import_fixes.py` - New test to prevent regression
