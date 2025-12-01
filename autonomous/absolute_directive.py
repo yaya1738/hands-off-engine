@@ -33,8 +33,12 @@ class AbsoluteDirective:
 
     def _register(self):
         """Register component with the absolute level."""
-        reg_file = Path("/root/hands-off-engine/state/absolute_registry.json")
+        # Use relative path from current working directory
+        reg_file = Path("state/absolute_registry.json")
         try:
+            # Ensure parent directory exists
+            reg_file.parent.mkdir(parents=True, exist_ok=True)
+            
             registry = json.loads(reg_file.read_text()) if reg_file.exists() else {"components": [], "master": MASTER}
             component = {
                 "class": self.__class__.__name__,
@@ -91,10 +95,13 @@ def cascade_directive(message: str = None):
 
     cascade_state["status"] = "complete"
 
-    # Write cascade state
-    Path("/root/hands-off-engine/state/cascade_state.json").write_text(
-        json.dumps(cascade_state, indent=2)
-    )
+    # Write cascade state (use relative path)
+    try:
+        cascade_file = Path("state/cascade_state.json")
+        cascade_file.parent.mkdir(parents=True, exist_ok=True)
+        cascade_file.write_text(json.dumps(cascade_state, indent=2))
+    except:
+        pass
 
     return cascade_state
 
@@ -109,25 +116,40 @@ def get_directive():
     return DIRECTIVE
 
 
-# Initialize on import
-if __name__ != "__main__":
-    # Ensure state directory exists
-    Path("/root/hands-off-engine/state").mkdir(exist_ok=True)
+# Initialize ONLY when run as main script, not on import
+# This prevents side effects and permission errors when importing the module
 
-    # Write absolute truth
-    truth = {
-        "master": MASTER,
-        "directive": DIRECTIVE,
-        "level": LEVEL,
-        "initialized": datetime.now(timezone.utc).isoformat()
-    }
-    Path("/root/hands-off-engine/state/ABSOLUTE_TRUTH.json").write_text(
-        json.dumps(truth, indent=2)
-    )
+
+def initialize_absolute_truth():
+    """
+    Initialize the absolute truth state files.
+    Call this explicitly when you want to initialize the system.
+    """
+    try:
+        # Ensure state directory exists
+        state_dir = Path("state")
+        state_dir.mkdir(parents=True, exist_ok=True)
+
+        # Write absolute truth
+        truth = {
+            "master": MASTER,
+            "directive": DIRECTIVE,
+            "level": LEVEL,
+            "initialized": datetime.now(timezone.utc).isoformat()
+        }
+        truth_file = state_dir / "ABSOLUTE_TRUTH.json"
+        truth_file.write_text(json.dumps(truth, indent=2))
+        return True
+    except Exception as e:
+        print(f"Warning: Could not initialize absolute truth: {e}")
+        return False
 
 
 if __name__ == "__main__":
     import sys
+
+    # Initialize the absolute truth when run as a script
+    initialize_absolute_truth()
 
     if len(sys.argv) > 1 and sys.argv[1] == "cascade":
         msg = " ".join(sys.argv[2:]) if len(sys.argv) > 2 else None
