@@ -364,8 +364,8 @@ def get_actual_bankroll() -> float:
             balance = state.get('balance', 0)
             print(f"  Detected actual balance: ${balance:.2f}")
             return float(balance)
-    except Exception as e:
-        print(f"  Warning: Could not read actual balance ({e})")
+    except (FileNotFoundError, json.JSONDecodeError, KeyError, ValueError) as e:
+        print(f"  Warning: Could not read actual balance ({type(e).__name__}: {e})")
     return 0.0
 
 
@@ -374,9 +374,12 @@ def main():
     announce_agent("trading-pipeline")  # UNIFIED AI
     import argparse
     
+    # Default minimum bankroll for micro-trading when actual balance unavailable
+    MIN_DEFAULT_BANKROLL = 10.0
+    
     # Get actual balance for intelligent default
     actual_balance = get_actual_bankroll()
-    default_bankroll = actual_balance if actual_balance > 0 else 10.0
+    default_bankroll = actual_balance if actual_balance > 0 else MIN_DEFAULT_BANKROLL
     
     parser = argparse.ArgumentParser(
         description='Run the full Hands-Off Engine pipeline'

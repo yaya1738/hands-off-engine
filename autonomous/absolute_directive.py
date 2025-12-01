@@ -131,8 +131,10 @@ if __name__ != "__main__":
     state_dir = REPO_ROOT / "state"
     try:
         state_dir.mkdir(parents=True, exist_ok=True)
-    except (PermissionError, OSError):
-        pass  # Skip if no permissions in this environment
+    except (PermissionError, OSError) as e:
+        # Log permission issues for debugging but continue
+        import logging
+        logging.warning(f"Could not create state directory {state_dir}: {e}")
 
     # Write absolute truth
     truth = {
@@ -146,8 +148,10 @@ if __name__ != "__main__":
         truth_file.write_text(
             json.dumps(truth, indent=2)
         )
-    except (PermissionError, OSError):
-        pass  # Skip if no permissions
+    except (PermissionError, OSError) as e:
+        # Log permission issues for debugging
+        import logging
+        logging.warning(f"Could not write absolute truth to {truth_file}: {e}")
 
 
 if __name__ == "__main__":

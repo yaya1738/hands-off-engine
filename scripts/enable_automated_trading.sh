@@ -14,7 +14,7 @@ REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$REPO_ROOT"
 
-echo "=" "======================================================================"
+echo "======================================================================"
 echo "  Hands-Off Engine: Enable Automated Trading"
 echo "======================================================================"
 echo
@@ -36,7 +36,7 @@ else:
 
 echo "  Current balance: \$${BALANCE}"
 
-if (( $(echo "$BALANCE < 1.0" | bc -l) )); then
+if (( $(python3 -c "print(1 if $BALANCE < 1.0 else 0)") )); then
     echo "  ⚠️  Balance too low for trading (< \$1.00)"
     echo "  Recommendation: Wait for positions to resolve or add funds"
     exit 1
