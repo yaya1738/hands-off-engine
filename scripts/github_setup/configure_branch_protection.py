@@ -47,6 +47,8 @@ def log_action(action: str, status: str, details: Dict[str, Any] = None):
 
 def get_github_info():
     """Extract owner/repo from environment or git remote."""
+    import re
+    
     # Try GITHUB_REPOSITORY env var (set in GitHub Actions)
     github_repo = os.environ.get("GITHUB_REPOSITORY")
     if github_repo and "/" in github_repo:
@@ -63,12 +65,26 @@ def get_github_info():
             check=True
         )
         remote_url = result.stdout.strip()
-        # Parse github.com:owner/repo.git or https://github.com/owner/repo.git
-        if "github.com" in remote_url:
-            parts = remote_url.replace(".git", "").split("/")
-            repo = parts[-1]
-            owner = parts[-2].split(":")[-1]
-            return owner, repo
+        
+        # Parse GitHub URLs securely with regex patterns
+        # Supports: https://github.com/owner/repo.git
+        #          git@github.com:owner/repo.git
+        #          git://github.com/owner/repo.git
+        
+        # Pattern for HTTPS URLs
+        https_match = re.match(r'https://github\.com/([^/]+)/([^/]+?)(?:\.git)?$', remote_url)
+        if https_match:
+            return https_match.group(1), https_match.group(2)
+        
+        # Pattern for SSH URLs
+        ssh_match = re.match(r'git@github\.com:([^/]+)/([^/]+?)(?:\.git)?$', remote_url)
+        if ssh_match:
+            return ssh_match.group(1), ssh_match.group(2)
+        
+        # Pattern for git:// URLs
+        git_match = re.match(r'git://github\.com/([^/]+)/([^/]+?)(?:\.git)?$', remote_url)
+        if git_match:
+            return git_match.group(1), git_match.group(2)
     except Exception as e:
         print(f"Warning: Could not parse git remote: {e}", file=sys.stderr)
     
