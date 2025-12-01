@@ -4,51 +4,22 @@ AI Intake Handler for Hands-Off Engine
 
 Handles commands posted as issue comments on the designated AI Intake issue.
 Currently supports: /plan
+
+Now integrated with AI Nexus audit logging and financial tracking.
 """
 import json
 import os
 import sys
-from datetime import datetime
 from pathlib import Path
 
 import requests
 from openai import OpenAI
 
-# Add audit logging
+# Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
-try:
-    from audit import get_audit_logger
-    audit = get_audit_logger(component="ai.intake_handler")
-except ImportError:
-    audit = None
 
-
-def log(message: str) -> None:
-    """Centralized logging with [AI-INTAKE] prefix for easy filtering."""
-    print(f"[AI-INTAKE] {message}", flush=True)
-
-
-# Configuration for task JSON generation
-TASKS_DIR = Path(os.getenv("AI_INTAKE_TASKS_DIR", "ai/tasks"))
-AI_INTAKE_ENABLE_TASKS = os.getenv("AI_INTAKE_ENABLE_TASKS", "1") not in ("0", "false", "False")
-
-
-def write_task_json(task: dict) -> Path:
-    """
-    Persist an AI intake task JSON for downstream runners.
-
-    Directory can be overridden via AI_INTAKE_TASKS_DIR.
-    """
-    TASKS_DIR.mkdir(parents=True, exist_ok=True)
-
-    ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
-    task_id = task.get("task_id") or f"ai-intake-{ts}"
-
-    path = TASKS_DIR / f"{task_id}.json"
-    path.write_text(json.dumps(task, indent=2), encoding="utf-8")
-
-    log(f"task json written: {path}")
-    return path
+from audit import AuditLogger, FinancialLedger
+from ai_nexus import AIProvider, AIRequest, AIResponse, NexusCore, AIProviderType, OpenAIProvider
 
 
 def load_text(path: str) -> str:
@@ -77,25 +48,30 @@ def post_comment(repo: str, issue_number: int, body: str) -> None:
 
 def run_plan(event: dict) -> None:
     """Handle /plan command: generate a roadmap-aligned plan."""
-    import datetime
-    session_id = f"ai_intake_plan_{datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
-    
     repo = os.environ["GITHUB_REPOSITORY"]
     issue = event["issue"]
     issue_number = issue["number"]
     comment_body = event["comment"]["body"]
 
-    # Audit the request
-    if audit:
-        audit.log_action(
-            action_type="ai_intake_command",
-            action_data={
-                "command": "/plan",
-                "issue_number": issue_number,
-                "repository": repo
-            },
-            session_id=session_id
-        )
+    # Initialize AI Nexus for audit logging and cost tracking
+    audit_logger = AuditLogger()
+    ledger = FinancialLedger()
+    nexus = NexusCore(audit_logger=audit_logger, ledger=ledger)
+
+    # Register OpenAI provider
+    openai_provider = OpenAIProvider(audit_logger, ledger)
+    nexus.register_provider(openai_provider)
+
+    # Log the /plan command invocation
+    audit_logger.log_event(
+        component="ai.intake_handler",
+        action="plan_command_invoked",
+        metadata={
+            "repo": repo,
+            "issue_number": issue_number,
+            "comment_length": len(comment_body)
+        }
+    )
 
     # Load policy + research report
     policy_text = load_text("AI_POLICY.md")
@@ -104,20 +80,16 @@ def run_plan(event: dict) -> None:
     )
     issue_description = issue.get("body") or ""
 
-    # Audit data loading
-    if audit:
-        audit.log_data_fetch(
-            source="policy_and_reports",
-            params={
-                "policy_file": "AI_POLICY.md",
-                "report_file": "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md"
-            },
-            success=True,
-            session_id=session_id
-        )
-
-    # Set up OpenAI client
-    client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+    # Log data loading
+    audit_logger.log_event(
+        component="ai.intake_handler",
+        action="load_policy_data",
+        metadata={
+            "policy_length": len(policy_text),
+            "report_length": len(report_text),
+            "issue_description_length": len(issue_description)
+        }
+    )
 
     system_msg = (
         "You are the planning assistant for the 'Hands-Off Engine' repository. "
@@ -149,117 +121,106 @@ TASK:
 - Keep it short enough to fit comfortably in a single GitHub comment.
 """.strip()
 
-    # Call OpenAI Chat Completion (modern SDK)
-    try:
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": system_msg},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=0.3,
-        )
+    # Create AI request through Nexus
+    ai_request = AIRequest(
+        provider_type=AIProviderType.OPENAI,
+        action="plan_generation",
+        prompt=user_prompt,
+        system_message=system_msg,
+        model="gpt-4o-mini",
+        temperature=0.3,
+        metadata={
+            "repo": repo,
+            "issue_number": issue_number
+        }
+    )
 
-        plan_text = response.choices[0].message.content
-        
-        # Audit AI decision
-        if audit:
-            audit.log_decision(
-                decision_type="ai_plan_generation",
-                inputs={
-                    "model": "gpt-4o-mini",
-                    "temperature": 0.3,
-                    "prompt_length": len(user_prompt)
-                },
-                outputs={
-                    "plan_length": len(plan_text),
-                    "plan_preview": plan_text[:200] + "..." if len(plan_text) > 200 else plan_text
-                },
-                metadata={
-                    "issue_number": issue_number,
-                    "command": "/plan"
-                },
-                session_id=session_id
-            )
-    except Exception as e:
-        # Audit AI error
-        if audit:
-            audit.log_error(
-                error_type="OpenAI API Error",
-                error_message=str(e),
-                context={
-                    "model": "gpt-4o-mini",
-                    "command": "/plan",
-                    "issue_number": issue_number
-                },
-                session_id=session_id
-            )
-        raise
+    # Execute through Nexus (logs costs automatically)
+    ai_response = nexus.execute_request(ai_request)
+
+    if not ai_response.success:
+        error_msg = f"Failed to generate plan: {ai_response.error}"
+        audit_logger.log_event(
+            component="ai.intake_handler",
+            action="plan_generation_failed",
+            metadata={"error": ai_response.error},
+            error=error_msg
+        )
+        # Post error comment
+        post_comment(repo, issue_number, f"❌ Error generating plan: {ai_response.error}")
+        return
+
+    plan_text = ai_response.content
+
+    # Log plan generation success
+    audit_logger.log_event(
+        component="ai.intake_handler",
+        action="plan_generated",
+        metadata={
+            "model": ai_response.model_used,
+            "tokens": ai_response.tokens_used,
+            "cost": ai_response.cost,
+            "plan_length": len(plan_text)
+        },
+        cost=ai_response.cost,
+        outcome="success"
+    )
+
+    # Add cost information to the comment
+    cost_info = (
+        f"\n\n---\n"
+        f"📊 **AI Nexus Metrics:**\n"
+        f"- Model: {ai_response.model_used}\n"
+        f"- Tokens: {ai_response.tokens_used['total']:,}\n"
+        f"- Cost: ${ai_response.cost:.4f}\n"
+        f"- Session: `{nexus.session_id[:8]}...`\n"
+    )
 
     comment = (
         "### 🤖 AI Intake – Plan\n\n"
         "Here is a roadmap-aligned plan based on the current AI policy and "
         "research report:\n\n"
         f"{plan_text}\n\n"
+        f"{cost_info}\n"
         "---\n"
-        "_Generated automatically by `ai_intake_handler.py`._"
+        "_Generated automatically by `ai_intake_handler.py` via AI Nexus._"
     )
 
-    # Build AI-runner task JSON
-    comment_dict = event.get("comment", {})
-    repo_dict = event.get("repository", {})
-
-    task_id = f"ai-intake-{repo_dict.get('full_name', 'unknown').replace('/', '-')}-{issue_number}-{comment_dict.get('id')}"
-
-    task_payload = {
-        "task_id": task_id,
-        "source": "github-ai-intake",
-        "created_at": datetime.utcnow().isoformat() + "Z",
-        "command": "/plan",
-        "repo_full_name": repo_dict.get("full_name"),
-        "issue_number": issue_number,
-        "issue_title": issue.get("title"),
-        "comment_id": comment_dict.get("id"),
-        "comment_author": (comment_dict.get("user") or {}).get("login"),
-        "comment_body": comment_body,
-        # the thing for AI-runner / MBOL to actually chew on:
-        "plan_markdown": plan_text,
-        # optional free-form metadata for future routing:
-        "meta": {
-            "ai_intake_issue_number": os.getenv("AI_INTAKE_ISSUE_NUMBER"),
-            "github_event_action": event.get("action"),
-        },
-    }
-
-    if AI_INTAKE_ENABLE_TASKS:
-        write_task_json(task_payload)
-    else:
-        log("Task JSON generation disabled via AI_INTAKE_ENABLE_TASKS")
-
-    post_comment(repo, issue_number, comment)
-<<<<<<< HEAD
-    
-    # Audit comment posting
-    if audit:
-        audit.log_action(
-            action_type="github_comment_posted",
-            action_data={
+    try:
+        post_comment(repo, issue_number, comment)
+        # Log successful comment posting
+        audit_logger.log_event(
+            component="ai.intake_handler",
+            action="comment_posted",
+            metadata={
                 "issue_number": issue_number,
                 "comment_length": len(comment)
             },
-            result="success",
-            session_id=session_id
+            outcome="success"
         )
-=======
-    log("Successfully handled /plan and posted response")
->>>>>>> origin/claude/add-logging-json-generation-018vWVqn9gaPDJcJBfYT3Pwf
+    except Exception as e:
+        # Log error
+        audit_logger.log_event(
+            component="ai.intake_handler",
+            action="comment_posting_failed",
+            metadata={"issue_number": issue_number},
+            error=str(e)
+        )
+        raise
+
+    # Print session summary
+    print("\n" + "="*80)
+    print("AI NEXUS SESSION SUMMARY")
+    print("="*80)
+    summary = nexus.get_session_metrics()
+    print(f"Session ID: {summary['session_id']}")
+    print(f"Total Cost: ${summary['financial']['total_costs']:.4f}")
+    print(f"ROI: {summary['financial']['roi_percent']:.2f}%")
+    print("="*80 + "\n")
 
 
 def main() -> None:
     """Main entry point for the AI Intake handler."""
-    import datetime
-    session_id = f"ai_intake_main_{datetime.datetime.utcnow().strftime('%Y%m%d_%H%M%S')}"
-    
     event_path = os.environ.get("GITHUB_EVENT_PATH")
     if not event_path:
         raise RuntimeError("GITHUB_EVENT_PATH not set")
@@ -269,7 +230,7 @@ def main() -> None:
 
     # Only handle issue_comment events
     if event.get("action") != "created":
-        log("Not a newly created comment, exiting.")
+        print("Not a newly created comment, exiting.")
         return
 
     issue = event.get("issue") or {}
@@ -278,7 +239,7 @@ def main() -> None:
     comment_body = (comment.get("body") or "").strip()
 
     if issue_number is None or not comment_body:
-        log("No issue number or comment body, exiting.")
+        print("No issue number or comment body, exiting.")
         return
 
     # Restrict to the AI Intake issue (default: 1, configurable via env)
@@ -289,71 +250,20 @@ def main() -> None:
         ai_issue_number = 1  # default
 
     if issue_number != ai_issue_number:
-        log(f"Issue #{issue_number} is not AI Intake (#{ai_issue_number}), skipping.")
+        print(f"Issue #{issue_number} is not AI Intake (#{ai_issue_number}), skipping.")
         return
 
     # Only react to commands starting with '/'
     first_line = comment_body.splitlines()[0].strip()
     if not first_line.startswith("/"):
-        log("No leading slash command, skipping.")
+        print("No leading slash command, skipping.")
         return
 
-    # Audit command detection
-    if audit:
-        audit.log_action(
-            action_type="ai_intake_invoked",
-            action_data={
-                "command": first_line,
-                "issue_number": issue_number,
-                "comment_length": len(comment_body)
-            },
-            session_id=session_id
-        )
-
     if first_line.startswith("/plan"):
-<<<<<<< HEAD
         print("Handling /plan command...")
-        try:
-            run_plan(event)
-            if audit:
-                audit.log_action(
-                    action_type="ai_intake_command_completed",
-                    action_data={
-                        "command": "/plan",
-                        "issue_number": issue_number
-                    },
-                    result="success",
-                    session_id=session_id
-                )
-        except Exception as e:
-            if audit:
-                audit.log_error(
-                    error_type="Command Execution Error",
-                    error_message=str(e),
-                    context={
-                        "command": "/plan",
-                        "issue_number": issue_number
-                    },
-                    session_id=session_id
-                )
-            raise
-    else:
-        print(f"Command {first_line} not implemented yet, skipping for now.")
-        if audit:
-            audit.log_action(
-                action_type="ai_intake_command_not_implemented",
-                action_data={
-                    "command": first_line,
-                    "issue_number": issue_number
-                },
-                session_id=session_id
-            )
-=======
-        log("Handling /plan command...")
         run_plan(event)
     else:
-        log(f"Command {first_line} not implemented yet, skipping for now.")
->>>>>>> origin/claude/add-logging-json-generation-018vWVqn9gaPDJcJBfYT3Pwf
+        print(f"Command {first_line} not implemented yet, skipping for now.")
 
 
 if __name__ == "__main__":

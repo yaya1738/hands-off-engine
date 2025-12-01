@@ -1,9 +1,8 @@
 """
-Audit package for Hands-Off Engine
-
-Provides comprehensive audit logging for all critical operations
+Audit logging system for Hands-Off Engine
+Tracks all AI operations, costs, and outcomes
 """
+from .audit_logger import AuditLogger, AuditEvent
+from .ledger import FinancialLedger, LedgerEntry
 
-from .audit_logger import AuditLogger, get_audit_logger
-
-__all__ = ['AuditLogger', 'get_audit_logger']
+__all__ = ["AuditLogger", "AuditEvent", "FinancialLedger", "LedgerEntry"]

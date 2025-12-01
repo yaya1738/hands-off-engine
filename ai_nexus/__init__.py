@@ -1,37 +1,24 @@
 """
-AI Nexus - Multi-Brain Orchestration Layer for Hands-Off Engine
+AI Nexus - Multi-Brain Orchestration System
 
-Coordinates multiple AI agents (Copilot, ChatGPT, Claude, etc.) with full audit trail
-and ledger tracking for accountability and self-improvement.
-
-Also provides flexible provider-based architecture for routing tasks to different
-AI providers with support for context files, retry logic, and structured result formats.
+Coordinates multiple AI providers (Claude, ChatGPT, Copilot) with:
+- Comprehensive audit logging
+- Financial tracking
+- Self-improvement based on performance
+- Self-financing through ROI analysis
 """
-
-# Core orchestration
-from .nexus import AINexus, AITask, AIResult, AIProvider, TaskPriority, TaskStatus
-from .ledger import ActionLedger
-
-# Provider implementations
-try:
-    from .provider_chatgpt import ChatGPTProvider
-except ImportError:
-    ChatGPTProvider = None
-
-try:
-    from .provider_groq import GroqProvider
-except ImportError:
-    GroqProvider = None
-
-try:
-    from .provider_google import GoogleProvider
-except ImportError:
-    GoogleProvider = None
+from .nexus_core import AIProvider, AIProviderType, AIRequest, AIResponse, NexusCore
+from .provider_claude import ClaudeProvider
+from .provider_openai import OpenAIProvider
+from .provider_copilot import CopilotProvider
 
 __all__ = [
-    # Core
-    'AINexus', 'AITask', 'AIResult', 'AIProvider', 'TaskPriority', 'TaskStatus', 'ActionLedger',
-    # Providers
-    'ChatGPTProvider', 'GroqProvider', 'GoogleProvider'
+    "AIProvider",
+    "AIProviderType",
+    "AIRequest",
+    "AIResponse",
+    "NexusCore",
+    "ClaudeProvider",
+    "OpenAIProvider",
+    "CopilotProvider"
 ]
-__version__ = '2.0.0'
