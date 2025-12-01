@@ -104,6 +104,22 @@ Check `ai/coordination/status.json` for:
 
 Post updates to `ai/coordination/messages.jsonl` for cross-agent communication.
 
+### Copilot Tasks Integration
+
+When assigned a task via the `copilot-task` label:
+1. Check `.github/.instructions.md` for agent-specific instructions
+2. Log task start to `ai/coordination/copilot_tasks.jsonl`
+3. Create branch following naming convention: `copilot/{type}-{issue-number}-{desc}`
+4. Complete work following `docs/DEVELOPMENT_STANDARDS.md`
+5. Log task completion to coordination files
+6. Open PR with `copilot` label for auto-merge eligibility
+
+Task lifecycle tracking in `ai/coordination/copilot_tasks.jsonl`:
+- `assigned` - Task labeled and logged
+- `in_progress` - Agent working on branch
+- `completed` - PR opened
+- `merged` - Auto-merged (or manually merged)
+
 ## Autonomous Operations (Auto-Merge Enabled)
 
 The system operates autonomously. Copilot PRs can be auto-merged when:
@@ -136,3 +152,29 @@ These can be merged automatically when CI passes:
 - Non-critical refactors
 - Self-healing agent updates
 - Alpha model improvements (with tests)
+
+## GitHub Spark Integration
+
+GitHub Spark apps can be used to create rapid prototypes for:
+- Trading dashboards (see `spark/trading_dashboard.md`)
+- Agent monitoring tools (see `spark/agent_monitor.md`)
+- Risk control panels
+- Quick data visualization
+
+Spark apps can interact with the repository via:
+- GitHub API (read state files, logs)
+- `repository_dispatch` webhooks (trigger actions)
+- See `docs/GITHUB_SPARK_INTEGRATION.md` for full integration guide
+
+When Spark apps trigger webhooks:
+- `.github/workflows/spark-webhook.yml` handles the events
+- Events: `spark_emergency_stop`, `spark_approve_trade`, `spark_health_check`
+- Actions are logged to `ai/coordination/messages.jsonl`
+
+## Task Assignment via Issues
+
+Create tasks for Copilot using the issue template:
+- Use `.github/ISSUE_TEMPLATE/copilot_task.yml`
+- Add `copilot-task` label to trigger assignment workflow
+- Workflow logs assignment to `ai/coordination/copilot_tasks.jsonl`
+- Agent receives task and begins work automatically

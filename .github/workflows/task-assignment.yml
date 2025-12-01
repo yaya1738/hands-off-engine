@@ -1,0 +1,42 @@
+name: Task Assignment Handler
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  assign-to-copilot:
+    if: contains(github.event.label.name, 'copilot-task')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log task assignment
+        run: |
+          echo "✅ Issue #${{ github.event.issue.number }} assigned to Copilot agent"
+          echo "Title: ${{ github.event.issue.title }}"
+          echo "Created by: ${{ github.event.issue.user.login }}"
+      
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Update coordination status
+        run: |
+          # Create timestamp
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Append task assignment to coordination log
+          mkdir -p ai/coordination
+          echo "{\"timestamp\": \"${TIMESTAMP}\", \"issue\": ${{ github.event.issue.number }}, \"status\": \"assigned\", \"agent\": \"copilot\", \"title\": \"${{ github.event.issue.title }}\"}" >> ai/coordination/copilot_tasks.jsonl
+          
+          # Log assignment
+          echo "📝 Task #${{ github.event.issue.number }} logged to coordination system"
+      
+      - name: Add comment to issue
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🤖 **Copilot Agent assigned**\n\nThis task has been assigned to the GitHub Copilot coding agent. The agent will:\n1. Read project context from `state/knowledge.json`\n2. Check current system state in `ai/coordination/status.json`\n3. Create a branch and implement the solution\n4. Open a PR for review\n\nTracking this task in `ai/coordination/copilot_tasks.jsonl`'
+            })
