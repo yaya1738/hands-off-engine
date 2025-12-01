@@ -483,4 +483,6 @@ If automation is critically broken:
 
 ---
 
-**Remember:** The automation system is designed to be self-healing and resilient. Most issues resolve automatically. This guide is for the ~1% of cases that need manual intervention.
+**Remember:** The automation system is designed to be self-healing and resilient. 
+Most issues resolve automatically. This guide is for the ~1% of cases that need 
+manual intervention.

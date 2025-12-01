@@ -119,7 +119,8 @@ def check_ai_coordination() -> Dict[str, Any]:
             autonomous_mode = status.get("autonomous_mode", {})
             active_agents = status.get("active_agents", [])
             
-            result["autonomous_enabled"] = autonomous_mode.get("enabled") is not None
+            # Check if autonomous mode is actually enabled (value is True)
+            result["autonomous_enabled"] = autonomous_mode.get("enabled") is True
             result["active_agents"] = len(active_agents)
             result["current_phase"] = status.get("current_phase", "unknown")
         except Exception as e:

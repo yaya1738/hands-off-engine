@@ -11,6 +11,7 @@ Run with: python -m pytest tests/test_automation_validation.py -v
 import pytest
 import json
 import os
+import sys
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -19,6 +20,9 @@ REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
 AI_DIR = REPO_ROOT / "ai"
 AUTONOMOUS_DIR = REPO_ROOT / "autonomous"
+
+# Add repo root to path (done once at module level)
+sys.path.insert(0, str(REPO_ROOT))
 
 
 class TestAutomationComponentsExist:
@@ -48,9 +52,6 @@ class TestAbsoluteDirectiveSystem:
     
     def test_absolute_directive_import(self):
         """Verify AbsoluteDirective can be imported."""
-        import sys
-        sys.path.insert(0, str(REPO_ROOT))
-        
         from autonomous.absolute_directive import (
             AbsoluteDirective,
             get_master,
@@ -62,9 +63,6 @@ class TestAbsoluteDirectiveSystem:
     
     def test_absolute_directive_inheritance(self):
         """Verify components can inherit from AbsoluteDirective."""
-        import sys
-        sys.path.insert(0, str(REPO_ROOT))
-        
         from autonomous.absolute_directive import AbsoluteDirective
         
         class TestComponent(AbsoluteDirective):
@@ -136,9 +134,6 @@ class TestAIRunnerSystem:
     
     def test_ai_runner_import(self):
         """Verify ai_runner can be imported."""
-        import sys
-        sys.path.insert(0, str(REPO_ROOT))
-        
         try:
             import ai_runner
             assert hasattr(ai_runner, 'TASKS_DIR')
@@ -163,9 +158,6 @@ class TestTradingPipeline:
     
     def test_autoloop_import(self):
         """Verify ho_autoloop can be imported."""
-        import sys
-        sys.path.insert(0, str(REPO_ROOT))
-        
         from ho_autoloop import run_all
         
         assert callable(run_all)
@@ -279,8 +271,9 @@ class TestKnowledgeManagement:
         all_docs = knowledge.get("optional_docs", []) + \
                    knowledge.get("required_reading", [])
         
-        assert any("AUTOMATION_SUCCESS_METRICS" in doc for doc in all_docs), \
-            "AUTOMATION_SUCCESS_METRICS.md not registered in knowledge.json"
+        # Check for exact match of the document path
+        assert "docs/AUTOMATION_SUCCESS_METRICS.md" in all_docs, \
+            "docs/AUTOMATION_SUCCESS_METRICS.md not registered in knowledge.json"
 
 
 class TestSystemHealth:
@@ -321,9 +314,6 @@ class TestAutomationIntegration:
     
     def test_cascade_system_functional(self):
         """Test that cascade directive system works end-to-end."""
-        import sys
-        sys.path.insert(0, str(REPO_ROOT))
-        
         from autonomous.absolute_directive import cascade_directive
         
         # Run cascade
@@ -338,9 +328,6 @@ class TestAutomationIntegration:
     
     def test_ai_runner_process_task_structure(self):
         """Test that ai_runner can process task structure."""
-        import sys
-        sys.path.insert(0, str(REPO_ROOT))
-        
         try:
             from ai_runner import process_sparkplug_autokernel_refresh
             
