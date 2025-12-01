@@ -8,6 +8,9 @@ jobs:
   assign-to-copilot:
     if: contains(github.event.label.name, 'copilot-task')
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Need write to commit coordination updates
+      issues: write    # Need write to comment on issues
     steps:
       - name: Log task assignment
         run: |
