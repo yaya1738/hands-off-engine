@@ -511,7 +511,7 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
             prs = json.loads(result.stdout)
 
             # Filter for trusted bot authors
-            trusted_authors = ['copilot', 'copilot-swe-agent', 'github-actions[bot]', 'dependabot[bot]']
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'github-actions[bot]', 'dependabot[bot]', 'app/copilot-swe-agent']
             draft_prs = [
                 p for p in prs
                 if p.get('isDraft') and
@@ -528,6 +528,74 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
 
         except Exception as e:
             logger.debug(f"Draft PR check skipped: {e}")
+
+    def check_conflicting_prs(self):
+        """Check for PRs with merge conflicts and request Copilot to fix them."""
+        try:
+            # Get open PRs with their mergeable status
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open",
+                 "--json", "number,author,mergeable,updatedAt,title", "--limit", "50"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return
+
+            prs = json.loads(result.stdout)
+
+            # Filter for conflicting PRs from Copilot
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'app/copilot-swe-agent']
+            conflicting_prs = [
+                p for p in prs
+                if p.get('mergeable') == 'CONFLICTING' and
+                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
+            ]
+
+            if not conflicting_prs:
+                return
+
+            # Check state file to avoid spamming comments
+            state_file = AI_COORD_DIR / "conflict_requests.json"
+            requested_prs = {}
+            if state_file.exists():
+                try:
+                    with open(state_file) as f:
+                        requested_prs = json.load(f)
+                except:
+                    pass
+
+            now = datetime.now()
+            for pr in conflicting_prs:
+                pr_num = pr['number']
+                pr_key = str(pr_num)
+
+                # Only request once per 24 hours per PR
+                if pr_key in requested_prs:
+                    last_request = datetime.fromisoformat(requested_prs[pr_key])
+                    if (now - last_request).total_seconds() < 86400:  # 24 hours
+                        continue
+
+                logger.info(f"PR #{pr_num} has conflicts - requesting Copilot to fix")
+
+                # Comment on PR asking Copilot to fix
+                subprocess.run(
+                    ["gh", "pr", "comment", str(pr_num), "--body",
+                     "@copilot This PR has merge conflicts with main. Please rebase this branch on main and resolve the conflicts, then push the updated changes."],
+                    capture_output=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+                requested_prs[pr_key] = now.isoformat()
+
+            # Save state
+            state_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(state_file, 'w') as f:
+                json.dump(requested_prs, f, indent=2)
+
+        except Exception as e:
+            logger.debug(f"Conflict PR check skipped: {e}")
 
     def run_cycle(self):
         """Run one coordination cycle."""
@@ -551,6 +619,9 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
 
         # Proactively check for draft PR buildup from trusted bots
         self.check_draft_pr_buildup()
+
+        # Check for conflicting PRs and request fixes
+        self.check_conflicting_prs()
 
         logger.info(f"Cycle complete: {len(messages)} messages, {len(tasks)} tasks processed")
 
