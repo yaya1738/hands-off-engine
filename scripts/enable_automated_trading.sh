@@ -36,7 +36,22 @@ else:
 
 echo "  Current balance: \$${BALANCE}"
 
-if (( $(python3 -c "print(1 if $BALANCE < 1.0 else 0)") )); then
+# Validate balance is numeric
+if ! [[ "$BALANCE" =~ ^[0-9]+\.?[0-9]*$ ]]; then
+    echo "  ✗ Could not read balance from state/financial_state.json"
+    exit 1
+fi
+
+# Safe comparison: pass balance as argument to avoid code injection
+if (( $(python3 - "$BALANCE" <<'PY'
+import sys
+try:
+    b = float(sys.argv[1])
+except Exception:
+    b = 0.0
+print(1 if b < 1.0 else 0)
+PY
+) )); then
     echo "  ⚠️  Balance too low for trading (< \$1.00)"
     echo "  Recommendation: Wait for positions to resolve or add funds"
     exit 1
@@ -66,7 +81,7 @@ cat > state/trading_mode.json <<EOF
   "live_trading_enabled": $([ -n "$LIVE_MODE" ] && echo "true" || echo "false"),
   "reason": "automated_trading_enabled_$(date +%Y%m%d_%H%M%S)",
   "auto_paused": false,
-  "enabled_at": "$(date -Iseconds)",
+  "enabled_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "min_balance": 1.0,
   "max_position_usd": 50.0
 }
@@ -78,10 +93,8 @@ echo "  ✓ Created state/trading_mode.json"
 echo
 echo "Step 4: Testing pipeline execution..."
 
-python3 scripts/run_pipeline.py \
-    --intelligent \
-    $LIVE_MODE \
-    --save-log
+# Test with the same command that will run in cron
+bash scripts/run_and_notify.sh --intelligent $LIVE_MODE
 
 if [ $? -ne 0 ]; then
     echo "  ✗ Pipeline test failed"
@@ -95,8 +108,11 @@ echo "  ✓ Pipeline test successful"
 echo
 echo "Step 5: Setting up cron automation..."
 
-# Generate cron command
-CRON_CMD="*/30 * * * * cd $REPO_ROOT && bash scripts/run_and_notify.sh --intelligent $LIVE_MODE >> logs/cron.log 2>&1"
+# Ensure logs directory exists for cron output
+mkdir -p logs
+
+# Generate cron command with proper spacing
+CRON_CMD="*/30 * * * * cd $REPO_ROOT && bash scripts/run_and_notify.sh --intelligent${LIVE_MODE:+ }${LIVE_MODE} >> logs/cron.log 2>&1"
 
 echo "  Proposed cron job (runs every 30 minutes):"
 echo "  $CRON_CMD"
@@ -110,10 +126,14 @@ if [[ ! $REPLY =~ ^[Yy]$ ]]; then
     echo "  crontab -e"
     echo "  Then add: $CRON_CMD"
 else
-    # Add to crontab
-    (crontab -l 2>/dev/null; echo "$CRON_CMD") | crontab -
-    echo "  ✓ Cron job added"
-    echo "  Trading will run every 30 minutes"
+    # Add to crontab only if not already present
+    if ! crontab -l 2>/dev/null | grep -Fq "scripts/run_and_notify.sh --intelligent"; then
+        (crontab -l 2>/dev/null; echo "$CRON_CMD") | crontab -
+        echo "  ✓ Cron job added"
+        echo "  Trading will run every 30 minutes"
+    else
+        echo "  ℹ️  Cron job already exists, skipping"
+    fi
 fi
 
 # Step 6: Summary

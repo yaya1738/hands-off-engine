@@ -132,9 +132,9 @@ if __name__ != "__main__":
     try:
         state_dir.mkdir(parents=True, exist_ok=True)
     except (PermissionError, OSError) as e:
-        # Log permission issues for debugging but continue
-        import logging
-        logging.warning(f"Could not create state directory {state_dir}: {e}")
+        # Log permission issues for debugging, but ensure visibility if logging is not configured
+        import sys
+        print(f"Warning: Could not create state directory {state_dir}: {e}", file=sys.stderr)
 
     # Write absolute truth
     truth = {
@@ -149,9 +149,9 @@ if __name__ != "__main__":
             json.dumps(truth, indent=2)
         )
     except (PermissionError, OSError) as e:
-        # Log permission issues for debugging
-        import logging
-        logging.warning(f"Could not write absolute truth to {truth_file}: {e}")
+        # Log permission issues for debugging, but ensure visibility if logging is not configured
+        import sys
+        print(f"Warning: Could not write absolute truth to {truth_file}: {e}", file=sys.stderr)
 
 
 if __name__ == "__main__":

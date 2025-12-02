@@ -364,7 +364,7 @@ def get_actual_bankroll() -> float:
             balance = state.get('balance', 0)
             print(f"  Detected actual balance: ${balance:.2f}")
             return float(balance)
-    except (FileNotFoundError, json.JSONDecodeError, KeyError, ValueError) as e:
+    except (FileNotFoundError, json.JSONDecodeError, ValueError) as e:
         print(f"  Warning: Could not read actual balance ({type(e).__name__}: {e})")
     return 0.0
 
@@ -388,7 +388,7 @@ def main():
         '--bankroll',
         type=float,
         default=default_bankroll,
-        help=f'Total bankroll for position sizing (default: actual balance ${default_bankroll:.2f})'
+        help=f'Total bankroll for position sizing (default: {"actual balance" if actual_balance > 0 else f"${MIN_DEFAULT_BANKROLL:.2f}"} = ${default_bankroll:.2f})'
     )
     parser.add_argument(
         '--live',
