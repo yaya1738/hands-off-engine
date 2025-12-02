@@ -280,6 +280,7 @@ class TriAgentSession:
                     # Check if there are earlier sessions that should complete first
                     if (other_cpu.session_order is not None and 
                         other_cpu.session_order < self.cpu.session_order and
+                        other_cpu.cpu_id != self.cpu.cpu_id and  # Exclude current session
                         other_cpu.status not in ["stopped", "completed"]):
                         print(f"⚠️  WARNING: Earlier session '{other_cpu.cpu_id}' (order {other_cpu.session_order}) is not completed!")
                         print(f"   This session (order {self.cpu.session_order}) should wait.")

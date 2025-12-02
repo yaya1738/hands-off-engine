@@ -5,7 +5,6 @@ Validates that session dependencies and ordering are enforced correctly.
 """
 
 import pytest
-import json
 from pathlib import Path
 from unittest.mock import patch
 import sys
@@ -14,7 +13,7 @@ import sys
 REPO_ROOT = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-from ai_nexus.spark_plug_types import CpuInstance, CpuConfig
+from ai_nexus.spark_plug_types import CpuInstance
 from ai_nexus.tri_agent_session_runner import TriAgentSession
 from scripts.autonomous_task_queue import AutonomousTaskQueue
 
@@ -224,7 +223,7 @@ def test_task_queue_blocks_when_previous_task_incomplete(temp_test_dir):
     )
     
     # Add second task that depends on first
-    task2_id = queue.add_task(
+    queue.add_task(
         title="Task 2",
         description="Second task",
         priority="critical",  # Higher priority but still blocked
@@ -241,7 +240,7 @@ def test_task_queue_respects_task_order(temp_test_dir):
     queue = AutonomousTaskQueue(temp_test_dir)
     
     # Add tasks in reverse order
-    task3_id = queue.add_task(
+    queue.add_task(
         title="Task 3",
         description="Third task",
         priority="high",

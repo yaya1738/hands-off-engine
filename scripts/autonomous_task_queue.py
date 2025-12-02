@@ -119,7 +119,8 @@ class AutonomousTaskQueue:
                     try:
                         record = json.loads(line)
                         completed_task_ids.add(record['task']['id'])
-                    except:
+                    except (json.JSONDecodeError, KeyError, TypeError):
+                        # Ignore lines that are not valid JSON or missing expected keys
                         pass
 
         # Sort by priority then age

@@ -49,22 +49,24 @@ echo "----------------------------------"
 echo ""
 
 echo "Starting Session A and B in parallel..."
-echo "(In practice, you'd run these in separate terminals)"
 echo ""
 
-# Session A
+# Session A (run in background)
 python -m ai_nexus.tri_agent_session_runner \
     --conversation-id 20251201_example_sessionA \
     --session-goal "Develop component A" \
     --rounds 1 \
-    --agents chatgpt
+    --agents chatgpt &
 
-# Session B  
+# Session B (run in background)
 python -m ai_nexus.tri_agent_session_runner \
     --conversation-id 20251201_example_sessionB \
     --session-goal "Develop component B" \
     --rounds 1 \
-    --agents claude_cli
+    --agents claude_cli &
+
+# Wait for both sessions to complete
+wait
 
 echo ""
 echo "Sessions A and B complete. Now starting integration session..."
