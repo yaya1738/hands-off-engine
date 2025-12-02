@@ -494,6 +494,41 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
 
         logger.info(f"Task {task_id} status → {new_status}")
 
+    def check_draft_pr_buildup(self):
+        """Check for draft PRs from trusted authors and trigger mark-ready workflow if needed."""
+        try:
+            # Get draft PRs from trusted authors (copilot)
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open", "--draft",
+                 "--json", "number,author,isDraft", "--limit", "50"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return
+
+            prs = json.loads(result.stdout)
+
+            # Filter for trusted bot authors
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'github-actions[bot]', 'dependabot[bot]']
+            draft_prs = [
+                p for p in prs
+                if p.get('isDraft') and
+                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
+            ]
+
+            if len(draft_prs) >= 3:  # Trigger if 3+ drafts from bots
+                logger.info(f"Found {len(draft_prs)} draft PRs from trusted authors - triggering mark-ready workflow")
+                subprocess.run(
+                    ["gh", "workflow", "run", "Mark Copilot PRs Ready for Review"],
+                    capture_output=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+        except Exception as e:
+            logger.debug(f"Draft PR check skipped: {e}")
+
     def run_cycle(self):
         """Run one coordination cycle."""
         logger.info("Starting coordination cycle")
@@ -513,6 +548,9 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
                 self.process_task(task)
             except Exception as e:
                 logger.error(f"Error processing task: {e}")
+
+        # Proactively check for draft PR buildup from trusted bots
+        self.check_draft_pr_buildup()
 
         logger.info(f"Cycle complete: {len(messages)} messages, {len(tasks)} tasks processed")
 
