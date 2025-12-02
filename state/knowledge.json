@@ -12,7 +12,8 @@
     "docs/knowledge/POLYMARKET_SPECIFIC.md",
     "docs/knowledge/TRADING_STRATEGY.md",
     "docs/knowledge/NEW_MARKET_EDGE.md",
-    "ai/integration/AI_NEXUS_PROTOCOL.md"
+    "ai/integration/AI_NEXUS_PROTOCOL.md",
+    "ai/coordination/CLUSTER_PLAN.md"
   ],
   "agent_instruction_files": [
     ".claude/instructions.md",
