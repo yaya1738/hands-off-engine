@@ -19,7 +19,7 @@ jobs:
           echo "Created by: ${{ github.event.issue.user.login }}"
       
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       
       - name: Update coordination status
         run: |
