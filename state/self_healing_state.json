@@ -1,6 +1,6 @@
 {
-  "total_fixes": 12,
-  "last_check": "2025-12-02T01:28:01.149080",
+  "total_fixes": 2,
+  "last_check": "2025-12-02T01:51:20.639393",
   "issues_detected": [
     "Hands-off-engine cron job missing",
     "Hands-off-engine cron job missing",
@@ -1950,7 +1950,11 @@
     "20 agent branches have unmerged work - auto-merge may not be working",
     "20 agent branches have unmerged work - auto-merge may not be working",
     "20 agent branches have unmerged work - auto-merge may not be working",
-    "19 agent branches have unmerged work - auto-merge may not be working"
+    "19 agent branches have unmerged work - auto-merge may not be working",
+    "Hands-off-engine cron job missing",
+    "7 agent branches have unmerged work - auto-merge may not be working",
+    "31 docs in monitored paths not categorized in knowledge.json: ['docs/BATCH_21_STATUS_REPORT.md', 'docs/BATCH_22_RAW_CLAUDE_OUTPUT_PART_1.md', 'docs/BATCH_22_RAW_CLAUDE_OUTPUT_PART_3.md', 'docs/BATCH_22_RAW_CLAUDE_OUTPUT_PART_2.md', 'docs/FINANCE_FLOW_DIAGRAM.md', 'docs/executor-architecture-implementation.md', 'docs/BATCH_23_STATUS_REPORT.md', 'docs/BATCH_21_COMPLETE_TRANSCRIPT_CHUNK_2_of_4.md', 'docs/BATCH_21_COMPLETE_TRANSCRIPT_CHUNK_3_of_4.md', 'docs/BATCH_19_FULL_IMPLEMENTATION_OUTPUT.md'] (and 21 more)",
+    "86 'later' mentions - deferred work accumulating. Remember: 'later' means 'never'"
   ],
   "auto_fixed": [
     "Reset trading health (archived trading_performance.jsonl.healed_20251128_030407)",
@@ -2006,7 +2010,9 @@
     "Triggered pipeline run",
     "Triggered pipeline run",
     "Triggered pipeline run",
-    "Triggered pipeline run"
+    "Triggered pipeline run",
+    "Reinstalled cron jobs",
+    "Triggered mark-ready workflow"
   ],
   "ssh_cluster_status": "connected",
   "ssh_fixed_at": "2025-12-02T01:28:01.149104"

@@ -3770,3 +3770,36 @@
 {"timestamp": "2025-12-01T12:20:32.251752+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 28 vCPU, 56.0GB RAM", "result": "info", "master": "Yair Siegel"}
 {"timestamp": "2025-12-01T12:20:32.252015+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 116.7% of target", "result": "info", "master": "Yair Siegel"}
 {"timestamp": "2025-12-01T12:20:32.252170+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:30:01.170460+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:30:01.189766+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:30:03.090270+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:30:03.097324+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:30:03.202023+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:30:03.210250+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:35:01.305585+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:35:01.328061+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:35:03.326047+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:35:03.344256+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:35:03.433045+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:35:03.461290+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:40:01.868623+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:40:01.869004+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:40:03.807846+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:40:03.872574+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:40:03.922775+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:40:03.990565+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:45:01.983756+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:45:01.984045+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:45:03.858958+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:45:03.894369+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:46:22.852331+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:46:34.980464+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:01.493828+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:01.502853+00:00", "agent": "coordination-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:03.466559+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:03.485570+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:03.572074+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:03.587872+00:00", "agent": "moonshot-loop", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:56.459273+00:00", "agent": "self-healing-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:51:07.108548+00:00", "agent": "self-healing-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:51:13.179410+00:00", "agent": "self-healing-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}

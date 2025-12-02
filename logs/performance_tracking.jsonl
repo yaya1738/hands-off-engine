@@ -4805,3 +4805,5 @@
 {"timestamp": "2025-12-01T12:20:44.462426Z", "total_orders": 19, "total_size_usd": 192.49999999999997, "mode": "dryrun", "orders": 19, "avg_confidence": 0.6999999999999997}
 {"timestamp": "2025-12-01T12:20:55.499433Z", "total_orders": 19, "total_size_usd": 192.49999999999997, "mode": "dryrun", "orders": 19, "avg_confidence": 0.6999999999999997}
 {"timestamp": "2025-12-01T12:21:50.467818Z", "total_orders": 19, "total_size_usd": 192.49999999999997, "mode": "dryrun", "orders": 19, "avg_confidence": 0.6999999999999997}
+{"timestamp": "2025-12-02T01:30:01.162090Z", "total_orders": 5, "total_size_usd": 1176.0, "mode": "dryrun", "orders": 5, "avg_confidence": 0.602}
+{"timestamp": "2025-12-02T01:30:01.200825Z", "total_orders": 5, "total_size_usd": 1176.0, "mode": "dryrun", "orders": 5, "avg_confidence": 0.602}
