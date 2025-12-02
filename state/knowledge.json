@@ -17,14 +17,20 @@
   "agent_instruction_files": [
     ".claude/instructions.md",
     ".github/copilot-instructions.md",
+    ".github/.instructions.md",
     "docs/AI_AGENT_LINK_PROTOCOL_v0.1.md"
   ],
   "optional_docs": [
+    "docs/AUTONOMOUS_EXECUTIVE_SUMMARY.md",
+    "docs/AUTONOMOUS_ACTIVATION_RUNBOOK.md",
+    "docs/AUTONOMOUS_IMPLEMENTATION_STATUS.md",
     "docs/RISK_MODEL_V1.md",
     "docs/AUDIT_SYSTEM.md",
     "docs/POLYMARKET_API_INTEGRATION.md",
     "docs/AI_INTAKE_IMPLEMENTATION_REPORT.md",
     "docs/AI_INTAKE_SETUP_GUIDE.md",
+    "docs/CHATGPT_AUDIT_2025-12-01.md",
+    "docs/CHATGPT_ACTIVATION_GUIDE.md",
     "docs/CHATGPT_COMMS_PROTOCOL_v0.5.md",
     "docs/CHATGPT_COMMS_PROTOCOL_v1_ideas.md",
     "docs/SPARK_PLUG_ARCHITECTURE_v0.1.md",
@@ -33,10 +39,13 @@
     "docs/SPARK_PLUG_v0.5_PER_KERNEL_HISTORY_POLICY.md",
     "docs/TRI_AGENT_SESSION_v0.1.md",
     "docs/TRI_AGENT_INTERCOM_v0.1.md",
+    "docs/TRI_AGENT_SESSION_OUTPUT_HANDLING.md",
     "docs/SHADOW_MODE_RUNBOOK.md",
     "docs/PRODUCTION_DEPLOYMENT.md",
     "docs/EXECUTION_NOTIFICATIONS.md",
     "docs/AUTONOMOUS_BOTTLENECKS_RESOLVED.md",
+    "docs/AUTONOMOUS_GAPS_ANALYSIS.md",
+    "docs/WHATS_NOT_AUTONOMOUS_YET.md",
     "docs/claude/MCP_ARCHITECTURE_CORRECTION.md",
     "docs/claude/MCP_SETUP_GUIDE.md",
     "docs/claude/MCP_VERIFICATION_RESULTS.md",
@@ -70,7 +79,9 @@
     "docs/BATCH_11_SPEC.md",
     "docs/BATCH_11_STATUS_REPORT.md",
     "docs/BATCH_17_SPEC.md",
-    "docs/BATCH_17_STATUS_REPORT.md"
+    "docs/BATCH_17_STATUS_REPORT.md",
+    "docs/GITHUB_SPARK_INTEGRATION.md",
+    "docs/TELEGRAM_COPILOT_INTEGRATION.md"
   ],
   "ephemeral_docs_excluded": [
     "Session logs (docs/claude/SESSION_*, ai/SESSION_*)",

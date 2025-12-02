@@ -65,6 +65,7 @@ class TelegramCommandBot:
             '/dashboard': self.cmd_dashboard,
             '/escape': self.cmd_escape_velocity,
             '/setpat': self.cmd_setpat,
+            '/fixssh': self.cmd_fixssh,
         }
 
     def process_command(self, command_text: str) -> str:
@@ -755,6 +756,97 @@ claude
 
         except Exception as e:
             return f"❌ Error configuring PAT: {str(e)}"
+
+    def cmd_fixssh(self, args) -> str:
+        """Fix SSH access on all droplets by adding ho-cli-main key."""
+        try:
+            # Get list of droplets
+            result = subprocess.run(
+                ["doctl", "compute", "droplet", "list", "--format", "ID,Name,PublicIPv4", "--no-header"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+
+            if result.returncode != 0:
+                return f"❌ Error getting droplets: {result.stderr}"
+
+            droplets = []
+            for line in result.stdout.strip().split('\n'):
+                parts = line.split()
+                if len(parts) >= 3:
+                    droplets.append({'id': parts[0], 'name': parts[1], 'ip': parts[2]})
+
+            if not droplets:
+                return "❌ No droplets found"
+
+            # SSH key to add
+            HO_CLI_KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9leXKzmPHKpTLjwsynPjVSbtyyhk0HFynKlA6X1z6x root@ho-cli-main"
+
+            fixed = []
+            failed = []
+            skipped = []
+
+            for d in droplets:
+                name = d['name']
+                ip = d['ip']
+
+                # Skip self
+                if name == 'pm-helper':
+                    skipped.append(name)
+                    continue
+
+                try:
+                    # Check if key already exists, if not add it
+                    cmd = f'''
+                    grep -q "root@ho-cli-main" /root/.ssh/authorized_keys 2>/dev/null && echo "EXISTS" || {{
+                        mkdir -p /root/.ssh
+                        chmod 700 /root/.ssh
+                        echo "{HO_CLI_KEY}" >> /root/.ssh/authorized_keys
+                        chmod 600 /root/.ssh/authorized_keys
+                        echo "ADDED"
+                    }}
+                    '''
+
+                    ssh_result = subprocess.run(
+                        ['ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=10', '-o', 'BatchMode=yes',
+                         f'root@{ip}', cmd],
+                        capture_output=True,
+                        text=True,
+                        timeout=30
+                    )
+
+                    if "ADDED" in ssh_result.stdout:
+                        fixed.append(f"{name} ({ip})")
+                    elif "EXISTS" in ssh_result.stdout:
+                        skipped.append(f"{name} (already has key)")
+                    else:
+                        failed.append(f"{name}: {ssh_result.stderr[:50]}")
+
+                except Exception as e:
+                    failed.append(f"{name}: {str(e)[:50]}")
+
+            msg = f"""🔧 SSH Fix Results
+
+✅ Fixed: {len(fixed)}
+"""
+            if fixed:
+                msg += "\n".join(f"  • {f}" for f in fixed) + "\n"
+
+            msg += f"\n⏭ Skipped: {len(skipped)}\n"
+            if skipped:
+                msg += "\n".join(f"  • {s}" for s in skipped[:5]) + "\n"
+
+            if failed:
+                msg += f"\n❌ Failed: {len(failed)}\n"
+                msg += "\n".join(f"  • {f}" for f in failed[:5]) + "\n"
+
+            msg += "\nho-cli-main can now SSH to fixed droplets."
+
+            return msg
+
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
 
 
 def send_telegram_message(message: str):

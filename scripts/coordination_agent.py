@@ -494,6 +494,95 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
 
         logger.info(f"Task {task_id} status → {new_status}")
 
+    def check_draft_pr_buildup(self):
+        """Check for draft PRs from trusted authors and trigger mark-ready workflow if needed."""
+        try:
+            # Get draft PRs from trusted authors (copilot)
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open", "--draft",
+                 "--json", "number,author,isDraft", "--limit", "50"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return
+
+            prs = json.loads(result.stdout)
+
+            # Filter for trusted bot authors
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'github-actions[bot]', 'dependabot[bot]', 'app/copilot-swe-agent']
+            draft_prs = [
+                p for p in prs
+                if p.get('isDraft') and
+                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
+            ]
+
+            if len(draft_prs) >= 3:  # Trigger if 3+ drafts from bots
+                logger.info(f"Found {len(draft_prs)} draft PRs from trusted authors - triggering mark-ready workflow")
+                subprocess.run(
+                    ["gh", "workflow", "run", "Mark Copilot PRs Ready for Review"],
+                    capture_output=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+        except Exception as e:
+            logger.debug(f"Draft PR check skipped: {e}")
+
+    def check_conflicting_prs(self):
+        """Check for PRs with merge conflicts and request Copilot to fix them immediately."""
+        try:
+            # Get open PRs with their mergeable status
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open",
+                 "--json", "number,author,mergeable,title", "--limit", "50"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return
+
+            prs = json.loads(result.stdout)
+
+            # Filter for conflicting PRs from Copilot
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'app/copilot-swe-agent']
+            conflicting_prs = [
+                p for p in prs
+                if p.get('mergeable') == 'CONFLICTING' and
+                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
+            ]
+
+            for pr in conflicting_prs:
+                pr_num = pr['number']
+
+                # Check if we already commented asking for fix (look for our comment)
+                check_result = subprocess.run(
+                    ["gh", "api", f"repos/yaya1738/hands-off-engine/issues/{pr_num}/comments",
+                     "--jq", '[.[] | select(.body | contains("merge conflicts"))] | length'],
+                    capture_output=True, text=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+                if check_result.returncode == 0 and check_result.stdout.strip() not in ['0', '']:
+                    # Already commented, skip
+                    continue
+
+                logger.info(f"PR #{pr_num} has conflicts - requesting Copilot to fix immediately")
+
+                # Comment on PR asking Copilot to fix
+                subprocess.run(
+                    ["gh", "pr", "comment", str(pr_num), "--body",
+                     f"@copilot This PR has merge conflicts. Please apply the changes from this PR to a fresh branch from main and push the fix. The goal was: {pr.get('title', 'see PR description')}"],
+                    capture_output=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+                logger.info(f"Requested Copilot fix for PR #{pr_num}")
+
+        except Exception as e:
+            logger.debug(f"Conflict PR check skipped: {e}")
+
     def run_cycle(self):
         """Run one coordination cycle."""
         logger.info("Starting coordination cycle")
@@ -513,6 +602,12 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
                 self.process_task(task)
             except Exception as e:
                 logger.error(f"Error processing task: {e}")
+
+        # Proactively check for draft PR buildup from trusted bots
+        self.check_draft_pr_buildup()
+
+        # Check for conflicting PRs and request fixes
+        self.check_conflicting_prs()
 
         logger.info(f"Cycle complete: {len(messages)} messages, {len(tasks)} tasks processed")
 

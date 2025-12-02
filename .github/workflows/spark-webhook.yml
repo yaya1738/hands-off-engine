@@ -1,0 +1,103 @@
+name: Spark App Webhook Handler
+
+on:
+  repository_dispatch:
+    types: 
+      - spark_emergency_stop
+      - spark_approve_trade
+      - spark_health_check
+
+jobs:
+  handle-spark-action:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Need write to commit state changes
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      
+      - name: Handle Emergency Stop
+        if: github.event.action == 'spark_emergency_stop'
+        run: |
+          echo "🛑 Emergency stop triggered from Spark app"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Log emergency stop to coordination
+          mkdir -p ai/coordination
+          echo "{\"timestamp\": \"${TIMESTAMP}\", \"action\": \"emergency_stop\", \"source\": \"spark_app\", \"triggered_by\": \"${{ github.event.client_payload.user }}\"}" >> ai/coordination/messages.jsonl
+          
+          # Create emergency stop marker
+          mkdir -p state
+          echo "{\"stopped\": true, \"timestamp\": \"${TIMESTAMP}\", \"reason\": \"Spark emergency stop\", \"triggered_by\": \"${{ github.event.client_payload.user }}\"}" > state/emergency_stop.json
+          
+          echo "⚠️ Emergency stop marker created at state/emergency_stop.json"
+          echo "System will halt trading operations until manually resumed"
+          
+      - name: Handle Trade Approval
+        if: github.event.action == 'spark_approve_trade'
+        run: |
+          echo "✅ Trade approved from Spark app"
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          TRADE_ID="${{ github.event.client_payload.trade_id }}"
+          USER="${{ github.event.client_payload.user }}"
+          
+          # Validate trade ID is not empty and contains only safe characters
+          if [ -z "$TRADE_ID" ] || [[ ! "$TRADE_ID" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+            echo "❌ Invalid trade ID format: $TRADE_ID"
+            exit 1
+          fi
+          
+          # Validate user field using jq for JSON safety
+          USER_JSON=$(echo "$USER" | jq -Rs .)
+          
+          # Log trade approval with sanitized user field
+          mkdir -p ai/coordination
+          echo "{\"timestamp\": \"${TIMESTAMP}\", \"action\": \"trade_approval\", \"source\": \"spark_app\", \"trade_id\": \"${TRADE_ID}\", \"approved_by\": ${USER_JSON}}" >> ai/coordination/messages.jsonl
+          
+          # Update approval state
+          mkdir -p state/approvals
+          echo "{\"approved\": true, \"timestamp\": \"${TIMESTAMP}\", \"trade_id\": \"${TRADE_ID}\", \"approved_by\": ${USER_JSON}}" > "state/approvals/${TRADE_ID}.json"
+          
+          echo "✅ Trade ${TRADE_ID} approved and logged"
+          
+      - name: Handle Health Check
+        if: github.event.action == 'spark_health_check'
+        run: |
+          echo "🏥 Health check triggered from Spark app"
+          
+          # Run health check script if it exists
+          if [ -f "scripts/github_setup/check_setup_status.py" ]; then
+            python scripts/github_setup/check_setup_status.py
+          else
+            echo "⚠️ Health check script not found"
+          fi
+          
+          # Log basic system status
+          echo "Git status:"
+          git status --short
+          
+          echo "Recent activity:"
+          git log --oneline -5
+          
+          echo "Coordination status:"
+          if [ -f "ai/coordination/status.json" ]; then
+            cat ai/coordination/status.json | python -m json.tool
+          fi
+      
+      - name: Commit and push changes
+        if: github.event.action == 'spark_emergency_stop' || github.event.action == 'spark_approve_trade'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Add only the specific files modified by this workflow
+          git add ai/coordination/messages.jsonl
+          [ -f state/emergency_stop.json ] && git add state/emergency_stop.json
+          git add state/approvals/*.json 2>/dev/null || true
+          
+          git diff --staged --quiet || git commit -m "chore: Spark app action - ${{ github.event.action }}"
+          git push

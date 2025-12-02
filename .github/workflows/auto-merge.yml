@@ -34,7 +34,7 @@ permissions:
 
 # Trusted bot authors that can auto-merge (case-insensitive matching used in script)
 env:
-  TRUSTED_AUTHORS: "copilot,github-actions[bot],dependabot[bot]"
+  TRUSTED_AUTHORS: "copilot,copilot-swe-agent,app/copilot-swe-agent,github-actions[bot],dependabot[bot]"
 
 jobs:
   auto-merge:
@@ -52,7 +52,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Determine PR number
         id: pr_number

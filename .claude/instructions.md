@@ -221,3 +221,39 @@ cat config/api_registry.json | python3 -c "import json,sys; d=json.load(sys.stdi
 curl -s http://138.68.103.156:8080 | head -3 && echo "Landing page: UP"
 ```
 
+---
+
+## Audit Logging (IMPORTANT)
+
+**All Claude Code CLI actions MUST be logged to the audit system.**
+
+When you complete work:
+
+```bash
+# Log your action
+python3 scripts/claude_audit_helper.py log_action \
+    --action "code_generation" \
+    --files-changed <num> \
+    --lines-added <num> \
+    --lines-removed <num> \
+    --metadata '{"description": "what you did"}' \
+    --verbose
+```
+
+**Common action types:**
+- `code_generation` - New code created
+- `code_review` - Code reviewed
+- `code_refactor` - Code refactored
+- `bug_fix` - Bug fixed
+- `optimization` - Performance improvements
+- `documentation` - Docs updated
+
+**Why this matters:**
+- Tracks AI costs and ROI
+- Provides accountability
+- Enables self-improvement
+- Required for financial sustainability
+
+**See**: `docs/CLAUDE_AUDIT_INTEGRATION.md` for full details
+
+

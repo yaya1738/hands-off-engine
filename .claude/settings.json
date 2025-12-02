@@ -45,6 +45,29 @@
       "Bash(systemctl:*)",
       "WebSearch"
     ],
-    "deny": []
+    "deny": [
+      "Bash(doctl compute droplet delete:*)",
+      "Bash(doctl compute droplet-action password-reset:*)",
+      "Bash(doctl compute droplet-action power-off:*)",
+      "Bash(doctl compute droplet-action power-cycle:*)",
+      "Bash(doctl compute droplet-action shutdown:*)",
+      "Bash(doctl compute droplet-action rebuild:*)",
+      "Bash(doctl compute droplet-action restore:*)",
+      "Bash(doctl compute droplet-action resize:*)",
+      "Bash(doctl compute droplet-action rename:*)",
+      "Bash(doctl compute droplet-action snapshot:*)",
+      "Bash(doctl compute droplet-action enable-backups:*)",
+      "Bash(doctl compute droplet-action disable-backups:*)",
+      "Bash(doctl compute droplet rm:*)",
+      "Bash(doctl compute droplet create:*)",
+      "Bash(rm -rf /root:*)",
+      "Bash(rm -rf /:*)",
+      "Bash(shutdown:*)",
+      "Bash(reboot:*)",
+      "Bash(init 0:*)",
+      "Bash(init 6:*)",
+      "Bash(poweroff:*)",
+      "Bash(halt:*)"
+    ]
   }
 }

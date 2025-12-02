@@ -1,0 +1,58 @@
+name: Task Assignment Handler
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  assign-to-copilot:
+    if: contains(github.event.label.name, 'copilot-task')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Need write to commit coordination updates
+      issues: write    # Need write to comment on issues
+    steps:
+      - name: Log task assignment
+        run: |
+          echo "✅ Issue #${{ github.event.issue.number }} assigned to Copilot agent"
+          echo "Title: ${{ github.event.issue.title }}"
+          echo "Created by: ${{ github.event.issue.user.login }}"
+      
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      
+      - name: Update coordination status
+        run: |
+          # Create timestamp
+          TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+          
+          # Sanitize issue title for JSON using jq
+          TITLE=$(echo "${{ github.event.issue.title }}" | jq -Rs .)
+          # Remove surrounding quotes from jq output
+          TITLE=${TITLE:1:-1}
+          
+          # Append task assignment to coordination log
+          mkdir -p ai/coordination
+          echo "{\"timestamp\": \"${TIMESTAMP}\", \"issue\": ${{ github.event.issue.number }}, \"status\": \"assigned\", \"agent\": \"copilot\", \"title\": ${TITLE}}" >> ai/coordination/copilot_tasks.jsonl
+          
+          # Log assignment
+          echo "📝 Task #${{ github.event.issue.number }} logged to coordination system"
+      
+      - name: Commit and push coordination updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add ai/coordination/copilot_tasks.jsonl
+          git diff --staged --quiet || git commit -m "chore: Log Copilot task assignment #${{ github.event.issue.number }}"
+          git push
+      
+      - name: Add comment to issue
+        uses: actions/github-script@v8
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🤖 **Copilot Agent assigned**\n\nThis task has been assigned to the GitHub Copilot coding agent. The agent will:\n1. Read project context from `state/knowledge.json`\n2. Check current system state in `ai/coordination/status.json`\n3. Create a branch and implement the solution\n4. Open a PR for review\n\nTracking this task in `ai/coordination/copilot_tasks.jsonl`'
+            })

@@ -1,0 +1,127 @@
+name: Repository Auto-Configuration
+
+# Automatically configure GitHub repository settings
+# Runs weekly to ensure configuration doesn't drift
+# Can be manually triggered for initial setup
+
+on:
+  workflow_dispatch:  # Manual trigger for initial setup
+    inputs:
+      skip_branch_protection:
+        description: 'Skip branch protection configuration'
+        type: boolean
+        default: false
+      skip_environments:
+        description: 'Skip environments configuration'
+        type: boolean
+        default: false
+      skip_security:
+        description: 'Skip security features configuration'
+        type: boolean
+        default: false
+      skip_project:
+        description: 'Skip project board configuration'
+        type: boolean
+        default: false
+  schedule:
+    - cron: '0 0 * * 0'  # Weekly on Sunday at midnight UTC
+  repository_dispatch:
+    types: [telegram_trigger_setup]  # Triggered by Telegram bot
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  configure:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+      
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: '3.11'
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests
+      
+      - name: Configure Branch Protection
+        if: ${{ !inputs.skip_branch_protection }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Branch Protection Configuration"
+          python scripts/github_setup/configure_branch_protection.py || {
+            echo "::warning::Branch protection configuration failed - may require admin token"
+            echo "Create a PAT with admin:repo scope and add as ADMIN_TOKEN secret if needed"
+          }
+          echo "::endgroup::"
+      
+      - name: Configure Environments
+        if: ${{ !inputs.skip_environments }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Environments Configuration"
+          python scripts/github_setup/configure_environments.py || {
+            echo "::warning::Environments configuration failed - may require admin token"
+          }
+          echo "::endgroup::"
+      
+      - name: Configure Security Features
+        if: ${{ !inputs.skip_security }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Security Configuration"
+          python scripts/github_setup/configure_security.py || {
+            echo "::warning::Some security features may require paid plan or admin access"
+          }
+          echo "::endgroup::"
+      
+      - name: Configure Project Board
+        if: ${{ !inputs.skip_project }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Project Board Configuration"
+          python scripts/github_setup/configure_project.py || {
+            echo "::warning::Project board configuration requires manual setup"
+          }
+          echo "::endgroup::"
+      
+      - name: Check Configuration Status
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "::group::Configuration Status"
+          python scripts/github_setup/check_setup_status.py || {
+            echo "::warning::Status check failed"
+          }
+          echo "::endgroup::"
+      
+      - name: Upload Configuration Logs
+        if: always()
+        uses: actions/upload-artifact@v5
+        with:
+          name: github-setup-logs
+          path: logs/github_setup.jsonl
+          if-no-files-found: ignore
+          retention-days: 30
+      
+      - name: Log Setup Complete
+        run: |
+          echo "✅ Repository auto-configuration complete"
+          echo "Note: Some operations may require elevated permissions (ADMIN_TOKEN)"
+          echo "Self-hosted runner setup must be run on the droplet separately"
+          echo ""
+          echo "To manually configure remaining items:"
+          echo "  1. Create ADMIN_TOKEN secret with admin:repo scope if needed"
+          echo "  2. Run: gh workflow run repo-setup.yml"
+          echo "  3. For runner setup, run: gh workflow run deploy-runner.yml --field droplet_ip=<IP>"
