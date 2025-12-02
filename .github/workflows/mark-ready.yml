@@ -26,7 +26,7 @@ permissions:
 
 # Trusted bot authors that can auto-mark ready (case-insensitive matching used in script)
 env:
-  TRUSTED_AUTHORS: "copilot,copilot-swe-agent,github-actions[bot],dependabot[bot]"
+  TRUSTED_AUTHORS: "copilot,copilot-swe-agent,app/copilot-swe-agent,github-actions[bot],dependabot[bot]"
 
 jobs:
   mark-ready:
