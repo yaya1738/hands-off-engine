@@ -17,18 +17,15 @@ import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
-    from ai.unified_ai import MASTER, get_master
+    from ai.unified_ai import MASTER
 except ImportError:
     # Fallback when unified_ai module is not available
     MASTER = "Yair Siegel"
-    def get_master(): return MASTER
 except (PermissionError, OSError) as e:
     # Fallback for restricted environments (e.g., CI/test)
     # where /root directory access is denied
-    import sys
-    print(f"Warning: Could not load unified_ai module ({e}), using fallback", file=sys.stderr)
+    logger.warning(f"Could not load unified_ai module ({e}), using fallback")
     MASTER = "Yair Siegel"
-    def get_master(): return MASTER
 
 
 import json

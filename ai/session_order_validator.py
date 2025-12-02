@@ -22,28 +22,28 @@ import json
 import sys
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import List, Dict, Optional, Set
+from typing import List, Dict, Optional
 
 # Add repo root to path
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
 # UNIFIED AI - All systems serve Yair Siegel
+import logging
+logger = logging.getLogger(__name__)
+
 try:
-    from ai.unified_ai import MASTER, get_master, log_action
+    from ai.unified_ai import MASTER, log_action
 except ImportError:
     # Fallback when unified_ai module is not available
     MASTER = "Yair Siegel"
-    def log_action(action, details): pass
-    def get_master(): return MASTER
+    def log_action(agent, action, result): pass
 except (PermissionError, OSError) as e:
     # Fallback for restricted environments (e.g., CI/test)
     # where /root directory access is denied
-    import sys
-    print(f"Warning: Could not load unified_ai module ({e}), using fallback", file=sys.stderr)
+    logger.warning(f"Could not load unified_ai module ({e}), using fallback")
     MASTER = "Yair Siegel"
-    def log_action(action, details): pass
-    def get_master(): return MASTER
+    def log_action(agent, action, result): pass
 
 
 class SessionOrderValidator:
@@ -111,20 +111,20 @@ class SessionOrderValidator:
         
         # If no prerequisites, session can proceed
         if not prerequisites:
-            log_action("session_validation", {
-                "session_id": session_id,
-                "agent": agent,
-                "result": "approved_no_prerequisites"
-            })
+            log_action(
+                agent or "unknown",
+                "session_validation",
+                f"approved_no_prerequisites for {session_id}"
+            )
             return True
         
         # Check if enforcement is enabled
         if not state['enforcement_rules'].get('require_prerequisite_completion', True):
-            log_action("session_validation", {
-                "session_id": session_id,
-                "agent": agent,
-                "result": "approved_enforcement_disabled"
-            })
+            log_action(
+                agent or "unknown",
+                "session_validation",
+                f"approved_enforcement_disabled for {session_id}"
+            )
             return True
         
         # Get completed sessions
@@ -141,19 +141,18 @@ class SessionOrderValidator:
             for prereq in missing_prerequisites:
                 print(f"   - {prereq}")
             
-            log_action("session_validation", {
-                "session_id": session_id,
-                "agent": agent,
-                "result": "blocked_missing_prerequisites",
-                "missing": missing_prerequisites
-            })
+            log_action(
+                agent or "unknown",
+                "session_validation",
+                f"blocked_missing_prerequisites for {session_id}: {', '.join(missing_prerequisites)}"
+            )
             return False
         
-        log_action("session_validation", {
-            "session_id": session_id,
-            "agent": agent,
-            "result": "approved_prerequisites_met"
-        })
+        log_action(
+            agent or "unknown",
+            "session_validation",
+            f"approved_prerequisites_met for {session_id}"
+        )
         return True
     
     def register_session(
@@ -212,11 +211,11 @@ class SessionOrderValidator:
         if dependencies:
             print(f"  Dependencies: {', '.join(dependencies)}")
         
-        log_action("session_registered", {
-            "session_id": session_id,
-            "agent": agent,
-            "dependencies": dependencies
-        })
+        log_action(
+            agent,
+            "session_registered",
+            f"registered {session_id} with {len(dependencies) if dependencies else 0} dependencies"
+        )
     
     def complete_session(
         self,
@@ -264,14 +263,15 @@ class SessionOrderValidator:
         
         print(f"✓ Session completed: {session_id} (outcome: {outcome})")
         
-        log_action("session_completed", {
-            "session_id": session_id,
-            "outcome": outcome,
-            "duration_seconds": self._calculate_duration(
-                active_session.get('started_at'),
-                completion_record['completed_at']
-            )
-        })
+        duration = self._calculate_duration(
+            active_session.get('started_at'),
+            completion_record['completed_at']
+        )
+        log_action(
+            active_session.get('agent', 'unknown'),
+            "session_completed",
+            f"completed {session_id} with outcome {outcome}" + (f" (duration: {duration}s)" if duration else "")
+        )
     
     def _calculate_duration(self, start_time: str, end_time: str) -> Optional[int]:
         """Calculate session duration in seconds"""

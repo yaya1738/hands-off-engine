@@ -8,7 +8,7 @@
 
 ## Problem Statement
 
-Ensure current live and queued agent sessions accurately follow instructions from their previous agent sessions and not jumping ahead of the agent session order set up.
+Ensure current live and queued agent sessions accurately follow instructions from their previous agent sessions without jumping ahead of the agent session order set up.
 
 ---
 
