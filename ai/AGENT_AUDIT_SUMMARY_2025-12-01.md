@@ -1,6 +1,6 @@
-# Agent Audit Summary - December 2025
+# Agent Audit Summary - November-December 2025 Transition
 
-**Generated:** 2025-12-01 (Monthly Summary for December 2025)  
+**Generated:** 2025-12-01 (Transition Period Summary)  
 **Purpose:** Comprehensive summary of agent activities, audit findings, and system propagation  
 **Status:** Active - This document tracks all agent audit insights and their integration into system components  
 **Coverage Period:** November 20 - December 1, 2025
@@ -36,6 +36,7 @@ This document consolidates audit findings from multiple AI agents (Claude Code, 
 - **Active Agents:** 4 (Claude Code, Copilot, ChatGPT, Claude Web)
 - **Primary Message Type:** orchestration_complete (22,535 messages)
 - **Agent-Initiated Messages:** 26
+- **Note:** Message breakdown: Claude Code (16) + Copilot (4) + Coordination Agent (4) + Master Orchestrator (22,535) + Other (2 from claude-cli and test)
 
 ---
 
@@ -90,7 +91,7 @@ This document consolidates audit findings from multiple AI agents (Claude Code, 
    - Aligned with Claude Code on Telegram-only interface
    - Created comprehensive communication procedures
    - Status: ✅ ALIGNED
-   - Propagated to: `docs/COMMUNICATION_PROCEDURES.md`, `.claude/COORDINATION_PROTOCOL.md`
+   - Propagated to: `.claude/COORDINATION_PROTOCOL.md`, `ai/coordination/USER_PROTOCOL_ALIGNMENT.md`
 
 2. **User Protocol Documentation**
    - Defined 99% Telegram, 1% GitHub Issues split
@@ -173,7 +174,9 @@ This document consolidates audit findings from multiple AI agents (Claude Code, 
 
 ### 5. Low Capital Runway ⚠️ CRITICAL
 **Finding:** $8.99 balance, ~25 day runway  
-**Calculation:** Based on historical spending and system costs (Note: Actual burn rate should be monitored; this is an estimate from session insights)  
+**Calculation:** **ESTIMATED** — Runway calculated as $8.99 ÷ $0.36/day ≈ 25 days  
+**Burn Rate Assumption:** $0.36 per day, based on average daily system costs from session insights (November 2025)  
+**Source:** Estimate derived from `ai/SESSION_INSIGHTS_2025-11-30.md` and historical audit logs; actual burn rate should be monitored  
 **Assumptions:** Minimal daily costs, no trading capital generation in short term  
 **Status:** Strategic decision made for AI consulting income  
 **Action Required:** Execute outreach strategy  
@@ -362,7 +365,7 @@ None currently blocked
 ### Key Documents Created by Agents
 1. `ai/ZERO_TOUCH_ARCHITECTURE.md` (Claude Code)
 2. `ai/DEPLOYMENT_ZERO_TOUCH.md` (Claude Code)
-3. `docs/COMMUNICATION_PROCEDURES.md` (Copilot)
+3. `.claude/COORDINATION_PROTOCOL.md` (Copilot)
 4. `ai/AGENT_COORDINATION_SUMMARY_2025-11-25.md` (Cross-agent)
 5. `ai/AUTONOMOUS_SESSION_SUMMARY_2025-11-23.md` (Claude Code)
 

@@ -3,7 +3,7 @@
 **Purpose:** Track how agent audit findings propagate through the system  
 **Created:** 2025-12-01  
 **Maintained By:** Coordination Agent  
-**Update Frequency:** Weekly
+**Update Frequency:** Weekly audits (findings and status) + Monthly reviews (comprehensive assessment and archival)
 
 ---
 
@@ -257,7 +257,7 @@ grep "self_improve" ai/coordination/messages.jsonl
    - To: Revenue generation system
    - Action: Execute AI Nexus outreach
    - Owner: Claude Code / AI Nexus
-   - Deadline: 2025-12-08
+   - Timeline: Within 7 days (by 2025-12-08)
    - Status: ❌ NOT STARTED
 
 2. **Capital Burn Monitoring**
@@ -265,7 +265,7 @@ grep "self_improve" ai/coordination/messages.jsonl
    - To: Self-healing agent
    - Action: Add burn rate tracking
    - Owner: Coordination Agent
-   - Deadline: 2025-12-03
+   - Timeline: Within 2 days (by 2025-12-03)
    - Status: ❌ NOT STARTED
 
 ### Priority 2: HIGH
@@ -275,7 +275,7 @@ grep "self_improve" ai/coordination/messages.jsonl
    - To: Coordination protocol
    - Action: Weekly minimum agent sync
    - Owner: All agents
-   - Deadline: 2025-12-15
+   - Timeline: Within 14 days (by 2025-12-15)
    - Status: ❌ NOT STARTED
 
 4. **Self-Improvement Metrics**
@@ -283,7 +283,7 @@ grep "self_improve" ai/coordination/messages.jsonl
    - To: Coordination agent
    - Action: Define improvement KPIs
    - Owner: Coordination Agent
-   - Deadline: 2025-12-15
+   - Timeline: Within 14 days (by 2025-12-15)
    - Status: ❌ NOT STARTED
 
 ### Priority 3: MEDIUM
@@ -293,7 +293,7 @@ grep "self_improve" ai/coordination/messages.jsonl
    - To: Component instrumentation
    - Action: Add logging to unmonitored components
    - Owner: Development team
-   - Deadline: 2025-12-22
+   - Timeline: Within 21 days (by 2025-12-22)
    - Status: ❌ NOT STARTED
 
 6. **Meta-Metrics Dashboard**
@@ -301,7 +301,7 @@ grep "self_improve" ai/coordination/messages.jsonl
    - To: Telegram bot integration
    - Action: Add /meta command
    - Owner: Telegram bot developer
-   - Deadline: 2025-12-15
+   - Timeline: Within 14 days (by 2025-12-15)
    - Status: ❌ NOT STARTED
 
 ---
