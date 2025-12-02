@@ -747,8 +747,8 @@ class SelfHealingAgent:
                     "type": "unmerged_branches",
                     "description": f"{unmerged_count} agent branches have unmerged work - auto-merge may not be working",
                     "severity": "high",
-                    "auto_fixable": False,
-                    "alert_user": True
+                    "auto_fixable": True,
+                    "fix_action": "trigger_mark_ready_workflow"
                 })
 
         except Exception as e:
@@ -919,6 +919,8 @@ class SelfHealingAgent:
                 return self.reset_trading_health()
             elif issue.get("fix_action") == "install_pre_commit_hook":
                 return self.install_pre_commit_hook()
+            elif issue.get("fix_action") == "trigger_mark_ready_workflow":
+                return self.trigger_mark_ready_workflow()
             elif issue.get("fix_action") == "self_improve":
                 return self.trigger_self_improvement(issue.get("context", ""))
 
@@ -1083,6 +1085,131 @@ class SelfHealingAgent:
         except Exception as e:
             logger.error(f"Error installing pre-commit hook: {e}")
             return None
+
+    def trigger_mark_ready_workflow(self) -> str:
+        """Trigger mark-ready workflow to process draft PRs and fix unmerged branches."""
+        try:
+            # Step 1: Trigger the mark-ready workflow
+            result = subprocess.run(
+                ["gh", "workflow", "run", "Mark Copilot PRs Ready for Review"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                logger.warning(f"Mark-ready workflow trigger failed: {result.stderr}")
+                # Try alternative: manually mark draft PRs ready
+                return self._manually_mark_prs_ready()
+
+            logger.info("✓ Triggered mark-ready workflow for unmerged branches")
+
+            # Step 2: Also check for conflicting PRs and comment on them
+            self._request_conflict_fixes()
+
+            return "Triggered mark-ready workflow"
+
+        except Exception as e:
+            logger.error(f"Error triggering mark-ready workflow: {e}")
+            return None
+
+    def _manually_mark_prs_ready(self) -> str:
+        """Fallback: manually mark draft PRs as ready using GraphQL."""
+        try:
+            # Get draft PRs from trusted authors
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open", "--draft",
+                 "--json", "number,author,id", "--limit", "30"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return None
+
+            import json
+            prs = json.loads(result.stdout)
+
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'app/copilot-swe-agent',
+                               'github-actions[bot]', 'dependabot[bot]']
+
+            marked_count = 0
+            for pr in prs:
+                author = pr.get('author', {}).get('login', '').lower()
+                if author in [a.lower() for a in trusted_authors]:
+                    pr_id = pr.get('id')
+                    if pr_id:
+                        # Mark ready via GraphQL
+                        mark_result = subprocess.run(
+                            ["gh", "api", "graphql", "-f", f"""query=mutation {{
+                                markPullRequestReadyForReview(input: {{pullRequestId: "{pr_id}"}}) {{
+                                    pullRequest {{ isDraft }}
+                                }}
+                            }}"""],
+                            capture_output=True, text=True, timeout=30,
+                            cwd=str(REPO_ROOT)
+                        )
+                        if mark_result.returncode == 0:
+                            marked_count += 1
+                            logger.info(f"Marked PR #{pr.get('number')} ready for review")
+
+            if marked_count > 0:
+                return f"Manually marked {marked_count} PRs ready"
+            return None
+
+        except Exception as e:
+            logger.error(f"Error manually marking PRs ready: {e}")
+            return None
+
+    def _request_conflict_fixes(self):
+        """Request Copilot to fix any conflicting PRs."""
+        try:
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open",
+                 "--json", "number,author,mergeable,title", "--limit", "30"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return
+
+            import json
+            prs = json.loads(result.stdout)
+
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'app/copilot-swe-agent']
+
+            for pr in prs:
+                if pr.get('mergeable') != 'CONFLICTING':
+                    continue
+
+                author = pr.get('author', {}).get('login', '').lower()
+                if author not in [a.lower() for a in trusted_authors]:
+                    continue
+
+                pr_num = pr['number']
+
+                # Check if already commented
+                check_result = subprocess.run(
+                    ["gh", "api", f"repos/yaya1738/hands-off-engine/issues/{pr_num}/comments",
+                     "--jq", '[.[] | select(.body | contains("merge conflicts"))] | length'],
+                    capture_output=True, text=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+                if check_result.returncode == 0 and check_result.stdout.strip() not in ['0', '']:
+                    continue  # Already commented
+
+                # Comment requesting fix
+                subprocess.run(
+                    ["gh", "pr", "comment", str(pr_num), "--body",
+                     f"@copilot This PR has merge conflicts. Please rebase or recreate from latest main. Goal: {pr.get('title', 'see description')}"],
+                    capture_output=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+                logger.info(f"Requested conflict fix for PR #{pr_num}")
+
+        except Exception as e:
+            logger.error(f"Error requesting conflict fixes: {e}")
 
     def send_telegram_alert(self, issue: Dict):
         """Send Telegram alert for issues requiring user attention."""
