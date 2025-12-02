@@ -32,12 +32,16 @@ def _get_state_dir() -> Path:
     repo_root = Path(__file__).parent.parent
     state_dir = repo_root / "state"
     
-    # Fallback to /root/hands-off-engine/state if it exists
-    if not state_dir.exists():
-        fallback = Path("/root/hands-off-engine/state")
-        if fallback.exists():
-            return fallback
+    # Use repo-relative if it exists and is a directory
+    if state_dir.is_dir():
+        return state_dir
     
+    # Fallback to /root/hands-off-engine/state if it exists and is a directory
+    fallback = Path("/root/hands-off-engine/state")
+    if fallback.is_dir():
+        return fallback
+    
+    # Return repo-relative path (will be created by mkdir later)
     return state_dir
 
 STATE_DIR = _get_state_dir()

@@ -10,10 +10,8 @@ Run with: python -m pytest tests/test_automation_validation.py -v
 
 import pytest
 import json
-import os
 import sys
 from pathlib import Path
-from datetime import datetime, timezone
 
 # Paths
 REPO_ROOT = Path(__file__).parent.parent
@@ -326,21 +324,12 @@ class TestAutomationIntegration:
         assert result["status"] == "complete"
         assert len(result["levels_touched"]) == 8  # 8 cascade levels
     
-    def test_ai_runner_process_task_structure(self):
-        """Test that ai_runner can process task structure."""
+    def test_ai_runner_imports_successfully(self):
+        """Test that ai_runner module can be imported."""
         try:
             from ai_runner import process_sparkplug_autokernel_refresh
-            
-            # Test with minimal task structure
-            test_task = {
-                "task_type": "sparkplug_autokernel_refresh",
-                "task_id": "test_validation",
-                "mode": "config",
-                "dry_run": True
-            }
-            
-            # Should not crash with proper task structure
-            assert test_task["task_type"] == "sparkplug_autokernel_refresh"
+            # Verify it's callable
+            assert callable(process_sparkplug_autokernel_refresh)
         except ImportError as e:
             pytest.skip(f"ai_runner dependencies not available: {e}")
 

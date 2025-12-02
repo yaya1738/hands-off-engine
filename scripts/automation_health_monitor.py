@@ -18,7 +18,7 @@ import json
 import argparse
 from pathlib import Path
 from datetime import datetime, timezone
-from typing import Dict, List, Any
+from typing import Dict, Any
 
 # Add repo root to path
 REPO_ROOT = Path(__file__).parent.parent
@@ -208,7 +208,7 @@ def check_documentation() -> Dict[str, Any]:
     }
 
 
-def run_health_check(verbose: bool = False) -> Dict[str, Any]:
+def run_health_check() -> Dict[str, Any]:
     """Run all health checks and return results."""
     timestamp = datetime.now(timezone.utc).isoformat()
     
@@ -350,7 +350,7 @@ def main():
     
     args = parser.parse_args()
     
-    results = run_health_check(verbose=args.verbose)
+    results = run_health_check()
     
     if args.json:
         print(json.dumps(results, indent=2))

@@ -13,8 +13,8 @@
 # Check if automation components are running
 python3 tests/test_automation_validation.py -v
 
-# Quick status check
-cd /home/runner/work/hands-off-engine/hands-off-engine
+# Quick status check (run from repo root)
+cd "$(git rev-parse --show-toplevel)"
 python3 -c "from autonomous.absolute_directive import get_master; print(f'Master: {get_master()}')"
 ```
 
@@ -54,10 +54,10 @@ ls -la state/circuit_breaker.lock 2>/dev/null
 **Solution:**
 ```bash
 # Set environment variable to point to correct state directory
-export HANDS_OFF_STATE_DIR="/home/runner/work/hands-off-engine/hands-off-engine/state"
+export HANDS_OFF_STATE_DIR="$(pwd)/state"
 
-# Or run from the repo root
-cd /home/runner/work/hands-off-engine/hands-off-engine
+# Or let the code auto-detect from repo root
+cd "$(git rev-parse --show-toplevel)"
 ```
 
 **Fixed In:** `absolute_directive.py` now uses dynamic path resolution
