@@ -189,3 +189,44 @@ class ClaudeProvider(AIProvider):
                 "tokens_used": tokens_used
             }
         )
+
+
+# Wrapper function for backward compatibility with tri_agent_session_runner
+def call_claude(prompt: str, system_message: Optional[str] = None, model: str = "claude-3-5-sonnet-latest") -> str:
+    """
+    Simple wrapper to call Claude without needing audit setup.
+
+    Args:
+        prompt: The user prompt
+        system_message: Optional system message
+        model: Model to use (default: claude-3-5-sonnet-latest)
+
+    Returns:
+        Response text from Claude
+    """
+    import os
+
+    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    if not api_key:
+        return "[Error: ANTHROPIC_API_KEY not set - Claude runs via CLI in this system]"
+
+    try:
+        import anthropic
+        client = anthropic.Anthropic(api_key=api_key)
+
+        kwargs = {
+            "model": model,
+            "max_tokens": 4096,
+            "messages": [{"role": "user", "content": prompt}]
+        }
+        if system_message:
+            kwargs["system"] = system_message
+
+        response = client.messages.create(**kwargs)
+
+        return response.content[0].text
+
+    except ImportError:
+        return "[Error: anthropic package not installed]"
+    except Exception as e:
+        return f"[Error calling Claude: {e}]"

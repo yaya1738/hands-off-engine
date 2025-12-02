@@ -127,3 +127,29 @@ class CopilotProvider(AIProvider):
                 "suggestions_accepted": suggestions_accepted
             }
         )
+
+
+# Wrapper function for backward compatibility with tri_agent_session_runner
+def call_github_copilot(prompt: str, system_message: Optional[str] = None) -> str:
+    """
+    Stub wrapper for GitHub Copilot.
+
+    GitHub Copilot operates through the GitHub interface (Issues/PRs with @copilot mentions)
+    rather than direct API calls. This stub returns guidance on how to use Copilot.
+
+    Args:
+        prompt: The user prompt
+        system_message: Optional system message (unused)
+
+    Returns:
+        Guidance message about using Copilot
+    """
+    return (
+        "[GitHub Copilot operates via @copilot mentions in Issues/PRs]\n\n"
+        f"To get Copilot's response to: '{prompt[:100]}...'\n"
+        "Create a GitHub Issue with:\n"
+        "1. Add @copilot mention in the issue body\n"
+        "2. Copilot will respond as a comment\n"
+        "3. Monitor the issue for Copilot's PR if code changes are needed\n\n"
+        "See: https://github.com/yaya1738/hands-off-engine/issues"
+    )

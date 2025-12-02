@@ -157,3 +157,45 @@ class OpenAIProvider(AIProvider):
                 success=False,
                 error=str(e)
             )
+
+
+# Wrapper function for backward compatibility with tri_agent_session_runner
+def call_chatgpt(prompt: str, system_message: Optional[str] = None, model: str = "gpt-4o-mini") -> str:
+    """
+    Simple wrapper to call ChatGPT without needing audit setup.
+
+    Args:
+        prompt: The user prompt
+        system_message: Optional system message
+        model: Model to use (default: gpt-4o-mini)
+
+    Returns:
+        Response text from ChatGPT
+    """
+    import os
+
+    api_key = os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        return "[Error: OPENAI_API_KEY not set]"
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+
+        messages = []
+        if system_message:
+            messages.append({"role": "system", "content": system_message})
+        messages.append({"role": "user", "content": prompt})
+
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            temperature=0.7
+        )
+
+        return response.choices[0].message.content
+
+    except ImportError:
+        return "[Error: openai package not installed]"
+    except Exception as e:
+        return f"[Error calling ChatGPT: {e}]"
