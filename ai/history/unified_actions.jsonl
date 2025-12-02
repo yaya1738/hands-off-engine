@@ -3803,3 +3803,112 @@
 {"timestamp": "2025-12-02T01:50:56.459273+00:00", "agent": "self-healing-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
 {"timestamp": "2025-12-02T01:51:07.108548+00:00", "agent": "self-healing-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
 {"timestamp": "2025-12-02T01:51:13.179410+00:00", "agent": "self-healing-agent", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:46:18.121221+00:00", "agent": "MegaCoordinator", "action": "[Iteration 373] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:46:21.421481+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:46:21.421785+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:46:21.421974+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:47:23.234641+00:00", "agent": "MegaCoordinator", "action": "[Iteration 374] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:47:25.220479+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:47:25.220717+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:47:25.220895+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:48:25.790704+00:00", "agent": "coordination", "action": "trade_cycle", "result": "{'timestamp': '2025-12-02T01:47:47.733216+00:00', 'balance': 3.49, 'signals_found': 128, 'trade_decision': 'All checks passed', 'trade_result': {'timestamp': '2025-12-02T01:48:25.790239+00:00', 'mode': 'shadow', 'signal': {'market_id': '0x1bef2cec162d5499c60c1acd8e3c5a3acc321aee580deda1f01aa40dadbda374', 'question': 'Will Marian Vanghelie be the next Mayor of Bucharest?', 'token_id': '27904998001260267225722216096455105604469879526408624700177303559424547760509', 'side': 'BUY', 'price': 0.0005, 'confidence': 0.7995, 'reason': 'Low YES price $0.00 with high volume $5,752,490', 'volume_24h': 5752490.388023, 'liquidity': 229930.29735, 'generated_at': '2025-12-02T01:47:48.419411+00:00', 'source': 'signal_generator'}, 'size_usd': 0.8725, 'success': True, 'reason': 'Shadow trade logged'}}", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:48:26.963514+00:00", "agent": "MegaCoordinator", "action": "[Iteration 375] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:48:28.595999+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:48:28.596291+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:48:28.596513+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:48:28.596683+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:49:32.437563+00:00", "agent": "MegaCoordinator", "action": "[Iteration 376] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:49:34.279608+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:49:34.279989+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:49:34.280197+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:01.663771+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:35.876729+00:00", "agent": "MegaCoordinator", "action": "[Iteration 377] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:37.555059+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:37.555345+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:50:37.555526+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:51:39.749523+00:00", "agent": "MegaCoordinator", "action": "[Iteration 378] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:51:41.705888+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:51:41.706159+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:51:41.706352+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:52:43.582338+00:00", "agent": "MegaCoordinator", "action": "[Iteration 379] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:52:45.134621+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:52:45.134891+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:52:45.135079+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:53:46.698567+00:00", "agent": "MegaCoordinator", "action": "[Iteration 380] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:53:48.586902+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:53:48.587100+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:53:48.587237+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:53:48.587481+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:54:06.236654+00:00", "agent": "coordination", "action": "trade_cycle", "result": "{'timestamp': '2025-12-02T01:53:26.267491+00:00', 'balance': 3.49, 'signals_found': 130, 'trade_decision': 'All checks passed', 'trade_result': {'timestamp': '2025-12-02T01:54:06.236338+00:00', 'mode': 'shadow', 'signal': {'market_id': '0x1bef2cec162d5499c60c1acd8e3c5a3acc321aee580deda1f01aa40dadbda374', 'question': 'Will Marian Vanghelie be the next Mayor of Bucharest?', 'token_id': '27904998001260267225722216096455105604469879526408624700177303559424547760509', 'side': 'BUY', 'price': 0.0005, 'confidence': 0.7995, 'reason': 'Low YES price $0.00 with high volume $5,752,490', 'volume_24h': 5752490.388023, 'liquidity': 229912.08064, 'generated_at': '2025-12-02T01:53:26.895901+00:00', 'source': 'signal_generator'}, 'size_usd': 0.8725, 'success': True, 'reason': 'Shadow trade logged'}}", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:54:51.997747+00:00", "agent": "MegaCoordinator", "action": "[Iteration 381] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:54:53.485348+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:54:53.485629+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:54:53.485767+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:55:55.053784+00:00", "agent": "MegaCoordinator", "action": "[Iteration 382] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:55:56.564637+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:55:56.564787+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:55:56.564888+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:56:58.183290+00:00", "agent": "MegaCoordinator", "action": "[Iteration 383] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:57:00.348382+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:57:00.348611+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:57:00.348759+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:58:02.233856+00:00", "agent": "MegaCoordinator", "action": "[Iteration 384] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:58:04.023875+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:58:04.024175+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:58:04.024456+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:59:06.117497+00:00", "agent": "MegaCoordinator", "action": "[Iteration 385] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:59:08.299057+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:59:08.299379+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:59:08.299583+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:59:08.299758+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T01:59:44.895674+00:00", "agent": "coordination", "action": "trade_cycle", "result": "{'timestamp': '2025-12-02T01:59:06.633699+00:00', 'balance': 3.49, 'signals_found': 127, 'trade_decision': 'All checks passed', 'trade_result': {'timestamp': '2025-12-02T01:59:44.895249+00:00', 'mode': 'shadow', 'signal': {'market_id': '0x1bef2cec162d5499c60c1acd8e3c5a3acc321aee580deda1f01aa40dadbda374', 'question': 'Will Marian Vanghelie be the next Mayor of Bucharest?', 'token_id': '27904998001260267225722216096455105604469879526408624700177303559424547760509', 'side': 'BUY', 'price': 0.0005, 'confidence': 0.7995, 'reason': 'Low YES price $0.00 with high volume $5,752,490', 'volume_24h': 5752490.388023, 'liquidity': 228642.95344, 'generated_at': '2025-12-02T01:59:07.349033+00:00', 'source': 'signal_generator'}, 'size_usd': 0.8725, 'success': True, 'reason': 'Shadow trade logged'}}", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:00:01.690928+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:00:12.091865+00:00", "agent": "MegaCoordinator", "action": "[Iteration 386] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:00:14.146045+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:00:14.146422+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:00:14.146741+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:01:15.915456+00:00", "agent": "MegaCoordinator", "action": "[Iteration 387] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:01:17.739946+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:01:17.740266+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:01:17.740433+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:02:19.607816+00:00", "agent": "MegaCoordinator", "action": "[Iteration 388] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:02:22.023834+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:02:22.024044+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:02:22.024195+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:03:23.741334+00:00", "agent": "MegaCoordinator", "action": "[Iteration 389] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:03:25.301209+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:03:25.301481+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:03:25.301647+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:04:27.569607+00:00", "agent": "MegaCoordinator", "action": "[Iteration 390] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:04:29.535787+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:04:29.536049+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:04:29.536197+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:04:29.536416+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:05:23.502202+00:00", "agent": "coordination", "action": "trade_cycle", "result": "{'timestamp': '2025-12-02T02:04:45.398799+00:00', 'balance': 3.49, 'signals_found': 126, 'trade_decision': 'All checks passed', 'trade_result': {'timestamp': '2025-12-02T02:05:23.501835+00:00', 'mode': 'shadow', 'signal': {'market_id': '0x1bef2cec162d5499c60c1acd8e3c5a3acc321aee580deda1f01aa40dadbda374', 'question': 'Will Marian Vanghelie be the next Mayor of Bucharest?', 'token_id': '27904998001260267225722216096455105604469879526408624700177303559424547760509', 'side': 'BUY', 'price': 0.0005, 'confidence': 0.7995, 'reason': 'Low YES price $0.00 with high volume $5,752,490', 'volume_24h': 5752490.388023, 'liquidity': 228642.95344, 'generated_at': '2025-12-02T02:04:46.067910+00:00', 'source': 'signal_generator'}, 'size_usd': 0.8725, 'success': True, 'reason': 'Shadow trade logged'}}", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:05:32.967336+00:00", "agent": "MegaCoordinator", "action": "[Iteration 391] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:05:35.045005+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:05:35.045236+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:05:35.045388+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:06:36.710487+00:00", "agent": "MegaCoordinator", "action": "[Iteration 392] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:06:38.203498+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:06:38.203758+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:06:38.203904+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:07:40.349837+00:00", "agent": "MegaCoordinator", "action": "[Iteration 393] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:07:42.611398+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:07:42.611632+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:07:42.611772+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:08:44.165175+00:00", "agent": "MegaCoordinator", "action": "[Iteration 394] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:08:46.141274+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:08:46.141579+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:08:46.141744+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:09:59.872129+00:00", "agent": "MegaCoordinator", "action": "[Iteration 395] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:10:01.393378+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:10:01.916574+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:10:01.916824+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:10:01.917009+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:10:01.917164+00:00", "agent": "MegaCoordinator", "action": "  Coordinating scaling...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:11:02.166969+00:00", "agent": "coordination", "action": "trade_cycle", "result": "{'timestamp': '2025-12-02T02:10:23.887506+00:00', 'balance': 3.49, 'signals_found': 127, 'trade_decision': 'All checks passed', 'trade_result': {'timestamp': '2025-12-02T02:11:02.166486+00:00', 'mode': 'shadow', 'signal': {'market_id': '0x1bef2cec162d5499c60c1acd8e3c5a3acc321aee580deda1f01aa40dadbda374', 'question': 'Will Marian Vanghelie be the next Mayor of Bucharest?', 'token_id': '27904998001260267225722216096455105604469879526408624700177303559424547760509', 'side': 'BUY', 'price': 0.0005, 'confidence': 0.7995, 'reason': 'Low YES price $0.00 with high volume $5,752,490', 'volume_24h': 5752490.388023, 'liquidity': 228674.08726, 'generated_at': '2025-12-02T02:10:24.326424+00:00', 'source': 'signal_generator'}, 'size_usd': 0.8725, 'success': True, 'reason': 'Shadow trade logged'}}", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:11:05.991272+00:00", "agent": "MegaCoordinator", "action": "[Iteration 396] Coordinating systems...", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:11:08.015393+00:00", "agent": "MegaCoordinator", "action": "  Hardware: 68 vCPU, 136.0GB RAM", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:11:08.015648+00:00", "agent": "MegaCoordinator", "action": "  Scaling: 259.6% of target", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-02T02:11:08.015787+00:00", "agent": "MegaCoordinator", "action": "  Health: HW 100%, System 80%", "result": "info", "master": "Yair Siegel"}

@@ -12,9 +12,9 @@
   "gap_to_trading": 41.01,
   "mini_singularity_threshold": 25.0,
   "gap_to_mini": 16.01,
-  "total_vcpus": 28,
-  "total_ram_gb": 56.0,
-  "healthy_nodes": 4,
+  "total_vcpus": 68,
+  "total_ram_gb": 136.0,
+  "healthy_nodes": 9,
   "bottleneck_node": "pm-helper",
   "idle_nodes": [
     "ho-compute-2 (134.122.124.240)",
@@ -49,7 +49,7 @@
     "claude-web"
   ],
   "distribution_ready": true,
-  "last_update": "2025-12-01T12:20:33.542546+00:00",
-  "scaling_progress": 116.7,
+  "last_update": "2025-12-02T02:10:05.990295+00:00",
+  "scaling_progress": 259.6,
   "hardware_health": 100.0
 }

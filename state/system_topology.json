@@ -448,7 +448,7 @@
   },
   "last_updated": "2025-11-30T23:26:24.456649+00:00",
   "real_infrastructure": {
-    "synced_at": "2025-12-01T10:49:47.068109+00:00",
+    "synced_at": "2025-12-02T02:10:23.806551+00:00",
     "droplets": [
       {
         "id": "524521199",
@@ -501,13 +501,78 @@
         "purpose": "Auto-scaled node for demand spikes",
         "criticality": "standard",
         "can_destroy": false
+      },
+      {
+        "id": "533782657",
+        "name": "ho-cli-main",
+        "ip": "165.22.176.190",
+        "vcpus": 8,
+        "memory_gb": 16,
+        "cost_monthly": 73.0,
+        "status": "active",
+        "topology_component": "infra_droplets",
+        "purpose": "Claude CLI execution node - autonomous improvements",
+        "criticality": "critical",
+        "can_destroy": false
+      },
+      {
+        "id": "533782681",
+        "name": "ho-compute-1",
+        "ip": "206.189.226.242",
+        "vcpus": 8,
+        "memory_gb": 16,
+        "cost_monthly": 73.0,
+        "status": "active",
+        "topology_component": "infra_droplets",
+        "purpose": "Compute capacity for parallel processing",
+        "criticality": "high",
+        "can_destroy": false
+      },
+      {
+        "id": "533782734",
+        "name": "ho-topdawg-4",
+        "ip": "157.245.134.228",
+        "vcpus": 8,
+        "memory_gb": 16,
+        "cost_monthly": 73.0,
+        "status": "active",
+        "topology_component": "infra_droplets",
+        "purpose": "Unknown - needs classification",
+        "criticality": "protected",
+        "can_destroy": false
+      },
+      {
+        "id": "533782813",
+        "name": "ho-mega-1",
+        "ip": "147.182.172.241",
+        "vcpus": 8,
+        "memory_gb": 16,
+        "cost_monthly": 73.0,
+        "status": "active",
+        "topology_component": "infra_droplets",
+        "purpose": "Unknown - needs classification",
+        "criticality": "protected",
+        "can_destroy": false
+      },
+      {
+        "id": "533782847",
+        "name": "ho-mega-2",
+        "ip": "167.99.144.133",
+        "vcpus": 8,
+        "memory_gb": 16,
+        "cost_monthly": 73.0,
+        "status": "active",
+        "topology_component": "infra_droplets",
+        "purpose": "Unknown - needs classification",
+        "criticality": "protected",
+        "can_destroy": false
       }
     ],
     "totals": {
-      "droplet_count": 4,
-      "total_vcpus": 28,
-      "total_memory_gb": 56,
-      "total_cost_monthly": 292.0
+      "droplet_count": 9,
+      "total_vcpus": 68,
+      "total_memory_gb": 136,
+      "total_cost_monthly": 657.0
     }
   }
 }

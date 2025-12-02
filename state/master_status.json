@@ -1,44 +1,48 @@
 {
-  "timestamp": "2025-12-01T12:20:34.007132",
+  "timestamp": "2025-12-02T02:11:13.793965",
   "hostname": "pm-helper",
-  "uptime_hours": 17.2,
+  "uptime_hours": 7.17,
   "components": {
     "hardware-brain": {
-      "status": "stopped"
+      "status": "crashed",
+      "error": "signal only works in main thread of the main interpreter",
+      "restarts": 89
     },
     "scaling-engine": {
       "status": "running",
-      "started": "2025-11-30T19:18:49.932962",
-      "restarts": 5
+      "started": "2025-12-01T19:01:10.552676",
+      "restarts": 0
     },
     "self-healer": {
-      "status": "stopped"
+      "status": "crashed",
+      "error": "signal only works in main thread of the main interpreter",
+      "restarts": 89
     },
     "state-sync": {
       "status": "running",
-      "started": "2025-11-30T19:18:53.939378",
-      "restarts": 5
+      "started": "2025-12-01T19:01:14.555586",
+      "restarts": 0
     },
     "infra-monitor": {
       "status": "running",
-      "started": "2025-11-30T19:18:55.942295",
-      "restarts": 5
+      "started": "2025-12-01T19:01:16.557006",
+      "restarts": 0
     }
   },
   "cluster": {
     "start_date": "2025-11-30T19:08:50.960035",
-    "current_date": "2025-12-01T12:20:34.006961",
-    "days_running": 0,
-    "current_vcpus": 28,
-    "current_ram_gb": 56.0,
-    "current_nodes": 4,
-    "current_monthly_cost": 384.0,
-    "target_vcpus": 24,
-    "target_ram_gb": 48.0,
-    "target_multiplier": 6.0,
-    "vcpu_pct": 116.7,
-    "ram_pct": 116.7,
-    "overall_pct": 116.7,
+    "current_date": "2025-12-02T02:11:13.793759",
+    "days_running": 1,
+    "current_vcpus": 68,
+    "current_ram_gb": 136.0,
+    "current_nodes": 9,
+    "current_monthly_cost": 944.0,
+    "target_vcpus": 26,
+    "target_ram_gb": 52.800000000000004,
+    "target_multiplier": 6.6000000000000005,
+    "vcpu_pct": 261.5,
+    "ram_pct": 257.6,
+    "overall_pct": 259.6,
     "nodes_to_add": 0,
     "last_provision": "2025-11-30T23:04:25.958565",
     "provisions_today": 0,
@@ -56,8 +60,8 @@
   },
   "health_score": 60.0,
   "alerts": [
-    "Component hardware-brain is stopped",
-    "Component self-healer is stopped"
+    "Component hardware-brain is crashed",
+    "Component self-healer is crashed"
   ],
   "evolution_generation": 1
 }

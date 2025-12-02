@@ -1,8 +1,8 @@
 {
-  "last_check": "2025-12-01T12:18:56.558155",
+  "last_check": "2025-12-02T02:09:02.163617",
   "cluster_healthy": true,
-  "total_vcpu": 28,
-  "total_ram_gb": 56.0,
+  "total_vcpu": 68,
+  "total_ram_gb": 136.0,
   "droplets": {},
   "alerts": []
 }
