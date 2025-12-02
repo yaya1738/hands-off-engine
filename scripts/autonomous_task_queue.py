@@ -12,6 +12,16 @@ This achieves "always working" behavior where Claude Code is continuously
 engaged in serving user Yair Siegel, even across session boundaries.
 """
 
+import json
+from datetime import datetime, timezone
+from typing import List, Dict, Optional
+import uuid
+import logging
+
+# Configure logging
+logging.basicConfig(level=logging.WARNING)
+logger = logging.getLogger(__name__)
+
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
 from pathlib import Path
@@ -26,17 +36,6 @@ except (PermissionError, OSError) as e:
     # where /root directory access is denied
     logger.warning(f"Could not load unified_ai module ({e}), using fallback")
     MASTER = "Yair Siegel"
-
-
-import json
-from datetime import datetime, timezone
-from typing import List, Dict, Optional
-import uuid
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.WARNING)
-logger = logging.getLogger(__name__)
 
 # Task status constants
 TASK_STATUS_PENDING = 'pending'
