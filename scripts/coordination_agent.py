@@ -530,12 +530,12 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
             logger.debug(f"Draft PR check skipped: {e}")
 
     def check_conflicting_prs(self):
-        """Check for PRs with merge conflicts and request Copilot to fix them."""
+        """Check for PRs with merge conflicts and request Copilot to fix them immediately."""
         try:
             # Get open PRs with their mergeable status
             result = subprocess.run(
                 ["gh", "pr", "list", "--state", "open",
-                 "--json", "number,author,mergeable,updatedAt,title", "--limit", "50"],
+                 "--json", "number,author,mergeable,title", "--limit", "50"],
                 capture_output=True, text=True, timeout=30,
                 cwd=str(REPO_ROOT)
             )
@@ -553,46 +553,32 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
                 p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
             ]
 
-            if not conflicting_prs:
-                return
-
-            # Check state file to avoid spamming comments
-            state_file = AI_COORD_DIR / "conflict_requests.json"
-            requested_prs = {}
-            if state_file.exists():
-                try:
-                    with open(state_file) as f:
-                        requested_prs = json.load(f)
-                except:
-                    pass
-
-            now = datetime.now()
             for pr in conflicting_prs:
                 pr_num = pr['number']
-                pr_key = str(pr_num)
 
-                # Only request once per 24 hours per PR
-                if pr_key in requested_prs:
-                    last_request = datetime.fromisoformat(requested_prs[pr_key])
-                    if (now - last_request).total_seconds() < 86400:  # 24 hours
-                        continue
+                # Check if we already commented asking for fix (look for our comment)
+                check_result = subprocess.run(
+                    ["gh", "api", f"repos/yaya1738/hands-off-engine/issues/{pr_num}/comments",
+                     "--jq", '[.[] | select(.body | contains("merge conflicts"))] | length'],
+                    capture_output=True, text=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
 
-                logger.info(f"PR #{pr_num} has conflicts - requesting Copilot to fix")
+                if check_result.returncode == 0 and check_result.stdout.strip() not in ['0', '']:
+                    # Already commented, skip
+                    continue
+
+                logger.info(f"PR #{pr_num} has conflicts - requesting Copilot to fix immediately")
 
                 # Comment on PR asking Copilot to fix
                 subprocess.run(
                     ["gh", "pr", "comment", str(pr_num), "--body",
-                     "@copilot This PR has merge conflicts with main. Please rebase this branch on main and resolve the conflicts, then push the updated changes."],
+                     f"@copilot This PR has merge conflicts. Please apply the changes from this PR to a fresh branch from main and push the fix. The goal was: {pr.get('title', 'see PR description')}"],
                     capture_output=True, timeout=30,
                     cwd=str(REPO_ROOT)
                 )
 
-                requested_prs[pr_key] = now.isoformat()
-
-            # Save state
-            state_file.parent.mkdir(parents=True, exist_ok=True)
-            with open(state_file, 'w') as f:
-                json.dump(requested_prs, f, indent=2)
+                logger.info(f"Requested Copilot fix for PR #{pr_num}")
 
         except Exception as e:
             logger.debug(f"Conflict PR check skipped: {e}")
