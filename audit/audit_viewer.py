@@ -96,6 +96,16 @@ def main():
         help="Filter by session ID"
     )
     parser.add_argument(
+        "--list-sessions",
+        action="store_true",
+        help="List all available session IDs"
+    )
+    parser.add_argument(
+        "--all-sessions",
+        action="store_true",
+        help="Show summary for all sessions"
+    )
+    parser.add_argument(
         "--summary",
         action="store_true",
         help="Show session summary instead of individual events"
@@ -121,6 +131,43 @@ def main():
 
     # Initialize logger
     logger = AuditLogger(log_dir=args.log_dir)
+
+    # Handle list sessions
+    if args.list_sessions:
+        session_ids = logger.get_all_sessions()
+        if not session_ids:
+            print("No sessions found.")
+            return
+        
+        print(f"\nFound {len(session_ids)} session(s):\n")
+        for session_id in session_ids:
+            # Get basic info about each session
+            summary = logger.get_session_summary(session_id)
+            print(f"Session: {session_id}")
+            print(f"  Events: {summary['total_events']}")
+            if summary['start_time']:
+                print(f"  Start:  {format_timestamp(summary['start_time'])}")
+            if summary['end_time']:
+                print(f"  End:    {format_timestamp(summary['end_time'])}")
+            print(f"  Cost:   {format_currency(summary['total_cost'])}")
+            print(f"  Revenue: {format_currency(summary['total_revenue'])}")
+            print(f"  Profit: {format_currency(summary['net_profit'])}")
+            print()
+        return
+
+    # Handle all sessions summary
+    if args.all_sessions:
+        session_ids = logger.get_all_sessions()
+        if not session_ids:
+            print("No sessions found.")
+            return
+        
+        print(f"\nGenerating summaries for {len(session_ids)} session(s)...\n")
+        for session_id in session_ids:
+            summary = logger.get_session_summary(session_id)
+            print_summary(summary)
+            print("\n")
+        return
 
     if args.summary:
         # Show summary
