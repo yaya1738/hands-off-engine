@@ -20,6 +20,9 @@
     "docs/AI_AGENT_LINK_PROTOCOL_v0.1.md"
   ],
   "optional_docs": [
+    "docs/AUTONOMOUS_EXECUTIVE_SUMMARY.md",
+    "docs/AUTONOMOUS_ACTIVATION_RUNBOOK.md",
+    "docs/AUTONOMOUS_IMPLEMENTATION_STATUS.md",
     "docs/RISK_MODEL_V1.md",
     "docs/AUDIT_SYSTEM.md",
     "docs/POLYMARKET_API_INTEGRATION.md",
