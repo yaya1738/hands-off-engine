@@ -919,6 +919,48 @@ def run_hft_economics():
         return {"success": False, "error": str(e)}
 
 
+def run_golden_state_scaler():
+    """
+    Run Golden State Auto-Scaler - Progressive tier advancement.
+
+    INTEGRAFIX Golden State tracks:
+    1. Current tier (0-4: Validation → Golden)
+    2. Trade performance for tier advancement
+    3. Automatic scaling based on proven performance
+    4. Circuit breaker protection
+
+    Path to $5M/month through progressive scaling.
+    """
+    try:
+        from integrafix.auto_scaler import AutoScaler
+        from integrafix.golden_state import GoldenState
+
+        scaler = AutoScaler()
+        golden = GoldenState.load()
+
+        # Run scaling check
+        result = scaler.run_check()
+
+        return {
+            "success": True,
+            "current_tier": golden.current_tier,
+            "tier_name": golden.get_tier_config().name,
+            "total_trades": golden.total_trades,
+            "total_pnl": golden.total_pnl,
+            "win_rate": golden.win_rate,
+            "tier_trades": golden.tier_trades,
+            "tier_pnl": golden.tier_pnl,
+            "monthly_projection": golden.monthly_projection(),
+            "golden_achieved": golden.golden_achieved,
+            "scaling_action": result.get("action"),
+            "scaling_reason": result.get("reason"),
+        }
+    except ImportError:
+        return {"success": False, "error": "Golden State not available"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 def run_abcfc_live_builder():
     """
     Run ABCFC Live Builder - real order book + flow integration.
@@ -1716,6 +1758,26 @@ def run_loop(interval_sec: int = 300):
                     log(f"    {outcome}")
         else:
             log(f"  Error: {outcome_result.get('error', 'unknown')}")
+
+        # 11.5 Golden State Scaler - Progressive tier advancement
+        log("[11.5/26] Running Golden State Auto-Scaler...")
+        golden_result = run_golden_state_scaler()
+        state["golden_state"] = golden_result
+        if golden_result.get("success"):
+            tier = golden_result.get("current_tier", 0)
+            tier_name = golden_result.get("tier_name", "Unknown")
+            trades = golden_result.get("total_trades", 0)
+            pnl = golden_result.get("total_pnl", 0)
+            wr = golden_result.get("win_rate", 0) * 100
+            proj = golden_result.get("monthly_projection", 0)
+            log(f"  Tier {tier} ({tier_name}) | Trades: {trades} | P&L: ${pnl:.2f} | WR: {wr:.1f}%")
+            log(f"  Monthly Projection: ${proj:,.0f} | Target: $5,000,000")
+            if golden_result.get("scaling_action"):
+                log(f"  ⚡ SCALING: {golden_result.get('scaling_action')} - {golden_result.get('scaling_reason')}")
+            if golden_result.get("golden_achieved"):
+                log(f"  🏆 GOLDEN STATE ACHIEVED!")
+        else:
+            log(f"  Golden State: {golden_result.get('error', 'skipped')}")
 
         # 12. INTEGRAFIX Trading Memory - AI learns from past trades
         log("[12/26] Running INTEGRAFIX Trading Memory...")
