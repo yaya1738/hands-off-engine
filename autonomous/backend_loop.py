@@ -41,6 +41,38 @@ STATE_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 LOOP_STATE = STATE_DIR / "backend_loop.json"
+PID_FILE = STATE_DIR / "backend_loop.pid"
+
+
+def acquire_pid_lock() -> bool:
+    """Acquire PID lock to prevent duplicate instances."""
+    import fcntl
+
+    # Check if another instance is running
+    if PID_FILE.exists():
+        try:
+            old_pid = int(PID_FILE.read_text().strip())
+            # Check if process is still running
+            os.kill(old_pid, 0)
+            # Process exists - don't start another
+            print(f"[INTEGRAFIX] Backend loop already running (PID {old_pid})")
+            return False
+        except (ProcessLookupError, ValueError):
+            # Process not running - ok to continue
+            pass
+
+    # Write our PID
+    PID_FILE.write_text(str(os.getpid()))
+    return True
+
+
+def release_pid_lock():
+    """Release PID lock on exit."""
+    try:
+        if PID_FILE.exists():
+            PID_FILE.unlink()
+    except:
+        pass
 
 
 def log(msg: str):
@@ -1147,7 +1179,7 @@ def run_integrafix_pipeline():
             import requests
             response = requests.get(
                 "https://gamma-api.polymarket.com/markets",
-                params={"closed": "false", "limit": 50},
+                params={"closed": "false", "limit": 100},  # INTEGRAFIX: 100 markets (upgraded from 50)
                 timeout=10,
             )
             if response.status_code == 200:
@@ -1254,9 +1286,9 @@ def run_integrafix_pipeline():
         # $15-25 trades on named markets = 4x better avg PnL than small hex trades
         result = pipeline.run_pipeline(
             markets=markets,
-            capital=100,  # GOLDEN: $100 per cycle (proven profitable)
-            max_per_trade=25,  # GOLDEN: Max $25 per trade (optimal sizing)
-            min_edge=0.03,  # 3% minimum edge
+            capital=150,  # INTEGRAFIX: $150 per cycle (upgraded from $100)
+            max_per_trade=30,  # INTEGRAFIX: Max $30 per trade (upgraded from $25)
+            min_edge=0.025,  # 2.5% minimum edge (catch more trades)
             dry_run=False,  # LIVE TRADING ENABLED
         )
 
@@ -1673,6 +1705,13 @@ def run_loop(interval_sec: int = 300):
 
 def main():
     import argparse
+    import atexit
+
+    # INTEGRAFIX: Prevent duplicate instances
+    if not acquire_pid_lock():
+        sys.exit(0)  # Another instance running, exit gracefully
+    atexit.register(release_pid_lock)
+
     parser = argparse.ArgumentParser(description="Backend Integration Loop")
     parser.add_argument("--interval", type=int, default=300, help="Loop interval in seconds")
     parser.add_argument("--once", action="store_true", help="Run once and exit")

@@ -6919,3 +6919,15 @@
 {"timestamp": "2025-12-03T21:21:08.556016+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
 {"timestamp": "2025-12-03T21:21:08.556164+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
 {"timestamp": "2025-12-03T21:21:13.106097+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:26:58.936217+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:26:58.936318+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:26:59.978497+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:26:59.978575+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:27:03.697399+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:27:14.046245+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:27:14.046360+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:27:15.053533+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:27:15.053621+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:27:17.808034+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:30:02.546982+00:00", "agent": "trading-pipeline", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T21:30:02.765897+00:00", "agent": "executor", "action": "trading_blocked:500.0", "result": "Trade $500.0 > 25% of $8.99 balance", "master": "Yair Siegel"}
