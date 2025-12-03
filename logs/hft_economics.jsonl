@@ -127,3 +127,13 @@
 {"ts_us": 1764798013011600, "type": "trade_close", "provider": "polymarket", "cost": 1.8562500000000008, "tokens": 0, "latency_us": 0}
 {"ts_us": 1764798013021350, "type": "trade_close", "provider": "polymarket", "cost": -1.8750000000000009, "tokens": 0, "latency_us": 0}
 {"ts_us": 1764798013029180, "type": "trade_close", "provider": "polymarket", "cost": 1.8562500000000008, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798349696081, "type": "trade_close", "provider": "polymarket", "cost": 1.8562500000000008, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798349702143, "type": "trade_close", "provider": "polymarket", "cost": -1.2499999999999964, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798349707850, "type": "trade_close", "provider": "polymarket", "cost": -1.3928571428571446, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798349713190, "type": "trade_close", "provider": "polymarket", "cost": 0.5445000000000001, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798349718567, "type": "trade_close", "provider": "polymarket", "cost": -1.8750000000000009, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798369701176, "type": "trade_close", "provider": "polymarket", "cost": -1.8750000000000009, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798369710613, "type": "trade_close", "provider": "polymarket", "cost": -1.2499999999999964, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798369719148, "type": "trade_close", "provider": "polymarket", "cost": -1.3928571428571446, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798369727177, "type": "trade_close", "provider": "polymarket", "cost": 0.5445000000000001, "tokens": 0, "latency_us": 0}
+{"ts_us": 1764798369734745, "type": "trade_close", "provider": "polymarket", "cost": -1.8750000000000009, "tokens": 0, "latency_us": 0}

@@ -74,6 +74,13 @@ try:
 except ImportError:
     EDGE_OPTIMIZER_AVAILABLE = False
 
+# Win Rate Booster Integration - Stricter filtering when WR is low
+try:
+    from integrafix.win_rate_booster import get_booster, WinRateBooster
+    WIN_RATE_BOOSTER_AVAILABLE = True
+except ImportError:
+    WIN_RATE_BOOSTER_AVAILABLE = False
+
 
 @dataclass
 class AutoTrade:
@@ -298,6 +305,24 @@ class AutonomousABCFCExecutor:
                             opp["composite_score"] = signal.composite_score
                             opp["contrarian_score"] = signal.contrarian_score
                             opp["timing_score"] = signal.timing_score
+                    except Exception:
+                        pass
+
+                # Win Rate Booster filter - stricter when WR is low
+                if WIN_RATE_BOOSTER_AVAILABLE:
+                    try:
+                        booster = get_booster()
+                        should_take, reason = booster.should_take_signal(
+                            market_title=opp["question"],
+                            edge=opp["edge"],
+                            confidence=opp["confidence"],
+                            price=opp["price"],
+                            composite_score=opp.get("composite_score", 0.5)
+                        )
+                        if not should_take:
+                            continue  # Skip this signal
+                        opp["booster_approved"] = True
+                        opp["booster_reason"] = reason
                     except Exception:
                         pass
 

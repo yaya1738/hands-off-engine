@@ -408,22 +408,28 @@ class HFTMonitor:
             with open(backend_state) as f:
                 state = json.load(f)
 
-            # Map backend_loop keys to HFT monitor component names
+            # INTEGRAFIX: Map backend_loop keys to HFT monitor component names
+            # Comprehensive mapping to sync ALL components
             component_map = {
+                # Core systems
                 "circuit_board": "circuit_board",
                 "ai_core": "ai_core",
                 "knowledge_nexus": "knowledge_nexus",
-                "crosschain": "crosschain",
+                "crosschain": "knowledge_crosschain",  # Fixed: crosschain -> knowledge_crosschain
                 "fusion": "knowledge_fusion",
                 "mega_coordinator": "mega_coordinator",
+                # Trading systems
                 "trading": "yair_auto_trader",
                 "hft_execution": "hft_execution",
+                "integrafix_pipeline": "integrafix_pipeline",
+                # ABCFC systems
                 "abcfc_cloud_flyer": "abcfc_cloud_flyer",
                 "abcfc_unified_state": "abcfc_unified_state",
                 "abcfc_layers": "abcfc_layers",
                 "abcfc_live_builder": "abcfc_live_builder",
                 "abcfc_system": "abcfc_system",
                 "yair_financial_abcfc": "yair_financial_abcfc",
+                # Integrafix systems
                 "integrafix_full": "integrafix_pipeline",
                 "outcome_tracker": "outcome_tracker",
                 "trading_memory": "trading_memory",

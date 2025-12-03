@@ -346,23 +346,37 @@ def run_abcfc_cloud_flyer():
         # Run one flight iteration
         result = flyer.fly_once()
 
-        # Convert state to JSON-serializable dict
-        state_data = result.get("state", {})
-        if hasattr(state_data, '__dict__'):
-            state_data = {
-                "name": getattr(state_data, 'name', 'unknown'),
-                "best": getattr(state_data, 'best', 0),
-                "worst": getattr(state_data, 'worst', 0),
-                "expected": getattr(state_data, 'expected', 0),
-            }
+        # INTEGRAFIX: Properly extract data from fly_once() result
+        # fly_once() returns: {iteration, state, cloud, selected, result}
+        state = result.get("state")
+        cloud = result.get("cloud", {})
+        selected = result.get("selected", {})
+
+        # Convert FlightState dataclass to JSON-serializable dict
+        state_data = {
+            "name": "Yair Siegel",
+            "best": state.bounds[1] if state and hasattr(state, 'bounds') else 0,
+            "worst": state.bounds[0] if state and hasattr(state, 'bounds') else 0,
+            "expected": state.total_expected if state and hasattr(state, 'total_expected') else 0,
+        }
+
+        # Extract cloud data
+        futures = cloud.get("futures", [])
+        actions_evaluated = len(futures)
+        nexus_cloud_size = actions_evaluated
+
+        # Extract selected action data
+        best_action = selected.get("action", "hold")
+        delta = selected.get("delta", {})
+        expected_improvement = delta.get("expected", 0) if isinstance(delta, dict) else 0
 
         return {
             "success": True,
             "state": state_data,
-            "actions_evaluated": result.get("actions_evaluated", 0),
-            "best_action": result.get("best_action", "hold"),
-            "expected_improvement": result.get("expected_improvement", 0),
-            "nexus_cloud_size": result.get("nexus_cloud_size", 0),
+            "actions_evaluated": actions_evaluated,
+            "best_action": best_action,
+            "expected_improvement": expected_improvement,
+            "nexus_cloud_size": nexus_cloud_size,
         }
     except ImportError:
         return {"success": False, "error": "ABCFC Cloud Flyer not available"}
