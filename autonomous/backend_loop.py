@@ -416,6 +416,79 @@ def run_hft_execution():
         return {"success": False, "error": str(e)}
 
 
+def run_trading_memory():
+    """
+    INTEGRAFIX: Sync AI memory with trading outcomes.
+
+    This enables the AI to learn from past trades:
+    - Remember successful patterns
+    - Avoid repeated mistakes
+    - Generate trading wisdom
+    """
+    try:
+        from integrafix.trading_memory import get_trading_memory
+
+        tm = get_trading_memory()
+
+        # Sync from outcomes
+        tm.sync_from_outcomes()
+
+        status = tm.status()
+
+        return {
+            "success": True,
+            "trading_memories": status["total_trading_memories"],
+            "recent_wins": status["recent_wins"],
+            "recent_losses": status["recent_losses"],
+            "insights": status["insights_count"],
+            "wisdom": status["wisdom"][:3] if status["wisdom"] else [],
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_outcome_tracker():
+    """
+    INTEGRAFIX: Track and record trade outcomes.
+
+    This completes the feedback loop:
+    signal → execute → RECORD → learn → (improves signal)
+    """
+    try:
+        from integrafix.outcome_tracker import get_tracker
+
+        tracker = get_tracker()
+
+        # Check for resolved markets
+        outcomes = tracker.check_resolutions()
+
+        # For dry-run trades, simulate some outcomes to test feedback loop
+        # This would be removed in production
+        if tracker.pending_trades:
+            # Only simulate a small batch per cycle
+            simulated = tracker.simulate_outcomes(win_rate=0.55)
+            outcomes.extend(simulated[:2])  # Max 2 per cycle
+
+        status = tracker.status()
+
+        return {
+            "success": True,
+            "pending_trades": status["pending_trades"],
+            "resolved_this_cycle": len(outcomes),
+            "total_resolved": status["total_resolved"],
+            "win_rate": status["win_rate"],
+            "total_pnl": status["total_pnl"],
+            "recent_outcomes": [
+                f"{'WIN' if o.was_correct else 'LOSS'} {o.side} ${o.pnl:+.2f}"
+                for o in outcomes[:3]
+            ] if outcomes else [],
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 def run_integrafix_pipeline():
     """
     INTEGRAFIX: Run the integrated trading pipeline.
@@ -566,7 +639,7 @@ def run_loop(interval_sec: int = 300):
         }
 
         # 1. Circuit Board - Signals through transistors
-        log("[1/11] Running Circuit Board...")
+        log("[1/13] Running Circuit Board...")
         circuit_result = run_circuit_board()
         state["circuit_board"] = circuit_result
         if circuit_result.get("success"):
@@ -577,7 +650,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {circuit_result.get('error', 'unknown')}")
 
         # 2. AI Core - Self between knowledge and action
-        log("[2/11] Running AI Core (SELF)...")
+        log("[2/13] Running AI Core (SELF)...")
         ai_result = run_ai_core(state)
         state["ai_core"] = ai_result
         if ai_result.get("success"):
@@ -590,7 +663,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {ai_result.get('error', 'unknown')}")
 
         # 3. Knowledge Nexus - Route knowledge to inflection points
-        log("[3/11] Activating Knowledge Nexus...")
+        log("[3/13] Activating Knowledge Nexus...")
         nexus_result = run_knowledge_nexus(state)
         state["knowledge_nexus"] = nexus_result
         if nexus_result.get("success"):
@@ -602,7 +675,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {nexus_result.get('error', 'unknown')}")
 
         # 4. Knowledge Crosschain - Cross-domain injection
-        log("[4/11] Running Knowledge Crosschain...")
+        log("[4/13] Running Knowledge Crosschain...")
         crosschain_result = run_crosschain()
         state["crosschain"] = crosschain_result
         if crosschain_result.get("success"):
@@ -613,7 +686,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {crosschain_result.get('error', 'unknown')}")
 
         # 5. Knowledge Fusion - Deep cross-reference
-        log("[5/11] Running Knowledge Fusion...")
+        log("[5/13] Running Knowledge Fusion...")
         fusion_result = run_knowledge_fusion()
         state["fusion"] = fusion_result
         if fusion_result.get("success"):
@@ -624,7 +697,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {fusion_result.get('error', 'unknown')}")
 
         # 6. Mega Coordinator
-        log("[6/11] Running Mega Coordinator...")
+        log("[6/13] Running Mega Coordinator...")
         mega_result = run_mega_coordinator()
         state["mega_coordinator"] = mega_result
         if mega_result.get("success"):
@@ -633,7 +706,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {mega_result.get('error', 'unknown')}")
 
         # 7. Process Endpoints
-        log("[7/11] Running Process Endpoints...")
+        log("[7/13] Running Process Endpoints...")
         endpoints_result = run_process_endpoints()
         state["process_endpoints"] = endpoints_result
         if endpoints_result.get("success"):
@@ -642,7 +715,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {endpoints_result.get('error', 'unknown')}")
 
         # 8. Trading Check
-        log("[8/11] Checking Trading Status...")
+        log("[8/13] Checking Trading Status...")
         trading_result = run_trading_check()
         state["trading"] = trading_result
         if trading_result.get("success"):
@@ -651,7 +724,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {trading_result.get('error', 'unknown')}")
 
         # 9. HFT Execution - Scan and execute opportunities
-        log("[9/11] Running HFT Execution...")
+        log("[9/13] Running HFT Execution...")
         hft_result = run_hft_execution()
         state["hft_execution"] = hft_result
         if hft_result.get("success"):
@@ -663,7 +736,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {hft_result.get('error', 'unknown')}")
 
         # 10. INTEGRAFIX Pipeline - Real edge detection with feedback loop
-        log("[10/11] Running INTEGRAFIX Trading Pipeline...")
+        log("[10/13] Running INTEGRAFIX Trading Pipeline...")
         integrafix_result = run_integrafix_pipeline()
         state["integrafix_pipeline"] = integrafix_result
         if integrafix_result.get("success"):
@@ -680,8 +753,38 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  Error: {integrafix_result.get('error', 'unknown')}")
 
-        # 11. Save State
-        log("[11/11] Saving State...")
+        # 11. INTEGRAFIX Outcome Tracker - Complete the feedback loop
+        log("[11/13] Running INTEGRAFIX Outcome Tracker...")
+        outcome_result = run_outcome_tracker()
+        state["outcome_tracker"] = outcome_result
+        if outcome_result.get("success"):
+            log(f"  Pending: {outcome_result.get('pending_trades', 0)} | "
+                f"Resolved: {outcome_result.get('resolved_this_cycle', 0)} | "
+                f"Win Rate: {outcome_result.get('win_rate', '0%')} | "
+                f"P&L: {outcome_result.get('total_pnl', '$0.00')}")
+            if outcome_result.get("recent_outcomes"):
+                for outcome in outcome_result["recent_outcomes"][:2]:
+                    log(f"    {outcome}")
+        else:
+            log(f"  Error: {outcome_result.get('error', 'unknown')}")
+
+        # 12. INTEGRAFIX Trading Memory - AI learns from past trades
+        log("[12/13] Running INTEGRAFIX Trading Memory...")
+        memory_result = run_trading_memory()
+        state["trading_memory"] = memory_result
+        if memory_result.get("success"):
+            log(f"  Memories: {memory_result.get('trading_memories', 0)} | "
+                f"Wins: {memory_result.get('recent_wins', 0)} | "
+                f"Losses: {memory_result.get('recent_losses', 0)} | "
+                f"Insights: {memory_result.get('insights', 0)}")
+            if memory_result.get("wisdom"):
+                for w in memory_result["wisdom"][:2]:
+                    log(f"    Wisdom: {w}")
+        else:
+            log(f"  Error: {memory_result.get('error', 'unknown')}")
+
+        # 13. Save State
+        log("[13/13] Saving State...")
         save_state(state)
         log("  State saved to backend_loop.json")
 
@@ -712,6 +815,8 @@ def main():
             "trading": run_trading_check(),
             "hft_execution": run_hft_execution(),
             "integrafix_pipeline": run_integrafix_pipeline(),
+            "outcome_tracker": run_outcome_tracker(),
+            "trading_memory": run_trading_memory(),
         }
         save_state(state)
         print(json.dumps(state, indent=2))
