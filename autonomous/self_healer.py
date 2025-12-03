@@ -91,11 +91,8 @@ class SelfHealer:
             command='python3 /root/hands-off-engine/autonomous/infra_manager.py monitor',
             critical=True
         ),
-        ProcessGuard(
-            name='position-monitor',
-            command='python3 /root/hands-off-engine/scripts/position_monitor.py',
-            critical=False
-        ),
+        # NOTE: position_monitor is a check-and-exit script, not a daemon
+        # It runs via cron, not as a persistent process
     ]
 
     # Protected systemd services

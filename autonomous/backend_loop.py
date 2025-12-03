@@ -731,7 +731,7 @@ def run_loop(interval_sec: int = 300):
         state["hft_execution"] = hft_result
         if hft_result.get("success"):
             log(f"  Wallets: {hft_result.get('wallets_active', 0)} | "
-                f"Capacity: {hft_result.get('capacity', 0):,}/sec | "
+                f"Capacity: {hft_result.get('capacity', '0/sec')} | "
                 f"Opportunities: {hft_result.get('opportunities_found', 0)} | "
                 f"Executed: {hft_result.get('successful_executions', 0)}")
         else:

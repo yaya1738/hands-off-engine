@@ -191,30 +191,80 @@ class ClaudeProvider(AIProvider):
         )
 
 
-# Standalone function for backward compatibility with tri_agent_session_runner
-def call_claude(prompt: str, system_message: str = None, model: str = "claude-3-5-sonnet-latest", **kwargs) -> str:
+# Standalone function for tri-agent session runner and alpha engine
+def call_claude(
+    agent_id: str,
+    prior_messages: list,
+    session_goal: str,
+    model: str = "claude-3-5-sonnet-latest",
+    max_tokens: int = 2048
+) -> dict:
     """
-    Simple function wrapper for Claude API calls.
-    Used by tri_agent_session_runner and multi_provider.
+    Call Claude backend for tri-agent session and alpha analysis.
 
-    Returns response text or error message.
+    Args:
+        agent_id: Agent identifier ("claude")
+        prior_messages: List of prior messages in conversation
+        session_goal: Description of session purpose
+        model: Anthropic model to use
+        max_tokens: Maximum tokens in response
+
+    Returns:
+        Dict with 'content', 'model', 'tokens' keys
     """
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
-        return "[Anthropic API key not configured - Claude runs via CLI]"
+        return {
+            "content": "[Claude backend unavailable - ANTHROPIC_API_KEY not set]",
+            "model": model,
+            "tokens": 0,
+            "error": "missing_api_key"
+        }
 
     try:
         import anthropic
         client = anthropic.Anthropic(api_key=api_key)
 
-        message = client.messages.create(
+        # Build system prompt
+        system_prompt = f"""You are Claude providing analysis for an autonomous trading system.
+
+Session Goal: {session_goal}
+
+Provide accurate, data-driven analysis. Be concise but thorough."""
+
+        # Build conversation
+        messages = []
+        for msg in prior_messages[-10:]:  # Last 10 messages for context
+            if isinstance(msg, dict):
+                role = msg.get("role", "user")
+                content = msg.get("content", "")
+                messages.append({"role": role, "content": content})
+
+        # Call Anthropic API
+        response = client.messages.create(
             model=model,
-            max_tokens=kwargs.get("max_tokens", 2000),
-            system=system_message or "You are a helpful AI assistant.",
-            messages=[{"role": "user", "content": prompt}]
+            max_tokens=max_tokens,
+            system=system_prompt,
+            messages=messages
         )
 
-        return message.content[0].text
+        return {
+            "content": response.content[0].text,
+            "model": response.model,
+            "tokens": response.usage.input_tokens + response.usage.output_tokens
+        }
 
+    except ImportError:
+        return {
+            "content": "[Claude backend unavailable - anthropic package not installed]",
+            "model": model,
+            "tokens": 0,
+            "error": "missing_package"
+        }
     except Exception as e:
-        return f"[Claude Error: {str(e)}]"
+        return {
+            "content": f"[Claude backend error: {str(e)}]",
+            "model": model,
+            "tokens": 0,
+            "error": str(e)
+        }

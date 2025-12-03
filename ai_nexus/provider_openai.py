@@ -159,35 +159,84 @@ class OpenAIProvider(AIProvider):
             )
 
 
-# Standalone function for backward compatibility with tri_agent_session_runner
-def call_chatgpt(prompt: str, system_message: str = None, model: str = "gpt-4o-mini", **kwargs) -> str:
+# Standalone function for tri-agent session runner and alpha engine
+def call_chatgpt(
+    agent_id: str,
+    prior_messages: list,
+    session_goal: str,
+    model: str = "gpt-4o-mini",
+    max_tokens: int = 2048
+) -> dict:
     """
-    Simple function wrapper for ChatGPT calls.
-    Used by tri_agent_session_runner and multi_provider.
+    Call ChatGPT backend for tri-agent session and alpha analysis.
 
-    Returns response text or error message.
+    Args:
+        agent_id: Agent identifier ("chatgpt")
+        prior_messages: List of prior messages in conversation
+        session_goal: Description of session purpose
+        model: OpenAI model to use
+        max_tokens: Maximum tokens in response
+
+    Returns:
+        Dict with 'content', 'model', 'tokens' keys
     """
     api_key = os.environ.get("OPENAI_API_KEY")
     if not api_key:
-        return "[OpenAI API key not configured]"
+        return {
+            "content": "[ChatGPT backend unavailable - OPENAI_API_KEY not set]",
+            "model": model,
+            "tokens": 0,
+            "error": "missing_api_key"
+        }
 
     try:
         from openai import OpenAI
         client = OpenAI(api_key=api_key)
 
-        messages = []
-        if system_message:
-            messages.append({"role": "system", "content": system_message})
-        messages.append({"role": "user", "content": prompt})
+        # Build conversation context
+        messages = [
+            {
+                "role": "system",
+                "content": f"""You are ChatGPT providing analysis for an autonomous trading system.
 
+Session Goal: {session_goal}
+
+Provide accurate, data-driven analysis. Be concise but thorough."""
+            }
+        ]
+
+        # Add prior messages
+        for msg in prior_messages[-10:]:  # Last 10 messages for context
+            if isinstance(msg, dict):
+                role = msg.get("role", "user")
+                content = msg.get("content", "")
+                messages.append({"role": role, "content": content})
+
+        # Call OpenAI API
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            temperature=kwargs.get("temperature", 0.7),
-            max_tokens=kwargs.get("max_tokens", 2000)
+            max_tokens=max_tokens,
+            temperature=0.7
         )
 
-        return response.choices[0].message.content
+        return {
+            "content": response.choices[0].message.content,
+            "model": response.model,
+            "tokens": response.usage.total_tokens if response.usage else 0
+        }
 
+    except ImportError:
+        return {
+            "content": "[ChatGPT backend unavailable - openai package not installed]",
+            "model": model,
+            "tokens": 0,
+            "error": "missing_package"
+        }
     except Exception as e:
-        return f"[OpenAI Error: {str(e)}]"
+        return {
+            "content": f"[ChatGPT backend error: {str(e)}]",
+            "model": model,
+            "tokens": 0,
+            "error": str(e)
+        }

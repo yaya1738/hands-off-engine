@@ -281,11 +281,13 @@ class AIMemory:
             if tags and not any(t in mem.tags for t in tags):
                 continue
 
-            # Filter by query
+            # Filter by query (searches content, context, AND tags)
             if query:
                 query_lower = query.lower()
+                tags_str = ' '.join(mem.tags).lower() if mem.tags else ''
                 if (query_lower not in mem.content.lower() and
-                    query_lower not in mem.context.lower()):
+                    query_lower not in mem.context.lower() and
+                    query_lower not in tags_str):
                     continue
 
             results.append(mem)
