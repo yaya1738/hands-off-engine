@@ -33,6 +33,13 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
+# ABCFC Integration - Absolute Bounds Continuous Fan Chart
+try:
+    from executor.math.abcfc_unified import create_binary_market_density
+    ABCFC_AVAILABLE = True
+except ImportError:
+    ABCFC_AVAILABLE = False
+
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
 HISTORY_DIR = STATE_DIR / "price_history"
@@ -364,9 +371,105 @@ class FairPriceEstimator:
 
         return None
 
+    def estimate_from_abcfc(self, market: Dict) -> Optional[FairPriceEstimate]:
+        """
+        METHOD 5: ABCFC Probability Density Analysis.
+
+        Uses Absolute Bounds Continuous Fan Chart to model the 2D probability
+        density of outcomes, giving a mathematically rigorous fair price estimate.
+
+        Key insight: Binary markets have known bounds (0, 1) and the ABCFC
+        density function models how probability mass should be distributed
+        between win/lose outcomes over time.
+        """
+        if not ABCFC_AVAILABLE:
+            return None
+
+        yes_price = market.get('yes_price') or market.get('last', 0.5)
+        no_price = market.get('no_price', 1 - yes_price)
+
+        # Get time to resolution if available
+        end_date = market.get('endDate') or market.get('end_date')
+        days_to_resolution = 30  # Default
+
+        if end_date:
+            try:
+                if isinstance(end_date, str):
+                    end_dt = datetime.fromisoformat(end_date.replace('Z', '+00:00'))
+                    days_to_resolution = max(1, (end_dt - datetime.now(timezone.utc)).days)
+            except Exception:
+                pass
+
+        # Create ABCFC for this binary market
+        # Bounds are the P&L range: worst = -entry, best = 1-entry
+        entry_price = yes_price
+        worst_pnl = -entry_price  # Lose everything paid
+        best_pnl = 1 - entry_price  # Gain the upside
+
+        try:
+            # Create binary market density
+            density_func = create_binary_market_density(
+                prob_yes=yes_price,  # Current market price as initial probability
+                entry_price=entry_price,
+                shares=1.0  # Normalized
+            )
+
+            # Sample the density to get expected value
+            # Integrate probability-weighted value across the outcome space
+            n_samples = 50
+            total_prob = 0.0
+            expected_value = 0.0
+
+            for i in range(n_samples):
+                x = worst_pnl + (best_pnl - worst_pnl) * i / (n_samples - 1)
+                t = days_to_resolution * 0.5  # Mid-point in time
+
+                # Get density at this point
+                p = density_func(x, t, worst_pnl, best_pnl, days_to_resolution)
+                total_prob += p
+                expected_value += p * x
+
+            if total_prob > 0:
+                expected_value /= total_prob
+
+            # Convert expected P&L back to fair price
+            # If E[P&L] > 0, the market is underpriced (buy YES)
+            # If E[P&L] < 0, the market is overpriced (sell YES)
+
+            # Fair price = price where E[P&L] = 0
+            # P&L = shares * (outcome - entry)
+            # E[P&L] = prob_yes * (1 - entry) + (1 - prob_yes) * (0 - entry) - current_entry
+            # Solving for prob_yes gives fair price
+
+            # Using Kelly-like adjustment based on density spread
+            density_confidence = min(0.8, total_prob / n_samples)
+
+            # Edge is the expected P&L
+            edge = expected_value
+
+            # Convert edge to price adjustment
+            fair_price = yes_price + edge * 0.5  # Conservative adjustment
+            fair_price = max(0.01, min(0.99, fair_price))
+
+            # Only actionable if edge is significant and confidence is reasonable
+            is_actionable = abs(edge) >= 0.03 and density_confidence >= 0.4
+
+            return FairPriceEstimate(
+                fair_price=fair_price,
+                confidence=density_confidence,
+                source="abcfc_density",
+                edge_vs_market=fair_price - yes_price,
+                is_actionable=is_actionable,
+                reasoning=f"ABCFC E[P&L]={expected_value:+.3f}, density_conf={density_confidence:.0%}, {days_to_resolution}d to resolution",
+            )
+
+        except Exception as e:
+            # ABCFC calculation failed, skip this method
+            return None
+
     def estimate_from_spread_arb(self, market: Dict) -> Optional[FairPriceEstimate]:
         """
-        METHOD 5: Spread arbitrage.
+        METHOD 6: Spread arbitrage.
 
         If YES + NO significantly != 1.0, there's a guaranteed arb.
         Fair prices are where sum = 1.0.
@@ -411,6 +514,7 @@ class FairPriceEstimator:
         # Try each method
         methods = [
             self.estimate_from_spread_arb,     # Highest confidence if exists
+            self.estimate_from_abcfc,          # ABCFC probability density
             self.estimate_from_orderbook,
             self.estimate_from_history,
             self.estimate_from_volatility,

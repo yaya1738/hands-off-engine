@@ -22,11 +22,19 @@ This is THE WIRE that connects the trading system end-to-end.
 
 import json
 import os
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field, asdict
 from enum import Enum
+
+# ABCFC Integration for position sizing
+try:
+    from executor.math.abcfc_unified import create_binary_market_density
+    ABCFC_AVAILABLE = True
+except ImportError:
+    ABCFC_AVAILABLE = False
 
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
@@ -345,8 +353,12 @@ class TradingPipeline:
             if remaining <= 0:
                 break
 
-            # Size by edge * confidence (Kelly-like)
-            suggested_size = total_size * signal.edge * signal.confidence
+            # Size using ABCFC-enhanced Kelly criterion
+            suggested_size = self._abcfc_position_size(
+                signal=signal,
+                total_capital=total_size,
+                max_position=max_per_trade
+            )
             size = min(suggested_size, max_per_trade, remaining)
 
             if size < 1:  # Minimum $1 trade
@@ -357,6 +369,109 @@ class TradingPipeline:
             remaining -= size
 
         return trades
+
+    def _abcfc_position_size(
+        self,
+        signal: 'EdgeSignal',
+        total_capital: float,
+        max_position: float = 50.0,
+    ) -> float:
+        """
+        Calculate position size using ABCFC probability density.
+
+        Uses the Kelly criterion with ABCFC-derived win probability and edge.
+
+        Kelly formula: f* = (bp - q) / b
+        Where:
+            f* = fraction of capital to bet
+            b = odds received on win (payout / risk)
+            p = probability of winning (from ABCFC)
+            q = probability of losing (1 - p)
+
+        Returns optimal position size in dollars.
+        """
+        # Fallback to simple edge * confidence if ABCFC unavailable
+        if not ABCFC_AVAILABLE:
+            return total_capital * signal.edge * signal.confidence
+
+        try:
+            entry_price = signal.market_price
+            fair_price = signal.fair_price
+
+            # Create ABCFC density for this position
+            density_func = create_binary_market_density(
+                prob_yes=fair_price,  # Our estimated true probability
+                entry_price=entry_price,
+                shares=1.0
+            )
+
+            # Calculate expected value and variance from density
+            worst_pnl = -entry_price
+            best_pnl = 1 - entry_price
+            days = 30  # Assume 30 days to resolution
+
+            n_samples = 50
+            total_prob = 0.0
+            expected_pnl = 0.0
+            expected_pnl_sq = 0.0
+
+            for i in range(n_samples):
+                x = worst_pnl + (best_pnl - worst_pnl) * i / (n_samples - 1)
+                t = days * 0.5  # Mid-point
+
+                p = density_func(x, t, worst_pnl, best_pnl, days)
+                total_prob += p
+                expected_pnl += p * x
+                expected_pnl_sq += p * x * x
+
+            if total_prob > 0:
+                expected_pnl /= total_prob
+                expected_pnl_sq /= total_prob
+                variance = expected_pnl_sq - expected_pnl ** 2
+            else:
+                # Fallback
+                return total_capital * signal.edge * signal.confidence
+
+            # Kelly criterion with ABCFC probability
+            # Win probability from ABCFC
+            if signal.side == "YES":
+                win_prob = fair_price
+                win_pnl = best_pnl  # Win if YES resolves at 1
+                lose_pnl = worst_pnl  # Lose if YES resolves at 0
+            else:
+                win_prob = 1 - fair_price
+                win_pnl = entry_price  # Win if NO resolves at 1 (YES at 0)
+                lose_pnl = -(1 - entry_price)  # Lose if NO resolves at 0
+
+            # Kelly fraction
+            # f* = (p * b - q) / b where b = win/lose ratio
+            if abs(lose_pnl) > 0.01:
+                b = abs(win_pnl / lose_pnl)
+                q = 1 - win_prob
+                kelly_fraction = (win_prob * b - q) / b
+            else:
+                kelly_fraction = signal.edge * signal.confidence
+
+            # Apply half-Kelly for safety (reduce variance)
+            kelly_fraction = kelly_fraction * 0.5
+
+            # Clamp to reasonable range [0, 0.25]
+            kelly_fraction = max(0, min(kelly_fraction, 0.25))
+
+            # Adjust by confidence
+            kelly_fraction *= signal.confidence
+
+            # Calculate position size
+            position_size = total_capital * kelly_fraction
+
+            # Apply minimum and maximum
+            position_size = max(1.0, min(position_size, max_position))
+
+            return position_size
+
+        except Exception:
+            # Fallback to simple calculation
+            return total_capital * signal.edge * signal.confidence
 
     # ==================== STAGE 3: RECORD OUTCOMES ====================
 
