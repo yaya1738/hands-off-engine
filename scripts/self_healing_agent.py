@@ -860,9 +860,9 @@ class SelfHealingAgent:
         issues = []
         
         try:
-            # Run handoff health check
+            # Run handoff health check using same Python interpreter
             result = subprocess.run(
-                ["python3", str(REPO_ROOT / "scripts" / "check_handoff_health.py"), "--json"],
+                [sys.executable, str(REPO_ROOT / "scripts" / "check_handoff_health.py"), "--json"],
                 capture_output=True,
                 text=True,
                 timeout=30

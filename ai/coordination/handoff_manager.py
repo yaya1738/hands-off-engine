@@ -18,7 +18,7 @@ from dataclasses import dataclass, asdict, field
 from datetime import datetime, timezone, timedelta
 from enum import Enum
 from pathlib import Path
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional, Set, Tuple
 import logging
 
 # Setup paths
@@ -62,7 +62,7 @@ class HandoffTask:
     estimated_duration: Optional[int] = None  # minutes
     deliverables: List[str] = field(default_factory=list)
     
-    def validate(self) -> tuple[bool, Optional[str]]:
+    def validate(self) -> Tuple[bool, Optional[str]]:
         """Validate task structure"""
         if not self.type:
             return False, "Task type is required"
@@ -108,7 +108,7 @@ class Handoff:
         elapsed = (now - created).total_seconds() / 60
         return elapsed > self.timeout_minutes
     
-    def can_accept(self, agent_capabilities: Set[str]) -> tuple[bool, Optional[str]]:
+    def can_accept(self, agent_capabilities: Set[str]) -> Tuple[bool, Optional[str]]:
         """Check if agent has required capabilities"""
         required_caps = set(self.task.requirements)
         if not required_caps.issubset(agent_capabilities):
@@ -361,7 +361,7 @@ class HandoffManager:
         
         # Sort by priority: critical > high > normal > low
         priority_order = {"critical": 4, "high": 3, "normal": 2, "low": 1}
-        return sorted(pending, key=lambda x: priority_order.get(x["priority"], 0), reverse=True)
+        return sorted(pending, key=lambda x: priority_order.get(x.get("priority", "normal"), 2), reverse=True)
     
     def check_timeouts(self) -> List[Dict]:
         """Check for expired handoffs and mark as timeout"""

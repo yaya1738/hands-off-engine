@@ -1,0 +1,22 @@
+{
+  "timestamp": "2025-12-03T13:12:48.996955+00:00",
+  "total_handoffs": 0,
+  "by_status": {
+    "pending": 0,
+    "accepted": 0,
+    "in_progress": 0,
+    "completed": 0,
+    "failed": 0,
+    "cancelled": 0,
+    "timeout": 0
+  },
+  "by_priority": {
+    "low": 0,
+    "normal": 0,
+    "high": 0,
+    "critical": 0
+  },
+  "by_agent": {},
+  "completion_rate": 0,
+  "average_duration_minutes": 0
+}
