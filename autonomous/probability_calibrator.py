@@ -27,6 +27,13 @@ import math
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
 
+# INTEGRAFIX: Wire in external fair price estimation
+try:
+    from integrafix.fair_price_estimator import get_estimator as get_fair_price_estimator
+    FAIR_PRICE_AVAILABLE = True
+except ImportError:
+    FAIR_PRICE_AVAILABLE = False
+
 MASTER = "Yair Siegel"
 CALIBRATION_STATE = STATE_DIR / "probability_calibration.json"
 PREDICTIONS_LOG = STATE_DIR / "predictions.jsonl"
@@ -86,12 +93,15 @@ class ProbabilityCalibrator:
         """
         Yair's teaching: Multiple models → Hyper Model
 
+        INTEGRAFIX: Now uses EXTERNAL fair price estimation instead of
+        circular market_price-based calculations.
+
         Combine:
-        1. Fundamental model - What should happen logically
-        2. Flow model - What smart money is doing
-        3. Statistical model - Historical patterns
-        4. Sentiment model - Market/social sentiment
-        5. Market model - What current price implies
+        1. INTEGRAFIX Model - External fair price (orderbook, history, volatility)
+        2. Statistical Model - Historical patterns
+        3. Fundamental Model - Category-based adjustment
+        4. Flow Model - What smart money is doing
+        5. Market Model - What current price implies (lowest weight)
         """
         question = market_data.get("question", "")
         prices = json.loads(market_data.get("outcomePrices", "[]"))
@@ -106,19 +116,46 @@ class ProbabilityCalibrator:
         estimates = {}
         confidences = {}
 
-        # 1. Market Model (baseline)
+        # INTEGRAFIX: Use EXTERNAL fair price estimation (breaks circular dependency)
+        if FAIR_PRICE_AVAILABLE:
+            try:
+                estimator = get_fair_price_estimator()
+                # Convert to format expected by fair price estimator
+                market_for_fp = {
+                    "slug": market_data.get("slug", ""),
+                    "question": question,
+                    "yes_price": market_yes,
+                    "no_price": market_no,
+                    "bestBid": market_data.get("bestBid", 0),
+                    "bestAsk": market_data.get("bestAsk", 0),
+                    "volume": volume,
+                    "endDate": market_data.get("endDate"),
+                }
+                fp_estimate = estimator.estimate_fair_price(market_for_fp)
+
+                # Only use if it's actionable (real signal, not noise)
+                if fp_estimate.is_actionable:
+                    estimates["integrafix"] = fp_estimate.fair_price
+                    confidences["integrafix"] = fp_estimate.confidence
+                elif fp_estimate.source != "no_signal":
+                    estimates["integrafix"] = fp_estimate.fair_price
+                    confidences["integrafix"] = fp_estimate.confidence * 0.5
+            except Exception:
+                pass
+
+        # 1. Market Model (baseline) - NOW LOWEST WEIGHT
         estimates["market"] = market_yes
-        confidences["market"] = 0.7 if volume > 100000 else 0.5
+        confidences["market"] = 0.3 if volume > 100000 else 0.2  # Reduced from 0.7/0.5
 
         # 2. Statistical Model - extreme prices often wrong
         if market_yes < 0.05:
             # Very low prices tend to be lower than true prob
             estimates["statistical"] = market_yes * 1.5
-            confidences["statistical"] = 0.4
+            confidences["statistical"] = 0.5  # Increased
         elif market_yes > 0.95:
             # Very high prices tend to be lower than market thinks
             estimates["statistical"] = market_yes * 0.98
-            confidences["statistical"] = 0.4
+            confidences["statistical"] = 0.5
         else:
             estimates["statistical"] = market_yes
             confidences["statistical"] = 0.3
@@ -158,13 +195,22 @@ class ProbabilityCalibrator:
         confidences["sentiment"] = 0.2
 
         # HYPER MODEL - Weighted combination
-        weights = self.state["model_weights"]
+        # INTEGRAFIX: Updated weights to prioritize external estimation
+        weights = {
+            "integrafix": 0.35,  # NEW: External estimation gets highest weight
+            "fundamental": 0.20,
+            "flow": 0.15,
+            "statistical": 0.15,
+            "sentiment": 0.10,
+            "market": 0.05,  # Reduced: Market price is input, not output
+        }
+
         total_weight = 0
         weighted_sum = 0
         confidence_sum = 0
 
         for model, estimate in estimates.items():
-            w = weights.get(model, 0.2)
+            w = weights.get(model, 0.1)
             c = confidences.get(model, 0.3)
             weighted_sum += estimate * w * c
             total_weight += w * c
@@ -172,7 +218,7 @@ class ProbabilityCalibrator:
 
         if total_weight > 0:
             hyper_estimate = weighted_sum / total_weight
-            hyper_confidence = confidence_sum / sum(weights.values())
+            hyper_confidence = confidence_sum / sum(w for k, w in weights.items() if k in estimates)
         else:
             hyper_estimate = market_yes
             hyper_confidence = 0.3
@@ -190,7 +236,8 @@ class ProbabilityCalibrator:
             "model_estimates": estimates,
             "model_confidences": confidences,
             "signal": "BUY_YES" if edge > 0.03 else "BUY_NO" if edge < -0.03 else "NO_EDGE",
-            "teaching": "Edge = our prob vs market prob"
+            "integrafix_wired": "integrafix" in estimates,  # Track if external estimation used
+            "teaching": "Edge = our prob vs market prob (INTEGRAFIX: external estimation)"
         }
 
     def record_prediction(self, market_id: str, our_prob: float,

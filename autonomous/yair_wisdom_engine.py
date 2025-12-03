@@ -298,6 +298,35 @@ class YairWisdomEngine:
             result["recommendation"] = "CONSIDER NO - Contrarian play"
             result["confidence"] = 0.55
 
+        # INTEGRAFIX: Calculate and output edge value
+        # This was MISSING - wisdom engine never outputted edge!
+        edge = 0.0
+        fair_prob = None
+
+        # Use EV calculation to derive edge
+        if "ev" in result["analysis"]:
+            # If EV > 0, we have edge
+            ev = result["analysis"]["ev"]
+            if ev > 0:
+                edge = ev * 0.1  # Scale EV to edge (rough approximation)
+
+        # Calculate fair price from recommendation
+        if result["recommendation"]:
+            if "BUY YES" in result["recommendation"]:
+                # We think YES is underpriced
+                # Fair prob is higher than market
+                fair_prob = min(0.95, yes_price * 1.15)  # 15% underpriced estimate
+                edge = fair_prob - yes_price
+            elif "CONSIDER NO" in result["recommendation"] or "SELL" in result["recommendation"]:
+                # We think NO is underpriced (YES overpriced)
+                fair_prob = max(0.05, yes_price * 0.85)  # 15% overpriced estimate
+                edge = yes_price - fair_prob  # Negative edge on YES = positive on NO
+
+        # Store edge and fair_prob in result
+        result["edge"] = round(edge, 4)
+        result["fair_prob"] = round(fair_prob, 4) if fair_prob else None
+        result["edge_actionable"] = abs(edge) >= 0.02  # 2% minimum edge
+
         return result
 
     # ==================== CATEGORY DETECTION (Yair Teaching) ====================

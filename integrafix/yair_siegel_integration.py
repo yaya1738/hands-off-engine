@@ -46,6 +46,19 @@ sys.path.insert(0, str(PROJECT_ROOT))
 STATE_DIR = PROJECT_ROOT / "state"
 YAIR_STATE_FILE = STATE_DIR / "yair_integration_state.json"
 
+# Import AI Memory and Knowledge Bridge for enhanced Claude capabilities
+try:
+    from integrafix.ai_memory import AIMemory, get_memory, MemoryType, MemoryPriority
+    AI_MEMORY_AVAILABLE = True
+except ImportError:
+    AI_MEMORY_AVAILABLE = False
+
+try:
+    from integrafix.yair_knowledge_bridge import YairKnowledgeBridge, get_yair_knowledge_bridge
+    KNOWLEDGE_BRIDGE_AVAILABLE = True
+except ImportError:
+    KNOWLEDGE_BRIDGE_AVAILABLE = False
+
 
 @dataclass
 class YairComponentStatus:
@@ -76,6 +89,10 @@ class YairSiegelIntegration:
         self._insights_adapter = None
         self._auto_trader = None
         self._wisdom_bridge = None
+
+        # Enhanced Claude capabilities
+        self._memory = get_memory() if AI_MEMORY_AVAILABLE else None
+        self._knowledge_bridge = get_yair_knowledge_bridge() if KNOWLEDGE_BRIDGE_AVAILABLE else None
 
     def _load_state(self) -> Dict:
         if YAIR_STATE_FILE.exists():
@@ -354,6 +371,78 @@ class YairSiegelIntegration:
         print("SYSTEM PURPOSE: Generate income for Yair Siegel autonomously")
         print("=" * 70)
 
+    # ==================== AI MEMORY INTEGRATION ====================
+
+    def remember_action(self, action: str, outcome: str):
+        """Remember an action taken for Yair."""
+        if self._memory:
+            self._memory.remember(
+                content=f"[YAIR ACTION] {action}\nOutcome: {outcome}",
+                memory_type=MemoryType.DECISION,
+                priority=MemoryPriority.HIGH,
+                tags=["yair", "action"],
+            )
+
+    def remember_trading_outcome(self, market: str, result: str):
+        """Remember a trading outcome for learning."""
+        if self._memory:
+            self._memory.remember(
+                content=f"[TRADING] Market: {market}\nResult: {result}",
+                memory_type=MemoryType.SUCCESS if "profit" in result.lower() else MemoryType.LEARNING,
+                priority=MemoryPriority.HIGH,
+                tags=["yair", "trading", market],
+            )
+
+    def recall_yair_history(self, limit: int = 5) -> List:
+        """Recall Yair-related history from memory."""
+        if self._memory:
+            return self._memory.recall(query="yair", limit=limit)
+        return []
+
+    def get_session_context_for_claude(self) -> str:
+        """
+        Generate complete Yair context for Claude session start.
+
+        This is the key integration with Claude capabilities - ensures
+        every Claude session starts with full Yair context.
+        """
+        if self._knowledge_bridge:
+            return self._knowledge_bridge.get_yair_context_for_claude()
+
+        # Fallback basic context
+        return """
+==========================================================
+YAIR SIEGEL CONTEXT
+==========================================================
+Owner: Yair Siegel (siegel.yaz@gmail.com)
+Directive: The system serves the user. Every action serves user's benefit.
+Mode: Hands-off, autonomous income generation
+==========================================================
+"""
+
+    def generate_claude_kernel(self) -> Dict:
+        """Generate a context kernel for Claude session bootstrap."""
+        if self._knowledge_bridge:
+            return self._knowledge_bridge.generate_yair_kernel()
+        return {"error": "Knowledge bridge not available"}
+
+    # ==================== KNOWLEDGE BRIDGE INTEGRATION ====================
+
+    def search_knowledge(self, topic: str) -> Dict:
+        """Search all knowledge bases for a topic."""
+        if self._knowledge_bridge:
+            return self._knowledge_bridge.search_knowledge_for_yair(topic)
+        return {}
+
+    def get_trading_context(self) -> Dict:
+        """Get Yair-specific trading context."""
+        if self._knowledge_bridge:
+            return self._knowledge_bridge.get_trading_context()
+        return {
+            "owner": "Yair Siegel",
+            "philosophy": "Be the house, not the gambler",
+        }
+
     # ==================== STATUS ====================
 
     def status(self) -> Dict:
@@ -364,6 +453,11 @@ class YairSiegelIntegration:
             "components": {k: asdict(v) for k, v in self.components.items()},
             "identity_loaded": bool(self.get_identity()),
             "finance_loaded": bool(self.get_finance_state().get("summary")),
+            # Enhanced Claude capabilities
+            "ai_memory_available": AI_MEMORY_AVAILABLE,
+            "knowledge_bridge_available": KNOWLEDGE_BRIDGE_AVAILABLE,
+            "memory_connected": self._memory is not None,
+            "knowledge_bridge_connected": self._knowledge_bridge is not None,
         }
 
 

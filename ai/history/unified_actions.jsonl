@@ -6461,3 +6461,128 @@
 {"timestamp": "2025-12-03T14:24:10.168542+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
 {"timestamp": "2025-12-03T14:24:10.168674+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
 {"timestamp": "2025-12-03T14:24:13.444521+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:29:25.854264+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:29:25.854368+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:29:26.747135+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:29:26.747249+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:29:29.830488+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:34:30.910355+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:34:30.910457+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:34:33.419606+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:34:33.419705+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:34:36.301860+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:39:37.360288+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:39:37.360394+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:39:38.420925+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:39:38.421004+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:39:41.625637+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:45:09.726271+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:45:09.726378+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:45:10.934966+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:45:10.935054+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:45:13.926894+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:50:15.636567+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:50:15.636671+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:50:16.845190+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:50:16.845278+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:50:19.530151+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:55:20.622309+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:55:20.622459+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:55:22.069067+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:55:22.069197+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T14:55:27.648010+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:00:36.395383+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:00:36.395547+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:00:37.379866+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:00:37.380012+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:00:40.318764+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:05:42.258098+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:05:42.258208+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:05:43.250296+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:05:43.250379+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:05:46.156483+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:10:47.375005+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:10:47.375126+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:10:48.741087+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:10:48.741181+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:10:52.431747+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:16:04.491321+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:16:04.491494+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:16:05.467969+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:16:05.468060+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:16:08.539746+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:21:10.110187+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:21:10.110292+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:21:11.187944+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:21:11.188049+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:21:14.375010+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:26:15.448458+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:26:15.448562+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:26:16.290440+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:26:16.290581+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:26:19.273746+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:31:23.659178+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:31:23.659278+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:31:26.561001+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:31:26.561099+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:31:30.312101+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:36:39.704788+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:36:39.704940+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:36:40.820456+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:36:40.820546+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:36:44.224125+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:41:45.844782+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:41:45.844899+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:41:46.714046+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:41:46.714122+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:41:49.486746+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:47:16.083421+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:47:16.083548+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:47:16.695647+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:47:16.695868+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:47:22.692326+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:52:23.849360+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:52:23.849466+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:52:24.504517+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:52:24.504597+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:52:27.371313+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:57:29.114389+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:57:29.114513+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:57:30.455654+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:57:30.455758+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:57:33.034645+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:59:30.768504+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:59:30.768593+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:59:31.599065+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:59:31.599157+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T15:59:36.461193+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:00:08.720656+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:00:08.720750+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:00:09.517788+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:00:09.517925+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:00:13.699911+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:02:45.342468+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:02:45.342691+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:02:46.307289+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:02:46.307434+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:02:49.479814+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:05:25.933939+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:05:25.934040+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:05:26.609783+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:05:26.609905+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:05:29.806267+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:07:50.487356+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:07:50.487543+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:07:51.628646+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:07:51.628736+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:07:55.751141+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:08:31.800028+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:08:31.800135+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:08:32.441540+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:08:32.441627+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:08:35.973139+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:09:59.244795+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:09:59.244884+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:10:00.069852+00:00", "agent": "MegaCoordinator", "action": "MegaCoordinator initialized - Serving Yair Siegel", "result": "info", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:10:00.069943+00:00", "agent": "MegaCoordinator", "action": "startup", "result": "online", "master": "Yair Siegel"}
+{"timestamp": "2025-12-03T16:10:04.306035+00:00", "agent": "web_agent", "action": "init", "result": "sources=5", "master": "Yair Siegel"}

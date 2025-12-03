@@ -42,7 +42,9 @@ The methodology:
 | Identity Profile | `security/yair_identity_profile.json` | Identity verification | ✓ WIRED |
 | Finance Hub | `finance/yair_finance_hub.json` | Financial state tracking | ✓ WIRED |
 | Wisdom Bridge | `integrafix/wisdom_bridge.py` | Wisdom → Trading signals | ✓ WIRED |
-| **Master Integration** | `integrafix/yair_siegel_integration.py` | Unified entry point | ✓ **NEW** |
+| **Knowledge Bridge** | `integrafix/yair_knowledge_bridge.py` | All knowledge bases → Yair | ✓ **NEW** |
+| **Context Kernel** | `ai/memory/kernels/yair_context_kernel.json` | Claude session bootstrap | ✓ **NEW** |
+| **Master Integration** | `integrafix/yair_siegel_integration.py` | Unified entry point + AI memory | ✓ ENHANCED |
 
 ### Yair's Encoded Teachings
 
@@ -67,6 +69,14 @@ TRADING STRATEGIES:
 182 branches on GitHub, 0 merged to main recently:
 - **Gap**: AI-generated branches orphaned (no consumer)
 - **Fix**: `branch_manager.py` automates analysis, PR creation, and cleanup
+- **Status**: WIRED ✓
+
+### Claude Capabilities Integration
+Enhanced Yair integration with Claude-specific features:
+- **AI Memory**: Cross-session learning about Yair's preferences and outcomes
+- **Knowledge Bridge**: Connects Yair to ALL 15+ knowledge bases
+- **Context Kernel**: Instant Yair context for any Claude session start
+- **Session Bootstrap**: `yair_context_kernel.json` loaded automatically
 - **Status**: WIRED ✓
 
 ---
@@ -164,7 +174,13 @@ integrafix/
 ├── branch_consolidator.py       → Branch analysis
 ├── branch_manager.py            → Branch automation
 ├── wisdom_bridge.py             → Yair wisdom → trading signals
-└── yair_siegel_integration.py   → MASTER Yair integration [NEW]
+├── yair_siegel_integration.py   → MASTER Yair integration + AI memory
+├── yair_knowledge_bridge.py     → Knowledge bases → Yair context
+├── edge_executor.py             → Edge signals → Trade execution [NEW]
+└── outcome_tracker.py           → Trade outcomes → Learning
+
+ai/memory/kernels/
+└── yair_context_kernel.json     → Claude session bootstrap [NEW]
 ```
 
 ### Yair-Specific Files (284 files reference Yair)
@@ -191,9 +207,9 @@ Key Yair Components:
 | backend_brain_no_bidirectional | BLIND | Brain/backend not bidirectional | 80% | Open |
 | brain_scaling_no_coordination | BLIND | Brain/scaling race condition | 90% | Open |
 | no_process_coordinator | MISSING | No central process coordinator | 100% | **FIXED** |
-| edge_to_executor_disconnected | DEAD_END | Edge never reaches executor | 100% | Open |
-| executor_to_recorder_disconnected | DEAD_END | Trades not recorded | 90% | Open |
-| recorder_to_learner_disconnected | DEAD_END | Outcomes not fed to learning | 80% | Open |
+| edge_to_executor_disconnected | DEAD_END | Edge never reaches executor | 100% | **FIXED** |
+| executor_to_recorder_disconnected | DEAD_END | Trades not recorded | 90% | **FIXED** |
+| recorder_to_learner_disconnected | DEAD_END | Outcomes not fed to learning | 80% | **FIXED** |
 | ai_no_memory | EPHEMERAL | Sessions start fresh | 70% | **FIXED** |
 | ai_no_branch_merge | ORPHANED | 182 branches, 0 merged | 60% | **FIXED** |
 | cron_no_coordination | BLIND | 18 crons run independently | 70% | **FIXED** |
