@@ -2,6 +2,7 @@
   "primary_status_doc": "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md",
   "required_reading": [
     "AI_POLICY.md",
+    "docs/SYSTEM_INTEGRATION_PROTOCOL.md",
     "termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md",
     "docs/claude/USER_PROFILE.md",
     "docs/claude/AI_COORDINATION_ARCHITECTURE.md",
@@ -83,7 +84,8 @@
     "docs/BATCH_17_STATUS_REPORT.md",
     "docs/GITHUB_SPARK_INTEGRATION.md",
     "docs/TELEGRAM_COPILOT_INTEGRATION.md",
-    "docs/HANDOFF_SYSTEM_V2.md"
+    "docs/HANDOFF_SYSTEM_V2.md",
+    "docs/SYSTEM_CONVERGENCE_ANALYSIS.md"
   ],
   "ephemeral_docs_excluded": [
     "Session logs (docs/claude/SESSION_*, ai/SESSION_*)",
