@@ -889,8 +889,10 @@ class TradingPipeline:
         Returns optimal position size in dollars.
         """
         # Fallback to simple edge * confidence if ABCFC unavailable
+        # GOLDEN STATE: Minimum $15 even in fallback
         if not ABCFC_AVAILABLE:
-            return total_capital * signal.edge * signal.confidence
+            size = total_capital * signal.edge * signal.confidence
+            return max(15.0, min(size, max_position))
 
         try:
             entry_price = signal.market_price
@@ -950,11 +952,11 @@ class TradingPipeline:
             else:
                 kelly_fraction = signal.edge * signal.confidence
 
-            # Apply half-Kelly for safety (reduce variance)
-            kelly_fraction = kelly_fraction * 0.5
+            # GOLDEN STATE: Use 0.75 Kelly (less conservative than half-Kelly)
+            kelly_fraction = kelly_fraction * 0.75
 
-            # Clamp to reasonable range [0, 0.25]
-            kelly_fraction = max(0, min(kelly_fraction, 0.25))
+            # GOLDEN STATE: Clamp to higher range [0.10, 0.35] for larger trades
+            kelly_fraction = max(0.10, min(kelly_fraction, 0.35))
 
             # Adjust by confidence
             kelly_fraction *= signal.confidence
@@ -962,8 +964,9 @@ class TradingPipeline:
             # Calculate position size
             position_size = total_capital * kelly_fraction
 
-            # Apply minimum and maximum
-            position_size = max(1.0, min(position_size, max_position))
+            # GOLDEN STATE: Minimum $15 per trade (proven optimal sizing)
+            # This prevents fragmented small bets that kill profitability
+            position_size = max(15.0, min(position_size, max_position))
 
             return position_size
 

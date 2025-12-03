@@ -493,33 +493,70 @@ def run_abcfc_system():
         # Build hierarchy from current state
         system.add_category("Trading")
         system.add_subcategory("Trading", "Polymarket")
+        system.add_category("Claude")
+        system.add_subcategory("Claude", "ValueDelivery")
 
-        # Load positions from state file
-        state_file = PROJECT_ROOT / "state" / "polymarket_live_state.json"
+        # INTEGRAFIX: Load positions from unified state (has 149+ positions!)
+        # Priority: abcfc_unified_state.json > polymarket_live_state.json
         positions_loaded = 0
 
-        if state_file.exists():
-            with open(state_file) as f:
-                data = json.load(f)
-                positions = data.get("positions", [])
+        unified_state = PROJECT_ROOT / "state" / "abcfc_unified_state.json"
+        if unified_state.exists():
+            try:
+                with open(unified_state) as f:
+                    data = json.load(f)
+                    positions = data.get("positions", [])
 
-                for pos in positions[:20]:  # Top 20
-                    try:
-                        entry = float(pos.get("avgPrice", 0.5) or 0.5)
-                        shares = float(pos.get("shares", 0) or 0)
-                        if shares <= 0:
+                    for pos in positions[:50]:  # Top 50 positions
+                        try:
+                            cat = pos.get("category", "Trading")
+                            subcat = pos.get("subcategory", "Polymarket")
+                            name = pos.get("name", f"pos_{positions_loaded}")[:30]
+                            worst = float(pos.get("worst", 0))
+                            best = float(pos.get("best", 0))
+                            expected = float(pos.get("expected", 0))
+
+                            # Ensure category hierarchy exists
+                            if cat not in ["Trading", "Claude"]:
+                                system.add_category(cat)
+                            if subcat:
+                                try:
+                                    system.add_subcategory(cat, subcat)
+                                except:
+                                    pass
+
+                            system.add_position(subcat or cat, name, worst, best, expected)
+                            positions_loaded += 1
+                        except:
                             continue
+            except Exception:
+                pass
 
-                        # Calculate ABCFC bounds
-                        worst = -shares * entry
-                        best = shares * (1 - entry)
-                        expected = shares * (0.5 - entry)  # Assume 50% if no prob
+        # Fallback to polymarket_live_state.json if no positions loaded
+        if positions_loaded == 0:
+            state_file = PROJECT_ROOT / "state" / "polymarket_live_state.json"
+            if state_file.exists():
+                with open(state_file) as f:
+                    data = json.load(f)
+                    positions = data.get("positions", [])
 
-                        name = str(pos.get("market", f"pos_{positions_loaded}"))[:20]
-                        system.add_position("Polymarket", name, worst, best, expected)
-                        positions_loaded += 1
-                    except:
-                        continue
+                    for pos in positions[:20]:  # Top 20
+                        try:
+                            entry = float(pos.get("avgPrice", 0.5) or 0.5)
+                            shares = float(pos.get("shares", 0) or 0)
+                            if shares <= 0:
+                                continue
+
+                            # Calculate ABCFC bounds
+                            worst = -shares * entry
+                            best = shares * (1 - entry)
+                            expected = shares * (0.5 - entry)  # Assume 50% if no prob
+
+                            name = str(pos.get("market", f"pos_{positions_loaded}"))[:20]
+                            system.add_position("Polymarket", name, worst, best, expected)
+                            positions_loaded += 1
+                        except:
+                            continue
 
         # Define standard actions
         actions = [
@@ -1029,12 +1066,16 @@ def run_hft_execution():
 
         trader = get_trader()
 
+        # INTEGRAFIX: Ensure HFT is activated and wallets are loaded
+        # Access hft property to trigger lazy initialization
+        hft = trader.hft  # This triggers _load_wallets() and activate()
+        hft_status = hft.status() if hft else {}
+
         # Run one cycle of Yair's trading system (dry_run=False for live execution)
         # Set dry_run=True here to just scan without executing
         results = trader.run_cycle(dry_run=True)  # Start with dry_run for safety
 
         status = trader.status()
-        hft_status = status.get("hft_status") or {}
 
         return {
             "success": True,

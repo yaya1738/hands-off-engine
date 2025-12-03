@@ -290,12 +290,36 @@ class YairFinancialABCFC:
                     ))
 
     def _load_trading_positions(self):
-        """Load trading positions from Polymarket state."""
-        pm_file = STATE_DIR / "polymarket_live_state.json"
-        if pm_file.exists():
-            with open(pm_file) as f:
-                data = json.load(f)
-                self.trading_positions = data.get("positions", [])
+        """Load trading positions from ABCFC unified state."""
+        # INTEGRAFIX: Use abcfc_unified_state.json (has 149+ positions!)
+        unified_file = STATE_DIR / "abcfc_unified_state.json"
+        if unified_file.exists():
+            try:
+                with open(unified_file) as f:
+                    data = json.load(f)
+                    # Convert ABCFC positions to trading format
+                    positions = data.get("positions", [])
+                    self.trading_positions = [
+                        {
+                            "market": p.get("name", ""),
+                            "category": p.get("category", "Trading"),
+                            "worst": p.get("worst", 0),
+                            "best": p.get("best", 0),
+                            "expected": p.get("expected", 0),
+                        }
+                        for p in positions
+                        if p.get("category") == "Trading" or "trade" in p.get("name", "").lower()
+                    ]
+            except Exception:
+                pass
+
+        # Fallback to polymarket_live_state.json
+        if not self.trading_positions:
+            pm_file = STATE_DIR / "polymarket_live_state.json"
+            if pm_file.exists():
+                with open(pm_file) as f:
+                    data = json.load(f)
+                    self.trading_positions = data.get("positions", [])
 
     def _load_business_revenue(self):
         """Load business revenue tracking."""
@@ -310,6 +334,39 @@ class YairFinancialABCFC:
                         "amount": data["income_generated"],
                         "category": "business",
                     })
+
+        # INTEGRAFIX: Add trading system P&L as hands-off revenue
+        try:
+            backend_file = STATE_DIR / "backend_loop.json"
+            if backend_file.exists():
+                with open(backend_file) as f:
+                    backend = json.load(f)
+
+                # Get P&L from outcome tracker
+                outcome = backend.get("outcome_tracker", {})
+                total_pnl_str = outcome.get("total_pnl", "$0")
+                # Parse "$265.73" format
+                total_pnl = float(total_pnl_str.replace("$", "").replace(",", ""))
+
+                if total_pnl > 0:
+                    self.business_revenue.append({
+                        "source": "trading_system",
+                        "amount": total_pnl,
+                        "category": "automated_trading",
+                        "win_rate": outcome.get("win_rate", "0%"),
+                    })
+
+                # Also add HFT economics if profitable
+                hft_econ = backend.get("hft_economics", {})
+                total_net = hft_econ.get("total_net", 0)
+                if total_net > 0:
+                    self.business_revenue.append({
+                        "source": "hft_economics",
+                        "amount": total_net,
+                        "category": "hft_profit",
+                    })
+        except Exception:
+            pass
 
     # ==================== ABCFC CONSTRUCTION ====================
 

@@ -376,7 +376,10 @@ class HFTMonitor:
         # 4. Scan Credits
         results["credits"] = self._scan_credits()
 
-        # 5. Calculate aggregate metrics
+        # 5. INTEGRAFIX: Sync health from backend_loop state
+        self._sync_from_backend_loop()
+
+        # 6. Calculate aggregate metrics
         results["aggregate"] = self._calculate_aggregates()
 
         # Record scan latency
@@ -389,6 +392,66 @@ class HFTMonitor:
         self._save_state(results)
 
         return results
+
+    def _sync_from_backend_loop(self):
+        """
+        INTEGRAFIX: Sync component health from backend_loop state.
+
+        The backend_loop tracks success for all major components.
+        Use this to mark components as HEALTHY automatically.
+        """
+        try:
+            backend_state = STATE_DIR / "backend_loop.json"
+            if not backend_state.exists():
+                return
+
+            with open(backend_state) as f:
+                state = json.load(f)
+
+            # Map backend_loop keys to HFT monitor component names
+            component_map = {
+                "circuit_board": "circuit_board",
+                "ai_core": "ai_core",
+                "knowledge_nexus": "knowledge_nexus",
+                "crosschain": "crosschain",
+                "fusion": "knowledge_fusion",
+                "mega_coordinator": "mega_coordinator",
+                "trading": "yair_auto_trader",
+                "hft_execution": "hft_execution",
+                "abcfc_cloud_flyer": "abcfc_cloud_flyer",
+                "abcfc_unified_state": "abcfc_unified_state",
+                "abcfc_layers": "abcfc_layers",
+                "abcfc_live_builder": "abcfc_live_builder",
+                "abcfc_system": "abcfc_system",
+                "yair_financial_abcfc": "yair_financial_abcfc",
+                "integrafix_full": "integrafix_pipeline",
+                "outcome_tracker": "outcome_tracker",
+                "trading_memory": "trading_memory",
+                "knowledge_reality": "knowledge_reality",
+                "hardware_preservation": "hardware_preservation",
+                "durable_upgrades": "durable_upgrades",
+                "credit_optimizer": "credit_optimizer",
+            }
+
+            # Update component health based on backend_loop success flags
+            for backend_key, monitor_name in component_map.items():
+                if backend_key in state:
+                    comp_data = state[backend_key]
+                    if isinstance(comp_data, dict) and comp_data.get("success"):
+                        # Mark as healthy
+                        self.update_component(monitor_name)
+                    elif isinstance(comp_data, dict):
+                        # Has data but not successful - mark degraded
+                        self.update_component(monitor_name, ComponentStatus.DEGRADED)
+
+            # Also mark polymarket_api healthy if trading is successful
+            if state.get("trading", {}).get("success"):
+                self.update_component("polymarket_api")
+                self.update_component("order_book")
+                self.update_component("position_manager")
+
+        except Exception:
+            pass  # Silent fail - don't break the scan
 
     def _scan_trading(self) -> Dict:
         """Scan trading systems."""

@@ -732,19 +732,30 @@ class KnowledgeReality:
     def _sync_financial_reality(self) -> Dict:
         """Sync with current financial reality."""
         result = {
-            "source": "polymarket_balance",
+            "source": "capital_management",
             "synced": False,
         }
 
         try:
-            balance_file = STATE_DIR / "polymarket_balance.json"
-            if balance_file.exists():
-                with open(balance_file) as f:
+            # INTEGRAFIX: Use capital_management.json (has real data)
+            capital_file = STATE_DIR / "capital_management.json"
+            if capital_file.exists():
+                with open(capital_file) as f:
                     data = json.load(f)
-                result["cash"] = data.get("cash", 0)
-                result["positions_value"] = data.get("positions_value", 0)
-                result["total"] = data.get("total", 0)
+                tiers = data.get("capital_tiers", {})
+                result["cash"] = tiers.get("tier_1_cash", 0)
+                result["positions_value"] = tiers.get("tier_3_locked", 0)
+                result["working_capital"] = tiers.get("tier_2_working", 0)
+                result["total"] = data.get("total_capital", 0)
                 result["synced"] = True
+
+            # Also try credit_optimizer for ROI data
+            credit_file = STATE_DIR / "credit_optimizer.json"
+            if credit_file.exists():
+                with open(credit_file) as f:
+                    credit_data = json.load(f)
+                result["monthly_value"] = credit_data.get("roi", {}).get("monthly_value", 0)
+                result["roi_multiplier"] = credit_data.get("roi", {}).get("multiplier", 0)
         except Exception as e:
             result["error"] = str(e)
 
@@ -753,17 +764,31 @@ class KnowledgeReality:
     def _sync_trading_reality(self) -> Dict:
         """Sync with current trading reality."""
         result = {
-            "source": "positions",
+            "source": "abcfc_unified_state",
             "synced": False,
         }
 
         try:
-            positions_file = STATE_DIR / "positions.json"
-            if positions_file.exists():
-                with open(positions_file) as f:
+            # INTEGRAFIX: Use abcfc_unified_state.json (has 149+ positions!)
+            unified_file = STATE_DIR / "abcfc_unified_state.json"
+            if unified_file.exists():
+                with open(unified_file) as f:
                     data = json.load(f)
-                result["position_count"] = len(data.get("positions", []))
+                positions = data.get("positions", [])
+                result["position_count"] = len(positions)
+                result["total_expected"] = data.get("total_expected", 0)
+                result["total_bounds"] = data.get("total_bounds", [0, 0])
                 result["synced"] = True
+
+            # Also check backend_loop for live trading state
+            backend_file = STATE_DIR / "backend_loop.json"
+            if backend_file.exists():
+                with open(backend_file) as f:
+                    backend = json.load(f)
+                trading = backend.get("trading", {})
+                result["open_orders"] = trading.get("open_orders", 0)
+                result["pipeline_trades"] = backend.get("integrafix_pipeline", {}).get("total_trades", 0)
+                result["win_rate"] = backend.get("outcome_tracker", {}).get("win_rate", "0%")
         except Exception as e:
             result["error"] = str(e)
 
@@ -777,13 +802,40 @@ class KnowledgeReality:
         }
 
         try:
-            if "reality_bridge" in self.modules:
-                bridge_data = self.modules["reality_bridge"]
-                if "bridge" in bridge_data:
-                    bridge = bridge_data["bridge"]
-                    who_am_i = bridge.who_am_i()
-                    result["health"] = who_am_i.get("present", {}).get("health", "unknown")
-                    result["phase"] = who_am_i.get("present", {}).get("phase", "unknown")
+            # INTEGRAFIX: Read from reality_bridge state file for accurate health
+            bridge_file = STATE_DIR / "reality_bridge.json"
+            if bridge_file.exists():
+                with open(bridge_file) as f:
+                    data = json.load(f)
+                snapshot = data.get("last_snapshot", {})
+                system = snapshot.get("system", {})
+
+                # Health based on health_score
+                health_score = system.get("health_score", 0)
+                if health_score >= 0.8:
+                    result["health"] = "healthy"
+                elif health_score >= 0.5:
+                    result["health"] = "degraded"
+                else:
+                    result["health"] = "critical"
+
+                result["daemons"] = system.get("daemons", 0)
+                result["bridges"] = system.get("bridges", 0)
+                result["cron_jobs"] = system.get("cron_jobs", 0)
+                result["health_score"] = health_score
+                result["phase"] = "operational" if health_score >= 0.5 else "degraded"
+                result["synced"] = True
+
+            # Also check backend_loop for hardware health
+            backend_file = STATE_DIR / "backend_loop.json"
+            if backend_file.exists():
+                with open(backend_file) as f:
+                    backend = json.load(f)
+                mega = backend.get("mega_coordinator", {})
+                result["vcpus"] = mega.get("vcpus", 0)
+                result["nodes"] = mega.get("nodes", "0/0")
+                if mega.get("health", {}).get("hardware", 0) >= 80:
+                    result["health"] = "healthy"
                     result["synced"] = True
         except Exception as e:
             result["error"] = str(e)
