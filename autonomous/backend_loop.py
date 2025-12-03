@@ -292,6 +292,42 @@ def run_mega_coordinator():
         return {"success": False, "error": str(e)}
 
 
+def run_abcfc_cloud_flyer():
+    """
+    Run ABCFC Cloud Flyer - navigate through decision space.
+
+    The Cloud Flyer uses the full ABCFC hierarchy to:
+    1. Build current state from live positions
+    2. Generate nexus cloud of possible futures
+    3. Evaluate each action's impact on Yair's top-line ABCFC
+    4. Recommend optimal trajectory
+    """
+    try:
+        from executor.math.abcfc_cloud_flyer import ABCFCCloudFlyer
+
+        flyer = ABCFCCloudFlyer(
+            name="Yair Siegel",
+            dry_run=True,  # Recommendations only
+            risk_aversion=0.5
+        )
+
+        # Run one flight iteration
+        result = flyer.fly_once()
+
+        return {
+            "success": True,
+            "state": result.get("state", {}),
+            "actions_evaluated": result.get("actions_evaluated", 0),
+            "best_action": result.get("best_action", "hold"),
+            "expected_improvement": result.get("expected_improvement", 0),
+            "nexus_cloud_size": result.get("nexus_cloud_size", 0),
+        }
+    except ImportError:
+        return {"success": False, "error": "ABCFC Cloud Flyer not available"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 def run_process_endpoints():
     """Run key process endpoints."""
     try:
@@ -737,8 +773,19 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  Error: {hft_result.get('error', 'unknown')}")
 
+        # 9.5 ABCFC Cloud Flyer - Navigate decision space
+        log("[9.5/14] Running ABCFC Cloud Flyer...")
+        cloud_result = run_abcfc_cloud_flyer()
+        state["abcfc_cloud_flyer"] = cloud_result
+        if cloud_result.get("success"):
+            log(f"  Actions: {cloud_result.get('actions_evaluated', 0)} | "
+                f"Best: {cloud_result.get('best_action', 'hold')} | "
+                f"E[Δ]: ${cloud_result.get('expected_improvement', 0):.2f}")
+        else:
+            log(f"  Cloud Flyer: {cloud_result.get('error', 'skipped')}")
+
         # 10. INTEGRAFIX Pipeline - Real edge detection with feedback loop
-        log("[10/13] Running INTEGRAFIX Trading Pipeline...")
+        log("[10/14] Running INTEGRAFIX Trading Pipeline...")
         integrafix_result = run_integrafix_pipeline()
         state["integrafix_pipeline"] = integrafix_result
         if integrafix_result.get("success"):

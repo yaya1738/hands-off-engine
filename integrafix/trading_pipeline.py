@@ -29,12 +29,27 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 
-# ABCFC Integration for position sizing
+# ABCFC Integration for position sizing and nexus cloud decisions
 try:
     from executor.math.abcfc_unified import create_binary_market_density
     ABCFC_AVAILABLE = True
 except ImportError:
     ABCFC_AVAILABLE = False
+
+# ABCFC Nexus for decision space evaluation
+try:
+    from executor.math.abcfc_nexus import get_nexus, ABCFCNexus
+    from executor.math.abcfc_layers import get_layers, ABCFCLayers
+    ABCFC_NEXUS_AVAILABLE = True
+except ImportError:
+    ABCFC_NEXUS_AVAILABLE = False
+
+# ABCFC Cloud Flyer for autonomous navigation
+try:
+    from executor.math.abcfc_cloud_flyer import ABCFCCloudFlyer
+    ABCFC_CLOUD_AVAILABLE = True
+except ImportError:
+    ABCFC_CLOUD_AVAILABLE = False
 
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
@@ -369,6 +384,100 @@ class TradingPipeline:
             remaining -= size
 
         return trades
+
+    def evaluate_with_nexus(
+        self,
+        signals: List['EdgeSignal'],
+        current_positions: List[Dict] = None,
+        risk_aversion: float = 0.5,
+    ) -> List['EdgeSignal']:
+        """
+        Evaluate signals using ABCFC Nexus decision space.
+
+        This uses the full ABCFC hierarchy and nexus cloud to determine
+        which trades to execute based on their impact on the overall portfolio.
+
+        Args:
+            signals: List of edge signals to evaluate
+            current_positions: Current portfolio positions
+            risk_aversion: Risk aversion parameter (0 = risk loving, 1 = risk averse)
+
+        Returns:
+            Filtered and ranked list of signals to execute
+        """
+        if not ABCFC_NEXUS_AVAILABLE or not signals:
+            return signals  # Fallback: return as-is
+
+        try:
+            # Get ABCFC nexus and layers
+            nexus = get_nexus()
+            layers = get_layers()
+
+            # Add current positions to hierarchy
+            if current_positions:
+                for pos in current_positions:
+                    market_id = pos.get('market_id') or pos.get('slug', 'unknown')
+                    price = pos.get('price') or pos.get('avgPrice', 0.5)
+                    size = pos.get('size') or pos.get('shares', 0) * price
+                    if size > 0:
+                        layers.add_polymarket_position(market_id, price, size)
+
+            nexus.set_steady_state(layers)
+
+            # Clear old actions
+            nexus.clear_actions()
+
+            # Add each signal as a potential action
+            for signal in signals:
+                action_name = f"trade_{signal.market_id}_{signal.side}"
+
+                if signal.side == "YES":
+                    nexus.add_buy_action(
+                        action_name,
+                        signal.market_id,
+                        size=10.0,  # $10 base size
+                        price=signal.market_price
+                    )
+                else:
+                    nexus.add_sell_action(
+                        action_name,
+                        signal.market_id,
+                        size=10.0
+                    )
+
+            # Add hold as baseline
+            nexus.add_hold_action("hold")
+
+            # Evaluate all actions
+            nexus.evaluate(risk_aversion=risk_aversion)
+
+            # Get ranked actions
+            best_action = nexus.best_action()
+
+            # Filter signals: only keep those with positive risk-adjusted score
+            # and better than hold
+            hold_score = nexus._actions.get("hold", None)
+            hold_baseline = hold_score.risk_adjusted_score if hold_score else 0
+
+            approved_signals = []
+            for signal in signals:
+                action_name = f"trade_{signal.market_id}_{signal.side}"
+                action = nexus._actions.get(action_name)
+
+                if action and action.risk_adjusted_score > hold_baseline:
+                    # Enhance signal with nexus data
+                    signal.nexus_score = action.risk_adjusted_score
+                    signal.nexus_expected_improvement = action.expected_improvement
+                    approved_signals.append(signal)
+
+            # Sort by nexus score
+            approved_signals.sort(key=lambda s: getattr(s, 'nexus_score', 0), reverse=True)
+
+            return approved_signals
+
+        except Exception as e:
+            # Fallback on error
+            return signals
 
     def _abcfc_position_size(
         self,
