@@ -1,8 +1,8 @@
 {
-  "timestamp": "2025-12-03T13:12:48.996955+00:00",
-  "total_handoffs": 0,
+  "timestamp": "2025-12-03T13:15:33.233931+00:00",
+  "total_handoffs": 1,
   "by_status": {
-    "pending": 0,
+    "pending": 1,
     "accepted": 0,
     "in_progress": 0,
     "completed": 0,
@@ -13,10 +13,17 @@
   "by_priority": {
     "low": 0,
     "normal": 0,
-    "high": 0,
+    "high": 1,
     "critical": 0
   },
-  "by_agent": {},
-  "completion_rate": 0,
+  "by_agent": {
+    "copilot": {
+      "total": 1,
+      "completed": 0,
+      "failed": 0,
+      "pending": 1
+    }
+  },
+  "completion_rate": 0.0,
   "average_duration_minutes": 0
 }

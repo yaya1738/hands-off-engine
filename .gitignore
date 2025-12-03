@@ -59,3 +59,7 @@ Thumbs.db
 .vscode/
 .claude/settings.local.json
 state/permanent/ACCESS_MASTER.md
+
+# Handoff runtime files
+ai/coordination/handoff_history.jsonl
+ai/coordination/handoff_metrics.json
