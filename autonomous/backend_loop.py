@@ -1321,7 +1321,7 @@ def run_integrafix_pipeline():
                     if not isinstance(raw_markets, list):
                         raw_markets = list(raw_markets) if raw_markets else []
 
-                    for m in raw_markets[:50]:  # Process top 50 markets
+                    for m in raw_markets[:200]:  # INTEGRAFIX: Process top 200 markets (4x coverage)
                         try:
                             tokens = m.get("tokens", []) or []
                             yes_price = 0.5
