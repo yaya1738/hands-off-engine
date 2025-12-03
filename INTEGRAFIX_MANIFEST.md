@@ -202,7 +202,7 @@ Key Yair Components:
 
 | Gap ID | Type | Description | Severity | Status |
 |--------|------|-------------|----------|--------|
-| edge_circular_fair_price | CIRCULAR | Fair price from market price = no edge | 100% | Open |
+| edge_circular_fair_price | CIRCULAR | Fair price from market price = no edge | 100% | **FIXED** |
 | wisdom_no_edge_output | ORPHANED | Wisdom engine edge orphaned | 90% | **FIXED** |
 | backend_brain_no_bidirectional | BLIND | Brain/backend not bidirectional | 80% | Open |
 | brain_scaling_no_coordination | BLIND | Brain/scaling race condition | 90% | Open |
