@@ -29,6 +29,20 @@ from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 
+# INTEGRAFIX: Win Rate Booster integration
+try:
+    from integrafix.win_rate_booster import get_booster, WinRateBooster
+    WIN_RATE_BOOSTER_AVAILABLE = True
+except ImportError:
+    WIN_RATE_BOOSTER_AVAILABLE = False
+
+# INTEGRAFIX: Edge Optimizer integration
+try:
+    from integrafix.edge_optimizer import EdgeOptimizer
+    EDGE_OPTIMIZER_AVAILABLE = True
+except ImportError:
+    EDGE_OPTIMIZER_AVAILABLE = False
+
 # ABCFC Integration for position sizing and nexus cloud decisions
 try:
     from executor.math.abcfc_unified import create_binary_market_density
@@ -271,15 +285,37 @@ class TradingPipeline:
         """
         Scan multiple markets for edges.
 
+        INTEGRAFIX: Now uses WinRateBooster to filter low-quality signals.
+
         Args:
             markets: List of market dicts
             min_edge: Minimum edge to consider actionable
         """
         signals = []
 
+        # INTEGRAFIX: Get win rate booster for intelligent filtering
+        booster = None
+        if WIN_RATE_BOOSTER_AVAILABLE:
+            try:
+                booster = get_booster()
+            except:
+                pass
+
         for market in markets:
             signal = self.detect_edge(market)
             if signal and signal.edge >= min_edge:
+                # INTEGRAFIX: Apply win rate booster filter
+                if booster:
+                    should_take, reason = booster.should_take_signal(
+                        market_title=signal.market_question,
+                        edge=signal.edge,
+                        confidence=signal.confidence,
+                        price=signal.market_price,
+                        composite_score=signal.edge * signal.confidence
+                    )
+                    if not should_take:
+                        continue  # Skip this signal
+
                 signals.append(signal)
 
         # Sort by edge * confidence (expected value)
