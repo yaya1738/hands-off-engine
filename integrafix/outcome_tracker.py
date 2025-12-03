@@ -24,6 +24,15 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 
+# HFT Economics tracking - every trade outcome at microsecond frequency
+try:
+    from integrafix.hft_economics import track_trade_pnl, track_value
+    HFT_TRACKING = True
+except ImportError:
+    HFT_TRACKING = False
+    def track_trade_pnl(*args, **kwargs): return 0
+    def track_value(*args, **kwargs): return 0
+
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
 TRADES_LOG = STATE_DIR / "trades_executed.jsonl"
@@ -134,50 +143,71 @@ class OutcomeTracker:
     def check_resolutions(self) -> List[ResolvedOutcome]:
         """
         Check Polymarket for resolved markets and record outcomes.
+        Uses the Gamma API to check market status.
         """
+        import requests
+
         outcomes = []
+        GAMMA_API = "https://gamma-api.polymarket.com"
 
-        try:
-            private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
-            if not private_key:
-                return outcomes
+        for trade_id, trade in list(self.pending_trades.items()):
+            try:
+                # Query Gamma API for market status
+                market_id = trade.market_id
 
-            from py_clob_client.client import ClobClient
+                # Try by slug first (most common format)
+                response = requests.get(
+                    f"{GAMMA_API}/markets?slug={market_id}",
+                    timeout=10
+                )
 
-            client = ClobClient(
-                "https://clob.polymarket.com",
-                key=private_key,
-                chain_id=137,
-            )
-            creds = client.create_or_derive_api_creds()
-            client.set_api_creds(creds)
-
-            # Check each pending trade's market
-            resolved_trades = []
-
-            for trade_id, trade in list(self.pending_trades.items()):
-                try:
-                    # Get market info
-                    # Note: This is a simplified check - real implementation would
-                    # use the condition_id to check resolution
-                    market_id = trade.market_id
-
-                    # For now, simulate resolution check
-                    # In production: query Polymarket for market resolution
-                    # If market resolved, determine outcome
-
-                    # Skip if market not resolved yet
-                    # This would be replaced with actual API check
+                if response.status_code != 200:
                     continue
 
-                except Exception as e:
+                markets = response.json()
+                if not markets:
                     continue
 
-            self.state["last_check"] = datetime.now(timezone.utc).isoformat()
-            self._save_state()
+                market = markets[0]
 
-        except Exception as e:
-            print(f"Error checking resolutions: {e}")
+                # Check if market is closed/resolved
+                if not market.get("closed", False):
+                    continue
+
+                # Determine resolution from outcomePrices
+                outcome_prices = market.get("outcomePrices", [])
+                if len(outcome_prices) < 2:
+                    continue
+
+                # outcomePrices[0] = YES price, outcomePrices[1] = NO price
+                yes_price = float(outcome_prices[0]) if outcome_prices[0] else 0
+                no_price = float(outcome_prices[1]) if outcome_prices[1] else 0
+
+                # Resolution: YES wins if yes_price > 0.5, NO wins if no_price > 0.5
+                if yes_price > 0.5:
+                    resolution = "YES"
+                elif no_price > 0.5:
+                    resolution = "NO"
+                else:
+                    # Market cancelled or indeterminate - skip
+                    continue
+
+                # Record the outcome
+                outcome = self.record_outcome(
+                    trade_id=trade_id,
+                    resolution=resolution,
+                    edge_predicted=0.0  # Would need signal data for this
+                )
+
+                if outcome:
+                    outcomes.append(outcome)
+                    print(f"  Resolved: {market_id[:40]}... -> {resolution}")
+
+            except Exception as e:
+                continue
+
+        self.state["last_check"] = datetime.now(timezone.utc).isoformat()
+        self._save_state()
 
         return outcomes
 
@@ -204,6 +234,16 @@ class OutcomeTracker:
 
         pnl = trade.size * pnl_per_share
         pnl_pct = (pnl / trade.size) * 100 if trade.size > 0 else 0
+
+        # Track profit/loss at HFT frequency (microseconds)
+        if HFT_TRACKING:
+            track_trade_pnl(
+                market=trade.market_id,
+                side=trade.side,
+                size=trade.size,
+                entry=trade.entry_price,
+                exit=resolution_price,
+            )
 
         # Determine if prediction was correct
         was_correct = (
@@ -255,6 +295,7 @@ class OutcomeTracker:
 
     def _feed_to_learner(self, outcome: ResolvedOutcome):
         """Feed outcome to the learning engine to improve future predictions."""
+        # Feed to trading pipeline
         try:
             from integrafix.trading_pipeline import get_pipeline
 
@@ -272,7 +313,31 @@ class OutcomeTracker:
                 print(f"  Generated {len(learnings)} learnings from outcome")
 
         except Exception as e:
-            print(f"Error feeding to learner: {e}")
+            print(f"Error feeding to pipeline: {e}")
+
+        # Feed to skill growth tracker (WIRE ADDED)
+        try:
+            from autonomous.skill_growth_tracker import SkillGrowthTracker
+
+            tracker = SkillGrowthTracker()
+
+            # Record probability estimation skill
+            actual_value = 1.0 if outcome.resolution == "YES" else 0.0
+            tracker.record_outcome(
+                skill="probability_estimation",
+                prediction=outcome.entry_price,  # Our predicted probability
+                actual=actual_value,
+                category=None,
+                details=f"Market: {outcome.market_id[:30]}"
+            )
+
+            # Record category-specific skill if applicable
+            # (Would need market category info to determine which skill)
+
+            tracker._save_state()
+
+        except Exception as e:
+            print(f"Error feeding to skill tracker: {e}")
 
     def simulate_outcomes(self, win_rate: float = 0.55, max_per_cycle: int = 5) -> List[ResolvedOutcome]:
         """

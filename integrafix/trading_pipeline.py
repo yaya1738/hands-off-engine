@@ -51,6 +51,39 @@ try:
 except ImportError:
     ABCFC_CLOUD_AVAILABLE = False
 
+# ABCFC Live for real order book integration
+try:
+    from executor.math.abcfc_live import (
+        LiveABCFCBuilder,
+        LivePosition,
+        OrderBook,
+        OrderBookLevel,
+        parse_polymarket_book,
+        analyze_order_flow,
+    )
+    ABCFC_LIVE_AVAILABLE = True
+except ImportError:
+    ABCFC_LIVE_AVAILABLE = False
+
+# ABCFC State for unified state harmonization
+try:
+    from executor.math.abcfc_state import get_state as get_abcfc_state, decide as abcfc_decide
+    ABCFC_STATE_AVAILABLE = True
+except ImportError:
+    ABCFC_STATE_AVAILABLE = False
+
+# ABCFC System for complete hierarchy + nexus + order flow
+try:
+    from executor.math.abcfc_system import (
+        ABCFCSystem,
+        Action as ABCFCAction,
+        OrderFlowModel,
+        FlowPredictability,
+    )
+    ABCFC_SYSTEM_AVAILABLE = True
+except ImportError:
+    ABCFC_SYSTEM_AVAILABLE = False
+
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
 PIPELINE_STATE = STATE_DIR / "trading_pipeline.json"
@@ -301,6 +334,12 @@ class TradingPipeline:
             self._log_trade(trade)
             self._save_state()
 
+            # ABCFC Integration: Sync to unified state
+            self.sync_to_unified_state(trade_record=trade)
+
+            # ABCFC Integration: Add to layers hierarchy
+            self.add_to_layers_hierarchy(signal, size)
+
         except Exception as e:
             trade.status = TradeStatus.FAILED
             trade.error = str(e)
@@ -478,6 +517,356 @@ class TradingPipeline:
         except Exception as e:
             # Fallback on error
             return signals
+
+    def build_live_abcfc(
+        self,
+        signal: 'EdgeSignal',
+        order_book_data: Dict = None,
+        trades: List[Dict] = None,
+    ) -> Optional[Any]:
+        """
+        Build a live ABCFC for a signal using real order book data.
+
+        This integrates order flow analysis to create flow-adjusted
+        probability densities for more accurate position sizing.
+
+        Args:
+            signal: The edge signal
+            order_book_data: Raw order book from Polymarket API
+            trades: Recent trades for order flow analysis
+
+        Returns:
+            LivePosition ABCFC object or None if unavailable
+        """
+        if not ABCFC_LIVE_AVAILABLE:
+            return None
+
+        try:
+            # Parse order book if provided
+            order_book = None
+            if order_book_data:
+                order_book = parse_polymarket_book(order_book_data)
+
+            # Analyze order flow if trades provided
+            flow_stats = None
+            if trades:
+                flow_stats = analyze_order_flow(trades)
+
+            # Create LivePosition
+            position = LivePosition(
+                token_id=signal.market_id,
+                market_name=signal.market_question[:50],
+                shares=1.0,  # Normalized for density calculation
+                entry_price=signal.market_price,
+                side=signal.side,
+                market_prob=signal.fair_price,
+                order_book=order_book,
+                flow_stats=flow_stats,
+            )
+
+            return position
+
+        except Exception:
+            return None
+
+    def sync_to_unified_state(
+        self,
+        positions: List[Dict] = None,
+        trade_record: 'TradeRecord' = None,
+    ):
+        """
+        Sync trading state to the unified ABCFC state.
+
+        This ensures THE state (UnifiedABCFCState) reflects all trading activity.
+        Everything is ABCFC - Polymarket positions, Claude value, Business revenue.
+
+        Args:
+            positions: Current positions to sync
+            trade_record: Recent trade to record
+        """
+        if not ABCFC_STATE_AVAILABLE:
+            return
+
+        try:
+            state = get_abcfc_state()
+
+            # Update trading positions
+            if positions:
+                abcfc_positions = []
+                for pos in positions:
+                    entry = pos.get('avgPrice') or pos.get('entry_price', 0.5)
+                    shares = pos.get('shares') or pos.get('size', 0)
+                    prob = pos.get('market_prob', entry)
+
+                    # Calculate ABCFC bounds
+                    if pos.get('side', 'YES') == 'YES':
+                        worst = -shares * entry
+                        best = shares * (1 - entry)
+                        expected = shares * (prob - entry)
+                    else:
+                        worst = -shares * (1 - entry)
+                        best = shares * entry
+                        expected = shares * ((1 - prob) - (1 - entry))
+
+                    abcfc_positions.append({
+                        'name': pos.get('market_id', 'unknown')[:30],
+                        'worst': worst,
+                        'best': best,
+                        'expected': expected,
+                    })
+
+                state.update_trading(abcfc_positions)
+
+            # Record Claude value from trading activity
+            if trade_record and trade_record.status == TradeStatus.EXECUTED:
+                state.update_claude(
+                    action_taken=f"trade_{trade_record.side}",
+                    value_added=trade_record.size * 0.02,  # Estimated 2% edge value
+                    worst=0,
+                    best=trade_record.size * 0.1,  # Potential 10% upside
+                )
+
+        except Exception:
+            pass  # Don't fail pipeline on state sync errors
+
+    def query_unified_state_decision(self) -> Optional[Dict]:
+        """
+        Query the unified ABCFC state for a decision.
+
+        Returns the nexus cloud decision on best action across all domains.
+        """
+        if not ABCFC_STATE_AVAILABLE:
+            return None
+
+        try:
+            return abcfc_decide()
+        except Exception:
+            return None
+
+    def add_to_layers_hierarchy(
+        self,
+        signal: 'EdgeSignal',
+        size: float,
+    ):
+        """
+        Add a position to the ABCFC layers hierarchy.
+
+        This maintains the hierarchical view:
+        Yair Siegel → Trading → Polymarket → [position]
+        """
+        if not ABCFC_NEXUS_AVAILABLE:
+            return
+
+        try:
+            layers = get_layers()
+
+            # Add to Polymarket layer
+            layers.add_polymarket_position(
+                market_slug=signal.market_id,
+                entry_price=signal.market_price,
+                size=size,
+                prob_yes=signal.fair_price if signal.side == 'YES' else 1 - signal.fair_price,
+                side=signal.side,
+                days=30,  # Default 30 days to resolution
+            )
+
+            # Save hierarchy state
+            layers.save()
+
+        except Exception:
+            pass
+
+    def evaluate_topline_impact(
+        self,
+        signal: 'EdgeSignal',
+        size: float,
+        current_positions: List[Dict] = None,
+    ) -> Optional[Dict]:
+        """
+        Evaluate how a trade affects Yair Siegel's top-line ABCFC.
+
+        This is the KEY insight: every trade propagates up to the root.
+        See impact on total worst/best/expected before executing.
+
+        Args:
+            signal: The edge signal to evaluate
+            size: Proposed position size
+            current_positions: Current portfolio positions
+
+        Returns:
+            Dict with top-line impact analysis
+        """
+        if not ABCFC_SYSTEM_AVAILABLE:
+            return None
+
+        try:
+            # Create system with current state
+            system = ABCFCSystem("Yair Siegel")
+            system.risk_aversion = 0.5
+
+            # Build hierarchy from current positions
+            system.add_category("Trading")
+            system.add_subcategory("Trading", "Polymarket")
+
+            if current_positions:
+                for pos in current_positions:
+                    entry = pos.get('avgPrice') or pos.get('entry_price', 0.5)
+                    shares = pos.get('shares') or pos.get('size', 0)
+                    prob = pos.get('market_prob', entry)
+                    side = pos.get('side', 'YES')
+
+                    if side == 'YES':
+                        worst = -shares * entry
+                        best = shares * (1 - entry)
+                        expected = shares * (prob - entry)
+                    else:
+                        worst = -shares * (1 - entry)
+                        best = shares * entry
+                        expected = shares * ((1 - prob) - (1 - entry))
+
+                    market_id = pos.get('market_id', f'pos_{len(system.hierarchy.all_nodes)}'[:20])
+                    system.add_position("Polymarket", market_id, worst, best, expected)
+
+            # Create action for proposed trade
+            action = ABCFCAction(
+                name=f"trade_{signal.market_id[:15]}",
+                action_type="buy" if signal.side == "YES" else "sell",
+                params={"size": size, "price": signal.market_price}
+            )
+
+            # Evaluate top-line impact
+            # First add a placeholder position for the new trade
+            entry = signal.market_price
+            if signal.side == 'YES':
+                worst = -size * entry
+                best = size * (1 - entry)
+                expected = size * (signal.fair_price - entry)
+            else:
+                worst = -size * (1 - entry)
+                best = size * entry
+                expected = size * ((1 - signal.fair_price) - (1 - entry))
+
+            pos_name = f"NEW_{signal.market_id[:15]}"
+            system.add_position("Polymarket", pos_name, worst, best, expected)
+
+            # Get impact
+            top_line_after = {
+                "worst": system.total_bounds()[0],
+                "best": system.total_bounds()[1],
+                "expected": system.total_expected(),
+            }
+
+            # Calculate delta from before
+            top_line_before = {
+                "worst": top_line_after["worst"] - worst,
+                "best": top_line_after["best"] - best,
+                "expected": top_line_after["expected"] - expected,
+            }
+
+            return {
+                "signal_id": signal.id,
+                "market_id": signal.market_id,
+                "side": signal.side,
+                "size": size,
+                "top_line_before": top_line_before,
+                "top_line_after": top_line_after,
+                "delta": {
+                    "worst": worst,
+                    "best": best,
+                    "expected": expected,
+                },
+                "risk_adjusted_score": (
+                    0.5 * expected + 0.5 * worst  # 50% risk aversion
+                ),
+            }
+
+        except Exception:
+            return None
+
+    def find_best_global_action(
+        self,
+        signals: List['EdgeSignal'],
+        current_positions: List[Dict] = None,
+        risk_aversion: float = 0.5,
+    ) -> Optional[Dict]:
+        """
+        Find the best action across ALL signals using ABCFCSystem.
+
+        This evaluates every signal's impact on the global top-line
+        and returns the one with the highest risk-adjusted score.
+
+        Args:
+            signals: List of edge signals to evaluate
+            current_positions: Current portfolio positions
+            risk_aversion: Risk aversion parameter (0-1)
+
+        Returns:
+            Best signal with top-line impact analysis
+        """
+        if not ABCFC_SYSTEM_AVAILABLE or not signals:
+            return None
+
+        try:
+            best_result = None
+            best_score = float('-inf')
+
+            for signal in signals:
+                # Evaluate each signal's top-line impact
+                result = self.evaluate_topline_impact(
+                    signal=signal,
+                    size=signal.edge * signal.confidence * 100,  # Scale by edge
+                    current_positions=current_positions,
+                )
+
+                if result and result.get("risk_adjusted_score", float('-inf')) > best_score:
+                    best_score = result["risk_adjusted_score"]
+                    best_result = {
+                        "signal": signal,
+                        "impact": result,
+                    }
+
+            return best_result
+
+        except Exception:
+            return None
+
+    def infer_order_flow_model(
+        self,
+        trades: List[Dict],
+    ) -> Optional[Dict]:
+        """
+        Infer order flow model from trade history.
+
+        Three levels of predictability:
+        1. PERFECT_DISCRETE - Know exact orders coming
+        2. CONTINUOUS_RATE - Know arrival rate λ(t)
+        3. UNKNOWN_CHAOTIC - Don't even know rate
+
+        Args:
+            trades: List of trade dicts with 'timestamp'
+
+        Returns:
+            Order flow model info
+        """
+        if not ABCFC_SYSTEM_AVAILABLE or not trades:
+            return None
+
+        try:
+            timestamps = [t.get('timestamp', 0) for t in trades if t.get('timestamp')]
+            if len(timestamps) < 3:
+                return {"level": "UNKNOWN", "confidence": 0.0}
+
+            model = OrderFlowModel.from_order_history(timestamps)
+
+            return {
+                "level": model.level.name,
+                "rate": model.get_rate(0),
+                "confidence": model.get_confidence(),
+                "regularity": model.regularity_score,
+            }
+
+        except Exception:
+            return None
 
     def _abcfc_position_size(
         self,

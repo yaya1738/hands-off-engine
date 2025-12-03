@@ -47,6 +47,33 @@ All actions are logged and validated through protection layers.
 
 ## ⛔ CRITICAL SAFETY RULES - READ FIRST
 
+### 🔴 NEVER KILL BACKGROUND LOOPS 🔴
+
+**THE FOLLOWING PROCESSES ARE SACRED - NEVER KILL THEM:**
+```
+backend_loop.py      - Main orchestrator running 26 modules
+hardware_brain.py    - Infrastructure management
+scaling_engine.py    - Auto-scaling
+infra_manager.py     - Infrastructure monitoring
+self_healer.py       - Self-healing agent
+```
+
+**FORBIDDEN COMMANDS:**
+- `kill` / `pkill` / `killall` targeting any of the above
+- `ps aux | grep ... | xargs kill`
+- Any command that would terminate these processes
+- Restarting these processes "to fix" something
+
+**WHY:** These loops run the entire autonomous system. Killing them breaks everything.
+If you think a loop is stuck, CHECK THE LOGS FIRST - they're probably fine.
+
+**If a loop ACTUALLY needs restart (rare):**
+1. Ask the user first
+2. Use `nohup ... &` to ensure it's properly daemonized
+3. Verify PPID=1 after restart
+
+---
+
 **NEVER run destructive infrastructure commands.** You have caused 8+ droplet shutdowns by testing API calls.
 
 **FORBIDDEN ACTIONS (will shut down the server you're running on):**

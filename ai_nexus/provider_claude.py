@@ -2,12 +2,23 @@
 """
 Claude AI Provider for AI Nexus
 Integrates Anthropic's Claude models
+
+HFT Economics: All API calls tracked at microsecond frequency.
 """
 import os
+import time
 from typing import Optional
 
 from .nexus_core import AIProvider, AIProviderType, AIRequest, AIResponse
 from audit import AuditLogger, FinancialLedger
+
+# HFT Economics tracking
+try:
+    from integrafix.hft_economics import track_api_call
+    HFT_TRACKING = True
+except ImportError:
+    HFT_TRACKING = False
+    def track_api_call(*args, **kwargs): return 0
 
 
 class ClaudeProvider(AIProvider):
@@ -111,6 +122,18 @@ class ClaudeProvider(AIProvider):
 
         cost = self.estimate_cost(request)
 
+        # Track at HFT frequency (microseconds)
+        start_us = int(time.time() * 1_000_000)
+        if HFT_TRACKING:
+            track_api_call(
+                provider="anthropic",
+                model=model.replace("-latest", ""),
+                input_tokens=prompt_tokens,
+                output_tokens=completion_tokens,
+                latency_us=0  # Actual latency tracked externally
+            )
+        latency_us = int(time.time() * 1_000_000) - start_us
+
         return AIResponse(
             request_id=request.request_id,
             provider_type=AIProviderType.CLAUDE,
@@ -118,11 +141,12 @@ class ClaudeProvider(AIProvider):
             model_used=model,
             tokens_used=tokens_used,
             cost=cost,
-            latency_ms=0.0,  # Tracked externally
+            latency_ms=latency_us / 1000,
             success=True,
             metadata={
                 "note": "Claude executes through CLI - this tracks costs and actions",
                 "action": request.action,
+                "hft_tracked": HFT_TRACKING,
                 **request.metadata
             }
         )

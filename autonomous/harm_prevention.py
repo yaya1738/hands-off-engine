@@ -142,6 +142,21 @@ KNOWN_HARMFUL_PATTERNS = {
         "connection_loss",
         "medium"
     ),
+    "code_deletion": (
+        "Deleting source code files or directories",
+        "self_destruction",
+        "critical"
+    ),
+    "self_termination": (
+        "Killing own critical processes",
+        "self_destruction",
+        "critical"
+    ),
+    "state_wipe": (
+        "Deleting or clearing state files",
+        "data_loss",
+        "critical"
+    ),
 }
 
 # Files that should NEVER be "optimized" or "cleaned"
@@ -153,9 +168,18 @@ SACRED_FILES = {
     "state/script_registry.json",
     "state/self_preservation.json",
     "state/harm_prevention.json",
+    "state/hardware_protection.json",
+    "state/outcome_tracker.json",
     "autonomous/self_preservation.py",
     "autonomous/security_layer.py",
     "autonomous/harm_prevention.py",
+    "autonomous/self_healer.py",
+    "autonomous/hardware_brain.py",
+    "autonomous/concrete_executor.py",
+    "integrafix/hardware_protection.py",
+    "integrafix/outcome_tracker.py",
+    "trading/market_data_pipeline.py",
+    "ai/ai_orchestrator.py",
 }
 
 # Processes that should never be "optimized" by killing
@@ -166,6 +190,11 @@ SACRED_PROCESSES = {
     "nginx",
     "postgres",
     "redis",
+    "hardware_brain.py",
+    "self_healer.py",
+    "backend_loop.py",
+    "scaling_engine.py",
+    "infra_manager.py",
 }
 
 # Config keys that should never be "reset" or "optimized"

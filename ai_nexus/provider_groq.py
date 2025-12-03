@@ -4,6 +4,14 @@ import os
 import json
 from typing import List, Dict, Optional
 
+# HFT Economics tracking - every API call at microsecond frequency
+try:
+    from integrafix.hft_economics import track_api_call
+    HFT_TRACKING = True
+except ImportError:
+    HFT_TRACKING = False
+    def track_api_call(*args, **kwargs): return 0
+
 def call_groq(
     prompt: str,
     model: str = "llama-3.1-70b-versatile",
@@ -47,10 +55,22 @@ def call_groq(
             temperature=0.7
         )
 
+        tokens_used = response.usage.total_tokens if response.usage else 0
+
+        # Track at HFT frequency (Groq is free but we track for metrics)
+        if HFT_TRACKING:
+            track_api_call(
+                provider="groq",
+                model=model.split("-")[0],  # llama, mixtral, etc.
+                input_tokens=response.usage.prompt_tokens if response.usage else 0,
+                output_tokens=response.usage.completion_tokens if response.usage else 0,
+                latency_us=0
+            )
+
         return {
             "content": response.choices[0].message.content,
             "model": model,
-            "tokens": response.usage.total_tokens if response.usage else 0
+            "tokens": tokens_used
         }
 
     except ImportError:

@@ -2,12 +2,23 @@
 """
 OpenAI Provider for AI Nexus
 Integrates OpenAI's GPT models
+
+HFT Economics: All API calls tracked at microsecond frequency.
 """
 import os
+import time
 from typing import Optional
 
 from .nexus_core import AIProvider, AIProviderType, AIRequest, AIResponse
 from audit import AuditLogger, FinancialLedger
+
+# HFT Economics tracking
+try:
+    from integrafix.hft_economics import track_api_call
+    HFT_TRACKING = True
+except ImportError:
+    HFT_TRACKING = False
+    def track_api_call(*args, **kwargs): return 0
 
 
 class OpenAIProvider(AIProvider):
@@ -132,6 +143,16 @@ class OpenAIProvider(AIProvider):
             output_cost = (usage.completion_tokens / 1_000_000) * pricing["output"]
             total_cost = input_cost + output_cost
 
+            # Track at HFT frequency (microseconds)
+            if HFT_TRACKING:
+                track_api_call(
+                    provider="openai",
+                    model=model,
+                    input_tokens=usage.prompt_tokens,
+                    output_tokens=usage.completion_tokens,
+                    latency_us=0  # Set externally
+                )
+
             content = response.choices[0].message.content
 
             return AIResponse(
@@ -142,7 +163,8 @@ class OpenAIProvider(AIProvider):
                 tokens_used=tokens_used,
                 cost=total_cost,
                 latency_ms=0.0,  # Set by nexus core
-                success=True
+                success=True,
+                metadata={"hft_tracked": HFT_TRACKING}
             )
 
         except Exception as e:

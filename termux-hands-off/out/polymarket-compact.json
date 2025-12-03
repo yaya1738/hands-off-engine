@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-12-01T15:52:33.136982Z",
-  "count": 143,
+  "timestamp": "2025-12-03T21:00:03.229113Z",
+  "count": 149,
   "markets": [
     {
       "token_id": "60487116984468020978247225474488676749601001829886755968952521846780452448915",
@@ -8,18 +8,18 @@
       "question": "Fed rate hike in 2025?",
       "slug": "fed-rate-hike-in-2025",
       "category": "unknown",
-      "volume_24h": 23773.287396,
-      "liquidity": 39065.81625,
+      "volume_24h": 62658.890564,
+      "liquidity": 64490.7029,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0065,
-        0.9935
+        0.006,
+        0.994
       ],
-      "yes_price": 0.0065,
-      "no_price": 0.9935,
+      "yes_price": 0.006,
+      "no_price": 0.994,
       "end_date": "2025-12-10T12:00:00Z",
       "active": true,
       "closed": false
@@ -30,8 +30,8 @@
       "question": "Will 7 Fed rate cuts happen in 2025?",
       "slug": "will-7-fed-rate-cuts-happen-in-2025",
       "category": "unknown",
-      "volume_24h": 133358.11,
-      "liquidity": 241963.38185,
+      "volume_24h": 10006.87,
+      "liquidity": 261068.13449,
       "outcomes": [
         "Yes",
         "No"
@@ -52,18 +52,18 @@
       "question": "Will 2 Fed rate cuts happen in 2025?",
       "slug": "will-2-fed-rate-cuts-happen-in-2025",
       "category": "unknown",
-      "volume_24h": 7294.409533,
-      "liquidity": 72484.2489,
+      "volume_24h": 35027.42553,
+      "liquidity": 95076.7254,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.1,
-        0.9
+        0.055,
+        0.945
       ],
-      "yes_price": 0.1,
-      "no_price": 0.9,
+      "yes_price": 0.055,
+      "no_price": 0.945,
       "end_date": "2025-12-10T12:00:00Z",
       "active": true,
       "closed": false
@@ -74,8 +74,8 @@
       "question": "Will 6 Fed rate cuts happen in 2025?",
       "slug": "will-6-fed-rate-cuts-happen-in-2025",
       "category": "unknown",
-      "volume_24h": 0,
-      "liquidity": 239746.9764,
+      "volume_24h": 10062.84,
+      "liquidity": 361238.60955,
       "outcomes": [
         "Yes",
         "No"
@@ -96,18 +96,18 @@
       "question": "Will 3 Fed rate cuts happen in 2025?",
       "slug": "will-3-fed-rate-cuts-happen-in-2025",
       "category": "unknown",
-      "volume_24h": 5007.765552,
-      "liquidity": 51448.7495,
+      "volume_24h": 38654.61708900001,
+      "liquidity": 76695.861,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.895,
-        0.105
+        0.935,
+        0.065
       ],
-      "yes_price": 0.895,
-      "no_price": 0.105,
+      "yes_price": 0.935,
+      "no_price": 0.065,
       "end_date": "2025-12-10T12:00:00Z",
       "active": true,
       "closed": false
@@ -118,18 +118,18 @@
       "question": "Will 4 Fed rate cuts happen in 2025?",
       "slug": "will-4-fed-rate-cuts-happen-in-2025",
       "category": "unknown",
-      "volume_24h": 306.972722,
-      "liquidity": 136336.67364,
+      "volume_24h": 1695.7473319999997,
+      "liquidity": 141498.3908,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.007,
-        0.993
+        0.0065,
+        0.9935
       ],
-      "yes_price": 0.007,
-      "no_price": 0.993,
+      "yes_price": 0.0065,
+      "no_price": 0.9935,
       "end_date": "2025-12-10T12:00:00Z",
       "active": true,
       "closed": false
@@ -140,18 +140,18 @@
       "question": "Will 5 Fed rate cuts happen in 2025?",
       "slug": "will-5-fed-rate-cuts-happen-in-2025",
       "category": "unknown",
-      "volume_24h": 7005.048000000001,
-      "liquidity": 257370.28921,
+      "volume_24h": 28473.375,
+      "liquidity": 299905.714,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0015,
-        0.9985
+        0.0005,
+        0.9995
       ],
-      "yes_price": 0.0015,
-      "no_price": 0.9985,
+      "yes_price": 0.0005,
+      "no_price": 0.9995,
       "end_date": "2025-12-10T12:00:00Z",
       "active": true,
       "closed": false
@@ -162,8 +162,8 @@
       "question": "Will 8+ Fed rate cuts happen in 2025?",
       "slug": "will-8plus-fed-rate-cuts-happen-in-2025",
       "category": "unknown",
-      "volume_24h": 182.94,
-      "liquidity": 190762.5214,
+      "volume_24h": 828.52,
+      "liquidity": 191709.92307,
       "outcomes": [
         "Yes",
         "No"
@@ -184,18 +184,18 @@
       "question": "Tim Cook out as Apple CEO in 2025?",
       "slug": "tim-cook-out-as-apple-ceo-in-2025",
       "category": "unknown",
-      "volume_24h": 169,
-      "liquidity": 12166.5829,
+      "volume_24h": 1236.9756049999999,
+      "liquidity": 16486.56442,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.032,
-        0.968
+        0.0235,
+        0.9765
       ],
-      "yes_price": 0.032,
-      "no_price": 0.968,
+      "yes_price": 0.0235,
+      "no_price": 0.9765,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -206,18 +206,18 @@
       "question": "Dan Clancy out as Twitch CEO in 2025?",
       "slug": "dan-clancy-out-as-twitch-ceo-in-2025",
       "category": "unknown",
-      "volume_24h": 2198.685195,
-      "liquidity": 1802.16865,
+      "volume_24h": 3678.2579,
+      "liquidity": 4247.39452,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.049,
-        0.951
+        0.0445,
+        0.9555
       ],
-      "yes_price": 0.049,
-      "no_price": 0.951,
+      "yes_price": 0.0445,
+      "no_price": 0.9555,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -228,74 +228,8 @@
       "question": "Sundar Pichai out as Google CEO in 2025?",
       "slug": "sundar-pichai-out-as-google-ceo-in-2025",
       "category": "unknown",
-      "volume_24h": 1584.5215440000002,
-      "liquidity": 6966.6249,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.0125,
-        0.9875
-      ],
-      "yes_price": 0.0125,
-      "no_price": 0.9875,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "103100089968391302849910741044331080042507199871441323314801879001189983397255",
-      "condition_id": "0xdf8855f2cfaca1f0e8a48d2557354c3e5c48aaf3dcf8d8ab154569f70d0da6b1",
-      "question": "Andy Jassy out as Amazon CEO in 2025?",
-      "slug": "andy-jassy-out-as-amazon-ceo-in-2025",
-      "category": "unknown",
-      "volume_24h": 162.332384,
-      "liquidity": 6911.96571,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.0205,
-        0.9795
-      ],
-      "yes_price": 0.0205,
-      "no_price": 0.9795,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "97335676421095248000879236735672623727863825668446448330851350298516318572302",
-      "condition_id": "0x178dee952f29fb0a77f63df1d59514d15009caeb7c011a5c086aad80e6369f8d",
-      "question": "Brian Armstrong out as Coinbase CEO in 2025?",
-      "slug": "brian-armstrong-out-as-coinbase-ceo-in-2025",
-      "category": "unknown",
-      "volume_24h": 3.038457,
-      "liquidity": 926.79889,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.0335,
-        0.9665
-      ],
-      "yes_price": 0.0335,
-      "no_price": 0.9665,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "10951761178807434939325434424769917840894727345210023126356841505391032385708",
-      "condition_id": "0x2573b652eb48365d20cd4396072e0e71b5401ed8ae2866a02b80dbc690fe9063",
-      "question": "Sam Altman out as OpenAI CEO in 2025?",
-      "slug": "sam-altman-out-as-openai-ceo-in-2025",
-      "category": "unknown",
-      "volume_24h": 506.339768,
-      "liquidity": 9396.85216,
+      "volume_24h": 120.29,
+      "liquidity": 6704.28582,
       "outcomes": [
         "Yes",
         "No"
@@ -311,23 +245,89 @@
       "closed": false
     },
     {
-      "token_id": "94850533403292240972948844256810904078895883844462287088135166537739765648754",
-      "condition_id": "0x0b16eb7741855ca3d4383fabb8b760c897c2165d603916497f484b87ba9826dc",
-      "question": "Will NVIDIA be the largest company in the world by market cap on December 31?",
-      "slug": "will-nvidia-be-the-largest-company-in-the-world-by-market-cap-on-december-31-2025",
+      "token_id": "103100089968391302849910741044331080042507199871441323314801879001189983397255",
+      "condition_id": "0xdf8855f2cfaca1f0e8a48d2557354c3e5c48aaf3dcf8d8ab154569f70d0da6b1",
+      "question": "Andy Jassy out as Amazon CEO in 2025?",
+      "slug": "andy-jassy-out-as-amazon-ceo-in-2025",
       "category": "unknown",
-      "volume_24h": 79377.42269399966,
-      "liquidity": 81530.7989,
+      "volume_24h": 481.052893,
+      "liquidity": 7649.75153,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.63,
-        0.37
+        0.0185,
+        0.9815
       ],
-      "yes_price": 0.63,
-      "no_price": 0.37,
+      "yes_price": 0.0185,
+      "no_price": 0.9815,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "97335676421095248000879236735672623727863825668446448330851350298516318572302",
+      "condition_id": "0x178dee952f29fb0a77f63df1d59514d15009caeb7c011a5c086aad80e6369f8d",
+      "question": "Brian Armstrong out as Coinbase CEO in 2025?",
+      "slug": "brian-armstrong-out-as-coinbase-ceo-in-2025",
+      "category": "unknown",
+      "volume_24h": 187.56,
+      "liquidity": 930.03278,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0065,
+        0.9935
+      ],
+      "yes_price": 0.0065,
+      "no_price": 0.9935,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "10951761178807434939325434424769917840894727345210023126356841505391032385708",
+      "condition_id": "0x2573b652eb48365d20cd4396072e0e71b5401ed8ae2866a02b80dbc690fe9063",
+      "question": "Sam Altman out as OpenAI CEO in 2025?",
+      "slug": "sam-altman-out-as-openai-ceo-in-2025",
+      "category": "unknown",
+      "volume_24h": 5310.002016,
+      "liquidity": 7932.24072,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.011,
+        0.989
+      ],
+      "yes_price": 0.011,
+      "no_price": 0.989,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "94850533403292240972948844256810904078895883844462287088135166537739765648754",
+      "condition_id": "0x0b16eb7741855ca3d4383fabb8b760c897c2165d603916497f484b87ba9826dc",
+      "question": "Will NVIDIA be the largest company in the world by market cap on December 31?",
+      "slug": "will-nvidia-be-the-largest-company-in-the-world-by-market-cap-on-december-31-2025",
+      "category": "unknown",
+      "volume_24h": 374649.0929810006,
+      "liquidity": 80943.9068,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.745,
+        0.255
+      ],
+      "yes_price": 0.745,
+      "no_price": 0.255,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -338,18 +338,18 @@
       "question": "Will Microsoft be the largest company in the world by market cap on December 31?",
       "slug": "will-microsoft-be-the-largest-company-in-the-world-by-market-cap-on-december-31-2025",
       "category": "unknown",
-      "volume_24h": 53669.61793300001,
-      "liquidity": 147551.88769,
+      "volume_24h": 131793.17077299993,
+      "liquidity": 160742.85273,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0045,
-        0.9955
+        0.0025,
+        0.9975
       ],
-      "yes_price": 0.0045,
-      "no_price": 0.9955,
+      "yes_price": 0.0025,
+      "no_price": 0.9975,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -360,18 +360,18 @@
       "question": "Will Apple be the largest company in the world by market cap on December 31?",
       "slug": "will-apple-be-the-largest-company-in-the-world-by-market-cap-on-december-31-2025",
       "category": "unknown",
-      "volume_24h": 58096.25713099997,
-      "liquidity": 38839.81731,
+      "volume_24h": 235919.15073000002,
+      "liquidity": 56397.6463,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.253,
-        0.747
+        0.2035,
+        0.7965
       ],
-      "yes_price": 0.253,
-      "no_price": 0.747,
+      "yes_price": 0.2035,
+      "no_price": 0.7965,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -382,18 +382,18 @@
       "question": "Will Alphabet be the largest company in the world by market cap on December 31?",
       "slug": "will-alphabet-be-the-largest-company-in-the-world-by-market-cap-on-december-31",
       "category": "unknown",
-      "volume_24h": 19899.553964,
-      "liquidity": 73813.68943,
+      "volume_24h": 107210.72606099994,
+      "liquidity": 70705.99602,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.111,
-        0.889
+        0.0415,
+        0.9585
       ],
-      "yes_price": 0.111,
-      "no_price": 0.889,
+      "yes_price": 0.0415,
+      "no_price": 0.9585,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -404,8 +404,8 @@
       "question": "Will Tesla be the largest company in the world by market cap on December 31?",
       "slug": "will-tesla-be-the-largest-company-in-the-world-by-market-cap-on-december-31",
       "category": "unknown",
-      "volume_24h": 32122.949999999975,
-      "liquidity": 365059.82893,
+      "volume_24h": 142690.887,
+      "liquidity": 372257.24451,
       "outcomes": [
         "Yes",
         "No"
@@ -448,8 +448,8 @@
       "question": "Will Amazon be the largest company in the world by market cap on December 31?",
       "slug": "will-amazon-be-the-largest-company-in-the-world-by-market-cap-on-december-31",
       "category": "unknown",
-      "volume_24h": 21079.280999999988,
-      "liquidity": 523818.27344,
+      "volume_24h": 92289.22099999998,
+      "liquidity": 554518.10456,
       "outcomes": [
         "Yes",
         "No"
@@ -470,8 +470,8 @@
       "question": "Will Saudi Aramco be the largest company in the world by market cap on December 31?",
       "slug": "will-saudi-aramco-be-the-largest-company-in-the-world-by-market-cap-on-december-31",
       "category": "unknown",
-      "volume_24h": 34869.05599999996,
-      "liquidity": 198349.06917,
+      "volume_24h": 87204.07799999998,
+      "liquidity": 259592.07287,
       "outcomes": [
         "Yes",
         "No"
@@ -492,18 +492,18 @@
       "question": "US recession in 2025?",
       "slug": "us-recession-in-2025",
       "category": "unknown",
-      "volume_24h": 14932.562453,
-      "liquidity": 73560.78531,
+      "volume_24h": 10937.509389,
+      "liquidity": 104747.34229,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0185,
-        0.9815
+        0.0175,
+        0.9825
       ],
-      "yes_price": 0.0185,
-      "no_price": 0.9815,
+      "yes_price": 0.0175,
+      "no_price": 0.9825,
       "end_date": "2026-02-28T12:00:00Z",
       "active": true,
       "closed": false
@@ -514,18 +514,18 @@
       "question": "Fed emergency rate cut in 2025?",
       "slug": "fed-emergency-rate-cut-in-2025",
       "category": "unknown",
-      "volume_24h": 6561.487918,
-      "liquidity": 39316.37021,
+      "volume_24h": 6672.445081000001,
+      "liquidity": 35020.39892,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0135,
-        0.9865
+        0.015,
+        0.985
       ],
-      "yes_price": 0.0135,
-      "no_price": 0.9865,
+      "yes_price": 0.015,
+      "no_price": 0.985,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -536,18 +536,18 @@
       "question": "Will Google have the top AI model on December 31?",
       "slug": "which-company-has-best-ai-model-end-of-2025",
       "category": "unknown",
-      "volume_24h": 29285.11446700001,
-      "liquidity": 56605.3475,
+      "volume_24h": 130570.89323500007,
+      "liquidity": 44747.9361,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.91,
-        0.09
+        0.865,
+        0.135
       ],
-      "yes_price": 0.91,
-      "no_price": 0.09,
+      "yes_price": 0.865,
+      "no_price": 0.135,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -558,18 +558,18 @@
       "question": "Will OpenAI have the top AI model on December 31?",
       "slug": "will-openai-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 17787.222763,
-      "liquidity": 61581.08835,
+      "volume_24h": 88147.525138,
+      "liquidity": 53994.15262,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0145,
-        0.9855
+        0.0935,
+        0.9065
       ],
-      "yes_price": 0.0145,
-      "no_price": 0.9855,
+      "yes_price": 0.0935,
+      "no_price": 0.9065,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -580,18 +580,18 @@
       "question": "Will Alibaba have the top AI model on December 31?",
       "slug": "will-alibaba-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 12235.319500000007,
-      "liquidity": 80280.52004,
+      "volume_24h": 54952.31699999997,
+      "liquidity": 138706.11812,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0025,
-        0.9975
+        0.0015,
+        0.9985
       ],
-      "yes_price": 0.0025,
-      "no_price": 0.9975,
+      "yes_price": 0.0015,
+      "no_price": 0.9985,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -602,18 +602,18 @@
       "question": "Will xAI have the top AI model on December 31?",
       "slug": "will-xai-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 22132.837357,
-      "liquidity": 67662.10863,
+      "volume_24h": 58512.47413499999,
+      "liquidity": 59383.2141,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.056,
-        0.944
+        0.032,
+        0.968
       ],
-      "yes_price": 0.056,
-      "no_price": 0.944,
+      "yes_price": 0.032,
+      "no_price": 0.968,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -624,18 +624,18 @@
       "question": "Will Anthropic have the top AI model on December 31?",
       "slug": "will-anthropic-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 18925.860614999998,
-      "liquidity": 142478.0158,
+      "volume_24h": 66917.45530999998,
+      "liquidity": 184693.45465,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0115,
-        0.9885
+        0.0045,
+        0.9955
       ],
-      "yes_price": 0.0115,
-      "no_price": 0.9885,
+      "yes_price": 0.0045,
+      "no_price": 0.9955,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -646,8 +646,8 @@
       "question": "Will Meta have the top AI model on December 31?",
       "slug": "will-meta-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 13108.591000000002,
-      "liquidity": 170249.50756,
+      "volume_24h": 67738.64499999999,
+      "liquidity": 196579.48846,
       "outcomes": [
         "Yes",
         "No"
@@ -668,8 +668,8 @@
       "question": "Will Mistral AI have the top AI model on December 31?",
       "slug": "will-mistral-ai-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 0,
-      "liquidity": 125901.77561,
+      "volume_24h": 11784.4,
+      "liquidity": 100014.87029,
       "outcomes": [
         "Yes",
         "No"
@@ -690,18 +690,18 @@
       "question": "Will DeepSeek have the top AI model on December 31?",
       "slug": "will-deepseek-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 11778.938000000004,
-      "liquidity": 40241.0616,
+      "volume_24h": 60779.76714899998,
+      "liquidity": 49591.24907,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0115,
-        0.9885
+        0.0055,
+        0.9945
       ],
-      "yes_price": 0.0115,
-      "no_price": 0.9885,
+      "yes_price": 0.0055,
+      "no_price": 0.9945,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -712,8 +712,8 @@
       "question": "Will Microsoft have the top AI model on December 31?",
       "slug": "will-microsoft-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 52.55,
-      "liquidity": 190965.2172,
+      "volume_24h": 39.2,
+      "liquidity": 192689.51082,
       "outcomes": [
         "Yes",
         "No"
@@ -734,8 +734,8 @@
       "question": "Will Z.ai have the top AI model on December 31?",
       "slug": "will-zai-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 10610.776000000002,
-      "liquidity": 59899.00922,
+      "volume_24h": 62506.13899999999,
+      "liquidity": 118960.65867,
       "outcomes": [
         "Yes",
         "No"
@@ -756,8 +756,8 @@
       "question": "Will Tencent have the top AI model on December 31?",
       "slug": "will-tencent-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 1992,
-      "liquidity": 143908.58499,
+      "volume_24h": 2750.86,
+      "liquidity": 119403.20447,
       "outcomes": [
         "Yes",
         "No"
@@ -778,18 +778,18 @@
       "question": "Will Moonshot have the top AI model on December 31?",
       "slug": "will-moonshot-have-the-top-ai-model-on-december-31",
       "category": "unknown",
-      "volume_24h": 15038.726000000002,
-      "liquidity": 88952.06809,
+      "volume_24h": 67350.698,
+      "liquidity": 160355.61143,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.002,
-        0.998
+        0.0015,
+        0.9985
       ],
-      "yes_price": 0.002,
-      "no_price": 0.998,
+      "yes_price": 0.0015,
+      "no_price": 0.9985,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -800,8 +800,8 @@
       "question": "Will Bitcoin reach $1,000,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-1000000-by-december-31-2025",
       "category": "unknown",
-      "volume_24h": 87509.99343400005,
-      "liquidity": 526696.3643,
+      "volume_24h": 451524.6425850006,
+      "liquidity": 774879.7016,
       "outcomes": [
         "Yes",
         "No"
@@ -822,8 +822,8 @@
       "question": "Will Bitcoin reach $250,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-250000-by-december-31-2025",
       "category": "unknown",
-      "volume_24h": 37088.654186,
-      "liquidity": 538007.40591,
+      "volume_24h": 82328.54360399987,
+      "liquidity": 526477.32006,
       "outcomes": [
         "Yes",
         "No"
@@ -844,18 +844,18 @@
       "question": "Will Bitcoin reach $200,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-200000-by-december-31-2025",
       "category": "unknown",
-      "volume_24h": 46721.81947199999,
-      "liquidity": 243831.66591,
+      "volume_24h": 80235.568707,
+      "liquidity": 285852.02788,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0045,
-        0.9955
+        0.0035,
+        0.9965
       ],
-      "yes_price": 0.0045,
-      "no_price": 0.9955,
+      "yes_price": 0.0035,
+      "no_price": 0.9965,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -866,18 +866,18 @@
       "question": "Will Bitcoin reach $150,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-150000-by-december-31-2025-188",
       "category": "unknown",
-      "volume_24h": 243552.27025300005,
-      "liquidity": 384440.18602,
+      "volume_24h": 102878.09532400001,
+      "liquidity": 326548.84944,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0075,
-        0.9925
+        0.0105,
+        0.9895
       ],
-      "yes_price": 0.0075,
-      "no_price": 0.9925,
+      "yes_price": 0.0105,
+      "no_price": 0.9895,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -888,18 +888,18 @@
       "question": "Will Bitcoin reach $130,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-130000-by-december-31-2025-911-832",
       "category": "unknown",
-      "volume_24h": 172214.2954629999,
-      "liquidity": 426124.98948,
+      "volume_24h": 478441.2030780002,
+      "liquidity": 222133.74912,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0195,
-        0.9805
+        0.034,
+        0.966
       ],
-      "yes_price": 0.0195,
-      "no_price": 0.9805,
+      "yes_price": 0.034,
+      "no_price": 0.966,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -908,20 +908,20 @@
       "token_id": "19172660598358578032571481657371270203404516640166684953652435968273007603461",
       "condition_id": "0x5e8e585d855c4288c3805064e74fc7ea1dab47dc0e9b42a0dbd9ca5f49c997f9",
       "question": "Will Bitcoin dip to $50,000 by December 31, 2025?",
-      "slug": "will-bitcoin-dip-to-50000-by-december-31-2025-391-715-682-587-692-994-786-318-267-857",
+      "slug": "will-bitcoin-dip-to-50000-by-december-31-2025-391-715-682-587-692-994-786-318-267-857-157-791-189-328-186",
       "category": "unknown",
-      "volume_24h": 31711.256398999994,
-      "liquidity": 91202.22657,
+      "volume_24h": 42466.13711499999,
+      "liquidity": 159942.50074,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.029,
-        0.971
+        0.016,
+        0.984
       ],
-      "yes_price": 0.029,
-      "no_price": 0.971,
+      "yes_price": 0.016,
+      "no_price": 0.984,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -930,20 +930,20 @@
       "token_id": "95047670164958340277111777643825971965059782358468932324606496632183052684085",
       "condition_id": "0x0aeb566c973d193ef7f77d2532ba6bffe4f76d5f6b7c5422ceaa966536b7ef90",
       "question": "Will Bitcoin dip to $70,000 by December 31, 2025?",
-      "slug": "will-bitcoin-dip-to-70000-by-december-31-2025-193-726-878-775-359-968-264-727-793-714",
+      "slug": "will-bitcoin-dip-to-70000-by-december-31-2025-193-726-878-775-359-968-264-727-793-714-257-318-569-865-147",
       "category": "unknown",
-      "volume_24h": 120483.57339600002,
-      "liquidity": 89301.8625,
+      "volume_24h": 164264.77780799998,
+      "liquidity": 123428.6968,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.22,
-        0.78
+        0.075,
+        0.925
       ],
-      "yes_price": 0.22,
-      "no_price": 0.78,
+      "yes_price": 0.075,
+      "no_price": 0.925,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -952,10 +952,10 @@
       "token_id": "17669060580911376882527520521421617329219303654142453382103185951654496084129",
       "condition_id": "0x86f01fcc4fa9ca9871189d8f4a1121bb31784c889d78f82e2f6de32381e3d894",
       "question": "Will Bitcoin dip to $20,000 by December 31, 2025?",
-      "slug": "will-bitcoin-dip-to-20000-by-december-31-2025-942-621-278-695-321-896-769-417-957-733",
+      "slug": "will-bitcoin-dip-to-20000-by-december-31-2025-942-621-278-695-321-896-769-417-957-733-354-361-233-126-159",
       "category": "unknown",
-      "volume_24h": 20159.761318,
-      "liquidity": 84197.22739,
+      "volume_24h": 18872.169189000004,
+      "liquidity": 94652.74272,
       "outcomes": [
         "Yes",
         "No"
@@ -976,18 +976,18 @@
       "question": "Will Bitcoin reach $140,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-140000-by-december-31-2025-258-893",
       "category": "unknown",
-      "volume_24h": 162506.6054739999,
-      "liquidity": 215786.24366,
+      "volume_24h": 189705.239425,
+      "liquidity": 198152.47338,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0115,
-        0.9885
+        0.0155,
+        0.9845
       ],
-      "yes_price": 0.0115,
-      "no_price": 0.9885,
+      "yes_price": 0.0155,
+      "no_price": 0.9845,
       "end_date": null,
       "active": true,
       "closed": false
@@ -998,8 +998,8 @@
       "question": "Will Bitcoin reach $170,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-170000-by-december-31-2025-215",
       "category": "unknown",
-      "volume_24h": 18305.066830999996,
-      "liquidity": 128603.87403,
+      "volume_24h": 124270.66406699998,
+      "liquidity": 159801.84949,
       "outcomes": [
         "Yes",
         "No"
@@ -1018,20 +1018,20 @@
       "token_id": "4960072122879914031540087398045925546763584182114633893203762140348078315559",
       "condition_id": "0xffcbecbfa6983b3cdd5e91d078088beb5738d0c746bcedceb62f7bfed0470af5",
       "question": "Will Bitcoin dip to $80,000 by December 31, 2025?",
-      "slug": "will-bitcoin-dip-to-80000-by-december-31-2025-118-573-457-488-883",
+      "slug": "will-bitcoin-dip-to-80000-by-december-31-2025-118-573-457-488-883-987-884-891-557",
       "category": "unknown",
-      "volume_24h": 168103.773594,
-      "liquidity": 70111.4732,
+      "volume_24h": 204339.36302299987,
+      "liquidity": 63282.78882,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.68,
-        0.32
+        0.2775,
+        0.7225
       ],
-      "yes_price": 0.68,
-      "no_price": 0.32,
+      "yes_price": 0.2775,
+      "no_price": 0.7225,
       "end_date": "2026-01-01T05:00:00Z",
       "active": true,
       "closed": false
@@ -1040,20 +1040,20 @@
       "token_id": "92530351746682701626081429271272191534203523777966250895862560038889741880940",
       "condition_id": "0xd3cfc885ca1a482af4057f39937398fa5adc7a0b61e2381956384af1bf59ce6f",
       "question": "Will Bitcoin reach $100,000 by December 31, 2025?",
-      "slug": "will-bitcoin-reach-100000-by-december-31-2025-213-146",
+      "slug": "will-bitcoin-reach-100000-by-december-31-2025-213-146-883-729-282",
       "category": "unknown",
-      "volume_24h": 161724.3387030001,
-      "liquidity": 69333.8355,
+      "volume_24h": 371511.5370350001,
+      "liquidity": 117891.4408,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.22,
-        0.78
+        0.515,
+        0.485
       ],
-      "yes_price": 0.22,
-      "no_price": 0.78,
+      "yes_price": 0.515,
+      "no_price": 0.485,
       "end_date": "2026-01-01T05:00:00Z",
       "active": true,
       "closed": false
@@ -1062,20 +1062,20 @@
       "token_id": "50658332794833733889417312663211494209117086541806369612154229286490509212741",
       "condition_id": "0x9e8440830c8cdccb524700bf0be33f35df2f0278bff7b843f8073235c96da886",
       "question": "Will Bitcoin reach $110,000 by December 31, 2025?",
-      "slug": "will-bitcoin-reach-110000-by-december-31-2025",
+      "slug": "will-bitcoin-reach-110000-by-december-31-2025-793",
       "category": "unknown",
-      "volume_24h": 136308.42898499998,
-      "liquidity": 123956.9986,
+      "volume_24h": 399877.496663,
+      "liquidity": 96172.4725,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.065,
-        0.935
+        0.175,
+        0.825
       ],
-      "yes_price": 0.065,
-      "no_price": 0.935,
+      "yes_price": 0.175,
+      "no_price": 0.825,
       "end_date": "2026-01-01T05:00:00Z",
       "active": true,
       "closed": false
@@ -1086,18 +1086,150 @@
       "question": "Will Bitcoin reach $120,000 by December 31, 2025?",
       "slug": "will-bitcoin-reach-120000-by-december-31-2025-472-972",
       "category": "unknown",
-      "volume_24h": 77189.85868599999,
-      "liquidity": 200652.36259,
+      "volume_24h": 243849.02868199997,
+      "liquidity": 161277.49701,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.027,
-        0.973
+        0.0585,
+        0.9415
       ],
-      "yes_price": 0.027,
-      "no_price": 0.973,
+      "yes_price": 0.0585,
+      "no_price": 0.9415,
+      "end_date": "2026-01-01T05:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "91630032807502442875790586053657634522505350693553360884357849233158148980160",
+      "condition_id": "0x4fbbb85445aaafada34e5d94c50b787038729a26b8aa995e0f18158e2019d94e",
+      "question": "Will Bitcoin reach $105,000 by December 31, 2025?",
+      "slug": "will-bitcoin-reach-105000-by-december-31-2025-784-751",
+      "category": "unknown",
+      "volume_24h": 83144.63375699997,
+      "liquidity": 10483.6027,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.305,
+        0.695
+      ],
+      "yes_price": 0.305,
+      "no_price": 0.695,
+      "end_date": "2026-01-01T05:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "96867039153990962337615945364940037915308440159720050466327100056373743698980",
+      "condition_id": "0xe1efac87d70a9556b222624def73e3d7adc7b4513c781867c6c7aa105ff1d9b5",
+      "question": "Will Bitcoin reach $95,000 by December 31, 2025?",
+      "slug": "will-bitcoin-reach-95000-by-december-31-2025-818-596-821-318-841",
+      "category": "unknown",
+      "volume_24h": 114585.90485199999,
+      "liquidity": 17885.1888,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.855,
+        0.145
+      ],
+      "yes_price": 0.855,
+      "no_price": 0.145,
+      "end_date": "2026-01-01T05:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "109192152673387340222691800887530033764015721589812755799692351090070662056960",
+      "condition_id": "0x0c6a26bd3f5a4ff406e6688e30e625e5c9680a7d243551eb5570ee0074c6f88e",
+      "question": "Will Bitcoin reach $105,000 by December 31, 2025?",
+      "slug": "will-bitcoin-reach-105000-by-december-31-2025-159-849-483-977",
+      "category": "unknown",
+      "volume_24h": 0,
+      "liquidity": 101.99,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.5,
+        0.5
+      ],
+      "yes_price": 0.5,
+      "no_price": 0.5,
+      "end_date": "2026-01-01T05:00:00Z",
+      "active": false,
+      "closed": false
+    },
+    {
+      "token_id": "43065048993201852298348000614811881300559249848584277889292802783823995424800",
+      "condition_id": "0xc8f19832fd11ad8968e947c4e4fbed6059075efb73f9d1c9133ce6235a291fd0",
+      "question": "Will Bitcoin reach $115,000 by December 31, 2025?",
+      "slug": "will-bitcoin-reach-115000-by-december-31-2025-746",
+      "category": "unknown",
+      "volume_24h": 88155.31912,
+      "liquidity": 9885.006,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.095,
+        0.905
+      ],
+      "yes_price": 0.095,
+      "no_price": 0.905,
+      "end_date": "2026-01-01T05:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "9544795897157931749789672600393215554463936120262788041377651439138297023248",
+      "condition_id": "0x03a914dc0a98b109dfbcb6e8f8acfdf46c9a06fc6eac38f842b354983541a9e2",
+      "question": "Will Bitcoin dip to $65,000 by December 31, 2025?",
+      "slug": "will-bitcoin-dip-to-65000-by-december-31-2025-724",
+      "category": "unknown",
+      "volume_24h": 25809.678755000004,
+      "liquidity": 9230.28776,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0335,
+        0.9665
+      ],
+      "yes_price": 0.0335,
+      "no_price": 0.9665,
+      "end_date": "2026-01-01T05:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "4381437605923304671404496289379268024880920729170055186356445875810529628422",
+      "condition_id": "0x4f20debe0c978a8cfffa20cc3019dd3740c945bb577f12c0d4b8c82c4bf0647f",
+      "question": "Will Bitcoin dip to $75,000 by December 31, 2025?",
+      "slug": "will-bitcoin-dip-to-75000-by-december-31-2025-515",
+      "category": "unknown",
+      "volume_24h": 11309.8434,
+      "liquidity": 3960.574,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.125,
+        0.875
+      ],
+      "yes_price": 0.125,
+      "no_price": 0.875,
       "end_date": "2026-01-01T05:00:00Z",
       "active": true,
       "closed": false
@@ -1108,18 +1240,18 @@
       "question": "Will Ethereum hit $7,000 by December 31?",
       "slug": "will-ethereum-hit-7000-by-december-31-733-852",
       "category": "unknown",
-      "volume_24h": 111785.144677,
-      "liquidity": 149521.8151,
+      "volume_24h": 120020.16318299997,
+      "liquidity": 110013.13604,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.009,
-        0.991
+        0.011,
+        0.989
       ],
-      "yes_price": 0.009,
-      "no_price": 0.991,
+      "yes_price": 0.011,
+      "no_price": 0.989,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1130,8 +1262,8 @@
       "question": "Will Ethereum hit $10,000 by December 31?",
       "slug": "will-ethereum-hit-10000-by-december-31-218-525",
       "category": "unknown",
-      "volume_24h": 9412.589969999999,
-      "liquidity": 130377.3873,
+      "volume_24h": 86422.02020099996,
+      "liquidity": 164234.12037,
       "outcomes": [
         "Yes",
         "No"
@@ -1152,18 +1284,18 @@
       "question": "Will Ethereum hit $8,000 by December 31?",
       "slug": "will-ethereum-hit-8000-by-december-31-124-489",
       "category": "unknown",
-      "volume_24h": 18598.040125,
-      "liquidity": 141378.12247,
+      "volume_24h": 197378.78872900002,
+      "liquidity": 122988.2256,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.008,
-        0.992
+        0.0095,
+        0.9905
       ],
-      "yes_price": 0.008,
-      "no_price": 0.992,
+      "yes_price": 0.0095,
+      "no_price": 0.9905,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1174,184 +1306,8 @@
       "question": "Will Ethereum hit $6,000 by December 31?",
       "slug": "will-ethereum-hit-6000-by-december-31-843-315",
       "category": "unknown",
-      "volume_24h": 263931.5532,
-      "liquidity": 327710.7991,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.0085,
-        0.9915
-      ],
-      "yes_price": 0.0085,
-      "no_price": 0.9915,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "96638575418189284731461006608299472691495172793493062289677934142140726427384",
-      "condition_id": "0xeeb92ddd77d671d1f9ea1f5727208d1fa91896a6d1f657fdcd7c9d578fe5c46c",
-      "question": "Will Ethereum hit $5,000 by December 31?",
-      "slug": "will-ethereum-hit-5000-by-december-31-796-376",
-      "category": "unknown",
-      "volume_24h": 95443.46816899999,
-      "liquidity": 273538.63348,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.0185,
-        0.9815
-      ],
-      "yes_price": 0.0185,
-      "no_price": 0.9815,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "82510958209410597815455827415233906018439939153028999177265735407231980907130",
-      "condition_id": "0x15e731302e61491cc8aafbcfb77febb1fdd58ea1525737a01f5e763d29e4588e",
-      "question": "Will Ethereum dip to $1,000 by December 31?",
-      "slug": "will-ethereum-dip-to-1000-by-december-31-498-391-185-526-541-347-589",
-      "category": "unknown",
-      "volume_24h": 13732.242056000001,
-      "liquidity": 76997.35108,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.011,
-        0.989
-      ],
-      "yes_price": 0.011,
-      "no_price": 0.989,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "36767938726053718701493886161747293701732479047257426596679742158953644231083",
-      "condition_id": "0x2688412dbb15d62fdf0257598665870343847a902add909a7e95a373870598b6",
-      "question": "Will Ethereum dip to $1,300 by December 31?",
-      "slug": "will-ethereum-dip-to-1300-by-december-31-455-941-866-736-589",
-      "category": "unknown",
-      "volume_24h": 14022.223866999999,
-      "liquidity": 60901.0459,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.018,
-        0.982
-      ],
-      "yes_price": 0.018,
-      "no_price": 0.982,
-      "end_date": "2025-12-31T00:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "103340235029917759242440988364163632161240314966392371375720218455927962726404",
-      "condition_id": "0x93621441f16eda493eace04900e1323e50e0b0a93c83d8f71d9d5ac9e4e77b44",
-      "question": "Will Ethereum hit $14,000 by December 31?",
-      "slug": "will-ethereum-hit-14000-by-december-31-239-295",
-      "category": "unknown",
-      "volume_24h": 26203.067186000004,
-      "liquidity": 425189.00589,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.0055,
-        0.9945
-      ],
-      "yes_price": 0.0055,
-      "no_price": 0.9945,
-      "end_date": null,
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "38241285507517544687722599294880756127677624993864646739185007191073534237447",
-      "condition_id": "0x5d8215ee4f2277a84a4f9fc06768f725093d602e4993d2a7714c123691811bd9",
-      "question": "Will Ethereum dip to $800 by December 31?",
-      "slug": "will-ethereum-dip-to-800-by-december-31-947-853-936-835-135",
-      "category": "unknown",
-      "volume_24h": 1645.917,
-      "liquidity": 64907.05409,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.008,
-        0.992
-      ],
-      "yes_price": 0.008,
-      "no_price": 0.992,
-      "end_date": "2025-12-31T00:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "90554604925549679441302051030677964177792034527604913227687950640465230372217",
-      "condition_id": "0xfe8911cbf25e9e359396faf1c0fcd31a9f2a3c3bb35d299e83f1cd200063cf34",
-      "question": "Will Ethereum hit $17,000 by December 31?",
-      "slug": "will-ethereum-hit-17000-by-december-31",
-      "category": "unknown",
-      "volume_24h": 70300.57112,
-      "liquidity": 172430.13653,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.0025,
-        0.9975
-      ],
-      "yes_price": 0.0025,
-      "no_price": 0.9975,
-      "end_date": "2026-01-01T04:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "22999731098119206643487263219621291731133602508852896696306511964985382013346",
-      "condition_id": "0x1bbdc459d73e6972f5ba1f687d739fde70a9774f4875611699fb00a9eb28f090",
-      "question": "Tether insolvent in 2025?",
-      "slug": "tether-insolvent-in-2025",
-      "category": "unknown",
-      "volume_24h": 80,
-      "liquidity": 37699.14796,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.008,
-        0.992
-      ],
-      "yes_price": 0.008,
-      "no_price": 0.992,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "27041836805134371913740407263212214733159750380813540071930429439405154056312",
-      "condition_id": "0x416316490efec1038ce09ec0184f82f1f7921876ee0594a30c783635ea6983d0",
-      "question": "USDT depeg in 2025?",
-      "slug": "usdt-depeg-in-2025",
-      "category": "unknown",
-      "volume_24h": 33365.59651,
-      "liquidity": 133921.82984,
+      "volume_24h": 216769.424087,
+      "liquidity": 318111.15778,
       "outcomes": [
         "Yes",
         "No"
@@ -1367,23 +1323,199 @@
       "closed": false
     },
     {
-      "token_id": "46031991343302022758885232715327973278894914473014946268947234642842781512787",
-      "condition_id": "0x21400affa8e3fdfff07bb8421d708635bc7be52f5396268dd281ef92a31bb86f",
-      "question": "Will Avatar 3 be the top grossing movie of 2025?",
-      "slug": "will-avatar-3-be-the-top-grossing-movie-of-2025",
+      "token_id": "96638575418189284731461006608299472691495172793493062289677934142140726427384",
+      "condition_id": "0xeeb92ddd77d671d1f9ea1f5727208d1fa91896a6d1f657fdcd7c9d578fe5c46c",
+      "question": "Will Ethereum hit $5,000 by December 31?",
+      "slug": "will-ethereum-hit-5000-by-december-31-796-376",
       "category": "unknown",
-      "volume_24h": 90854.41601799997,
-      "liquidity": 275356.00109,
+      "volume_24h": 281264.637018,
+      "liquidity": 235110.00385,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0285,
-        0.9715
+        0.0315,
+        0.9685
       ],
-      "yes_price": 0.0285,
-      "no_price": 0.9715,
+      "yes_price": 0.0315,
+      "no_price": 0.9685,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "82510958209410597815455827415233906018439939153028999177265735407231980907130",
+      "condition_id": "0x15e731302e61491cc8aafbcfb77febb1fdd58ea1525737a01f5e763d29e4588e",
+      "question": "Will Ethereum dip to $1,000 by December 31?",
+      "slug": "will-ethereum-dip-to-1000-by-december-31-498-391-185-526-541-347-589",
+      "category": "unknown",
+      "volume_24h": 1435.8356130000002,
+      "liquidity": 67707.26048,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0065,
+        0.9935
+      ],
+      "yes_price": 0.0065,
+      "no_price": 0.9935,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "36767938726053718701493886161747293701732479047257426596679742158953644231083",
+      "condition_id": "0x2688412dbb15d62fdf0257598665870343847a902add909a7e95a373870598b6",
+      "question": "Will Ethereum dip to $1,300 by December 31?",
+      "slug": "will-ethereum-dip-to-1300-by-december-31-455-941-866-736-589",
+      "category": "unknown",
+      "volume_24h": 14658.46773,
+      "liquidity": 66252.68549,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0085,
+        0.9915
+      ],
+      "yes_price": 0.0085,
+      "no_price": 0.9915,
+      "end_date": "2025-12-31T00:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "103340235029917759242440988364163632161240314966392371375720218455927962726404",
+      "condition_id": "0x93621441f16eda493eace04900e1323e50e0b0a93c83d8f71d9d5ac9e4e77b44",
+      "question": "Will Ethereum hit $14,000 by December 31?",
+      "slug": "will-ethereum-hit-14000-by-december-31-239-295",
+      "category": "unknown",
+      "volume_24h": 73640.45297500001,
+      "liquidity": 145929.33312,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0035,
+        0.9965
+      ],
+      "yes_price": 0.0035,
+      "no_price": 0.9965,
+      "end_date": null,
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "38241285507517544687722599294880756127677624993864646739185007191073534237447",
+      "condition_id": "0x5d8215ee4f2277a84a4f9fc06768f725093d602e4993d2a7714c123691811bd9",
+      "question": "Will Ethereum dip to $800 by December 31?",
+      "slug": "will-ethereum-dip-to-800-by-december-31-947-853-936-835-135",
+      "category": "unknown",
+      "volume_24h": 10215.877071999997,
+      "liquidity": 68634.17307,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.004,
+        0.996
+      ],
+      "yes_price": 0.004,
+      "no_price": 0.996,
+      "end_date": "2025-12-31T00:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "90554604925549679441302051030677964177792034527604913227687950640465230372217",
+      "condition_id": "0xfe8911cbf25e9e359396faf1c0fcd31a9f2a3c3bb35d299e83f1cd200063cf34",
+      "question": "Will Ethereum hit $17,000 by December 31?",
+      "slug": "will-ethereum-hit-17000-by-december-31",
+      "category": "unknown",
+      "volume_24h": 59732.34110000001,
+      "liquidity": 412930.24071,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.002,
+        0.998
+      ],
+      "yes_price": 0.002,
+      "no_price": 0.998,
+      "end_date": "2026-01-01T04:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "22999731098119206643487263219621291731133602508852896696306511964985382013346",
+      "condition_id": "0x1bbdc459d73e6972f5ba1f687d739fde70a9774f4875611699fb00a9eb28f090",
+      "question": "Tether insolvent in 2025?",
+      "slug": "tether-insolvent-in-2025",
+      "category": "unknown",
+      "volume_24h": 774.137333,
+      "liquidity": 38815.39049,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0105,
+        0.9895
+      ],
+      "yes_price": 0.0105,
+      "no_price": 0.9895,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "27041836805134371913740407263212214733159750380813540071930429439405154056312",
+      "condition_id": "0x416316490efec1038ce09ec0184f82f1f7921876ee0594a30c783635ea6983d0",
+      "question": "USDT depeg in 2025?",
+      "slug": "usdt-depeg-in-2025",
+      "category": "unknown",
+      "volume_24h": 3631.422973,
+      "liquidity": 160246.02224,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0075,
+        0.9925
+      ],
+      "yes_price": 0.0075,
+      "no_price": 0.9925,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "46031991343302022758885232715327973278894914473014946268947234642842781512787",
+      "condition_id": "0x21400affa8e3fdfff07bb8421d708635bc7be52f5396268dd281ef92a31bb86f",
+      "question": "Will Avatar 3 be the top grossing movie of 2025?",
+      "slug": "will-avatar-3-be-the-top-grossing-movie-of-2025",
+      "category": "unknown",
+      "volume_24h": 128885.20133000003,
+      "liquidity": 251567.62296,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0435,
+        0.9565
+      ],
+      "yes_price": 0.0435,
+      "no_price": 0.9565,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1394,18 +1526,18 @@
       "question": "Will Wicked: For Good be the top grossing movie of 2025?",
       "slug": "will-wicked-for-good-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 88469.654574,
-      "liquidity": 69833.81031,
+      "volume_24h": 149375.62272400004,
+      "liquidity": 126359.32013,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0455,
-        0.9545
+        0.008,
+        0.992
       ],
-      "yes_price": 0.0455,
-      "no_price": 0.9545,
+      "yes_price": 0.008,
+      "no_price": 0.992,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1416,8 +1548,8 @@
       "question": "Will Superman be the top grossing movie of 2025?",
       "slug": "will-superman-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 513420.0004999999,
-      "liquidity": 750494.96119,
+      "volume_24h": 142996.78899999993,
+      "liquidity": 954142.51425,
       "outcomes": [
         "Yes",
         "No"
@@ -1438,8 +1570,8 @@
       "question": "Will Thunderbolts be the top grossing movie of 2025?",
       "slug": "will-thunderbolts-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 136199.37150000004,
-      "liquidity": 907888.62258,
+      "volume_24h": 87810.52299999996,
+      "liquidity": 966044.85158,
       "outcomes": [
         "Yes",
         "No"
@@ -1460,8 +1592,8 @@
       "question": "Will The Fantastic Four: First Steps be the top grossing movie of 2025?",
       "slug": "will-the-fantastic-four-first-steps-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 194722.856,
-      "liquidity": 894684.14912,
+      "volume_24h": 707.39,
+      "liquidity": 915611.01774,
       "outcomes": [
         "Yes",
         "No"
@@ -1482,8 +1614,8 @@
       "question": "Will Jurassic World: Rebirth be the top grossing movie of 2025?",
       "slug": "will-jurassic-world-rebirth-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 405264.84349999996,
-      "liquidity": 818470.95353,
+      "volume_24h": 205653.5049999999,
+      "liquidity": 946992.40652,
       "outcomes": [
         "Yes",
         "No"
@@ -1504,8 +1636,8 @@
       "question": "Will Captain America: Brave New World be the top grossing movie of 2025?",
       "slug": "will-captain-america-new-world-order-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 408220.0650000001,
-      "liquidity": 927656.4476,
+      "volume_24h": 5579.07,
+      "liquidity": 937732.63539,
       "outcomes": [
         "Yes",
         "No"
@@ -1526,18 +1658,18 @@
       "question": "Will Zootopia 2 be the top grossing movie of 2025?",
       "slug": "will-zootopia-2-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 181023.57660599987,
-      "liquidity": 97807.61864,
+      "volume_24h": 192601.60545099998,
+      "liquidity": 64836.80274,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0415,
-        0.9585
+        0.0165,
+        0.9835
       ],
-      "yes_price": 0.0415,
-      "no_price": 0.9585,
+      "yes_price": 0.0165,
+      "no_price": 0.9835,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1548,8 +1680,8 @@
       "question": "Will How to Train Your Dragon be the top grossing movie of 2025?",
       "slug": "will-how-to-train-your-dragon-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 431855.05,
-      "liquidity": 881830.24826,
+      "volume_24h": 2184.63,
+      "liquidity": 895690.80488,
       "outcomes": [
         "Yes",
         "No"
@@ -1570,18 +1702,18 @@
       "question": "Will A Minecraft Movie be the top grossing movie of 2025?",
       "slug": "will-a-minecraft-movie-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 70164.20324800002,
-      "liquidity": 103449.2721,
+      "volume_24h": 123062.17956799998,
+      "liquidity": 66970.72082,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.87,
-        0.13
+        0.925,
+        0.075
       ],
-      "yes_price": 0.87,
-      "no_price": 0.13,
+      "yes_price": 0.925,
+      "no_price": 0.075,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1592,18 +1724,18 @@
       "question": "Will Lilo & Stitch be the top grossing movie of 2025?",
       "slug": "will-movie-a-be-the-top-grossing-movie-of-2025",
       "category": "unknown",
-      "volume_24h": 60803.036631,
-      "liquidity": 208176.94179,
+      "volume_24h": 79141.46997499999,
+      "liquidity": 89559.03931,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.013,
-        0.987
+        0.0065,
+        0.9935
       ],
-      "yes_price": 0.013,
-      "no_price": 0.987,
+      "yes_price": 0.0065,
+      "no_price": 0.9935,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1614,18 +1746,18 @@
       "question": "Will SpaceX have 200 or more launches in 2025?",
       "slug": "will-spacex-have-200-or-more-launches-in-2025",
       "category": "unknown",
-      "volume_24h": 387.02,
-      "liquidity": 9655.07938,
+      "volume_24h": 10.06,
+      "liquidity": 10777.14784,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.009,
-        0.991
+        0.0055,
+        0.9945
       ],
-      "yes_price": 0.009,
-      "no_price": 0.991,
+      "yes_price": 0.0055,
+      "no_price": 0.9945,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1636,18 +1768,18 @@
       "question": "Will SpaceX have between 140-159 launches in 2025?",
       "slug": "will-spacex-have-between-140-159-launches-in-2025",
       "category": "unknown",
-      "volume_24h": 285.714285,
-      "liquidity": 5905.47565,
+      "volume_24h": 10.02,
+      "liquidity": 5478.50859,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.005,
-        0.995
+        0.004,
+        0.996
       ],
-      "yes_price": 0.005,
-      "no_price": 0.995,
+      "yes_price": 0.004,
+      "no_price": 0.996,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1658,18 +1790,18 @@
       "question": "Will SpaceX have between 160-179 launches in 2025?",
       "slug": "will-spacex-have-between-160-179-launches-in-2025",
       "category": "unknown",
-      "volume_24h": 4946,
-      "liquidity": 4467.24361,
+      "volume_24h": 2751.725923,
+      "liquidity": 4714.76343,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.9445,
-        0.0555
+        0.953,
+        0.047
       ],
-      "yes_price": 0.9445,
-      "no_price": 0.0555,
+      "yes_price": 0.953,
+      "no_price": 0.047,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1680,18 +1812,18 @@
       "question": "Will SpaceX have between 180-199 launches in 2025?",
       "slug": "will-spacex-have-between-180-199-launches-in-2025",
       "category": "unknown",
-      "volume_24h": 6722.511626,
-      "liquidity": 2879.51416,
+      "volume_24h": 3687.4399999999996,
+      "liquidity": 3567.44155,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.037,
-        0.963
+        0.0335,
+        0.9665
       ],
-      "yes_price": 0.037,
-      "no_price": 0.963,
+      "yes_price": 0.0335,
+      "no_price": 0.9665,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1702,18 +1834,18 @@
       "question": "Weed rescheduled in 2025?",
       "slug": "weed-rescheduled-in-2025",
       "category": "unknown",
-      "volume_24h": 264.735962,
-      "liquidity": 8726.02483,
+      "volume_24h": 3179.705283,
+      "liquidity": 5613.81617,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0545,
-        0.9455
+        0.0935,
+        0.9065
       ],
-      "yes_price": 0.0545,
-      "no_price": 0.9455,
+      "yes_price": 0.0935,
+      "no_price": 0.9065,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1724,18 +1856,18 @@
       "question": "Ukraine joins NATO in 2025?",
       "slug": "ukraine-joins-nato-in-2025",
       "category": "unknown",
-      "volume_24h": 5606.994743999997,
-      "liquidity": 22089.61242,
+      "volume_24h": 2919.149,
+      "liquidity": 25254.35062,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0125,
-        0.9875
+        0.0055,
+        0.9945
       ],
-      "yes_price": 0.0125,
-      "no_price": 0.9875,
+      "yes_price": 0.0055,
+      "no_price": 0.9945,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1746,8 +1878,8 @@
       "question": "Khamenei out as Supreme Leader of Iran in 2025?",
       "slug": "khamenei-out-as-supreme-leader-of-iran-in-2025",
       "category": "unknown",
-      "volume_24h": 30958.824628,
-      "liquidity": 147396.96576,
+      "volume_24h": 52496.412324999954,
+      "liquidity": 79585.77298,
       "outcomes": [
         "Yes",
         "No"
@@ -1768,18 +1900,18 @@
       "question": "Nuclear weapon detonation in 2025?",
       "slug": "nuclear-weapon-detonation-in-2025",
       "category": "unknown",
-      "volume_24h": 13671.337116999994,
-      "liquidity": 52235.1612,
+      "volume_24h": 15626.311376999998,
+      "liquidity": 57638.33223,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0235,
-        0.9765
+        0.0215,
+        0.9785
       ],
-      "yes_price": 0.0235,
-      "no_price": 0.9765,
+      "yes_price": 0.0215,
+      "no_price": 0.9785,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1790,18 +1922,18 @@
       "question": "Russia x Ukraine ceasefire in 2025?",
       "slug": "russia-x-ukraine-ceasefire-in-2025",
       "category": "unknown",
-      "volume_24h": 801407.2396240004,
-      "liquidity": 878014.5117,
+      "volume_24h": 1288168.8416750042,
+      "liquidity": 1318758.6497,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.085,
-        0.915
+        0.055,
+        0.945
       ],
-      "yes_price": 0.085,
-      "no_price": 0.915,
+      "yes_price": 0.055,
+      "no_price": 0.945,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1812,18 +1944,18 @@
       "question": "Putin out as President of Russia in 2025?",
       "slug": "putin-out-as-president-of-russia-in-2025",
       "category": "unknown",
-      "volume_24h": 8796.702075000001,
-      "liquidity": 45040.57375,
+      "volume_24h": 17355.247153999997,
+      "liquidity": 38868.73815,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0145,
-        0.9855
+        0.015,
+        0.985
       ],
-      "yes_price": 0.0145,
-      "no_price": 0.9855,
+      "yes_price": 0.015,
+      "no_price": 0.985,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1834,18 +1966,18 @@
       "question": "Netanyahu out by 2025?",
       "slug": "netanyahu-out-in-2025-492",
       "category": "unknown",
-      "volume_24h": 4625.1172910000005,
-      "liquidity": 20997.53547,
+      "volume_24h": 1932.17,
+      "liquidity": 24917.56418,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0195,
-        0.9805
+        0.018,
+        0.982
       ],
-      "yes_price": 0.0195,
-      "no_price": 0.9805,
+      "yes_price": 0.018,
+      "no_price": 0.982,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1857,17 +1989,17 @@
       "slug": "one-direction-reunion-in-2025",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 1458.73182,
+      "liquidity": 1669.39981,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.008,
-        0.992
+        0.0075,
+        0.9925
       ],
-      "yes_price": 0.008,
-      "no_price": 0.992,
+      "yes_price": 0.0075,
+      "no_price": 0.9925,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1879,17 +2011,17 @@
       "slug": "britney-spears-tour-in-2025",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 1719.3013,
+      "liquidity": 1841.2539,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.05,
-        0.95
+        0.045,
+        0.955
       ],
-      "yes_price": 0.05,
-      "no_price": 0.95,
+      "yes_price": 0.045,
+      "no_price": 0.955,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1900,18 +2032,18 @@
       "question": "Nara & Lucky divorce in 2025?",
       "slug": "nara-lucky-divorce-in-2025",
       "category": "unknown",
-      "volume_24h": 9.01,
-      "liquidity": 1002.05495,
+      "volume_24h": 0,
+      "liquidity": 974.55613,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0395,
-        0.9605
+        0.0415,
+        0.9585
       ],
-      "yes_price": 0.0395,
-      "no_price": 0.9605,
+      "yes_price": 0.0415,
+      "no_price": 0.9585,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1922,18 +2054,18 @@
       "question": "Lana Del Rey divorce in 2025?",
       "slug": "lana-del-rey-divorce-in-2025",
       "category": "unknown",
-      "volume_24h": 2,
-      "liquidity": 6786.70386,
+      "volume_24h": 1.031967,
+      "liquidity": 6561.11926,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0345,
-        0.9655
+        0.034,
+        0.966
       ],
-      "yes_price": 0.0345,
-      "no_price": 0.9655,
+      "yes_price": 0.034,
+      "no_price": 0.966,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1944,18 +2076,18 @@
       "question": "Hailey Bieber pregnant in 2025?",
       "slug": "hailey-bieber-pregnant-in-2025",
       "category": "unknown",
-      "volume_24h": 5,
-      "liquidity": 171.4049,
+      "volume_24h": 2.08165,
+      "liquidity": 201.7015,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.17,
-        0.83
+        0.11,
+        0.89
       ],
-      "yes_price": 0.17,
-      "no_price": 0.83,
+      "yes_price": 0.11,
+      "no_price": 0.89,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -1966,8 +2098,8 @@
       "question": "New pandemic in 2025?",
       "slug": "new-pandemic-in-2025",
       "category": "unknown",
-      "volume_24h": 2623,
-      "liquidity": 25922.39342,
+      "volume_24h": 1578.666665,
+      "liquidity": 24755.38017,
       "outcomes": [
         "Yes",
         "No"
@@ -1988,18 +2120,18 @@
       "question": "Will the US confirm that aliens exist in 2025?",
       "slug": "will-the-us-confirm-that-aliens-exist-in-2025",
       "category": "unknown",
-      "volume_24h": 62404.95423999998,
-      "liquidity": 151727.02046,
+      "volume_24h": 30080.565938999996,
+      "liquidity": 91729.51392,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0105,
-        0.9895
+        0.0145,
+        0.9855
       ],
-      "yes_price": 0.0105,
-      "no_price": 0.9895,
+      "yes_price": 0.0145,
+      "no_price": 0.9855,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2010,18 +2142,18 @@
       "question": "MicroStrategy sells any Bitcoin in 2025?",
       "slug": "microstrategy-sell-any-bitcoin-in-2025",
       "category": "unknown",
-      "volume_24h": 68273.65723699999,
-      "liquidity": 93108.17188,
+      "volume_24h": 117908.30127200003,
+      "liquidity": 76856.76318,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.051,
-        0.949
+        0.024,
+        0.976
       ],
-      "yes_price": 0.051,
-      "no_price": 0.949,
+      "yes_price": 0.024,
+      "no_price": 0.976,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2032,18 +2164,18 @@
       "question": "MicroStrategy sells any Bitcoin by March 31, 2026?",
       "slug": "microstrategy-sells-any-bitcoin-by-march-31-2026",
       "category": "unknown",
-      "volume_24h": 8086.272885,
-      "liquidity": 1785.7157,
+      "volume_24h": 13934.576880999999,
+      "liquidity": 27614.4698,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.37,
-        0.63
+        0.12,
+        0.88
       ],
-      "yes_price": 0.37,
-      "no_price": 0.63,
+      "yes_price": 0.12,
+      "no_price": 0.88,
       "end_date": null,
       "active": true,
       "closed": false
@@ -2054,18 +2186,18 @@
       "question": "MicroStrategy sells any Bitcoin by June 30, 2026?",
       "slug": "microstrategy-sells-any-bitcoin-by-june-30-2026",
       "category": "unknown",
-      "volume_24h": 7269.368815,
-      "liquidity": 2894.7059,
+      "volume_24h": 5059.127082999999,
+      "liquidity": 19858.5546,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.37,
-        0.63
+        0.215,
+        0.785
       ],
-      "yes_price": 0.37,
-      "no_price": 0.63,
+      "yes_price": 0.215,
+      "no_price": 0.785,
       "end_date": "2026-07-01T04:00:00Z",
       "active": true,
       "closed": false
@@ -2076,18 +2208,18 @@
       "question": "Will Gold close under $2,500 at the end of 2025?",
       "slug": "will-gold-close-under-2500-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 21331.903165,
-      "liquidity": 38542.77943,
+      "volume_24h": 12388.346000000009,
+      "liquidity": 54624.87721,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0015,
-        0.9985
+        0.0005,
+        0.9995
       ],
-      "yes_price": 0.0015,
-      "no_price": 0.9985,
+      "yes_price": 0.0005,
+      "no_price": 0.9995,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2098,18 +2230,18 @@
       "question": "Will Gold close at $2,500-2,600 at the end of 2025?",
       "slug": "will-gold-close-at-2500-2600-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 10070.853999999998,
-      "liquidity": 98914.54854,
+      "volume_24h": 47187.60100000001,
+      "liquidity": 93334.4777,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0015,
-        0.9985
+        0.0005,
+        0.9995
       ],
-      "yes_price": 0.0015,
-      "no_price": 0.9985,
+      "yes_price": 0.0005,
+      "no_price": 0.9995,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2120,18 +2252,18 @@
       "question": "Will Gold close at $2,600-2,700 at the end of 2025?",
       "slug": "will-gold-close-at-2600-2700-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 2526.541,
-      "liquidity": 104355.19048,
+      "volume_24h": 3709.700000000001,
+      "liquidity": 102256.3977,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0015,
-        0.9985
+        0.001,
+        0.999
       ],
-      "yes_price": 0.0015,
-      "no_price": 0.9985,
+      "yes_price": 0.001,
+      "no_price": 0.999,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2142,8 +2274,8 @@
       "question": "Will Gold close at $2,800-2,900 at the end of 2025?",
       "slug": "will-gold-close-at-2800-2900-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 3417.524000000001,
-      "liquidity": 100303.87755,
+      "volume_24h": 35374.445999999996,
+      "liquidity": 118329.92363,
       "outcomes": [
         "Yes",
         "No"
@@ -2164,8 +2296,8 @@
       "question": "Will Gold close at $2,700-2,800 at the end of 2025?",
       "slug": "will-gold-close-at-2700-2800-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 13576.52,
-      "liquidity": 104212.00639,
+      "volume_24h": 17403.30300000001,
+      "liquidity": 135729.76559,
       "outcomes": [
         "Yes",
         "No"
@@ -2186,8 +2318,8 @@
       "question": "Will Gold close at $2,900-3,000 at the end of 2025?",
       "slug": "will-gold-close-at-2900-3000-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 17025.253,
-      "liquidity": 109287.98343,
+      "volume_24h": 32003.637499999997,
+      "liquidity": 152196.25489,
       "outcomes": [
         "Yes",
         "No"
@@ -2208,18 +2340,18 @@
       "question": "Will Gold close at $3,000-3,100 at the end of 2025?",
       "slug": "will-gold-close-at-3000-3100-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 68002.91833299992,
-      "liquidity": 91010.89654,
+      "volume_24h": 36827.70483200001,
+      "liquidity": 145306.23021,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0025,
-        0.9975
+        0.003,
+        0.997
       ],
-      "yes_price": 0.0025,
-      "no_price": 0.9975,
+      "yes_price": 0.003,
+      "no_price": 0.997,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2230,18 +2362,18 @@
       "question": "Will Gold close at $3,100-3,200 at the end of 2025?",
       "slug": "will-gold-close-at-3100-3200-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 93438.55433599999,
-      "liquidity": 91563.51221,
+      "volume_24h": 99042.93333199996,
+      "liquidity": 114658.50315,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0025,
-        0.9975
+        0.004,
+        0.996
       ],
-      "yes_price": 0.0025,
-      "no_price": 0.9975,
+      "yes_price": 0.004,
+      "no_price": 0.996,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2252,18 +2384,18 @@
       "question": "Will Gold close at $3,200 or more at the end of 2025?",
       "slug": "will-gold-close-at-3200-or-more-at-the-end-of-2025",
       "category": "unknown",
-      "volume_24h": 3902.4815630000003,
-      "liquidity": 106640.49443,
+      "volume_24h": 59047.346080999996,
+      "liquidity": 139416.26622,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.9885,
-        0.0115
+        0.9905,
+        0.0095
       ],
-      "yes_price": 0.9885,
-      "no_price": 0.0115,
+      "yes_price": 0.9905,
+      "no_price": 0.0095,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2274,18 +2406,18 @@
       "question": "US national Bitcoin reserve in 2025?",
       "slug": "us-national-bitcoin-reserve-in-2025",
       "category": "unknown",
-      "volume_24h": 64371.81183599999,
-      "liquidity": 33382.79028,
+      "volume_24h": 30061.507824000008,
+      "liquidity": 56683.51099,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.03,
-        0.97
+        0.0205,
+        0.9795
       ],
-      "yes_price": 0.03,
-      "no_price": 0.97,
+      "yes_price": 0.0205,
+      "no_price": 0.9795,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2296,18 +2428,18 @@
       "question": "Will 2025 be the hottest year on record?",
       "slug": "will-2025-be-the-hottest-year-on-record",
       "category": "unknown",
-      "volume_24h": 3360.595728,
-      "liquidity": 37073.22349,
+      "volume_24h": 361.447408,
+      "liquidity": 37274.03173,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0175,
-        0.9825
+        0.014,
+        0.986
       ],
-      "yes_price": 0.0175,
-      "no_price": 0.9825,
+      "yes_price": 0.014,
+      "no_price": 0.986,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2318,18 +2450,18 @@
       "question": "Will Kim Jong Un visit US in 2025?",
       "slug": "will-kim-jong-un-visit-us-in-2025",
       "category": "unknown",
-      "volume_24h": 22,
-      "liquidity": 7120.57953,
+      "volume_24h": 24.34,
+      "liquidity": 5456.16827,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0165,
-        0.9835
+        0.0155,
+        0.9845
       ],
-      "yes_price": 0.0165,
-      "no_price": 0.9835,
+      "yes_price": 0.0155,
+      "no_price": 0.9845,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2340,18 +2472,18 @@
       "question": "Harry & Meghan divorce in 2025?",
       "slug": "harry-meghan-divorce-in-2025",
       "category": "unknown",
-      "volume_24h": 5623.858153000001,
-      "liquidity": 11010.14293,
+      "volume_24h": 1.071427,
+      "liquidity": 15662.06138,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.026,
-        0.974
+        0.0245,
+        0.9755
       ],
-      "yes_price": 0.026,
-      "no_price": 0.974,
+      "yes_price": 0.0245,
+      "no_price": 0.9755,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2362,18 +2494,18 @@
       "question": "Trump divorce in 2025?",
       "slug": "trump-divorce-in-2025",
       "category": "unknown",
-      "volume_24h": 16.135,
-      "liquidity": 20011.98558,
+      "volume_24h": 2.011024,
+      "liquidity": 18090.59269,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0075,
-        0.9925
+        0.0065,
+        0.9935
       ],
-      "yes_price": 0.0075,
-      "no_price": 0.9925,
+      "yes_price": 0.0065,
+      "no_price": 0.9935,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2384,8 +2516,30 @@
       "question": "Bird flu vaccine in 2025?",
       "slug": "bird-flu-vaccine-in-2025",
       "category": "unknown",
-      "volume_24h": 5843.833272000001,
-      "liquidity": 22452.90792,
+      "volume_24h": 1273.5467589999998,
+      "liquidity": 24103.98882,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0205,
+        0.9795
+      ],
+      "yes_price": 0.0205,
+      "no_price": 0.9795,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "42535223527525889381000268612132321840663183873116564510482379287054948510637",
+      "condition_id": "0x705a52e7a17eba05f3cfef9b28b0f4a9f737d9110bad59301852228b4fe377f7",
+      "question": "Jay-Z & Beyonc\u00e9 divorce in 2025?",
+      "slug": "jay-z-beyonc-divorce-in-2025",
+      "category": "unknown",
+      "volume_24h": 531.925385,
+      "liquidity": 6490.82237,
       "outcomes": [
         "Yes",
         "No"
@@ -2401,45 +2555,23 @@
       "closed": false
     },
     {
-      "token_id": "42535223527525889381000268612132321840663183873116564510482379287054948510637",
-      "condition_id": "0x705a52e7a17eba05f3cfef9b28b0f4a9f737d9110bad59301852228b4fe377f7",
-      "question": "Jay-Z & Beyonc\u00e9 divorce in 2025?",
-      "slug": "jay-z-beyonc-divorce-in-2025",
-      "category": "unknown",
-      "volume_24h": 2340.320000000001,
-      "liquidity": 6936.53487,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.019,
-        0.981
-      ],
-      "yes_price": 0.019,
-      "no_price": 0.981,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
       "token_id": "45343480653694577807177505914664405669209636932459044719445554137639656106379",
       "condition_id": "0xafc235557ace53ff0b0d2e93392314a7c3f3daab26a79050e985c11282f66df7",
       "question": "Maduro out in 2025?",
       "slug": "maduro-out-in-2025-411",
       "category": "unknown",
-      "volume_24h": 287244.49534300005,
-      "liquidity": 373712.768,
+      "volume_24h": 532613.6871710004,
+      "liquidity": 237752.5653,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.19,
-        0.81
+        0.175,
+        0.825
       ],
-      "yes_price": 0.19,
-      "no_price": 0.81,
+      "yes_price": 0.175,
+      "no_price": 0.825,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2450,18 +2582,18 @@
       "question": "Maduro out by March 31, 2026?",
       "slug": "maduro-out-by-march-31-2026",
       "category": "unknown",
-      "volume_24h": 28038.106705,
-      "liquidity": 29670.5984,
+      "volume_24h": 67906.85165600003,
+      "liquidity": 37750.1286,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.395,
-        0.605
+        0.44,
+        0.56
       ],
-      "yes_price": 0.395,
-      "no_price": 0.605,
+      "yes_price": 0.44,
+      "no_price": 0.56,
       "end_date": "2026-03-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2472,18 +2604,18 @@
       "question": "Israel withdraws from Gaza in 2025?",
       "slug": "israel-withdraws-from-gaza-in-2025",
       "category": "unknown",
-      "volume_24h": 4116.86,
-      "liquidity": 38484.16237,
+      "volume_24h": 5152.9813060000015,
+      "liquidity": 82543.3603,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0175,
-        0.9825
+        0.011,
+        0.989
       ],
-      "yes_price": 0.0175,
-      "no_price": 0.9825,
+      "yes_price": 0.011,
+      "no_price": 0.989,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2494,18 +2626,18 @@
       "question": "Kraken IPO in 2025?",
       "slug": "kraken-ipo-in-2025",
       "category": "unknown",
-      "volume_24h": 4080.2557850000003,
-      "liquidity": 26780.56306,
+      "volume_24h": 3048.365155,
+      "liquidity": 23338.96752,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.028,
-        0.972
+        0.0295,
+        0.9705
       ],
-      "yes_price": 0.028,
-      "no_price": 0.972,
+      "yes_price": 0.0295,
+      "no_price": 0.9705,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2516,18 +2648,18 @@
       "question": "Kraken IPO by March 31, 2026?",
       "slug": "kraken-ipo-by-march-31-2026",
       "category": "unknown",
-      "volume_24h": 4084,
-      "liquidity": 1336.2173,
+      "volume_24h": 15.873013,
+      "liquidity": 991.8347,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.475,
-        0.525
+        0.39,
+        0.61
       ],
-      "yes_price": 0.475,
-      "no_price": 0.525,
+      "yes_price": 0.39,
+      "no_price": 0.61,
       "end_date": "2026-04-01T04:00:00Z",
       "active": true,
       "closed": false
@@ -2538,18 +2670,18 @@
       "question": "Kraken IPO by December 31, 2026?",
       "slug": "kraken-ipo-by-december-31-2026",
       "category": "unknown",
-      "volume_24h": 299.315788,
-      "liquidity": 932.8612,
+      "volume_24h": 0,
+      "liquidity": 509.5073,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.83,
-        0.17
+        0.93,
+        0.07
       ],
-      "yes_price": 0.83,
-      "no_price": 0.17,
+      "yes_price": 0.93,
+      "no_price": 0.07,
       "end_date": "2027-01-01T05:00:00Z",
       "active": true,
       "closed": false
@@ -2560,18 +2692,18 @@
       "question": "Supreme Court vacancy in 2025?",
       "slug": "supreme-court-vacancy-2025",
       "category": "unknown",
-      "volume_24h": 5502.568332,
-      "liquidity": 6657.78432,
+      "volume_24h": 275.692142,
+      "liquidity": 10593.27155,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0535,
-        0.9465
+        0.022,
+        0.978
       ],
-      "yes_price": 0.0535,
-      "no_price": 0.9465,
+      "yes_price": 0.022,
+      "no_price": 0.978,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2582,18 +2714,18 @@
       "question": "NYSE marketwide circuit breaker in 2025?",
       "slug": "nyse-marketwide-circuit-breaker-in-2025",
       "category": "unknown",
-      "volume_24h": 19260.330909000004,
-      "liquidity": 36481.25853,
+      "volume_24h": 2529.79,
+      "liquidity": 40165.79299,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0225,
-        0.9775
+        0.0195,
+        0.9805
       ],
-      "yes_price": 0.0225,
-      "no_price": 0.9775,
+      "yes_price": 0.0195,
+      "no_price": 0.9805,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2604,18 +2736,18 @@
       "question": "Will 4-6 SpaceX Starship launches successfully reach Space in 2025?",
       "slug": "will-4-6-spacex-starship-launches-successfully-reach-space-in-2025",
       "category": "unknown",
-      "volume_24h": 3158.364628,
-      "liquidity": 1323.90425,
+      "volume_24h": 3943.00338,
+      "liquidity": 5265.87334,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.975,
-        0.025
+        0.973,
+        0.027
       ],
-      "yes_price": 0.975,
-      "no_price": 0.025,
+      "yes_price": 0.973,
+      "no_price": 0.027,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2626,30 +2758,8 @@
       "question": "Will 7-9 SpaceX Starship launches successfully reach Space in 2025?",
       "slug": "will-7-9-spacex-starship-launches-successfully-reach-space-in-2025",
       "category": "unknown",
-      "volume_24h": 0,
-      "liquidity": 3353.56894,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.005,
-        0.995
-      ],
-      "yes_price": 0.005,
-      "no_price": 0.995,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "112403166699668315796308425909260822660090132032662803764863929013764824751231",
-      "condition_id": "0x712015ce8ac2c87d89bfacff5610f225c147a147441a78654846d1462921ede7",
-      "question": "Will 10-12 SpaceX Starship launches successfully reach Space in 2025?",
-      "slug": "will-10-12-spacex-starship-launches-successfully-reach-space-in-2025",
-      "category": "unknown",
-      "volume_24h": 0,
-      "liquidity": 2116.14091,
+      "volume_24h": 1.3,
+      "liquidity": 5803.77978,
       "outcomes": [
         "Yes",
         "No"
@@ -2665,13 +2775,35 @@
       "closed": false
     },
     {
+      "token_id": "112403166699668315796308425909260822660090132032662803764863929013764824751231",
+      "condition_id": "0x712015ce8ac2c87d89bfacff5610f225c147a147441a78654846d1462921ede7",
+      "question": "Will 10-12 SpaceX Starship launches successfully reach Space in 2025?",
+      "slug": "will-10-12-spacex-starship-launches-successfully-reach-space-in-2025",
+      "category": "unknown",
+      "volume_24h": 0,
+      "liquidity": 4670.24396,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.0025,
+        0.9975
+      ],
+      "yes_price": 0.0025,
+      "no_price": 0.9975,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
       "token_id": "78048778177518619940889394051470973601850957915954182877172509824391716750767",
       "condition_id": "0xce10d06e7a223dd0cf7ca71c788e7fb3e988a0344b202942af81f712e020e286",
       "question": "Will 13-15 SpaceX Starship launches successfully reach Space in 2025?",
       "slug": "will-13-15-spacex-starship-launches-successfully-reach-space-in-2025",
       "category": "unknown",
-      "volume_24h": 0,
-      "liquidity": 6192.95949,
+      "volume_24h": 551.45,
+      "liquidity": 7977.04924,
       "outcomes": [
         "Yes",
         "No"
@@ -2693,7 +2825,7 @@
       "slug": "will-16-18-spacex-starship-launches-successfully-reach-space-in-2025",
       "category": "unknown",
       "volume_24h": 0,
-      "liquidity": 6140.07299,
+      "liquidity": 5699.20096,
       "outcomes": [
         "Yes",
         "No"
@@ -2714,8 +2846,8 @@
       "question": "Will 19-21 SpaceX Starship launches successfully reach Space in 2025?",
       "slug": "will-19-21-spacex-starship-launches-successfully-reach-space-in-2025",
       "category": "unknown",
-      "volume_24h": 199.99,
-      "liquidity": 8456.92279,
+      "volume_24h": 0,
+      "liquidity": 7857.3139,
       "outcomes": [
         "Yes",
         "No"
@@ -2736,8 +2868,8 @@
       "question": "Will 22-24 SpaceX Starship launches successfully reach Space in 2025?",
       "slug": "will-22-24-spacex-starship-launches-successfully-reach-space-in-2025",
       "category": "unknown",
-      "volume_24h": 0,
-      "liquidity": 8385.64196,
+      "volume_24h": 6.32,
+      "liquidity": 9860.36628,
       "outcomes": [
         "Yes",
         "No"
@@ -2758,8 +2890,8 @@
       "question": "Will 25 or more SpaceX Starship launches successfully reach Space in 2025?",
       "slug": "will-25-or-more-spacex-starship-launches-successfully-reach-space-in-2025",
       "category": "unknown",
-      "volume_24h": 65.52,
-      "liquidity": 7007.81828,
+      "volume_24h": 0,
+      "liquidity": 7422.24757,
       "outcomes": [
         "Yes",
         "No"
@@ -2780,18 +2912,18 @@
       "question": "Assad leaves Russia before 2026?",
       "slug": "assad-leaves-russia-before-2026",
       "category": "unknown",
-      "volume_24h": 0,
-      "liquidity": 1130.41069,
+      "volume_24h": 108.69,
+      "liquidity": 1244.31829,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.02,
-        0.98
+        0.015,
+        0.985
       ],
-      "yes_price": 0.02,
-      "no_price": 0.98,
+      "yes_price": 0.015,
+      "no_price": 0.985,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2802,8 +2934,8 @@
       "question": "AI wins IMO gold medal in 2025?",
       "slug": "ai-wins-math-olympiad-in-2025",
       "category": "unknown",
-      "volume_24h": 394.630242,
-      "liquidity": 12239.27345,
+      "volume_24h": 1088.903645,
+      "liquidity": 14329.63891,
       "outcomes": [
         "Yes",
         "No"
@@ -2824,18 +2956,18 @@
       "question": "Cardano ETF in 2025?",
       "slug": "cardano-etf-in-2025",
       "category": "unknown",
-      "volume_24h": 3297.065442,
-      "liquidity": 4296.7544,
+      "volume_24h": 4359.494133,
+      "liquidity": 5558.7038,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.19,
-        0.81
+        0.115,
+        0.885
       ],
-      "yes_price": 0.19,
-      "no_price": 0.81,
+      "yes_price": 0.115,
+      "no_price": 0.885,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2846,18 +2978,18 @@
       "question": "Pepe ETF in 2025?",
       "slug": "pepe-etf-in-2025",
       "category": "unknown",
-      "volume_24h": 7536.214251000001,
-      "liquidity": 26358.45748,
+      "volume_24h": 4197.679,
+      "liquidity": 25282.3549,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.013,
-        0.987
+        0.0135,
+        0.9865
       ],
-      "yes_price": 0.013,
-      "no_price": 0.987,
+      "yes_price": 0.0135,
+      "no_price": 0.9865,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2868,18 +3000,18 @@
       "question": "Macron out in 2025?",
       "slug": "macron-out-in-2025-834",
       "category": "unknown",
-      "volume_24h": 321.542348,
-      "liquidity": 25382.26607,
+      "volume_24h": 2542.54,
+      "liquidity": 31495.52163,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.019,
-        0.981
+        0.0165,
+        0.9835
       ],
-      "yes_price": 0.019,
-      "no_price": 0.981,
+      "yes_price": 0.0165,
+      "no_price": 0.9835,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2890,8 +3022,8 @@
       "question": "Macron out by June 30, 2026?",
       "slug": "macron-out-by-june-30-2026-273",
       "category": "unknown",
-      "volume_24h": 3.333332,
-      "liquidity": 19180.0499,
+      "volume_24h": 826.474441,
+      "liquidity": 18169.8006,
       "outcomes": [
         "Yes",
         "No"
@@ -2912,18 +3044,18 @@
       "question": "Will Trump deport less than 250,000?",
       "slug": "will-trump-deport-less-than-250000",
       "category": "unknown",
-      "volume_24h": 37.38,
-      "liquidity": 4957.67127,
+      "volume_24h": 937.81,
+      "liquidity": 4747.41743,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0315,
-        0.9685
+        0.0555,
+        0.9445
       ],
-      "yes_price": 0.0315,
-      "no_price": 0.9685,
+      "yes_price": 0.0555,
+      "no_price": 0.9445,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2934,18 +3066,18 @@
       "question": "Will Trump deport 250,000-500,000 people?",
       "slug": "will-trump-deport-250000-500000-people",
       "category": "unknown",
-      "volume_24h": 124.87,
-      "liquidity": 3197.9928,
+      "volume_24h": 425.996733,
+      "liquidity": 3278.0263,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.83,
-        0.17
+        0.755,
+        0.245
       ],
-      "yes_price": 0.83,
-      "no_price": 0.17,
+      "yes_price": 0.755,
+      "no_price": 0.245,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2956,18 +3088,18 @@
       "question": "Will Trump deport 500,000-750,000- people?",
       "slug": "will-trump-deport-500000-750000-people",
       "category": "unknown",
-      "volume_24h": 549.515756,
-      "liquidity": 2980.02415,
+      "volume_24h": 1106.3897910000003,
+      "liquidity": 3031.14373,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.1195,
-        0.8805
+        0.1575,
+        0.8425
       ],
-      "yes_price": 0.1195,
-      "no_price": 0.8805,
+      "yes_price": 0.1575,
+      "no_price": 0.8425,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -2978,52 +3110,8 @@
       "question": "Will Trump deport 750,000-1,000,000 people?",
       "slug": "will-trump-deport-750000-1000000-people",
       "category": "unknown",
-      "volume_24h": 19.68,
-      "liquidity": 6633.28202,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.011,
-        0.989
-      ],
-      "yes_price": 0.011,
-      "no_price": 0.989,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "13018971792603393862521629014128024641178044618205296260525674415067194037856",
-      "condition_id": "0x49a20c7523c271099008f3ef9a31521263b24d637959852a391e6b4697b1a437",
-      "question": "Will Trump deport 1,000,000-1,250,000 people?",
-      "slug": "will-trump-deport-1000000-1250000-people",
-      "category": "unknown",
-      "volume_24h": 19.68,
-      "liquidity": 8219.79783,
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "outcomePrices": [
-        0.003,
-        0.997
-      ],
-      "yes_price": 0.003,
-      "no_price": 0.997,
-      "end_date": "2025-12-31T12:00:00Z",
-      "active": true,
-      "closed": false
-    },
-    {
-      "token_id": "24682525479474221428144937281315825971983904267399062415430320764754931667953",
-      "condition_id": "0x50c669f178da4e5bbea7f1be25041fd278914712fa87a6a6f8e57d5923d88dee",
-      "question": "Will Trump deport 1,750,000-2,000,000 people?",
-      "slug": "will-trump-deport-1750000-2000000-people",
-      "category": "unknown",
-      "volume_24h": 19.68,
-      "liquidity": 11821.37012,
+      "volume_24h": 1079.481,
+      "liquidity": 7579.09072,
       "outcomes": [
         "Yes",
         "No"
@@ -3039,23 +3127,67 @@
       "closed": false
     },
     {
-      "token_id": "73414222381656326204771753454630063673548497164758947581648273905027617570612",
-      "condition_id": "0x9472be65457510b7fc3477b20ba90910e99d92eac8421a14bf4b7b7a08ef31dc",
-      "question": "Will Trump deport 1,250,000-1,500,000 people?",
-      "slug": "will-trump-deport-1250000-1500000-people",
+      "token_id": "13018971792603393862521629014128024641178044618205296260525674415067194037856",
+      "condition_id": "0x49a20c7523c271099008f3ef9a31521263b24d637959852a391e6b4697b1a437",
+      "question": "Will Trump deport 1,000,000-1,250,000 people?",
+      "slug": "will-trump-deport-1000000-1250000-people",
       "category": "unknown",
-      "volume_24h": 19.68,
-      "liquidity": 6946.05863,
+      "volume_24h": 273.84,
+      "liquidity": 8163.19328,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.0065,
-        0.9935
+        0.01,
+        0.99
       ],
-      "yes_price": 0.0065,
-      "no_price": 0.9935,
+      "yes_price": 0.01,
+      "no_price": 0.99,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "24682525479474221428144937281315825971983904267399062415430320764754931667953",
+      "condition_id": "0x50c669f178da4e5bbea7f1be25041fd278914712fa87a6a6f8e57d5923d88dee",
+      "question": "Will Trump deport 1,750,000-2,000,000 people?",
+      "slug": "will-trump-deport-1750000-2000000-people",
+      "category": "unknown",
+      "volume_24h": 272.2,
+      "liquidity": 11865.76597,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.004,
+        0.996
+      ],
+      "yes_price": 0.004,
+      "no_price": 0.996,
+      "end_date": "2025-12-31T12:00:00Z",
+      "active": true,
+      "closed": false
+    },
+    {
+      "token_id": "73414222381656326204771753454630063673548497164758947581648273905027617570612",
+      "condition_id": "0x9472be65457510b7fc3477b20ba90910e99d92eac8421a14bf4b7b7a08ef31dc",
+      "question": "Will Trump deport 1,250,000-1,500,000 people?",
+      "slug": "will-trump-deport-1250000-1500000-people",
+      "category": "unknown",
+      "volume_24h": 267.2,
+      "liquidity": 6998.89347,
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "outcomePrices": [
+        0.004,
+        0.996
+      ],
+      "yes_price": 0.004,
+      "no_price": 0.996,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -3066,8 +3198,8 @@
       "question": "Will Trump deport 1,500,000-1,750,000 people?",
       "slug": "will-trump-deport-1500000-1750000-people",
       "category": "unknown",
-      "volume_24h": 19.68,
-      "liquidity": 7381.82209,
+      "volume_24h": 305.90566,
+      "liquidity": 6027.18287,
       "outcomes": [
         "Yes",
         "No"
@@ -3088,18 +3220,18 @@
       "question": "Will Trump deport 2,000,000 or more people?",
       "slug": "will-trump-deport-2000000-or-more-people",
       "category": "unknown",
-      "volume_24h": 389.68,
-      "liquidity": 5491.82464,
+      "volume_24h": 267.210733,
+      "liquidity": 4467.99197,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.017,
-        0.983
+        0.022,
+        0.978
       ],
-      "yes_price": 0.017,
-      "no_price": 0.983,
+      "yes_price": 0.022,
+      "no_price": 0.978,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -3110,18 +3242,18 @@
       "question": "Will Trump deport 750,000 or more people in 2025?",
       "slug": "will-trump-deport-750000-or-more-people-in-2025",
       "category": "unknown",
-      "volume_24h": 377,
-      "liquidity": 6881.44807,
+      "volume_24h": 646.75,
+      "liquidity": 3920.31424,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.039,
-        0.961
+        0.049,
+        0.951
       ],
-      "yes_price": 0.039,
-      "no_price": 0.961,
+      "yes_price": 0.049,
+      "no_price": 0.951,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false
@@ -3132,18 +3264,18 @@
       "question": "Magnificent 7 shrinks below 25% of S&P 500 in 2025?",
       "slug": "magnificent-7-less-than-25-of-sp-500-in-2025",
       "category": "unknown",
-      "volume_24h": 570,
-      "liquidity": 14584.34259,
+      "volume_24h": 1628,
+      "liquidity": 19608.33582,
       "outcomes": [
         "Yes",
         "No"
       ],
       "outcomePrices": [
-        0.023,
-        0.977
+        0.0215,
+        0.9785
       ],
-      "yes_price": 0.023,
-      "no_price": 0.977,
+      "yes_price": 0.0215,
+      "no_price": 0.9785,
       "end_date": "2025-12-31T12:00:00Z",
       "active": true,
       "closed": false

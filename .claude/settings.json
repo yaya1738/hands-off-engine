@@ -1,4 +1,19 @@
 {
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/root/hands-off-engine/.claude/hooks/check_kill.sh",
+            "timeout": 5,
+            "statusMessage": "INTEGRAFIX: Checking command safety..."
+          }
+        ]
+      }
+    ]
+  },
   "permissions": {
     "allow": [
       "Bash(python3:*)",

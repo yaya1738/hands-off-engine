@@ -4,6 +4,14 @@ import os
 import json
 from typing import List, Dict, Optional
 
+# HFT Economics tracking - every API call at microsecond frequency
+try:
+    from integrafix.hft_economics import track_api_call
+    HFT_TRACKING = True
+except ImportError:
+    HFT_TRACKING = False
+    def track_api_call(*args, **kwargs): return 0
+
 def call_gemini(
     prompt: str,
     model: str = "gemini-1.5-flash",
@@ -47,6 +55,18 @@ def call_gemini(
                 temperature=0.7
             )
         )
+
+        # Track at HFT frequency (Gemini free tier but we track for metrics)
+        if HFT_TRACKING:
+            # Estimate tokens from response length (Gemini doesn't always report)
+            estimated_tokens = len(prompt) // 4 + len(response.text) // 4
+            track_api_call(
+                provider="google",
+                model="gemini-pro",  # Simplified model name for tracking
+                input_tokens=len(prompt) // 4,
+                output_tokens=len(response.text) // 4,
+                latency_us=0
+            )
 
         return {
             "content": response.text,

@@ -37,6 +37,13 @@ from autonomous.glitch_detector import GlitchDetector
 from autonomous.skill_growth_tracker import SkillGrowthTracker
 from autonomous.outcome_recorder import OutcomeRecorder
 
+# INTEGRAFIX: Import cost tracker for billing
+try:
+    from finance.cost_tracker import get_cost_tracker
+    COST_TRACKING_ENABLED = True
+except ImportError:
+    COST_TRACKING_ENABLED = False
+
 EXECUTION_LOG = STATE_DIR / "concrete_executions.jsonl"
 PIPELINE_STATE = STATE_DIR / "pipeline_state.json"
 
@@ -56,6 +63,9 @@ class ConcreteExecutor:
         self.glitch = GlitchDetector()
         self.skills = SkillGrowthTracker()
         self.outcomes = OutcomeRecorder()  # INTEGRAFIX: Close the feedback loop
+
+        # INTEGRAFIX: Wire cost tracking for billing
+        self.cost_tracker = get_cost_tracker() if COST_TRACKING_ENABLED else None
 
         self.dry_run = dry_run  # Safety: start in dry run mode
 
@@ -317,6 +327,18 @@ class ConcreteExecutor:
             # Log for outcome tracking
             self._log_execution(execution_result)
 
+            # INTEGRAFIX: Log trading cost for billing
+            if self.cost_tracker:
+                self.cost_tracker.log_cost(
+                    partner="polymarket",
+                    action="trade_execution",
+                    resource=evaluation.get("market_id", "unknown")[:30],
+                    quantity=size,
+                    unit="USDC",
+                    unit_cost=1.0,  # 1:1 USDC
+                    notes=f"{direction} @ {limit_price:.3f}, edge: {action.get('edge', 0):.1%}"
+                )
+
             return execution_result
 
         except Exception as e:
@@ -499,6 +521,17 @@ class ConcreteExecutor:
         print(f"  Total blocked: {self.state['trades_blocked']}")
         print(f"  Total edge captured: {self.state['total_edge_captured']:.1%}")
         print()
+
+        # INTEGRAFIX: Show cost tracking status
+        if self.cost_tracker:
+            cost_summary = self.cost_tracker.get_summary()
+            print("[COST TRACKING - Serving Yair's Financial Health]")
+            print(f"  Today's costs: ${cost_summary['today']['total']:.2f}")
+            print(f"  This month: ${cost_summary['this_month']['total']:.2f}")
+            if cost_summary['today']['by_partner']:
+                for partner, cost in cost_summary['today']['by_partner'].items():
+                    print(f"    {partner}: ${cost:.2f}")
+            print()
 
         # INTEGRAFIX: Check outcome recorder status
         pending_count = len([t for t in self.outcomes.pending.get("trades", {}).values()

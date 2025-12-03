@@ -152,6 +152,74 @@ class AuditLogger:
         events.sort(key=lambda e: e.timestamp)
         return events
 
+    # ============================================================
+    # INTEGRAFIX WIRE: Wrapper methods for nexus.py compatibility
+    # These translate log_action/log_error/log_decision calls to log_event
+    # ============================================================
+
+    def log_action(
+        self,
+        action_type: str,
+        action_data: Optional[Dict[str, Any]] = None,
+        result: Optional[str] = None,
+        session_id: Optional[str] = None
+    ) -> AuditEvent:
+        """
+        Wire: Translates nexus.py log_action calls to log_event.
+        Tracks AI actions with full audit trail.
+        """
+        return self.log_event(
+            component="ai.nexus",
+            action=action_type,
+            metadata=action_data or {},
+            outcome=result,
+            session_id=session_id
+        )
+
+    def log_error(
+        self,
+        error_type: str,
+        error_message: str,
+        context: Optional[Dict[str, Any]] = None,
+        session_id: Optional[str] = None
+    ) -> AuditEvent:
+        """
+        Wire: Translates nexus.py log_error calls to log_event.
+        Tracks errors for debugging and learning.
+        """
+        metadata = context or {}
+        metadata["error_type"] = error_type
+        return self.log_event(
+            component="ai.nexus",
+            action=f"error_{error_type}",
+            metadata=metadata,
+            error=error_message,
+            session_id=session_id
+        )
+
+    def log_decision(
+        self,
+        decision_type: str,
+        inputs: Optional[Dict[str, Any]] = None,
+        outputs: Optional[Dict[str, Any]] = None,
+        session_id: Optional[str] = None
+    ) -> AuditEvent:
+        """
+        Wire: Translates nexus.py log_decision calls to log_event.
+        Tracks AI decision-making for transparency and learning.
+        """
+        metadata = {
+            "decision_type": decision_type,
+            "inputs": inputs or {},
+            "outputs": outputs or {}
+        }
+        return self.log_event(
+            component="ai.nexus",
+            action=f"decision_{decision_type}",
+            metadata=metadata,
+            session_id=session_id
+        )
+
     def get_session_summary(self, session_id: Optional[str] = None) -> Dict[str, Any]:
         """
         Get summary statistics for a session

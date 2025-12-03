@@ -77,6 +77,13 @@ class SelfHealer:
     # Critical processes that must always run
     GUARDED_PROCESSES = [
         ProcessGuard(
+            name='backend-loop',
+            command='python3 /root/hands-off-engine/autonomous/backend_loop.py',
+            critical=True,
+            restart_delay_sec=5,  # Fast restart - this is the main orchestrator
+            max_restarts_per_hour=10
+        ),
+        ProcessGuard(
             name='hardware-brain',
             command='python3 /root/hands-off-engine/autonomous/hardware_brain.py run',
             critical=True
