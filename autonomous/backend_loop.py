@@ -416,6 +416,126 @@ def run_hft_execution():
         return {"success": False, "error": str(e)}
 
 
+def run_integrafix_pipeline():
+    """
+    INTEGRAFIX: Run the integrated trading pipeline.
+
+    This replaces the broken circular edge detection with:
+    1. Fair price estimation from orderbook/category analysis
+    2. Signal detection with real edge
+    3. Execution tracking
+    4. Outcome recording and learning
+
+    WIRES CONNECTED:
+    - fair_price_estimator → trading_pipeline → polymarket API
+    - outcome_recorder → learning_engine → estimator (feedback loop)
+    """
+    try:
+        from integrafix.trading_pipeline import get_pipeline
+
+        pipeline = get_pipeline()
+
+        # Get live markets from Polymarket
+        markets = []
+        try:
+            private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+            if private_key:
+                from py_clob_client.client import ClobClient
+
+                client = ClobClient(
+                    "https://clob.polymarket.com",
+                    key=private_key,
+                    chain_id=137,
+                )
+                creds = client.create_or_derive_api_creds()
+                client.set_api_creds(creds)
+
+                # Get active markets - handle different return types
+                raw_markets = client.get_markets()
+                if isinstance(raw_markets, dict):
+                    raw_markets = raw_markets.get("data", []) or raw_markets.get("markets", []) or []
+                if not isinstance(raw_markets, list):
+                    raw_markets = list(raw_markets) if raw_markets else []
+
+                for m in raw_markets[:50]:  # Process top 50 markets
+                    try:
+                        tokens = m.get("tokens", []) or []
+                        yes_price = 0.5
+                        no_price = 0.5
+                        token_id = None
+
+                        if tokens and len(tokens) > 0:
+                            yes_price = float(tokens[0].get("price", 0.5) or 0.5)
+                            token_id = tokens[0].get("token_id")
+                        if tokens and len(tokens) > 1:
+                            no_price = float(tokens[1].get("price", 0.5) or 0.5)
+
+                        market_data = {
+                            "slug": str(m.get("condition_id", "") or "")[:40],
+                            "question": str(m.get("question", "") or ""),
+                            "yes_price": yes_price,
+                            "no_price": no_price,
+                        }
+
+                        # Get orderbook for spread analysis
+                        if token_id:
+                            try:
+                                book = client.get_order_book(token_id)
+                                if book and book.get("bids") and len(book["bids"]) > 0:
+                                    market_data["bestBid"] = float(book["bids"][0].get("price", 0) or 0)
+                                if book and book.get("asks") and len(book["asks"]) > 0:
+                                    market_data["bestAsk"] = float(book["asks"][0].get("price", 0) or 0)
+                            except:
+                                pass
+
+                        markets.append(market_data)
+                    except Exception as me:
+                        # Skip malformed markets
+                        continue
+        except Exception as e:
+            log(f"  Market fetch error: {e}")
+
+        if not markets:
+            return {
+                "success": False,
+                "error": "No markets available",
+                "signals": 0,
+                "trades": 0,
+            }
+
+        # Run the integrated pipeline
+        result = pipeline.run_pipeline(
+            markets=markets,
+            capital=100,  # $100 per cycle
+            max_per_trade=25,  # Max $25 per trade
+            min_edge=0.02,  # 2% minimum edge
+            dry_run=True,  # Start with dry run for safety
+        )
+
+        # Get pipeline status
+        status = pipeline.status()
+
+        return {
+            "success": True,
+            "markets_scanned": result.get("markets_scanned", 0),
+            "signals_detected": result.get("signals_detected", 0),
+            "trades_executed": result.get("trades_executed", 0),
+            "capital_deployed": result.get("total_size", 0),
+            "dry_run": result.get("dry_run", True),
+            "total_signals": status.get("state", {}).get("total_signals", 0),
+            "total_trades": status.get("state", {}).get("total_trades", 0),
+            "win_rate": status.get("state", {}).get("win_rate", 0),
+            "total_pnl": status.get("state", {}).get("total_pnl", 0),
+            "top_trades": [
+                f"{t['side']} {t['market'][:30]}... ${t['size']:.2f}"
+                for t in result.get("trades", [])[:3]
+            ],
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 def save_state(state: dict):
     """Save loop state."""
     state["last_updated"] = datetime.now(timezone.utc).isoformat()
@@ -430,6 +550,7 @@ def run_loop(interval_sec: int = 300):
     log("AI Core: Self between knowledge and action")
     log("Circuit Board: Transistors at every inflection point")
     log("Knowledge Bases: computing, business, money")
+    log("INTEGRAFIX: Edge detection with feedback loop")
     log(f"Interval: {interval_sec} seconds")
     log("=" * 70)
 
@@ -445,7 +566,7 @@ def run_loop(interval_sec: int = 300):
         }
 
         # 1. Circuit Board - Signals through transistors
-        log("[1/10] Running Circuit Board...")
+        log("[1/11] Running Circuit Board...")
         circuit_result = run_circuit_board()
         state["circuit_board"] = circuit_result
         if circuit_result.get("success"):
@@ -456,7 +577,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {circuit_result.get('error', 'unknown')}")
 
         # 2. AI Core - Self between knowledge and action
-        log("[2/10] Running AI Core (SELF)...")
+        log("[2/11] Running AI Core (SELF)...")
         ai_result = run_ai_core(state)
         state["ai_core"] = ai_result
         if ai_result.get("success"):
@@ -469,7 +590,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {ai_result.get('error', 'unknown')}")
 
         # 3. Knowledge Nexus - Route knowledge to inflection points
-        log("[3/10] Activating Knowledge Nexus...")
+        log("[3/11] Activating Knowledge Nexus...")
         nexus_result = run_knowledge_nexus(state)
         state["knowledge_nexus"] = nexus_result
         if nexus_result.get("success"):
@@ -481,7 +602,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {nexus_result.get('error', 'unknown')}")
 
         # 4. Knowledge Crosschain - Cross-domain injection
-        log("[4/10] Running Knowledge Crosschain...")
+        log("[4/11] Running Knowledge Crosschain...")
         crosschain_result = run_crosschain()
         state["crosschain"] = crosschain_result
         if crosschain_result.get("success"):
@@ -492,7 +613,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {crosschain_result.get('error', 'unknown')}")
 
         # 5. Knowledge Fusion - Deep cross-reference
-        log("[5/10] Running Knowledge Fusion...")
+        log("[5/11] Running Knowledge Fusion...")
         fusion_result = run_knowledge_fusion()
         state["fusion"] = fusion_result
         if fusion_result.get("success"):
@@ -503,7 +624,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {fusion_result.get('error', 'unknown')}")
 
         # 6. Mega Coordinator
-        log("[6/10] Running Mega Coordinator...")
+        log("[6/11] Running Mega Coordinator...")
         mega_result = run_mega_coordinator()
         state["mega_coordinator"] = mega_result
         if mega_result.get("success"):
@@ -512,7 +633,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {mega_result.get('error', 'unknown')}")
 
         # 7. Process Endpoints
-        log("[7/10] Running Process Endpoints...")
+        log("[7/11] Running Process Endpoints...")
         endpoints_result = run_process_endpoints()
         state["process_endpoints"] = endpoints_result
         if endpoints_result.get("success"):
@@ -521,7 +642,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {endpoints_result.get('error', 'unknown')}")
 
         # 8. Trading Check
-        log("[8/10] Checking Trading Status...")
+        log("[8/11] Checking Trading Status...")
         trading_result = run_trading_check()
         state["trading"] = trading_result
         if trading_result.get("success"):
@@ -530,7 +651,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Error: {trading_result.get('error', 'unknown')}")
 
         # 9. HFT Execution - Scan and execute opportunities
-        log("[9/10] Running HFT Execution...")
+        log("[9/11] Running HFT Execution...")
         hft_result = run_hft_execution()
         state["hft_execution"] = hft_result
         if hft_result.get("success"):
@@ -541,8 +662,26 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  Error: {hft_result.get('error', 'unknown')}")
 
-        # 10. Save State
-        log("[10/10] Saving State...")
+        # 10. INTEGRAFIX Pipeline - Real edge detection with feedback loop
+        log("[10/11] Running INTEGRAFIX Trading Pipeline...")
+        integrafix_result = run_integrafix_pipeline()
+        state["integrafix_pipeline"] = integrafix_result
+        if integrafix_result.get("success"):
+            log(f"  Markets: {integrafix_result.get('markets_scanned', 0)} | "
+                f"Signals: {integrafix_result.get('signals_detected', 0)} | "
+                f"Trades: {integrafix_result.get('trades_executed', 0)} | "
+                f"Deployed: ${integrafix_result.get('capital_deployed', 0):.2f}")
+            if integrafix_result.get("top_trades"):
+                for trade in integrafix_result["top_trades"][:2]:
+                    log(f"    {trade}")
+            log(f"  Cumulative: {integrafix_result.get('total_signals', 0)} signals, "
+                f"{integrafix_result.get('total_trades', 0)} trades, "
+                f"${integrafix_result.get('total_pnl', 0):.2f} P&L")
+        else:
+            log(f"  Error: {integrafix_result.get('error', 'unknown')}")
+
+        # 11. Save State
+        log("[11/11] Saving State...")
         save_state(state)
         log("  State saved to backend_loop.json")
 
@@ -572,6 +711,7 @@ def main():
             "process_endpoints": run_process_endpoints(),
             "trading": run_trading_check(),
             "hft_execution": run_hft_execution(),
+            "integrafix_pipeline": run_integrafix_pipeline(),
         }
         save_state(state)
         print(json.dumps(state, indent=2))
