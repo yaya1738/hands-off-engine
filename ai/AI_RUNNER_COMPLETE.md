@@ -1,0 +1,445 @@
+============================================================
+# 1. FILE: /root/hands-off/ai/ai_runner.py
+============================================================
+
+```python
+#!/usr/bin/env python3
+
+import os
+import sys
+import json
+import time
+import logging
+import subprocess
+import requests
+from pathlib import Path
+from datetime import datetime
+
+# Directories
+TASKS_DIR = Path("/root/hands-off/ai/tasks")
+RESULTS_DIR = Path("/root/hands-off/ai/results")
+PROCESSED_DIR = Path("/root/hands-off/ai/processed")
+LOG_DIR = Path("/root/hands-off-out/ai")
+
+# Environment variables
+API_URL = os.getenv("AI_RUNNER_API_URL", "")
+API_KEY = os.getenv("AI_RUNNER_API_KEY", "")
+MODEL = os.getenv("AI_RUNNER_MODEL", "anthropic/claude-3.5-sonnet")
+EXECUTE = os.getenv("AI_RUNNER_EXECUTE", "0") == "1"
+
+# Allowed write paths
+ALLOWED_PATHS = [
+    "/usr/local/bin",
+    "/root/hands-off",
+    "/root/hands-off-out"
+]
+
+# Dangerous patterns
+DANGEROUS_PATTERNS = [
+    "rm -rf /",
+    "rm -rf /*",
+    "dd if=",
+    "mkfs",
+    ":(){ :|:& };:",
+    "> /dev/sd",
+    "curl | sh",
+    "wget | sh",
+]
+
+# Setup logging
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.FileHandler(LOG_DIR / "ai-runner.log"),
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
+
+
+def validate_command(cmd):
+    """Validate command for safety."""
+    cmd_lower = cmd.lower().strip()
+
+    # Check dangerous patterns
+    for pattern in DANGEROUS_PATTERNS:
+        if pattern in cmd_lower:
+            return False, f"Dangerous pattern detected: {pattern}"
+
+    # Check if command writes to allowed paths only
+    if any(op in cmd_lower for op in ["touch", "mkdir", "cp", "mv", ">"]):
+        # Extract potential paths (simple heuristic)
+        for part in cmd.split():
+            if part.startswith("/") and not any(part.startswith(allowed) for allowed in ALLOWED_PATHS):
+                return False, f"Write to disallowed path: {part}"
+
+    return True, "OK"
+
+
+def read_file_safe(path):
+    """Read file contents safely."""
+    try:
+        p = Path(path)
+        if not p.exists():
+            return f"[FILE NOT FOUND: {path}]"
+        if p.stat().st_size > 1_000_000:  # 1MB limit
+            return f"[FILE TOO LARGE: {path}]"
+        return p.read_text()
+    except Exception as e:
+        return f"[ERROR READING {path}: {e}]"
+
+
+def call_llm(system_prompt, user_prompt):
+    """Call LLM API and return JSON response."""
+    if not API_URL or not API_KEY:
+        raise ValueError("AI_RUNNER_API_URL and AI_RUNNER_API_KEY must be set")
+
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": MODEL,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        "temperature": 0.3
+    }
+
+    response = requests.post(API_URL, headers=headers, json=payload, timeout=120)
+    response.raise_for_status()
+
+    data = response.json()
+
+    # Handle different API response formats
+    if "choices" in data:
+        content = data["choices"][0]["message"]["content"]
+    elif "content" in data:
+        if isinstance(data["content"], list):
+            content = data["content"][0].get("text", "")
+        else:
+            content = data["content"]
+    else:
+        raise ValueError(f"Unexpected API response format: {data}")
+
+    # Extract JSON from markdown code blocks if present
+    content = content.strip()
+    if content.startswith("```json"):
+        content = content[7:]
+    if content.startswith("```"):
+        content = content[3:]
+    if content.endswith("```"):
+        content = content[:-3]
+
+    return json.loads(content.strip())
+
+
+def execute_command(cmd):
+    """Execute shell command and return result."""
+    logger.info(f"Executing: {cmd}")
+    try:
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            check=True,
+            capture_output=True,
+            text=True,
+            timeout=300
+        )
+        return {
+            "command": cmd,
+            "status": "success",
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+            "returncode": result.returncode
+        }
+    except subprocess.CalledProcessError as e:
+        return {
+            "command": cmd,
+            "status": "failed",
+            "stdout": e.stdout,
+            "stderr": e.stderr,
+            "returncode": e.returncode
+        }
+    except subprocess.TimeoutExpired:
+        return {
+            "command": cmd,
+            "status": "timeout",
+            "stdout": "",
+            "stderr": "Command timed out after 300 seconds",
+            "returncode": -1
+        }
+
+
+def process_task(task_file):
+    """Process a single task file."""
+    task_id = task_file.stem
+    logger.info(f"Processing task: {task_id}")
+
+    started_at = datetime.utcnow().isoformat()
+
+    try:
+        # Load task
+        task = json.loads(task_file.read_text())
+        task_id = task.get("id", task_id)
+        goal = task.get("goal", "")
+        context = task.get("context", {})
+        mode = task.get("mode", "plan-and-execute")
+
+        logger.info(f"Task {task_id}: {goal}")
+
+        # Read context files
+        file_contents = []
+        for file_path in context.get("files", []):
+            content = read_file_safe(file_path)
+            file_contents.append(f"=== {file_path} ===\n{content}\n")
+
+        # Build LLM prompt
+        system_prompt = (
+            "You are an infrastructure coding agent. "
+            "Respond ONLY with JSON containing a high-level plan and a list of shell commands. "
+            "No prose. Format: {\"plan\": \"...\", \"commands\": [\"cmd1\", \"cmd2\", ...]}"
+        )
+
+        user_prompt = f"""GOAL: {goal}
+
+MODE: {mode}
+
+CONTEXT FILES:
+{''.join(file_contents)}
+
+NOTES: {context.get('notes', 'None')}
+
+Provide a plan and shell commands to accomplish this goal."""
+
+        # Call LLM
+        logger.info(f"Calling LLM with model {MODEL}")
+        llm_response = call_llm(system_prompt, user_prompt)
+
+        plan = llm_response.get("plan", "")
+        commands = llm_response.get("commands", [])
+
+        logger.info(f"Plan: {plan}")
+        logger.info(f"Commands: {len(commands)}")
+
+        # Validate and execute commands
+        command_results = []
+        overall_status = "ok"
+
+        for cmd in commands:
+            # Validate
+            valid, reason = validate_command(cmd)
+            if not valid:
+                logger.error(f"Command validation failed: {reason}")
+                command_results.append({
+                    "command": cmd,
+                    "status": "validation_failed",
+                    "reason": reason,
+                    "stdout": "",
+                    "stderr": "",
+                    "returncode": -1
+                })
+                overall_status = "failed"
+                continue
+
+            # Execute or log
+            if EXECUTE:
+                result = execute_command(cmd)
+                command_results.append(result)
+                if result["status"] != "success":
+                    overall_status = "failed"
+            else:
+                logger.info(f"DRY RUN (AI_RUNNER_EXECUTE not set): {cmd}")
+                command_results.append({
+                    "command": cmd,
+                    "status": "dry_run",
+                    "stdout": "",
+                    "stderr": "",
+                    "returncode": 0
+                })
+
+        finished_at = datetime.utcnow().isoformat()
+
+        # Write result
+        result = {
+            "id": task_id,
+            "status": overall_status,
+            "plan": plan,
+            "commands": commands,
+            "command_results": command_results,
+            "started_at": started_at,
+            "finished_at": finished_at
+        }
+
+        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+        result_file = RESULTS_DIR / f"{task_id}.result.json"
+        result_file.write_text(json.dumps(result, indent=2))
+
+        logger.info(f"Task {task_id} completed with status: {overall_status}")
+
+        # Move task to processed
+        PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+        task_file.rename(PROCESSED_DIR / task_file.name)
+
+    except Exception as e:
+        logger.error(f"Task {task_id} failed with exception: {e}", exc_info=True)
+
+        finished_at = datetime.utcnow().isoformat()
+
+        # Write error result
+        result = {
+            "id": task_id,
+            "status": "failed",
+            "error": str(e),
+            "started_at": started_at,
+            "finished_at": finished_at
+        }
+
+        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+        result_file = RESULTS_DIR / f"{task_id}.result.json"
+        result_file.write_text(json.dumps(result, indent=2))
+
+        # Move task to processed anyway
+        try:
+            PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
+            task_file.rename(PROCESSED_DIR / task_file.name)
+        except:
+            pass
+
+
+def main():
+    """Main loop."""
+    logger.info("AI Runner started")
+    logger.info(f"API URL: {API_URL}")
+    logger.info(f"Model: {MODEL}")
+    logger.info(f"Execute mode: {EXECUTE}")
+
+    if not API_URL or not API_KEY:
+        logger.warning("AI_RUNNER_API_URL or AI_RUNNER_API_KEY not set - will fail on first task")
+
+    while True:
+        try:
+            # Scan for task files
+            TASKS_DIR.mkdir(parents=True, exist_ok=True)
+            task_files = sorted(TASKS_DIR.glob("*.json"))
+
+            if task_files:
+                logger.info(f"Found {len(task_files)} task(s)")
+                for task_file in task_files:
+                    process_task(task_file)
+
+            time.sleep(7)  # Poll every 7 seconds
+
+        except KeyboardInterrupt:
+            logger.info("Shutting down...")
+            break
+        except Exception as e:
+            logger.error(f"Main loop error: {e}", exc_info=True)
+            time.sleep(10)
+
+
+if __name__ == "__main__":
+    main()
+```
+
+============================================================
+# 2. FILE: /etc/systemd/system/ai-runner.service
+============================================================
+
+```ini
+[Unit]
+Description=Hands-Off AI Runner
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /root/hands-off/ai/ai_runner.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+User=root
+WorkingDirectory=/root/hands-off
+
+Environment="AI_RUNNER_API_URL=https://openrouter.ai/api/v1/chat/completions"
+Environment="AI_RUNNER_API_KEY=your_api_key_here"
+Environment="AI_RUNNER_MODEL=anthropic/claude-3.5-sonnet"
+Environment="AI_RUNNER_EXECUTE=0"
+
+[Install]
+WantedBy=multi-user.target
+```
+
+============================================================
+# 3. SHELL SETUP COMMANDS
+============================================================
+
+```bash
+# Create required directories
+mkdir -p /root/hands-off/ai/tasks
+mkdir -p /root/hands-off/ai/results
+mkdir -p /root/hands-off/ai/processed
+mkdir -p /root/hands-off-out/ai
+
+# Install Python dependencies
+pip3 install requests
+
+# Copy files (if not already in place)
+# cp ai_runner.py /root/hands-off/ai/ai_runner.py
+# cp ai-runner.service /etc/systemd/system/ai-runner.service
+
+# Make script executable
+chmod +x /root/hands-off/ai/ai_runner.py
+
+# Edit service file to set your API key
+nano /etc/systemd/system/ai-runner.service
+# Change AI_RUNNER_API_KEY=your_api_key_here to your actual key
+# Set AI_RUNNER_EXECUTE=1 when ready to execute commands (leave at 0 for dry-run mode)
+
+# Reload systemd daemon
+systemctl daemon-reload
+
+# Enable service to start on boot
+systemctl enable ai-runner
+
+# Start the service
+systemctl start ai-runner
+
+# Check service status
+systemctl status ai-runner
+
+# View live logs
+journalctl -u ai-runner -f
+```
+
+============================================================
+# 4. EXAMPLE TASK: /root/hands-off/ai/tasks/test_echo.json
+============================================================
+
+```json
+{
+  "id": "test_echo",
+  "priority": 1,
+  "goal": "Test the AI runner with a simple echo command",
+  "context": {
+    "files": [],
+    "notes": "This is a safe test task that just echoes a message to verify the AI runner is working correctly."
+  },
+  "mode": "plan-and-execute"
+}
+```
+
+============================================================
+# USAGE
+============================================================
+
+1. Copy ai_runner.py to /root/hands-off/ai/ai_runner.py
+2. Copy ai-runner.service to /etc/systemd/system/ai-runner.service
+3. Run the shell setup commands above
+4. Drop the test_echo.json into /root/hands-off/ai/tasks/
+5. Check /root/hands-off/ai/results/test_echo.result.json for output
+6. View logs: journalctl -u ai-runner -f

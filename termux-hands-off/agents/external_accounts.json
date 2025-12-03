@@ -1,0 +1,30 @@
+{
+  "paypal": 1300.0,
+  "paypal_business": 4100,
+  "paypal_cashback_balance": 7900,
+  "monzo": 300.0,
+  "robinhood_cash": 150.0,
+  "robinhood_total": 1400,
+  "polymarket_cash": 470.0,
+  "polymarket_total": 530,
+  "schwab": 50,
+  "credit_capital_one": -6400,
+  "credit_paypal_credit": -4870,
+  "credit_total_limit": 7600,
+  "credit_score": 706,
+  "auth_user_limits": 35000,
+  "pending_usaa_card": 0,
+  "rent_monthly_shekel": 4000,
+  "rent_monthly_usd": 1066.67,
+  "life_notes": {
+    "solo_living_productive": true,
+    "flexible_move_ok": true,
+    "soundcloud_active": true
+  },
+  "last_review": "2025-11-04T05:05:05Z",
+  "polymarket_wallet": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
+  "polymarket_cost_basis": 530.0,
+  "polymarket_positions_mark": 0.0,
+  "polymarket_unrealized_est": -530.0,
+  "rent_paid_ahead_months": 2
+}

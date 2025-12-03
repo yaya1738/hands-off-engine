@@ -1,0 +1,21 @@
+[Unit]
+Description=Hands-Off AI Runner
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/python3 /root/hands-off/ai/ai_runner.py
+Restart=always
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+User=root
+WorkingDirectory=/root/hands-off
+
+Environment="AI_RUNNER_API_URL=https://openrouter.ai/api/v1/chat/completions"
+Environment="AI_RUNNER_API_KEY=your_api_key_here"
+Environment="AI_RUNNER_MODEL=anthropic/claude-3.5-sonnet"
+Environment="AI_RUNNER_EXECUTE=0"
+
+[Install]
+WantedBy=multi-user.target

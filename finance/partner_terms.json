@@ -1,0 +1,400 @@
+{
+  "version": "3.0",
+  "last_updated": "2025-11-30",
+  "master": "Yair Siegel",
+  "verification": "Cross-referenced with official docs and real-world customer reports",
+
+  "partners": {
+    "digitalocean": {
+      "name": "DigitalOcean",
+      "type": "infrastructure",
+      "account_email": "siegel.yaz@gmail.com",
+      "droplet_limit": 10,
+
+      "charge_timing": {
+        "meter_starts": "INSTANT - the second droplet is created",
+        "meter_stops": "ONLY when droplet is DESTROYED (not powered off)",
+        "billing_unit": "hour",
+        "billing_granularity": "Partial hours rounded UP to full hour",
+        "accrual_method": "Hourly - cost accumulates every hour droplet exists",
+        "monthly_cap": "672 hours (28 days) = max monthly charge",
+        "invoice_date": "Monthly on account anniversary",
+        "charge_date": "Same day as invoice - auto-charged to card",
+        "payment_method": "Card on file (auto-charge)",
+        "prepaid_credit": true,
+        "credit_deduction": "Real-time as usage accrues"
+      },
+
+      "pricing": {
+        "s-1vcpu-1gb": {"hourly": 0.00744, "monthly": 5, "per_second": 0.00000207},
+        "s-1vcpu-2gb": {"hourly": 0.01488, "monthly": 10, "per_second": 0.00000413},
+        "s-2vcpu-2gb": {"hourly": 0.02232, "monthly": 15, "per_second": 0.00000620},
+        "s-2vcpu-4gb": {"hourly": 0.02976, "monthly": 20, "per_second": 0.00000827},
+        "s-4vcpu-8gb": {"hourly": 0.05952, "monthly": 40, "per_second": 0.00001653},
+        "s-8vcpu-16gb": {"hourly": 0.11905, "monthly": 80, "per_second": 0.00003307},
+        "s-8vcpu-16gb-amd": {"hourly": 0.14286, "monthly": 96, "per_second": 0.00003968}
+      },
+
+      "additional_charges": {
+        "snapshot": {"per_gb_month": 0.05, "billed": "monthly with invoice"},
+        "bandwidth_overage": {"per_gb": 0.01, "free_quota_gb": 1000},
+        "floating_ip": {"hourly": 0.00595, "monthly": 4, "when_unassigned": "still billed"},
+        "volumes": {"per_gb_month": 0.10, "billed": "monthly"}
+      },
+
+      "verified_behavior": {
+        "source": "DigitalOcean Documentation + Community Forums",
+        "powered_off_billing": "CONFIRMED: Droplets that are powered down but not destroyed incur charges for as long as they remain on the platform",
+        "reason": "Compute resources (CPU, RAM, disk) stay reserved on hypervisor even when powered off",
+        "only_way_to_stop": "DESTROY the droplet - this is the ONLY way to stop billing"
+      },
+
+      "critical_timing_rules": [
+        "CREATE = START BILLING: Charges begin the INSTANT you create",
+        "DESTROY = STOP BILLING: This is the ONLY way to stop charges",
+        "POWER OFF ≠ FREE: Powered-off droplets STILL COST MONEY (verified)",
+        "PARTIAL HOUR = FULL HOUR: 1 minute = charged for full hour",
+        "672 HOUR CAP: Never pay more than monthly rate per billing period"
+      ],
+
+      "sources": [
+        "https://docs.digitalocean.com/products/droplets/details/pricing/",
+        "https://www.digitalocean.com/community/questions/how-is-digitalocean-billing-calculated"
+      ]
+    },
+
+    "anthropic": {
+      "name": "Anthropic (Claude)",
+      "type": "ai_provider",
+
+      "charge_timing": {
+        "meter_starts": "Per API call - when request is processed",
+        "meter_stops": "When response is complete",
+        "billing_unit": "token (per million)",
+        "billing_granularity": "Exact token count (input + output separate)",
+        "accrual_method": "Per-request - cost calculated per API call",
+        "invoice_date": "Monthly (1st of month for previous month)",
+        "charge_date": "Net 30 from invoice",
+        "payment_method": "Invoice/card",
+        "subscription_charge": "Claude Pro/Max: Monthly on signup anniversary"
+      },
+
+      "pricing_per_million_tokens": {
+        "claude-opus-4": {"input": 15.00, "output": 75.00, "note": "Maximum intelligence"},
+        "claude-sonnet-4": {"input": 3.00, "output": 15.00, "note": "Balanced performance"},
+        "claude-sonnet-3.5": {"input": 3.00, "output": 15.00, "note": "Previous generation"},
+        "claude-haiku-3.5": {"input": 0.80, "output": 4.00, "note": "Fast and efficient"},
+        "claude-haiku-3": {"input": 0.25, "output": 1.25, "note": "Fastest, cheapest"}
+      },
+
+      "subscriptions": {
+        "free": {"monthly": 0, "limits": "Limited daily use"},
+        "pro": {"monthly": 20, "annual_monthly": 17, "limits": "More queries, faster"},
+        "max": {"monthly": 100, "limits": "Priority access, highest usage"}
+      },
+
+      "prompt_caching": {
+        "5min_write": "1.25x base input price",
+        "1hr_write": "2x base input price",
+        "cache_read": "0.1x base input price (90% savings)"
+      },
+
+      "verified_behavior": {
+        "source": "Anthropic Pricing Page + Claude Docs",
+        "output_cost_ratio": "Output tokens typically 5x cost of input tokens",
+        "usage_tiers": "Monthly spend caps with deposits to raise limits",
+        "rate_limits": "RPM, TPM, TPD limits vary by tier"
+      },
+
+      "critical_timing_rules": [
+        "IMMEDIATE ACCRUAL: Each API call adds to monthly bill",
+        "OUTPUT COSTS 5X MORE: Output tokens much more expensive",
+        "CONTEXT = COST: Longer conversations = more input tokens = more cost",
+        "USE CACHING: 90% savings on repeated prompts"
+      ],
+
+      "sources": [
+        "https://www.anthropic.com/pricing",
+        "https://docs.claude.com/en/docs/about-claude/pricing"
+      ]
+    },
+
+    "openai": {
+      "name": "OpenAI",
+      "type": "ai_provider",
+
+      "charge_timing": {
+        "meter_starts": "Per API call - when request is processed",
+        "meter_stops": "When response is complete",
+        "billing_unit": "token",
+        "billing_granularity": "Exact token count",
+        "accrual_method": "PREPAID DEDUCTION - credits deducted in real-time",
+        "credit_check": "BEFORE each request - fails if insufficient",
+        "auto_recharge": "Optional - triggers at threshold you set",
+        "payment_method": "Prepaid credits (since March 2024)",
+        "minimum_purchase": 5.00,
+        "credit_expiry": "1 year from purchase"
+      },
+
+      "pricing_per_million_tokens": {
+        "gpt-4-turbo": {"input": 10.00, "output": 30.00},
+        "gpt-4o": {"input": 5.00, "output": 15.00},
+        "gpt-4o-mini": {"input": 0.15, "output": 0.60},
+        "gpt-3.5-turbo": {"input": 0.50, "output": 1.50}
+      },
+
+      "verified_behavior": {
+        "source": "OpenAI Community Forums + Stack Overflow",
+        "march_2024_change": "All accounts switched from postpaid to prepaid billing",
+        "error_on_zero": "Error 429: 'You exceeded your current quota' when credits exhausted",
+        "no_grace_period": "Unlike postpaid, service stops IMMEDIATELY when credits run out",
+        "new_key_needed": "Some users report needing to generate new API key after adding credits"
+      },
+
+      "critical_timing_rules": [
+        "PREPAID ONLY: Must have credits BEFORE making requests (since March 2024)",
+        "REAL-TIME DEDUCTION: Credits deducted immediately per call",
+        "ZERO CREDITS = ERROR 429: API returns insufficient_quota error",
+        "NO GRACE PERIOD: Unlike postpaid, service stops immediately",
+        "CREDITS EXPIRE: 1 year from purchase, non-refundable"
+      ],
+
+      "sources": [
+        "https://community.openai.com/t/march-8-api-error-429-check-plan-or-billing-details-monthly-billed-accounts-switched-to-prepaid/670739",
+        "https://stackoverflow.com/questions/75898276/openai-api-error-429-you-exceeded-your-current-quota"
+      ]
+    },
+
+    "groq": {
+      "name": "Groq",
+      "type": "ai_provider",
+
+      "charge_timing": {
+        "meter_starts": "N/A - FREE",
+        "meter_stops": "N/A - FREE",
+        "billing_unit": "none",
+        "cost": 0,
+        "rate_limit_reset_rpm": "Rolling 60-second window",
+        "rate_limit_reset_daily": "Midnight UTC"
+      },
+
+      "pricing": {
+        "all_models": {"input_per_1k": 0, "output_per_1k": 0, "cost": "FREE"}
+      },
+
+      "rate_limits_free_tier": {
+        "llama-3.1-8b-instant": {"rpm": 30, "rpd": 14400, "tpm": 6000, "tpd": 500000},
+        "llama-3.3-70b-versatile": {"rpm": 30, "rpd": 1000, "tpm": 12000, "tpd": 100000},
+        "mixtral-8x7b": {"rpm": 30, "rpd": 14400, "tpm": 6000, "tpd": 500000},
+        "whisper-large-v3": {"rpm": 20, "rpd": 2000, "audio_seconds_hour": 7200}
+      },
+
+      "verified_behavior": {
+        "source": "Groq Console Documentation",
+        "organization_level": "Rate limits apply at organization level, not per API key",
+        "error_on_limit": "429 error when rate limit hit, includes retry-after header",
+        "developer_tier": "10x higher limits available for paid tier"
+      },
+
+      "critical_timing_rules": [
+        "FREE: $0 cost always",
+        "30 RPM: Default requests per minute for most models",
+        "500K TPD: Default tokens per day limit",
+        "RPM RESETS: Rolling 60-second window",
+        "DAILY RESETS: Midnight UTC",
+        "RATE LIMIT = 429 ERROR: Request rejected, retry after reset"
+      ],
+
+      "sources": [
+        "https://console.groq.com/docs/rate-limits"
+      ]
+    },
+
+    "google_ai": {
+      "name": "Google AI (Gemini)",
+      "type": "ai_provider",
+
+      "charge_timing": {
+        "meter_starts": "N/A - FREE tier",
+        "meter_stops": "N/A - FREE tier",
+        "billing_unit": "none",
+        "cost": 0,
+        "rate_limit_reset": "Rolling window for RPM, midnight Pacific Time for daily"
+      },
+
+      "pricing": {
+        "gemini-2.5-flash": {"input_per_1k": 0, "output_per_1k": 0, "cost": "FREE"},
+        "gemini-2.5-pro": {"input_per_1k": 0, "output_per_1k": 0, "cost": "FREE"},
+        "gemini-1.5-flash": {"input_per_1k": 0, "output_per_1k": 0, "cost": "FREE"}
+      },
+
+      "rate_limits_free_tier": {
+        "gemini-2.5-flash": {"rpm": 10, "rpd": 250, "tpm": 250000},
+        "gemini-2.5-flash-lite": {"rpm": 15, "rpd": 1000, "tpm": 250000},
+        "gemini-2.5-pro": {"rpm": 5, "rpd": 100, "tpm": 250000},
+        "gemini-1.5-flash": {"rpm": 15, "rpd": 1500, "tpm": 1000000},
+        "gemini-1.5-pro": {"rpm": 2, "rpd": 50, "tpm": 32000}
+      },
+
+      "verified_behavior": {
+        "source": "Google AI for Developers Documentation",
+        "project_level": "Rate limits apply at project level, all API keys share same pool",
+        "error_on_limit": "429 status code with retry-after information",
+        "daily_reset": "Quota resets at midnight Pacific Time",
+        "token_limits": "TPM applies to input + output tokens combined"
+      },
+
+      "critical_timing_rules": [
+        "FREE: $0 cost in free tier",
+        "PROJECT-LEVEL LIMITS: All API keys share same quota pool",
+        "RPM VARIES BY MODEL: 2-15 RPM depending on model",
+        "DAILY RESET: Midnight Pacific Time",
+        "HIGHER LIMITS THAN GROQ: Better for sustained usage"
+      ],
+
+      "sources": [
+        "https://ai.google.dev/gemini-api/docs/rate-limits",
+        "https://ai.google.dev/gemini-api/docs/pricing"
+      ]
+    },
+
+    "polymarket": {
+      "name": "Polymarket",
+      "type": "trading_platform",
+
+      "charge_timing": {
+        "meter_starts": "INSTANT on trade execution",
+        "meter_stops": "On market resolution OR position sale",
+        "billing_unit": "per_transaction",
+        "trading_fee": 0,
+        "gas_timing": "IMMEDIATE - paid with each transaction",
+        "fund_lock": "USDC locked until resolution/sale"
+      },
+
+      "pricing": {
+        "trading_fee": "0% (verified - no platform fees)",
+        "gas_fee_polygon": {"average": 0.001, "max": 0.01, "unit": "USD"},
+        "withdrawal_gas": {"average": 0.01, "max": 0.05, "unit": "USD"},
+        "bridge_from_ethereum": {"average": 10, "max": 30, "unit": "USD", "note": "Avoid - use Polygon direct"}
+      },
+
+      "capital_flow": {
+        "buy": "USDC immediately locked in position",
+        "sell": "USDC immediately returned to wallet",
+        "resolution_win": "Payout at market close (automatic)",
+        "resolution_lose": "Position worth $0 (no action needed)"
+      },
+
+      "verified_behavior": {
+        "source": "Polymarket Official Documentation + Third-Party Reviews",
+        "zero_trading_fees": "CONFIRMED: Polymarket does not charge any trading fees",
+        "gas_abstracted": "Meta-transactions eliminate visible gas costs for most users",
+        "polygon_network": "Sub-cent gas fees, much cheaper than Ethereum",
+        "fiat_onramp": "MoonPay/Stripe available, but intermediaries may charge fees"
+      },
+
+      "critical_timing_rules": [
+        "NO TRADING FEES: 0% - only gas (verified)",
+        "GAS IMMEDIATE: ~$0.001-0.01 per transaction on Polygon",
+        "FUNDS LOCKED: Capital tied up until resolution",
+        "RESOLUTION = AUTO-SETTLE: No action needed, funds released automatically",
+        "AVOID ETH BRIDGE: Use Coinbase/Binance to Polygon direct (saves $10-30)"
+      ],
+
+      "sources": [
+        "https://docs.polymarket.com/polymarket-learn/trading/fees",
+        "https://polymarket.support/fees/"
+      ]
+    },
+
+    "coingecko": {
+      "name": "CoinGecko API",
+      "type": "data_provider",
+
+      "charge_timing": {
+        "cost": 0,
+        "billing_unit": "none",
+        "rate_limit_reset": "Rolling per-minute window"
+      },
+
+      "rate_limits": {
+        "demo_api": {"calls_per_minute": 10, "calls_per_month": 10000},
+        "free_api": {"calls_per_minute": 30}
+      },
+
+      "critical_timing_rules": [
+        "FREE: No cost",
+        "10-30 CALLS/MIN: Rate limit varies by plan",
+        "RATE LIMITED: Will block temporarily if exceeded"
+      ],
+
+      "sources": ["https://www.coingecko.com/en/api/pricing"]
+    },
+
+    "github": {
+      "name": "GitHub",
+      "type": "code_hosting",
+
+      "charge_timing": {
+        "cost": 0,
+        "billing_unit": "none",
+        "actions_reset": "Monthly on billing cycle"
+      },
+
+      "free_tier": {
+        "private_repos": "Unlimited",
+        "actions_minutes": 2000,
+        "storage_gb": 500,
+        "packages_gb": 500
+      },
+
+      "critical_timing_rules": [
+        "FREE: No cost for current usage pattern",
+        "ACTIONS: 2000 free minutes/month, then blocked"
+      ],
+
+      "sources": ["https://github.com/pricing"]
+    }
+  },
+
+  "billing_calendar": {
+    "digitalocean": {
+      "type": "continuous",
+      "description": "Charges accrue every hour, invoice monthly",
+      "check_frequency": "hourly",
+      "stop_condition": "DESTROY droplet"
+    },
+    "anthropic": {
+      "type": "accrual",
+      "description": "Usage tracked, invoiced monthly",
+      "invoice_day": 1,
+      "payment_terms": "Net 30"
+    },
+    "openai": {
+      "type": "prepaid",
+      "description": "Credits deducted in real-time, fails at zero",
+      "check_frequency": "per_request",
+      "failure_mode": "Error 429 immediately"
+    },
+    "groq": {
+      "type": "free",
+      "description": "No billing, rate-limited only",
+      "daily_reset": "Midnight UTC"
+    },
+    "google_ai": {
+      "type": "free",
+      "description": "No billing, rate-limited only",
+      "daily_reset": "Midnight Pacific Time"
+    },
+    "polymarket": {
+      "type": "per_transaction",
+      "description": "Gas paid per trade (~$0.001), funds locked until resolution"
+    }
+  },
+
+  "cost_tracking": {
+    "log_file": "finance/cost_log.jsonl",
+    "alert_threshold_daily": 10,
+    "alert_threshold_monthly": 200
+  }
+}

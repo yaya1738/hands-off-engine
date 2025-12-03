@@ -1,0 +1,2 @@
+#!/data/data/com.termux/files/usr/bin/bash
+$HOME/hands-off/agent/alert_mux.sh --src watchdog --sev crit --title "Watchdog RED" --body "${1:-Triggered}"

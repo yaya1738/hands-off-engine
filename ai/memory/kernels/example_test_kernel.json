@@ -1,0 +1,23 @@
+{
+  "kernel_id": "example_test_kernel",
+  "topic": "Example Test Topic",
+  "summary": "This is an example kernel created for testing.",
+  "key_decisions": [
+    {
+      "decision": "Use Kelly fraction 0.15 for week 1",
+      "rationale": "Conservative staged rollout",
+      "source": "cpu_risk_20251125_01",
+      "date": "2025-11-26T09:59:02.434017Z",
+      "status": "approved"
+    }
+  ],
+  "failed_paths": [],
+  "open_questions": [],
+  "source_weights": {
+    "chatgpt": 1.0,
+    "claude_cli": 0.8,
+    "github_copilot_agent": 0.6
+  },
+  "raw_refs": [],
+  "last_updated": "2025-11-26T09:59:02.435146Z"
+}

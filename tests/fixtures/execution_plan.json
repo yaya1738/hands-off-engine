@@ -1,0 +1,30 @@
+{
+  "mode": "DRYRUN",
+  "generated_at": "2025-01-15T12:05:00Z",
+  "orders": [
+    {
+      "market_id": "market-001",
+      "side": "YES",
+      "size_usd": 500.0,
+      "limit_price": 0.45,
+      "reason": "Strong positive edge (0.17)"
+    },
+    {
+      "market_id": "market-002",
+      "side": "YES",
+      "size_usd": 300.0,
+      "limit_price": 0.52,
+      "reason": "Moderate positive edge (0.13)"
+    },
+    {
+      "market_id": "market-003",
+      "side": "NO",
+      "size_usd": 200.0,
+      "limit_price": 0.72,
+      "reason": "Negative YES edge, buy NO instead"
+    }
+  ],
+  "total_size_usd": 1000.0,
+  "risk_checks_passed": true,
+  "notes": "DRYRUN execution plan - no real trades will be executed"
+}

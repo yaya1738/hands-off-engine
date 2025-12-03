@@ -1,0 +1,120 @@
+name: Agent Coordination Notification
+
+on:
+  push:
+    paths:
+      - 'ai/coordination/messages.jsonl'
+      - 'ai/coordination/status.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  notify-agents:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check for urgent coordination messages
+        id: check_urgent
+        run: |
+          # Check last message for urgent flag
+          LAST_MSG=$(tail -1 ai/coordination/messages.jsonl)
+          echo "Last message: $LAST_MSG"
+
+          # Check if message is request type or high priority
+          if echo "$LAST_MSG" | grep -q '"type":"request"'; then
+            echo "urgent=true" >> $GITHUB_OUTPUT
+          else
+            echo "urgent=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create notification issue if urgent
+        if: steps.check_urgent.outputs.urgent == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const messages = fs.readFileSync('ai/coordination/messages.jsonl', 'utf8')
+              .trim().split('\n')
+              .map(line => JSON.parse(line));
+
+            const lastMsg = messages[messages.length - 1];
+
+            // Check if coordination issue exists
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: 'agent-coordination',
+              state: 'open'
+            });
+
+            let issueNumber;
+
+            if (issues.data.length > 0) {
+              // Comment on existing issue
+              issueNumber = issues.data[0].number;
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issueNumber,
+                body: `## 🔔 New Coordination Message
+
+**From:** ${lastMsg.from}
+**To:** ${lastMsg.to}
+**Type:** ${lastMsg.type}
+**Time:** ${lastMsg.timestamp}
+
+**Message:**
+${lastMsg.message}
+
+---
+*View full coordination log: \`ai/coordination/messages.jsonl\`*`
+              });
+            } else {
+              // Create new coordination issue
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: '🤖 Agent Coordination Hub',
+                labels: ['agent-coordination'],
+                body: `## Agent Coordination Messages
+
+This issue tracks real-time coordination between AI agents.
+
+**Latest Message:**
+
+**From:** ${lastMsg.from}
+**To:** ${lastMsg.to}
+**Type:** ${lastMsg.type}
+
+**Message:**
+${lastMsg.message}
+
+---
+
+**Coordination Protocol:**
+- Agents coordinate via \`ai/coordination/messages.jsonl\`
+- This issue provides notifications
+- View full log: \`ai/coordination/messages.jsonl\`
+
+**Active Agents:**
+- Claude Code CLI
+- GitHub Copilot
+`
+              });
+            }
+
+      - name: Trigger Copilot workflow if exists
+        continue-on-error: true
+        run: |
+          # This will trigger repository_dispatch event that Copilot can listen to
+          curl -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            https://api.github.com/repos/${{ github.repository }}/dispatches \
+            -d '{"event_type":"coordination_message","client_payload":{"source":"claude-code","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}}'

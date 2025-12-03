@@ -1,0 +1,319 @@
+#!/usr/bin/env python3
+"""
+ho-hft - Hands-Off HFT Command Center
+One command to rule all high-frequency trading operations.
+
+USAGE:
+  ho-hft status          # Show fleet status
+  ho-hft wallets         # List/create wallets
+  ho-hft wallets create 10   # Create 10 new wallets
+  ho-hft presign TOKEN   # Pre-sign orders for token
+  ho-hft fire TOKEN      # Fire orders at token
+  ho-hft start           # Start HFT fleet
+  ho-hft stop            # Stop HFT fleet
+  ho-hft benchmark       # Run throughput benchmark
+
+Serving: Yair Siegel
+"""
+
+import sys
+import os
+
+# Add project to path
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+
+import json
+import time
+from datetime import datetime, timezone
+
+
+def cmd_status():
+    """Show HFT fleet status."""
+    from executor.hft_million_coordinator import HFTMillionCoordinator
+    from executor.multi_wallet_manager import MultiWalletManager
+
+    print("=" * 60)
+    print("HFT FLEET STATUS")
+    print("=" * 60)
+
+    # Wallet status
+    manager = MultiWalletManager()
+    wallets = manager.list_wallets()
+    active = [w for w in wallets if w.get("status") == "active"]
+
+    print(f"\n[WALLETS]")
+    print(f"  Total: {len(wallets)}")
+    print(f"  Active: {len(active)}")
+
+    # Capacity calculation
+    coordinator = HFTMillionCoordinator()
+    capacity = coordinator.calculate_capacity()
+
+    print(f"\n[CAPACITY]")
+    print(f"  Rate per wallet: {capacity['rate_per_wallet']:,}/sec")
+    print(f"  Theoretical max: {capacity['theoretical_multi_process']:,.0f}/sec")
+    print(f"  Wallets for 1M/sec: ~{capacity['wallets_needed_for_1m']:,}")
+
+    # Queue status
+    print(f"\n[QUEUE]")
+    print(f"  Buffer size: 1,000,000 orders")
+    print(f"  Current: {coordinator.head.value - coordinator.tail.value:,}")
+
+    print("\n" + "=" * 60)
+
+
+def cmd_wallets(args):
+    """Manage wallets."""
+    from executor.multi_wallet_manager import MultiWalletManager
+
+    manager = MultiWalletManager()
+
+    if not args or args[0] == "list":
+        wallets = manager.list_wallets()
+        print(f"\n[WALLETS: {len(wallets)}]")
+        for w in wallets[:20]:
+            addr = w.get("address", "")[:20]
+            alias = w.get("alias", "unknown")
+            status = w.get("status", "unknown")
+            print(f"  {alias}: {addr}... [{status}]")
+        if len(wallets) > 20:
+            print(f"  ... and {len(wallets) - 20} more")
+
+    elif args[0] == "create":
+        count = int(args[1]) if len(args) > 1 else 1
+        print(f"Creating {count} wallets...")
+        wallets = manager.create_wallet_batch(count, "hft")
+        print(f"Created {len(wallets)} wallets:")
+        for w in wallets[:5]:
+            print(f"  {w.alias}: {w.address[:20]}...")
+        if len(wallets) > 5:
+            print(f"  ... and {len(wallets) - 5} more")
+
+    elif args[0] == "init":
+        print("Initializing all wallet clients...")
+        results = manager.init_all_clients()
+        ok = sum(1 for r in results.values() if r == "OK")
+        print(f"Initialized: {ok}/{len(results)}")
+
+
+def cmd_presign(args):
+    """Pre-sign orders for token."""
+    from executor.hft_order_presigner import HFTOrderPresigner
+
+    if not args:
+        print("Usage: ho-hft presign TOKEN_ID [center_price] [levels]")
+        return
+
+    token_id = args[0]
+    center = float(args[1]) if len(args) > 1 else 0.5
+    levels = int(args[2]) if len(args) > 2 else 50
+
+    print(f"Pre-signing orders for {token_id[:20]}...")
+    print(f"  Center: {center}, Levels: {levels}")
+
+    presigner = HFTOrderPresigner()
+    result = presigner.presign_grid_parallel(
+        token_id=token_id,
+        center_price=center,
+        spread_bps=10,
+        levels=levels,
+        size_per_level=10
+    )
+
+    print(f"\nResult:")
+    print(f"  Orders pre-signed: {result.get('orders_pre_signed', 0)}")
+    print(f"  Rate: {result.get('orders_per_sec', 0):.0f}/sec")
+    print(f"  Elapsed: {result.get('elapsed_sec', 0)*1000:.0f}ms")
+
+
+def cmd_fire(args):
+    """Fire orders at token."""
+    import asyncio
+    from executor.hft_order_cannon import HFTOrderCannon, CannonConfig
+
+    if not args:
+        print("Usage: ho-hft fire TOKEN_ID [count]")
+        return
+
+    token_id = args[0]
+    count = int(args[1]) if len(args) > 1 else 100
+
+    print(f"Firing {count} orders at {token_id[:20]}...")
+
+    async def fire():
+        cannon = HFTOrderCannon()
+        orders = [{"token_id": token_id, "test": i} for i in range(count)]
+        result = await cannon.fire_barrage(orders)
+        await cannon.cleanup()
+        return result
+
+    result = asyncio.run(fire())
+
+    print(f"\nResult:")
+    print(f"  Fired: {result['orders_fired']}")
+    print(f"  Rate: {result['rate_per_sec']:.0f}/sec")
+    print(f"  Latency: {result['avg_latency_ms']:.1f}ms")
+
+
+def cmd_start():
+    """Start HFT fleet."""
+    from executor.hft_million_coordinator import HFTMillionCoordinator
+
+    print("Starting HFT fleet...")
+    coordinator = HFTMillionCoordinator()
+    coordinator.start()
+    print(f"Started {len(coordinator.processes)} processes")
+    print("Fleet is running. Use 'ho-hft stop' to stop.")
+
+
+def cmd_stop():
+    """Stop HFT fleet."""
+    from executor.hft_million_coordinator import HFTMillionCoordinator
+
+    print("Stopping HFT fleet...")
+    coordinator = HFTMillionCoordinator()
+    coordinator.stop()
+    print("Fleet stopped.")
+
+
+def cmd_benchmark():
+    """Run throughput benchmark."""
+    import asyncio
+    from executor.hft_order_cannon import HFTOrderCannon, CannonConfig
+
+    print("=" * 60)
+    print("HFT THROUGHPUT BENCHMARK")
+    print("=" * 60)
+
+    async def bench():
+        config = CannonConfig(
+            connections_per_wallet=100,
+            max_concurrent_requests=1000,
+        )
+        cannon = HFTOrderCannon(config)
+
+        # Burst test
+        print("\n[BURST TEST: 1000 orders]")
+        orders = [{"test": i} for i in range(1000)]
+        start = time.time()
+        result = await cannon.fire_barrage(orders)
+        elapsed = time.time() - start
+
+        print(f"  Orders: {result['orders_fired']}")
+        print(f"  Time: {elapsed*1000:.0f}ms")
+        print(f"  Rate: {result['rate_per_sec']:.0f}/sec")
+
+        # Scaling projection
+        base_rate = result['rate_per_sec']
+        print("\n[SCALING PROJECTION]")
+        print(f"  1 wallet: {base_rate:.0f}/sec")
+        print(f"  100 wallets: {base_rate * 100:.0f}/sec")
+        print(f"  1000 wallets: {base_rate * 1000:.0f}/sec")
+
+        await cannon.cleanup()
+
+    asyncio.run(bench())
+    print("\n" + "=" * 60)
+
+
+def cmd_orders():
+    """Show current Polymarket orders."""
+    from executor.parallel_order_orchestrator import ParallelOrderOrchestrator
+
+    orchestrator = ParallelOrderOrchestrator()
+    orchestrator.load_wallets_from_registry()
+
+    print("\n[CURRENT ORDERS]")
+    all_orders = orchestrator.get_all_orders()
+
+    total = 0
+    for addr, orders in all_orders.items():
+        if isinstance(orders, list):
+            total += len(orders)
+            print(f"\n  Wallet {addr[:15]}...: {len(orders)} orders")
+            for o in orders[:3]:
+                side = o.get("side", "?")
+                price = o.get("price", 0)
+                size = o.get("original_size", o.get("size", 0))
+                print(f"    {side} {size} @ {price}")
+            if len(orders) > 3:
+                print(f"    ... and {len(orders) - 3} more")
+
+    print(f"\n  TOTAL: {total} orders across {len(all_orders)} wallets")
+
+
+def cmd_cancel_all():
+    """Cancel all orders on all wallets."""
+    from executor.parallel_order_orchestrator import ParallelOrderOrchestrator
+
+    print("Cancelling all orders on all wallets...")
+    orchestrator = ParallelOrderOrchestrator()
+    orchestrator.load_wallets_from_registry()
+    results = orchestrator.cancel_all_all_wallets()
+
+    success = sum(1 for r in results if r.success)
+    print(f"Cancelled on {success}/{len(results)} wallets")
+
+
+def cmd_help():
+    """Show help."""
+    print("""
+ho-hft - Hands-Off HFT Command Center
+=====================================
+
+COMMANDS:
+  status          Show fleet status and capacity
+  wallets         List all wallets
+  wallets create N    Create N new wallets
+  wallets init    Initialize all wallet clients
+  presign TOKEN   Pre-sign orders for token
+  fire TOKEN [N]  Fire N orders at token
+  start           Start HFT fleet (background)
+  stop            Stop HFT fleet
+  benchmark       Run throughput benchmark
+  orders          Show current Polymarket orders
+  cancel-all      Cancel all orders on all wallets
+  help            Show this help
+
+EXAMPLES:
+  ho-hft status
+  ho-hft wallets create 100
+  ho-hft presign 0x1234... 0.5 50
+  ho-hft fire 0x1234... 1000
+  ho-hft benchmark
+
+TARGET: 1-2 Million orders/second with 1000+ wallets
+""")
+
+
+def main():
+    if len(sys.argv) < 2:
+        cmd_help()
+        return
+
+    cmd = sys.argv[1].lower().replace("-", "_")
+    args = sys.argv[2:]
+
+    commands = {
+        "status": cmd_status,
+        "wallets": lambda: cmd_wallets(args),
+        "presign": lambda: cmd_presign(args),
+        "fire": lambda: cmd_fire(args),
+        "start": cmd_start,
+        "stop": cmd_stop,
+        "benchmark": cmd_benchmark,
+        "orders": cmd_orders,
+        "cancel_all": cmd_cancel_all,
+        "help": cmd_help,
+    }
+
+    if cmd in commands:
+        commands[cmd]()
+    else:
+        print(f"Unknown command: {cmd}")
+        cmd_help()
+
+
+if __name__ == "__main__":
+    main()

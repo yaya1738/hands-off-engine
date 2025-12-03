@@ -1,0 +1,2 @@
+#!/data/data/com.termux/files/usr/bin/bash
+$HOME/hands-off/agent/alert_mux.sh --src server --sev "${1:-warn}" --title "Server" --body "${2:-(no body)}"

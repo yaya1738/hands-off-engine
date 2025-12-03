@@ -1,0 +1,162 @@
+import os, json, subprocess, time
+from http.server import BaseHTTPRequestHandler, HTTPServer
+from urllib.parse import urlparse, parse_qs
+
+BASE = os.path.expanduser("~/hands-off/autopilot")
+STATE = os.path.join(BASE, "state.env")
+PAUSE_FLAG = os.path.join(BASE, "PAUSED")
+LOG = os.path.join(BASE, f"edges-{time.strftime('%Y%m%d', time.gmtime())}.log")
+ENVF = os.path.join(BASE, "admin.env")
+
+ADMIN_TOKEN = ""
+ADMIN_PORT = 8787
+try:
+    if os.path.exists(ENVF):
+        for line in open(ENVF):
+            if line.strip().startswith("#") or "=" not in line: continue
+            k,v = line.strip().split("=",1)
+            if k == "ADMIN_TOKEN": ADMIN_TOKEN = v.strip()
+            if k == "ADMIN_PORT" and v.strip().isdigit(): ADMIN_PORT = int(v.strip())
+except: pass
+
+def read_state():
+    d = {"THR":"0.05","EMPTY_COUNT":"0","PAUSED":("1" if os.path.exists(PAUSE_FLAG) else "0")}
+    if os.path.exists(STATE):
+        try:
+            for line in open(STATE):
+                if "=" in line:
+                    k,v = line.strip().split("=",1)
+                    d[k]=v
+        except: pass
+    return d
+
+def write_state(thr=None, empty=None):
+    st = read_state()
+    if thr is not None: st["THR"] = f"{float(thr):.3f}"
+    if empty is not None: st["EMPTY_COUNT"] = str(int(empty))
+    with open(STATE,"w") as f:
+        f.write(f"THR={st['THR']}\nEMPTY_COUNT={st['EMPTY_COUNT']}\n")
+
+class H(BaseHTTPRequestHandler):
+    def _ok(self, payload, ctype="application/json"):
+        b = payload.encode() if isinstance(payload,str) else payload
+        self.send_response(200); self.send_header("Content-Type", ctype)
+        self.send_header("Cache-Control","no-store"); self.end_headers()
+        self.wfile.write(b)
+    def _txt(self, s): self._ok(s, "text/plain; charset=utf-8")
+    def log_message(self, *a, **k): pass
+
+    def _auth(self):
+        if ADMIN_TOKEN:
+            tok = self.headers.get("X-Admin-Token","")
+            if tok != ADMIN_TOKEN:
+                self.send_response(403); self.end_headers()
+                return False
+        return True
+
+    def do_GET(self):
+        if not self._auth(): return
+        p = urlparse(self.path); q = parse_qs(p.query)
+
+        if p.path == "/state":
+            return self._ok(json.dumps(read_state(), separators=(",",":")))
+        if p.path == "/pause":
+            open(PAUSE_FLAG,"a").close(); return self._txt("[ok] paused")
+        if p.path == "/resume":
+            if os.path.exists(PAUSE_FLAG): os.remove(PAUSE_FLAG)
+            return self._txt("[ok] resumed")
+        if p.path == "/set_threshold":
+            thr = q.get("v",[""])[0]
+            try:
+                write_state(thr=float(thr)); return self._txt(f"[ok] THR set -> {float(thr):.3f}")
+            except:
+                return self._txt("[err] invalid v")
+        if p.path == "/tail":
+            n = int(q.get("n",["20"])[0])
+            try:
+                lines = open(LOG,"r",errors="ignore").read().splitlines()[-n:]
+                return self._txt("\n".join(lines) if lines else "(empty)")
+            except:
+                return self._txt("(no log)")
+        if p.path == "/force_run":
+            try:
+                out = subprocess.check_output(
+                    ["/data/data/com.termux/files/usr/bin/bash", os.path.join(BASE,"run_once.sh")],
+                    stderr=subprocess.STDOUT, timeout=60
+                )
+                return self._txt(out.decode(errors="ignore")[:4000])
+            except Exception as e:
+                return self._txt(f"[err] force_run: {e}")
+        if p.path == "/add_watchword":
+            w = (q.get("w",[""])[0] or "").strip().lower()
+            wl = os.path.join(BASE, "watchlist.txt")
+            if not w: return self._txt("[err] missing ?w=term")
+            try:
+                have = set([x.strip().lower() for x in open(wl).read().splitlines() if x.strip()]) if os.path.exists(wl) else set()
+                if w in have: return self._txt(f"[skip] already present: {w}")
+                with open(wl,"a") as f: f.write(w+"\n")
+                return self._txt(f"[ok] watchword added: {w}")
+            except Exception as e:
+                return self._txt(f"[err] {e}")
+
+        # --- inserted health/status/ping ---
+        if self.path in ("/health","/status","/ping"):
+            tok = self.headers.get("X-Admin-Token","")
+            if not tok:
+                self.send_response(403); self.end_headers(); return
+            self.send_response(200)
+            self.send_header("Content-Type","text/plain")
+            self.end_headers()
+            self.wfile.write(b"ok\n")
+            return
+        # --- end inserted block ---
+        # --- inserted finance + metrics ---
+        if self.path == "/finance/state":
+            tok = self.headers.get("X-Admin-Token","")
+            if not tok:
+                self.send_response(403); self.end_headers(); return
+            try:
+                import json, os
+                with open(os.path.expanduser("/data/data/com.termux/files/home/hands-off/data/finances/state.json"),"r",encoding="utf-8") as f:
+                    data = f.read().encode()
+                self.send_response(200)
+                self.send_header("Content-Type","application/json")
+                self.end_headers()
+                self.wfile.write(data)
+            except FileNotFoundError:
+                
+self.send_response(404); self.end_headers(); self.wfile.write(b"state.json not found\n")
+            except Exception as e:
+                self.send_response(500); self.end_headers(); self.wfile.write(str(e).encode())
+            return
+
+        if self.path == "/metrics":
+            tok = self.headers.get("X-Admin-Token","")
+            if not tok:
+                self.send_response(403); self.end_headers(); return
+            import os, json, time
+            # Build a tiny Prometheus-ish text payload
+            m = []
+            m.append("admin_up 1")
+            try:
+                st = json.load(open(os.path.expanduser("/data/data/com.termux/files/home/hands-off/data/finances/state.json"),"r",encoding="utf-8"))
+                m.append(f"fin_notes_total {len(st.get(notes,[]))}")
+                bal = st.get(balances,{})
+                for k,v in bal.items():
+                    try:
+                        vv = float(v)
+                        m.append(f"balance{{asset=\"{k}\"}} {vv}")
+                    except: pass
+            except Exception:
+                m.append("fin_notes_total 0")
+            body = ("\n".join(m) + "\n").encode()
+            self.send_response(200)
+            self.send_header("Content-Type","text/plain")
+            self.end_headers()
+            self.wfile.write(body)
+            return
+        # --- end inserted block ---
+        self.send_response(404); self.end_headers()
+
+if __name__ == "__main__":
+    HTTPServer(("127.0.0.1", ADMIN_PORT), H).serve_forever()

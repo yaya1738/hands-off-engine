@@ -1,0 +1,37 @@
+{
+  "default_backend": "claude_cli",
+  "fallback_chain": [
+    "claude_cli",
+    "anthropic_api",
+    "openrouter"
+  ],
+  "backends": {
+    "claude_cli": {
+      "type": "claude_cli",
+      "description": "Claude Code / Claude CLI using my subscription (subject to weekly/session caps)",
+      "command_hint": "claude code"
+    },
+    "anthropic_api": {
+      "type": "anthropic_api",
+      "description": "Anthropic API (pay-per-token, no weekly hard caps once configured)",
+      "env_key": "ANTHROPIC_API_KEY",
+      "model": "claude-3-5-sonnet-latest"
+    },
+    "openrouter": {
+      "type": "openrouter",
+      "description": "OpenRouter API as an additional fallback / diversification lane",
+      "env_key": "OPENROUTER_API_KEY",
+      "model": "anthropic/claude-3.5-sonnet"
+    }
+  },
+  "error_patterns": {
+    "treat_as_cap": [
+      "usage limit",
+      "rate limit",
+      "too many requests",
+      "You have reached your",
+      "quota",
+      "insufficient_quota"
+    ]
+  }
+}

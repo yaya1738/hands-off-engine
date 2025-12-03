@@ -1,0 +1,215 @@
+version: '3.8'
+
+services:
+  # ==========================================================
+  # Core Infrastructure Services
+  # ==========================================================
+
+  selfheal:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+      target: selfheal
+    container_name: hands-off-selfheal
+    restart: always
+    volumes:
+      - ../:/app:ro
+      - ../state:/app/state:rw
+      - ../termux-hands-off/state:/app/termux-hands-off/state:rw
+      - /var/run/docker.sock:/var/run/docker.sock:ro  # Allow container management
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "python3", "/app/infrastructure/selfheal.py", "--status"]
+      interval: 120s
+      timeout: 10s
+      retries: 3
+    networks:
+      - hands-off-network
+
+  health-monitor:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+      target: health-monitor
+    container_name: hands-off-health-monitor
+    restart: always
+    volumes:
+      - ../:/app:ro
+      - ../state:/app/state:rw
+      - ../termux-hands-off/state:/app/termux-hands-off/state:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - hands-off-network
+
+  # ==========================================================
+  # Application Services
+  # ==========================================================
+
+  orchestrator:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+      target: orchestrator
+    container_name: hands-off-orchestrator
+    restart: always
+    volumes:
+      - ../:/app:ro
+      - ../state:/app/state:rw
+      - ../termux-hands-off/state:/app/termux-hands-off/state:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "test", "-f", "/app/termux-hands-off/state/master.json"]
+      interval: 60s
+      timeout: 5s
+      retries: 3
+    networks:
+      - hands-off-network
+
+  # Pipeline runs on schedule (triggered by external cron or systemd timer)
+  # This service is for manual execution: docker-compose run pipeline
+  pipeline:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+      target: pipeline
+    container_name: hands-off-pipeline
+    volumes:
+      - ../:/app:rw
+      - ../state:/app/state:rw
+      - ../termux-hands-off/state:/app/termux-hands-off/state:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    networks:
+      - hands-off-network
+    profiles:
+      - manual  # Don't start automatically
+
+  # ==========================================================
+  # Monitoring & Dashboard
+  # ==========================================================
+
+  admin-server:
+    build:
+      context: ..
+      dockerfile: infrastructure/Dockerfile
+      target: base
+    container_name: hands-off-admin
+    restart: always
+    command: ["python3", "/app/termux-hands-off/autopilot/admin_server.py"]
+    ports:
+      - "8787:8787"
+    volumes:
+      - ../:/app:ro
+      - ../state:/app/state:rw
+      - ../termux-hands-off/state:/app/termux-hands-off/state:rw
+    environment:
+      - PYTHONUNBUFFERED=1
+      - LOG_LEVEL=INFO
+      - ADMIN_TOKEN=${ADMIN_TOKEN:-change-me-in-production}
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8787/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+    networks:
+      - hands-off-network
+
+  # ==========================================================
+  # Optional: Metrics & Visualization
+  # ==========================================================
+
+  # Prometheus for metrics collection (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: hands-off-prometheus
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+    networks:
+      - hands-off-network
+    profiles:
+      - monitoring
+
+  # Grafana for visualization (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: hands-off-grafana
+    restart: always
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana-datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    networks:
+      - hands-off-network
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+
+  # Loki for log aggregation (optional)
+  loki:
+    image: grafana/loki:latest
+    container_name: hands-off-loki
+    restart: always
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./loki-config.yml:/etc/loki/local-config.yaml:ro
+      - loki-data:/loki
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - hands-off-network
+    profiles:
+      - monitoring
+
+networks:
+  hands-off-network:
+    driver: bridge
+
+volumes:
+  prometheus-data:
+  grafana-data:
+  loki-data:

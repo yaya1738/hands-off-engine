@@ -1,0 +1,27 @@
+{
+  "cpu_id": "cpu_autokernel_risk_model_v2_20251127_200442",
+  "mode": "burst",
+  "bound_kernels": [
+    "risk_model_v2"
+  ],
+  "intercom_path": "/root/hands-off-engine/ai/intercom/autokernel_risk_model_v2_20251127_200442/thread.jsonl",
+  "input_queue": null,
+  "output_queue": null,
+  "status": "stopped",
+  "config": {
+    "max_rounds": 2,
+    "max_cost_usd": 1.0,
+    "allowed_nodes": [
+      "chatgpt",
+      "claude_cli",
+      "github_copilot_agent"
+    ],
+    "safety_profile": "design_only",
+    "max_steps": 20,
+    "max_duration_seconds": 900
+  },
+  "created": "2025-11-27T20:04:42.716090Z",
+  "steps_completed": 0,
+  "duration_seconds": 0.0,
+  "kernel_updates_applied": false
+}

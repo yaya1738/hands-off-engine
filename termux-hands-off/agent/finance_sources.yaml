@@ -1,0 +1,7 @@
+sources:
+  - type: manual_file
+    path: balances_manual.yaml
+  - type: onchain_usdc_eth
+    addresses_file: addresses_eth.yaml
+  - type: okx_spot
+  - type: kraken_spot

@@ -1,0 +1,83 @@
+{
+  "version": "2.0",
+  "last_updated": "2025-11-30T16:04:36.436001+00:00",
+  "owner": "yair_siegel",
+  "source": "direct_input",
+  "accounts": {
+    "polymarket": {
+      "type": "prediction_market",
+      "wallet_address": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
+      "balance_usdc": 8.99,
+      "last_updated": "2025-11-30T16:04:36.435960+00:00",
+      "balance_matic": 0.0
+    },
+    "robinhood": {
+      "type": "brokerage",
+      "balance_usd": 1500,
+      "notes": "Positions, fluctuates"
+    },
+    "paypal_business": {
+      "type": "payment",
+      "balance_usd": 1000,
+      "notes": "Used for credit card cycling arbitrage"
+    },
+    "credit_cards": {
+      "type": "credit",
+      "total_available": 6000,
+      "total_debt": 18000,
+      "total_limit": 24000,
+      "notes": "Cycling via PayPal Business for low fees"
+    }
+  },
+  "credit": {
+    "score": 680,
+    "total_limit": 24000,
+    "total_balance": 18000,
+    "total_available": 6000,
+    "utilization_pct": 75,
+    "strategy": "Cycle through PayPal Business at optimal points for lowest fees/interest"
+  },
+  "monthly_burn": {
+    "housing": {
+      "amount_ils": 4000,
+      "amount_usd": 1080,
+      "notes": "Apartment, can sublet/move",
+      "flexible": true
+    },
+    "food": {
+      "amount_usd": 1950,
+      "daily_rate": 65,
+      "notes": "High quality for health/time savings",
+      "flexible": true
+    },
+    "ai_services": {
+      "amount_usd": 250,
+      "breakdown": {
+        "claude_max": "~$20",
+        "chatgpt_plus": "~$20",
+        "copilot_pro": "~$10",
+        "anthropic_api": "variable",
+        "ifttt": "~$5",
+        "other": "variable"
+      },
+      "notes": "Should be generating ROI",
+      "flexible": false
+    },
+    "total_usd": 3280
+  },
+  "summary": {
+    "total_liquid_usd": 2741,
+    "total_invested_usd": 1500,
+    "total_credit_available": 6000,
+    "monthly_burn_usd": 3280,
+    "runway_months": 0.84,
+    "deployable_to_trading": 241,
+    "critical_insight": "Runway < 1 month without new income. AI costs should be generating ROI. Credit cycling is active strategy."
+  },
+  "strategy_notes": {
+    "credit_cycling": "Use PayPal Business to move credit card balances at optimal points",
+    "cost_flexibility": "Housing and food can flex up/down as needed",
+    "ai_roi_requirement": "AI spend must generate returns > spend",
+    "immediate_need": "Cash flow positive or reduce burn"
+  }
+}

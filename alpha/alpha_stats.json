@@ -1,0 +1,43 @@
+{
+  "timestamp": "2025-11-18T03:07:25.035438+00:00",
+  "threshold": 0.02,
+  "best_score": 0.407,
+  "avg_score": 0.2166,
+  "median_score": 0.1942,
+  "total_candidates": 7,
+  "filtered_candidates": 7,
+  "top_10_avg": 0.2166,
+  "category_breakdown": {
+    "crypto": {
+      "count": 2,
+      "avg_score": 0.2629,
+      "top_score": 0.3954,
+      "top_edge": 0.15
+    },
+    "macro": {
+      "count": 3,
+      "avg_score": 0.2354,
+      "top_score": 0.407,
+      "top_edge": 0.15
+    },
+    "sports": {
+      "count": 1,
+      "avg_score": 0.2138,
+      "top_score": 0.2138,
+      "top_edge": 0.06
+    },
+    "politics": {
+      "count": 1,
+      "avg_score": 0.0706,
+      "top_score": 0.0706,
+      "top_edge": 0.02
+    }
+  },
+  "percentiles": {
+    "p25": 0.1051,
+    "p50": 0.1942,
+    "p75": 0.3954,
+    "p90": 0.407,
+    "p95": 0.407
+  }
+}

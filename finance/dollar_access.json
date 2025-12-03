@@ -1,0 +1,78 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-30T17:05:00Z",
+  "purpose": "System dollar access and storage tracking",
+
+  "inflow_channels": {
+    "polymarket_wallet": {
+      "status": "ACTIVE",
+      "network": "Polygon",
+      "address": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
+      "accepts": ["USDC", "USDC.e", "MATIC"],
+      "current_balance_usdc": 8.99,
+      "positions_value_usdc": 99.0,
+      "notes": "Primary trading wallet - can receive direct USDC deposits"
+    },
+    "paypal_business": {
+      "status": "NEEDS_API_KEY",
+      "email": "unknown",
+      "current_balance": 1000,
+      "notes": "User has PayPal Business but no API integrated"
+    },
+    "stripe": {
+      "status": "NOT_CONFIGURED",
+      "notes": "Could accept credit cards for consulting"
+    },
+    "crypto_direct": {
+      "status": "ACTIVE",
+      "networks": {
+        "polygon_usdc": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
+        "ethereum_usdc": "SAME_ADDRESS_DIFFERENT_NETWORK"
+      },
+      "notes": "Clients can pay directly in USDC to wallet"
+    }
+  },
+
+  "storage_locations": {
+    "polymarket": {
+      "status": "ACTIVE",
+      "balance": 8.99,
+      "positions": 99.0,
+      "total": 107.99,
+      "access": "API via py_clob_client"
+    }
+  },
+
+  "outflow_channels": {
+    "polymarket_trading": {
+      "status": "ACTIVE_LOW_BALANCE",
+      "min_trade": 1.0,
+      "current_capability": "Limited - $8.99 available"
+    }
+  },
+
+  "recovery_timeline": {
+    "dec_10_2025": {
+      "event": "Fed rate positions resolve",
+      "expected_return": "0 to ~71 depending on outcome",
+      "markets": ["fed-rate-hike-in-2025", "will-6-fed-rate-cuts-happen-in-2025", "will-7-fed-rate-cuts-happen-in-2025"]
+    },
+    "dec_31_2025": {
+      "event": "Pichai position resolves",
+      "expected_return": "0 to ~28 depending on outcome",
+      "markets": ["sundar-pichai-out-as-google-ceo-in-2025"]
+    }
+  },
+
+  "immediate_actions": [
+    "Add USDC payment option to landing page",
+    "Monitor for position resolutions via capital_recovery_monitor.py",
+    "Alert when balance crosses $50 (min trading)"
+  ],
+
+  "blocked_actions": [
+    "PayPal API integration (needs credentials)",
+    "Stripe setup (needs account)",
+    "Bank API (not possible)"
+  ]
+}

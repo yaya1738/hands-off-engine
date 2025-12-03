@@ -1,0 +1,170 @@
+#!/usr/bin/env python3
+"""
+ho-fleet - Polymarket Wallet Fleet Manager
+Quick commands for multi-wallet operations.
+
+USAGE:
+  ho-fleet status        # Fleet overview
+  ho-fleet create N      # Create N wallets
+  ho-fleet list          # List all wallets
+  ho-fleet orders        # All orders across fleet
+  ho-fleet cancel        # Cancel all orders
+  ho-fleet balance       # Check balances
+  ho-fleet rebalance     # Rebalance capital
+
+Serving: Yair Siegel
+"""
+
+import sys
+import os
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+
+
+def cmd_status():
+    """Fleet overview."""
+    from executor.multi_wallet_manager import MultiWalletManager
+    from executor.parallel_order_orchestrator import ParallelOrderOrchestrator
+
+    manager = MultiWalletManager()
+    wallets = manager.list_wallets()
+    active = [w for w in wallets if w.get("status") == "active"]
+
+    print("=" * 50)
+    print("POLYMARKET WALLET FLEET")
+    print("=" * 50)
+    print(f"\nWallets: {len(active)} active / {len(wallets)} total")
+
+    # Get orders
+    orchestrator = ParallelOrderOrchestrator()
+    orchestrator.load_wallets_from_registry()
+    stats = orchestrator.get_fleet_stats()
+
+    print(f"Orders: {stats['total_open_orders']}")
+    print(f"Working Capital: ${stats['total_working_capital']:.2f}")
+    print("=" * 50)
+
+
+def cmd_create(count=1):
+    """Create wallets."""
+    from executor.multi_wallet_manager import MultiWalletManager
+
+    manager = MultiWalletManager()
+    print(f"Creating {count} wallets...")
+    wallets = manager.create_wallet_batch(count, "fleet")
+    print(f"Created {len(wallets)} wallets")
+    for w in wallets[:5]:
+        print(f"  {w.alias}: {w.address[:25]}...")
+
+
+def cmd_list():
+    """List wallets."""
+    from executor.multi_wallet_manager import MultiWalletManager
+
+    manager = MultiWalletManager()
+    wallets = manager.list_wallets()
+
+    print(f"\n[{len(wallets)} WALLETS]")
+    for w in wallets:
+        addr = w.get("address", "")[:20]
+        alias = w.get("alias", "?")
+        status = w.get("status", "?")
+        print(f"  {alias}: {addr}... [{status}]")
+
+
+def cmd_orders():
+    """Show all orders."""
+    from executor.parallel_order_orchestrator import ParallelOrderOrchestrator
+
+    orchestrator = ParallelOrderOrchestrator()
+    orchestrator.load_wallets_from_registry()
+    all_orders = orchestrator.get_all_orders()
+
+    total = 0
+    for addr, orders in all_orders.items():
+        if isinstance(orders, list):
+            total += len(orders)
+            if orders:
+                print(f"\n[{addr[:15]}...] {len(orders)} orders")
+                for o in orders[:5]:
+                    print(f"  {o.get('side')} {o.get('original_size', o.get('size'))} @ {o.get('price')}")
+
+    print(f"\nTOTAL: {total} orders")
+
+
+def cmd_cancel():
+    """Cancel all orders."""
+    from executor.parallel_order_orchestrator import ParallelOrderOrchestrator
+
+    print("Cancelling all orders...")
+    orchestrator = ParallelOrderOrchestrator()
+    orchestrator.load_wallets_from_registry()
+    results = orchestrator.cancel_all_all_wallets()
+    print(f"Done: {sum(1 for r in results if r.success)}/{len(results)} wallets")
+
+
+def cmd_balance():
+    """Check balances."""
+    from executor.wallet_flow_coordinator import WalletFlowCoordinator
+
+    coordinator = WalletFlowCoordinator()
+    balances = coordinator.get_all_balances()
+
+    total_usdc = 0
+    print("\n[BALANCES]")
+    for addr, bal in balances.items():
+        usdc = bal.get("usdc", 0)
+        matic = bal.get("matic", 0)
+        alias = bal.get("alias", addr[:10])
+        total_usdc += usdc
+        print(f"  {alias}: ${usdc:.2f} USDC, {matic:.4f} MATIC")
+
+    print(f"\nTOTAL: ${total_usdc:.2f} USDC")
+
+
+def cmd_help():
+    print("""
+ho-fleet - Polymarket Wallet Fleet Manager
+==========================================
+
+COMMANDS:
+  status    Fleet overview (wallets, orders, capital)
+  create N  Create N new wallets
+  list      List all wallets
+  orders    Show all orders across fleet
+  cancel    Cancel all orders on all wallets
+  balance   Check USDC/MATIC balances
+  help      Show this help
+
+EXAMPLES:
+  ho-fleet status
+  ho-fleet create 10
+  ho-fleet orders
+  ho-fleet cancel
+""")
+
+
+def main():
+    cmd = sys.argv[1] if len(sys.argv) > 1 else "help"
+    args = sys.argv[2:]
+
+    if cmd == "status":
+        cmd_status()
+    elif cmd == "create":
+        count = int(args[0]) if args else 1
+        cmd_create(count)
+    elif cmd == "list":
+        cmd_list()
+    elif cmd == "orders":
+        cmd_orders()
+    elif cmd == "cancel":
+        cmd_cancel()
+    elif cmd == "balance":
+        cmd_balance()
+    else:
+        cmd_help()
+
+
+if __name__ == "__main__":
+    main()

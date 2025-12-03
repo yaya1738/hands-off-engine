@@ -1,0 +1,14 @@
+{
+  "master": "Yair Siegel",
+  "enabled": true,
+  "blocked_count": 2,
+  "last_block": {
+    "timestamp": "2025-11-30T23:01:29.531136+00:00",
+    "action_type": "remove_cron",
+    "target": "position_monitor",
+    "reason": "Critical cron job - required for monitoring",
+    "blocked": true
+  },
+  "survival_priority": "ABSOLUTE",
+  "last_updated": "2025-11-30T23:01:29.531173+00:00"
+}

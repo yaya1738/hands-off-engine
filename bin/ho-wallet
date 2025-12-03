@@ -1,0 +1,259 @@
+#!/usr/bin/env python3
+"""
+ho-wallet - Polymarket Wallet Factory CLI
+Full stack wallet creation, onboarding, and management.
+
+USAGE:
+  ho-wallet status            # Factory & master wallet status
+  ho-wallet create [USDC]     # Create one FULLY ONBOARDED wallet
+  ho-wallet fleet N [USDC]    # Create N trading wallets
+  ho-wallet check ADDRESS     # Check wallet readiness
+  ho-wallet onboard KEY       # Onboard existing wallet
+  ho-wallet fund ADDRESS USDC # Fund wallet with USDC
+  ho-wallet allowances ADDR   # Check Polymarket allowances
+
+Serving: Yair Siegel
+"""
+
+import sys
+import os
+import json
+
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, PROJECT_ROOT)
+
+
+def cmd_status():
+    """Show factory status."""
+    from executor.polymarket_wallet_factory import factory
+
+    print("=" * 60)
+    print("POLYMARKET WALLET FACTORY")
+    print("=" * 60)
+
+    status = factory.status()
+
+    print("\n[MASTER WALLET]")
+    master = status["master_wallet"]
+    if "error" in master:
+        print(f"  ERROR: {master['error']}")
+    else:
+        print(f"  Address: {master['address'][:20]}...")
+        print(f"  USDC: ${master['usdc']:.2f}")
+        print(f"  MATIC: {master['matic']:.4f}")
+
+    print(f"\n[FLEET]")
+    print(f"  Registered wallets: {status['fleet_size']}")
+
+    print(f"\n[POLYMARKET CONTRACTS]")
+    for name in status["polymarket_contracts"]:
+        print(f"  - {name}")
+
+    print("\n" + "=" * 60)
+
+
+def cmd_create(usdc=100, matic=0.1):
+    """Create one fully onboarded wallet."""
+    from executor.polymarket_wallet_factory import factory
+
+    print(f"Creating FULLY ONBOARDED trading wallet...")
+    print(f"  USDC: ${usdc}")
+    print(f"  MATIC: {matic}")
+    print()
+
+    wallet = factory.create_trading_wallet(usdc, matic)
+
+    print()
+    print("=" * 50)
+    print(f"WALLET: {wallet.alias}")
+    print("=" * 50)
+    print(f"Address: {wallet.address}")
+    print(f"Status: {wallet.status}")
+    print(f"USDC: ${wallet.usdc_balance:.2f}")
+    print(f"MATIC: {wallet.matic_balance:.4f}")
+    print(f"Allowances: {'SET' if wallet.allowances_set else 'NOT SET'}")
+    print(f"API Creds: {'DERIVED' if wallet.api_creds_derived else 'NOT DERIVED'}")
+    print(f"Ready to Trade: {wallet.status == 'active'}")
+
+
+def cmd_fleet(count=5, usdc_per=50):
+    """Create fleet of trading wallets."""
+    from executor.polymarket_wallet_factory import factory
+
+    print(f"Creating {count} FULLY ONBOARDED trading wallets...")
+    print(f"  USDC per wallet: ${usdc_per}")
+    print(f"  Total USDC needed: ${count * usdc_per}")
+    print()
+
+    wallets = factory.create_trading_fleet(count, usdc_per)
+
+    active = [w for w in wallets if w.status == "active"]
+    print()
+    print("=" * 50)
+    print(f"FLEET CREATED: {len(active)}/{count} successful")
+    print("=" * 50)
+
+    for w in wallets:
+        status_icon = "✓" if w.status == "active" else "✗"
+        print(f"  {status_icon} {w.alias}: {w.address[:20]}... [{w.status}]")
+
+
+def cmd_check(address):
+    """Check wallet status."""
+    from executor.polymarket_wallet_factory import factory
+
+    status = factory.get_wallet_status(address)
+
+    print("=" * 50)
+    print(f"WALLET STATUS: {address[:20]}...")
+    print("=" * 50)
+    print(f"USDC: ${status['usdc_balance']:.2f}")
+    print(f"MATIC: {status['matic_balance']:.4f}")
+    print(f"Ready to Trade: {status['ready_to_trade']}")
+
+    print("\n[ALLOWANCES]")
+    for name, info in status["allowances"].items():
+        if isinstance(info, dict) and "is_max" in info:
+            status_icon = "✓" if info["is_max"] else "✗"
+            print(f"  {status_icon} {name}")
+        else:
+            print(f"  ? {name}: {info}")
+
+
+def cmd_onboard(private_key, fund_usdc=0, fund_matic=0):
+    """Onboard existing wallet."""
+    from executor.polymarket_wallet_factory import factory
+
+    print("Onboarding wallet...")
+    wallet = factory.onboard_existing_wallet(
+        private_key,
+        fund_usdc=fund_usdc,
+        fund_matic=fund_matic
+    )
+
+    print()
+    print("=" * 50)
+    print(f"ONBOARDED: {wallet.alias}")
+    print("=" * 50)
+    print(f"Address: {wallet.address}")
+    print(f"USDC: ${wallet.usdc_balance:.2f}")
+    print(f"Status: {wallet.status}")
+
+
+def cmd_fund(address, usdc_amount, matic_amount=0):
+    """Fund wallet with USDC."""
+    from executor.polymarket_wallet_factory import factory
+
+    print(f"Funding {address[:20]}...")
+
+    if matic_amount > 0:
+        result = factory.fund_with_matic(address, matic_amount)
+        if result.get("success"):
+            print(f"  ✓ Sent {matic_amount} MATIC")
+        else:
+            print(f"  ✗ MATIC failed: {result.get('error')}")
+
+    result = factory.fund_with_usdc(address, usdc_amount)
+    if result.get("success"):
+        print(f"  ✓ Sent ${usdc_amount} USDC")
+        print(f"  TX: {result['tx_hash']}")
+    else:
+        print(f"  ✗ USDC failed: {result.get('error')}")
+
+
+def cmd_allowances(address):
+    """Check allowances."""
+    from executor.polymarket_wallet_factory import factory
+
+    print(f"Checking allowances for {address[:20]}...")
+    allowances = factory.check_allowances(address)
+
+    print("\n[POLYMARKET ALLOWANCES]")
+    for name, info in allowances.items():
+        if isinstance(info, dict) and "is_max" in info:
+            status = "UNLIMITED" if info["is_max"] else f"${info['allowance_usdc']:.2f}"
+            print(f"  {name}: {status}")
+        else:
+            print(f"  {name}: ERROR - {info}")
+
+
+def cmd_help():
+    print("""
+ho-wallet - Polymarket Wallet Factory
+=====================================
+
+Creates FULLY ONBOARDED Polymarket trading accounts:
+  1. Generate ETH keypair
+  2. Fund with MATIC (gas)
+  3. Fund with USDC (capital)
+  4. Set Polymarket allowances
+  5. Derive API credentials
+  6. Register in fleet
+
+COMMANDS:
+  status              Factory & master wallet status
+  create [USDC]       Create one fully onboarded wallet (default: $100)
+  fleet N [USDC]      Create N trading wallets (default: $50 each)
+  check ADDRESS       Check wallet readiness & allowances
+  onboard KEY [USDC]  Onboard existing wallet, optionally fund
+  fund ADDRESS USDC   Fund wallet with USDC
+  allowances ADDRESS  Check Polymarket contract allowances
+  help                Show this help
+
+EXAMPLES:
+  ho-wallet status
+  ho-wallet create 200           # Create wallet with $200 USDC
+  ho-wallet fleet 10 100         # Create 10 wallets with $100 each
+  ho-wallet check 0x1234...      # Check if wallet is ready to trade
+  ho-wallet fund 0x1234... 500   # Send $500 USDC to wallet
+
+REQUIREMENTS:
+  - POLYMARKET_PRIVATE_KEY set (master wallet for funding)
+  - Master wallet must have USDC + MATIC on Polygon
+""")
+
+
+def main():
+    if len(sys.argv) < 2:
+        cmd_help()
+        return
+
+    cmd = sys.argv[1].lower()
+    args = sys.argv[2:]
+
+    if cmd == "status":
+        cmd_status()
+    elif cmd == "create":
+        usdc = float(args[0]) if args else 100
+        cmd_create(usdc)
+    elif cmd == "fleet":
+        count = int(args[0]) if args else 5
+        usdc = float(args[1]) if len(args) > 1 else 50
+        cmd_fleet(count, usdc)
+    elif cmd == "check":
+        if not args:
+            print("Usage: ho-wallet check ADDRESS")
+            return
+        cmd_check(args[0])
+    elif cmd == "onboard":
+        if not args:
+            print("Usage: ho-wallet onboard PRIVATE_KEY [USDC]")
+            return
+        fund_usdc = float(args[1]) if len(args) > 1 else 0
+        cmd_onboard(args[0], fund_usdc)
+    elif cmd == "fund":
+        if len(args) < 2:
+            print("Usage: ho-wallet fund ADDRESS USDC_AMOUNT")
+            return
+        cmd_fund(args[0], float(args[1]))
+    elif cmd == "allowances":
+        if not args:
+            print("Usage: ho-wallet allowances ADDRESS")
+            return
+        cmd_allowances(args[0])
+    else:
+        cmd_help()
+
+
+if __name__ == "__main__":
+    main()

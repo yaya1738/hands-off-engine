@@ -1,0 +1,49 @@
+# Aider configuration for hands-off-engine Termux workflow
+# Optimized for mobile development and offline-first operation
+
+# Model settings - use Claude Sonnet for quality, Haiku for speed
+model: claude-sonnet-4-5-20250929
+weak-model: claude-3-5-haiku-20241022
+
+# Editor model for complex refactoring (optional, uses main model if not set)
+editor-model: claude-sonnet-4-5-20250929
+
+# Git settings
+auto-commits: true
+dirty-commits: true
+attribute-author: true
+attribute-committer: false
+attribute-commit-message-author: true
+attribute-commit-message-committer: false
+
+# Commit message template
+commit-prompt: |
+  Write a clear, concise commit message following conventional commits format.
+  Focus on the "why" rather than the "what".
+  Keep it under 72 characters for the subject line.
+
+  End with:
+  🤖 Generated with [aider](https://aider.chat) + Claude
+
+# UI preferences for mobile
+dark-mode: true
+pretty: true
+stream: true
+
+# Chat history
+chat-history-file: .aider.chat.history.md
+restore-chat-history: false
+
+# File handling
+watch-files: false
+
+# LLM settings
+max-tokens: 8192
+timeout: 120
+
+# Upgrade check (disable on mobile to save bandwidth)
+check-update: false
+
+# Voice mode (experimental - may not work well on mobile)
+voice-format: wav
+voice-language: en

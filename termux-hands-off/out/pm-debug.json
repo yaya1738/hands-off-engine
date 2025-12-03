@@ -1,0 +1,55 @@
+{
+  "tried": [
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "bitcoin",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "ethereum",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "trump",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "israel",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "nba",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "err": null
+    }
+  ],
+  "hits": 103
+}

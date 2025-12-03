@@ -1,0 +1,35 @@
+{
+  "timestamp": "2025-11-11T01:07:13Z",
+  "providers": {
+    "polymarket": {
+      "ok": true,
+      "count": 0,
+      "data": [],
+      "debug": null
+    },
+    "coingecko": {
+      "ok": true,
+      "data": {
+        "bitcoin": {
+          "usd": 106057
+        },
+        "ethereum": {
+          "usd": 3580.25
+        },
+        "solana": {
+          "usd": 167.38
+        },
+        "tether": {
+          "usd": 0.99962
+        }
+      }
+    },
+    "fx": {
+      "ok": false,
+      "USDILS": null
+    }
+  },
+  "meta": {
+    "runtime_sec": 1.097
+  }
+}

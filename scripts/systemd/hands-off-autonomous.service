@@ -1,0 +1,44 @@
+[Unit]
+Description=Hands-Off Engine Autonomous Infrastructure Manager
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/hands-off-engine
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/opt/hands-off-engine"
+
+# Cloud provider credentials (set these!)
+# Environment="DO_API_TOKEN=your-digitalocean-token"
+# Environment="AWS_ACCESS_KEY_ID=your-aws-key"
+# Environment="AWS_SECRET_ACCESS_KEY=your-aws-secret"
+
+# Telegram notifications (optional)
+# Environment="TELEGRAM_BOT_TOKEN=your-bot-token"
+# Environment="TELEGRAM_CHAT_ID=your-chat-id"
+
+# The main command
+ExecStart=/usr/bin/python3 -m autonomous.unified_system --budget 500
+
+# Restart policy
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=append:/var/log/hands-off/autonomous.log
+StandardError=append:/var/log/hands-off/autonomous-error.log
+
+# Security
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/opt/hands-off-engine/logs
+ReadWritePaths=/opt/hands-off-engine/state
+ReadWritePaths=/var/log/hands-off
+
+[Install]
+WantedBy=multi-user.target

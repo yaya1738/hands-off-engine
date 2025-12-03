@@ -1,0 +1,8 @@
+{
+  "provider": "chatgpt",
+  "prompt": "Draft a plan to merge the updated alpha strategy into the main trading algorithm. Identify any risks or required checks.",
+  "context_files": [
+    "docs/alpha_strategy_update.md",
+    "state/alpha_performance_metrics.json"
+  ]
+}

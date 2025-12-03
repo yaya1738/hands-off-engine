@@ -1,0 +1,15 @@
+{
+  "kernel_id": "system_health",
+  "topic": "System Health & Infrastructure",
+  "summary": "Infrastructure reliability patterns, recurring failure modes, fixes applied, and operational resilience improvements.",
+  "key_decisions": [],
+  "failed_paths": [],
+  "open_questions": [],
+  "source_weights": {
+    "chatgpt": 1.0,
+    "claude_cli": 0.8,
+    "github_copilot_agent": 0.6
+  },
+  "raw_refs": [],
+  "last_updated": "2025-11-26T10:55:17.867445Z"
+}

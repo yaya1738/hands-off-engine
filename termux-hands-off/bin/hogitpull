@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pull latest code from GitHub into the droplet repo
+ssh do138 'cd /root/hands-off && git pull --ff-only'

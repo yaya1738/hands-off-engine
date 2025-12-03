@@ -1,0 +1,40 @@
+📊 Weekly System Report
+2025-11-21 to 2025-11-23
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⏱ **Operations**
+• Total runs: 54
+• Frequency: Every hour (24/7)
+• Uptime: 100.0%
+
+💼 **Trading Activity**
+• Orders planned: 250
+• Total size: $7,285.60
+• Avg per run: 4.6 orders
+• Mode: DRYRUN (no real money)
+
+📈 **Alpha Performance**
+• Avg selection rate: 93.1%
+• Avg edge: 7.9%
+• Quality: Good
+
+🤖 **Autonomous Agents**
+• Self-healing: Active (24/7)
+• Coordination: Active (24/7)
+• AI agents: Collaborating
+• Issues auto-fixed: 0
+
+✅ **System Health**
+• Status: Healthy
+• Errors: 0
+• Manual interventions: 0
+• CLI launches needed: 0
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+**Next Week:**
+Continue autonomous operation. System running smoothly.
+No action needed unless you want to adjust parameters.
+
+Send /status anytime for current state.

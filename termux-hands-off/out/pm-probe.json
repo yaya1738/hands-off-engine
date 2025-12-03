@@ -1,0 +1,122 @@
+{
+  "ts": 1762823399,
+  "queries": [
+    "bitcoin",
+    "ethereum",
+    "trump",
+    "israel",
+    "nba"
+  ],
+  "tried": [
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "bitcoin",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "body_head": "{\"events\":[{\"active\":true,\"archived\":false,\"closed\":false,\"endDate\":\"2025-12-01T05:00:00Z\",\"ended\":false,\"id\":\"70054\",\"image\":\"https://polymarket-upload.s3.us-east-2.amazonaws.com/BTC+fullsize.png\",\"markets\":[{\"active\":true,\"archived\":false,\"bestAsk\":0.008,\"bestBid\":0.007,\"closed\":false,\"groupItemTitle\":\"\u2191 150,000\",\"lastTradePrice\":0.008,\"outcomePrices\":[\"0.0075\",\"0.9925\"],\"outcomes\":[\"Yes\",\"No\"],\"question\":\"Will Bitcoin reach $150,000 in November?\",\"slug\":\"will-bitcoin-reach-150k-in-november-2025\",\"spread\":0.001},{\"active\":true,\"archived\":false,\"bestAsk\":0.019,\"bestBid\":0.018,\"closed\":false,\"",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/search",
+      "params": {
+        "q": "bitcoin",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 401,
+      "body_head": "invalid token/cookies\n",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "ethereum",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "body_head": "{\"events\":[{\"active\":true,\"archived\":false,\"closed\":false,\"endDate\":\"2025-12-01T05:00:00Z\",\"ended\":false,\"id\":\"70055\",\"image\":\"https://polymarket-upload.s3.us-east-2.amazonaws.com/ETH+fullsize.jpg\",\"markets\":[{\"active\":true,\"archived\":false,\"bestAsk\":0.006,\"bestBid\":0.005,\"closed\":false,\"groupItemTitle\":\"\u2191 7,000\",\"lastTradePrice\":0.005,\"outcomePrices\":[\"0.0055\",\"0.9945\"],\"outcomes\":[\"Yes\",\"No\"],\"question\":\"Will Ethereum reach $7,000 in November?\",\"slug\":\"will-ethereum-reach-7000-in-november-2025\",\"spread\":0.001},{\"active\":true,\"archived\":false,\"bestAsk\":0.023,\"bestBid\":0.019,\"closed\":false,\"gr",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/search",
+      "params": {
+        "q": "ethereum",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 401,
+      "body_head": "invalid token/cookies\n",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "trump",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "body_head": "{\"events\":[{\"active\":true,\"archived\":false,\"closed\":false,\"endDate\":\"2025-11-10T00:00:00Z\",\"ended\":false,\"id\":\"77375\",\"image\":\"https://polymarket-upload.s3.us-east-2.amazonaws.com/trump+sharaa.png\",\"markets\":[{\"active\":true,\"archived\":false,\"bestAsk\":0.962,\"bestBid\":0.941,\"closed\":false,\"groupItemTitle\":\"No handshake\",\"lastTradePrice\":0.941,\"outcomePrices\":[\"0.9515\",\"0.0485\"],\"outcomes\":[\"Yes\",\"No\"],\"question\":\"Will Trump and Ahmed al-Sharaa not shake hands on November 10 2025?\",\"slug\":\"will-trump-and-ahmed-al-sharaa-not-shake-hands-on-november-10-2025\",\"spread\":0.021},{\"active\":true,\"archived",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/search",
+      "params": {
+        "q": "trump",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 401,
+      "body_head": "invalid token/cookies\n",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "israel",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "body_head": "{\"events\":[{\"active\":true,\"archived\":false,\"closed\":false,\"endDate\":\"2025-11-14T00:00:00Z\",\"ended\":false,\"id\":\"67423\",\"image\":\"https://polymarket-upload.s3.us-east-2.amazonaws.com/will-israel-strike-lebanon-on-OG5HKQaGk7r4.jpg\",\"markets\":[{\"active\":true,\"archived\":false,\"bestAsk\":0.002,\"closed\":true,\"closedTime\":\"2025-10-31 15:47:14+00\",\"groupItemTitle\":\"October 29\",\"lastTradePrice\":1,\"outcomePrices\":[\"0\",\"1\"],\"outcomes\":[\"Yes\",\"No\"],\"question\":\"Will Israel strike Lebanon on October 29?\",\"slug\":\"will-israel-strike-lebanon-on-october-29\",\"spread\":0.002},{\"active\":true,\"archived\":false,\"bestAsk\"",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/search",
+      "params": {
+        "q": "israel",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 401,
+      "body_head": "invalid token/cookies\n",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/public-search",
+      "params": {
+        "q": "nba",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 200,
+      "body_head": "{\"events\":[{\"active\":true,\"archived\":false,\"closed\":false,\"endDate\":\"2026-07-01T00:00:00Z\",\"ended\":false,\"id\":\"27830\",\"image\":\"https://polymarket-upload.s3.us-east-2.amazonaws.com/nba-finals-points-leader-7g2ZEZvMXxLb.jpg\",\"markets\":[{\"active\":true,\"archived\":false,\"bestAsk\":0.31,\"bestBid\":0.3,\"closed\":false,\"groupItemTitle\":\"Oklahoma City Thunder\",\"lastTradePrice\":0.3,\"outcomePrices\":[\"0.305\",\"0.695\"],\"outcomes\":[\"Yes\",\"No\"],\"question\":\"Will the Oklahoma City Thunder win the 2026 NBA Finals?\",\"slug\":\"will-the-oklahoma-city-thunder-win-the-2026-nba-finals\",\"spread\":0.01},{\"active\":true,\"archiv",
+      "err": null
+    },
+    {
+      "url": "https://gamma-api.polymarket.com/search",
+      "params": {
+        "q": "nba",
+        "limit_per_type": 3,
+        "optimized": true
+      },
+      "status": 401,
+      "body_head": "invalid token/cookies\n",
+      "err": null
+    }
+  ]
+}

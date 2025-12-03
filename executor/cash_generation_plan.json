@@ -1,0 +1,45 @@
+{
+  "generated_at": "2025-11-27T19:05:45.996588Z",
+  "bankroll": 241.36,
+  "max_total_risk": 120.68,
+  "kelly_fraction": 1.0,
+  "trades": [
+    {
+      "market": "Will a major US bank launch crypto custody in 2025?",
+      "side": "YES",
+      "size_usd": 38.62,
+      "edge": 0.16,
+      "confidence": 0.74,
+      "fair_value": 0.74,
+      "market_price": 0.58,
+      "reasoning": "Regulatory clarity + client demand + competitive pressure"
+    },
+    {
+      "market": "Will crypto market cap exceed $5 trillion in 2025?",
+      "side": "YES",
+      "size_usd": 36.2,
+      "edge": 0.15,
+      "confidence": 0.71,
+      "fair_value": 0.71,
+      "market_price": 0.56,
+      "reasoning": "Current $2.5T + bull market + institutional inflows"
+    },
+    {
+      "market": "Will Tether (USDT) lose #1 stablecoin position in 2025?",
+      "side": "NO",
+      "size_usd": 36.2,
+      "edge": 0.15,
+      "confidence": 0.73,
+      "fair_value": 0.27,
+      "market_price": 0.42,
+      "reasoning": "Network effects too strong, USDC hasn't caught up"
+    }
+  ],
+  "summary": {
+    "num_trades": 3,
+    "total_risk_usd": 111.03,
+    "avg_edge": 15.3,
+    "expected_profit": 17.04,
+    "expected_roi_pct": 15.3
+  }
+}

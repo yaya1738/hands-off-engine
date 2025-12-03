@@ -1,0 +1,3 @@
+{
+  "OKX_API_KEY": "# When prompted:\r#   ETHERSCAN_API_KEY  -> paste your key (get one free at etherscan.io)\r# Others -> press Enter to skip for now\r\r# Verify it saved\rpython - <<'PY'\rimport json,sys\rd=json.load(open(\"vault.json\"))\rprint(\"[ok] ETHERSCAN_API_KEY present?\" , bool(d.get(\"ETHERSCAN_API_KEY\")))\rPY"
+}

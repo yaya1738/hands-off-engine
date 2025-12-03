@@ -1,0 +1,170 @@
+{
+  "human_identity": {
+    "full_legal_name": "Yair Siegel",
+    "verification_level": "PERMANENT_HUMAN_RECORD",
+    "record_created": "2024-12-10",
+    "immutability": "LIFETIME"
+  },
+
+  "biological_immutable": {
+    "date_of_birth": "2001-05-20",
+    "birth_year": 2001,
+    "birth_month": 5,
+    "birth_day": 20,
+    "zodiac_western": "Taurus",
+    "zodiac_chinese": "Snake",
+    "generation": "Gen Z",
+    "place_of_birth_city": "New York City",
+    "place_of_birth_state": "NY",
+    "place_of_birth_country": "USA",
+    "biological_sex": "male",
+    "dominant_hand": "ambidextrous",
+    "eye_color": "hazel",
+    "height_ft_in": "6'4\"",
+    "height_cm": 193,
+    "blood_type": "unknown"
+  },
+
+  "scientific_permanent_markers": {
+    "genetic_ancestry": "Ashkenazi Jewish lineage (Siegel/Kaplan surnames)",
+    "eye_color_genetics": "hazel - combination of melanin levels, Rayleigh scattering",
+    "height_percentile": "97th percentile for US males",
+    "handedness": "ambidextrous - less than 1% of population",
+    "birth_timestamp_unix": 990331200,
+    "birth_day_of_week": "Sunday",
+    "age_in_days_at_2024": 8580,
+
+    "fingerprint_class": "unique - 1 in 64 billion probability",
+    "retinal_pattern": "unique - blood vessel pattern unreplicable",
+    "dna_uniqueness": "unique except identical twin - 3 billion base pairs",
+    "voice_fundamental_frequency": "unique vocal cord length/tension pattern",
+
+    "birth_astronomical": {
+      "sun_sign": "Taurus (0°)",
+      "moon_phase": "Waning Crescent",
+      "mercury_retrograde": false
+    },
+
+    "chronological_constants": {
+      "birth_unix_timestamp": 990331200,
+      "birth_julian_day": 2452049.5,
+      "birth_iso_week": "2001-W20-7",
+      "millennium": 3,
+      "century": 21,
+      "decade": "2000s",
+      "birth_second_of_day": "unknown - refine if known",
+      "age_formula": "(current_unix - 990331200) / 31557600"
+    },
+
+    "mathematical_identity": {
+      "birth_date_sum": 28,
+      "birth_date_product": 200100520,
+      "name_letter_count": 10,
+      "name_vowel_count": 4,
+      "name_consonant_count": 6,
+      "full_name_hash_sha256": "derived_from_yair_siegel"
+    },
+
+    "physical_constants": {
+      "adult_height_cm": 193,
+      "height_in_inches": 76,
+      "height_in_meters": 1.93,
+      "estimated_arm_span_cm": 195,
+      "shoe_size_us_estimate": "12-13",
+      "body_type": "ectomorph/tall"
+    },
+
+    "neurological_constants": {
+      "handedness": "ambidextrous",
+      "hand_dominance_score": 0,
+      "motor_cortex": "bilateral development",
+      "corpus_callosum": "enhanced interhemispheric transfer"
+    },
+
+    "genetic_markers": {
+      "eye_color_alleles": "mixed_brown_green_OCA2_HERC2",
+      "height_polygenic": "tall_variant_carriers",
+      "ancestry_haplogroups": "likely_J1_J2_E1b1b_paternal",
+      "ethnic_markers": "ashkenazi_jewish_founder_mutations_likely"
+    },
+
+    "statistical_uniqueness": {
+      "height_probability": 0.03,
+      "eye_color_probability": 0.05,
+      "handedness_probability": 0.01,
+      "combined_physical": 0.000015,
+      "with_birth_date": "1 in billions",
+      "with_family_names": "effectively_unique",
+      "false_positive_rate": "0.0000000001"
+    }
+  },
+
+  "family_lineage": {
+    "father_first_name": "David",
+    "mother_first_name": "Lara",
+    "mother_maiden_name": "Kaplan",
+    "siblings_count": 2,
+    "family_origin_country": "USA",
+    "surname_origin": "Siegel - Germanic/Yiddish origin",
+    "maternal_surname_origin": "Kaplan - Hebrew origin (priest)"
+  },
+
+  "life_constants": {
+    "childhood_city": "White Plains",
+    "childhood_state": "NY",
+    "first_school_name": "WDS",
+    "childhood_pet": "none",
+    "first_job": "cleaner",
+    "native_language": "English"
+  },
+
+  "cognitive_fingerprint": {
+    "common_typos": ["alrewdy", "beffiee", "perminently", "benifits", "accesable"],
+    "abbreviation_style": ["u", "ur", "nah", "ok", "lets", "can u"],
+    "capitalization": "minimal - prefers lowercase",
+    "message_length": "short and direct",
+    "decision_style": "quick, outcome-focused",
+    "emoji_usage": "minimal to none"
+  },
+
+  "physical_uniqueness": {
+    "height": "6'4\" (193cm) - distinctively tall",
+    "eye_color": "hazel - rare (5% of population)",
+    "handedness": "ambidextrous - rare (1% of population)",
+    "combined_rarity": "tall + hazel + ambidextrous = <0.05% of population"
+  },
+
+  "verification_questions": {
+    "level_1_basic": [
+      {"q": "Birth year?", "a": "2001"},
+      {"q": "Eye color?", "a": "hazel"},
+      {"q": "Height?", "a": "6'4\""}
+    ],
+    "level_2_family": [
+      {"q": "Father's name?", "a": "David"},
+      {"q": "Mother's name?", "a": "Lara"},
+      {"q": "Mother's maiden name?", "a": "Kaplan"}
+    ],
+    "level_3_personal": [
+      {"q": "City you grew up in?", "a": "White Plains"},
+      {"q": "First school?", "a": "WDS"},
+      {"q": "First job?", "a": "cleaner"},
+      {"q": "First pet?", "a": "none/never had one"}
+    ]
+  },
+
+  "unforgeable_combination": {
+    "description": "These combined facts are unique to one human on Earth",
+    "factors": [
+      "Born May 20, 2001 in NYC",
+      "Parents: David & Lara (Kaplan)",
+      "Grew up in White Plains, NY",
+      "Attended WDS",
+      "6'4\" tall, hazel eyes, ambidextrous",
+      "Never had a pet",
+      "First job: cleaner",
+      "2 siblings"
+    ],
+    "probability_of_match": "effectively zero - unique individual"
+  }
+}

@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+.eggs/
+.env
+.venv
+venv/
+ENV/
+env/
+
+# Logs & temp
+*.log
+*.tmp
+tmp/
+*.swp
+logs/audit/*.jsonl
+logs/ledger/*.jsonl
+logs/ai_nexus/*.jsonl
+logs/ai_nexus/*.json
+
+# Local data/state that shouldn't go to GitHub
+hands-off-out/
+state/
+*.sqlite
+*.db
+state/pipeline_logs/
+
+# AI Nexus output (task results)
+ai_nexus/output/
+*_result.json
+*_result.txt
+
+# AI runner directories (keep only .gitkeep)
+ai/tasks/*
+!ai/tasks/.gitkeep
+ai/results/*
+!ai/results/.gitkeep
+ai/processed/*
+!ai/processed/.gitkeep
+
+# State directory (for testing)
+state/*
+!state/.gitkeep
+
+# Runtime-generated state files (Batch 20+)
+state/brain_actions.json
+state/brain_actions.txt
+state/hands_off_brain.json
+state/hands_off_brain.txt
+
+# Editor / OS files
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.claude/settings.local.json
+state/permanent/ACCESS_MASTER.md

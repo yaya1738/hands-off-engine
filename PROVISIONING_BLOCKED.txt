@@ -1,0 +1,9 @@
+# PROVISIONING BLOCKED
+# Created: 2025-12-02
+# Reason: Prevent runaway scaling that burns capital
+# DO NOT DELETE without explicit approval from Yair Siegel
+
+BLOCK_REASON=capital_preservation
+BLOCK_DATE=2025-12-02
+BLOCKED_BY=autonomous_self_modification
+

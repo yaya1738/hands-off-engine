@@ -1,0 +1,79 @@
+{
+  "last_update": "2025-11-04T04:00:17Z",
+  "balances": {
+    "USDC": 4.15E-7,
+    "Cash_Polymarket": 41,
+    "ETH": 9.1E-9,
+    "XLM": 0.00003375
+  },
+  "notes": [
+    {
+      "t": "2025-11-04T02:42:35Z",
+      "m": "bootstrap complete"
+    },
+    {
+      "t": "2025-11-04T02:44:48Z",
+      "m": "set balance: USDC=313"
+    },
+    {
+      "t": "2025-11-04T02:44:48Z",
+      "m": "set balance: Cash_Polymarket=41"
+    },
+    {
+      "t": "2025-11-04T02:44:48Z",
+      "m": "initialized balances"
+    },
+    {
+      "t": "2025-11-04T02:51:30Z",
+      "m": "fin_refresh"
+    },
+    {
+      "t": "2025-11-04T03:02:18Z",
+      "m": "fin_refresh"
+    },
+    {
+      "t": "2025-11-04T03:02:31Z",
+      "m": "set balance: USDC=320"
+    },
+    {
+      "t": "2025-11-04T03:02:31Z",
+      "m": "topped up USDC to 320"
+    },
+    {
+      "t": "2025-11-04T03:02:31Z",
+      "m": "fin_refresh"
+    },
+    {
+      "t": "2025-11-04T03:03:36Z",
+      "m": "import balances"
+    },
+    {
+      "t": "2025-11-04T03:03:54Z",
+      "m": "Net worth change: 7.00 (now 361)"
+    },
+    {
+      "t": "2025-11-04T03:04:05Z",
+      "m": "fin_refresh"
+    },
+    {
+      "t": "2025-11-04T03:04:52Z",
+      "m": "import balances"
+    },
+    {
+      "t": "2025-11-04T03:05:19Z",
+      "m": "Net worth change: 30.00 (now 391)"
+    },
+    {
+      "t": "2025-11-04T03:45:05Z",
+      "m": "fin_refresh"
+    },
+    {
+      "t": "2025-11-04T03:45:29Z",
+      "m": "fin_refresh"
+    },
+    {
+      "t": "2025-11-04T04:00:17Z",
+      "m": "fin_refresh"
+    }
+  ]
+}

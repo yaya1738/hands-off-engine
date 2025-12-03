@@ -1,0 +1,22 @@
+{
+  "markets": [
+    {
+      "id": "nba_celtics_title",
+      "question": "Will the Boston Celtics win the 2026 NBA Championship?",
+      "closes_at": "2026-06-20T00:00:00Z",
+      "yes_price": 0.42,
+      "no_price": 0.58,
+      "volume": 12345,
+      "tags": ["NBA", "basketball"]
+    },
+    {
+      "id": "btc_100k",
+      "question": "Will Bitcoin trade above $100,000 before 2026-12-31?",
+      "closes_at": "2026-12-31T23:59:59Z",
+      "yes_price": 0.27,
+      "no_price": 0.73,
+      "volume": 98765,
+      "tags": ["bitcoin", "crypto"]
+    }
+  ]
+}

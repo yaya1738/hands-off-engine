@@ -1,0 +1,17 @@
+{"key":"bitcoin above","p_fair":0.55,"p_mkt":0.45,"note":"demo long edge +0.10"}
+{"key":"celtics win","p_fair":0.10,"p_mkt":0.22,"note":"demo short edge -0.12"}
+{"key":"oil above","p_fair":0.58,"p_mkt":0.44,"note":"demo +0.14"}
+{"key":"test_market","p_fair":0.62,"p_mkt":0.48,"note":"http add demo"}
+{"key":"demo_telegram","p_fair":0.70,"p_mkt":0.50,"note":"telegram test"}
+{"key":"selftest_edge","p_fair":0.80,"p_mkt":0.55,"note":"notification self-test"}
+{"key":"telegram_live","p_fair":0.76,"p_mkt":0.55,"note":"live alert test"}
+{"key":"tg_smoke","p_fair":0.74,"p_mkt":0.55,"note":"tg live test"}
+{"key":"tg_smoke2","p_fair":0.78,"p_mkt":0.56,"note":"tg live test 2"}
+{"key":"tg_smoke_fix","p_fair":0.77,"p_mkt":0.56,"note":"post-fix"}
+{"key":"tg_fix_final","p_fair":0.79,"p_mkt":0.58,"note":"post-fix verify"}
+{"key":"tg_fix_final2","p_fair":0.81,"p_mkt":0.60,"note":"final verify"}
+{"key":"tg_indent_ok","p_fair":0.82,"p_mkt":0.60,"note":"indent fix verify"}
+{"key":"tg_indent_ok2","p_fair":0.83,"p_mkt":0.61,"note":"indent fix verify 2"}
+{"key":"tg_indent_final","p_fair":0.84,"p_mkt":0.62,"note":"indent final verify"}
+{"key":"force_ping","p_fair":0.90,"p_mkt":0.50,"note":"forced alert"}
+{"key":"sanity_0236Z","p_fair":0.88,"p_mkt":0.55,"note":"one-tap"}

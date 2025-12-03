@@ -1,0 +1,20 @@
+{
+  "change_id": "ee7ea9b453dd82c9",
+  "change_type": "file_modification",
+  "description": "file_modification on /var/log/test.log",
+  "target": "/var/log/test.log",
+  "timestamp": "2025-11-30T23:17:33.364025+00:00",
+  "intention": "Archive old log file",
+  "pre_state": {
+    "captured_at": "2025-11-30T23:17:33.363864+00:00",
+    "target": "/var/log/test.log",
+    "type": "file_modification"
+  },
+  "post_state": null,
+  "outcome": "pending",
+  "harm_detected": false,
+  "harm_description": "",
+  "rollback_available": false,
+  "rollback_path": "",
+  "validated": true
+}

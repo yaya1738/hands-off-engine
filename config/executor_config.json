@@ -1,0 +1,21 @@
+{
+  "mode": "DRYRUN",
+  "allowed_commands": [
+    "python", "python3", "pytest", "ls", "git", "echo", "cat"
+  ],
+  "blocked_substrings": [
+    "rm -rf",
+    "sudo",
+    ":(){ :|:& };:",
+    "mkfs",
+    "dd if="
+  ],
+  "protected_paths": [
+    ".ssh",
+    ".env",
+    "id_rsa",
+    "termux"
+  ],
+  "max_timeout_sec": 120,
+  "workspace_root_only": true
+}
