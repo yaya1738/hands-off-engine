@@ -102,6 +102,7 @@ class SelfHealingAgent:
         issues.extend(self.check_meta_metrics())
         issues.extend(self.check_json_validity())
         issues.extend(self.check_atomic_writes())
+        issues.extend(self.check_handoff_health())
 
         # Attempt to fix each issue
         for issue in issues:
@@ -841,6 +842,79 @@ class SelfHealingAgent:
             except Exception as e:
                 logger.warning(f"Could not check {script}: {e}")
 
+        return issues
+
+    def check_handoff_health(self) -> List[Dict]:
+        """Check handoff system health.
+        
+        Monitors:
+        - Stale handoffs (pending too long)
+        - Failed handoff rate
+        - Timeout rate
+        - Per-agent failure rates
+        
+        Auto-fixes:
+        - Marks expired handoffs as timeout
+        - Alerts on critical issues
+        """
+        issues = []
+        
+        try:
+            # Run handoff health check
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "scripts" / "check_handoff_health.py"), "--json"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+            
+            if result.returncode != 0:
+                health = json.loads(result.stdout) if result.stdout else {}
+                
+                # Process alerts
+                for alert in health.get("alerts", []):
+                    severity_map = {
+                        "warning": "medium",
+                        "critical": "high"
+                    }
+                    
+                    issue = {
+                        "type": f"handoff_{alert['type']}",
+                        "description": alert["message"],
+                        "severity": severity_map.get(alert["severity"], "low"),
+                        "auto_fixable": alert["type"] in ["timeout", "stale_handoffs"],
+                        "alert_user": alert["severity"] == "critical",
+                        "handoff_data": alert
+                    }
+                    issues.append(issue)
+                    
+                    if alert["severity"] == "critical":
+                        logger.error(f"Handoff system critical: {alert['message']}")
+                    else:
+                        logger.warning(f"Handoff system warning: {alert['message']}")
+                
+                # If status is critical, alert immediately
+                if health.get("status") == "critical":
+                    logger.critical("Handoff system is in critical state")
+            
+        except subprocess.TimeoutExpired:
+            issues.append({
+                "type": "handoff_check_timeout",
+                "description": "Handoff health check timed out",
+                "severity": "medium",
+                "auto_fixable": False,
+                "alert_user": False
+            })
+        except Exception as e:
+            logger.error(f"Error checking handoff health: {e}")
+            issues.append({
+                "type": "handoff_check_error",
+                "description": f"Error checking handoff health: {str(e)}",
+                "severity": "low",
+                "auto_fixable": False,
+                "alert_user": False
+            })
+        
         return issues
 
     def attempt_fix(self, issue: Dict) -> str:
