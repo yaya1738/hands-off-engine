@@ -135,25 +135,34 @@ class ConcreteExecutor:
 
         # For extreme prices (< 5% or > 95%), apply wisdom engine's insight
         # Yair's teaching: "Very low prices tend to be lower than true prob"
+        # INTEGRAFIX: For extreme low prices, calculate edge as % of potential return
         if market_price < 0.05:
-            # Wisdom: assume 50% underpriced at extremes
-            estimated_true = market_price * 1.5
-            our_estimate = min(estimated_true, 0.10)  # Cap at 10% to be conservative
-            confidence = 0.55  # Moderate confidence on extreme value plays
+            # Extreme value play - massive upside if it hits
+            # Edge = how much we think it's underpriced relative to payout
+            # If price is 1% but we think 2%, that's 100% edge on the trade!
+            estimated_true = market_price * 2.0  # More aggressive: assume 100% underpriced
+            our_estimate = min(estimated_true, 0.15)  # Cap at 15%
+            # Calculate edge as relative improvement, not absolute
+            # This gives meaningful edge values for small prices
+            edge = (our_estimate - market_price) / market_price if market_price > 0 else 0
+            edge = min(edge, 0.5)  # Cap at 50% relative edge
+            confidence = 0.60  # Higher confidence on extreme value plays
             edge_source = "wisdom_extreme_low"
         elif market_price > 0.95:
-            # High prices often overconfident
+            # High prices often overconfident - small edge to fade
             estimated_true = market_price * 0.97
             our_estimate = max(estimated_true, 0.90)
+            edge = abs(our_estimate - market_price)
             confidence = 0.50
             edge_source = "wisdom_extreme_high"
         elif wisdom_confidence > 0.5 and wisdom_analysis.get("value_zone") in ["extreme_low", "extreme_high"]:
             # Wisdom engine has high confidence on value zone
             edge_source = "wisdom"
             confidence = wisdom_confidence
-
-        # Calculate actual edge (difference between our estimate and market)
-        edge = abs(our_estimate - market_price)
+            edge = abs(our_estimate - market_price)
+        else:
+            # Mid-range: use absolute edge
+            edge = abs(our_estimate - market_price)
 
         evaluation["pipeline_stages"]["probability"] = {
             "market_price": market_price,
