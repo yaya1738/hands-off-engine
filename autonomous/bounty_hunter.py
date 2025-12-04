@@ -116,13 +116,37 @@ class BountyHunter:
 
         bounties_found = []
 
-        # Known bounty repos
+        # Known bounty repos (EXPANDED LIST)
         bounty_repos = [
+            # Original sources
             "daydreamsai/agent-bounties",
             "Chakra-Network/dojo-spas",
             "duckduckgo/Android",
             "pydantic/pydantic",
             "cortexlinux/cortex",
+            # ML/AI frameworks
+            "tenstorrent/tt-metal",
+            "tenstorrent/tt-mlir",
+            "tenstorrent/tt-forge",
+            # Major open source projects
+            "microsoft/vscode",
+            "nodejs/node",
+            "rust-lang/rust",
+            "golang/go",
+            "python/cpython",
+            # Developer tools
+            "vercel/next.js",
+            "facebook/react",
+            "vuejs/core",
+            "angular/angular",
+            # Crypto/Web3
+            "ethereum/go-ethereum",
+            "solana-labs/solana",
+            "uniswap/v4-core",
+            # Infrastructure
+            "kubernetes/kubernetes",
+            "docker/docker-ce",
+            "hashicorp/terraform",
         ]
 
         headers = {"Authorization": f"token {GITHUB_TOKEN}"} if GITHUB_TOKEN else {}
