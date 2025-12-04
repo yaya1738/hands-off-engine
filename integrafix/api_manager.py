@@ -24,6 +24,7 @@ from typing import Dict, List, Optional, Any, Callable
 from dataclasses import dataclass
 
 from integrafix.api_registry import APIRegistry, APIEndpoint
+from integrafix.failure_hardening import FailureHardeningSystem, retry_with_backoff
 
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
@@ -45,6 +46,7 @@ class APIManager:
 
     def __init__(self):
         self.registry = APIRegistry()
+        self.failure_hardening = FailureHardeningSystem()
         self.state_file = STATE_DIR / "api_manager.json"
         self.state = self._load_state()
 
@@ -165,10 +167,18 @@ class APIManager:
                 abcfc_score=abcfc_score
             )
 
-        # Make the API call
+        # Make the API call with retry logic and circuit breaker
         start_time = time.time()
         try:
-            result = self._execute_api_call(api, params)
+            # Get circuit breaker for this API
+            cb = self.failure_hardening.get_circuit_breaker(api_name)
+
+            # Wrap execution with retry logic
+            @retry_with_backoff(max_retries=3, base_delay=1.0)
+            def execute_with_retry():
+                return cb.call(self._execute_api_call, api, params)
+
+            result = execute_with_retry()
             duration = time.time() - start_time
 
             # Record success
@@ -200,8 +210,13 @@ class APIManager:
         except Exception as e:
             duration = time.time() - start_time
 
-            # Record failure
+            # Record failure in both systems
             self.registry.record_api_call(api_name, success=False)
+            self.failure_hardening.record_failure(
+                component=f"api_{api_name}",
+                error=e,
+                impact="medium" if abcfc_score < 100 else "high"
+            )
 
             # Update state
             self.state["total_calls"] += 1
@@ -390,6 +405,14 @@ class APIManager:
             "net_value": self.state["total_value_generated"] - self.state["total_cost"],
             "roi": roi
         }
+
+    def run_health_check(self):
+        """Run health check and self-healing."""
+        health = self.failure_hardening.health_check()
+        if health["overall_status"] != "healthy":
+            print("\n⚠️  System degraded - attempting self-heal...")
+            self.failure_hardening.self_heal()
+        return health
 
     def display_status(self):
         """Display API manager status."""

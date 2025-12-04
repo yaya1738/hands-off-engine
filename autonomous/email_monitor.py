@@ -251,16 +251,22 @@ Yair Siegel
         return response
 
     def generate_offer_response(self, email_data, classification):
-        """Generate offer acknowledgment."""
-        response = {
-            "to": self.extract_email(email_data["from"]),
-            "subject": f"Re: {email_data['subject']}",
-            "body": f"""Thank you so much for the offer!
+        """Generate autonomous offer response using payment automation."""
+        # Extract company name and salary from email
+        company = self._extract_company_name(email_data)
+        salary = self._extract_salary(email_data["body"])
+
+        # If we can't extract salary, request details
+        if not salary:
+            response = {
+                "to": self.extract_email(email_data["from"]),
+                "subject": f"Re: {email_data['subject']}",
+                "body": f"""Thank you so much for the offer!
 
 I'm excited about this opportunity and appreciate your confidence in me.
 
 I'd like to review the full details carefully. Could you please send:
-- Full offer letter/details
+- Full offer letter with compensation details
 - Benefits package information
 - Start date expectations
 - Any other relevant documentation
@@ -270,11 +276,55 @@ I'll review everything and get back to you within 24-48 hours.
 Best,
 Yair Siegel
 """,
-            "action": "review_offer",
-            "alert_user": True  # High priority - user should know
-        }
+                "action": "request_offer_details",
+                "alert_user": False  # System will handle once we get details
+            }
+            return response
 
-        return response
+        # Use payment automation to handle offer
+        try:
+            from payment_automation import PaymentAutomation
+            payment_system = PaymentAutomation()
+
+            offer_details = {
+                "contact_email": self.extract_email(email_data["from"]),
+                "start_date": "Flexible",
+                "remote": True
+            }
+
+            result = payment_system.handle_job_offer(company, salary, offer_details)
+
+            # Convert payment automation result to email response
+            response = {
+                "to": self.extract_email(email_data["from"]),
+                "subject": result["response"]["subject"],
+                "body": result["response"]["body"],
+                "action": result["response"]["action"],
+                "decision": result["decision"],
+                "salary": salary,
+                "company": company,
+                "alert_user": result["decision"] == "accepted"  # Only alert if accepted
+            }
+
+            return response
+
+        except Exception as e:
+            # Fallback to manual review if automation fails
+            print(f"Payment automation failed: {e}, falling back to manual review")
+            response = {
+                "to": self.extract_email(email_data["from"]),
+                "subject": f"Re: {email_data['subject']}",
+                "body": f"""Thank you for the offer!
+
+I'm interested in this opportunity. Could you please send the complete offer details so I can review?
+
+Best,
+Yair Siegel
+""",
+                "action": "review_offer",
+                "alert_user": True
+            }
+            return response
 
     def generate_document_response(self, email_data, classification):
         """Generate document sending response."""
@@ -310,6 +360,56 @@ siegel.yaz@gmail.com
         """Extract email address from From field."""
         match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', from_field)
         return match.group(0) if match else from_field
+
+    def _extract_company_name(self, email_data):
+        """Extract company name from email."""
+        # Try to extract from email domain
+        from_email = email_data.get("from", "")
+        email_match = re.search(r'@([\w\.-]+)\.\w+', from_email)
+        if email_match:
+            domain = email_match.group(1)
+            # Clean up common patterns
+            company = domain.replace("mail", "").replace("email", "").replace("hr", "")
+            return company.title()
+
+        # Try to extract from subject
+        subject = email_data.get("subject", "")
+        if "from" in subject.lower():
+            match = re.search(r'from\s+(\w+)', subject, re.IGNORECASE)
+            if match:
+                return match.group(1).title()
+
+        return "Company"
+
+    def _extract_salary(self, body):
+        """Extract salary from email body."""
+        # Look for salary patterns
+        # $150,000 or $150K or 150k or $150000
+        patterns = [
+            r'\$\s*(\d{1,3}(?:,\d{3})+)(?:\s*per\s*year|\s*annually)?',  # $150,000
+            r'\$\s*(\d+)K',  # $150K
+            r'(\d+)k\s*(?:per\s*year|annually)',  # 150k annually
+            r'\$\s*(\d{5,6})',  # $150000
+            r'salary.*?\$\s*(\d{1,3}(?:,\d{3})+)',  # salary: $150,000
+            r'compensation.*?\$\s*(\d{1,3}(?:,\d{3})+)',  # compensation: $150,000
+        ]
+
+        for pattern in patterns:
+            match = re.search(pattern, body, re.IGNORECASE)
+            if match:
+                salary_str = match.group(1).replace(',', '')
+
+                # Handle K suffix
+                if 'K' in body[match.start():match.end()].upper():
+                    return float(salary_str) * 1000
+
+                salary = float(salary_str)
+
+                # If it's reasonable range, return it
+                if 50000 <= salary <= 1000000:
+                    return salary
+
+        return None
 
     def check_inbox(self):
         """Check inbox for new messages."""
@@ -407,7 +507,31 @@ siegel.yaz@gmail.com
                         # System handles by pushing portfolio
                         pass
 
+                    elif action == "accept_offer":
+                        # Offer accepted autonomously - alert user of success
+                        company = auto_response.get("company", "Company")
+                        salary = auto_response.get("salary", 0)
+                        alerts.alert_offer_received(
+                            company=company,
+                            salary=f"${salary:,.0f} - ACCEPTED AUTONOMOUSLY",
+                            details={
+                                "Status": "Accepted by system",
+                                "Action": "Payment info sent, awaiting onboarding"
+                            }
+                        )
+
+                    elif action == "negotiate_offer":
+                        # Offer negotiated autonomously - no alert needed
+                        # System is handling negotiation
+                        pass
+
+                    elif action == "reject_offer":
+                        # Offer rejected autonomously - no alert needed
+                        # Below minimum threshold
+                        pass
+
                     elif action == "review_offer":
+                        # Manual review needed (fallback case)
                         company = email_record.get("subject", "Company")
                         alerts.alert_offer_received(
                             company=company,

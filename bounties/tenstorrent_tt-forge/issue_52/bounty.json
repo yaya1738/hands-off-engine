@@ -1,0 +1,19 @@
+{
+  "id": "tenstorrent/tt-forge-52",
+  "repo": "tenstorrent/tt-forge",
+  "issue_number": 52,
+  "title": "[$3000 BOUNTY] Add a Tensor parallel JAX Qwen2.5-7B Model to TT-xla Model Demos",
+  "description": "### **\\[$3000 BOUNTY\\] Add a JAX Qwen2.5-7B Model to TT-xla Model Demos**\n\n**Background:**  \nTT-Forge is a growing collection of model demos showcasing the capabilities of AI models running on Tenstorrent hardware. This bounty aims to bring up the **tensor parallelized** (not data parallelized) implementation of the **Qwen2.5-7B** model using the **JAX framework**. This is an opportunity for AI developers to contribute to cutting-edge research and earn rewards.\n\n**Requirements:**\n\n* **Tensor Par",
+  "amount": 3000.0,
+  "difficulty": "easy",
+  "tech_stack": [
+    "python",
+    "javascript",
+    "typescript"
+  ],
+  "url": "https://github.com/tenstorrent/tt-forge/issues/52",
+  "created_at": "2025-02-28T15:34:01Z",
+  "feasibility_score": 1.0,
+  "status": "discovered",
+  "notes": "ABCFC Score: 3000.00"
+}

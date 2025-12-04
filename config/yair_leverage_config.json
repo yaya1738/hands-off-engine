@@ -1,0 +1,278 @@
+{
+  "_comment": "MAX YAIR LEVERAGE Configuration",
+  "_principle": "Yair's 1 hour input \u2192 100x output through autonomous systems + remote employees",
+  "yair_involvement": {
+    "strategy_setting": {
+      "frequency": "once_per_quarter",
+      "time_required": "30 minutes",
+      "actions": [
+        "Define quarterly goals",
+        "Set budget limits",
+        "Approve major projects"
+      ]
+    },
+    "high_level_decisions": {
+      "frequency": "as_needed",
+      "time_required": "5-10 minutes each",
+      "triggers": [
+        "Budget overrun risk",
+        "Major strategic pivot",
+        "Employee performance issues (rare)"
+      ]
+    },
+    "monitoring": {
+      "frequency": "optional",
+      "time_required": "0 minutes (system sends summaries)",
+      "method": "Weekly email digest + dashboard"
+    }
+  },
+  "autonomous_operations": {
+    "hiring": {
+      "yair_approval_needed": false,
+      "auto_approve_threshold": 90,
+      "max_hires_per_week": 3,
+      "budget_check": true,
+      "description": "System posts jobs, screens, tests, hires automatically"
+    },
+    "task_assignment": {
+      "yair_approval_needed": false,
+      "auto_assign": true,
+      "match_algorithm": "skills_performance_workload",
+      "description": "System assigns tasks based on skills, past performance, availability"
+    },
+    "work_monitoring": {
+      "yair_alerts": "only_critical",
+      "auto_monitor": true,
+      "check_frequency": "every_6_hours",
+      "auto_reminders": true,
+      "description": "System monitors GitHub, sends reminders, flags issues automatically"
+    },
+    "quality_evaluation": {
+      "yair_approval_needed": false,
+      "auto_approve_threshold": 90,
+      "manual_review_threshold": 80,
+      "description": "System evaluates deliverables, approves high-quality work automatically"
+    },
+    "payments": {
+      "yair_approval_needed": false,
+      "auto_pay_threshold": 90,
+      "weekly_auto_pay": true,
+      "bonus_auto_pay": true,
+      "budget_limit_alert": true,
+      "description": "System processes payments weekly, bonuses for quality, stays within budget"
+    }
+  },
+  "leverage_multipliers": {
+    "time_multiplier": {
+      "yair_time_per_week": 0.5,
+      "employee_hours_managed": 120,
+      "multiplier": "240x",
+      "description": "30 min/week from Yair \u2192 120 hours/week of work output"
+    },
+    "quality_multiplier": {
+      "auto_quality_checks": true,
+      "test_coverage_required": 90,
+      "code_review_automated": true,
+      "description": "Maintain high quality without Yair reviewing every deliverable"
+    },
+    "scale_multiplier": {
+      "max_employees": 10,
+      "yair_time_scales": false,
+      "description": "System can manage 1 or 10 employees with same Yair time"
+    },
+    "income_multiplier": {
+      "employee_cost": 10000,
+      "value_delivered": 50000,
+      "net_multiplier": "5x",
+      "description": "$10k spend \u2192 $50k+ value delivered per month"
+    }
+  },
+  "budget_controls": {
+    "monthly_budget": 15000,
+    "emergency_reserve": 3000,
+    "auto_approve_limit": 1000,
+    "yair_approval_above": 1000,
+    "budget_alerts": {
+      "at_50_percent": false,
+      "at_80_percent": true,
+      "at_100_percent": true
+    }
+  },
+  "hiring_criteria": {
+    "auto_hire_if": {
+      "github_score": 35,
+      "skills_match": 24,
+      "experience": 16,
+      "challenge_score": 85,
+      "total_score": 85
+    },
+    "positions": [
+      {
+        "role": "Full Stack Developer",
+        "max_count": 3,
+        "rate_range": [
+          45,
+          60
+        ],
+        "max_hours_per_week": 40,
+        "skills_required": [
+          "Python",
+          "React",
+          "FastAPI",
+          "Testing",
+          "Git"
+        ]
+      },
+      {
+        "role": "AI/ML Engineer",
+        "max_count": 3,
+        "rate_range": [
+          50,
+          70
+        ],
+        "max_hours_per_week": 30,
+        "skills_required": [
+          "Python",
+          "PyTorch",
+          "ML",
+          "NLP",
+          "Testing"
+        ]
+      },
+      {
+        "role": "DevOps Engineer",
+        "max_count": 1,
+        "rate_range": [
+          55,
+          75
+        ],
+        "max_hours_per_week": 20,
+        "skills_required": [
+          "Docker",
+          "Kubernetes",
+          "AWS",
+          "CI/CD",
+          "Python"
+        ]
+      }
+    ]
+  },
+  "quality_standards": {
+    "code": {
+      "test_coverage_min": 90,
+      "linting_required": true,
+      "type_hints_required": true,
+      "documentation_required": true
+    },
+    "deliverables": {
+      "auto_approve_score": 90,
+      "manual_review_score": 80,
+      "revision_request_score": 79
+    },
+    "performance": {
+      "min_acceptable_quality": 85,
+      "termination_threshold": 75,
+      "bonus_threshold": 95
+    }
+  },
+  "payment_automation": {
+    "frequency": "weekly",
+    "day": "friday",
+    "methods": [
+      "crypto_usdc",
+      "bank_transfer"
+    ],
+    "bonuses": {
+      "quality_95_plus": 0.25,
+      "early_delivery": 0.15,
+      "exceptional_work": 0.25
+    },
+    "auto_process": true,
+    "yair_approval_needed": false
+  },
+  "communication_automation": {
+    "employee_questions": {
+      "auto_respond": true,
+      "response_time": "< 1 hour",
+      "escalate_to_yair": "never"
+    },
+    "status_updates": {
+      "frequency": "weekly",
+      "format": "email_digest",
+      "includes": [
+        "Tasks completed",
+        "Payments processed",
+        "Quality scores",
+        "Budget status"
+      ]
+    },
+    "task_notifications": {
+      "auto_send": true,
+      "via": [
+        "github_issue",
+        "email"
+      ],
+      "reminders": true
+    }
+  },
+  "scaling_strategy": {
+    "growth_triggers": {
+      "hire_when_utilization_above": 0.8,
+      "max_employees": 10,
+      "budget_allows": true
+    },
+    "termination_triggers": {
+      "quality_below": 75,
+      "missed_deadlines": 3,
+      "no_activity_days": 7
+    }
+  },
+  "yair_dashboard": {
+    "url": "http://localhost:8000/employee-dashboard",
+    "updates": "real_time",
+    "requires_login": false,
+    "metrics": [
+      "Active employees",
+      "Tasks in progress",
+      "Budget spent vs remaining",
+      "Average quality score",
+      "Total value delivered",
+      "ROI (value/cost)"
+    ]
+  },
+  "leverage_metrics": {
+    "target_multipliers": {
+      "time": 240,
+      "quality": 1.0,
+      "scale": 10,
+      "income": 5
+    },
+    "current_multipliers": {
+      "time": 0,
+      "quality": 0,
+      "scale": 0,
+      "income": 0
+    }
+  },
+  "_leverage_philosophy": {
+    "principle": "MAX YAIR LEVERAGE = Minimum input, maximum output",
+    "yair_does": [
+      "Set strategy (quarterly, 30 min)",
+      "Define 'good' (once, encoded in system)",
+      "Approve major decisions (rare, 5 min each)"
+    ],
+    "system_does": [
+      "Post jobs (24/7)",
+      "Screen candidates (automatic)",
+      "Test candidates (automatic)",
+      "Hire (automatic if score 85+)",
+      "Assign tasks (automatic)",
+      "Monitor work (every 6 hours)",
+      "Review deliverables (automatic)",
+      "Process payments (weekly, automatic)",
+      "Handle communication (automatic)",
+      "Scale up/down (automatic)"
+    ],
+    "result": "Yair's 30 min \u2192 120+ hours of quality work output"
+  }
+}
