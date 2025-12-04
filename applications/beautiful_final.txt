@@ -1,0 +1,50 @@
+Beautiful.ai Senior Engineer Application
+
+Application URL: https://www.beautiful.ai/careers
+Greenhouse: https://job-boards.greenhouse.io/beautifulai
+
+---
+
+I'm applying for Senior Engineering roles at Beautiful.ai. Building tools that make design accessible resonates deeply with my focus on user experience.
+
+**Engineering Experience:**
+
+This week I built 4 production tools with exceptional UX (137/137 tests passing):
+
+1. **/dev/llm FUSE Device** - File-like interface for LLMs (echo "prompt" > /mnt/llm/claude/prompt) - making AI accessible as files (20 tests)
+2. **Model Lifecycle Manager** - Simple systemd integration for complex ML services (36 tests)
+3. **KV-Cache Manager** - Clean Python API for complex memory management (49 tests)
+4. **Accelerator Resource Limits** - Intuitive workload presets for GPU management (32 tests)
+
+**Why I Focus on UX:**
+Every tool prioritizes developer experience:
+- Familiar interfaces (filesystem, systemd)
+- Clear error messages
+- Comprehensive documentation
+- Zero-config defaults with deep customization
+
+**Technical Skills:**
+- Full-stack development
+- Systems programming
+- Performance optimization
+- User-centered design
+- Test-driven development
+
+**Why Beautiful.ai:**
+✓ Mission-driven (democratizing design)
+✓ Product focus on user experience
+✓ Remote US/CAN
+✓ $160-250k + equity range
+
+**Portfolio:**
+- GitHub: github.com/yaya1738
+- Bounty work: cortexlinux/cortex ($550, 137 tests)
+
+**Availability:** Immediate
+
+I'm excited about building tools that empower creativity and make design accessible to everyone.
+
+Best,
+Yair Siegel
+siegel.yaz@gmail.com
+github.com/yaya1738

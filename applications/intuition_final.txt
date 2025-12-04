@@ -1,0 +1,47 @@
+Intuition Machines - ML Security Engineer Application
+
+Application URL: https://apply.workable.com/imachines/
+
+---
+
+I'm applying for ML Security Engineer roles at Intuition Machines. As the team behind hCaptcha, you're at the intersection of ML and security—exactly where I want to be.
+
+**ML + Security Experience:**
+
+This week I built 4 AI infrastructure security tools (137/137 tests passing):
+
+1. **Accelerator Resource Limits** - cgroups v2 isolation for GPU workloads with security boundaries (32 tests)
+2. **KV-Cache Manager** - Secure shared memory with access controls and resource limits (49 tests)
+3. **Model Lifecycle Manager** - Secure service orchestration with systemd hardening (36 tests)
+4. **/dev/llm FUSE Device** - Virtual filesystem with permission management (20 tests)
+
+**Core Skills:**
+- ML systems security (resource isolation, access control, secure inference)
+- Production ML infrastructure
+- Systems programming (memory safety, process isolation)
+- Performance + security tradeoffs
+- LLM evaluation and structured outputs
+
+**Security Focus:**
+- Resource isolation (cgroups, sandboxing)
+- Memory safety patterns
+- Secure service design
+- Attack surface reduction
+- Security-performance balance
+
+**Why Intuition Machines:**
+✓ hCaptcha solves real security problems
+✓ ML applied to practical challenges
+✓ Remote-first, global team
+✓ Cutting-edge AI/ML work
+
+**Portfolio:**
+- GitHub: github.com/yaya1738
+- Bounty work: cortexlinux/cortex ($550 submitted)
+
+**Availability:** Immediate, worldwide remote
+
+Best,
+Yair Siegel
+siegel.yaz@gmail.com
+github.com/yaya1738

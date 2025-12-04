@@ -1,0 +1,50 @@
+DuckDuckGo Senior Backend Engineer Application
+
+Application URL: https://jobs.ashbyhq.com/duck-duck-go/abb953ee-5bb7-4637-9f66-ad555b446ab7
+
+---
+
+I'm applying for the Senior Backend Engineer role at DuckDuckGo. I'm passionate about online privacy and building systems that empower users.
+
+**Backend Engineering Experience:**
+
+This week I built 4 production-grade infrastructure systems (137/137 tests passing):
+
+1. **KV-Cache Manager** - Shared memory system with bitmap allocation, serialization, eviction policies
+2. **Model Lifecycle Manager** - Process orchestration with systemd, health monitoring, SQLite state
+3. **Accelerator Resource Limits** - cgroups v2 resource management for GPU/TPU workloads
+4. **/dev/llm FUSE Device** - Virtual filesystem with session management
+
+**Technical Skills:**
+- 7+ years professional experience (backend focus)
+- Large-scale application development
+- Systems programming (memory management, process control, filesystems)
+- Performance optimization and resource management
+- Test-driven development
+- Async/concurrent architectures
+
+**Additional Tech:**
+- Python (primary), Go exposure
+- FastAPI backends
+- System service management
+- Database design and optimization
+
+**Why DuckDuckGo:**
+✓ Privacy-first mission aligns with my values
+✓ Remote-first culture
+✓ Profitable, sustainable company
+✓ Technical depth and mentorship opportunities
+
+**Availability:** Immediate
+**Location:** US-based, remote
+
+**Portfolio:**
+- GitHub: github.com/yaya1738
+- Bounty work: cortexlinux/cortex ($550 submitted)
+
+I'm excited about contributing to DuckDuckGo's mission of raising the standard of trust online.
+
+Best,
+Yair Siegel
+siegel.yaz@gmail.com
+github.com/yaya1738

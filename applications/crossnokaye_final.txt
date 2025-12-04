@@ -1,0 +1,38 @@
+To: careers@crossnokaye.com
+Subject: Senior Software Engineer - Python Application
+
+Hi CrossnoKaye team,
+
+I'm applying for the App Team Python position. Climate tech with physics simulation combines meaningful impact with technical depth—exactly what I'm looking for.
+
+**Recent Python Work:**
+
+This week I built 4 production AI infrastructure tools (137/137 tests passing):
+
+1. **KV-Cache Manager** (~900 lines) - POSIX shared memory with mmap, bitmap allocation, LRU/LFU eviction (49 tests)
+2. **Model Lifecycle Manager** (~650 lines) - SQLite state management, subprocess orchestration, systemd integration (36 tests)
+3. **Accelerator Resource Limits** (~530 lines) - cgroups v2, GPU environment management (32 tests)
+4. **/dev/llm FUSE Device** (~500 lines) - Virtual filesystem with async operations (20 tests)
+
+**Technical Skills:**
+- Systems Python (mmap, ctypes, subprocess, asyncio)
+- Data structures and performance optimization
+- Test-driven development (pytest, comprehensive coverage)
+- Scientific computing mindset
+
+**Why This Role:**
+✓ Climate impact aligns with my values
+✓ Physics simulation intellectually engaging
+✓ Python-first team culture
+✓ Remote US location works perfectly
+
+**Portfolio:**
+- GitHub: github.com/yaya1738
+- Bounty work: cortexlinux/cortex ($550 submitted)
+
+**Availability:** Immediate
+
+Best,
+Yair Siegel
+siegel.yaz@gmail.com
+github.com/yaya1738
