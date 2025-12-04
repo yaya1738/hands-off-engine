@@ -1,0 +1,78 @@
+{
+  "updated": "2025-12-04T20:00:00Z",
+  "applications": [
+    {
+      "company": "Pydantic",
+      "to": "careers@pydantic.dev",
+      "subject": "Solutions Engineer Application - Yair Siegel",
+      "body_file": "pydantic_application_final.txt",
+      "match_score": 92,
+      "salary": "Competitive + stock",
+      "priority": "high",
+      "status": "pending"
+    },
+    {
+      "company": "CrossnoKaye",
+      "to": "careers@crossnokaye.com",
+      "subject": "Senior Software Engineer - Python Application",
+      "body_file": "crossnokaye_final.txt",
+      "match_score": 90,
+      "salary": "TBD",
+      "priority": "high",
+      "status": "pending"
+    }
+  ],
+  "web_forms": [
+    {
+      "company": "SynRes",
+      "url": "https://form.jotform.com/253356690270156",
+      "body_file": "synres_application_final.txt",
+      "match_score": 95,
+      "salary": "$100-200k",
+      "special_instructions": "Must include word EXCELED",
+      "priority": "highest",
+      "status": "pending",
+      "method": "web_form"
+    },
+    {
+      "company": "Renaissance Philanthropy",
+      "url": "https://web.miniextensions.com/JMaVfmSS6p3XZLecqZfJ",
+      "body_file": "renaissance_final.txt",
+      "match_score": 91,
+      "salary": "$125-190k + bonus",
+      "priority": "high",
+      "status": "pending",
+      "method": "web_form"
+    },
+    {
+      "company": "DuckDuckGo",
+      "url": "https://jobs.ashbyhq.com/duck-duck-go/abb953ee-5bb7-4637-9f66-ad555b446ab7",
+      "body_file": "duckduckgo_final.txt",
+      "match_score": 88,
+      "salary": "$178.5k + equity",
+      "priority": "medium",
+      "status": "pending",
+      "method": "web_portal"
+    },
+    {
+      "company": "Intuition Machines",
+      "url": "https://apply.workable.com/imachines/",
+      "body_file": "intuition_final.txt",
+      "match_score": 87,
+      "salary": "TBD",
+      "priority": "medium",
+      "status": "pending",
+      "method": "web_portal"
+    },
+    {
+      "company": "Beautiful.ai",
+      "url": "https://www.beautiful.ai/careers",
+      "body_file": "beautiful_final.txt",
+      "match_score": 85,
+      "salary": "$160-250k + equity",
+      "priority": "medium",
+      "status": "pending",
+      "method": "web_portal"
+    }
+  ]
+}

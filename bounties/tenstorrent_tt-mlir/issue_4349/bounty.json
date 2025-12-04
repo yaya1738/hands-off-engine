@@ -1,0 +1,20 @@
+{
+  "id": "tenstorrent/tt-mlir-4349",
+  "repo": "tenstorrent/tt-mlir",
+  "issue_number": 4349,
+  "title": "[Bounty $2000] Tune a model - VoVNet",
+  "description": "_This is a technical bounty suitable for developers with experience in ML model optimization, C++, and performance engineering. Knowledge of neural network architectures and low-level optimization techniques is highly beneficial._\n\n## Goal\n\nYour mission, should you choose to accept it, is to optimize VoVNet model to achieve **~1400 FPS** throughput using our TT-NN C++ library. \n\n**Starting Point**: Use our existing toolchain to bootstrap your optimization:\n- Leverage our `tt-mlir` compiler throu",
+  "amount": 2000.0,
+  "difficulty": "easy",
+  "tech_stack": [
+    "python",
+    "javascript",
+    "go",
+    "typescript"
+  ],
+  "url": "https://github.com/tenstorrent/tt-mlir/issues/4349",
+  "created_at": "2025-08-05T09:32:51Z",
+  "feasibility_score": 1.0,
+  "status": "discovered",
+  "notes": "ABCFC Score: 2000.00"
+}

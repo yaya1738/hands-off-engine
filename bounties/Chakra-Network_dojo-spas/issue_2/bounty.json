@@ -1,0 +1,20 @@
+{
+  "id": "Chakra-Network/dojo-spas-2",
+  "repo": "Chakra-Network/dojo-spas",
+  "issue_number": 2,
+  "title": "Bounty: Quickbooks SPA",
+  "description": "# Bounty: QuickBooks Single-Page Application\n\n- **Reward:** $2,000 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nBuild a modular accounting SPA that emulates QuickBooks-style bookkeeping so reinforcement-learning agents can rehearse finance workflows without touching live ledgers.\n\n## Minimal Functionality\n- **Financial dashboard:** surface cash flow, profit & loss, and outstanding invoices using shared state fed through `useDojoState`",
+  "amount": 2000.0,
+  "difficulty": "easy",
+  "tech_stack": [
+    "javascript",
+    "go",
+    "react",
+    "typescript"
+  ],
+  "url": "https://github.com/Chakra-Network/dojo-spas/issues/2",
+  "created_at": "2025-10-23T21:51:09Z",
+  "feasibility_score": 1.0,
+  "status": "discovered",
+  "notes": "ABCFC Score: 2000.00"
+}

@@ -1,0 +1,20 @@
+{
+  "id": "Chakra-Network/dojo-spas-4",
+  "repo": "Chakra-Network/dojo-spas",
+  "issue_number": 4,
+  "title": "Bounty: HubSpot SPA",
+  "description": "# Bounty: HubSpot Marketing SPA\n\n- **Reward:** $1,500 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nCreate a HubSpot-inspired marketing automation SPA so reinforcement-learning agents can orchestrate campaigns, manage contacts, and interpret analytics in a controlled environment.\n\n## Minimal Functionality\n- **Marketing overview:** dashboard summarizing campaign performance, lead funnel, and email engagement metrics seeded through `useD",
+  "amount": 1500.0,
+  "difficulty": "easy",
+  "tech_stack": [
+    "javascript",
+    "go",
+    "react",
+    "typescript"
+  ],
+  "url": "https://github.com/Chakra-Network/dojo-spas/issues/4",
+  "created_at": "2025-10-23T21:53:23Z",
+  "feasibility_score": 0.9500000000000001,
+  "status": "discovered",
+  "notes": "ABCFC Score: 1423.00"
+}
