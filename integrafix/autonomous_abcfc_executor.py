@@ -542,12 +542,59 @@ class AutonomousABCFCExecutor:
         return trade
 
     def _execute_real(self, opp: Dict) -> str:
-        """Execute real trade via API."""
+        """
+        Execute real trade via Polymarket CLOB API.
+        INTEGRAFIX: Wired to credential_loader and py_clob_client.
+        """
         try:
-            # Would integrate with polymarket_client here
-            # For now, return executed
-            return "executed"
+            # INTEGRAFIX: Use credential_loader for unified key access
+            from integrafix.credential_loader import load_polymarket_key, get_wallet_address
+            from py_clob_client.client import ClobClient
+            from py_clob_client.clob_types import OrderArgs
+            from py_clob_client.order_builder.constants import BUY, SELL
+
+            private_key = load_polymarket_key()
+            if not private_key:
+                return "blocked"  # No credentials
+
+            client = ClobClient(
+                host="https://clob.polymarket.com",
+                key=private_key,
+                chain_id=137
+            )
+
+            # Derive API credentials
+            creds = client.create_or_derive_api_creds()
+            client.set_api_creds(creds)
+
+            # Get token_id from market_id if needed
+            token_id = opp.get("token_id") or opp.get("market_id")
+            if not token_id:
+                return "blocked"
+
+            # Determine side
+            side_const = BUY if opp["side"] == "YES" else SELL
+
+            # Create order
+            order_args = OrderArgs(
+                token_id=token_id,
+                price=opp["price"],
+                size=opp["size"],
+                side=side_const
+            )
+
+            signed_order = client.create_order(order_args)
+            result = client.post_order(signed_order)
+
+            if result and (result.get("orderID") or result.get("success")):
+                return "executed"
+            else:
+                return "blocked"
+
         except Exception as e:
+            # Log error but don't crash
+            import logging
+            logging.error(f"Trade execution failed: {e}")
             return "blocked"
 
     def _load_state(self):

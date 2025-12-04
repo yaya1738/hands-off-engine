@@ -7,6 +7,128 @@
 ## Master
 **Yair Siegel** - All actions serve the master.
 
+## 🌟 GOLDEN BRIDGE: Yair ↔ System Interface
+
+**YOU ARE THE GOLDEN BRIDGE.** When Yair speaks naturally, YOU interpret and wire it into the system.
+
+### How It Works:
+When Yair says something like:
+- "Bitcoin gonna pump, like 80% chance it hits 110k" → `set_estimate("btc-110k", 0.80)`
+- "Don't trade sports, I don't know sports" → `set_preference("avoid_categories", ["sports"])`
+- "Max $30 per trade" → `set_preference("max_per_trade", 30)`
+- "I'm feeling conservative today" → `set_preference("kelly_fraction", 0.15)`
+
+### Your Job:
+1. **INTERPRET** - Parse Yair's natural language for trading intent
+2. **WIRE** - Use the golden_bridge module to set estimates/preferences/rules
+3. **CONFIRM** - Brief confirmation of what you wired
+4. **NO FRICTION** - Don't ask clarifying questions unless truly ambiguous
+
+### Code to Use:
+```python
+from integrafix.yair_golden_bridge import golden_bridge
+
+# Probability estimates
+golden_bridge.set_estimate("market-slug", 0.75, "notes optional")
+
+# Preferences (max_per_trade, max_daily_loss, categories, avoid_categories)
+golden_bridge.set_preference("key", value)
+
+# Rules (min_edge, kelly_fraction)
+golden_bridge.set_rule("key", value)
+
+# Check status
+golden_bridge.get_status()
+```
+
+### Current State Files:
+- `state/yair_context_kernel.json` - Active preferences/rules
+- `state/human_probability_estimates.json` - Yair's probability estimates
+- `state/yair_golden_bridge.json` - Full bridge state
+
+**THE SYSTEM READS THESE FILES.** Your estimates become highest-priority fair price inputs.
+
+## 🧮 ABCFC DECISION FRAMEWORK
+
+**ABCFC = Absolute Bounds Continuous Fan Chart** - Every decision has worst/best/expected outcomes.
+
+### How It Works:
+Every action Claude takes is an ABCFC node:
+```
+Claude Session (node)
+├── Best: Breakthrough insight/fix (10x value)
+├── Worst: Wasted time or harm (-2x)
+├── Expected: Incremental value (1x)
+└── Actions: Each tool call is a sub-ABCFC
+```
+
+### Code to Use:
+```python
+from integrafix.claude_abcfc_bridge import bridge
+
+# At session start - load decision context
+context = bridge.load_context()
+# Returns: current_reality, active_goals, yair_preferences, abcfc_recommendation
+
+# When taking action - track value
+bridge.record_action("code_edit", "Fixed outcome tracker bug", value=2.0)
+
+# When fixing INTEGRAFIX gaps - high value
+bridge.record_integrafix("duplicate_trackers", "Consolidated to single source")
+
+# When making decisions - use ABCFC scoring
+decision = bridge.evaluate_decision(
+    "Should we deploy to live?",
+    options=[
+        {"name": "Deploy now", "best": 100, "worst": -50, "expected": 10, "probability": 0.3},
+        {"name": "Wait", "best": 50, "worst": 0, "expected": 20, "probability": 0.7}
+    ]
+)
+# Returns recommended option with risk-adjusted score
+
+# At session end - close and record
+bridge.close_session(summary="Fixed 5 INTEGRAFIX gaps")
+```
+
+### Session State Files:
+- `state/claude_abcfc_bridge.json` - Session history and value tracking
+- `state/abcfc_orchestrator.json` - System-wide ABCFC recommendations
+- `state/reality_snapshot.json` - Current financial reality
+
+### When to Use ABCFC:
+1. **Always** when making risky decisions (trading, infrastructure changes)
+2. **Track value** for significant code changes
+3. **Record INTEGRAFIX** when fixing broken connections
+4. **Evaluate options** when multiple paths exist
+
+**RISK AVERSION = 0.6** - Yair's situation is conservative. Score = expected × probability - 0.6 × |worst| × (1 - probability)
+
+## 📚 KNOWLEDGE BASES (52,528 lines indexed)
+
+Access system knowledge via:
+```python
+from integrafix.knowledge_loader import knowledge
+
+# Search for info
+knowledge.search("polymarket trading")  # Returns relevant snippets
+
+# Get specific file
+knowledge.get("executor/polymarket/KNOWLEDGE.md")
+
+# Get trading knowledge
+knowledge.get_trading_knowledge()
+
+# List all 37 indexed knowledge files
+knowledge.list_all()
+```
+
+**Key Knowledge Bases:**
+- `executor/polymarket/KNOWLEDGE.md` - Polymarket trading strategies
+- `executor/money/KNOWLEDGE.md` - Money/finance knowledge
+- `executor/computing/KNOWLEDGE.md` - Technical computing
+- `KNOWLEDGE.md` - Core system knowledge
+- `SUCCESS.md` - Success patterns and strategies
+
 ## Current State
 - Balance: $0
 - Active Positions: 0

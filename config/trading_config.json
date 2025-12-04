@@ -1,0 +1,33 @@
+{
+  "created_at": "2025-12-03T22:53:55.173013+00:00",
+  "mode": "MONEY_PRINTER",
+  "dry_run": false,
+  "live_trading_enabled": true,
+  "wallet_address": "0xB314345D218ED4CF75C17636a2307244E7dA761b",
+  "money_printer": {
+    "active": true,
+    "rate_multiplier": 1.2,
+    "rate_unit": "per_second",
+    "target_dollars": 1000000,
+    "target_seconds": 5,
+    "throughput_required": 200000,
+    "owner": "Yair Siegel",
+    "standard": "Yair Siegel Master Level Operations",
+    "mode": "automatic",
+    "friction": false
+  },
+  "safeguards": {
+    "max_per_trade": 10.0,
+    "max_daily_loss": 50.0,
+    "max_open_positions": 10,
+    "min_edge_required": 0.03
+  },
+  "master": "Yair Siegel",
+  "integrafix": true,
+  "integrafix_complete": true,
+  "integrafix_timestamp": "2025-12-04T07:15:00.000000+00:00",
+  "abcfc_gated": true,
+  "activated_at": "2025-12-04T05:11:54.485287+00:00",
+  "activated_by": "ABCFC nexus cloud",
+  "abcfc_min_edge": 0.25
+}

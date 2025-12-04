@@ -3,6 +3,53 @@
 
 ---
 
+# INTEGRAFIX: REAL SUCCESS = REAL MONEY
+
+> Success is measured by **real income generated for Yair Siegel**.
+> This KB connects success theory to **actual system state**.
+
+## Current Reality (Check These Files)
+| What | Where | Purpose |
+|------|-------|---------|
+| **Wallet Balance** | `state/wallet_state.json` | Real USDC balance |
+| **Open Positions** | `state/wallet_state.json` | Live orders worth $$ |
+| **Trading Mode** | `config/trading_config.json` | DRY_RUN vs LIVE |
+| **Real Wallet** | `0xB314345D218ED4CF75C17636a2307244E7dA761b` | Polymarket wallet |
+| **P&L History** | `state/outcome_tracker.json` | Win/loss record |
+
+## DRY_RUN vs LIVE Trading
+**CRITICAL**: Success only counts when trading is LIVE.
+- **DRY_RUN=true**: Paper trades - learning but NO REAL SUCCESS
+- **LIVE (dry_run=false)**: Real trades - COUNTS AS SUCCESS
+- Check mode: `cat config/trading_config.json | grep dry_run`
+
+## System Integration Points
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Main KB** | `KNOWLEDGE.md` | System overview |
+| **Polymarket KB** | `executor/polymarket/KNOWLEDGE.md` | Trading mechanics |
+| **Money KB** | `executor/money/KNOWLEDGE.md` | Financial strategy |
+| **Trading Pipeline** | `integrafix/trading_pipeline.py` | Executes trades |
+| **Outcome Tracker** | `integrafix/outcome_tracker.py` | Tracks wins/losses |
+| **Escape Velocity** | `autonomous/escape_velocity_tracker.py` | Income > costs |
+
+## Success = Wallet Balance Growing
+```
+Check Real Success:
+$ cat state/wallet_state.json | python3 -c "import json,sys; d=json.load(sys.stdin); print(f'Balance: ${d.get(\"balance_usdc\", 0):.2f}')"
+
+If balance is going UP in LIVE mode → REAL SUCCESS
+If balance is in DRY_RUN mode → Practice only
+```
+
+## Golden Bridge to Success
+Yair can set success preferences via natural language:
+- "I want $100/day income" → `set_preference("daily_income_target", 100)`
+- "Focus on crypto markets" → `set_preference("categories", ["crypto"])`
+- See: `integrafix/yair_golden_bridge.py`
+
+---
+
 # TABLE OF CONTENTS
 
 1. [The Nature of Success](#1-the-nature-of-success)

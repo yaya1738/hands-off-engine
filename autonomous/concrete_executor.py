@@ -231,9 +231,10 @@ class ConcreteExecutor:
         }
 
         # STAGE 3: Capital - Determine allocation
-        edge = abs(our_estimate - market_price)
+        # INTEGRAFIX: Use the edge calculated in probability stage, not recalculate
+        # For low-priced markets, relative edge (50%) >> absolute edge (0.7%)
         opportunity = {
-            "edge": edge,
+            "edge": edge,  # Use edge from probability stage (relative for extreme prices)
             "confidence": confidence,
             "market_price": market_price,
             "our_estimate": our_estimate
@@ -362,13 +363,15 @@ class ConcreteExecutor:
         try:
             from py_clob_client.client import ClobClient
             from py_clob_client.clob_types import OrderArgs
+            # INTEGRAFIX: Use credential_loader for unified key access
+            from integrafix.credential_loader import load_polymarket_key, get_wallet_address
 
             host = "https://clob.polymarket.com"
-            key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+            key = load_polymarket_key()  # INTEGRAFIX: Unified credential source
             funder = os.environ.get("POLYMARKET_FUNDER_ADDRESS")
 
             if not key:
-                return {"executed": False, "reason": "No API key configured"}
+                return {"executed": False, "reason": "No API key - check credential_loader"}
 
             client = ClobClient(host, key=key, chain_id=137, funder=funder)
             creds = client.create_or_derive_api_creds()

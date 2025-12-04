@@ -74,12 +74,14 @@ class PolymarketOrders:
         """Get or create CLOB client."""
         if self._client is None:
             from py_clob_client.client import ClobClient
+            # INTEGRAFIX: Use credential_loader for unified key access
+            from integrafix.credential_loader import load_polymarket_key
 
-            private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+            private_key = load_polymarket_key()
             funder = os.environ.get("POLYMARKET_FUNDER_ADDRESS")
 
             if not private_key:
-                raise ValueError("POLYMARKET_PRIVATE_KEY not set")
+                raise ValueError("No API key - check credential_loader")
 
             self._client = ClobClient(
                 "https://clob.polymarket.com",
@@ -1067,9 +1069,11 @@ class PolymarketOrders:
             partition = [1, 2]
 
             # Get private key
-            private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+            # INTEGRAFIX: Use credential_loader for unified key access
+            from integrafix.credential_loader import load_polymarket_key
+            private_key = load_polymarket_key()
             if not private_key:
-                return {"success": False, "error": "POLYMARKET_PRIVATE_KEY not set"}
+                return {"success": False, "error": "No API key - check credential_loader"}
 
             # Get account
             account = w3.eth.account.from_key(private_key)
@@ -1145,9 +1149,11 @@ class PolymarketOrders:
             partition = [1, 2]
 
             # Get private key
-            private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+            # INTEGRAFIX: Use credential_loader for unified key access
+            from integrafix.credential_loader import load_polymarket_key
+            private_key = load_polymarket_key()
             if not private_key:
-                return {"success": False, "error": "POLYMARKET_PRIVATE_KEY not set"}
+                return {"success": False, "error": "No API key - check credential_loader"}
 
             # Get account
             account = w3.eth.account.from_key(private_key)

@@ -1,0 +1,103 @@
+{
+  "updated": "2025-12-04T05:10:00Z",
+  "target_rate": "$80-120/hr or $160k-250k/yr",
+  "applications_drafted": 7,
+  "opportunities": [
+    {
+      "company": "Renaissance Philanthropy",
+      "role": "Research Engineer / MLE",
+      "compensation": "TBD",
+      "location": "Remote (worldwide)",
+      "match_score": 91,
+      "status": "application_ready",
+      "file": "renaissance_philanthropy_application.md",
+      "apply_url": "https://www.renaissancephilanthropy.org/careers"
+    },
+    {
+      "company": "SynRes",
+      "role": "Senior Python Engineer - AI LLM Reasoning",
+      "compensation": "Contract TBD",
+      "location": "Remote",
+      "match_score": 95,
+      "status": "application_ready",
+      "file": "synres_application.md"
+    },
+    {
+      "company": "Pydantic",
+      "role": "Solutions Engineer",
+      "compensation": "TBD",
+      "location": "Remote (UTC-8 to UTC+1)",
+      "match_score": 92,
+      "status": "application_ready",
+      "file": "pydantic_application.md",
+      "apply_url": "pydantic.dev/jobs/solutions-engineer"
+    },
+    {
+      "company": "DuckDuckGo",
+      "role": "Senior Backend Engineer",
+      "compensation": "$178,500 + equity",
+      "location": "Remote",
+      "match_score": 88,
+      "status": "application_ready",
+      "file": "duckduckgo_application.md",
+      "apply_url": "jobs.ashbyhq.com/duck-duck-go"
+    },
+    {
+      "company": "Beautiful.ai",
+      "role": "Senior Engineer",
+      "compensation": "$160k-250k + equity",
+      "location": "Remote (US/CAN)",
+      "match_score": 85,
+      "status": "application_ready",
+      "file": "beautiful_ai_application.md"
+    },
+    {
+      "company": "Intuition Machines",
+      "role": "ML Security Engineer",
+      "compensation": "TBD",
+      "location": "Remote (worldwide)",
+      "match_score": 87,
+      "status": "application_ready",
+      "file": "intuition_machines_application.md",
+      "apply_url": "apply.workable.com/imachines"
+    },
+    {
+      "company": "CrossnoKaye",
+      "role": "Senior Software Engineer - Python",
+      "compensation": "TBD",
+      "location": "Remote (US)",
+      "match_score": 90,
+      "status": "application_ready",
+      "file": "crossnokaye_application.md",
+      "contact": "careers@crossnokaye.com"
+    }
+  ],
+  "additional_leads": [
+    {"company": "Profitmind", "role": "Web Scraping Developer", "salary": "$90-110k"},
+    {"company": "Shorebird", "role": "Systems Engineer", "salary": "$160-230k"},
+    {"company": "FUTO", "role": "ML Engineer", "focus": "Privacy-first ML"},
+    {"company": "Datalab", "role": "Research Engineer", "tech": "FastAPI, PyTorch"}
+  ],
+  "bounty_leads": [
+    {"repo": "Chakra-Network/dojo-spas", "bounty": "$1000-2000", "tech": "React/TypeScript", "status": "potential"},
+    {"repo": "daydreamsai/agent-bounties", "bounty": "$1000", "tech": "TypeScript agents", "status": "potential"},
+    {"repo": "MonoGame/MonoGame", "bounty": "$500-5000", "tech": "C#", "status": "not-fit"}
+  ],
+  "hn_thread": "https://news.ycombinator.com/item?id=46108941",
+  "portfolio": {
+    "bounties": "$550 submitted to cortexlinux",
+    "tests": "137/137 passing",
+    "projects": 4,
+    "github": "github.com/yaya1738"
+  },
+  "abcfc_projection": {
+    "if_one_lands_at_150k": {
+      "monthly": 12500,
+      "employment_expected_delta": "+$12500/mo"
+    },
+    "if_one_lands_at_200k": {
+      "monthly": 16666,
+      "employment_expected_delta": "+$16666/mo"
+    }
+  }
+}

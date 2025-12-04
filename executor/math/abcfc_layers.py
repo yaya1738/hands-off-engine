@@ -555,11 +555,79 @@ class ABCFCLayers:
 _layers = None
 
 def get_layers() -> ABCFCLayers:
-    """Get or create the ABCFC layers singleton."""
+    """
+    Get or create the ABCFC layers singleton.
+
+    INTEGRAFIX: Loads positions from abcfc_unified_state.json for real data.
+    """
     global _layers
     if _layers is None:
         _layers = ABCFCLayers()
+        _load_from_unified_state(_layers)
     return _layers
+
+
+def _load_from_unified_state(layers: ABCFCLayers):
+    """
+    INTEGRAFIX: Load positions from unified state into layers hierarchy.
+    """
+    try:
+        import json
+        from pathlib import Path
+
+        PROJECT_ROOT = Path(__file__).parent.parent.parent
+        unified_file = PROJECT_ROOT / "state" / "abcfc_unified_state.json"
+
+        if not unified_file.exists():
+            return
+
+        with open(unified_file) as f:
+            data = json.load(f)
+
+        positions = data.get("positions", [])
+
+        for pos in positions[:100]:  # Top 100 positions
+            try:
+                name = pos.get("name", "unknown")[:30]
+                category = pos.get("category", "Trading")
+                worst = float(pos.get("worst", 0))
+                best = float(pos.get("best", 0))
+                expected = float(pos.get("expected", 0))
+
+                # Determine parent based on category
+                if category == "Trading" or "trade" in name.lower() or "polymarket" in name.lower():
+                    parent = "polymarket"
+                    layer = "market"
+                else:
+                    parent = "handsoff"
+                    layer = "stream"
+
+                # Create node with ABCFC values directly
+                node_id = f"{parent}_{name}"
+                node = ABCFCNode(
+                    name=name,
+                    layer=layer,
+                    parent=parent,
+                    best_case=best,
+                    worst_case=worst,
+                    expected=expected,
+                    metadata={"source": "unified_state", "category": category}
+                )
+
+                # Store and link
+                layers.nodes[node_id] = node
+                if parent in layers.nodes:
+                    if node_id not in layers.nodes[parent].children:
+                        layers.nodes[parent].children.append(node_id)
+
+            except Exception:
+                continue
+
+        # Recalculate aggregates
+        layers._recalculate_aggregates()
+
+    except Exception:
+        pass  # Silent fail - layers work without positions
 
 
 # Convenience aliases

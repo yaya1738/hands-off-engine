@@ -141,8 +141,10 @@ class TradingProtectionManager:
             try:
                 data = json.loads(self.config_path.read_text())
                 return [TradingSystemProtection(**p) for p in data.get("systems", [])]
-            except:
-                pass
+            except Exception as e:
+                # INTEGRAFIX: Log trading protection config failures
+                import logging
+                logging.warning(f"Failed to load trading protection config: {e}")
 
         # Default protections - matched to actual running processes
         return [

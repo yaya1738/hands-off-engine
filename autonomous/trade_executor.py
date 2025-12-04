@@ -266,15 +266,48 @@ class TradeExecutor:
 
         elif self.mode == "LIVE":
             # Check for API credentials
-            private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+            # INTEGRAFIX: Use credential_loader for unified key access
+            from integrafix.credential_loader import load_polymarket_key
+            private_key = load_polymarket_key()
             if not private_key:
                 result["status"] = "failed"
-                result["error"] = "No POLYMARKET_PRIVATE_KEY configured"
+                result["error"] = "No API key - check credential_loader"
                 return result
 
-            # Would execute real trade here
-            result["status"] = "live_disabled"
-            result["message"] = "Live trading requires additional setup"
+            # INTEGRAFIX: Execute real trade via py_clob_client
+            from py_clob_client.client import ClobClient
+            from py_clob_client.clob_types import OrderArgs
+            from py_clob_client.order_builder.constants import BUY, SELL
+
+            client = ClobClient(
+                host="https://clob.polymarket.com",
+                key=private_key,
+                chain_id=137
+            )
+            creds = client.create_or_derive_api_creds()
+            client.set_api_creds(creds)
+
+            # Get token_id from signal
+            token_id = signal.get("token_id") or signal.get("market_id")
+            side_const = BUY if signal.get("side") == "BUY" else SELL
+            price = signal.get("price", 0.5)
+
+            order_args = OrderArgs(
+                token_id=token_id,
+                price=price,
+                size=amount,
+                side=side_const
+            )
+
+            signed_order = client.create_order(order_args)
+            api_result = client.post_order(signed_order)
+
+            if api_result and (api_result.get("orderID") or api_result.get("success")):
+                result["status"] = "executed"
+                result["order_id"] = api_result.get("orderID") or str(api_result)[:50]
+            else:
+                result["status"] = "failed"
+                result["error"] = f"API error: {api_result}"
 
         self._log_trade(result)
         self.state["total_trades"] += 1

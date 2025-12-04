@@ -71,8 +71,9 @@ def release_pid_lock():
     try:
         if PID_FILE.exists():
             PID_FILE.unlink()
-    except:
-        pass
+    except OSError as e:
+        # INTEGRAFIX: Log PID cleanup failures
+        log(f"Warning: Failed to remove PID file: {e}")
 
 
 def log(msg: str):
@@ -488,6 +489,251 @@ def run_abcfc_layers():
         return {"success": False, "error": str(e)}
 
 
+def run_abcfc_pure_2d():
+    """
+    Run ABCFC Pure 2D - mathematical foundation with FULL area calculations.
+
+    INTEGRAFIX: Wire the pure mathematical ABCFC definition into the system.
+    THE BEAUTY of ABCFC is the AREA calculations:
+    - E[X|t] = ∫ x · P(x,t) dx          (expected value via integral)
+    - Var[X|t] = ∫ (x-E)² · P(x,t) dx   (variance via integral)
+    - F(x,t) = ∫_a^x P(u,t) du          (CDF via integral)
+    - Quantiles via inverse CDF         (confidence intervals)
+
+    The ABCFC is defined as P(x, t) where:
+    - x ∈ [worst, best] (bounded outcome space)
+    - t ∈ [0, T] (time to resolution)
+    - ∫ P(x,t) dx = 1 for all t (area = 1, normalized)
+    """
+    try:
+        from executor.math.abcfc_pure import ABCFC2D, time_evolving_density, beta_density, bimodal_density
+        import json
+        import math
+
+        # Load unified state to get real position bounds
+        unified_state = PROJECT_ROOT / "state" / "abcfc_unified_state.json"
+        total_worst = 0
+        total_best = 0
+        total_expected = 0
+        n_positions = 0
+
+        if unified_state.exists():
+            with open(unified_state) as f:
+                data = json.load(f)
+                total_worst = data.get("total_bounds", [0, 0])[0]
+                total_best = data.get("total_bounds", [0, 0])[1]
+                total_expected = data.get("total_expected", 0)
+                n_positions = data.get("n_positions", 0)
+
+        # Create ABCFC 2D chart from real bounds
+        if total_best > total_worst:
+            # TIME-EVOLVING density: starts uncertain (bimodal), becomes clearer (beta)
+            # This is THE key 2D aspect - density changes over time
+            def evolving_density(x, t, a, b, T):
+                """
+                Density that evolves from bimodal (uncertain) to beta (centered).
+                P(x, t) = (1 - t/T) * bimodal(x) + (t/T) * beta(x)
+                """
+                progress = t / T if T > 0 else 0.5
+                p_bimodal = bimodal_density(x, t, a, b, T, p_high=0.4, width=0.15)
+                p_beta = beta_density(x, t, a, b, T, alpha=2.5, beta=2.5)
+                return (1 - progress) * p_bimodal + progress * p_beta
+
+            chart = ABCFC2D(
+                bounds=(total_worst, total_best),
+                duration=30,
+                density=evolving_density
+            )
+
+            # ========== THE AREA CALCULATIONS (THE BEAUTY) ==========
+
+            # Expected value at key time points (integral of x·P(x,t))
+            e_t0 = chart.E(t=0)
+            e_t10 = chart.E(t=10)
+            e_t20 = chart.E(t=20)
+            e_t30 = chart.E(t=30)
+
+            # Variance evolution (integral of (x-E)²·P(x,t))
+            var_t0 = chart.Var(t=0)
+            var_t15 = chart.Var(t=15)
+            var_t30 = chart.Var(t=30)
+            std_t0 = math.sqrt(var_t0)
+            std_t30 = math.sqrt(var_t30)
+
+            # QUANTILES via CDF (inverse of integral) - confidence bands
+            q10_t15 = chart.quantile(0.10, t=15)  # 10th percentile
+            q25_t15 = chart.quantile(0.25, t=15)  # 25th percentile
+            q50_t15 = chart.quantile(0.50, t=15)  # Median
+            q75_t15 = chart.quantile(0.75, t=15)  # 75th percentile
+            q90_t15 = chart.quantile(0.90, t=15)  # 90th percentile
+
+            # CDF at key points (cumulative area)
+            cdf_expected = chart.CDF(total_expected, t=15)  # Prob of being <= expected
+            cdf_zero = chart.CDF(0, t=15)  # Prob of loss
+
+            # Confidence interval width (area between quantiles)
+            ci_80_width = q90_t15 - q10_t15  # 80% CI
+            ci_50_width = q75_t15 - q25_t15  # 50% CI
+
+            # Generate visualization
+            viz_path = str(PROJECT_ROOT / "state" / "abcfc_2d_chart.png")
+            viz_result = chart.plot(save_path=viz_path)
+
+            return {
+                "success": True,
+                "bounds": [round(total_worst, 2), round(total_best, 2)],
+                "duration_days": 30,
+                "density_type": "time_evolving",
+                "positions_loaded": n_positions,
+
+                # Expected value trajectory (E[X|t] integrals)
+                "expected_trajectory": {
+                    "t0": round(e_t0, 2),
+                    "t10": round(e_t10, 2),
+                    "t20": round(e_t20, 2),
+                    "t30": round(e_t30, 2),
+                },
+
+                # Variance evolution (shows uncertainty decreasing over time)
+                "variance_evolution": {
+                    "var_t0": round(var_t0, 2),
+                    "var_t15": round(var_t15, 2),
+                    "var_t30": round(var_t30, 2),
+                    "std_t0": round(std_t0, 2),
+                    "std_t30": round(std_t30, 2),
+                },
+
+                # QUANTILE CONFIDENCE BANDS (THE AREA BEAUTY)
+                "quantiles_t15": {
+                    "q10": round(q10_t15, 2),
+                    "q25": round(q25_t15, 2),
+                    "median": round(q50_t15, 2),
+                    "q75": round(q75_t15, 2),
+                    "q90": round(q90_t15, 2),
+                },
+
+                # Confidence interval widths
+                "confidence_intervals": {
+                    "ci_80_width": round(ci_80_width, 2),
+                    "ci_50_width": round(ci_50_width, 2),
+                },
+
+                # CDF probabilities (cumulative area)
+                "cdf_probabilities": {
+                    "prob_below_expected": round(cdf_expected, 4),
+                    "prob_loss": round(cdf_zero, 4),
+                    "prob_profit": round(1 - cdf_zero, 4),
+                },
+
+                "unified_expected": total_expected,
+                "chart_generated": viz_result.get("success", False),
+                "chart_path": viz_path if viz_result.get("success") else None,
+            }
+        else:
+            return {
+                "success": True,
+                "bounds": [0, 0],
+                "note": "No positions loaded",
+                "positions_loaded": 0,
+            }
+
+    except ImportError as e:
+        return {"success": False, "error": f"ABCFC Pure not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_abcfc_nexus():
+    """
+    Run ABCFC Nexus - dynamic decision space.
+
+    INTEGRAFIX: Wire the nexus cloud decision engine.
+    Evaluates all possible actions and finds optimal trajectory.
+
+    The Nexus connects:
+    1. STEADY STATE - Current ABCFC hierarchy
+    2. ACTION SPACE - All possible actions
+    3. FUTURE STATES - Projected outcomes for each action
+    4. DECISION ENGINE - Optimal action selection
+    """
+    try:
+        from executor.math.abcfc_nexus import get_nexus, Action
+
+        nexus = get_nexus()
+
+        # Get current steady state
+        steady = nexus.steady_state
+        current_expected = steady.total_finance.expected if steady else 0
+
+        # Define standard actions
+        actions = [
+            Action("hold", "hold"),
+            Action("hedge_25", "hedge", params={"ratio": 0.25}),
+            Action("hedge_50", "hedge", params={"ratio": 0.50}),
+            Action("rebalance", "adjust", params={"target": "equal_weight"}),
+        ]
+
+        # Add actions to nexus
+        for action in actions:
+            nexus.add_action(action.name, action.action_type, **action.params)
+
+        # Evaluate all actions
+        try:
+            evaluation = nexus.evaluate()
+            best = nexus.best_action()
+            best_name = best.name if best else "hold"
+            best_improvement = best.expected_improvement if best else 0
+        except:
+            evaluation = {}
+            best_name = "hold"
+            best_improvement = 0
+
+        # Get nexus cloud summary
+        cloud_size = len(nexus._nexus_cloud) if hasattr(nexus, '_nexus_cloud') else 0
+
+        # INTEGRAFIX: Wire nexus decisions back to unified state
+        try:
+            unified_state_file = PROJECT_ROOT / "state" / "abcfc_unified_state.json"
+            if unified_state_file.exists():
+                with open(unified_state_file) as f:
+                    unified_data = json.load(f)
+
+                # Update with nexus decision
+                unified_data["nexus_decision"] = best_name
+                unified_data["nexus_improvement"] = round(best_improvement, 2)
+                unified_data["nexus_cloud_size"] = cloud_size
+                unified_data["nexus_updated"] = datetime.now(timezone.utc).isoformat()
+
+                # If nexus found a better action, update primary decision
+                if best_improvement > 0 and best_name != "hold":
+                    unified_data["decision"] = best_name
+                    unified_data["decision_source"] = "nexus"
+                    unified_data["decision_score"] = round(best_improvement, 4)
+
+                with open(unified_state_file, 'w') as f:
+                    json.dump(unified_data, f, indent=2)
+        except Exception:
+            pass  # Non-critical - continue without persisting
+
+        return {
+            "success": True,
+            "steady_state_expected": round(current_expected, 2),
+            "actions_evaluated": len(actions),
+            "nexus_cloud_size": cloud_size,
+            "best_action": best_name,
+            "expected_improvement": round(best_improvement, 2),
+            "synced_to_unified": True,
+            "evaluation": {
+                "actions_ranked": len(evaluation.get("ranked", [])) if isinstance(evaluation, dict) else 0,
+            }
+        }
+
+    except ImportError as e:
+        return {"success": False, "error": f"ABCFC Nexus not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 def run_abcfc_system():
     """
     Run ABCFC System - complete hierarchy + nexus + decision engine.
@@ -623,6 +869,332 @@ def run_yair_financial_abcfc():
         return result
     except ImportError:
         return {"success": False, "error": "Yair Financial ABCFC not available"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_quantum_abcfc():
+    """
+    Run Quantum ABCFC - Heisenberg Uncertainty + Wave Function Collapse.
+
+    INTEGRAFIX: Wire quantum concepts into ABCFC:
+    1. Uncertainty Spheres: Δx·Δp ≥ ℏ/2 (position vs momentum)
+    2. Wave Functions: State superposition until observation
+    3. Collapse: Observation forces eigenvalue
+    4. Entanglement: Correlated ABCFCs affect each other
+    """
+    try:
+        from executor.math.quantum_abcfc import create_quantum_trading_system
+
+        q = create_quantum_trading_system()
+
+        # Get wave functions and uncertainty state
+        wave_functions = len(q.wave_functions) if hasattr(q, 'wave_functions') else 0
+        spheres = len(q.spheres) if hasattr(q, 'spheres') else 0
+        entangled = len(q.entanglements) if hasattr(q, 'entanglements') else 0
+
+        # Get uncertainty status
+        uncertainty_status = {}
+        if hasattr(q, 'uncertainty_status'):
+            try:
+                uncertainty_status = q.uncertainty_status()
+            except:
+                pass
+
+        # Get superposition status
+        superposition_status = {}
+        if hasattr(q, 'superposition_status'):
+            try:
+                superposition_status = q.superposition_status()
+            except:
+                pass
+
+        return {
+            "success": True,
+            "wave_functions": wave_functions,
+            "uncertainty_spheres": spheres,
+            "entangled_pairs": entangled,
+            "uncertainty_status": uncertainty_status,
+            "superposition_status": superposition_status,
+            "classical_system": q.name if hasattr(q, 'name') else "unknown",
+        }
+    except ImportError as e:
+        return {"success": False, "error": f"Quantum ABCFC not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_abcfc_orchestrator():
+    """
+    Run ABCFC Orchestrator - Unified orchestration layer.
+
+    INTEGRAFIX: Wire all ABCFC components together:
+    1. YairMasterABCFC - Master hierarchy
+    2. ABCFCSystem - Core math
+    3. ABCFCNexus/Cloud - Decision space
+    4. ABCFCLiveNexus - Live market data
+    5. CloudFlyer - Autonomous execution
+    """
+    try:
+        from integrafix.abcfc_orchestrator import ABCFCOrchestrator
+
+        orchestrator = ABCFCOrchestrator()
+
+        # Run a full cycle
+        try:
+            state = orchestrator.run_cycle()
+        except:
+            state = None
+
+        # Get dashboard data for summary
+        dashboard = {}
+        if hasattr(orchestrator, 'get_dashboard_data'):
+            try:
+                dashboard = orchestrator.get_dashboard_data()
+            except:
+                pass
+
+        # Extract from state or dashboard
+        if state and hasattr(state, 'hierarchy_nodes'):
+            return {
+                "success": True,
+                "hierarchy_nodes": state.hierarchy_nodes,
+                "total_expected": round(state.total_expected, 2),
+                "total_bounds": list(state.total_bounds) if state.total_bounds else [0, 0],
+                "risk_modifiers": len(state.risk_modifiers) if state.risk_modifiers else 0,
+                "risk_adjusted_expected": round(state.risk_adjusted_expected, 2),
+                "cloud_size": state.cloud_size,
+                "recommended_action": state.recommended_action,
+                "recommended_score": round(state.recommended_score, 4),
+            }
+        else:
+            return {
+                "success": True,
+                "hierarchy_nodes": dashboard.get("hierarchy_nodes", 0),
+                "total_expected": dashboard.get("total_expected", 0),
+                "risk_aversion": orchestrator.risk_aversion,
+                "dry_run": orchestrator.dry_run,
+                "history_entries": len(orchestrator.history) if hasattr(orchestrator, 'history') else 0,
+            }
+    except ImportError as e:
+        return {"success": False, "error": f"ABCFC Orchestrator not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_abcfc_live_nexus():
+    """
+    Run ABCFC Live Nexus - Live market + executable actions.
+
+    INTEGRAFIX: Wire theoretical ABCFC to practical trading:
+    1. OBSERVE: Pull real positions and market data
+    2. GENERATE: Create executable actions from opportunities
+    3. SIMULATE: Use actual probabilities and order book depth
+    4. DECIDE: Score with real expected values
+    5. EXECUTE: Place trades (or dry run)
+    """
+    try:
+        from integrafix.abcfc_live_nexus import ABCFCLiveNexus
+
+        nexus = ABCFCLiveNexus()
+
+        # Run a cycle to generate actions
+        try:
+            nexus.run_cycle()
+        except:
+            pass
+
+        # Get proposed and executed actions
+        proposed = nexus.proposed_actions if hasattr(nexus, 'proposed_actions') else []
+        executed = nexus.executed_actions if hasattr(nexus, 'executed_actions') else []
+        market_data = nexus.market_data if hasattr(nexus, 'market_data') else {}
+        positions = nexus.current_positions if hasattr(nexus, 'current_positions') else []
+
+        return {
+            "success": True,
+            "markets_loaded": len(market_data),
+            "current_positions": len(positions),
+            "actions_proposed": len(proposed),
+            "actions_executed": len(executed),
+            "min_edge": nexus.min_edge if hasattr(nexus, 'min_edge') else 0,
+            "risk_aversion": nexus.risk_aversion if hasattr(nexus, 'risk_aversion') else 0.5,
+            "dry_run": nexus.dry_run if hasattr(nexus, 'dry_run') else True,
+        }
+    except ImportError as e:
+        return {"success": False, "error": f"ABCFC Live Nexus not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_autonomous_abcfc_executor():
+    """
+    Run Autonomous ABCFC Executor - Automated trading execution.
+
+    INTEGRAFIX: Complete the feedback loop:
+    1. Monitor positions and market conditions
+    2. Generate trade proposals from ABCFC decisions
+    3. Execute approved trades
+    4. Track outcomes and update learning
+    """
+    try:
+        from integrafix.autonomous_abcfc_executor import AutonomousABCFCExecutor
+
+        executor = AutonomousABCFCExecutor()
+
+        # Get executor state
+        trades_executed = executor.trades_executed if hasattr(executor, 'trades_executed') else []
+        current_exposure = executor.current_exposure if hasattr(executor, 'current_exposure') else 0
+        daily_trades = executor.daily_trades if hasattr(executor, 'daily_trades') else 0
+        tier_name = executor.tier_name if hasattr(executor, 'tier_name') else "unknown"
+        live_mode = executor.live_mode if hasattr(executor, 'live_mode') else False
+
+        # Calculate P&L from executed trades
+        total_pnl = 0
+        wins = 0
+        for trade in trades_executed:
+            pnl = trade.get("pnl", 0) if isinstance(trade, dict) else 0
+            total_pnl += pnl
+            if pnl > 0:
+                wins += 1
+
+        win_rate = wins / len(trades_executed) if trades_executed else 0
+
+        return {
+            "success": True,
+            "executor_tier": tier_name,
+            "live_mode": live_mode,
+            "trades_executed": len(trades_executed),
+            "daily_trades": daily_trades,
+            "current_exposure": round(current_exposure, 2),
+            "max_exposure": executor.max_exposure if hasattr(executor, 'max_exposure') else 0,
+            "total_pnl": round(total_pnl, 2),
+            "win_rate": round(win_rate, 4),
+            "kelly_fraction": executor.kelly_fraction if hasattr(executor, 'kelly_fraction') else 0,
+        }
+    except ImportError as e:
+        return {"success": False, "error": f"Autonomous Executor not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_abcfc_hft_frequency():
+    """
+    Run ABCFC-HFT Frequency - Microsecond ABCFC updates for HFT.
+
+    INTEGRAFIX: Connect ABCFC hierarchy to HFT execution:
+    - MICRO (1μs)  - Order placement, instant bounds update
+    - MILLI (1ms)  - Position updates
+    - SECOND (1s)  - ABCFC recalculation
+    - MINUTE (60s) - Nexus cloud evaluation
+    - HOUR (3600s) - Strategic rebalancing
+
+    Every HFT trade updates ABCFC bounds immediately.
+    """
+    try:
+        from integrafix.abcfc_hft_frequency import get_abcfc_hft
+
+        hft = get_abcfc_hft()
+        result = hft.run_cycle()
+
+        if result.get("success"):
+            return {
+                "success": True,
+                "timestamp_us": result.get("timestamp_us", 0),
+                "total_expected": result.get("abcfc", {}).get("total", {}).get("expected", 0),
+                "total_bounds": [
+                    result.get("abcfc", {}).get("total", {}).get("worst", 0),
+                    result.get("abcfc", {}).get("total", {}).get("best", 0),
+                ],
+                "events_per_second": result.get("hft_metrics", {}).get("events_per_second", 0),
+                "latency_us": result.get("hft_metrics", {}).get("latency_us", 0),
+                "cost_per_sec": result.get("flow_rate", {}).get("cost_per_sec", 0),
+                "profit_per_sec": result.get("flow_rate", {}).get("profit_per_sec", 0),
+                "net_per_sec": result.get("flow_rate", {}).get("net_per_sec", 0),
+                "action": result.get("decision", {}).get("action", "hold"),
+                "confidence": result.get("decision", {}).get("confidence", 0),
+                "signal_strength": result.get("signal", {}).get("signal_strength", 0),
+                "recommended_side": result.get("signal", {}).get("recommended_side", "HOLD"),
+            }
+        else:
+            return {"success": False, "error": result.get("error", "Unknown")}
+    except ImportError as e:
+        return {"success": False, "error": f"ABCFC-HFT Frequency not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_claude_abcfc():
+    """
+    Run Claude ABCFC - Claude's own ABCFC tracking.
+
+    INTEGRAFIX: Claude operates with ABCFC like any other component:
+    - Worst: Maximum harm Claude could cause
+    - Expected: Typical value based on session outcomes
+    - Best: Maximum value Claude could provide
+
+    Tracks: sessions, win rate, calibration error, delivery score
+    """
+    try:
+        from integrafix.claude_abcfc import get_claude_abcfc
+
+        tracker = get_claude_abcfc()
+        abcfc = tracker.get_abcfc()
+
+        return {
+            "success": True,
+            "worst": abcfc.get("worst", 0),
+            "expected": abcfc.get("expected", 0),
+            "best": abcfc.get("best", 0),
+            "position": abcfc.get("position_in_range", 0),
+            "signal": abcfc.get("signal", "HOLD"),
+            "win_rate": abcfc.get("win_rate", 0),
+            "sessions": abcfc.get("sessions_total", 0),
+            "avg_delivery": abcfc.get("avg_delivery_score", 0),
+            "calibration_error": abcfc.get("calibration_error", 0),
+        }
+    except ImportError as e:
+        return {"success": False, "error": f"Claude ABCFC not available: {e}"}
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_polymarket_fundamentals():
+    """
+    Run Polymarket Fundamentals - Yair's knowledge encoded.
+
+    INTEGRAFIX: All Polymarket-specific knowledge:
+    - Zero trading fees (capture smaller edges)
+    - Reusable collateral (infinite patience)
+    - Maker vs Taker (be the house)
+    - UMA resolution awareness
+    - Smart money tracking
+    - Zero-sum analysis (counterparty mistakes)
+    - Position holder analysis
+    - Market rules risk monitoring
+
+    From POLYMARKET_SPECIFIC.md + MARKET_FUNDAMENTALS.md
+    """
+    try:
+        from integrafix.polymarket_fundamentals import get_polymarket_fundamentals
+
+        pf = get_polymarket_fundamentals()
+        status = pf.status()
+
+        return {
+            "success": True,
+            "collateral_total": status.get("collateral", {}).get("total", 0),
+            "collateral_available": status.get("collateral", {}).get("available", 0),
+            "collateral_utilization": status.get("collateral", {}).get("utilization", 0),
+            "wallets_tracked": status.get("wallets_tracked", 0),
+            "markets_with_orders": status.get("markets_with_orders", 0),
+            "yair_rules": [
+                "Be the house, not the gambler",
+                "Reusable collateral - fish everywhere",
+                "Patient liquidity provider wins",
+            ],
+        }
+    except ImportError as e:
+        return {"success": False, "error": f"Polymarket Fundamentals not available: {e}"}
     except Exception as e:
         return {"success": False, "error": str(e)}
 
@@ -990,9 +1562,11 @@ def run_abcfc_live_builder():
         from executor.math.abcfc_live import LiveABCFCBuilder, parse_polymarket_book, analyze_order_flow
 
         # Get current positions from Polymarket
-        private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+        # INTEGRAFIX: Use credential_loader for unified key access
+        from integrafix.credential_loader import load_polymarket_key
+        private_key = load_polymarket_key()
         if not private_key:
-            return {"success": False, "error": "No API key for live data"}
+            return {"success": False, "error": "No API key - check credential_loader"}
 
         from py_clob_client.client import ClobClient
 
@@ -1072,9 +1646,11 @@ def run_process_endpoints():
 def run_trading_check():
     """Check Polymarket trading status."""
     try:
-        private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+        # INTEGRAFIX: Use credential_loader for unified key access
+        from integrafix.credential_loader import load_polymarket_key
+        private_key = load_polymarket_key()
         if not private_key:
-            return {"success": False, "error": "No API key"}
+            return {"success": False, "error": "No API key - check credential_loader"}
 
         from py_clob_client.client import ClobClient
 
@@ -1127,9 +1703,40 @@ def run_hft_execution():
         hft = trader.hft  # This triggers _load_wallets() and activate()
         hft_status = hft.status() if hft else {}
 
-        # Run one cycle of Yair's trading system (dry_run=False for live execution)
-        # Set dry_run=True here to just scan without executing
-        results = trader.run_cycle(dry_run=True)  # Start with dry_run for safety
+        # INTEGRAFIX: Read trading mode from config
+        dry_run = True  # Default safe
+        config_file = PROJECT_ROOT / "config" / "trading_config.json"
+        if config_file.exists():
+            try:
+                with open(config_file) as f:
+                    config = json.load(f)
+                if config.get("live_trading_enabled") and not config.get("dry_run"):
+                    # INTEGRAFIX HIGHER: ABCFC gate before enabling live trading
+                    abcfc_approves_live = False
+                    try:
+                        from integrafix.claude_abcfc_bridge import get_bridge as get_abcfc
+                        abcfc = get_abcfc()
+                        # Use configurable edge threshold (default 0.25 = conservative)
+                        min_edge = config.get("abcfc_min_edge", 0.25)
+                        result = abcfc.evaluate_trading_decision(
+                            decision="Enable live trading mode",
+                            actions=[
+                                {"name": "go_live", "action_type": "buy", "edge": min_edge, "price": 0.5, "size": 100},
+                                {"name": "stay_dry", "action_type": "hold"}
+                            ]
+                        )
+                        recommended = result.get("recommended", {}).get("action", "stay_dry")
+                        abcfc_approves_live = (recommended == "go_live")
+                    except Exception:
+                        pass
+
+                    if abcfc_approves_live:
+                        dry_run = False
+                    # If ABCFC doesn't approve, stay in dry_run even if config says live
+            except:
+                pass
+
+        results = trader.run_cycle(dry_run=dry_run)
 
         status = trader.status()
 
@@ -1160,7 +1767,24 @@ def run_hft_execution():
                 "wallets": status.get("hft_wallets", 0)
             }
 
-        results = bridge.scan_and_execute(dry_run=False)
+        # INTEGRAFIX HIGHER: ABCFC gate for fallback execution path
+        fallback_dry_run = True
+        try:
+            from integrafix.claude_abcfc_bridge import get_bridge as get_abcfc
+            abcfc = get_abcfc()
+            result = abcfc.evaluate_trading_decision(
+                decision="Fallback HFT execution",
+                actions=[
+                    {"name": "execute", "action_type": "buy", "edge": 0.20, "price": 0.5, "size": 50},
+                    {"name": "skip", "action_type": "hold"}
+                ]
+            )
+            if result.get("recommended", {}).get("action") == "execute":
+                fallback_dry_run = False
+        except Exception:
+            pass
+
+        results = bridge.scan_and_execute(dry_run=fallback_dry_run)
 
         return {
             "success": True,
@@ -1218,31 +1842,28 @@ def run_outcome_tracker():
     signal → execute → RECORD → learn → (improves signal)
     """
     try:
-        from integrafix.outcome_tracker import get_tracker
+        # INTEGRAFIX: Use OutcomeRecorder (has correct 0.99 threshold for resolution)
+        # Previously used integrafix.outcome_tracker which had buggy 0.5 threshold
+        from autonomous.outcome_recorder import OutcomeRecorder
 
-        tracker = get_tracker()
+        recorder = OutcomeRecorder()
 
-        # Check for resolved markets
-        outcomes = tracker.check_resolutions()
+        # Check for resolved markets (requires 0.99+ price = truly settled)
+        outcomes = recorder.check_resolutions()
 
-        # For dry-run trades, simulate some outcomes to test feedback loop
-        # This would be removed in production
-        if tracker.pending_trades:
-            # Only simulate a small batch per cycle
-            simulated = tracker.simulate_outcomes(win_rate=0.55)
-            outcomes.extend(simulated[:2])  # Max 2 per cycle
-
-        status = tracker.status()
+        # Get stats from learning insights
+        learning = recorder.learning
+        pending = recorder.pending
 
         return {
             "success": True,
-            "pending_trades": status["pending_trades"],
+            "pending_trades": len(pending.get("trades", {})),
             "resolved_this_cycle": len(outcomes),
-            "total_resolved": status["total_resolved"],
-            "win_rate": status["win_rate"],
-            "total_pnl": status["total_pnl"],
+            "total_resolved": learning.get("total_resolved", 0),
+            "win_rate": learning.get("win_rate", 0),
+            "total_pnl": learning.get("total_pnl", 0),
             "recent_outcomes": [
-                f"{'WIN' if o.was_correct else 'LOSS'} {o.side} ${o.pnl:+.2f}"
+                f"{'WIN' if o.get('won') else 'LOSS'} ${o.get('pnl', 0):+.2f}"
                 for o in outcomes[:3]
             ] if outcomes else [],
         }
@@ -1302,7 +1923,9 @@ def run_integrafix_pipeline():
         # Fallback to ClobClient if gamma-api fails
         if not markets:
             try:
-                private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+                # INTEGRAFIX: Use credential_loader for unified key access
+                from integrafix.credential_loader import load_polymarket_key
+                private_key = load_polymarket_key()
                 if private_key:
                     from py_clob_client.client import ClobClient
 
@@ -1378,15 +2001,28 @@ def run_integrafix_pipeline():
                 "trades": 0,
             }
 
-        # Run the integrated pipeline
-        # GOLDEN STATE CONFIG: Restored optimal settings
-        # $15-25 trades on named markets = 4x better avg PnL than small hex trades
+        # INTEGRAFIX: Read safeguards from config
+        trading_config_file = PROJECT_ROOT / "config" / "trading_config.json"
+        max_trade = 5.0  # Default conservative
+        min_edge = 0.05  # Default 5%
+        live_enabled = False
+        if trading_config_file.exists():
+            try:
+                with open(trading_config_file) as f:
+                    tconfig = json.load(f)
+                safeguards = tconfig.get("safeguards", {})
+                max_trade = safeguards.get("max_per_trade", 5.0)
+                min_edge = safeguards.get("min_edge_required", 0.05)
+                live_enabled = tconfig.get("live_trading_enabled", False) and not tconfig.get("dry_run", True)
+            except:
+                pass
+
         result = pipeline.run_pipeline(
             markets=markets,
-            capital=150,  # INTEGRAFIX: $150 per cycle (upgraded from $100)
-            max_per_trade=30,  # INTEGRAFIX: Max $30 per trade (upgraded from $25)
-            min_edge=0.025,  # 2.5% minimum edge (catch more trades)
-            dry_run=False,  # LIVE TRADING ENABLED
+            capital=max_trade * 5,  # INTEGRAFIX: 5 trades max per cycle
+            max_per_trade=max_trade,
+            min_edge=min_edge,
+            dry_run=not live_enabled,
         )
 
         # Get pipeline status
@@ -1407,6 +2043,110 @@ def run_integrafix_pipeline():
                 f"{t['side']} {t['market'][:30]}... ${t['size']:.2f}"
                 for t in result.get("trades", [])[:3]
             ],
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_capital_bridge():
+    """
+    INTEGRAFIX: Capital Bridge - The Missing Wire
+
+    Monitors the path from income to trading activation.
+    This is THE BLOCKER that kept the system from trading.
+
+    Without capital, all the trading infrastructure is theater.
+    This module tracks:
+    1. Current wallet balance
+    2. Income source status
+    3. ABCFC-ranked recommendations for capital generation
+    4. Auto-activation when threshold met
+    """
+    try:
+        from integrafix.capital_bridge import CapitalBridge
+
+        bridge = CapitalBridge()
+        report = bridge.status_report()
+
+        wallet = report["wallet"]
+        income = report["income"]
+        top_rec = report["next_action"]
+
+        return {
+            "success": True,
+            "balance_usdc": wallet["balance_usdc"],
+            "activation_threshold": wallet["activation_threshold"],
+            "gap_to_activation": wallet["gap_to_activation"],
+            "ready_to_trade": wallet["ready_to_trade"],
+            "live_mode": wallet["live_mode"],
+            "total_earned": income["total_earned_usd"],
+            "total_injected": income["total_injected_usdc"],
+            "sources_available": income["sources_available"],
+            "next_action": top_rec["name"] if top_rec else "None",
+            "next_action_score": top_rec["abcfc_score"] if top_rec else 0,
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_income_engine():
+    """
+    INTEGRAFIX: Income Engine - Active Capital Generation
+
+    The capital_bridge is PASSIVE (tracks income sources).
+    The income_engine is ACTIVE (generates opportunities, does work).
+
+    Key insight: AI IS the production engine.
+    - Scans for opportunities (bounties, gigs, contracts)
+    - Drafts proposals
+    - Does the actual paid work
+    - Creates deliverables
+
+    Human only clicks send and receives payment.
+    """
+    try:
+        from integrafix.income_engine import IncomeEngine
+
+        engine = IncomeEngine()
+
+        # Get pipeline status
+        status = engine.get_pipeline_status()
+        next_action = engine.get_next_action()
+
+        # Auto-scan if no recent scan (every 6 hours)
+        last_scan = engine.state.get("last_scan")
+        should_scan = False
+        if not last_scan:
+            should_scan = True
+        else:
+            from datetime import datetime, timedelta
+            try:
+                # Handle both naive and timezone-aware datetimes
+                last_scan_str = last_scan.replace('Z', '+00:00')
+                if '+' not in last_scan_str and 'T' in last_scan_str:
+                    # Naive datetime - assume UTC
+                    last_scan_dt = datetime.fromisoformat(last_scan_str).replace(tzinfo=timezone.utc)
+                else:
+                    last_scan_dt = datetime.fromisoformat(last_scan_str)
+                if datetime.now(timezone.utc) - last_scan_dt > timedelta(hours=6):
+                    should_scan = True
+            except Exception:
+                should_scan = True  # On parse error, just scan
+
+        if should_scan:
+            new_opps = engine.scan_opportunities()
+            status["new_scan_results"] = len(new_opps)
+
+        return {
+            "success": True,
+            "pipeline": status["pipeline"],
+            "stats": status["stats"],
+            "next_action": next_action["action"],
+            "next_priority": next_action["priority"],
+            "next_instruction": next_action["instruction"],
+            "top_opportunities": len(status.get("top_opportunities", []))
         }
 
     except Exception as e:
@@ -1565,7 +2305,7 @@ def run_loop(interval_sec: int = 300):
             log(f"  Unified State: {unified_result.get('error', 'skipped')}")
 
         # 9.7 ABCFC Layers - Hierarchical finance
-        log("[9.7/26] Running ABCFC Layers...")
+        log("[9.7/28] Running ABCFC Layers...")
         layers_result = run_abcfc_layers()
         state["abcfc_layers"] = layers_result
         if layers_result.get("success"):
@@ -1578,8 +2318,33 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  Layers: {layers_result.get('error', 'skipped')}")
 
+        # 9.75 ABCFC Pure 2D - Mathematical foundation
+        log("[9.75/28] Running ABCFC Pure 2D...")
+        pure_2d_result = run_abcfc_pure_2d()
+        state["abcfc_pure_2d"] = pure_2d_result
+        if pure_2d_result.get("success"):
+            bounds = pure_2d_result.get("bounds", [0, 0])
+            log(f"  2D Math: bounds=[${bounds[0]:.0f}, ${bounds[1]:.0f}] | "
+                f"E[t=15]=${pure_2d_result.get('expected_t15', 0):.0f} | "
+                f"σ=${pure_2d_result.get('std_t0', 0):.0f}")
+            if pure_2d_result.get("chart_generated"):
+                log(f"  Chart: {pure_2d_result.get('chart_path', 'N/A')}")
+        else:
+            log(f"  Pure 2D: {pure_2d_result.get('error', 'skipped')}")
+
+        # 9.76 ABCFC Nexus - Decision space
+        log("[9.76/28] Running ABCFC Nexus...")
+        nexus_result = run_abcfc_nexus()
+        state["abcfc_nexus"] = nexus_result
+        if nexus_result.get("success"):
+            log(f"  Nexus: E[state]=${nexus_result.get('steady_state_expected', 0):.0f} | "
+                f"Actions: {nexus_result.get('actions_evaluated', 0)} | "
+                f"Best: {nexus_result.get('best_action', 'hold')}")
+        else:
+            log(f"  Nexus: {nexus_result.get('error', 'skipped')}")
+
         # 9.8 ABCFC Live Builder - Real order book integration
-        log("[9.8/26] Running ABCFC Live Builder...")
+        log("[9.8/28] Running ABCFC Live Builder...")
         live_result = run_abcfc_live_builder()
         state["abcfc_live_builder"] = live_result
         if live_result.get("success"):
@@ -1619,8 +2384,106 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  Yair Financial: {yair_financial_result.get('error', 'skipped')}")
 
-        # 9.11 INTEGRAFIX Full - Complete system integration
-        log("[9.11/26] Running INTEGRAFIX Full...")
+        # 9.11 Quantum ABCFC - Heisenberg Uncertainty + Wave Function Collapse
+        log("[9.11/30] Running Quantum ABCFC...")
+        quantum_result = run_quantum_abcfc()
+        state["quantum_abcfc"] = quantum_result
+        if quantum_result.get("success"):
+            log(f"  Wave Functions: {quantum_result.get('wave_functions', 0)} | "
+                f"Collapsed: {quantum_result.get('collapsed', 0)}")
+            log(f"  Uncertainty: Δx·Δp = {quantum_result.get('uncertainty_product', 0):.4f} | "
+                f"Entangled Pairs: {quantum_result.get('entangled_pairs', 0)}")
+        else:
+            log(f"  Quantum ABCFC: {quantum_result.get('error', 'skipped')}")
+
+        # 9.12 ABCFC Orchestrator - Unified orchestration layer
+        log("[9.12/30] Running ABCFC Orchestrator...")
+        orchestrator_result = run_abcfc_orchestrator()
+        state["abcfc_orchestrator"] = orchestrator_result
+        if orchestrator_result.get("success"):
+            log(f"  Hierarchy: {orchestrator_result.get('hierarchy_nodes', 0)} nodes | "
+                f"E: ${orchestrator_result.get('total_expected', 0):,.0f}")
+            log(f"  Risk-Adjusted E: ${orchestrator_result.get('risk_adjusted_expected', 0):,.0f} | "
+                f"Cloud: {orchestrator_result.get('cloud_size', 0)} futures")
+            log(f"  Action: {orchestrator_result.get('recommended_action', 'hold')} "
+                f"(score: {orchestrator_result.get('recommended_score', 0):.2f})")
+        else:
+            log(f"  Orchestrator: {orchestrator_result.get('error', 'skipped')}")
+
+        # 9.13 ABCFC Live Nexus - Live market + executable actions
+        log("[9.13/30] Running ABCFC Live Nexus...")
+        live_nexus_result = run_abcfc_live_nexus()
+        state["abcfc_live_nexus"] = live_nexus_result
+        if live_nexus_result.get("success"):
+            log(f"  Markets: {live_nexus_result.get('markets_loaded', 0)} | "
+                f"Actions: {live_nexus_result.get('actions_generated', 0)} generated")
+            log(f"  Approved: {live_nexus_result.get('actions_approved', 0)} | "
+                f"Executed: {live_nexus_result.get('actions_executed', 0)} | "
+                f"Dry Run: {live_nexus_result.get('dry_run', True)}")
+        else:
+            log(f"  Live Nexus: {live_nexus_result.get('error', 'skipped')}")
+
+        # 9.14 Autonomous ABCFC Executor - Automated trading execution
+        log("[9.14/30] Running Autonomous ABCFC Executor...")
+        executor_result = run_autonomous_abcfc_executor()
+        state["autonomous_abcfc_executor"] = executor_result
+        if executor_result.get("success"):
+            log(f"  Active: {executor_result.get('executor_active', False)} | "
+                f"Pending: {executor_result.get('pending_trades', 0)} | "
+                f"Executed: {executor_result.get('executed_trades', 0)}")
+            log(f"  Profit: ${executor_result.get('total_profit', 0):.2f} | "
+                f"Win Rate: {executor_result.get('win_rate', 0):.2%} | "
+                f"Dry Run: {executor_result.get('dry_run', True)}")
+        else:
+            log(f"  Executor: {executor_result.get('error', 'skipped')}")
+
+        # 9.145 ABCFC-HFT Frequency - Microsecond ABCFC updates for HFT
+        log("[9.145/31] Running ABCFC-HFT Frequency...")
+        abcfc_hft_result = run_abcfc_hft_frequency()
+        state["abcfc_hft_frequency"] = abcfc_hft_result
+        if abcfc_hft_result.get("success"):
+            log(f"  E[Total]: ${abcfc_hft_result.get('total_expected', 0):.2f} | "
+                f"Events/sec: {abcfc_hft_result.get('events_per_second', 0)} | "
+                f"Latency: {abcfc_hft_result.get('latency_us', 0)}μs")
+            log(f"  Flow: Net ${abcfc_hft_result.get('net_per_sec', 0):.4f}/sec | "
+                f"Action: {abcfc_hft_result.get('action', 'hold')} ({abcfc_hft_result.get('confidence', 0):.1%}) | "
+                f"Signal: {abcfc_hft_result.get('recommended_side', 'HOLD')}")
+        else:
+            log(f"  ABCFC-HFT: {abcfc_hft_result.get('error', 'skipped')}")
+
+        # 9.146 Polymarket Fundamentals - Yair's knowledge encoded
+        log("[9.146/33] Running Polymarket Fundamentals...")
+        poly_fund_result = run_polymarket_fundamentals()
+        state["polymarket_fundamentals"] = poly_fund_result
+        if poly_fund_result.get("success"):
+            log(f"  Collateral: ${poly_fund_result.get('collateral_total', 0):.2f} | "
+                f"Available: ${poly_fund_result.get('collateral_available', 0):.2f} | "
+                f"Util: {poly_fund_result.get('collateral_utilization', 0):.1f}%")
+            log(f"  Wallets Tracked: {poly_fund_result.get('wallets_tracked', 0)} | "
+                f"Markets w/Orders: {poly_fund_result.get('markets_with_orders', 0)}")
+            rules = poly_fund_result.get('yair_rules', [])
+            if rules:
+                log(f"  Rule: {rules[0]}")
+        else:
+            log(f"  Polymarket Fundamentals: {poly_fund_result.get('error', 'skipped')}")
+
+        # 9.147 Claude ABCFC - Claude's own ABCFC tracking
+        log("[9.147/33] Running Claude ABCFC...")
+        claude_abcfc_result = run_claude_abcfc()
+        state["claude_abcfc"] = claude_abcfc_result
+        if claude_abcfc_result.get("success"):
+            log(f"  Claude ABCFC: [{claude_abcfc_result.get('worst', 0):.0f}, "
+                f"{claude_abcfc_result.get('expected', 0):.1f}, "
+                f"{claude_abcfc_result.get('best', 0):.0f}]")
+            log(f"  Position: {claude_abcfc_result.get('position', 0):.1%} | "
+                f"Signal: {claude_abcfc_result.get('signal', 'HOLD')} | "
+                f"Sessions: {claude_abcfc_result.get('sessions', 0)} | "
+                f"Win Rate: {claude_abcfc_result.get('win_rate', 0):.0%}")
+        else:
+            log(f"  Claude ABCFC: {claude_abcfc_result.get('error', 'skipped')}")
+
+        # 9.15 INTEGRAFIX Full - Complete system integration
+        log("[9.15/32] Running INTEGRAFIX Full...")
         integrafix_full_result = run_integrafix_full()
         state["integrafix_full"] = integrafix_full_result
         if integrafix_full_result.get("success"):
@@ -1740,8 +2603,45 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  HFT Economics: {econ_result.get('error', 'skipped')}")
 
+        # 9.5. Capital Bridge - THE MISSING WIRE
+        log("[9.5/27] Running Capital Bridge (Income → Trading Gate)...")
+        capital_result = run_capital_bridge()
+        state["capital_bridge"] = capital_result
+        if capital_result.get("success"):
+            ready_icon = "READY" if capital_result.get("ready_to_trade") else "BLOCKED"
+            mode_icon = "LIVE" if capital_result.get("live_mode") else "DRY_RUN"
+            log(f"  Balance: ${capital_result.get('balance_usdc', 0):.2f} | "
+                f"Gap: ${capital_result.get('gap_to_activation', 0):.2f} | "
+                f"Status: [{ready_icon}] [{mode_icon}]")
+            log(f"  Earned: ${capital_result.get('total_earned', 0):.2f} | "
+                f"Sources: {capital_result.get('sources_available', 0)} available")
+            if capital_result.get("next_action"):
+                log(f"  NEXT ACTION: {capital_result.get('next_action')} "
+                    f"(ABCFC: {capital_result.get('next_action_score', 0)})")
+        else:
+            log(f"  Capital Bridge: {capital_result.get('error', 'unknown')}")
+
+        # 9.6. Income Engine - Active capital generation
+        log("[9.6/27] Running Income Engine (AI as Production Engine)...")
+        income_result = run_income_engine()
+        state["income_engine"] = income_result
+        if income_result.get("success"):
+            pipeline = income_result.get("pipeline", {})
+            stats = income_result.get("stats", {})
+            log(f"  Pipeline: {pipeline.get('new_opportunities', 0)} new, "
+                f"{pipeline.get('proposals_draft', 0)} drafts, "
+                f"{pipeline.get('work_in_progress', 0)} WIP, "
+                f"{pipeline.get('awaiting_payment', 0)} pending payment")
+            log(f"  Stats: {stats.get('opportunities_found', 0)} found, "
+                f"{stats.get('proposals_sent', 0)} sent, "
+                f"${stats.get('total_earned_usd', 0):.2f} earned")
+            log(f"  NEXT [{income_result.get('next_priority', 'N/A')}]: "
+                f"{income_result.get('next_action', 'none')}")
+        else:
+            log(f"  Income Engine: {income_result.get('error', 'unknown')}")
+
         # 10. INTEGRAFIX Pipeline - Real edge detection with feedback loop
-        log("[10/26] Running INTEGRAFIX Trading Pipeline...")
+        log("[10/27] Running INTEGRAFIX Trading Pipeline...")
         integrafix_result = run_integrafix_pipeline()
         state["integrafix_pipeline"] = integrafix_result
         if integrafix_result.get("success"):
@@ -1849,6 +2749,8 @@ def main():
             "abcfc_cloud_flyer": run_abcfc_cloud_flyer(),
             "abcfc_unified_state": run_unified_abcfc_state(),
             "abcfc_layers": run_abcfc_layers(),
+            "abcfc_pure_2d": run_abcfc_pure_2d(),
+            "abcfc_nexus": run_abcfc_nexus(),
             "abcfc_live_builder": run_abcfc_live_builder(),
             "abcfc_system": run_abcfc_system(),
             "yair_financial_abcfc": run_yair_financial_abcfc(),

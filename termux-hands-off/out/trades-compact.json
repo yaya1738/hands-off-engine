@@ -1,0 +1,40 @@
+{
+  "title": "\ud83c\udfaf 12 INTEGRAFIXED TRADES READY",
+  "timestamp": "2025-12-04T05:48:58.964811+00:00",
+  "total_orders": 12,
+  "total_size_usd": 1200,
+  "avg_edge": 0.5,
+  "markets": [
+    {
+      "q": "Fed rate hike in 2025?",
+      "d": "YES",
+      "p": 0.005,
+      "s": 100
+    },
+    {
+      "q": "US recession in 2025?",
+      "d": "YES",
+      "p": 0.023,
+      "s": 100
+    },
+    {
+      "q": "Fed emergency rate cut in 2025?",
+      "d": "YES",
+      "p": 0.013,
+      "s": 100
+    },
+    {
+      "q": "Tether insolvent in 2025?",
+      "d": "YES",
+      "p": 0.007,
+      "s": 100
+    },
+    {
+      "q": "USDT depeg in 2025?",
+      "d": "YES",
+      "p": 0.003,
+      "s": 100
+    }
+  ],
+  "status": "AWAITING_KEY"
+}

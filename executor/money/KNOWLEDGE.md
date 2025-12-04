@@ -5,6 +5,46 @@
 
 ---
 
+# INTEGRAFIX: HANDS-OFF SYSTEM INTEGRATION
+
+> This KB serves **Yair Siegel** - all money knowledge applied to his situation.
+
+## Yair's Financial Reality
+| Metric | Value | Source |
+|--------|-------|--------|
+| **Runway** | < 1 month | `finance/yair_finance_hub.json` |
+| **Debt** | ~$18,000 | Credit cards, personal |
+| **Trading Capital** | Check `state/wallet_state.json` | Polymarket USDC |
+| **Monthly Burn** | See `finance/` | Infrastructure + living |
+
+## System Integration Points
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Main KB** | `KNOWLEDGE.md` | System overview |
+| **Success Framework** | `SUCCESS.md` | Income milestones |
+| **Polymarket Trading** | `executor/polymarket/KNOWLEDGE.md` | Trading mechanics |
+| **Finance Hub** | `finance/yair_finance_hub.json` | Yair's finances |
+| **Cost Tracker** | `finance/cost_tracker.py` | System costs |
+| **Escape Velocity** | `autonomous/escape_velocity_tracker.py` | When income > costs |
+
+## How This KB Connects to System
+```
+Money Knowledge → Risk Management → Trading Safeguards
+       ↓
+Psychology of Money → Yair's Preferences → Golden Bridge
+       ↓
+Wealth Building → Compound Growth → Escape Velocity
+```
+
+## Key Money Concepts for Hands-Off System
+1. **Kelly Criterion**: Position sizing (see Polymarket KB)
+2. **Compound Interest**: Used in `compound_growth.py`
+3. **Risk Aversion**: Yair = 0.6 (conservative)
+4. **Opportunity Cost**: Every dollar has a cost
+5. **Time Value of Money**: < 1 month runway = urgent
+
+---
+
 # TABLE OF CONTENTS
 
 1. [Nature of Money](#1-nature-of-money)

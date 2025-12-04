@@ -1,0 +1,717 @@
+#!/usr/bin/env python3
+"""
+INCOME ENGINE - The Active Capital Generator
+
+This is the MISSING piece. capital_bridge.py is passive (tracks/recommends).
+This module is ACTIVE - it actually generates income opportunities and does work.
+
+The insight: AI IS the production engine. It can:
+- Scan for opportunities
+- Draft proposals
+- DO the actual paid work
+- Create deliverables
+
+Human only needs to: click send, sign agreements, receive payment.
+
+Author: Claude + Yair
+Created: 2025-12-04
+"""
+
+import json
+import os
+import re
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+import hashlib
+
+# Paths
+STATE_DIR = Path("/root/hands-off-engine/state")
+ENGINE_STATE_FILE = STATE_DIR / "income_engine.json"
+OPPORTUNITIES_DIR = STATE_DIR / "opportunities"
+DELIVERABLES_DIR = Path("/root/hands-off-engine/deliverables")
+
+# ABCFC risk aversion
+RISK_AVERSION = 0.6
+
+
+class IncomeEngine:
+    """
+    Active income generation engine.
+
+    Phases:
+    1. SCAN - Find opportunities (bounties, gigs, contracts)
+    2. PROPOSE - Draft proposals/applications
+    3. WORK - Do the actual paid work (AI is the production engine)
+    4. DELIVER - Create and track deliverables
+    5. COLLECT - Track payment receipt
+    """
+
+    # Opportunity sources to scan
+    SOURCES = {
+        "github_bounties": {
+            "name": "GitHub Bounties",
+            "type": "bounty",
+            "url_pattern": "https://github.com/{repo}/issues?q=is%3Aissue+is%3Aopen+label%3Abounty",
+            "scan_method": "github_api",
+            "typical_payout": (50, 500),
+            "probability": 0.4,
+            "effort_hours": (2, 20)
+        },
+        "algora_bounties": {
+            "name": "Algora Bounties",
+            "type": "bounty",
+            "url": "https://console.algora.io/bounties",
+            "scan_method": "web_scrape",
+            "typical_payout": (100, 1000),
+            "probability": 0.3,
+            "effort_hours": (5, 40)
+        },
+        "gitcoin": {
+            "name": "Gitcoin Bounties",
+            "type": "bounty",
+            "url": "https://gitcoin.co/explorer",
+            "scan_method": "web_scrape",
+            "typical_payout": (50, 2000),
+            "probability": 0.25,
+            "effort_hours": (10, 80)
+        },
+        "upwork_dev": {
+            "name": "Upwork Development",
+            "type": "freelance",
+            "url": "https://www.upwork.com/nx/search/jobs/?q=python%20ai",
+            "scan_method": "manual_check",
+            "typical_payout": (200, 2000),
+            "probability": 0.2,
+            "effort_hours": (10, 40)
+        },
+        "direct_outreach": {
+            "name": "Direct Client Outreach",
+            "type": "consulting",
+            "scan_method": "proactive",
+            "typical_payout": (500, 5000),
+            "probability": 0.15,
+            "effort_hours": (20, 100)
+        }
+    }
+
+    def __init__(self):
+        self.state = self._load_state()
+        OPPORTUNITIES_DIR.mkdir(parents=True, exist_ok=True)
+        DELIVERABLES_DIR.mkdir(parents=True, exist_ok=True)
+
+    def _load_state(self) -> Dict:
+        """Load or initialize engine state."""
+        if ENGINE_STATE_FILE.exists():
+            with open(ENGINE_STATE_FILE) as f:
+                return json.load(f)
+
+        default_state = {
+            "created": datetime.now().isoformat(),
+            "last_updated": datetime.now().isoformat(),
+            "last_scan": None,
+            "opportunities": {},  # id -> opportunity
+            "proposals": {},  # id -> proposal
+            "active_work": {},  # id -> work in progress
+            "deliverables": {},  # id -> deliverable
+            "payments_pending": {},  # id -> payment info
+            "payments_received": [],  # completed payments
+            "stats": {
+                "opportunities_found": 0,
+                "proposals_drafted": 0,
+                "proposals_sent": 0,
+                "work_completed": 0,
+                "total_earned_usd": 0
+            }
+        }
+        self._save_state(default_state)
+        return default_state
+
+    def _save_state(self, state: Optional[Dict] = None):
+        """Persist state."""
+        if state is None:
+            state = self.state
+        state["last_updated"] = datetime.now().isoformat()
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
+        with open(ENGINE_STATE_FILE, 'w') as f:
+            json.dump(state, f, indent=2)
+
+    def _generate_id(self, content: str) -> str:
+        """Generate unique ID from content."""
+        return hashlib.sha256(content.encode()).hexdigest()[:12]
+
+    # ========== PHASE 1: SCAN ==========
+
+    def scan_opportunities(self) -> List[Dict]:
+        """
+        Scan all sources for opportunities.
+        Returns list of new opportunities found.
+        """
+        new_opportunities = []
+
+        for source_key, source in self.SOURCES.items():
+            try:
+                if source["scan_method"] == "github_api":
+                    opps = self._scan_github_bounties()
+                elif source["scan_method"] == "web_scrape":
+                    opps = self._scan_web_source(source)
+                elif source["scan_method"] == "manual_check":
+                    opps = self._create_manual_check_reminder(source)
+                elif source["scan_method"] == "proactive":
+                    opps = self._generate_outreach_targets()
+                else:
+                    continue
+
+                for opp in opps:
+                    opp["source"] = source_key
+                    opp["found_at"] = datetime.now().isoformat()
+                    opp_id = self._generate_id(f"{source_key}:{opp.get('title', opp.get('url', ''))}")
+
+                    if opp_id not in self.state["opportunities"]:
+                        opp["id"] = opp_id
+                        opp["status"] = "new"
+                        opp["abcfc_score"] = self._score_opportunity(opp, source)
+                        self.state["opportunities"][opp_id] = opp
+                        new_opportunities.append(opp)
+
+            except Exception as e:
+                print(f"Error scanning {source_key}: {e}")
+
+        self.state["last_scan"] = datetime.now().isoformat()
+        self.state["stats"]["opportunities_found"] += len(new_opportunities)
+        self._save_state()
+
+        return new_opportunities
+
+    def _scan_github_bounties(self) -> List[Dict]:
+        """Scan GitHub for bounty-labeled issues."""
+        opportunities = []
+
+        # Known repos with bounties
+        bounty_repos = [
+            "anthropics/anthropic-cookbook",
+            "langchain-ai/langchain",
+            "openai/openai-python",
+            "huggingface/transformers",
+        ]
+
+        # In real implementation, would use GitHub API
+        # For now, create placeholder that human can populate
+        opportunities.append({
+            "type": "scan_task",
+            "title": "Check GitHub bounty repos",
+            "description": f"Repos to check: {', '.join(bounty_repos)}",
+            "action_url": "https://github.com/search?q=label%3Abounty+is%3Aissue+is%3Aopen&type=issues",
+            "human_action": "Click link, find suitable bounties, add to system"
+        })
+
+        return opportunities
+
+    def _scan_web_source(self, source: Dict) -> List[Dict]:
+        """Scan a web source for opportunities."""
+        # Create check reminder for human
+        return [{
+            "type": "scan_task",
+            "title": f"Check {source['name']}",
+            "description": f"Scan {source['name']} for new opportunities",
+            "action_url": source.get("url", ""),
+            "human_action": "Visit link, find opportunities, add to system",
+            "typical_payout": source.get("typical_payout", (0, 0))
+        }]
+
+    def _create_manual_check_reminder(self, source: Dict) -> List[Dict]:
+        """Create reminder to manually check a source."""
+        return [{
+            "type": "scan_task",
+            "title": f"Manual check: {source['name']}",
+            "description": f"Search {source['name']} for suitable opportunities",
+            "action_url": source.get("url", ""),
+            "human_action": "Search, filter, evaluate opportunities"
+        }]
+
+    def _generate_outreach_targets(self) -> List[Dict]:
+        """Generate proactive outreach opportunities."""
+        # Companies/individuals that might need AI/trading help
+        targets = [
+            {
+                "title": "Reach out to crypto trading firms",
+                "description": "Offer trading system consulting",
+                "type": "outreach",
+                "target_industry": "crypto",
+                "pitch_angle": "AI-powered prediction systems"
+            },
+            {
+                "title": "Contact AI startups needing dev help",
+                "description": "Offer Claude/LLM integration expertise",
+                "type": "outreach",
+                "target_industry": "ai_startups",
+                "pitch_angle": "Anthropic Claude integration specialist"
+            }
+        ]
+        return targets
+
+    def _score_opportunity(self, opp: Dict, source: Dict) -> float:
+        """ABCFC score an opportunity."""
+        low, high = source.get("typical_payout", (100, 500))
+        expected = (low + high) / 2
+        best = high * 1.2
+        worst = 0  # Time wasted but no payment
+
+        prob = source.get("probability", 0.3)
+
+        # ABCFC: expected × prob - risk_aversion × |worst| × (1 - prob)
+        # Here worst is time cost, estimate as effort_hours * $30
+        effort_low, effort_high = source.get("effort_hours", (5, 20))
+        time_cost = ((effort_low + effort_high) / 2) * 30
+
+        score = expected * prob - RISK_AVERSION * time_cost * (1 - prob)
+        return round(score, 2)
+
+    # ========== PHASE 2: PROPOSE ==========
+
+    def draft_proposal(self, opportunity_id: str) -> Dict:
+        """
+        Draft a proposal for an opportunity.
+        AI generates the proposal content.
+        """
+        opp = self.state["opportunities"].get(opportunity_id)
+        if not opp:
+            return {"error": f"Opportunity {opportunity_id} not found"}
+
+        proposal = {
+            "id": f"prop_{opportunity_id}",
+            "opportunity_id": opportunity_id,
+            "created_at": datetime.now().isoformat(),
+            "status": "draft",
+            "content": self._generate_proposal_content(opp),
+            "human_action": "Review, edit if needed, click send"
+        }
+
+        self.state["proposals"][proposal["id"]] = proposal
+        self.state["opportunities"][opportunity_id]["status"] = "proposal_drafted"
+        self.state["stats"]["proposals_drafted"] += 1
+        self._save_state()
+
+        # Save proposal to file for easy access
+        proposal_file = OPPORTUNITIES_DIR / f"{proposal['id']}.md"
+        with open(proposal_file, 'w') as f:
+            f.write(proposal["content"])
+
+        return proposal
+
+    def _generate_proposal_content(self, opp: Dict) -> str:
+        """Generate proposal content based on opportunity type."""
+        title = opp.get("title", "Opportunity")
+        opp_type = opp.get("type", "general")
+
+        if opp_type == "bounty":
+            return f"""# Proposal: {title}
+
+## Summary
+I'd like to work on this bounty. I have experience with similar issues and can deliver a high-quality solution.
+
+## Approach
+1. Analyze the problem thoroughly
+2. Design a clean, maintainable solution
+3. Implement with tests
+4. Document the changes
+
+## Timeline
+I can start immediately and aim to complete within [X days].
+
+## Relevant Experience
+- Built AI/trading systems
+- Experienced with Python, APIs, web development
+- Strong understanding of clean code practices
+
+## Questions
+[Any clarifying questions about the requirements]
+
+---
+*Ready for Yair to review and send*
+"""
+
+        elif opp_type == "freelance":
+            return f"""# Application: {title}
+
+## Introduction
+Hello! I'm a developer with experience in AI/ML, Python, and trading systems.
+
+## Why I'm a Good Fit
+- Relevant technical skills
+- Track record of delivering quality work
+- Available to start immediately
+
+## Proposed Rate
+[Discuss rate based on project scope]
+
+## Portfolio/Examples
+- AI-powered trading system (this system!)
+- Claude/LLM integrations
+- Python automation
+
+## Next Steps
+Happy to discuss the project in more detail.
+
+---
+*Ready for Yair to review and send*
+"""
+
+        else:  # outreach, consulting, etc.
+            return f"""# Outreach: {title}
+
+## Value Proposition
+[What specific value can we provide?]
+
+## Our Expertise
+- AI/ML system development
+- Trading system architecture
+- Automation and integration
+
+## Call to Action
+Would love to schedule a brief call to discuss how we might help.
+
+---
+*Ready for Yair to review, personalize, and send*
+"""
+
+    def mark_proposal_sent(self, proposal_id: str) -> Dict:
+        """Mark a proposal as sent by human."""
+        if proposal_id in self.state["proposals"]:
+            self.state["proposals"][proposal_id]["status"] = "sent"
+            self.state["proposals"][proposal_id]["sent_at"] = datetime.now().isoformat()
+            self.state["stats"]["proposals_sent"] += 1
+            self._save_state()
+            return {"status": "marked_sent", "id": proposal_id}
+        return {"error": "Proposal not found"}
+
+    # ========== PHASE 3: WORK ==========
+
+    def start_work(self, opportunity_id: str, accepted_rate: float = 0) -> Dict:
+        """
+        Mark that work has been accepted and start tracking.
+        The AI will then do the actual work.
+        """
+        opp = self.state["opportunities"].get(opportunity_id)
+        if not opp:
+            return {"error": "Opportunity not found"}
+
+        work = {
+            "id": f"work_{opportunity_id}",
+            "opportunity_id": opportunity_id,
+            "started_at": datetime.now().isoformat(),
+            "status": "in_progress",
+            "accepted_rate": accepted_rate,
+            "deliverables": [],
+            "time_logged_hours": 0,
+            "notes": []
+        }
+
+        self.state["active_work"][work["id"]] = work
+        self.state["opportunities"][opportunity_id]["status"] = "work_in_progress"
+        self._save_state()
+
+        return work
+
+    def log_work_progress(self, work_id: str, hours: float, note: str = "") -> Dict:
+        """Log progress on active work."""
+        if work_id in self.state["active_work"]:
+            work = self.state["active_work"][work_id]
+            work["time_logged_hours"] += hours
+            if note:
+                work["notes"].append({
+                    "timestamp": datetime.now().isoformat(),
+                    "hours": hours,
+                    "note": note
+                })
+            self._save_state()
+            return work
+        return {"error": "Work not found"}
+
+    # ========== PHASE 4: DELIVER ==========
+
+    def create_deliverable(self, work_id: str, deliverable_type: str,
+                          content: str, filename: str) -> Dict:
+        """
+        Create a deliverable for work.
+        AI generates the actual content.
+        """
+        if work_id not in self.state["active_work"]:
+            return {"error": "Work not found"}
+
+        deliverable = {
+            "id": f"del_{self._generate_id(filename)}",
+            "work_id": work_id,
+            "type": deliverable_type,
+            "filename": filename,
+            "created_at": datetime.now().isoformat(),
+            "status": "created"
+        }
+
+        # Save deliverable content
+        deliverable_path = DELIVERABLES_DIR / work_id
+        deliverable_path.mkdir(parents=True, exist_ok=True)
+
+        file_path = deliverable_path / filename
+        with open(file_path, 'w') as f:
+            f.write(content)
+
+        deliverable["file_path"] = str(file_path)
+
+        self.state["deliverables"][deliverable["id"]] = deliverable
+        self.state["active_work"][work_id]["deliverables"].append(deliverable["id"])
+        self._save_state()
+
+        return deliverable
+
+    def mark_delivered(self, work_id: str) -> Dict:
+        """Mark work as delivered, awaiting payment."""
+        if work_id in self.state["active_work"]:
+            work = self.state["active_work"][work_id]
+            work["status"] = "delivered"
+            work["delivered_at"] = datetime.now().isoformat()
+
+            # Move to pending payment
+            self.state["payments_pending"][work_id] = {
+                "work_id": work_id,
+                "expected_amount": work["accepted_rate"],
+                "delivered_at": work["delivered_at"]
+            }
+
+            opp_id = work["opportunity_id"]
+            if opp_id in self.state["opportunities"]:
+                self.state["opportunities"][opp_id]["status"] = "delivered"
+
+            self.state["stats"]["work_completed"] += 1
+            self._save_state()
+
+            return {"status": "delivered", "awaiting_payment": work["accepted_rate"]}
+        return {"error": "Work not found"}
+
+    # ========== PHASE 5: COLLECT ==========
+
+    def record_payment(self, work_id: str, amount_usd: float,
+                      method: str = "", notes: str = "") -> Dict:
+        """Record payment received for completed work."""
+        payment = {
+            "work_id": work_id,
+            "amount_usd": amount_usd,
+            "received_at": datetime.now().isoformat(),
+            "method": method,
+            "notes": notes
+        }
+
+        self.state["payments_received"].append(payment)
+        self.state["stats"]["total_earned_usd"] += amount_usd
+
+        # Clean up
+        if work_id in self.state["payments_pending"]:
+            del self.state["payments_pending"][work_id]
+        if work_id in self.state["active_work"]:
+            self.state["active_work"][work_id]["status"] = "paid"
+
+        self._save_state()
+
+        return payment
+
+    # ========== PIPELINE MANAGEMENT ==========
+
+    def get_pipeline_status(self) -> Dict:
+        """Get full pipeline status."""
+        return {
+            "timestamp": datetime.now().isoformat(),
+            "last_scan": self.state["last_scan"],
+            "pipeline": {
+                "new_opportunities": len([o for o in self.state["opportunities"].values()
+                                         if o.get("status") == "new"]),
+                "proposals_draft": len([p for p in self.state["proposals"].values()
+                                       if p.get("status") == "draft"]),
+                "proposals_sent": len([p for p in self.state["proposals"].values()
+                                      if p.get("status") == "sent"]),
+                "work_in_progress": len([w for w in self.state["active_work"].values()
+                                        if w.get("status") == "in_progress"]),
+                "awaiting_payment": len(self.state["payments_pending"])
+            },
+            "stats": self.state["stats"],
+            "top_opportunities": self._get_top_opportunities(5)
+        }
+
+    def _get_top_opportunities(self, n: int = 5) -> List[Dict]:
+        """Get top N opportunities by ABCFC score."""
+        opps = list(self.state["opportunities"].values())
+        opps.sort(key=lambda x: x.get("abcfc_score", 0), reverse=True)
+        return opps[:n]
+
+    def get_next_action(self) -> Dict:
+        """
+        Get the single most important next action.
+        ABCFC-ranked priority.
+        """
+        # Priority order:
+        # 1. Pending payments (chase money owed)
+        # 2. Work in progress (finish to get paid)
+        # 3. Sent proposals (follow up)
+        # 4. Draft proposals (send them)
+        # 5. New opportunities (evaluate/propose)
+        # 6. Scan for more
+
+        if self.state["payments_pending"]:
+            pending = list(self.state["payments_pending"].values())[0]
+            return {
+                "action": "chase_payment",
+                "priority": "HIGH",
+                "details": pending,
+                "instruction": "Follow up on delivered work to get paid"
+            }
+
+        in_progress = [w for w in self.state["active_work"].values()
+                      if w.get("status") == "in_progress"]
+        if in_progress:
+            work = in_progress[0]
+            return {
+                "action": "complete_work",
+                "priority": "HIGH",
+                "details": work,
+                "instruction": "AI should work on this to completion"
+            }
+
+        sent_proposals = [p for p in self.state["proposals"].values()
+                        if p.get("status") == "sent"]
+        if sent_proposals:
+            # Check if old enough to follow up
+            for p in sent_proposals:
+                sent_at = datetime.fromisoformat(p.get("sent_at", datetime.now().isoformat()))
+                if datetime.now() - sent_at > timedelta(days=3):
+                    return {
+                        "action": "follow_up",
+                        "priority": "MEDIUM",
+                        "details": p,
+                        "instruction": "Send follow-up message"
+                    }
+
+        draft_proposals = [p for p in self.state["proposals"].values()
+                         if p.get("status") == "draft"]
+        if draft_proposals:
+            return {
+                "action": "review_and_send",
+                "priority": "MEDIUM",
+                "details": draft_proposals[0],
+                "instruction": "Yair: review proposal and click send"
+            }
+
+        new_opps = [o for o in self.state["opportunities"].values()
+                   if o.get("status") == "new"]
+        if new_opps:
+            top_opp = max(new_opps, key=lambda x: x.get("abcfc_score", 0))
+            return {
+                "action": "draft_proposal",
+                "priority": "MEDIUM",
+                "details": top_opp,
+                "instruction": "AI should draft proposal for this opportunity"
+            }
+
+        # Default: scan for new opportunities
+        return {
+            "action": "scan",
+            "priority": "LOW",
+            "details": {"last_scan": self.state["last_scan"]},
+            "instruction": "Run scan_opportunities() to find new work"
+        }
+
+    def print_status(self):
+        """Print human-readable status."""
+        status = self.get_pipeline_status()
+
+        print("\n" + "="*60)
+        print("INCOME ENGINE STATUS")
+        print("="*60)
+
+        print(f"\nLast Scan: {status['last_scan'] or 'Never'}")
+
+        pipeline = status["pipeline"]
+        print("\nPIPELINE:")
+        print(f"  New Opportunities: {pipeline['new_opportunities']}")
+        print(f"  Draft Proposals:   {pipeline['proposals_draft']}")
+        print(f"  Sent Proposals:    {pipeline['proposals_sent']}")
+        print(f"  Work in Progress:  {pipeline['work_in_progress']}")
+        print(f"  Awaiting Payment:  {pipeline['awaiting_payment']}")
+
+        stats = status["stats"]
+        print("\nSTATS:")
+        print(f"  Total Opportunities Found: {stats['opportunities_found']}")
+        print(f"  Proposals Drafted:         {stats['proposals_drafted']}")
+        print(f"  Proposals Sent:            {stats['proposals_sent']}")
+        print(f"  Work Completed:            {stats['work_completed']}")
+        print(f"  Total Earned:              ${stats['total_earned_usd']:.2f}")
+
+        next_action = self.get_next_action()
+        print("\n" + "-"*60)
+        print(f"NEXT ACTION: [{next_action['priority']}] {next_action['action']}")
+        print(f"  {next_action['instruction']}")
+        print("="*60)
+
+
+# Integration with capital_bridge
+def wire_to_capital_bridge():
+    """Connect income engine earnings to capital bridge."""
+    from integrafix.capital_bridge import CapitalBridge
+
+    engine = IncomeEngine()
+    bridge = CapitalBridge()
+
+    # Sync earnings
+    total_earned = engine.state["stats"]["total_earned_usd"]
+    return {
+        "engine_earned": total_earned,
+        "bridge_status": bridge.check_activation_ready(),
+        "next_action": engine.get_next_action()
+    }
+
+
+# CLI interface
+if __name__ == "__main__":
+    import sys
+
+    engine = IncomeEngine()
+
+    if len(sys.argv) > 1:
+        cmd = sys.argv[1]
+
+        if cmd == "status":
+            engine.print_status()
+
+        elif cmd == "scan":
+            print("Scanning for opportunities...")
+            new = engine.scan_opportunities()
+            print(f"Found {len(new)} new opportunities")
+            for opp in new:
+                print(f"  - {opp.get('title', 'Unknown')}: ABCFC={opp.get('abcfc_score', 0)}")
+
+        elif cmd == "next":
+            action = engine.get_next_action()
+            print(f"\n[{action['priority']}] {action['action']}")
+            print(f"  {action['instruction']}")
+
+        elif cmd == "propose" and len(sys.argv) > 2:
+            opp_id = sys.argv[2]
+            proposal = engine.draft_proposal(opp_id)
+            if "error" not in proposal:
+                prop_id = proposal['id']
+                print(f"Proposal drafted: {prop_id}")
+                print(f"Saved to: {OPPORTUNITIES_DIR / f'{prop_id}.md'}")
+            else:
+                print(proposal["error"])
+
+        elif cmd == "pipeline":
+            status = engine.get_pipeline_status()
+            print(json.dumps(status, indent=2))
+
+        else:
+            print("Usage:")
+            print("  python income_engine.py status    - Show full status")
+            print("  python income_engine.py scan      - Scan for opportunities")
+            print("  python income_engine.py next      - Get next action")
+            print("  python income_engine.py propose <opp_id>  - Draft proposal")
+            print("  python income_engine.py pipeline  - Get pipeline JSON")
+    else:
+        engine.print_status()

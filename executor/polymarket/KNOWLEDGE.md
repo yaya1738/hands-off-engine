@@ -1,5 +1,52 @@
 # Polymarket Complete Knowledge Base
 
+---
+
+# INTEGRAFIX: HANDS-OFF SYSTEM INTEGRATION
+
+> This KB is part of the **Hands-Off Engine** serving **Yair Siegel**.
+> All trading knowledge here is executed through the autonomous system.
+
+## System Integration Points
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Main KB** | `KNOWLEDGE.md` | System overview |
+| **Trade Executor** | `autonomous/trade_executor.py` | Executes trades |
+| **Trading Pipeline** | `integrafix/trading_pipeline.py` | Full trading flow |
+| **Fair Price Estimator** | `integrafix/fair_price_estimator.py` | Calculates edge |
+| **Trading Config** | `config/trading_config.json` | DRY_RUN vs LIVE mode |
+| **Wallet State** | `state/wallet_state.json` | Real positions |
+| **Golden Bridge** | `integrafix/yair_golden_bridge.py` | Yair's probability estimates |
+
+## Yair's Trading Context
+- **Real Wallet**: `0xB314345D218ED4CF75C17636a2307244E7dA761b`
+- **Current Mode**: Check `config/trading_config.json` for DRY_RUN or LIVE
+- **Max Per Trade**: See `state/yair_context_kernel.json`
+- **Risk Aversion**: 0.6 (conservative)
+- **Categories Avoided**: Sports (per Yair's preference)
+
+## DRY_RUN vs LIVE Trading
+The system operates in two modes:
+- **DRY_RUN=true**: Paper trades only, no real money
+- **LIVE (dry_run=false)**: Real USDC on Polygon/Polymarket
+- Always verify mode before trading: `config/trading_config.json`
+
+## How Trading Flows Through the System
+```
+Yair says "BTC gonna pump" → Golden Bridge sets estimate
+                ↓
+Fair Price Estimator calculates edge vs market price
+                ↓
+Trading Pipeline checks safeguards (max_per_trade, edge requirement)
+                ↓
+If LIVE mode: Trade Executor places real order via py_clob_client
+If DRY_RUN: Log simulated trade
+                ↓
+Outcome Tracker records result for learning
+```
+
+---
+
 ## Table of Contents
 1. [Platform Overview](#platform-overview)
 2. [Technical Architecture](#technical-architecture)

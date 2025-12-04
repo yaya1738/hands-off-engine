@@ -158,21 +158,36 @@ class ABCFC2D:
         """
         Cumulative distribution at (x, t).
 
-        F(x, t) = ∫_{a}^{x} P(u, t) du
+        F(x, t) = ∫_{a}^{x} P(u, t) du / ∫_{a}^{b} P(u, t) du
+
+        INTEGRAFIX: Must normalize since density may be unnormalized.
         """
         if x <= self.a:
             return 0.0
         if x >= self.b:
             return 1.0
 
-        dx = (x - self.a) / n
-        total = 0.0
-
+        # First compute total integral for normalization (THE AREA)
+        full_dx = (self.b - self.a) / n
+        total_area = 0.0
         for i in range(n):
-            u = self.a + (i + 0.5) * dx
-            total += self.P(u, t) * dx
+            u = self.a + (i + 0.5) * full_dx
+            total_area += self.P(u, t) * full_dx
 
-        return min(1.0, total)
+        if total_area <= 0:
+            return 0.5  # Fallback
+
+        # Now compute partial integral up to x
+        partial_n = max(100, int(n * (x - self.a) / (self.b - self.a)))
+        dx = (x - self.a) / partial_n
+        partial_area = 0.0
+
+        for i in range(partial_n):
+            u = self.a + (i + 0.5) * dx
+            partial_area += self.P(u, t) * dx
+
+        # Normalized CDF = partial area / total area
+        return min(1.0, max(0.0, partial_area / total_area))
 
     def quantile(self, p: float, t: float, n: int = 1000) -> float:
         """

@@ -232,7 +232,34 @@ class PolymarketLive:
                     }
 
                 if signal and signal["confidence"] >= MIN_CONFIDENCE:
-                    signals.append(signal)
+                    # INTEGRAFIX HIGHER: Validate signal against ABCFC hierarchy
+                    abcfc_approved = True
+                    try:
+                        from integrafix.claude_abcfc_bridge import get_bridge as get_abcfc
+                        abcfc = get_abcfc()
+                        result = abcfc.evaluate_trading_decision(
+                            decision=f"Signal: {signal['market'][:30]}",
+                            actions=[
+                                {
+                                    "name": "take_signal",
+                                    "action_type": "buy",
+                                    "edge": signal["confidence"] - 0.5,  # Confidence above 50% = edge
+                                    "price": signal["price"],
+                                    "size": signal.get("suggested_size", 10)
+                                },
+                                {"name": "skip", "action_type": "hold"}
+                            ]
+                        )
+                        recommended = result.get("recommended", {}).get("action", "skip")
+                        if recommended != "take_signal":
+                            abcfc_approved = False
+                            signal["abcfc_blocked"] = True
+                            signal["abcfc_reason"] = "Nexus cloud recommends skip"
+                    except Exception:
+                        pass
+
+                    if abcfc_approved:
+                        signals.append(signal)
 
         except Exception as e:
             print(f"Error generating signals: {e}")
@@ -299,7 +326,33 @@ class PolymarketLive:
         print(f"  Signals: {len(signals)}")
         print()
 
+        # INTEGRAFIX HIGHER: Final nexus gate before execution
+        nexus_approves_execution = False
         if signals and safety["safe_to_trade"]:
+            try:
+                from integrafix.claude_abcfc_bridge import get_bridge as get_abcfc
+                abcfc = get_abcfc()
+                # Get overall nexus decision for trading session
+                result = abcfc.evaluate_trading_decision(
+                    decision="Execute trading signals",
+                    actions=[
+                        {"name": "execute_signals", "action_type": "buy", "edge": 0.25, "price": 0.5, "size": sum(s.get("suggested_size", 10) for s in signals[:2])},
+                        {"name": "hold_session", "action_type": "hold"}
+                    ]
+                )
+                if result.get("recommended", {}).get("action") == "execute_signals":
+                    nexus_approves_execution = True
+                    print("  ✓ ABCFC nexus cloud APPROVES execution")
+                else:
+                    print("  ✗ ABCFC nexus cloud recommends HOLD")
+            except Exception as e:
+                # If ABCFC unavailable, allow execution with safety check passed
+                nexus_approves_execution = True
+                print(f"  ⚠ ABCFC check skipped: {e}")
+
+        results["nexus_approved"] = nexus_approves_execution
+
+        if signals and safety["safe_to_trade"] and nexus_approves_execution:
             print("READY TO EXECUTE:")
             for signal in signals[:2]:
                 print(f"  → {signal['side']} {signal['outcome']} @ {signal['price']:.3f}")

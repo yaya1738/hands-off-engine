@@ -1,0 +1,26 @@
+{
+  "created_at": "2025-12-03T22:57:52.903690+00:00",
+  "master": "Yair Siegel",
+  "costs": {
+    "digitalocean": {
+      "droplets": 9,
+      "hourly_rate": 0.1,
+      "monthly_estimate": 72.0
+    },
+    "ai_apis": {
+      "anthropic": 0,
+      "openai": 0,
+      "google": 0
+    },
+    "trading": {
+      "fees_paid": 0,
+      "slippage_cost": 0
+    }
+  },
+  "total_cost": 72.0,
+  "revenue": {
+    "trading_pnl": 0,
+    "unrealized": 2218.7
+  },
+  "integrafix": true
+}

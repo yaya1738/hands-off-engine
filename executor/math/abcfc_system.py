@@ -438,11 +438,18 @@ class ABCFCNexus:
         elif action.action_type == "buy":
             size = action.params.get("size", 10)
             price = action.params.get("price", 0.5)
+            # INTEGRAFIX: Use actual probability/edge if provided, not hardcoded 50%
+            prob = action.params.get("probability", action.params.get("prob", 0.5))
+            edge = action.params.get("edge", 0)
+            if edge > 0:
+                # If edge provided, derive probability from price + edge
+                prob = min(price + edge, 0.95)
 
             # Buying increases both upside and downside
             new_worst = current.worst - size * price
             new_best = current.best + size * (1 - price)
-            new_expected = current.expected + size * (0.5 - price)  # Assuming 50% prob
+            # INTEGRAFIX: Use actual probability for expected value
+            new_expected = current.expected + size * (prob - price)
 
             return ABCFC(
                 name=f"{current.name}+buy",

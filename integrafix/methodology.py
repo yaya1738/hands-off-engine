@@ -634,6 +634,68 @@ class IntegrafixMethodology:
                 severity=0.7,
                 fix_complexity=0.6,
             ),
+
+            # ============ GAPS DISCOVERED 2025-12-03 ============
+
+            # Duplicate Systems Gaps
+            Gap(
+                id="duplicate_outcome_trackers",
+                gap_type=GapType.BLIND,
+                source="integrafix/outcome_tracker.py",
+                target="autonomous/outcome_recorder.py",
+                description="TWO outcome tracking systems both writing to trade_outcomes.jsonl with different logic",
+                severity=1.0,
+                fix_complexity=0.5,
+            ),
+            Gap(
+                id="outcome_tracker_wrong_threshold",
+                gap_type=GapType.CIRCULAR,
+                source="outcome_tracker.check_resolutions",
+                target="resolution",
+                description="Used price>0.5 as 'resolution' instead of actual settlement (needs 0.95+)",
+                severity=1.0,
+                fix_complexity=0.3,
+            ),
+            Gap(
+                id="fake_outcome_simulation",
+                gap_type=GapType.CIRCULAR,
+                source="backend_loop.simulate_outcomes",
+                target="outcome_tracker",
+                description="Simulated fake outcomes with hardcoded 55% win rate, polluting real data",
+                severity=1.0,
+                fix_complexity=0.2,
+            ),
+
+            # State Confusion Gaps
+            Gap(
+                id="trading_mode_conflicting_configs",
+                gap_type=GapType.BLIND,
+                source="config/trading_config.json",
+                target="state/trading_mode.json",
+                description="Two config files for trading mode with conflicting values",
+                severity=0.8,
+                fix_complexity=0.3,
+            ),
+            Gap(
+                id="trade_executor_misleading_state",
+                gap_type=GapType.ORPHANED,
+                source="trade_executor_state.json",
+                target="UI",
+                description="Shows 'LIVE mode, 108 trades' but all were simulated with 0 real trades",
+                severity=0.9,
+                fix_complexity=0.3,
+            ),
+
+            # Silent Error Handling
+            Gap(
+                id="bare_except_handlers",
+                gap_type=GapType.EPHEMERAL,
+                source="125+ bare except: pass",
+                target="error_visibility",
+                description="125+ bare except handlers silently swallowing errors, masking failures",
+                severity=0.8,
+                fix_complexity=0.7,
+            ),
         ]
 
         for gap in known_gaps:

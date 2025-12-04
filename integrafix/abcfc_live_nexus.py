@@ -698,7 +698,10 @@ class ABCFCLiveNexus:
         return results
 
     def _execute_trade(self, action: LiveAction) -> Dict:
-        """Execute actual trade via Polymarket API."""
+        """
+        Execute actual trade via Polymarket API.
+        INTEGRAFIX: Wired to credential_loader and py_clob_client.
+        """
         if not self.client:
             return {
                 "action_id": action.action_id,
@@ -708,18 +711,45 @@ class ABCFCLiveNexus:
             }
 
         try:
-            # Would place actual order here
-            # order = self.client.create_order(...)
-            action.status = ActionStatus.EXECUTED
+            # INTEGRAFIX: Execute actual order
+            from py_clob_client.clob_types import OrderArgs
+            from py_clob_client.order_builder.constants import BUY, SELL
 
-            return {
-                "action_id": action.action_id,
-                "status": "EXECUTED",
-                "market": action.market_slug,
-                "side": action.side,
-                "size": action.size,
-                "executed": True,
-            }
+            token_id = action.token_id or action.market_slug
+            side_const = BUY if action.side == "YES" else SELL
+
+            order_args = OrderArgs(
+                token_id=token_id,
+                price=action.price,
+                size=action.size,
+                side=side_const
+            )
+
+            signed_order = self.client.create_order(order_args)
+            result = self.client.post_order(signed_order)
+
+            order_id = result.get("orderID") or result.get("id") if result else None
+
+            if order_id or result:
+                action.status = ActionStatus.EXECUTED
+                return {
+                    "action_id": action.action_id,
+                    "status": "EXECUTED",
+                    "market": action.market_slug,
+                    "side": action.side,
+                    "size": action.size,
+                    "order_id": str(order_id or result)[:50],
+                    "executed": True,
+                }
+            else:
+                action.status = ActionStatus.REJECTED
+                return {
+                    "action_id": action.action_id,
+                    "status": "ERROR",
+                    "error": "No order_id returned",
+                    "executed": False,
+                }
+
         except Exception as e:
             action.status = ActionStatus.REJECTED
 

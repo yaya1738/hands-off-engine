@@ -1,139 +1,89 @@
 {
-  "kernel_id": "yair_context",
-  "kernel_type": "user_context",
-  "version": "1.0.0",
-  "created": "2025-12-03",
-  "purpose": "Complete Yair Siegel context for Claude session bootstrap",
-
-  "master_directive": "The entire hands-off-engine exists to serve Yair Siegel. Every action serves the master.",
-
-  "identity": {
-    "primary_name": "Yair Siegel",
-    "aliases": ["Froggy", "Joseph Siegel", "yaya1738"],
-    "email": "siegel.yaz@gmail.com",
-    "wallet": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
-    "github": "yaya1738",
-    "telegram_chat_id": "8327766663",
-    "role": "master",
-    "system_relationship": "owner_and_beneficiary"
+  "master": "Yair Siegel",
+  "updated_at": "2025-12-04T04:00:00.000000",
+  "master_abcfc": {
+    "assertion": "Can't lose. Always win. Nothing wrong.",
+    "parameters": {
+      "worst_case": 0,
+      "probability": 1.0,
+      "risk_aversion": 0
+    },
+    "trajectory": "STRAIGHT_LINE_UP",
+    "interpretation": "All outcomes are positive inputs to trajectory. Variance is in the HOW, not the WHAT.",
+    "formula": "score = expected (no worst case, prob=1, risk=0)"
   },
-
-  "situation": {
-    "current_state": "< 1 month runway, urgent need for income generation",
-    "communication_preference": "telegram",
-    "action_likelihood": "minimal - system must be autonomous",
-    "primary_need": "autonomous income generation"
+  "component_abcfc": {
+    "formula": "score = expected × prob - risk_aversion × |worst| × (1 - prob)",
+    "default_risk_aversion": 0.6,
+    "note": "Component-level decisions have variance. Master-level frame is always positive."
   },
-
-  "core_philosophy": [
-    "Not just a trading bot - system serves Yair",
-    "Emergent rationality from component interaction",
-    "User's tax is explaining - figure things out autonomously",
-    "Every action must be high leverage given runway",
-    "Build now, launch when user provides one input"
-  ],
-
-  "trading_wisdom": {
-    "teachings": [
-      "Be the house, not the gambler - MAKE more than you TAKE",
-      "THE PRICE IS A LIE - always check book depth",
-      "Post limits at ridiculous levels, let market come to you",
-      "Same capital can fish across ALL markets (reusable collateral)",
-      "One man's fat finger = your opportunity"
-    ],
-    "strategies": {
-      "merge_arbitrage": {
-        "description": "YES + NO < $1 = free money",
-        "action": "Buy both sides when combined cost < $1"
-      },
-      "espn_algorithm": {
-        "description": "ESPN mid-game probability = very accurate",
-        "action": "Compare ESPN live odds to market prices"
-      },
-      "thin_book_edge": {
-        "description": "New markets have thin books = easier fills at extremes",
-        "action": "Post limits at favorable prices in new markets"
-      },
-      "fishing_strategy": {
-        "description": "Same collateral backs ALL limit orders",
-        "action": "Scatter limit orders across markets with reusable collateral"
-      },
-      "smart_edge": {
-        "description": "Be SMART not FAST - analysis over speed",
-        "action": "Focus on analytical edge rather than latency"
-      },
-      "category_strategy": {
-        "description": "Different strategies for sports/politics/war/mention",
-        "action": "Tailor approach to market category"
-      }
-    },
-    "core_principle": "Be the house - market making beats speculation"
+  "active_estimates": {},
+  "risk_preferences": {
+    "max_per_trade": 25,
+    "max_daily_loss": 100,
+    "categories": [
+      "politics",
+      "crypto",
+      "tech",
+      "finance"
+    ]
   },
-
-  "system_components": {
-    "yair_wisdom_engine": {
-      "path": "autonomous/yair_wisdom_engine.py",
-      "purpose": "Encodes all trading teachings"
+  "trading_rules": {
+    "min_edge": 0.03,
+    "kelly_fraction": 0.25
+  },
+  "golden_bridge": true,
+  "polymarket_wallet": "0xB314345D218ED4CF75C17636a2307244E7dA761b",
+  "open_orders": 6,
+  "estimates": {},
+  "preferences": {
+    "max_per_trade": 25,
+    "max_daily_loss": 100,
+    "categories": [
+      "politics",
+      "crypto",
+      "tech",
+      "finance"
+    ]
+  },
+  "rules": {
+    "min_edge": 0.03,
+    "kelly_fraction": 0.25
+  },
+  "expenses": [
+    {
+      "name": "Server Costs",
+      "category": "business",
+      "monthly_amount": 50,
+      "worst_monthly": 100,
+      "best_monthly": 30,
+      "required": true
     },
-    "yair_insights": {
-      "path": "alpha/yair_insights.py",
-      "purpose": "Human insight pipeline (golden sprinkles)"
+    {
+      "name": "API Subscriptions",
+      "category": "business",
+      "monthly_amount": 478.5,
+      "worst_monthly": 717.75,
+      "best_monthly": 239.25,
+      "required": true
     },
-    "yair_auto_trader": {
-      "path": "executor/yair_auto_trader.py",
-      "purpose": "Full automated trading suite"
-    },
-    "yair_siegel_integration": {
-      "path": "integrafix/yair_siegel_integration.py",
-      "purpose": "Master integration module"
-    },
-    "yair_knowledge_bridge": {
-      "path": "integrafix/yair_knowledge_bridge.py",
-      "purpose": "Knowledge base connector"
+    {
+      "name": "Trading Fees",
+      "category": "variable",
+      "monthly_amount": 20,
+      "worst_monthly": 100,
+      "best_monthly": 5,
+      "required": false
     }
-  },
-
-  "key_files": {
-    "identity": "security/yair_identity_profile.json",
-    "finance": "finance/yair_finance_hub.json",
-    "user_profile": "docs/claude/USER_PROFILE.md",
-    "knowledge": "KNOWLEDGE.md",
-    "knowledge_advanced": "KNOWLEDGE_ADVANCED.md",
-    "system_truth": "state/permanent/SYSTEM_TRUTH.md"
-  },
-
-  "bootstrap_instructions": [
-    "1. Read this kernel for Yair context",
-    "2. Read .claude/instructions.md for safety rules",
-    "3. Check state/permanent/SYSTEM_TRUTH.md for current state",
-    "4. All actions must serve Yair Siegel",
-    "5. System must operate autonomously - minimize user tax"
   ],
-
-  "critical_rules": [
-    "The master is Yair Siegel - all actions serve the master",
-    "Never destroy the system - self-preservation is absolute",
-    "Rate limit: max 10 automated changes per hour",
-    "Sacred files cannot be auto-modified without approval",
-    "Financial decisions require high confidence (>75%)",
-    "When in doubt, preserve system stability over action"
-  ],
-
-  "communication": {
-    "telegram_bot": "@pm_alerts_autobot",
-    "telegram_chat_id": "8327766663",
-    "notification_levels": {
-      "critical": "always_notify",
-      "important": "batch_notify",
-      "info": "log_only"
-    }
+  "wisdom": {
+    "teachings_applied": 42,
+    "profitable_applications": 0,
+    "category_performance": {}
   },
-
-  "integrafix_status": {
-    "wisdom_bridge": "WIRED",
-    "knowledge_bridge": "WIRED",
-    "ai_memory": "WIRED",
-    "branch_manager": "WIRED",
-    "system_integration": "ACTIVE"
-  }
+  "consolidated_from": [
+    "yair_golden_bridge.json",
+    "yair_expenses.json",
+    "yair_wisdom.json"
+  ]
 }

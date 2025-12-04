@@ -3,6 +3,43 @@
 
 ---
 
+# INTEGRAFIX: KNOWLEDGE BASE INTEGRATION
+
+> **INTEGRAFIX** is our methodology for wiring disconnected components together.
+> This KB connects to ALL other knowledge bases in the system.
+
+## Cross-References to Other KBs
+| Knowledge Base | Location | Integration Point |
+|---------------|----------|-------------------|
+| **Polymarket Trading** | `executor/polymarket/KNOWLEDGE.md` | Trading mechanics, CLOB API |
+| **Money/Finance** | `executor/money/KNOWLEDGE.md` | Financial strategy, Yair's situation |
+| **Computing** | `executor/computing/KNOWLEDGE.md` | Infrastructure knowledge |
+| **Success Framework** | `SUCCESS.md` | Success metrics and milestones |
+| **UMA Oracle** | `executor/uma/KNOWLEDGE.md` | Market resolution system |
+| **Trading Strategy** | `docs/knowledge/TRADING_STRATEGY.md` | Edge and positioning |
+
+## Master: Yair Siegel
+All knowledge in this system serves **Yair Siegel**. Key context:
+- **Situation**: < 1 month runway, $18k debt
+- **Goal**: Autonomous income generation
+- **Risk Tolerance**: Conservative (0.6 risk aversion)
+- **Trading Capital**: Real wallet `0xB314345D218ED4CF75C17636a2307244E7dA761b`
+
+## Trading Mode: DRY_RUN vs LIVE
+The system operates in two modes:
+- **DRY_RUN**: Simulated trades for testing (no real money)
+- **LIVE**: Real trades with real USDC on Polymarket
+- **Config**: `config/trading_config.json` controls the mode
+- **State**: `state/wallet_state.json` tracks real positions
+
+## Golden Bridge
+Claude interprets Yair's natural language into system actions:
+- "Bitcoin gonna pump, 80% chance" → `set_estimate("btc-pump", 0.80)`
+- "Max $30 per trade" → `set_preference("max_per_trade", 30)`
+- See: `integrafix/yair_golden_bridge.py`
+
+---
+
 # TABLE OF CONTENTS
 
 1. [System Overview](#1-system-overview)

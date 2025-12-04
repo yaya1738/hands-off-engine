@@ -1,17 +1,22 @@
 {
   "version": "1.0",
-  "last_updated": "2025-11-30T17:05:00Z",
+  "last_updated": "2025-12-03T22:53:55.173013+00:00",
   "purpose": "System dollar access and storage tracking",
-
   "inflow_channels": {
     "polymarket_wallet": {
       "status": "ACTIVE",
       "network": "Polygon",
-      "address": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
-      "accepts": ["USDC", "USDC.e", "MATIC"],
+      "address": "0xB314345D218ED4CF75C17636a2307244E7dA761b",
+      "accepts": [
+        "USDC",
+        "USDC.e",
+        "MATIC"
+      ],
       "current_balance_usdc": 8.99,
       "positions_value_usdc": 99.0,
-      "notes": "Primary trading wallet - can receive direct USDC deposits"
+      "notes": "Primary trading wallet - can receive direct USDC deposits",
+      "open_orders": 6,
+      "orders_value": 2218.7
     },
     "paypal_business": {
       "status": "NEEDS_API_KEY",
@@ -32,7 +37,6 @@
       "notes": "Clients can pay directly in USDC to wallet"
     }
   },
-
   "storage_locations": {
     "polymarket": {
       "status": "ACTIVE",
@@ -42,7 +46,6 @@
       "access": "API via py_clob_client"
     }
   },
-
   "outflow_channels": {
     "polymarket_trading": {
       "status": "ACTIVE_LOW_BALANCE",
@@ -50,26 +53,29 @@
       "current_capability": "Limited - $8.99 available"
     }
   },
-
   "recovery_timeline": {
     "dec_10_2025": {
       "event": "Fed rate positions resolve",
       "expected_return": "0 to ~71 depending on outcome",
-      "markets": ["fed-rate-hike-in-2025", "will-6-fed-rate-cuts-happen-in-2025", "will-7-fed-rate-cuts-happen-in-2025"]
+      "markets": [
+        "fed-rate-hike-in-2025",
+        "will-6-fed-rate-cuts-happen-in-2025",
+        "will-7-fed-rate-cuts-happen-in-2025"
+      ]
     },
     "dec_31_2025": {
       "event": "Pichai position resolves",
       "expected_return": "0 to ~28 depending on outcome",
-      "markets": ["sundar-pichai-out-as-google-ceo-in-2025"]
+      "markets": [
+        "sundar-pichai-out-as-google-ceo-in-2025"
+      ]
     }
   },
-
   "immediate_actions": [
     "Add USDC payment option to landing page",
     "Monitor for position resolutions via capital_recovery_monitor.py",
     "Alert when balance crosses $50 (min trading)"
   ],
-
   "blocked_actions": [
     "PayPal API integration (needs credentials)",
     "Stripe setup (needs account)",

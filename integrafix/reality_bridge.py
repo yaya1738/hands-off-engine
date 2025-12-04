@@ -326,16 +326,29 @@ class RealityBridge:
         except:
             pass
 
-        # Outcome reality
+        # Outcome reality - INTEGRAFIX: Read from HFT ground truth
         try:
-            outcome_path = STATE_DIR / "outcome_tracker.json"
-            if outcome_path.exists():
-                with open(outcome_path) as f:
-                    outcomes = json.load(f)
-                snapshot.total_trades = outcomes.get("total_trades", 0)
-                snapshot.resolved_trades = outcomes.get("resolved_trades", 0)
-                snapshot.win_rate = outcomes.get("win_rate", 0)
-                snapshot.total_pnl = outcomes.get("total_pnl", 0)
+            hft_log = PROJECT_ROOT / "logs" / "hft_economics.jsonl"
+            if hft_log.exists():
+                wins = 0
+                total = 0
+                pnl = 0.0
+                with open(hft_log) as f:
+                    for line in f:
+                        try:
+                            d = json.loads(line)
+                            if d.get("type") == "trade_close":
+                                total += 1
+                                cost = d.get("cost", 0)
+                                pnl += cost
+                                if cost > 0:
+                                    wins += 1
+                        except:
+                            pass
+                snapshot.total_trades = total
+                snapshot.resolved_trades = total
+                snapshot.win_rate = wins / total if total > 0 else 0
+                snapshot.total_pnl = pnl
         except:
             pass
 

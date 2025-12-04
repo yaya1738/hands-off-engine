@@ -40,9 +40,34 @@ try:
 except ImportError:
     ABCFC_AVAILABLE = False
 
+# INTEGRAFIX: Knowledge Base Integration
+try:
+    from integrafix.knowledge_loader import knowledge as kb_loader
+    KNOWLEDGE_AVAILABLE = True
+except ImportError:
+    KNOWLEDGE_AVAILABLE = False
+    kb_loader = None
+
+def get_knowledge_for_market(market_title: str) -> Optional[str]:
+    """INTEGRAFIX: Search knowledge bases for relevant trading insights."""
+    if not KNOWLEDGE_AVAILABLE or not kb_loader:
+        return None
+    try:
+        # Extract key terms from market title
+        terms = market_title.lower().replace('?', '').split()[:5]
+        query = ' '.join(terms)
+        results = kb_loader.search(query, limit=1)
+        if results:
+            return results[0].get('snippet', '')
+    except:
+        pass
+    return None
+
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
 HISTORY_DIR = STATE_DIR / "price_history"
+HUMAN_ESTIMATES_FILE = STATE_DIR / "human_probability_estimates.json"
+YAIR_KERNEL_FILE = STATE_DIR / "yair_context_kernel.json"
 
 
 @dataclass
@@ -96,6 +121,68 @@ class FairPriceEstimator:
         self._save_history(market_id, self.price_history[market_id])
 
     # ==================== ESTIMATION METHODS ====================
+
+    def estimate_from_human(self, market: Dict) -> Optional[FairPriceEstimate]:
+        """
+        INTEGRAFIX: METHOD 0 (HIGHEST PRIORITY) - Human probability estimate from Yair.
+
+        If Yair has provided a probability estimate for this market, USE IT.
+        Human edge detection is often superior to machine algorithms.
+        """
+        market_id = market.get('market_slug') or market.get('slug') or market.get('condition_id') or ''
+        if not market_id:
+            return None
+
+        # Normalize market_id for lookup
+        market_id = market_id.lower().strip()
+
+        # Try to load human estimates
+        human_prob = None
+
+        # Check human_probability_estimates.json
+        if HUMAN_ESTIMATES_FILE.exists():
+            try:
+                with open(HUMAN_ESTIMATES_FILE) as f:
+                    data = json.load(f)
+                    estimates = data.get("estimates", {})
+
+                    # Try exact match and partial matches
+                    for est_id, prob in estimates.items():
+                        if est_id.lower() == market_id or market_id in est_id.lower():
+                            human_prob = prob
+                            break
+            except:
+                pass
+
+        # Also check yair_context_kernel.json
+        if human_prob is None and YAIR_KERNEL_FILE.exists():
+            try:
+                with open(YAIR_KERNEL_FILE) as f:
+                    kernel = json.load(f)
+                    active = kernel.get("active_estimates", {})
+
+                    for est_id, prob in active.items():
+                        if est_id.lower() == market_id or market_id in est_id.lower():
+                            human_prob = prob
+                            break
+            except:
+                pass
+
+        if human_prob is None:
+            return None
+
+        # Calculate edge vs market
+        yes_price = market.get('yes_price') or market.get('last', 0.5)
+        edge = human_prob - yes_price
+
+        return FairPriceEstimate(
+            fair_price=human_prob,
+            confidence=0.85,  # High confidence in human estimates
+            source="human_yair",
+            edge_vs_market=edge,
+            is_actionable=abs(edge) >= 0.03,  # 3% minimum edge
+            reasoning=f"Yair's probability estimate: {human_prob:.1%} (market: {yes_price:.1%})",
+        )
 
     def estimate_from_orderbook(self, market: Dict) -> Optional[FairPriceEstimate]:
         """
@@ -511,8 +598,9 @@ class FairPriceEstimator:
         """
         estimates = []
 
-        # Try each method
+        # Try each method (INTEGRAFIX: Human estimates have highest priority)
         methods = [
+            self.estimate_from_human,          # INTEGRAFIX: Yair's estimates first!
             self.estimate_from_spread_arb,     # Highest confidence if exists
             self.estimate_from_abcfc,          # ABCFC probability density
             self.estimate_from_orderbook,

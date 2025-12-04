@@ -30,6 +30,26 @@ MASTER = "Yair Siegel"
 WISDOM_STATE = STATE_DIR / "yair_wisdom.json"
 LEARNINGS_LOG = STATE_DIR / "wisdom_learnings.jsonl"
 
+# INTEGRAFIX: Load knowledge bases
+try:
+    from integrafix.knowledge_loader import knowledge as kb_loader
+    KNOWLEDGE_LOADED = True
+except ImportError:
+    KNOWLEDGE_LOADED = False
+    kb_loader = None
+
+def get_knowledge_insight(topic: str) -> str:
+    """INTEGRAFIX: Get relevant insight from knowledge bases."""
+    if not KNOWLEDGE_LOADED or not kb_loader:
+        return ""
+    try:
+        results = kb_loader.search(topic, limit=2)
+        if results:
+            return results[0].get('snippet', '')
+    except:
+        pass
+    return ""
+
 # Yair's teachings encoded as actionable rules
 YAIR_TEACHINGS = {
     "core_philosophy": {

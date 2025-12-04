@@ -5,6 +5,57 @@
 
 ---
 
+# INTEGRAFIX: HANDS-OFF SYSTEM INFRASTRUCTURE
+
+> Computing knowledge applied to **Yair Siegel's** Hands-Off Engine.
+> This system runs on real infrastructure that costs real money.
+
+## System Infrastructure
+| Component | Details | Cost |
+|-----------|---------|------|
+| **Main Server** | DigitalOcean droplet | ~$12/mo |
+| **Termux** | Pixel 6a Android | $0 (owned) |
+| **Polygon RPC** | Polymarket trading | Gas in MATIC |
+| **AI APIs** | Claude/GPT/etc | ~$250/mo budget |
+
+## System Integration Points
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **Main KB** | `KNOWLEDGE.md` | System overview |
+| **Infra Manager** | `autonomous/infra_manager.py` | Server management |
+| **Hardware Brain** | `hardware/hardware_brain.py` | Infrastructure decisions |
+| **Self Healer** | `autonomous/self_healer.py` | Auto-fix issues |
+| **Backend Loop** | `autonomous/backend_loop.py` | Main orchestrator (SACRED) |
+
+## Sacred Processes (NEVER KILL)
+```
+backend_loop.py      - Main orchestrator
+hardware_brain.py    - Infrastructure
+scaling_engine.py    - Auto-scaling
+infra_manager.py     - Infra monitoring
+self_healer.py       - Self-healing
+```
+
+## How Computing KB Connects
+```
+Computing Knowledge → Distributed Systems → Backend Architecture
+        ↓
+Networking → API design → Polymarket CLOB integration
+        ↓
+Security → Wallet safety → Trading protection
+        ↓
+AI/ML → Fair price estimation → Trading edge
+```
+
+## Key Computing for Hands-Off
+1. **Distributed Systems**: Backend loop runs across Termux + DO
+2. **API Design**: py_clob_client for Polymarket
+3. **Security**: Wallet private key protection
+4. **Cron Jobs**: 18+ scheduled tasks
+5. **Self-Healing**: Detect and fix failures automatically
+
+---
+
 # TABLE OF CONTENTS
 
 1. [Nature of Computation](#1-nature-of-computation)

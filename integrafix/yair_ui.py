@@ -51,7 +51,9 @@ class YairDataAggregator:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "identity": self._load_identity(),
             "financial": self._load_financial(),
+            "wallet": self._load_wallet(),
             "trading": self._load_trading(),
+            "golden": self._load_golden(),
             "goals": self._load_goals(),
             "reality": self._load_reality(),
             "actions": self._load_actions(),
@@ -80,38 +82,130 @@ class YairDataAggregator:
         return {"name": "Yair Siegel", "role": "master"}
 
     def _load_financial(self) -> Dict:
-        """Load financial state."""
+        """Load financial state - INTEGRAFIX: Wire ALL wealth sources."""
         financial = {
             "liquid_usd": 0,
             "deployable": 0,
             "runway_months": 0,
             "monthly_burn": 0,
             "polymarket_balance": 0,
+            "robinhood_balance": 0,
+            "paypal_balance": 0,
             "credit_available": 0,
+            "credit_debt": 0,
+            "total_accessible": 0,
+            "net_worth": 0,
+            "trading_pnl": 0,
+            "api_credits": 0,
+            "infra_value": 0,
             "status": "unknown",
+            "accounts": [],
+            "assets": [],
         }
 
         try:
-            # From kernel
-            kernel_path = STATE_DIR / "yair_context_kernel.json"
-            if kernel_path.exists():
-                with open(kernel_path) as f:
-                    kernel = json.load(f)
-                fin = kernel.get("financial_snapshot", {})
-                financial["liquid_usd"] = fin.get("liquid_usd", 0)
-                financial["deployable"] = fin.get("deployable", 0)
-                financial["runway_months"] = fin.get("runway_months", 0)
-
-            # From finance hub
+            # 1. From finance hub - cash accounts
             finance_path = PROJECT_ROOT / "finance" / "yair_finance_hub.json"
             if finance_path.exists():
                 with open(finance_path) as f:
                     hub = json.load(f)
-                financial["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 0)
-                financial["polymarket_balance"] = hub.get("accounts", {}).get("polymarket", {}).get("balance_usdc", 0)
-                financial["credit_available"] = hub.get("credit", {}).get("total_available", 0)
 
-            # Status
+                accounts = hub.get("accounts", {})
+
+                # Polymarket
+                pm = accounts.get("polymarket", {})
+                financial["polymarket_balance"] = pm.get("balance_usdc", 0)
+                if financial["polymarket_balance"] > 0:
+                    financial["accounts"].append({"name": "Polymarket", "balance": financial["polymarket_balance"], "type": "cash"})
+
+                # Robinhood
+                rh = accounts.get("robinhood", {})
+                financial["robinhood_balance"] = rh.get("balance_usd", 0)
+                if financial["robinhood_balance"] > 0:
+                    financial["accounts"].append({"name": "Robinhood", "balance": financial["robinhood_balance"], "type": "cash"})
+
+                # PayPal Business
+                pp = accounts.get("paypal_business", {})
+                financial["paypal_balance"] = pp.get("balance_usd", 0)
+                if financial["paypal_balance"] > 0:
+                    financial["accounts"].append({"name": "PayPal", "balance": financial["paypal_balance"], "type": "cash"})
+
+                # Credit
+                credit = hub.get("credit", {})
+                financial["credit_available"] = credit.get("total_available", 0)
+                financial["credit_debt"] = credit.get("total_balance", 0)
+
+                # Monthly burn
+                burn = hub.get("monthly_burn", {})
+                financial["monthly_burn"] = burn.get("total_usd", 0)
+
+            # 2. Trading P&L from HFT ground truth
+            hft_log = PROJECT_ROOT / "logs" / "hft_economics.jsonl"
+            if hft_log.exists():
+                pnl = 0.0
+                with open(hft_log) as f:
+                    for line in f:
+                        try:
+                            d = json.loads(line)
+                            if d.get("type") == "trade_close":
+                                pnl += d.get("cost", 0)
+                        except:
+                            pass
+                financial["trading_pnl"] = pnl
+                if pnl != 0:
+                    financial["assets"].append({"name": "Trading P&L", "value": pnl, "type": "earned"})
+
+            # 3. API Credits from credit_optimizer
+            credit_opt = STATE_DIR / "credit_optimizer.json"
+            if credit_opt.exists():
+                with open(credit_opt) as f:
+                    co = json.load(f)
+                balances = co.get("balances", {})
+                total_credits = 0
+                for provider, data in balances.items():
+                    remaining = data.get("remaining_credits", 0)
+                    # INTEGRAFIX: Skip infinity values (free tiers) for net worth calculation
+                    if isinstance(remaining, (int, float)) and remaining > 0 and remaining < 1000000:
+                        total_credits += remaining
+                        financial["assets"].append({"name": f"{provider.title()} Credits", "value": remaining, "type": "credits"})
+                    elif data.get("note") == "Free tier - unlimited usage":
+                        # Show free tier providers but don't add to total
+                        financial["assets"].append({"name": f"{provider.title()} (Free)", "value": 0, "type": "free"})
+                financial["api_credits"] = total_credits
+
+            # 4. Infrastructure value from mega_state
+            mega = STATE_DIR / "mega_state.json"
+            if mega.exists():
+                with open(mega) as f:
+                    ms = json.load(f)
+                # Estimate infra value: $10/vCPU/month, $5/GB RAM
+                vcpus = ms.get("total_vcpus", 0)
+                ram = ms.get("total_ram_gb", 0)
+                infra_monthly = vcpus * 10 + ram * 5
+                financial["infra_value"] = infra_monthly
+                if infra_monthly > 0:
+                    financial["assets"].append({"name": "Infrastructure", "value": infra_monthly, "type": "compute"})
+
+            # Calculate totals
+            financial["liquid_usd"] = (
+                financial["polymarket_balance"] +
+                financial["robinhood_balance"] +
+                financial["paypal_balance"]
+            )
+            financial["total_accessible"] = financial["liquid_usd"] + financial["credit_available"]
+            financial["net_worth"] = (
+                financial["liquid_usd"] +
+                financial["trading_pnl"] +
+                financial["api_credits"] -
+                financial["credit_debt"]
+            )
+            financial["deployable"] = financial["total_accessible"]
+
+            # Runway
+            if financial["monthly_burn"] > 0:
+                financial["runway_months"] = financial["total_accessible"] / financial["monthly_burn"]
+
+            # Status based on runway
             if financial["runway_months"] < 1:
                 financial["status"] = "CRITICAL"
             elif financial["runway_months"] < 3:
@@ -124,28 +218,133 @@ class YairDataAggregator:
 
         return financial
 
+    def _load_wallet(self) -> Dict:
+        """Load actual wallet state - INTEGRAFIX: Show ALL wallets."""
+        wallet = {
+            "address": "Not configured",
+            "balance": 0,
+            "positions": 0,
+            "unrealized_pnl": 0,
+            "mode": "UNKNOWN",
+            "total_wallets": 0,
+            "funded_wallets": 0,
+            "scale_wallets": [],
+        }
+        try:
+            # Get main wallet from finance hub
+            finance_path = PROJECT_ROOT / "finance" / "yair_finance_hub.json"
+            if finance_path.exists():
+                with open(finance_path) as f:
+                    hub = json.load(f)
+                pm = hub.get("accounts", {}).get("polymarket", {})
+                wallet["address"] = pm.get("wallet_address", "Not set")
+                wallet["balance"] = pm.get("balance_usdc", 0)
+
+            # Get trading mode from executor state
+            exec_state = STATE_DIR / "trade_executor_state.json"
+            if exec_state.exists():
+                with open(exec_state) as f:
+                    es = json.load(f)
+                wallet["mode"] = es.get("mode", "UNKNOWN")
+
+            # Get positions from polymarket_live_state
+            pm_state = STATE_DIR / "polymarket_live_state.json"
+            if pm_state.exists():
+                with open(pm_state) as f:
+                    pms = json.load(f)
+                positions = pms.get("positions", [])
+                wallet["positions"] = len(positions)
+                wallet["unrealized_pnl"] = sum(p.get("unrealized_pnl", 0) for p in positions if isinstance(p, dict))
+
+            # Get ALL wallets from registry
+            registry_path = STATE_DIR / "wallets" / "registry.json"
+            if registry_path.exists():
+                with open(registry_path) as f:
+                    registry = json.load(f)
+                wallets = registry.get("wallets", {})
+                wallet["total_wallets"] = len(wallets)
+                wallet["funded_wallets"] = 1  # Only main wallet is funded
+                # Get some scale wallet info
+                for addr, data in list(wallets.items())[:5]:
+                    wallet["scale_wallets"].append({
+                        "alias": data.get("alias", "unknown"),
+                        "address": addr[:10] + "...",
+                        "status": data.get("status", "unknown"),
+                    })
+
+        except:
+            pass
+        return wallet
+
     def _load_trading(self) -> Dict:
-        """Load trading state."""
+        """INTEGRAFIX: Load trading state with TRUTH - distinguish REAL vs SIMULATED."""
         trading = {
+            "mode": "DRYRUN",
+            "real_trades": 0,
+            "simulated_trades": 0,
+            "resolved_trades": 0,  # Markets that actually settled
             "total_trades": 0,
-            "resolved": 0,
             "win_rate": 0,
             "total_pnl": 0,
             "open_positions": 0,
             "signals_pending": 0,
             "opportunities": [],
+            "safeguards": {},
         }
 
         try:
-            # From outcome tracker
-            outcome_path = STATE_DIR / "outcome_tracker.json"
-            if outcome_path.exists():
-                with open(outcome_path) as f:
-                    outcomes = json.load(f)
-                trading["total_trades"] = outcomes.get("total_trades", 0)
-                trading["resolved"] = outcomes.get("resolved_trades", outcomes.get("total_resolved", 0))
-                trading["win_rate"] = outcomes.get("win_rate", 0)
-                trading["total_pnl"] = outcomes.get("total_pnl", 0)
+            # INTEGRAFIX: Get mode from trading_mode.json (single source of truth)
+            mode_file = STATE_DIR / "trading_mode.json"
+            if mode_file.exists():
+                with open(mode_file) as f:
+                    mode_data = json.load(f)
+                trading["mode"] = "LIVE" if mode_data.get("live_trading_enabled") else "DRYRUN"
+                trading["safeguards"] = mode_data.get("safeguards", {})
+
+            # INTEGRAFIX: Get REAL trades from polymarket_live_state.json (ground truth)
+            live_state = STATE_DIR / "polymarket_live_state.json"
+            if live_state.exists():
+                with open(live_state) as f:
+                    live = json.load(f)
+                trading["real_trades"] = live.get("total_trades", 0)
+                trading["total_pnl"] = live.get("total_pnl", 0)
+                trading["open_positions"] = len(live.get("positions", []))
+
+            # INTEGRAFIX: Get SIMULATED trades from hft_economics.jsonl (tokens=0 means simulated)
+            hft_log = PROJECT_ROOT / "logs" / "hft_economics.jsonl"
+            if hft_log.exists():
+                wins = 0
+                simulated = 0
+                pnl = 0.0
+                with open(hft_log) as f:
+                    for line in f:
+                        try:
+                            d = json.loads(line)
+                            if d.get("type") == "trade_close":
+                                if d.get("tokens", 0) == 0:  # tokens=0 means simulated
+                                    simulated += 1
+                                cost = d.get("cost", 0)
+                                pnl += cost
+                                if cost > 0:
+                                    wins += 1
+                        except:
+                            pass
+                trading["simulated_trades"] = simulated
+                trading["total_trades"] = trading["real_trades"] + simulated
+                # Only use live P&L if we have real trades
+                if trading["real_trades"] == 0:
+                    trading["total_pnl"] = 0.0  # No real P&L from simulated trades
+
+            # INTEGRAFIX: Get ACTUAL resolved trades from outcome_tracker (markets that settled)
+            outcome_tracker = STATE_DIR / "outcome_tracker.json"
+            if outcome_tracker.exists():
+                with open(outcome_tracker) as f:
+                    ot = json.load(f)
+                trading["resolved_trades"] = ot.get("total_resolved", 0)
+                trading["win_rate"] = ot.get("win_rate", 0)
+            else:
+                trading["resolved_trades"] = 0
+                trading["win_rate"] = 0
 
             # From positions
             positions_path = STATE_DIR / "positions.json"
@@ -172,6 +371,49 @@ class YairDataAggregator:
             pass
 
         return trading
+
+    def _load_golden(self) -> Dict:
+        """Load golden state - INTEGRAFIX: Wire Yair to Golden Path."""
+        golden = {
+            "tier": 0,
+            "tier_name": "Unknown",
+            "win_rate": 0,
+            "total_trades": 0,
+            "tier_trades": 0,
+            "required_trades": 10,
+            "required_wr": 0.52,
+            "max_exposure": 200,
+            "projection": 0,
+            "target": 5000000,
+            "gap": 5000000,
+            "path": [],
+        }
+        try:
+            from integrafix.golden_state import GoldenState
+            gs = GoldenState.load()
+            tier_cfg = gs.get_tier_config()
+            golden["tier"] = gs.current_tier
+            golden["tier_name"] = tier_cfg.name
+            golden["win_rate"] = gs.win_rate
+            golden["total_trades"] = gs.total_trades
+            golden["tier_trades"] = gs.tier_trades
+            golden["required_trades"] = tier_cfg.required_trades
+            golden["required_wr"] = tier_cfg.required_win_rate
+            golden["max_exposure"] = tier_cfg.max_exposure
+            golden["projection"] = gs.monthly_projection()
+            golden["gap"] = 5000000 - golden["projection"]
+            golden["wr_gap"] = max(0, tier_cfg.required_win_rate - gs.win_rate)
+            golden["path"] = [
+                {"tier": 0, "name": "Validation", "exposure": 200},
+                {"tier": 1, "name": "Foundation", "exposure": 500},
+                {"tier": 2, "name": "Growth", "exposure": 5000},
+                {"tier": 3, "name": "Acceleration", "exposure": 50000},
+                {"tier": 4, "name": "Scale", "exposure": 200000},
+                {"tier": 5, "name": "Golden", "exposure": 500000},
+            ]
+        except:
+            pass
+        return golden
 
     def _load_goals(self) -> Dict:
         """Load goals state."""
@@ -362,30 +604,94 @@ class TerminalUI:
         lines.append(f"  {self.data.get('timestamp', '')}")
         lines.append("=" * 70)
 
-        # Financial Section
+        # Financial Section - INTEGRAFIX: Show ALL wealth
         fin = self.data.get("financial", {})
         status_icon = {"CRITICAL": "🔴", "WARNING": "🟡", "OK": "🟢"}.get(fin.get("status"), "⚪")
         lines.append(f"\n{status_icon} FINANCIAL [{fin.get('status', 'UNKNOWN')}]")
-        lines.append(f"  ├─ Liquid:     ${fin.get('liquid_usd', 0):,.0f}")
-        lines.append(f"  ├─ Deployable: ${fin.get('deployable', 0):,.0f}")
-        lines.append(f"  ├─ Runway:     {fin.get('runway_months', 0):.1f} months")
-        lines.append(f"  ├─ Burn:       ${fin.get('monthly_burn', 0):,.0f}/mo")
-        lines.append(f"  └─ Polymarket: ${fin.get('polymarket_balance', 0):.2f}")
+        lines.append(f"  ├─ Total Accessible: ${fin.get('total_accessible', 0):,.2f}")
+        lines.append(f"  ├─ Liquid Cash:      ${fin.get('liquid_usd', 0):,.2f}")
+        lines.append(f"  ├─ Credit Available: ${fin.get('credit_available', 0):,.0f}")
+        lines.append(f"  ├─ Credit Debt:      ${fin.get('credit_debt', 0):,.0f}")
+        lines.append(f"  ├─ Net Worth:        ${fin.get('net_worth', 0):+,.0f}")
+        lines.append(f"  ├─ Burn:             ${fin.get('monthly_burn', 0):,.0f}/mo")
+        lines.append(f"  └─ Runway:           {fin.get('runway_months', 0):.1f} months")
+        # Show all accounts
+        if fin.get("accounts"):
+            lines.append("  CASH ACCOUNTS:")
+            for acc in fin["accounts"]:
+                lines.append(f"    💵 {acc['name']}: ${acc['balance']:,.2f}")
+        # Show assets
+        if fin.get("assets"):
+            lines.append("  OTHER ASSETS:")
+            for asset in fin["assets"]:
+                lines.append(f"    📦 {asset['name']}: ${asset['value']:,.2f}")
 
-        # Trading Section
+        # Wallet Section - INTEGRAFIX: Show ALL wallets
+        wallet = self.data.get("wallet", {})
+        mode = wallet.get("mode", "UNKNOWN")
+        mode_icon = "🟢" if mode == "LIVE" else "🟡" if mode == "DRYRUN" else "🔴"
+        lines.append(f"\n{mode_icon} WALLETS [{mode}]")
+        lines.append(f"  ├─ Total Wallets: {wallet.get('total_wallets', 0)}")
+        lines.append(f"  ├─ Funded: {wallet.get('funded_wallets', 0)}")
+        lines.append(f"  ├─ Main: {wallet.get('address', 'Not set')[:20]}...")
+        lines.append(f"  ├─ Balance: ${wallet.get('balance', 0):.2f} USDC")
+        lines.append(f"  ├─ Positions: {wallet.get('positions', 0)}")
+        lines.append(f"  └─ Unrealized: ${wallet.get('unrealized_pnl', 0):+.2f}")
+        if wallet.get("total_wallets", 0) > 1:
+            unfunded = wallet.get("total_wallets", 0) - wallet.get("funded_wallets", 0)
+            lines.append(f"  ⚠️  {unfunded} wallets unfunded (ready for scaling)")
+
+        # Trading Section - INTEGRAFIX: Show TRUE state (REAL vs SIMULATED)
         trading = self.data.get("trading", {})
-        win_rate = trading.get("win_rate", 0)
-        wr_icon = "🟢" if win_rate >= 0.6 else "🟡" if win_rate >= 0.5 else "🔴"
-        lines.append(f"\n{wr_icon} TRADING")
-        lines.append(f"  ├─ Win Rate:  {win_rate:.1%}")
-        lines.append(f"  ├─ Total P&L: ${trading.get('total_pnl', 0):+.2f}")
-        lines.append(f"  ├─ Resolved:  {trading.get('resolved', 0)} trades")
-        lines.append(f"  └─ Open:      {trading.get('open_positions', 0)} positions")
+        mode = trading.get("mode", "DRYRUN")
+        mode_icon = "🟢" if mode == "LIVE" else "🟡"
+        real_trades = trading.get("real_trades", 0)
+        simulated_trades = trading.get("simulated_trades", 0)
+        resolved_trades = trading.get("resolved_trades", 0)
+        lines.append(f"\n{mode_icon} TRADING [{mode}]")
+        lines.append(f"  ├─ REAL Trades:    {real_trades}")
+        lines.append(f"  ├─ Simulated:      {simulated_trades}")
+        lines.append(f"  ├─ Resolved:       {resolved_trades} (markets settled)")
+        lines.append(f"  ├─ Real P&L:       ${trading.get('total_pnl', 0):+.2f}")
+        lines.append(f"  └─ Open Positions: {trading.get('open_positions', 0)}")
+        # Show safeguards if in LIVE mode
+        safeguards = trading.get("safeguards", {})
+        if mode == "LIVE" and safeguards:
+            lines.append("  SAFEGUARDS:")
+            lines.append(f"    Max/Trade: ${safeguards.get('max_per_trade', 0):.0f}")
+            lines.append(f"    Max Daily Loss: ${safeguards.get('max_daily_loss', 0):.0f}")
+            lines.append(f"    Min Edge: {safeguards.get('min_edge_required', 0)*100:.0f}%")
+        if real_trades == 0 and mode == "LIVE":
+            lines.append("  ⚠️  LIVE mode enabled but 0 real trades yet")
+        if simulated_trades > 0 and resolved_trades == 0:
+            lines.append("  ⚠️  No markets resolved yet - win rate unknown")
 
         if trading.get("opportunities"):
             lines.append("  OPPORTUNITIES:")
             for opp in trading["opportunities"]:
                 lines.append(f"    • [{opp['type']}] {opp['market']} ({opp['profit']})")
+
+        # Golden State Section - INTEGRAFIX: Wire Yair to Golden Path
+        golden = self.data.get("golden", {})
+        tier = golden.get("tier", 0)
+        wr_gap = golden.get("wr_gap", 0)
+        gold_icon = "🏆" if tier >= 5 else "⭐" if tier >= 3 else "🎯"
+        lines.append(f"\n{gold_icon} GOLDEN PATH [Tier {tier}: {golden.get('tier_name', 'Unknown')}]")
+        lines.append(f"  ├─ Max Exposure: ${golden.get('max_exposure', 0):,}")
+        lines.append(f"  ├─ Projection:   ${golden.get('projection', 0):,.0f}/month")
+        lines.append(f"  ├─ Target:       $5,000,000/month")
+        lines.append(f"  └─ Gap:          ${golden.get('gap', 0):,.0f}")
+        # Show tier path
+        lines.append("  PATH:")
+        for p in golden.get("path", []):
+            if p["tier"] < tier:
+                lines.append(f"    ✅ Tier {p['tier']}: {p['name']}")
+            elif p["tier"] == tier:
+                lines.append(f"    → Tier {p['tier']}: {p['name']} ← YOU")
+            else:
+                lines.append(f"    ○ Tier {p['tier']}: {p['name']}")
+        if wr_gap > 0:
+            lines.append(f"  ⚠️  Need +{wr_gap*100:.1f}% WR to advance")
 
         # Goals Section
         goals = self.data.get("goals", {})

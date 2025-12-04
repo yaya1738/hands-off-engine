@@ -526,34 +526,43 @@ class GoalsEffectsBridge:
         """
         imported = []
 
-        # 1. Import from outcome_tracker
+        # 1. Import from HFT ground truth - INTEGRAFIX: Wire to real data
         try:
-            outcome_path = STATE_DIR / "outcome_tracker.json"
-            if outcome_path.exists():
-                with open(outcome_path) as f:
-                    outcomes = json.load(f)
+            hft_log = PROJECT_ROOT / "logs" / "hft_economics.jsonl"
+            if hft_log.exists():
+                total = 0
+                pnl = 0.0
+                with open(hft_log) as f:
+                    for line in f:
+                        try:
+                            d = json.loads(line)
+                            if d.get("type") == "trade_close":
+                                total += 1
+                                pnl += d.get("cost", 0)
+                        except:
+                            pass
 
-                if outcomes.get("total_pnl", 0) != 0:
+                if pnl != 0:
                     effect = self.record_effect(
                         name="Trading P&L",
-                        description=f"Total trading profit/loss: ${outcomes.get('total_pnl', 0):.2f}",
+                        description=f"Total trading profit/loss: ${pnl:.2f}",
                         effect_type=EffectType.OUTCOME,
-                        value=outcomes.get("total_pnl", 0),
+                        value=pnl,
                         value_type="currency",
                         domain="trading",
-                        source="outcome_tracker",
+                        source="hft_economics",
                     )
                     imported.append(effect)
 
-                if outcomes.get("total_resolved", 0) > 0:
+                if total > 0:
                     effect = self.record_effect(
                         name="Trades Resolved",
-                        description=f"Resolved {outcomes.get('total_resolved', 0)} trades",
+                        description=f"Resolved {total} trades",
                         effect_type=EffectType.MEASUREMENT,
-                        value=outcomes.get("total_resolved", 0),
+                        value=total,
                         value_type="count",
                         domain="trading",
-                        source="outcome_tracker",
+                        source="hft_economics",
                     )
                     imported.append(effect)
         except:

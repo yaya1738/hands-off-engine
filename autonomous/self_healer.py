@@ -50,6 +50,7 @@ class ProcessGuard:
     restart_delay_sec: int = 10
     max_restarts_per_hour: int = 5
     critical: bool = True  # If True, system is degraded when down
+    code_file: str = ''  # Path to main code file for staleness check
 
 
 @dataclass
@@ -81,7 +82,8 @@ class SelfHealer:
             command='python3 /root/hands-off-engine/autonomous/backend_loop.py',
             critical=True,
             restart_delay_sec=5,  # Fast restart - this is the main orchestrator
-            max_restarts_per_hour=10
+            max_restarts_per_hour=10,
+            code_file='/root/hands-off-engine/autonomous/backend_loop.py'
         ),
         ProcessGuard(
             name='hardware-brain',
@@ -212,6 +214,59 @@ class SelfHealer:
             self._log(f"Error checking process {process.name}: {e}", level='error')
             return False, None
 
+    def check_code_stale(self, process: ProcessGuard, pid: int) -> bool:
+        """
+        INTEGRAFIX: Check if process is running stale code.
+
+        Compares code file mtime to process start time.
+        If code is newer than process, code is stale and needs restart.
+
+        Returns: True if code is stale (needs restart)
+        """
+        if not process.code_file:
+            return False
+
+        try:
+            code_path = Path(process.code_file)
+            if not code_path.exists():
+                return False
+
+            # Get code file modification time
+            code_mtime = code_path.stat().st_mtime
+
+            # Get process start time from /proc
+            proc_stat = Path(f'/proc/{pid}/stat')
+            if not proc_stat.exists():
+                return False
+
+            # Get system boot time and process start time in jiffies
+            with open('/proc/uptime') as f:
+                uptime_seconds = float(f.read().split()[0])
+
+            with open(f'/proc/{pid}/stat') as f:
+                stat_fields = f.read().split()
+                # Field 22 is starttime in clock ticks since boot
+                starttime_ticks = int(stat_fields[21])
+
+            # Convert to epoch time
+            clock_ticks_per_sec = os.sysconf('SC_CLK_TCK')
+            boot_time = time.time() - uptime_seconds
+            process_start_time = boot_time + (starttime_ticks / clock_ticks_per_sec)
+
+            # Check if code is newer than process
+            is_stale = code_mtime > process_start_time
+
+            if is_stale:
+                code_age = datetime.fromtimestamp(code_mtime).strftime('%H:%M:%S')
+                proc_age = datetime.fromtimestamp(process_start_time).strftime('%H:%M:%S')
+                self._log(f"STALE CODE: {process.name} - code updated {code_age}, process started {proc_age}")
+
+            return is_stale
+
+        except Exception as e:
+            self._log(f"Error checking code staleness for {process.name}: {e}", level='error')
+            return False
+
     def _can_restart_process(self, process: ProcessGuard) -> bool:
         """Check if we can restart a process (rate limiting)."""
         now = datetime.utcnow()
@@ -317,6 +372,17 @@ class SelfHealer:
                 if self.restart_process(process):
                     status['action'] = 'restarted'
                     results['actions_taken'].append(f"Restarted {process.name}")
+                else:
+                    status['action'] = 'restart_failed'
+
+            # INTEGRAFIX: Check for stale code even if running
+            elif pid and self.check_code_stale(process, pid):
+                self._log(f"Process {process.name} running STALE CODE - restarting", level='warning')
+
+                if self.restart_process(process):
+                    status['action'] = 'restarted_stale_code'
+                    status['stale'] = True
+                    results['actions_taken'].append(f"Restarted {process.name} (stale code)")
                 else:
                     status['action'] = 'restart_failed'
 

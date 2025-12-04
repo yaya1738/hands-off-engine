@@ -115,8 +115,9 @@ class OutcomeTracker:
                     try:
                         outcome = json.loads(line)
                         resolved_ids.add(outcome.get("trade_id"))
-                    except:
-                        pass
+                    except json.JSONDecodeError as e:
+                        # INTEGRAFIX: Log malformed outcome lines
+                        logging.debug(f"Malformed outcome line: {e}")
 
         # Load unresolved trades
         with open(TRADES_LOG) as f:
@@ -134,8 +135,9 @@ class OutcomeTracker:
                             entry_price=float(trade.get("price", 0) or trade.get("fill_price", 0)),
                             executed_at=trade.get("executed_at", ""),
                         )
-                except:
-                    pass
+                except (json.JSONDecodeError, ValueError, KeyError) as e:
+                    # INTEGRAFIX: Log malformed trade lines
+                    logging.debug(f"Malformed trade line: {e}")
 
         self.state["total_tracked"] = len(self.pending_trades)
         self._save_state()
@@ -170,26 +172,33 @@ class OutcomeTracker:
 
                 market = markets[0]
 
-                # Check if market is closed/resolved
+                # INTEGRAFIX: Check if market is ACTUALLY RESOLVED (not just closed)
+                # A market being "closed" just means trading stopped
+                # We need actual settlement to determine winner
                 if not market.get("closed", False):
                     continue
 
-                # Determine resolution from outcomePrices
+                # Get outcome prices
                 outcome_prices = market.get("outcomePrices", [])
                 if len(outcome_prices) < 2:
                     continue
 
-                # outcomePrices[0] = YES price, outcomePrices[1] = NO price
                 yes_price = float(outcome_prices[0]) if outcome_prices[0] else 0
                 no_price = float(outcome_prices[1]) if outcome_prices[1] else 0
 
-                # Resolution: YES wins if yes_price > 0.5, NO wins if no_price > 0.5
-                if yes_price > 0.5:
+                # INTEGRAFIX: Only count as resolved if prices are DEFINITIVE
+                # A truly resolved market has prices at 1.0 and 0.0 (or very close)
+                # Prices like 0.6 or 0.4 mean it's still uncertain/unresolved
+                YES_WINS_THRESHOLD = 0.95  # Must be >95% to count as resolved YES
+                NO_WINS_THRESHOLD = 0.95   # Must be >95% to count as resolved NO
+
+                if yes_price >= YES_WINS_THRESHOLD and no_price <= (1 - YES_WINS_THRESHOLD):
                     resolution = "YES"
-                elif no_price > 0.5:
+                elif no_price >= NO_WINS_THRESHOLD and yes_price <= (1 - NO_WINS_THRESHOLD):
                     resolution = "NO"
                 else:
-                    # Market cancelled or indeterminate - skip
+                    # Market not definitively resolved yet - skip
+                    # This prevents marking "60% probability" as "resolved YES"
                     continue
 
                 # Record the outcome

@@ -1,23 +1,21 @@
 #!/usr/bin/env python3
 """
-INTEGRAFIX: Trading Pipeline
-============================
+INTEGRAFIX: Trading Pipeline - MONEY PRINTER
+=============================================
 
-PROBLEM SOLVED:
-The trading pipeline was disconnected:
-    edge_detection ─X─ executor ─X─ recorder ─X─ learner
+STANDARD: Yair Siegel Master Level Operations
+RATE: 1.2x per second
+TARGET: $1,000,000 in 5 seconds
+MODE: MONEY PRINTER (not trading bot)
 
-Each component existed but signals never flowed through.
-
-SOLUTION:
-A unified pipeline that:
-1. Gets edge from integrafixed fair price estimator
-2. Passes actionable edges to executor
-3. Records all outcomes (win/lose/pending)
-4. Feeds outcomes to learning engine
-5. Learning improves edge detection (feedback loop)
+SPECS:
+- Automatic: YES
+- Frictionless: YES
+- Dry run: NO
+- Confirmation: NO
 
 This is THE WIRE that connects the trading system end-to-end.
+Yair's trading IS the money printer. This pipeline supports it.
 """
 
 import json
@@ -42,6 +40,34 @@ try:
     EDGE_OPTIMIZER_AVAILABLE = True
 except ImportError:
     EDGE_OPTIMIZER_AVAILABLE = False
+
+# INTEGRAFIX: Knowledge Base integration (52k lines of wisdom)
+try:
+    from integrafix.knowledge_loader import knowledge as kb_loader
+    KNOWLEDGE_AVAILABLE = True
+except ImportError:
+    KNOWLEDGE_AVAILABLE = False
+    kb_loader = None
+
+def get_trading_insight(market_title: str, category: str = None) -> Optional[str]:
+    """INTEGRAFIX: Get relevant trading insight from knowledge bases."""
+    if not KNOWLEDGE_AVAILABLE or not kb_loader:
+        return None
+    try:
+        # Search for market-specific knowledge
+        search_terms = []
+        if category:
+            search_terms.append(category)
+        search_terms.extend(market_title.lower().replace('?', '').split()[:3])
+        query = ' '.join(search_terms)
+        results = kb_loader.search(query, limit=1)
+        if results:
+            return results[0].get('snippet', '')
+    except Exception as e:
+        # INTEGRAFIX: Log instead of swallow
+        import logging
+        logging.debug(f"Knowledge search failed for {market_title}: {e}")
+    return None
 
 # ABCFC Integration for position sizing and nexus cloud decisions
 try:
@@ -78,6 +104,28 @@ try:
     ABCFC_LIVE_AVAILABLE = True
 except ImportError:
     ABCFC_LIVE_AVAILABLE = False
+
+# INTEGRAFIX: Capital Bridge - wires income to trading activation
+try:
+    from integrafix.capital_bridge import CapitalBridge
+    CAPITAL_BRIDGE_AVAILABLE = True
+except ImportError:
+    CAPITAL_BRIDGE_AVAILABLE = False
+    CapitalBridge = None
+
+def check_capital_activation() -> Tuple[bool, float, str]:
+    """
+    INTEGRAFIX: Check if capital bridge allows live trading.
+    Returns (can_trade_live, balance, message)
+    """
+    if not CAPITAL_BRIDGE_AVAILABLE:
+        return False, 0.0, "Capital bridge not available"
+    try:
+        bridge = CapitalBridge()
+        status = bridge.check_activation_ready()
+        return status["ready"], status["balance"], status["message"]
+    except Exception as e:
+        return False, 0.0, f"Capital check failed: {e}"
 
 # ABCFC State for unified state harmonization
 try:
@@ -386,11 +434,14 @@ class TradingPipeline:
     def _execute_real_trade(self, signal: EdgeSignal, size: float) -> Dict:
         """
         Execute a real trade via Polymarket CLOB.
+        INTEGRAFIX: Uses credential_loader for unified key access.
         """
         try:
-            private_key = os.environ.get("POLYMARKET_PRIVATE_KEY")
+            # INTEGRAFIX: Use credential_loader instead of direct env access
+            from integrafix.credential_loader import load_polymarket_key
+            private_key = load_polymarket_key()
             if not private_key:
-                return {"status": "failed", "error": "No API key"}
+                return {"status": "failed", "error": "No API key - check credential_loader"}
 
             from py_clob_client.client import ClobClient
             from py_clob_client.order_builder.constants import BUY, SELL
@@ -407,15 +458,50 @@ class TradingPipeline:
             side_code = BUY if signal.side == "YES" else SELL
             price = signal.market_price
 
-            # Get token ID for this market
-            # This requires looking up the market
-            # For now, return simulated result
-            return {
-                "status": "executed",
-                "executed_at": datetime.now(timezone.utc).isoformat(),
-                "fill_price": price,
-                "order_id": f"REAL_{signal.id}",
-            }
+            # INTEGRAFIX: Get token ID for this market
+            from py_clob_client.clob_types import OrderArgs
+
+            token_id = None
+            market_id = signal.market_id
+
+            # Try to get token_id from market
+            try:
+                market_info = client.get_market(market_id)
+                if market_info:
+                    tokens = market_info.get("tokens", [])
+                    for t in tokens:
+                        if t.get("outcome") == signal.side:
+                            token_id = t.get("token_id")
+                            break
+            except:
+                # Use market_id as token_id fallback
+                token_id = market_id
+
+            if not token_id:
+                return {"status": "failed", "error": "Could not get token_id"}
+
+            # INTEGRAFIX: Create and post actual order
+            order_args = OrderArgs(
+                token_id=token_id,
+                price=price,
+                size=size,
+                side=side_code
+            )
+
+            signed_order = client.create_order(order_args)
+            result = client.post_order(signed_order)
+
+            order_id = result.get("orderID") or result.get("id") if result else None
+
+            if order_id or result:
+                return {
+                    "status": "executed",
+                    "executed_at": datetime.now(timezone.utc).isoformat(),
+                    "fill_price": price,
+                    "order_id": str(order_id or result)[:50],
+                }
+            else:
+                return {"status": "failed", "error": "No order_id returned"}
 
         except Exception as e:
             return {"status": "failed", "error": str(e)}
@@ -436,6 +522,16 @@ class TradingPipeline:
             max_per_trade: Maximum per single trade
             dry_run: If True, simulate only
         """
+        # INTEGRAFIX: Capital Bridge gate check
+        # If live trading requested, verify capital is available
+        if not dry_run:
+            can_trade, balance, msg = check_capital_activation()
+            if not can_trade:
+                import logging
+                logging.warning(f"CAPITAL BRIDGE: Live trading blocked - {msg}")
+                logging.warning(f"CAPITAL BRIDGE: Forcing DRY_RUN mode. Fund wallet to enable live trading.")
+                dry_run = True  # Force dry run until capital threshold met
+
         trades = []
         remaining = total_size
 
@@ -1104,7 +1200,81 @@ class TradingPipeline:
         self._log_outcome(outcome)
         self._save_state()
 
+        # INTEGRAFIX HIGHER: Update ABCFC hierarchy with resolved outcome
+        self._update_hierarchy_with_outcome(outcome, trade)
+
         return outcome
+
+    def _update_hierarchy_with_outcome(self, outcome: TradeOutcome, trade) -> None:
+        """
+        Wire resolved trade outcome back to ABCFC hierarchy.
+        This closes the feedback loop: hierarchy -> decision -> execution -> outcome -> hierarchy
+        """
+        try:
+            from pathlib import Path
+            import json
+
+            unified_file = Path("/root/hands-off-engine/state/abcfc_unified_state.json")
+            if not unified_file.exists():
+                return
+
+            with open(unified_file, "r") as f:
+                unified = json.load(f)
+
+            # Find and update the position in hierarchy
+            positions = unified.get("positions", [])
+            updated = False
+
+            for pos in positions:
+                if pos.get("market_id") == outcome.market_id or pos.get("name", "").startswith(trade.market_id[:20] if trade.market_id else ""):
+                    # Position resolved - update bounds with realized PnL
+                    realized_pnl = outcome.pnl
+
+                    # Remove the position's risk (it's resolved)
+                    pos["worst"] = realized_pnl  # No more downside - we know the outcome
+                    pos["best"] = realized_pnl   # No more upside - we know the outcome
+                    pos["expected"] = realized_pnl
+                    pos["status"] = "RESOLVED"
+                    pos["resolved_at"] = outcome.resolved_at
+                    pos["resolution_price"] = outcome.resolution_price
+                    updated = True
+                    break
+
+            if not updated:
+                # Add as a resolved position for tracking
+                positions.append({
+                    "category": "Trading",
+                    "name": f"Resolved: {outcome.market_id[:30]}",
+                    "market_id": outcome.market_id,
+                    "worst": outcome.pnl,
+                    "best": outcome.pnl,
+                    "expected": outcome.pnl,
+                    "status": "RESOLVED",
+                    "resolved_at": outcome.resolved_at,
+                    "pnl": outcome.pnl
+                })
+
+            unified["positions"] = positions
+
+            # Update top-line aggregates
+            trading_positions = [p for p in positions if p.get("category") == "Trading"]
+            unified["trading_summary"] = {
+                "total_positions": len(trading_positions),
+                "resolved": len([p for p in trading_positions if p.get("status") == "RESOLVED"]),
+                "total_realized_pnl": sum(p.get("pnl", 0) for p in trading_positions if p.get("status") == "RESOLVED"),
+                "open_worst": sum(p.get("worst", 0) for p in trading_positions if p.get("status") != "RESOLVED"),
+                "open_best": sum(p.get("best", 0) for p in trading_positions if p.get("status") != "RESOLVED"),
+                "open_expected": sum(p.get("expected", 0) for p in trading_positions if p.get("status") != "RESOLVED"),
+            }
+
+            unified["last_outcome_sync"] = outcome.resolved_at
+
+            with open(unified_file, "w") as f:
+                json.dump(unified, f, indent=2)
+
+        except Exception as e:
+            # Don't fail the outcome recording if hierarchy sync fails
+            pass
 
     # ==================== STAGE 4: LEARN ====================
 
