@@ -1,0 +1,52 @@
+Renaissance Philanthropy - Machine Learning Engineer Application
+
+Application URL: https://web.miniextensions.com/JMaVfmSS6p3XZLecqZfJ
+
+---
+
+I'm applying for the Machine Learning Engineer role at Renaissance Philanthropy. I'm passionate about using AI/ML to create educational impact.
+
+**Technical Qualifications:**
+
+This week I built 4 production-ready ML infrastructure tools (137/137 tests passing):
+
+1. **KV-Cache Manager** - Shared memory optimization for LLM inference (49 tests)
+2. **Model Lifecycle Manager** - systemd-based LLM service orchestration (36 tests)
+3. **/dev/llm FUSE Device** - Virtual filesystem for LLM interaction (20 tests)
+4. **Accelerator Resource Limits** - GPU/TPU workload management (32 tests)
+
+**Core Skills:**
+- Production ML/AI deployment (LLM pipelines, inference optimization)
+- Cloud infrastructure (system design, resource management)
+- LLM evaluation and agentic frameworks
+- RAG systems and structured outputs
+- FastAPI backends and async architectures
+
+**Mission Alignment:**
+I'm driven by democratizing access to powerful AI tools. My current work focuses on making LLM infrastructure accessible and reliable for educational applications.
+
+**Research Background:**
+- Behavioral data analysis through prediction markets (Polymarket trading system)
+- Technical strategy and proof-of-concept development
+- Systems thinking for complex problem spaces
+
+**Educational Tech:**
+- Building Claude Code tutorials to teach AI-assisted development
+- Creating accessible interfaces for complex ML systems
+- Focus on developer experience and learning curves
+
+**Portfolio:**
+- GitHub: github.com/yaya1738
+- Bounty work: cortexlinux/cortex ($550 submitted, 137 tests)
+- Live trading system with economic research
+
+**Availability:** Immediate
+**Location:** US-based, fully remote
+**Travel:** <10% works great
+
+I'm excited about providing technical guidance to mission-driven educational teams and bringing AI innovation to impactful projects.
+
+Best,
+Yair Siegel
+siegel.yaz@gmail.com
+github.com/yaya1738

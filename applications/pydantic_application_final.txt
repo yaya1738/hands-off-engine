@@ -1,0 +1,47 @@
+To: careers@pydantic.dev
+Subject: Solutions Engineer Application - Yair Siegel
+
+Hi Pydantic team,
+
+I'm applying for the Solutions Engineer role at Logfire. I'm a Python engineer with deep validation/observability experience and strong customer-facing skills.
+
+**Why I'm a strong fit:**
+
+**Technical Depth:**
+This week I built 4 production AI infrastructure tools (137/137 tests passing in <24 hours):
+- KV-Cache Manager with dataclass serialization (49 tests)
+- Model Lifecycle Manager with systemd integration (36 tests)
+- /dev/llm FUSE Device with structured configs (20 tests)
+- Accelerator Resource Limits with cgroups (32 tests)
+
+I understand stack traces, async/await patterns, and OTel instrumentation debugging. I use Pydantic daily for validation and structured outputs.
+
+**Customer-Facing Experience:**
+- Technical consulting and system design discussions
+- Developer education (currently drafting Claude Code tutorial)
+- Troubleshooting production issues with remote teams
+- Process automation and documentation
+
+**Qualifications:**
+✓ Production Python coding (FastAPI, asyncio, dataclasses)
+✓ Stack trace debugging and async patterns
+✓ Customer communication and training
+✓ Timezone: US-based, can overlap UTC-8 to UTC+1
+✓ Available for quarterly offsites
+✓ Fluent English
+
+**Nice-to-haves:**
+✓ AI engineering best practices (LLM structured outputs, function calling)
+✓ DevRel mindset (documentation, examples, teaching)
+
+**Portfolio:** github.com/yaya1738
+**Bounty work:** cortexlinux/cortex issues #220-223 ($550 submitted)
+
+**Availability:** Immediate
+
+I'm excited about helping Logfire customers succeed and feeding real-world insights back to your engineering team.
+
+Best,
+Yair Siegel
+siegel.yaz@gmail.com
+github.com/yaya1738
