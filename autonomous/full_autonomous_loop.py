@@ -28,6 +28,7 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 from integrafix.api_orchestrator import APIOrchestrator
+from integrafix.self_improvement_engine import SelfImprovementEngine
 
 
 class AutonomousLoop:
@@ -36,7 +37,9 @@ class AutonomousLoop:
     def __init__(self):
         self.running = True
         self.orchestrator = APIOrchestrator()
+        self.self_improvement = SelfImprovementEngine()
         self.wallet_address = "0xB314345D218ED4CF75C17636a2307244E7dA761b"
+        self.cycles_since_improvement = 0
 
     def run_v1_money_printer(self):
         """V1: Money Printer - Check markets via API."""
@@ -156,6 +159,17 @@ class AutonomousLoop:
         else:
             print(f"   ROI: ∞ (zero cost)")
 
+        # Self-improvement every 10 cycles
+        self.cycles_since_improvement += 1
+        if self.cycles_since_improvement >= 10:
+            print("\n🧠 [SELF-IMPROVEMENT]")
+            print("   Running self-improvement cycle...")
+            try:
+                self.self_improvement.run_self_improvement_cycle()
+                self.cycles_since_improvement = 0
+            except Exception as e:
+                print(f"   ⚠️  Self-improvement error: {e}")
+
         print()
         print("=" * 80)
         success_count = sum(1 for v in results.values() if v)
@@ -175,8 +189,10 @@ class AutonomousLoop:
         print("  • V2: GitHub Bounty Hunter → GitHub API")
         print("  • V3: Bug Bounty Hunter → HackerOne API")
         print("  • Infrastructure → Blockchain APIs")
+        print("  • Self-Improvement → Every 10 cycles")
         print()
         print("All operations use ABCFC-optimized API calls")
+        print("System autonomously improves itself")
         print()
         print("Press Ctrl+C to stop")
         print()
