@@ -114,13 +114,22 @@ class JobApplicationAgent:
         return sent
 
     def check_for_responses(self):
-        """Check email for application responses (future enhancement)."""
-        # TODO: Implement IMAP email checking
-        # - Check handsoff email inbox
-        # - Parse for job responses
-        # - Update application status
-        # - Alert on interviews
-        pass
+        """Check email for application responses."""
+        try:
+            from email_monitor import EmailMonitor
+            monitor = EmailMonitor()
+            result = monitor.run_cycle()
+
+            if result.get("interviews"):
+                self.state["interviews_scheduled"] += result["interviews"]
+
+            if result.get("new_emails"):
+                self.state["responses_received"] += result["new_emails"]
+
+            return result
+        except Exception as e:
+            print(f"Email monitoring not available: {e}")
+            return None
 
     def schedule_follow_ups(self):
         """Schedule follow-up emails for pending applications."""
@@ -146,7 +155,11 @@ class JobApplicationAgent:
             print("Waiting 24h between application batches")
 
         # Check for responses
-        # self.check_for_responses()
+        print("Checking for email responses...")
+        response_result = self.check_for_responses()
+        if response_result:
+            print(f"  New emails: {response_result.get('new_emails', 0)}")
+            print(f"  Auto-responses sent: {response_result.get('responses', 0)}")
 
         # Schedule follow-ups
         # self.schedule_follow_ups()
