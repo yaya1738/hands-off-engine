@@ -28,7 +28,7 @@
       "compensation": "TBD",
       "location": "Remote (UTC-8 to UTC+1)",
       "match_score": 92,
-      "status": "application_ready",
+      "status": "failed",
       "file": "pydantic_application.md",
       "apply_url": "pydantic.dev/jobs/solutions-engineer"
     },
@@ -73,15 +73,46 @@
     }
   ],
   "additional_leads": [
-    {"company": "Profitmind", "role": "Web Scraping Developer", "salary": "$90-110k"},
-    {"company": "Shorebird", "role": "Systems Engineer", "salary": "$160-230k"},
-    {"company": "FUTO", "role": "ML Engineer", "focus": "Privacy-first ML"},
-    {"company": "Datalab", "role": "Research Engineer", "tech": "FastAPI, PyTorch"}
+    {
+      "company": "Profitmind",
+      "role": "Web Scraping Developer",
+      "salary": "$90-110k"
+    },
+    {
+      "company": "Shorebird",
+      "role": "Systems Engineer",
+      "salary": "$160-230k"
+    },
+    {
+      "company": "FUTO",
+      "role": "ML Engineer",
+      "focus": "Privacy-first ML"
+    },
+    {
+      "company": "Datalab",
+      "role": "Research Engineer",
+      "tech": "FastAPI, PyTorch"
+    }
   ],
   "bounty_leads": [
-    {"repo": "Chakra-Network/dojo-spas", "bounty": "$1000-2000", "tech": "React/TypeScript", "status": "potential"},
-    {"repo": "daydreamsai/agent-bounties", "bounty": "$1000", "tech": "TypeScript agents", "status": "potential"},
-    {"repo": "MonoGame/MonoGame", "bounty": "$500-5000", "tech": "C#", "status": "not-fit"}
+    {
+      "repo": "Chakra-Network/dojo-spas",
+      "bounty": "$1000-2000",
+      "tech": "React/TypeScript",
+      "status": "potential"
+    },
+    {
+      "repo": "daydreamsai/agent-bounties",
+      "bounty": "$1000",
+      "tech": "TypeScript agents",
+      "status": "potential"
+    },
+    {
+      "repo": "MonoGame/MonoGame",
+      "bounty": "$500-5000",
+      "tech": "C#",
+      "status": "not-fit"
+    }
   ],
   "hn_thread": "https://news.ycombinator.com/item?id=46108941",
   "portfolio": {

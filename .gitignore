@@ -59,3 +59,4 @@ Thumbs.db
 .vscode/
 .claude/settings.local.json
 state/permanent/ACCESS_MASTER.md
+.env.handsoff_email
