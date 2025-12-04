@@ -1,0 +1,30 @@
+Hi SynRes team,
+
+I'm applying for the Senior Python Engineer role. I've EXCELED at building production AI infrastructure and am excited about this governance layer rebuild.
+
+**This week I built 4 production-ready AI tools (137/137 tests passing in <24 hours):**
+
+1. **KV-Cache Manager** - POSIX shared memory pools for LLM inference with bitmap allocation and LRU/LFU/FIFO/Priority eviction (49 tests)
+
+2. **Model Lifecycle Manager** - systemd-based LLM service management supporting vLLM, llama.cpp, Ollama, TGI backends with health monitoring (36 tests)
+
+3. **/dev/llm FUSE Device** - Virtual filesystem providing file-like LLM access with session management (20 tests)
+
+4. **Accelerator Resource Limits** - cgroups v2 wrapper for AI workloads (32 tests)
+
+**Core skills matching your needs:**
+- Deep Python (asyncio, dataclasses, ctypes, mmap)
+- FastAPI + async-first architectures
+- LLM structured-output pipelines (JSON mode, function calling)
+- Systems programming and optimization
+- Metadata-to-parameter conversion patterns
+
+**Portfolio:** github.com/yaya1738
+**Bounties:** cortexlinux/cortex issues #220, #221, #222, #223 ($550 submitted)
+
+**Availability:** Immediate, flexible hours (part-time works great)
+**Rate:** $80-120/hr or negotiable within your $100-200k range
+
+Best,
+Yair Siegel
+siegel.yaz@gmail.com

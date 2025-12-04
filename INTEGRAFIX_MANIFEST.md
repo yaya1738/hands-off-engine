@@ -204,8 +204,8 @@ Key Yair Components:
 |--------|------|-------------|----------|--------|
 | edge_circular_fair_price | CIRCULAR | Fair price from market price = no edge | 100% | **FIXED** |
 | wisdom_no_edge_output | ORPHANED | Wisdom engine edge orphaned | 90% | **FIXED** |
-| backend_brain_no_bidirectional | BLIND | Brain/backend not bidirectional | 80% | Open |
-| brain_scaling_no_coordination | BLIND | Brain/scaling race condition | 90% | Open |
+| backend_brain_no_bidirectional | BLIND | Brain/backend not bidirectional | 80% | **FIXED** |
+| brain_scaling_no_coordination | BLIND | Brain/scaling race condition | 90% | **FIXED** |
 | no_process_coordinator | MISSING | No central process coordinator | 100% | **FIXED** |
 | edge_to_executor_disconnected | DEAD_END | Edge never reaches executor | 100% | **FIXED** |
 | executor_to_recorder_disconnected | DEAD_END | Trades not recorded | 90% | **FIXED** |
