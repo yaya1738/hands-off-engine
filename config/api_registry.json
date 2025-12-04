@@ -1,150 +1,608 @@
 {
-  "api_registry": {
-    "version": "1.0",
-    "updated": "2025-11-30",
-    "description": "Master registry of all APIs available to AI Nexus"
-  },
-
-  "configured_working": {
-    "openai": {
-      "status": "working",
-      "env_var": "OPENAI_API_KEY",
-      "env_file": ".env",
-      "capabilities": ["chat", "embeddings", "images", "tts", "whisper"],
-      "models": ["gpt-4o", "gpt-4o-mini", "gpt-3.5-turbo"],
-      "cost": "pay-per-token",
-      "notes": "Primary LLM for intelligent alpha"
+  "apis": {
+    "polymarket_get_markets": {
+      "name": "polymarket_get_markets",
+      "provider": "polymarket",
+      "category": "trading",
+      "method": "GET",
+      "url_template": "https://clob.polymarket.com/markets",
+      "auth_type": "api_key",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 1000,
+      "success_probability": 0.99,
+      "expected_value": 10.0,
+      "description": "Get all active Polymarket markets",
+      "required_params": [],
+      "optional_params": [
+        "closed",
+        "archived"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
     },
-    "anthropic": {
-      "status": "working",
-      "env_var": "ANTHROPIC_API_KEY",
-      "env_file": "claude_cli_config",
-      "capabilities": ["chat", "code", "analysis"],
-      "models": ["claude-3-opus", "claude-3-sonnet", "claude-3-haiku"],
-      "cost": "pay-per-token",
-      "notes": "Used via Claude CLI for complex reasoning"
+    "polymarket_place_order": {
+      "name": "polymarket_place_order",
+      "provider": "polymarket",
+      "category": "trading",
+      "method": "POST",
+      "url_template": "https://clob.polymarket.com/order",
+      "auth_type": "api_key",
+      "cost_per_call": 0.01,
+      "rate_limit_per_hour": 100,
+      "success_probability": 0.95,
+      "expected_value": 5.0,
+      "description": "Place a limit order on Polymarket",
+      "required_params": [
+        "market",
+        "side",
+        "price",
+        "size"
+      ],
+      "optional_params": [
+        "expiration"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
     },
-    "telegram": {
-      "status": "working",
-      "env_var": "TELEGRAM_BOT_TOKEN",
-      "env_file": ".env.social.template",
-      "capabilities": ["send_messages", "receive_commands", "notifications"],
-      "bot_username": "@pm_alerts_autobot",
-      "cost": "free",
-      "notes": "Primary user notification channel"
+    "polymarket_get_orderbook": {
+      "name": "polymarket_get_orderbook",
+      "provider": "polymarket",
+      "category": "trading",
+      "method": "GET",
+      "url_template": "https://clob.polymarket.com/book",
+      "auth_type": "api_key",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 2000,
+      "success_probability": 0.99,
+      "expected_value": 15.0,
+      "description": "Get orderbook for a specific market",
+      "required_params": [
+        "token_id"
+      ],
+      "optional_params": [],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
     },
-    "polymarket": {
-      "status": "working",
-      "env_var": "POLYMARKET_PRIVATE_KEY",
-      "env_file": ".env.polymarket",
-      "capabilities": ["trading", "market_data", "positions"],
-      "balance": "$8.99",
-      "cost": "trading fees only",
-      "notes": "Main trading venue"
+    "github_search_issues": {
+      "name": "github_search_issues",
+      "provider": "github",
+      "category": "github",
+      "method": "GET",
+      "url_template": "https://api.github.com/search/issues",
+      "auth_type": "bearer",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 30,
+      "success_probability": 0.98,
+      "expected_value": 100.0,
+      "description": "Search GitHub issues (for bounties)",
+      "required_params": [
+        "q"
+      ],
+      "optional_params": [
+        "sort",
+        "order",
+        "per_page"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
     },
-    "digitalocean": {
-      "status": "working",
-      "env_var": "DO_API_TOKEN",
-      "env_file": ".env",
-      "capabilities": ["droplets", "domains", "spaces"],
-      "cost": "infrastructure costs",
-      "notes": "Server infrastructure"
+    "github_get_issue": {
+      "name": "github_get_issue",
+      "provider": "github",
+      "category": "github",
+      "method": "GET",
+      "url_template": "https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}",
+      "auth_type": "bearer",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 5000,
+      "success_probability": 0.99,
+      "expected_value": 10.0,
+      "description": "Get details of a specific issue",
+      "required_params": [
+        "owner",
+        "repo",
+        "issue_number"
+      ],
+      "optional_params": [],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
     },
-    "github": {
-      "status": "partial",
-      "access_method": "SSH key (pm-helper only)",
-      "env_var": "GITHUB_PAT",
-      "env_file": ".env",
-      "capabilities": ["push", "pull", "branches", "api"],
-      "repo": "yaya1738/hands-off-engine",
-      "cost": "free",
-      "notes": "PAT needed for: compute nodes, API calls, CLI migration",
-      "action_needed": "Generate PAT at https://github.com/settings/tokens with 'repo' scope",
-      "telegram_command": "/setpat <token>"
+    "github_create_comment": {
+      "name": "github_create_comment",
+      "provider": "github",
+      "category": "github",
+      "method": "POST",
+      "url_template": "https://api.github.com/repos/{owner}/{repo}/issues/{issue_number}/comments",
+      "auth_type": "bearer",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 5000,
+      "success_probability": 0.99,
+      "expected_value": 50.0,
+      "description": "Post a comment on an issue (claim bounty)",
+      "required_params": [
+        "owner",
+        "repo",
+        "issue_number",
+        "body"
+      ],
+      "optional_params": [],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "github_list_prs": {
+      "name": "github_list_prs",
+      "provider": "github",
+      "category": "github",
+      "method": "GET",
+      "url_template": "https://api.github.com/repos/{owner}/{repo}/pulls",
+      "auth_type": "bearer",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 5000,
+      "success_probability": 0.99,
+      "expected_value": 5.0,
+      "description": "List pull requests for a repo",
+      "required_params": [
+        "owner",
+        "repo"
+      ],
+      "optional_params": [
+        "state",
+        "sort"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "github_create_pr": {
+      "name": "github_create_pr",
+      "provider": "github",
+      "category": "github",
+      "method": "POST",
+      "url_template": "https://api.github.com/repos/{owner}/{repo}/pulls",
+      "auth_type": "bearer",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 5000,
+      "success_probability": 0.95,
+      "expected_value": 500.0,
+      "description": "Create a pull request",
+      "required_params": [
+        "owner",
+        "repo",
+        "title",
+        "head",
+        "base"
+      ],
+      "optional_params": [
+        "body"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "hackerone_list_programs": {
+      "name": "hackerone_list_programs",
+      "provider": "hackerone",
+      "category": "security",
+      "method": "GET",
+      "url_template": "https://api.hackerone.com/v1/hackers/programs",
+      "auth_type": "api_key",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 100,
+      "success_probability": 0.95,
+      "expected_value": 200.0,
+      "description": "List available bug bounty programs",
+      "required_params": [],
+      "optional_params": [
+        "page"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "hackerone_submit_report": {
+      "name": "hackerone_submit_report",
+      "provider": "hackerone",
+      "category": "security",
+      "method": "POST",
+      "url_template": "https://api.hackerone.com/v1/hackers/reports",
+      "auth_type": "api_key",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 10,
+      "success_probability": 0.6,
+      "expected_value": 2000.0,
+      "description": "Submit a vulnerability report",
+      "required_params": [
+        "program_id",
+        "title",
+        "vulnerability_information"
+      ],
+      "optional_params": [
+        "severity",
+        "impact"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "aws_s3_upload": {
+      "name": "aws_s3_upload",
+      "provider": "aws",
+      "category": "infrastructure",
+      "method": "PUT",
+      "url_template": "https://s3.amazonaws.com/{bucket}/{key}",
+      "auth_type": "aws_sig",
+      "cost_per_call": 0.0001,
+      "rate_limit_per_hour": 10000,
+      "success_probability": 0.99,
+      "expected_value": 1.0,
+      "description": "Upload file to S3 bucket",
+      "required_params": [
+        "bucket",
+        "key",
+        "data"
+      ],
+      "optional_params": [
+        "metadata"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "cloudflare_dns_update": {
+      "name": "cloudflare_dns_update",
+      "provider": "cloudflare",
+      "category": "infrastructure",
+      "method": "PUT",
+      "url_template": "https://api.cloudflare.com/client/v4/zones/{zone_id}/dns_records/{dns_record_id}",
+      "auth_type": "bearer",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 1200,
+      "success_probability": 0.99,
+      "expected_value": 5.0,
+      "description": "Update DNS record",
+      "required_params": [
+        "zone_id",
+        "dns_record_id",
+        "type",
+        "name",
+        "content"
+      ],
+      "optional_params": [
+        "ttl",
+        "proxied"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "email_send_smtp": {
+      "name": "email_send_smtp",
+      "provider": "gmail",
+      "category": "communication",
+      "method": "POST",
+      "url_template": "smtp://smtp.gmail.com:587",
+      "auth_type": "password",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 100,
+      "success_probability": 0.98,
+      "expected_value": 10.0,
+      "description": "Send email via SMTP",
+      "required_params": [
+        "to",
+        "subject",
+        "body"
+      ],
+      "optional_params": [
+        "cc",
+        "bcc",
+        "attachments"
+      ],
+      "response_format": "status",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "telegram_send_message": {
+      "name": "telegram_send_message",
+      "provider": "telegram",
+      "category": "communication",
+      "method": "POST",
+      "url_template": "https://api.telegram.org/bot{token}/sendMessage",
+      "auth_type": "bearer",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 30,
+      "success_probability": 0.99,
+      "expected_value": 5.0,
+      "description": "Send Telegram message",
+      "required_params": [
+        "chat_id",
+        "text"
+      ],
+      "optional_params": [
+        "parse_mode"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "etherscan_get_balance": {
+      "name": "etherscan_get_balance",
+      "provider": "etherscan",
+      "category": "crypto",
+      "method": "GET",
+      "url_template": "https://api.etherscan.io/api",
+      "auth_type": "api_key",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 5,
+      "success_probability": 0.99,
+      "expected_value": 10.0,
+      "description": "Get wallet balance from Ethereum",
+      "required_params": [
+        "address"
+      ],
+      "optional_params": [
+        "tag"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
+    },
+    "polygonscan_get_balance": {
+      "name": "polygonscan_get_balance",
+      "provider": "polygonscan",
+      "category": "crypto",
+      "method": "GET",
+      "url_template": "https://api.polygonscan.com/api",
+      "auth_type": "api_key",
+      "cost_per_call": 0.0,
+      "rate_limit_per_hour": 5,
+      "success_probability": 0.99,
+      "expected_value": 10.0,
+      "description": "Get wallet balance from Polygon",
+      "required_params": [
+        "address"
+      ],
+      "optional_params": [
+        "tag"
+      ],
+      "response_format": "json",
+      "enabled": true,
+      "last_used": null,
+      "total_calls": 0,
+      "failed_calls": 0
     }
   },
-
-  "configured_not_working": {
-    "twitter": {
-      "status": "template_only",
-      "env_var": "TWITTER_BEARER_TOKEN",
-      "action_needed": "User needs to create app at developer.twitter.com"
-    },
-    "reddit": {
-      "status": "template_only",
-      "env_var": "REDDIT_CLIENT_ID",
-      "action_needed": "User needs to create app at reddit.com/prefs/apps"
+  "stats": {
+    "total_api_calls": 0,
+    "total_cost": 0.0,
+    "apis": {
+      "polymarket_get_markets": {
+        "name": "polymarket_get_markets",
+        "category": "trading",
+        "provider": "polymarket",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "polymarket_place_order": {
+        "name": "polymarket_place_order",
+        "category": "trading",
+        "provider": "polymarket",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "polymarket_get_orderbook": {
+        "name": "polymarket_get_orderbook",
+        "category": "trading",
+        "provider": "polymarket",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "github_search_issues": {
+        "name": "github_search_issues",
+        "category": "github",
+        "provider": "github",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "github_get_issue": {
+        "name": "github_get_issue",
+        "category": "github",
+        "provider": "github",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "github_create_comment": {
+        "name": "github_create_comment",
+        "category": "github",
+        "provider": "github",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "github_list_prs": {
+        "name": "github_list_prs",
+        "category": "github",
+        "provider": "github",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "github_create_pr": {
+        "name": "github_create_pr",
+        "category": "github",
+        "provider": "github",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "hackerone_list_programs": {
+        "name": "hackerone_list_programs",
+        "category": "security",
+        "provider": "hackerone",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "hackerone_submit_report": {
+        "name": "hackerone_submit_report",
+        "category": "security",
+        "provider": "hackerone",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "aws_s3_upload": {
+        "name": "aws_s3_upload",
+        "category": "infrastructure",
+        "provider": "aws",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "cloudflare_dns_update": {
+        "name": "cloudflare_dns_update",
+        "category": "infrastructure",
+        "provider": "cloudflare",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "email_send_smtp": {
+        "name": "email_send_smtp",
+        "category": "communication",
+        "provider": "gmail",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "telegram_send_message": {
+        "name": "telegram_send_message",
+        "category": "communication",
+        "provider": "telegram",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "etherscan_get_balance": {
+        "name": "etherscan_get_balance",
+        "category": "crypto",
+        "provider": "etherscan",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      },
+      "polygonscan_get_balance": {
+        "name": "polygonscan_get_balance",
+        "category": "crypto",
+        "provider": "polygonscan",
+        "total_calls": 0,
+        "failed_calls": 0,
+        "success_rate": 0,
+        "total_cost": 0.0,
+        "avg_cost": 0,
+        "abcfc_score": 0.0,
+        "last_used": null
+      }
     }
-  },
-
-  "recommended_additions": {
-    "free_tier": [
-      {
-        "provider": "groq",
-        "url": "console.groq.com",
-        "why": "Free tier, extremely fast inference, good for quick queries",
-        "models": ["llama-3.1-70b", "mixtral-8x7b"],
-        "free_limit": "Generous free tier"
-      },
-      {
-        "provider": "google_ai",
-        "url": "aistudio.google.com",
-        "why": "Free tier includes Gemini Pro, multimodal",
-        "models": ["gemini-1.5-pro", "gemini-1.5-flash"],
-        "free_limit": "60 requests/min free"
-      },
-      {
-        "provider": "mistral",
-        "url": "console.mistral.ai",
-        "why": "Free tier, strong reasoning, European provider",
-        "models": ["mistral-large", "mistral-small"],
-        "free_limit": "Limited free tier"
-      },
-      {
-        "provider": "together_ai",
-        "url": "api.together.xyz",
-        "why": "Free $25 credit, access to many open models",
-        "models": ["llama", "mixtral", "qwen"],
-        "free_limit": "$25 free credit"
-      },
-      {
-        "provider": "huggingface",
-        "url": "huggingface.co",
-        "why": "Free inference API for open models",
-        "models": ["many open source"],
-        "free_limit": "Rate limited free tier"
-      }
-    ],
-    "paid_valuable": [
-      {
-        "provider": "perplexity",
-        "url": "perplexity.ai",
-        "why": "Real-time web search + LLM, great for research"
-      },
-      {
-        "provider": "replicate",
-        "url": "replicate.com",
-        "why": "Run any ML model, good for image/video generation"
-      }
-    ],
-    "for_income": [
-      {
-        "provider": "stripe",
-        "url": "stripe.com",
-        "why": "Accept payments for services",
-        "action": "User creates account, system gets API keys"
-      },
-      {
-        "provider": "gumroad",
-        "url": "gumroad.com",
-        "why": "Sell digital products (signals, reports)",
-        "action": "User creates account"
-      }
-    ]
-  },
-
-  "mcp_servers": {
-    "configured": ["github-mcp-server", "playwright-mcp"],
-    "recommended": ["filesystem", "brave-search", "memory"]
   }
 }
