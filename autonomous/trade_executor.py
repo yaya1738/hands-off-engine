@@ -17,6 +17,13 @@ from decimal import Decimal
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
 
+# INTEGRAFIX: Import ABCFC bridge for proper decision scoring
+try:
+    from integrafix.claude_abcfc_bridge import get_bridge
+    ABCFC_AVAILABLE = True
+except ImportError:
+    ABCFC_AVAILABLE = False
+
 MASTER = "Yair Siegel"
 TRADE_STATE = STATE_DIR / "trade_executor_state.json"
 TRADE_LOG = STATE_DIR / "trade_history.jsonl"
@@ -27,7 +34,28 @@ class TradeExecutor:
 
     def __init__(self):
         self.state = self._load_state()
-        self.mode = os.environ.get("TRADING_MODE", "DRYRUN")
+        self.mode = self._get_trading_mode()
+
+    def _get_trading_mode(self) -> str:
+        """INTEGRAFIX: Get trading mode from config file first, then env, then state."""
+        # 1. Check config file (highest priority)
+        config_file = PROJECT_ROOT / "config" / "trading_config.json"
+        if config_file.exists():
+            try:
+                with open(config_file) as f:
+                    config = json.load(f)
+                if config.get("live_trading_enabled") and not config.get("dry_run"):
+                    return "LIVE"
+            except Exception as e:
+                # INTEGRAFIX: Log config load failures
+                import logging
+                logging.warning(f"Failed to load trading config: {e}")
+        # 2. Check environment variable
+        env_mode = os.environ.get("TRADING_MODE")
+        if env_mode:
+            return env_mode
+        # 3. Check state file
+        return self.state.get("mode", "DRYRUN")
 
     def _load_state(self) -> Dict:
         if TRADE_STATE.exists():
@@ -71,7 +99,7 @@ class TradeExecutor:
         return []
 
     def analyze_opportunity(self, market: Dict) -> Optional[Dict]:
-        """Analyze a market for trading opportunity."""
+        """Analyze a market for trading opportunity using ABCFC evaluation."""
         try:
             question = market.get("question", "")
             prices = json.loads(market.get("outcomePrices", "[]"))
@@ -84,45 +112,123 @@ class TradeExecutor:
             yes_price = float(prices[0])
             no_price = float(prices[1])
 
-            # Look for mispriced markets
-            signal = None
+            # INTEGRAFIX: Use ABCFC bridge for proper evaluation
+            if ABCFC_AVAILABLE:
+                return self._analyze_with_abcfc(market, question, yes_price, no_price, volume, liquidity)
 
-            # Very low YES price with high volume = potential value
-            if yes_price < 0.05 and volume > 100000:
-                signal = {
-                    "market": question[:80],
-                    "side": "YES",
-                    "price": yes_price,
-                    "confidence": 0.6,
-                    "reason": f"Low YES ({yes_price:.3f}) with ${volume:,.0f} volume"
-                }
-
-            # Very high YES price might be overconfident
-            elif yes_price > 0.95 and volume > 100000:
-                signal = {
-                    "market": question[:80],
-                    "side": "NO",
-                    "price": no_price,
-                    "confidence": 0.5,
-                    "reason": f"High YES ({yes_price:.3f}) may be overconfident"
-                }
-
-            # Liquidity opportunity - large spread
-            spread = abs(yes_price - (1 - no_price))
-            if spread > 0.02 and liquidity > 10000:
-                if not signal:
-                    signal = {
-                        "market": question[:80],
-                        "side": "SPREAD",
-                        "spread": spread,
-                        "confidence": 0.4,
-                        "reason": f"Wide spread ({spread:.3f}) arbitrage potential"
-                    }
-
-            return signal
+            # Fallback: original heuristics (deprecated)
+            return self._analyze_heuristic(question, yes_price, no_price, volume, liquidity)
 
         except Exception as e:
             return None
+
+    def _analyze_with_abcfc(self, market: Dict, question: str, yes_price: float,
+                            no_price: float, volume: float, liquidity: float) -> Optional[Dict]:
+        """INTEGRAFIX: Analyze using ABCFC bridge for proper scoring."""
+        bridge = get_bridge()
+
+        # Potential actions: buy YES, buy NO, or skip
+        trade_size = 1.0  # $1 base position for evaluation
+
+        actions = [
+            {
+                "name": "buy_yes",
+                "action_type": "buy",
+                "side": "YES",
+                "price": yes_price,
+                "size": trade_size,
+                "market": question[:80],
+                "volume": volume,
+                "liquidity": liquidity
+            },
+            {
+                "name": "buy_no",
+                "action_type": "buy",
+                "side": "NO",
+                "price": no_price,
+                "size": trade_size,
+                "market": question[:80],
+                "volume": volume,
+                "liquidity": liquidity
+            },
+            {
+                "name": "skip",
+                "action_type": "hold",
+                "side": "NONE",
+                "market": question[:80]
+            }
+        ]
+
+        # Evaluate using trading decision method
+        result = bridge.evaluate_trading_decision(
+            decision=f"Trade on: {question[:50]}",
+            actions=actions
+        )
+
+        recommended = result.get("recommended", {})
+        action_name = recommended.get("action", "skip")
+        score = recommended.get("score", 0)
+
+        # Only signal if score is positive and not skip
+        if action_name == "skip" or score <= 0:
+            return None
+
+        # Find the action details
+        for a in actions:
+            if a["name"] == action_name:
+                return {
+                    "market": question[:80],
+                    "side": a["side"],
+                    "price": a.get("price", 0),
+                    "confidence": min(score / 10, 1.0),  # Normalize score to confidence
+                    "abcfc_score": score,
+                    "reason": f"ABCFC score: {score:.2f}",
+                    "using_abcfc": True
+                }
+
+        return None
+
+    def _analyze_heuristic(self, question: str, yes_price: float, no_price: float,
+                          volume: float, liquidity: float) -> Optional[Dict]:
+        """Fallback heuristic analysis (deprecated - prefer ABCFC)."""
+        signal = None
+
+        # Very low YES price with high volume = potential value
+        if yes_price < 0.05 and volume > 100000:
+            signal = {
+                "market": question[:80],
+                "side": "YES",
+                "price": yes_price,
+                "confidence": 0.6,
+                "reason": f"Low YES ({yes_price:.3f}) with ${volume:,.0f} volume",
+                "using_abcfc": False
+            }
+
+        # Very high YES price might be overconfident
+        elif yes_price > 0.95 and volume > 100000:
+            signal = {
+                "market": question[:80],
+                "side": "NO",
+                "price": no_price,
+                "confidence": 0.5,
+                "reason": f"High YES ({yes_price:.3f}) may be overconfident",
+                "using_abcfc": False
+            }
+
+        # Liquidity opportunity - large spread
+        spread = abs(yes_price - (1 - no_price))
+        if spread > 0.02 and liquidity > 10000:
+            if not signal:
+                signal = {
+                    "market": question[:80],
+                    "side": "SPREAD",
+                    "spread": spread,
+                    "confidence": 0.4,
+                    "reason": f"Wide spread ({spread:.3f}) arbitrage potential",
+                    "using_abcfc": False
+                }
+
+        return signal
 
     def generate_signals(self) -> List[Dict]:
         """Generate trading signals from current markets."""

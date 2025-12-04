@@ -29,6 +29,13 @@ sys.path.insert(0, str(PROJECT_ROOT))
 STATE_DIR = PROJECT_ROOT / "state"
 MASTER = "Yair Siegel"
 
+# INTEGRAFIX: Import ABCFC bridge for hierarchy-aware decisions
+try:
+    from integrafix.claude_abcfc_bridge import get_bridge as get_abcfc_bridge
+    ABCFC_AVAILABLE = True
+except ImportError:
+    ABCFC_AVAILABLE = False
+
 # Import teaching systems
 from autonomous.yair_wisdom_engine import YairWisdomEngine
 from autonomous.probability_calibrator import ProbabilityCalibrator
@@ -67,9 +74,46 @@ class ConcreteExecutor:
         # INTEGRAFIX: Wire cost tracking for billing
         self.cost_tracker = get_cost_tracker() if COST_TRACKING_ENABLED else None
 
-        self.dry_run = dry_run  # Safety: start in dry run mode
+        # INTEGRAFIX: Check config file for live trading
+        self.dry_run = self._check_trading_mode(dry_run)
+        self.safeguards = self._load_safeguards()
 
         self.state = self._load_state()
+
+    def _check_trading_mode(self, default_dry_run: bool) -> bool:
+        """INTEGRAFIX: Check config file for live trading mode."""
+        config_file = PROJECT_ROOT / "config" / "trading_config.json"
+        if config_file.exists():
+            try:
+                with open(config_file) as f:
+                    config = json.load(f)
+                if config.get("live_trading_enabled") and not config.get("dry_run"):
+                    return False  # Live trading enabled
+            except Exception as e:
+                # INTEGRAFIX: Log config load failures
+                import logging
+                logging.warning(f"Failed to load trading config: {e}")
+        return default_dry_run
+
+    def _load_safeguards(self) -> Dict:
+        """INTEGRAFIX: Load trading safeguards from config."""
+        config_file = PROJECT_ROOT / "config" / "trading_config.json"
+        defaults = {
+            "max_per_trade": 5.0,
+            "max_daily_loss": 20.0,
+            "max_open_positions": 5,
+            "min_edge_required": 0.05
+        }
+        if config_file.exists():
+            try:
+                with open(config_file) as f:
+                    config = json.load(f)
+                return config.get("safeguards", defaults)
+            except Exception as e:
+                # INTEGRAFIX: Log safeguards load failures
+                import logging
+                logging.warning(f"Failed to load safeguards config: {e}")
+        return defaults
 
     def _load_state(self) -> Dict:
         if PIPELINE_STATE.exists():
@@ -245,6 +289,42 @@ class ConcreteExecutor:
             kelly_fraction = (edge * confidence) / (1 - edge) if edge < 1 else 0.01
             max_fraction = 0.05  # Never more than 5% of capital
             position_fraction = min(kelly_fraction, max_fraction)
+
+            # INTEGRAFIX: Final ABCFC validation against hierarchy
+            abcfc_approved = True
+            if ABCFC_AVAILABLE:
+                try:
+                    bridge = get_abcfc_bridge()
+                    abcfc_result = bridge.evaluate_trading_decision(
+                        decision=f"Execute trade on {evaluation.get('market', '')[:40]}",
+                        actions=[
+                            {"name": "execute", "action_type": "buy", "direction": direction, "edge": edge},
+                            {"name": "skip", "action_type": "hold"}
+                        ]
+                    )
+                    recommended = abcfc_result.get("recommended", {}).get("action", "skip")
+                    if recommended != "execute":
+                        abcfc_approved = False
+                        evaluation["pipeline_stages"]["abcfc"] = {
+                            "status": "BLOCKED",
+                            "reason": "ABCFC hierarchy check failed",
+                            "recommended": recommended
+                        }
+                    else:
+                        evaluation["pipeline_stages"]["abcfc"] = {
+                            "status": "APPROVED",
+                            "score": abcfc_result.get("recommended", {}).get("score", 0)
+                        }
+                except Exception as e:
+                    evaluation["pipeline_stages"]["abcfc"] = {"status": "ERROR", "error": str(e)}
+
+            if not abcfc_approved:
+                evaluation["recommendation"] = "ABCFC_BLOCKED"
+                evaluation["concrete_action"] = {
+                    "action": "NO_TRADE",
+                    "reason": "ABCFC hierarchy validation failed"
+                }
+                return evaluation
 
             evaluation["recommendation"] = "TRADE"
             evaluation["concrete_action"] = {
