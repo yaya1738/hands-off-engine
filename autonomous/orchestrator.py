@@ -62,6 +62,13 @@ from infrastructure import (
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from ai.approval_queue import ApprovalQueue, needs_approval, send_approval_notification
 
+# INTEGRAFIX: Import ABCFC bridge for hierarchy-aware decisions
+try:
+    from integrafix.claude_abcfc_bridge import get_bridge as get_abcfc_bridge
+    ABCFC_AVAILABLE = True
+except ImportError:
+    ABCFC_AVAILABLE = False
+
 
 class UnifiedAutonomousSystem:
     """
@@ -390,6 +397,25 @@ class UnifiedAutonomousSystem:
         """Make infrastructure decisions based on health."""
         decisions = []
 
+        # INTEGRAFIX: Use ABCFC to validate infrastructure decisions against hierarchy
+        abcfc_allows_spending = True
+        if ABCFC_AVAILABLE:
+            try:
+                bridge = get_abcfc_bridge()
+                result = bridge.evaluate_trading_decision(
+                    decision="Infrastructure spending",
+                    actions=[
+                        {"name": "spend", "action_type": "buy", "size": 50},
+                        {"name": "hold", "action_type": "hold"}
+                    ]
+                )
+                recommended = result.get("recommended", {}).get("action", "hold")
+                if recommended != "spend":
+                    abcfc_allows_spending = False
+                    # Still allow emergency actions, but block optional upgrades
+            except Exception:
+                pass  # On error, allow spending (fail-open for infra)
+
         # Check if we need to upgrade or provision
         if health.overall_status == HealthStatus.CRITICAL:
             # Critical - need more capacity
@@ -403,8 +429,8 @@ class UnifiedAutonomousSystem:
                 self._execute_infra_decision(decision)
 
         elif health.overall_status == HealthStatus.WARNING:
-            # Warning - consider upgrade
-            if self.auto_upgrade:
+            # Warning - consider upgrade (INTEGRAFIX: check ABCFC first)
+            if self.auto_upgrade and abcfc_allows_spending:
                 decision = self._create_infra_decision(
                     action="upgrade_server",
                     reason=f"Warning health state ({health.overall_score})",
@@ -416,22 +442,26 @@ class UnifiedAutonomousSystem:
                         self._execute_infra_decision(decision)
                     else:
                         self._queue_infra_for_approval(decision)
+            elif not abcfc_allows_spending:
+                # ABCFC blocked - log but don't spend
+                pass
 
         elif health.overall_status == HealthStatus.DEGRADED:
-            # Degraded - schedule upgrade
-            decision = self._create_infra_decision(
-                action="plan_upgrade",
-                reason=f"Degraded health ({health.overall_score})",
-                auto_approve=False
-            )
-            if decision:
-                decisions.append(decision)
-                self._queue_infra_for_approval(decision)
+            # Degraded - schedule upgrade (INTEGRAFIX: check ABCFC first)
+            if abcfc_allows_spending:
+                decision = self._create_infra_decision(
+                    action="plan_upgrade",
+                    reason=f"Degraded health ({health.overall_score})",
+                    auto_approve=False
+                )
+                if decision:
+                    decisions.append(decision)
+                    self._queue_infra_for_approval(decision)
 
         # CRITICAL: Check for component-specific issues that warrant upgrade
         # even if overall status looks healthy (other components mask the problem)
-        elif self._needs_resource_upgrade(health):
-            # Component is struggling - upgrade to fix it
+        elif self._needs_resource_upgrade(health) and abcfc_allows_spending:
+            # Component is struggling - upgrade to fix it (INTEGRAFIX: ABCFC gated)
             component, reason = self._get_struggling_component(health)
             if self.auto_upgrade:
                 decision = self._create_infra_decision(
