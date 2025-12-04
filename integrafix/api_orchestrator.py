@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
-from api_manager import APIManager, APICallResult
+from integrafix.api_manager import APIManager, APICallResult
 
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"

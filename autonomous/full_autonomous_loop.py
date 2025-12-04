@@ -1,20 +1,18 @@
 #!/usr/bin/env python3
 """
-Full Autonomous Loop
-====================
+Full Autonomous Loop - API Powered
+===================================
 
-The COMPLETE autonomous system that runs without ANY human intervention:
+The COMPLETE autonomous system powered by API orchestrator:
 
-1. Scans for bounties
-2. Claims bounties automatically
-3. Implements solutions
-4. Submits PRs
-5. Monitors PR comments
-6. Responds to feedback
-7. Receives payments
-8. Confirms receipt
+1. Scans for bounties via GitHub API
+2. Checks markets via Polymarket API
+3. Monitors bugs via HackerOne API
+4. Tracks wallet via blockchain APIs
+5. All operations use ABCFC-optimized API calls
 
 ZERO HUMAN INTERACTION REQUIRED.
+All operations through unified API system.
 
 Master: Yair Siegel
 Progress = Less dependency on human
@@ -22,144 +20,163 @@ Progress = Less dependency on human
 
 import sys
 import time
-import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 
+# Add integrafix to path
 PROJECT_ROOT = Path(__file__).parent.parent
+sys.path.insert(0, str(PROJECT_ROOT))
+
+from integrafix.api_orchestrator import APIOrchestrator
 
 
 class AutonomousLoop:
-    """Full autonomous operation loop."""
+    """Full autonomous operation loop using API orchestrator."""
 
     def __init__(self):
         self.running = True
+        self.orchestrator = APIOrchestrator()
+        self.wallet_address = "0xB314345D218ED4CF75C17636a2307244E7dA761b"
 
-    def run_bounty_scan(self):
-        """Scan for new bounties."""
-        print("\n🔍 [SCAN] Looking for bounties...")
+    def run_v1_money_printer(self):
+        """V1: Money Printer - Check markets via API."""
+        print("\n🖨️  [V1: MONEY PRINTER]")
         try:
-            result = subprocess.run(
-                ["python3", str(PROJECT_ROOT / "autonomous" / "bounty_hunter.py")],
-                capture_output=True,
-                text=True,
-                timeout=120
-            )
-            if "Found" in result.stdout:
-                print(f"✅ [SCAN] {result.stdout.count('Found')} bounties found")
-            return True
-        except Exception as e:
-            print(f"❌ [SCAN] Error: {e}")
-            return False
-
-    def monitor_communications(self):
-        """Monitor GitHub and email for communications."""
-        print("\n📡 [COMMS] Checking communications...")
-        try:
-            # GitHub monitoring
-            subprocess.run(
-                ["python3", str(PROJECT_ROOT / "autonomous" / "github_bot.py")],
-                capture_output=True,
-                timeout=30
-            )
-
-            # Email monitoring (if configured)
-            # subprocess.run(...)
-
-            print("✅ [COMMS] All channels monitored")
-            return True
-        except Exception as e:
-            print(f"❌ [COMMS] Error: {e}")
-            return False
-
-    def check_payments(self):
-        """Check for incoming payments."""
-        print("\n💰 [PAYMENT] Checking for payments...")
-        try:
-            subprocess.run(
-                ["python3", str(PROJECT_ROOT / "autonomous" / "payment_handler.py")],
-                capture_output=True,
-                timeout=30
-            )
-            print("✅ [PAYMENT] Payment check complete")
-            return True
-        except Exception as e:
-            print(f"❌ [PAYMENT] Error: {e}")
-            return False
-
-    def run_money_printer(self):
-        """Check Money Printer status."""
-        print("\n🖨️  [TRADING] Money Printer status...")
-        try:
-            # Check if backend loop is running
-            result = subprocess.run(
-                ["pgrep", "-f", "backend_loop.py"],
-                capture_output=True,
-                text=True
-            )
-            if result.stdout.strip():
-                print("✅ [TRADING] Money Printer active")
+            result = self.orchestrator.get_polymarket_markets()
+            if result.success:
+                market_count = len(result.data)
+                print(f"✅ Found {market_count} active markets")
+                print(f"   ABCFC Score: {result.abcfc_score:.2f}")
+                print(f"   Cost: ${result.cost:.4f}, Duration: {result.duration:.2f}s")
+                return True
             else:
-                print("⚠️  [TRADING] Money Printer not running")
-            return True
+                print(f"❌ Failed: {result.error}")
+                return False
         except Exception as e:
-            print(f"❌ [TRADING] Error: {e}")
+            print(f"❌ Error: {e}")
             return False
 
-    def run_bug_bounty_scan(self):
-        """Scan for bug bounties (weekly)."""
-        print("\n🎯 [BUG BOUNTY] Scanning security programs...")
+    def run_v2_bounty_hunter(self):
+        """V2: GitHub Bounty Hunter - Search via API."""
+        print("\n🎯 [V2: GITHUB BOUNTY HUNTER]")
         try:
-            # Only run full scans weekly (check if it's been 7 days)
-            subprocess.run(
-                ["python3", str(PROJECT_ROOT / "autonomous" / "bug_bounty_hunter.py")],
-                capture_output=True,
-                timeout=180
+            result = self.orchestrator.search_github_bounties(
+                query="label:bounty is:open",
+                per_page=30
             )
-            print("✅ [BUG BOUNTY] Scan complete")
-            return True
+            if result.success:
+                bounties = result.data.get("parsed_bounties", [])
+                print(f"✅ Found {len(bounties)} bounties")
+                print(f"   ABCFC Score: {result.abcfc_score:.2f}")
+                print(f"   Cost: ${result.cost:.4f}, Duration: {result.duration:.2f}s")
+
+                # Show top 3 bounties
+                if bounties:
+                    print("   Top bounties:")
+                    for i, bounty in enumerate(bounties[:3], 1):
+                        repo_str = "/".join(bounty["repo"])
+                        amount_str = f"${bounty['amount']:.0f}" if bounty['amount'] > 0 else "Amount TBD"
+                        print(f"   {i}. {repo_str} #{bounty['issue_number']} - {amount_str}")
+
+                return True
+            else:
+                print(f"❌ Failed: {result.error}")
+                return False
         except Exception as e:
-            print(f"❌ [BUG BOUNTY] Error: {e}")
+            print(f"❌ Error: {e}")
+            return False
+
+    def run_v3_bug_bounty_hunter(self):
+        """V3: Bug Bounty Hunter - Check programs via API."""
+        print("\n🔒 [V3: BUG BOUNTY HUNTER]")
+        try:
+            result = self.orchestrator.list_bug_bounty_programs()
+            if result.success:
+                print(f"✅ Programs checked via API")
+                print(f"   ABCFC Score: {result.abcfc_score:.2f}")
+                print(f"   Cost: ${result.cost:.4f}, Duration: {result.duration:.2f}s")
+                return True
+            else:
+                # Expected if no credentials
+                print(f"⚠️  {result.error}")
+                return False
+        except Exception as e:
+            print(f"❌ Error: {e}")
+            return False
+
+    def check_wallet_balance(self):
+        """Check crypto wallet balance via API."""
+        print("\n💰 [WALLET CHECK]")
+        try:
+            # Check Ethereum
+            result = self.orchestrator.check_wallet_balance(
+                self.wallet_address,
+                network="ethereum"
+            )
+            if result.success:
+                print(f"✅ Ethereum wallet checked")
+                print(f"   ABCFC Score: {result.abcfc_score:.2f}")
+                print(f"   Cost: ${result.cost:.4f}, Duration: {result.duration:.2f}s")
+                return True
+            else:
+                print(f"⚠️  {result.error}")
+                return False
+        except Exception as e:
+            print(f"❌ Error: {e}")
             return False
 
     def run_cycle(self):
-        """Run one complete autonomous cycle."""
+        """Run one complete autonomous cycle via APIs."""
         print("=" * 80)
-        print(f"🤖 AUTONOMOUS CYCLE - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print(f"🤖 AUTONOMOUS CYCLE (API-POWERED) - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         print("=" * 80)
 
-        # 1. Check Money Printer (most important - active income)
-        self.run_money_printer()
+        results = {
+            "v1_money_printer": False,
+            "v2_bounty_hunter": False,
+            "v3_bug_bounty": False,
+            "wallet_check": False
+        }
 
-        # 2. Scan for GitHub bounties
-        self.run_bounty_scan()
+        # Run all verticals via API orchestrator
+        results["v1_money_printer"] = self.run_v1_money_printer()
+        results["v2_bounty_hunter"] = self.run_v2_bounty_hunter()
+        results["v3_bug_bounty"] = self.run_v3_bug_bounty_hunter()
+        results["wallet_check"] = self.check_wallet_balance()
 
-        # 3. Scan for bug bounties (V3)
-        self.run_bug_bounty_scan()
-
-        # 4. Monitor communications
-        self.monitor_communications()
-
-        # 5. Check payments
-        self.check_payments()
+        # Show API statistics
+        print("\n📊 [API STATISTICS]")
+        api_stats = self.orchestrator.api_manager.get_api_stats()
+        print(f"✅ Total API Calls: {api_stats['total_calls']}")
+        print(f"   Success Rate: {api_stats['success_rate']:.1%}")
+        print(f"   Total Cost: ${api_stats['total_cost']:.4f}")
+        print(f"   Net Value: ${api_stats['net_value']:.2f}")
+        if api_stats['roi'] != float('inf'):
+            print(f"   ROI: {api_stats['roi']:.1f}x")
+        else:
+            print(f"   ROI: ∞ (zero cost)")
 
         print()
         print("=" * 80)
-        print("✅ Cycle complete - waiting 5 minutes")
+        success_count = sum(1 for v in results.values() if v)
+        print(f"✅ Cycle complete - {success_count}/{len(results)} operations successful")
         print("=" * 80)
         print()
+
+        return results
 
     def run_forever(self):
-        """Run the autonomous loop forever."""
-        print("🚀 FULL AUTONOMOUS MODE ACTIVATED")
+        """Run the autonomous loop forever via APIs."""
+        print("🚀 FULL AUTONOMOUS MODE (API-POWERED)")
         print("=" * 80)
         print()
-        print("Operating completely autonomously:")
-        print("  • V1: Money Printer (Trading)")
-        print("  • V2: GitHub Bounty Hunter")
-        print("  • V3: Bug Bounty Hunter (NEW)")
-        print("  • Monitoring communications")
-        print("  • Handling payments")
+        print("Operating via unified API system:")
+        print("  • V1: Money Printer → Polymarket API")
+        print("  • V2: GitHub Bounty Hunter → GitHub API")
+        print("  • V3: Bug Bounty Hunter → HackerOne API")
+        print("  • Infrastructure → Blockchain APIs")
+        print()
+        print("All operations use ABCFC-optimized API calls")
         print()
         print("Press Ctrl+C to stop")
         print()
@@ -172,15 +189,24 @@ class AutonomousLoop:
                 self.run_cycle()
 
                 # Wait 5 minutes between cycles
+                print(f"⏸️  Waiting 5 minutes until next cycle...")
                 time.sleep(300)
 
         except KeyboardInterrupt:
             print("\n\n⏹️  Autonomous loop stopped by user")
             print(f"Completed {cycle_count} cycles")
 
+            # Show final stats
+            print("\n📊 FINAL STATISTICS:")
+            api_stats = self.orchestrator.api_manager.get_api_stats()
+            print(f"  Total API Calls: {api_stats['total_calls']}")
+            print(f"  Success Rate: {api_stats['success_rate']:.1%}")
+            print(f"  Total Cost: ${api_stats['total_cost']:.4f}")
+            print(f"  Net Value: ${api_stats['net_value']:.2f}")
+
 
 def main():
-    """Run full autonomous system."""
+    """Run full autonomous system via APIs."""
     loop = AutonomousLoop()
 
     # Check if running in background mode

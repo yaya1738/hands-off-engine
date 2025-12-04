@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Callable
 from dataclasses import dataclass
 
-from api_registry import APIRegistry, APIEndpoint
+from integrafix.api_registry import APIRegistry, APIEndpoint
 
 PROJECT_ROOT = Path(__file__).parent.parent
 STATE_DIR = PROJECT_ROOT / "state"
