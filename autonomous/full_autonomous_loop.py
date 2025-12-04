@@ -106,6 +106,22 @@ class AutonomousLoop:
             print(f"❌ [TRADING] Error: {e}")
             return False
 
+    def run_bug_bounty_scan(self):
+        """Scan for bug bounties (weekly)."""
+        print("\n🎯 [BUG BOUNTY] Scanning security programs...")
+        try:
+            # Only run full scans weekly (check if it's been 7 days)
+            subprocess.run(
+                ["python3", str(PROJECT_ROOT / "autonomous" / "bug_bounty_hunter.py")],
+                capture_output=True,
+                timeout=180
+            )
+            print("✅ [BUG BOUNTY] Scan complete")
+            return True
+        except Exception as e:
+            print(f"❌ [BUG BOUNTY] Error: {e}")
+            return False
+
     def run_cycle(self):
         """Run one complete autonomous cycle."""
         print("=" * 80)
@@ -115,13 +131,16 @@ class AutonomousLoop:
         # 1. Check Money Printer (most important - active income)
         self.run_money_printer()
 
-        # 2. Scan for new bounties
+        # 2. Scan for GitHub bounties
         self.run_bounty_scan()
 
-        # 3. Monitor communications
+        # 3. Scan for bug bounties (V3)
+        self.run_bug_bounty_scan()
+
+        # 4. Monitor communications
         self.monitor_communications()
 
-        # 4. Check payments
+        # 5. Check payments
         self.check_payments()
 
         print()
@@ -136,10 +155,11 @@ class AutonomousLoop:
         print("=" * 80)
         print()
         print("Operating completely autonomously:")
-        print("  • Scanning for bounties")
+        print("  • V1: Money Printer (Trading)")
+        print("  • V2: GitHub Bounty Hunter")
+        print("  • V3: Bug Bounty Hunter (NEW)")
         print("  • Monitoring communications")
         print("  • Handling payments")
-        print("  • Running Money Printer")
         print()
         print("Press Ctrl+C to stop")
         print()

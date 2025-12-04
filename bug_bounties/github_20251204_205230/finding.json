@@ -1,0 +1,23 @@
+{
+  "finding": {
+    "type": "exposed_endpoint",
+    "severity": "medium",
+    "domain": "github.com",
+    "path": "/wp-admin",
+    "status_code": 200,
+    "potential_bounty": 500
+  },
+  "target": {
+    "name": "GitHub",
+    "handle": "github",
+    "min_bounty": 617,
+    "max_bounty": 30000,
+    "scope": [
+      "github.com",
+      "api.github.com"
+    ],
+    "platform": "hackerone"
+  },
+  "timestamp": "2025-12-04T20:52:30.771604+00:00",
+  "status": "pending_review"
+}

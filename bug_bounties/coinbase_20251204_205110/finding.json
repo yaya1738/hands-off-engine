@@ -1,0 +1,24 @@
+{
+  "finding": {
+    "type": "missing_security_headers",
+    "severity": "low",
+    "domain": "api.coinbase.com",
+    "missing": [
+      "X-Content-Type-Options"
+    ],
+    "potential_bounty": 100
+  },
+  "target": {
+    "name": "Coinbase",
+    "handle": "coinbase",
+    "min_bounty": 200,
+    "max_bounty": 50000,
+    "scope": [
+      "coinbase.com",
+      "api.coinbase.com"
+    ],
+    "platform": "hackerone"
+  },
+  "timestamp": "2025-12-04T20:51:10.971587+00:00",
+  "status": "pending_review"
+}

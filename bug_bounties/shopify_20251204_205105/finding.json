@@ -1,0 +1,25 @@
+{
+  "finding": {
+    "type": "missing_security_headers",
+    "severity": "low",
+    "domain": "shopify.dev",
+    "missing": [
+      "X-Frame-Options",
+      "Content-Security-Policy"
+    ],
+    "potential_bounty": 100
+  },
+  "target": {
+    "name": "Shopify",
+    "handle": "shopify",
+    "min_bounty": 500,
+    "max_bounty": 50000,
+    "scope": [
+      "*.shopify.com",
+      "shopify.dev"
+    ],
+    "platform": "hackerone"
+  },
+  "timestamp": "2025-12-04T20:51:05.560068+00:00",
+  "status": "pending_review"
+}
