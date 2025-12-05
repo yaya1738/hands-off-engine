@@ -49,3 +49,16 @@ The engine includes foundations from earlier batches including:
 - Autonomous AI loop orchestration
 
 See `docs/` for detailed batch reports.
+
+## Hardware & Infrastructure
+
+**For hardware deployment and infrastructure architecture, see:**
+- **[HARDWARE_BLUEPRINT.md](HARDWARE_BLUEPRINT.md)** - THE authoritative hardware specification
+  - Recommended: Oracle Cloud Always Free + Clone Architecture
+  - Cost: $0/month, infinite scalability
+  - Complete deployment guide included
+
+**Quick deployment:**
+```bash
+bash scripts/DEPLOY_NEW_BASE.sh
+```
