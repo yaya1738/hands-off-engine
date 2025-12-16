@@ -1,0 +1,46 @@
+{
+  "timestamp": "2025-12-04T22:30:00Z",
+  "recommendation": {
+    "name": "Oracle Cloud - Always Free",
+    "provider": "oracle",
+    "score": 82.88125,
+    "cost_per_month": 0.4166666666666667,
+    "specs": {
+      "cpu_cores": 1,
+      "ram_gb": 1.0,
+      "storage_gb": 50
+    }
+  },
+  "all_options": [
+    {
+      "name": "Oracle Cloud - Always Free",
+      "score": 82.88125,
+      "cost": 0.4166666666666667
+    },
+    {
+      "name": "Termux (Android)",
+      "score": 81.7625,
+      "cost": 0.8333333333333334
+    },
+    {
+      "name": "AWS EC2 t2.micro",
+      "score": 77.88125,
+      "cost": 0.4166666666666667
+    },
+    {
+      "name": "GCP e2-micro",
+      "score": 77.88125,
+      "cost": 0.4166666666666667
+    },
+    {
+      "name": "Hetzner CX11",
+      "score": 69.86047500000001,
+      "cost": 3.9983333333333335
+    },
+    {
+      "name": "DigitalOcean Basic",
+      "score": 58.800625,
+      "cost": 4.208333333333333
+    }
+  ]
+}

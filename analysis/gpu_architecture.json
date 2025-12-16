@@ -1,0 +1,81 @@
+{
+  "timestamp": "2025-12-04T23:10:00Z",
+  "recommended_primary": {
+    "name": "Quad RTX 3090",
+    "gpu_model": "RTX 3090",
+    "gpu_count": 4,
+    "total_vram": 96,
+    "cost_per_month": 1022.0,
+    "provider": "Vast.ai"
+  },
+  "budget_alternative": {
+    "name": "Quad RTX 3090",
+    "gpu_model": "RTX 3090",
+    "gpu_count": 4,
+    "total_vram": 96,
+    "cost_per_month": 1022.0,
+    "provider": "Vast.ai"
+  },
+  "upgrade_path": [
+    "Phase 1: RTX 3090 ($292/mo) - Validate",
+    "Phase 2: RTX 4090 ($584/mo) - Performance",
+    "Phase 3: Dual RTX 4090 ($1168/mo) - Scale",
+    "Phase 4: A100/H100 ($1095-2920/mo) - Enterprise"
+  ],
+  "all_options": [
+    {
+      "name": "Quad RTX 3090",
+      "vram": 96,
+      "cost": 1022.0,
+      "score": 368.87866927592955
+    },
+    {
+      "name": "Dual A100 40GB",
+      "vram": 80,
+      "cost": 2190.0,
+      "score": 255.73059360730593
+    },
+    {
+      "name": "Single A100 80GB",
+      "vram": 80,
+      "cost": 1825.0,
+      "score": 230.87671232876713
+    },
+    {
+      "name": "Single H100",
+      "vram": 80,
+      "cost": 2920.0,
+      "score": 215.54794520547946
+    },
+    {
+      "name": "Dual RTX 4090",
+      "vram": 48,
+      "cost": 1168.0,
+      "score": 201.82191780821918
+    },
+    {
+      "name": "Single A100 40GB",
+      "vram": 40,
+      "cost": 1095.0,
+      "score": 175.73059360730593
+    },
+    {
+      "name": "Single RTX A6000",
+      "vram": 48,
+      "cost": 657.0,
+      "score": 147.46118721461187
+    },
+    {
+      "name": "Single RTX 4090",
+      "vram": 24,
+      "cost": 584.0,
+      "score": 128.82191780821918
+    },
+    {
+      "name": "Single RTX 3090",
+      "vram": 24,
+      "cost": 292.0,
+      "score": 99.64383561643835
+    }
+  ]
+}

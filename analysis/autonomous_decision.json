@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-12-04T22:50:00Z",
+  "perspective": "autonomous_system",
+  "decision": {
+    "name": "Hetzner API",
+    "autonomy_level": 0.98,
+    "manual_steps": 1,
+    "provision_time_min": 2,
+    "cost_per_month": 3.79,
+    "score": 108.44015
+  },
+  "all_options": [
+    {
+      "name": "Hetzner API",
+      "autonomy": 0.98,
+      "score": 108.44015
+    },
+    {
+      "name": "DigitalOcean API",
+      "autonomy": 0.98,
+      "score": 107.93549999999999
+    },
+    {
+      "name": "Docker Container (Local)",
+      "autonomy": 1.0,
+      "score": 104.0997
+    },
+    {
+      "name": "AWS EC2 (CLI)",
+      "autonomy": 0.95,
+      "score": 102.985
+    },
+    {
+      "name": "Oracle Cloud (Web Console)",
+      "autonomy": 0.2,
+      "score": 27.455
+    }
+  ]
+}

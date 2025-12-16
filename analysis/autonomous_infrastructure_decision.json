@@ -1,0 +1,10 @@
+{
+  "timestamp": "2025-12-05T01:18:52.276800",
+  "decision": "APPROVED",
+  "winning_option": "Hetzner + Oracle + GPU (RECOMMENDED)",
+  "abcfc_score": 483.45,
+  "monthly_cost": 99.9,
+  "alternatives_evaluated": 4,
+  "recommendation": "Migrate to Hetzner + Oracle + GPU hybrid",
+  "autonomous_approval": true
+}

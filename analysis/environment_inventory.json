@@ -1,0 +1,168 @@
+{
+  "timestamp": "2025-12-05T00:28:34.768901",
+  "environments": {
+    "pm-helper": {
+      "name": "pm-helper",
+      "ip": "138.68.103.156",
+      "processes": [],
+      "repositories": [
+        "hands-off-engine"
+      ],
+      "services": [],
+      "disk_usage": {
+        "total": "155G",
+        "used": "13G",
+        "available": "143G",
+        "percent": "8%"
+      },
+      "accessible": true,
+      "hands_off_branch": "",
+      "state_files_count": 111
+    },
+    "ho-compute-2": {
+      "name": "ho-compute-2",
+      "ip": "159.203.184.188",
+      "processes": [],
+      "repositories": [
+        "hands-off-engine"
+      ],
+      "services": [],
+      "disk_usage": {
+        "total": "310G",
+        "used": "3.9G",
+        "available": "307G",
+        "percent": "2%"
+      },
+      "accessible": true,
+      "hands_off_branch": "",
+      "state_files_count": 52
+    },
+    "ho-scale-1764543864": {
+      "name": "ho-scale-1764543864",
+      "ip": "162.243.175.211",
+      "processes": [],
+      "repositories": [
+        "hands-off-engine"
+      ],
+      "services": [],
+      "disk_usage": {
+        "total": "310G",
+        "used": "4.0G",
+        "available": "306G",
+        "percent": "2%"
+      },
+      "accessible": true,
+      "hands_off_branch": "",
+      "state_files_count": 52
+    },
+    "ho-cli-main": {
+      "name": "ho-cli-main",
+      "ip": "165.22.176.190",
+      "processes": [
+        {
+          "command": "/usr/bin/python3 /usr/bin/networkd-dispatcher --run-startup-triggers",
+          "cpu": "0.0",
+          "mem": "0.1"
+        },
+        {
+          "command": "/usr/bin/python3 /usr/share/unattended-upgrades/unattended-upgrade-shutdown --wa",
+          "cpu": "0.0",
+          "mem": "0.1"
+        },
+        {
+          "command": "python3 /root/hands-off-engine/autonomous/hardware_brain.py run",
+          "cpu": "0.0",
+          "mem": "0.1"
+        },
+        {
+          "command": "python3 /root/hands-off-engine/autonomous/scaling_engine.py run",
+          "cpu": "0.0",
+          "mem": "0.1"
+        },
+        {
+          "command": "python3 /root/hands-off-engine/autonomous/infra_manager.py monitor",
+          "cpu": "0.0",
+          "mem": "0.1"
+        },
+        {
+          "command": "python3 autonomous/self_healer.py run",
+          "cpu": "0.0",
+          "mem": "0.1"
+        },
+        {
+          "command": "node /root/.npm/_npx/3dfbf5a9eea4a1b3/node_modules/.bin/mcp-server-github",
+          "cpu": "0.0",
+          "mem": "0.3"
+        },
+        {
+          "command": "node /root/.npm/_npx/86170c4cd1c5da32/node_modules/.bin/mcp-server-playwright",
+          "cpu": "0.0",
+          "mem": "0.4"
+        },
+        {
+          "command": "node /root/.npm/_npx/3dfbf5a9eea4a1b3/node_modules/.bin/mcp-server-github",
+          "cpu": "0.0",
+          "mem": "0.4"
+        },
+        {
+          "command": "node /root/.npm/_npx/86170c4cd1c5da32/node_modules/.bin/mcp-server-playwright",
+          "cpu": "0.0",
+          "mem": "0.4"
+        },
+        {
+          "command": "node /root/.npm/_npx/3dfbf5a9eea4a1b3/node_modules/.bin/mcp-server-github",
+          "cpu": "0.0",
+          "mem": "0.3"
+        },
+        {
+          "command": "node /root/.npm/_npx/86170c4cd1c5da32/node_modules/.bin/mcp-server-playwright",
+          "cpu": "0.0",
+          "mem": "0.4"
+        },
+        {
+          "command": "python3 MONEY_PRINTER.py",
+          "cpu": "307",
+          "mem": "0.4"
+        },
+        {
+          "command": "python3 /root/hands-off-engine/autonomous/pr_email_bridge.py --continuous",
+          "cpu": "0.0",
+          "mem": "0.0"
+        },
+        {
+          "command": "python3 autonomous/email_inbox_handler.py --continuous",
+          "cpu": "0.5",
+          "mem": "0.2"
+        },
+        {
+          "command": "python3 /root/hands-off-engine/autonomous/backend_loop.py",
+          "cpu": "0.6",
+          "mem": "0.9"
+        },
+        {
+          "command": "python3",
+          "cpu": "0.3",
+          "mem": "0.0"
+        }
+      ],
+      "repositories": [
+        "hands-off-engine"
+      ],
+      "services": [
+        "autonomous_loop",
+        "polymarket",
+        "api_orchestrator",
+        "trading"
+      ],
+      "disk_usage": {
+        "total": "310G",
+        "used": "8.1G",
+        "available": "302G",
+        "percent": "3%"
+      },
+      "accessible": true,
+      "hands_off_branch": "local-sync",
+      "state_files_count": 139
+    }
+  }
+}

@@ -2264,6 +2264,13 @@ def run_income_engine():
             new_opps = engine.scan_opportunities()
             status["new_scan_results"] = len(new_opps)
 
+        # AUTO-EXECUTE next action if it's draft_proposal
+        if next_action["action"] == "draft_proposal":
+            opp_id = next_action.get("details", {}).get("id")
+            if opp_id:
+                result = engine.draft_proposal(opp_id)
+                status["auto_drafted"] = not ("error" in result)
+
         return {
             "success": True,
             "pipeline": status["pipeline"],

@@ -1,0 +1,56 @@
+{
+  "timestamp": "2025-12-05T00:47:50.290848",
+  "recommended_design": "Cost-Optimized Hybrid",
+  "monthly_cost": 99.9,
+  "nodes": [
+    {
+      "provider": "Hetzner",
+      "type": "Dedicated AX41",
+      "region": "Ashburn US",
+      "specs": "8 CPU, 64GB RAM, 512GB NVMe",
+      "role": "PRIMARY",
+      "cost": 49.9
+    },
+    {
+      "provider": "Oracle",
+      "type": "ARM A1 (Always Free)",
+      "region": "Phoenix",
+      "specs": "4 CPU, 24GB RAM, 200GB storage",
+      "role": "BACKUP",
+      "cost": 0.0
+    },
+    {
+      "provider": "Vast.ai",
+      "type": "RTX 3090 (on-demand)",
+      "region": "Flexible",
+      "specs": "24GB VRAM",
+      "role": "GPU",
+      "cost": 50.0
+    }
+  ],
+  "comparison": {
+    "current_do": {
+      "droplets": 9,
+      "cost": 72.0,
+      "vcpus": 68,
+      "ram_gb": 136,
+      "idle_nodes": 8,
+      "gpu": 0
+    },
+    "recommended": {
+      "nodes": 3,
+      "cost": 99.9,
+      "vcpus": 12,
+      "ram_gb": 88,
+      "idle_nodes": 0,
+      "gpu": 1
+    }
+  },
+  "next_steps": [
+    "Order Hetzner AX41 dedicated server",
+    "Setup Oracle Cloud free tier",
+    "Migrate services from DO to Hetzner",
+    "Destroy all 9 DO droplets",
+    "Setup Vast.ai account for GPU"
+  ]
+}

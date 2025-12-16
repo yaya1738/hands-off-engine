@@ -1,14 +1,14 @@
 {
   "version": "2.0",
-  "last_updated": "2025-12-03T22:53:55.173013+00:00",
+  "last_updated": "2025-12-05T05:22:52.730068Z",
   "owner": "yair_siegel",
   "source": "direct_input",
   "accounts": {
     "polymarket": {
       "type": "prediction_market",
-      "wallet_address": "0xB314345D218ED4CF75C17636a2307244E7dA761b",
-      "balance_usdc": 8.99,
-      "last_updated": "2025-12-03T22:53:55.173013+00:00",
+      "wallet_address": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D",
+      "balance_usdc": 4.62,
+      "last_updated": "2025-12-05T05:24:00Z",
       "balance_matic": 0.0,
       "open_orders": 6,
       "orders_value": 2218.7,
@@ -70,12 +70,12 @@
     "total_usd": 3280
   },
   "summary": {
-    "total_liquid_usd": 2741,
+    "total_liquid_usd": 2504.62,
     "total_invested_usd": 1500,
     "total_credit_available": 6000,
     "monthly_burn_usd": 3280,
     "runway_months": 0.84,
-    "deployable_to_trading": 241,
+    "deployable_to_trading": 4.62,
     "critical_insight": "Runway < 1 month without new income. AI costs should be generating ROI. Credit cycling is active strategy."
   },
   "strategy_notes": {

@@ -1,0 +1,73 @@
+{
+  "timestamp": "2025-12-05T00:21:31.411640",
+  "total_droplets": 9,
+  "total_vcpus": 68,
+  "total_ram_gb": 136.0,
+  "total_disk_gb": 2720,
+  "tracked_monthly_cost": 72.0,
+  "droplets": [
+    {
+      "name": "pm-helper",
+      "vcpus": 4,
+      "ram_gb": 8,
+      "disk_gb": 160,
+      "region": "fra1"
+    },
+    {
+      "name": "ho-compute-2",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    },
+    {
+      "name": "ho-compute-2",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    },
+    {
+      "name": "ho-scale-1764543864",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    },
+    {
+      "name": "ho-cli-main",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    },
+    {
+      "name": "ho-compute-1",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    },
+    {
+      "name": "ho-topdawg-4",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    },
+    {
+      "name": "ho-mega-1",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    },
+    {
+      "name": "ho-mega-2",
+      "vcpus": 8,
+      "ram_gb": 16,
+      "disk_gb": 320,
+      "region": "nyc1"
+    }
+  ]
+}

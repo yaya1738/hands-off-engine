@@ -1,0 +1,264 @@
+{
+  "timestamp": "2025-12-05T00:33:29.576731",
+  "current_state": {
+    "placement": {
+      "ho-cli-main": {
+        "vcpus": 8,
+        "ram_gb": 16,
+        "region": "nyc1",
+        "cpu_used": 8.6,
+        "cpu_percent": 107.5,
+        "memory_used": 15.8,
+        "memory_percent": 98.75,
+        "services": [
+          "MONEY_PRINTER",
+          "polymarket",
+          "trade_executor",
+          "autonomous_loop",
+          "backend_loop",
+          "api_orchestrator",
+          "hardware_brain",
+          "scaling_engine",
+          "infra_manager",
+          "self_healer",
+          "email_inbox_handler",
+          "pr_email_bridge",
+          "mcp_servers"
+        ],
+        "service_count": 13
+      }
+    },
+    "abcfc_score": -60,
+    "nodes_used": 1,
+    "total_services": 13,
+    "critical_services_redundant": 0,
+    "regions_used": 1
+  },
+  "optimal_placement": {
+    "placement": {
+      "ho-cli-main": {
+        "vcpus": 8,
+        "ram_gb": 16,
+        "region": "nyc1",
+        "cpu_used": 4.1,
+        "cpu_percent": 51.24999999999999,
+        "memory_used": 6.5,
+        "memory_percent": 40.625,
+        "services": [
+          "MONEY_PRINTER",
+          "autonomous_loop",
+          "backend_loop"
+        ],
+        "service_count": 3
+      },
+      "ho-compute-1": {
+        "vcpus": 8,
+        "ram_gb": 16,
+        "region": "nyc1",
+        "cpu_used": 2.5,
+        "cpu_percent": 31.25,
+        "memory_used": 5.0,
+        "memory_percent": 31.25,
+        "services": [
+          "polymarket",
+          "trade_executor",
+          "api_orchestrator"
+        ],
+        "service_count": 3
+      },
+      "ho-topdawg-4": {
+        "vcpus": 8,
+        "ram_gb": 16,
+        "region": "nyc1",
+        "cpu_used": 0.8,
+        "cpu_percent": 10.0,
+        "memory_used": 2.0,
+        "memory_percent": 12.5,
+        "services": [
+          "hardware_brain",
+          "scaling_engine",
+          "infra_manager",
+          "self_healer"
+        ],
+        "service_count": 4
+      },
+      "ho-mega-1": {
+        "vcpus": 8,
+        "ram_gb": 16,
+        "region": "nyc1",
+        "cpu_used": 1.2,
+        "cpu_percent": 15.0,
+        "memory_used": 2.3,
+        "memory_percent": 14.374999999999998,
+        "services": [
+          "email_inbox_handler",
+          "pr_email_bridge",
+          "mcp_servers"
+        ],
+        "service_count": 3
+      },
+      "pm-helper": {
+        "vcpus": 4,
+        "ram_gb": 8,
+        "region": "fra1",
+        "cpu_used": 2.0,
+        "cpu_percent": 50.0,
+        "memory_used": 4.0,
+        "memory_percent": 50.0,
+        "services": [
+          "polymarket",
+          "autonomous_loop",
+          "api_orchestrator"
+        ],
+        "service_count": 3
+      }
+    },
+    "abcfc_score": 280.0,
+    "nodes_used": 5,
+    "total_services": 13,
+    "critical_services_redundant": 3,
+    "regions_used": 2
+  },
+  "improvement": {
+    "abcfc_score_change": 340.0,
+    "nodes_utilized_change": 4,
+    "redundancy_added": 3,
+    "regions_added": 1
+  },
+  "services": [
+    {
+      "name": "MONEY_PRINTER",
+      "description": "Core autonomous trading engine",
+      "cpu_requirement": 3.0,
+      "memory_requirement": 4.0,
+      "critical": true,
+      "category": "trading"
+    },
+    {
+      "name": "polymarket",
+      "description": "Polymarket trading service",
+      "cpu_requirement": 1.0,
+      "memory_requirement": 2.0,
+      "critical": true,
+      "category": "trading"
+    },
+    {
+      "name": "trade_executor",
+      "description": "Trade execution service",
+      "cpu_requirement": 1.0,
+      "memory_requirement": 2.0,
+      "critical": true,
+      "category": "trading"
+    },
+    {
+      "name": "autonomous_loop",
+      "description": "Main autonomous decision loop",
+      "cpu_requirement": 0.5,
+      "memory_requirement": 1.0,
+      "critical": true,
+      "category": "core"
+    },
+    {
+      "name": "backend_loop",
+      "description": "Backend processing loop",
+      "cpu_requirement": 0.6,
+      "memory_requirement": 1.5,
+      "critical": true,
+      "category": "core"
+    },
+    {
+      "name": "api_orchestrator",
+      "description": "API orchestration service",
+      "cpu_requirement": 0.5,
+      "memory_requirement": 1.0,
+      "critical": true,
+      "category": "core"
+    },
+    {
+      "name": "hardware_brain",
+      "description": "Hardware management",
+      "cpu_requirement": 0.2,
+      "memory_requirement": 0.5,
+      "critical": true,
+      "category": "monitoring"
+    },
+    {
+      "name": "scaling_engine",
+      "description": "Auto-scaling management",
+      "cpu_requirement": 0.2,
+      "memory_requirement": 0.5,
+      "critical": true,
+      "category": "monitoring"
+    },
+    {
+      "name": "infra_manager",
+      "description": "Infrastructure monitoring",
+      "cpu_requirement": 0.2,
+      "memory_requirement": 0.5,
+      "critical": true,
+      "category": "monitoring"
+    },
+    {
+      "name": "self_healer",
+      "description": "Self-healing system",
+      "cpu_requirement": 0.2,
+      "memory_requirement": 0.5,
+      "critical": true,
+      "category": "monitoring"
+    },
+    {
+      "name": "email_inbox_handler",
+      "description": "Email processing",
+      "cpu_requirement": 0.5,
+      "memory_requirement": 0.5,
+      "critical": false,
+      "category": "utility"
+    },
+    {
+      "name": "pr_email_bridge",
+      "description": "PR email bridge",
+      "cpu_requirement": 0.2,
+      "memory_requirement": 0.3,
+      "critical": false,
+      "category": "utility"
+    },
+    {
+      "name": "mcp_servers",
+      "description": "MCP servers (github, playwright)",
+      "cpu_requirement": 0.5,
+      "memory_requirement": 1.5,
+      "critical": false,
+      "category": "utility"
+    }
+  ],
+  "migration_phases": [
+    {
+      "phase": 1,
+      "name": "Setup Monitoring Node",
+      "node": "ho-topdawg-4",
+      "risk": "LOW",
+      "time_estimate": "30 minutes"
+    },
+    {
+      "phase": 2,
+      "name": "Setup Hot Standby Trading",
+      "node": "ho-compute-1",
+      "risk": "MEDIUM",
+      "time_estimate": "1 hour"
+    },
+    {
+      "phase": 3,
+      "name": "Setup Utility Services",
+      "node": "ho-mega-1",
+      "risk": "LOW",
+      "time_estimate": "30 minutes"
+    },
+    {
+      "phase": 4,
+      "name": "Setup EU Redundancy",
+      "node": "pm-helper",
+      "risk": "LOW",
+      "time_estimate": "1 hour"
+    }
+  ]
+}

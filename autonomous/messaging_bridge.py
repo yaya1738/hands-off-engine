@@ -32,6 +32,20 @@ except:
     WHATSAPP_AVAILABLE = False
     print("⚠️  WhatsApp notifier not available")
 
+try:
+    from autonomous.phone_provider import PhoneProvider
+    PHONE_AVAILABLE = True
+except:
+    PHONE_AVAILABLE = False
+    print("⚠️  Phone provider not available")
+
+try:
+    from autonomous.sms_provider_manager import SMSProviderManager
+    SMS_MULTI_PROVIDER_AVAILABLE = True
+except:
+    SMS_MULTI_PROVIDER_AVAILABLE = False
+    print("⚠️  Multi-provider SMS manager not available")
+
 STATE_FILE = Path(__file__).parent.parent / 'state' / 'messaging_bridge.json'
 
 
@@ -41,6 +55,8 @@ class MessagingBridge:
     def __init__(self):
         self.telegram = TelegramNotifier() if TELEGRAM_AVAILABLE else None
         self.whatsapp = WhatsAppNotifier() if WHATSAPP_AVAILABLE else None
+        self.phone = PhoneProvider() if PHONE_AVAILABLE else None  # For voice calls only
+        self.sms = SMSProviderManager() if SMS_MULTI_PROVIDER_AVAILABLE else None  # Multi-provider SMS
         self.load_state()
 
     def load_state(self):
@@ -63,35 +79,77 @@ class MessagingBridge:
 
     def notify(self, message: str, priority: str = 'normal', channel: str = 'both') -> bool:
         """
-        Send notification via appropriate channel.
+        Send notification via appropriate channel with robust failover.
 
         Args:
             message: Message to send
             priority: 'critical' or 'normal'
-            channel: 'telegram', 'whatsapp', or 'both'
+            channel: 'telegram', 'whatsapp', 'both', or 'all'
+
+        Routing (with multi-provider cellular failover):
+            Critical Priority:
+                1. WhatsApp (instant app notification)
+                2. Multi-Provider SMS (Twilio → AWS SNS → Vonage → Plivo → TextBelt)
+                3. Voice Call (if SMS fails - ultimate failover via Twilio)
+                4. Telegram (last resort)
+
+            Normal Priority:
+                1. Telegram (convenient, non-urgent)
+                2. Multi-Provider SMS (automatic failover across 5 providers)
+                3. WhatsApp (last resort)
         """
         success = False
 
         if priority == 'critical':
-            # Critical → WhatsApp first, fallback to Telegram
-            if channel in ['whatsapp', 'both'] and self.whatsapp:
+            # Critical → Multi-channel with cellular failover for robustness
+
+            # Try WhatsApp first (instant if app is open)
+            if channel in ['whatsapp', 'both', 'all'] and self.whatsapp:
                 if self.whatsapp.send_message(message):
                     self.state['whatsapp_sent'] += 1
                     success = True
 
+            # Multi-Provider SMS failover - most robust (works without internet)
+            # Tries: Twilio → AWS SNS → Vonage → Plivo → TextBelt
+            if not success and self.sms:
+                sms_success, provider = self.sms.send_sms(to_number=self._get_phone_number(), message=message, priority='critical')
+                if sms_success:
+                    self.state['sms_sent'] = self.state.get('sms_sent', 0) + 1
+                    self.state[f'sms_via_{provider}'] = self.state.get(f'sms_via_{provider}', 0) + 1
+                    success = True
+
+            # Voice call - ultimate failover for TRUE emergencies
+            if not success and self.phone and channel == 'all':
+                if self.phone.make_voice_call(message):
+                    self.state['calls_made'] = self.state.get('calls_made', 0) + 1
+                    success = True
+
+            # Telegram last resort
             if not success and self.telegram:
                 if self.telegram.send_message(f"🚨 {message}"):
                     self.state['telegram_sent'] += 1
                     success = True
 
         else:
-            # Normal → Telegram first, fallback to WhatsApp
-            if channel in ['telegram', 'both'] and self.telegram:
+            # Normal → Telegram preferred, SMS failover
+
+            # Try Telegram first (convenient for regular updates)
+            if channel in ['telegram', 'both', 'all'] and self.telegram:
                 if self.telegram.send_message(message):
                     self.state['telegram_sent'] += 1
                     success = True
 
-            if not success and channel == 'both' and self.whatsapp:
+            # Multi-Provider SMS failover if Telegram unavailable
+            # Automatically tries all providers until one succeeds
+            if not success and self.sms:
+                sms_success, provider = self.sms.send_sms(to_number=self._get_phone_number(), message=message, priority='normal')
+                if sms_success:
+                    self.state['sms_sent'] = self.state.get('sms_sent', 0) + 1
+                    self.state[f'sms_via_{provider}'] = self.state.get(f'sms_via_{provider}', 0) + 1
+                    success = True
+
+            # WhatsApp last resort
+            if not success and channel in ['both', 'all'] and self.whatsapp:
                 if self.whatsapp.send_message(message):
                     self.state['whatsapp_sent'] += 1
                     success = True
@@ -101,6 +159,24 @@ class MessagingBridge:
             self.save_state()
 
         return success
+
+    def _get_phone_number(self) -> str:
+        """Get phone number from configuration."""
+        # Try multi-provider config first
+        env_file = Path(__file__).parent.parent / '.env.sms_providers'
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                if line.startswith('YOUR_PHONE_NUMBER='):
+                    return line.split('=')[1].strip().strip('"')
+
+        # Fall back to legacy config
+        env_file = Path(__file__).parent.parent / '.env.handsoff_phone'
+        if env_file.exists():
+            for line in env_file.read_text().splitlines():
+                if line.startswith('YOUR_PHONE_NUMBER='):
+                    return line.split('=')[1].strip().strip('"')
+
+        return ''
 
     def monitor_system_events(self):
         """Monitor system for events worth notifying about."""
@@ -223,6 +299,16 @@ class MessagingBridge:
         print(f"Starting messaging bridge (checking every {interval}s)")
         print(f"Telegram: {'✓' if self.telegram else '✗'}")
         print(f"WhatsApp: {'✓' if self.whatsapp else '✗'}")
+
+        if self.sms:
+            available_providers = [p for p in self.sms.providers if self.sms._is_provider_available(p)]
+            print(f"Multi-Provider SMS: ✓ ({len(available_providers)} providers)")
+            for p in available_providers:
+                print(f"  • {p['name']} (${p.get('cost_per_sms', 0):.4f}/SMS)")
+        else:
+            print(f"Multi-Provider SMS: ✗")
+
+        print(f"Voice Calls: {'✓' if self.phone else '✗'}")
         print()
 
         # Send startup notification

@@ -1,0 +1,145 @@
+{
+  "trading_system": {
+    "money_printer": {
+      "file": "MONEY_PRINTER.py",
+      "purpose": "Main trading execution engine",
+      "dependencies": [],
+      "apis_called": [
+        "Polymarket API",
+        "HTTP API calls"
+      ],
+      "state_files": [],
+      "config_files": [],
+      "lines": 92,
+      "classes": [
+        "MoneyPrinter"
+      ],
+      "functions": 6
+    },
+    "trading_pipeline": {
+      "file": "integrafix/trading_pipeline.py",
+      "purpose": "Trading decision pipeline",
+      "dependencies": [],
+      "apis_called": [],
+      "state_files": [],
+      "config_files": []
+    },
+    "polymarket_orders": {
+      "file": "executor/polymarket_orders.py",
+      "purpose": "Order placement and execution",
+      "dependencies": [],
+      "apis_called": [
+        "Polymarket API",
+        "HTTP API calls",
+        "Web3/Blockchain"
+      ],
+      "state_files": [],
+      "config_files": [],
+      "lines": 1326,
+      "classes": [
+        "Market",
+        "PolymarketOrders"
+      ],
+      "functions": 31
+    },
+    "trade_executor": {
+      "file": "autonomous/trade_executor.py",
+      "purpose": "Trade execution coordinator",
+      "dependencies": [],
+      "apis_called": [
+        "Polymarket API",
+        "HTTP API calls"
+      ],
+      "state_files": [],
+      "config_files": [],
+      "lines": 405,
+      "classes": [
+        "TradeExecutor"
+      ],
+      "functions": 14
+    },
+    "hft_execution_bridge": {
+      "file": "autonomous/hft_execution_bridge.py",
+      "purpose": "High-frequency trading bridge",
+      "dependencies": [],
+      "apis_called": [
+        "Polymarket API",
+        "HTTP API calls"
+      ],
+      "state_files": [],
+      "config_files": [],
+      "lines": 1405,
+      "classes": [
+        "ExecutionOpportunity",
+        "ExecutionResult",
+        "HFTExecutionBridge"
+      ],
+      "functions": 32
+    },
+    "abcfc_live_nexus": {
+      "file": "integrafix/abcfc_live_nexus.py",
+      "purpose": "ABCFC decision framework for trading",
+      "dependencies": [],
+      "apis_called": [
+        "Polymarket API"
+      ],
+      "state_files": [],
+      "config_files": [],
+      "lines": 1018,
+      "classes": [
+        "ActionStatus",
+        "LiveAction",
+        "LiveMarketData",
+        "ABCFCLiveNexus"
+      ],
+      "functions": 26
+    },
+    "fair_price_estimator": {
+      "file": "integrafix/fair_price_estimator.py",
+      "purpose": "Fair price calculation",
+      "dependencies": [],
+      "apis_called": [
+        "Polymarket API"
+      ],
+      "state_files": [],
+      "config_files": [],
+      "lines": 740,
+      "classes": [
+        "FairPriceEstimate",
+        "FairPriceEstimator"
+      ],
+      "functions": 17
+    },
+    "polymarket_fundamentals": {
+      "file": "integrafix/polymarket_fundamentals.py",
+      "purpose": "Market fundamentals analysis",
+      "dependencies": [],
+      "apis_called": [
+        "Polymarket API"
+      ],
+      "state_files": [],
+      "config_files": [],
+      "lines": 973,
+      "classes": [
+        "OrderType",
+        "TraderType",
+        "WalletProfile",
+        "CollateralPosition",
+        "PolymarketFundamentals"
+      ],
+      "functions": 23
+    }
+  },
+  "job_hunting_system": {},
+  "ai_intelligence": {},
+  "backend_orchestration": {
+    "file": "autonomous/backend_loop.py",
+    "lines": 2937,
+    "orchestrated_functions": 41,
+    "purpose": "Main system orchestrator"
+  },
+  "finance_system": {},
+  "safety_systems": {},
+  "infrastructure": {},
+  "integrations": {}
+}
