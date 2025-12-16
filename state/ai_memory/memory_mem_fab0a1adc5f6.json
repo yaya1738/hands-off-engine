@@ -1,0 +1,19 @@
+{
+  "id": "mem_fab0a1adc5f6",
+  "memory_type": "success",
+  "priority": 3,
+  "content": "WIN: YES on 'm1' | P&L: $+0.60 | Edge: 3.0%",
+  "context": "Trade win: Edge predicted: 3.0%",
+  "tags": [
+    "trading",
+    "win",
+    "yes"
+  ],
+  "created_at": "2025-12-04T05:10:41.108039+00:00",
+  "session_id": "session_20251204_045950",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

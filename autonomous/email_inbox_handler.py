@@ -194,8 +194,15 @@ class EmailInboxHandler:
         # Extract PR number
         pr_num = self.extract_pr_number(subject) or self.extract_pr_number(body)
 
+        # INTEGRAFIX: Detect job offers and notify income_engine
+        if self._is_job_offer_email(subject, body):
+            action['action_taken'] = 'job_offer_detected'
+            job_details = self._extract_job_details(subject, body, email_data.get('from', ''))
+            action['details'].append(f"Job offer: {job_details.get('title', 'Unknown')}")
+            self._notify_income_engine_job_offer(job_details)
+
         # Determine action based on email content
-        if 'merged' in subject.lower():
+        elif 'merged' in subject.lower():
             action['action_taken'] = 'pr_merged'
             action['details'].append(f"PR #{pr_num} merged! Bounty claimable.")
             self.handle_pr_merged(pr_num)
@@ -278,6 +285,80 @@ Please let me know if you need any clarifications.""")
             return
 
         print(f"👀 PR #{pr_num} reviewed")
+
+    def _is_job_offer_email(self, subject: str, body: str) -> bool:
+        """INTEGRAFIX: Detect if email is a job offer or work acceptance."""
+        subject_lower = subject.lower()
+        body_lower = body.lower()
+
+        job_keywords = [
+            'job offer', 'offer letter', 'hired', 'welcome to the team',
+            'accepted your proposal', 'you\'re hired', 'start date',
+            'contract attached', 'congratulations', 'pleased to offer',
+            'upwork contract', 'fiverr order', 'freelancer contract',
+            'bounty accepted', 'work approved'
+        ]
+
+        return any(kw in subject_lower or kw in body_lower for kw in job_keywords)
+
+    def _extract_job_details(self, subject: str, body: str, from_email: str) -> Dict:
+        """INTEGRAFIX: Extract job offer details from email."""
+        # Extract rate/amount using regex
+        rate = 0.0
+        rate_patterns = [
+            r'\$(\d+(?:,\d{3})*(?:\.\d{2})?)',
+            r'(\d+(?:,\d{3})*(?:\.\d{2})?)\s*(?:USD|dollars)',
+            r'rate[:\s]+\$?(\d+(?:,\d{3})*(?:\.\d{2})?)'
+        ]
+
+        for pattern in rate_patterns:
+            match = re.search(pattern, body, re.IGNORECASE)
+            if match:
+                rate_str = match.group(1).replace(',', '')
+                rate = float(rate_str)
+                break
+
+        # Determine source
+        source = "email"
+        if 'upwork' in from_email.lower() or 'upwork' in subject.lower():
+            source = "upwork"
+        elif 'fiverr' in from_email.lower() or 'fiverr' in subject.lower():
+            source = "fiverr"
+        elif 'freelancer' in from_email.lower():
+            source = "freelancer"
+        elif 'github' in from_email.lower() or 'bounty' in subject.lower():
+            source = "github_bounty"
+
+        return {
+            "title": subject[:100],
+            "source": source,
+            "rate": rate,
+            "details": body[:500],
+            "sender_email": from_email
+        }
+
+    def _notify_income_engine_job_offer(self, job_details: Dict):
+        """INTEGRAFIX: Notify income_engine of job offer."""
+        try:
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent.parent))
+            from integrafix.income_engine import IncomeEngine
+
+            engine = IncomeEngine()
+            result = engine.record_job_offer_from_email(
+                source=job_details['source'],
+                title=job_details['title'],
+                rate=job_details['rate'],
+                details=job_details['details'],
+                sender_email=job_details['sender_email']
+            )
+
+            print(f"✓ Income engine notified: {result.get('status')}")
+            if 'work_id' in result:
+                print(f"✓ Work tracking auto-started: {result['work_id']}")
+
+        except Exception as e:
+            print(f"Failed to notify income_engine: {e}")
 
     def gh_comment(self, pr_num: int, body: str):
         """Post comment to GitHub PR."""

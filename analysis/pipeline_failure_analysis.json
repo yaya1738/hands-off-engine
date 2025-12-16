@@ -1,0 +1,123 @@
+{
+  "sequences": {
+    "INCOME_GENERATION_PIPELINE": {
+      "sequence": [
+        "backend_loop.run_income_engine() @ 5min intervals",
+        "\u2192 income_engine.scan_opportunities()",
+        "\u2192 income_engine.draft_proposal(opp_id)",
+        "\u2192 [HUMAN: Review & send proposal]",
+        "\u2192 [EXTERNAL: Job offer email arrives]",
+        "\u2192 email_inbox_handler.process_inbox()",
+        "\u2192 [MISSING: email \u2192 income_engine notification]",
+        "\u2192 [HUMAN: Accept work manually]",
+        "\u2192 income_engine.accept_work(opp_id)",
+        "\u2192 income_engine.mark_delivered(work_id)",
+        "\u2192 [EXTERNAL: Payment arrives]",
+        "\u2192 payment_handler.record_payment()",
+        "\u2192 payment_handler._inject_to_capital_bridge()",
+        "\u2192 payment_handler._record_in_income_engine()",
+        "\u2192 capital_bridge.inject_capital()",
+        "\u2192 capital_bridge.check_activation_ready()",
+        "\u2192 capital_bridge.flip_to_live() if threshold met"
+      ],
+      "failure_points": []
+    },
+    "EMAIL_MONITORING_PIPELINE": {
+      "sequence": [
+        "email_inbox_handler runs standalone OR via backend_loop",
+        "\u2192 connect to Gmail IMAP",
+        "\u2192 process bounty-related emails",
+        "\u2192 handle PR events (merged, approved, etc)",
+        "\u2192 [MISSING: notify income_engine of job offers]",
+        "\u2192 [MISSING: notify income_engine of payments]"
+      ],
+      "failure_points": []
+    },
+    "TRADING_ACTIVATION_PIPELINE": {
+      "sequence": [
+        "payment_handler.record_payment()",
+        "\u2192 capital_bridge.inject_capital()",
+        "\u2192 capital_bridge.check_activation_ready()",
+        "\u2192 If balance >= $50: capital_bridge.flip_to_live()",
+        "\u2192 Updates .env.polymarket DRY_RUN=false",
+        "\u2192 [MISSING: Restart trading pipeline?]",
+        "\u2192 trading_pipeline picks up LIVE mode"
+      ],
+      "failure_points": []
+    }
+  },
+  "failure_points": [
+    {
+      "id": "FP-001",
+      "severity": "HIGH",
+      "pipeline": "INCOME_GENERATION",
+      "location": "email_inbox_handler.py",
+      "issue": "No method to notify income_engine when job offer email arrives",
+      "impact": "Job offers detected but not automatically recorded in income_engine",
+      "current_state": "email_inbox_handler processes bounty emails but has no _notify_income_engine_acceptance() method",
+      "fix_required": "Add method to notify income_engine when 'accepted', 'job offer', 'hired' emails detected"
+    },
+    {
+      "id": "FP-002",
+      "severity": "HIGH",
+      "pipeline": "INCOME_GENERATION",
+      "location": "income_engine.py",
+      "issue": "No method to receive job acceptance notifications from email_inbox_handler",
+      "impact": "Accepted work must be manually entered into income_engine",
+      "current_state": "income_engine has accept_work() but requires human to call it manually",
+      "fix_required": "Add method like record_job_offer(source, details) that email_inbox_handler can call"
+    },
+    {
+      "id": "FP-003",
+      "severity": "MEDIUM",
+      "pipeline": "EMAIL_MONITORING",
+      "location": "backend_loop.py",
+      "issue": "email_inbox_handler not called in backend_loop",
+      "impact": "Email monitoring runs separately, not integrated with main loop",
+      "current_state": "backend_loop has 26 systems but email_inbox_handler not included",
+      "fix_required": "Add run_email_inbox_handler() to backend_loop"
+    },
+    {
+      "id": "FP-004",
+      "severity": "MEDIUM",
+      "pipeline": "INCOME_GENERATION",
+      "location": "payment_handler.py::_record_in_income_engine()",
+      "issue": "Matches delivered work by status=='delivered', fragile logic",
+      "impact": "If multiple delivered works exist, only first one gets payment recorded",
+      "current_state": "Loops through active_work and breaks on first delivered",
+      "fix_required": "Match by source/amount/date or require work_id parameter"
+    },
+    {
+      "id": "FP-005",
+      "severity": "LOW",
+      "pipeline": "TRADING_ACTIVATION",
+      "location": "capital_bridge.py::flip_to_live()",
+      "issue": "Changes DRY_RUN flag but doesn't restart trading pipeline",
+      "impact": "Trading pipeline may not pick up LIVE mode until next restart",
+      "current_state": "Updates .env.polymarket but no restart/reload mechanism",
+      "fix_required": "Notify trading_pipeline to reload config OR restart service"
+    },
+    {
+      "id": "FP-006",
+      "severity": "LOW",
+      "pipeline": "ALL",
+      "location": "Multiple state files",
+      "issue": "payment_automation.json vs payment_handler.json - duplicate state?",
+      "impact": "Potential state inconsistency between different payment tracking systems",
+      "current_state": "Both files track payments, may diverge",
+      "fix_required": "Consolidate to single source of truth"
+    },
+    {
+      "id": "FP-007",
+      "severity": "MEDIUM",
+      "pipeline": "INCOME_GENERATION",
+      "location": "backend_loop.py::run_income_engine()",
+      "issue": "Auto-drafts proposals but has no way to know if human sent them",
+      "impact": "Backend loop repeatedly drafts same proposal every cycle",
+      "current_state": "Drafts proposal, saves to file, no feedback loop on send status",
+      "fix_required": "Track proposal send status, mark as 'sent' when human sends"
+    }
+  ],
+  "total_failures": 7,
+  "analysis_date": "2025-12-16"
+}

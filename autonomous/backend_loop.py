@@ -2285,6 +2285,69 @@ def run_income_engine():
         return {"success": False, "error": str(e)}
 
 
+def run_email_inbox_handler():
+    """
+    INTEGRAFIX: Email Inbox Handler - Zero-touch email management
+
+    Monitors Gmail for:
+    - Job offers → auto-notifies income_engine
+    - Bounty acceptances → auto-starts work tracking
+    - PR notifications → auto-responds
+    - Payment confirmations → auto-records
+
+    Human never needs to check email manually.
+    """
+    try:
+        from autonomous.email_inbox_handler import EmailInboxHandler
+
+        handler = EmailInboxHandler()
+
+        # Quick check for new emails (don't block for long)
+        if not handler.connect_imap():
+            return {"success": False, "error": "IMAP connection failed"}
+
+        email_ids = handler.get_unread_emails()
+
+        if not email_ids:
+            return {
+                "success": True,
+                "unread": 0,
+                "processed": 0,
+                "actions": []
+            }
+
+        # Process up to 5 emails per cycle (don't block loop)
+        processed = 0
+        actions = []
+
+        for email_id in email_ids[:5]:
+            email_data = handler.parse_email(email_id)
+            if not email_data:
+                continue
+
+            if handler.is_bounty_related(email_data):
+                action = handler.process_email(email_data)
+                actions.append(action['action_taken'])
+                handler.mark_as_read(email_id)
+                processed += 1
+
+        # Close connection
+        if handler.mail:
+            handler.mail.logout()
+
+        handler.save_state()
+
+        return {
+            "success": True,
+            "unread": len(email_ids),
+            "processed": processed,
+            "actions": actions
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
 def save_state(state: dict):
     """Save loop state."""
     state["last_updated"] = datetime.now(timezone.utc).isoformat()
@@ -2810,6 +2873,17 @@ def run_loop(interval_sec: int = 300):
                 f"{income_result.get('next_action', 'none')}")
         else:
             log(f"  Income Engine: {income_result.get('error', 'unknown')}")
+
+        # 9.65. INTEGRAFIX Email Inbox - Zero-touch email management
+        log("[9.65/27] Running Email Inbox Handler (Zero-Touch)...")
+        email_result = run_email_inbox_handler()
+        state["email_inbox"] = email_result
+        if email_result.get("success"):
+            log(f"  Unread: {email_result.get('unread', 0)} | "
+                f"Processed: {email_result.get('processed', 0)} | "
+                f"Actions: {', '.join(email_result.get('actions', [])) if email_result.get('actions') else 'none'}")
+        else:
+            log(f"  Email: {email_result.get('error', 'unavailable')}")
 
         # 10. INTEGRAFIX Pipeline - Real edge detection with feedback loop
         log("[10/27] Running INTEGRAFIX Trading Pipeline...")

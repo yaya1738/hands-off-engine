@@ -1,0 +1,19 @@
+{
+  "id": "mem_393a5a3211b6",
+  "memory_type": "learning",
+  "priority": 3,
+  "content": "LOSS: NO on 'will-bitcoin-dip-to-50000-by-december-31-2025-391-' | P&L: $-0.98 | Edge: 3.0%",
+  "context": "Trade loss: Edge predicted: 3.0%",
+  "tags": [
+    "trading",
+    "loss",
+    "no"
+  ],
+  "created_at": "2025-12-05T02:45:36.217611+00:00",
+  "session_id": "session_20251204_212129",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

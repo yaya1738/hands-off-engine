@@ -165,7 +165,14 @@ Questions? Reply to this thread - monitored 24/7 by autonomous system.
             print(f"Capital bridge injection failed: {e}")
 
     def _record_in_income_engine(self, amount: float, source: str, notes: str):
-        """Record payment in income engine."""
+        """
+        Record payment in income engine.
+
+        INTEGRAFIX FIX (FP-004): Improved matching logic.
+        - Matches by amount + source similarity, not just first 'delivered'
+        - Falls back to most recent delivered work if no exact match
+        - Records unmatched payments for manual review
+        """
         try:
             import sys
             sys.path.insert(0, str(PROJECT_ROOT))
@@ -173,12 +180,68 @@ Questions? Reply to this thread - monitored 24/7 by autonomous system.
 
             engine = IncomeEngine()
 
-            # Find matching work and record payment
-            for work_id, work in engine.state.get('active_work', {}).items():
-                if work.get('status') == 'delivered':
-                    result = engine.record_payment(work_id, amount, 'crypto', notes)
-                    print(f"✓ Income engine: Payment recorded for {work_id}")
-                    break
+            # Find delivered works
+            delivered_works = {
+                work_id: work
+                for work_id, work in engine.state.get('active_work', {}).items()
+                if work.get('status') == 'delivered'
+            }
+
+            if not delivered_works:
+                print(f"⚠ No delivered work to match payment ${amount} from {source}")
+                # Still record the payment generically
+                result = engine.record_payment('unmatched', amount, 'crypto', f"{source}: {notes}")
+                return
+
+            # Try to match by amount (within 10% tolerance) and source similarity
+            best_match = None
+            best_score = 0
+
+            for work_id, work in delivered_works.items():
+                accepted_rate = work.get('accepted_rate', 0)
+                work_source = work.get('opportunity_id', '').lower()
+
+                # Score this match
+                score = 0
+
+                # Amount match (within 10%)
+                if accepted_rate > 0:
+                    amount_diff = abs(amount - accepted_rate) / accepted_rate
+                    if amount_diff < 0.1:  # Within 10%
+                        score += 50
+                    elif amount_diff < 0.3:  # Within 30%
+                        score += 25
+
+                # Source similarity
+                if source.lower() in work_source or work_source in source.lower():
+                    score += 30
+
+                # Recency (prefer newer work)
+                delivered_at = work.get('delivered_at', '')
+                if delivered_at:
+                    from datetime import datetime, timedelta
+                    try:
+                        delivered_dt = datetime.fromisoformat(delivered_at.replace('Z', '+00:00'))
+                        if datetime.now(datetime.timezone.utc) - delivered_dt < timedelta(days=7):
+                            score += 20
+                    except:
+                        pass
+
+                if score > best_score:
+                    best_score = score
+                    best_match = work_id
+
+            # Record payment for best match
+            if best_match:
+                result = engine.record_payment(best_match, amount, 'crypto', notes)
+                print(f"✓ Income engine: Payment ${amount} → {best_match} (match score: {best_score})")
+            else:
+                # No good match - use most recent delivered
+                most_recent = max(delivered_works.items(),
+                                key=lambda x: x[1].get('delivered_at', ''))
+                result = engine.record_payment(most_recent[0], amount, 'crypto', notes)
+                print(f"⚠ Income engine: Payment ${amount} → {most_recent[0]} (fallback)")
+
         except Exception as e:
             print(f"Income engine payment record failed: {e}")
 

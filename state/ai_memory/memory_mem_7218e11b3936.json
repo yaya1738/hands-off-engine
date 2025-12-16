@@ -1,0 +1,19 @@
+{
+  "id": "mem_7218e11b3936",
+  "memory_type": "learning",
+  "priority": 3,
+  "content": "LOSS: NO on '0xd1a5513fa75fd1d158f430161adf2e3df88511' | P&L: $-1.88 | Edge: 3.0%",
+  "context": "Trade loss: Edge predicted: 3.0%",
+  "tags": [
+    "trading",
+    "loss",
+    "no"
+  ],
+  "created_at": "2025-12-04T02:16:34.006218+00:00",
+  "session_id": "session_20251203_212117",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

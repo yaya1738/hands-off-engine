@@ -1,0 +1,23 @@
+{
+  "development": {
+    "git_initialized": true,
+    "github_workflows": 3,
+    "workflow_files": [
+      "auto-merge.yml",
+      "ai-intake.yml",
+      "agent-coordination-notify.yml"
+    ]
+  },
+  "deployment": {},
+  "trading": {
+    "components_exist": 5,
+    "components_total": 5,
+    "pipeline_wired": true
+  },
+  "learning": {
+    "components_exist": 3,
+    "components_total": 3
+  },
+  "feedback": {},
+  "score": 100
+}

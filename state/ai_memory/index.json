@@ -1,0 +1,218 @@
+{
+  "last_updated": "2025-12-16T05:50:59.826679+00:00",
+  "total_memories": 33276,
+  "total_sessions": 14,
+  "sessions": {
+    "session_20251203_151226": {
+      "session_id": "session_20251203_151226",
+      "started_at": "2025-12-03T15:12:26.406862+00:00",
+      "ended_at": "2025-12-03T15:12:26.411306+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 80.0% \u2192 80.0%",
+        "Errors: 1"
+      ],
+      "next_actions": []
+    },
+    "session_20251203_151245": {
+      "session_id": "session_20251203_151245",
+      "started_at": "2025-12-03T15:12:45.627706+00:00",
+      "ended_at": "2025-12-03T15:12:45.630151+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 80.0% \u2192 80.0%",
+        "Errors: 1"
+      ],
+      "next_actions": []
+    },
+    "session_20251203_151252": {
+      "session_id": "session_20251203_151252",
+      "started_at": "2025-12-03T15:12:52.617556+00:00",
+      "ended_at": "2025-12-03T15:12:52.621150+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 50.0% \u2192 50.0%",
+        "Errors: 0"
+      ],
+      "next_actions": [
+        "Wisdom engine calculates analysis but never outputs edge value",
+        "Trades executed but outcomes never recorded",
+        "Outcomes recorded but never fed to learning system"
+      ]
+    },
+    "session_20251203_151828": {
+      "session_id": "session_20251203_151828",
+      "started_at": "2025-12-03T15:18:28.664315+00:00",
+      "ended_at": null,
+      "task_description": "Integrafix continuation - wiring with other CLI",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [],
+      "next_actions": []
+    },
+    "session_20251203_151842": {
+      "session_id": "session_20251203_151842",
+      "started_at": "2025-12-03T15:18:42.373805+00:00",
+      "ended_at": "2025-12-03T15:18:42.377614+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 50.0% \u2192 50.0%",
+        "Errors: 0"
+      ],
+      "next_actions": [
+        "Wisdom engine calculates analysis but never outputs edge value",
+        "Trades executed but outcomes never recorded",
+        "Outcomes recorded but never fed to learning system"
+      ]
+    },
+    "session_20251203_151859": {
+      "session_id": "session_20251203_151859",
+      "started_at": "2025-12-03T15:18:59.173434+00:00",
+      "ended_at": "2025-12-03T15:18:59.176893+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 77.5% \u2192 77.5%",
+        "Errors: 0"
+      ],
+      "next_actions": [
+        "Fair price derived from market price + noise = circular, no real edge",
+        "Each Claude session starts fresh - no memory between sessions",
+        "170+ branches created but 0 merged to main"
+      ]
+    },
+    "session_20251203_152534": {
+      "session_id": "session_20251203_152534",
+      "started_at": "2025-12-03T15:25:34.268656+00:00",
+      "ended_at": "2025-12-03T15:25:34.282825+00:00",
+      "task_description": "Integration Test",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Session ended automatically"
+      ],
+      "next_actions": [
+        "Review session outcomes"
+      ]
+    },
+    "session_20251203_152749": {
+      "session_id": "session_20251203_152749",
+      "started_at": "2025-12-03T15:27:49.683773+00:00",
+      "ended_at": null,
+      "task_description": "Testing integrafix startup",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [],
+      "next_actions": []
+    },
+    "session_20251203_153034": {
+      "session_id": "session_20251203_153034",
+      "started_at": "2025-12-03T15:30:34.643321+00:00",
+      "ended_at": "2025-12-03T15:30:34.647200+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 82.2% \u2192 82.2%",
+        "Errors: 0"
+      ],
+      "next_actions": []
+    },
+    "session_20251203_153221": {
+      "session_id": "session_20251203_153221",
+      "started_at": "2025-12-03T15:32:21.222800+00:00",
+      "ended_at": null,
+      "task_description": "Testing integrafix startup",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [],
+      "next_actions": []
+    },
+    "session_20251203_155205": {
+      "session_id": "session_20251203_155205",
+      "started_at": "2025-12-03T15:52:05.104228+00:00",
+      "ended_at": "2025-12-03T15:52:05.108450+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 82.2% \u2192 82.2%",
+        "Errors: 0"
+      ],
+      "next_actions": []
+    },
+    "session_20251203_155400": {
+      "session_id": "session_20251203_155400",
+      "started_at": "2025-12-03T15:54:00.186264+00:00",
+      "ended_at": null,
+      "task_description": "Testing integrafix startup",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [],
+      "next_actions": []
+    },
+    "session_20251203_160047": {
+      "session_id": "session_20251203_160047",
+      "started_at": "2025-12-03T16:00:47.715318+00:00",
+      "ended_at": "2025-12-03T16:00:47.719806+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 80.6% \u2192 80.6%",
+        "Errors: 0"
+      ],
+      "next_actions": []
+    },
+    "session_20251203_161047": {
+      "session_id": "session_20251203_161047",
+      "started_at": "2025-12-03T16:10:47.749292+00:00",
+      "ended_at": "2025-12-03T16:10:47.756107+00:00",
+      "task_description": "Recursive integrafix engine run",
+      "decisions_made": 0,
+      "learnings_recorded": 0,
+      "errors_encountered": 0,
+      "successes": 0,
+      "key_outcomes": [
+        "Integration: 80.6% \u2192 80.6%",
+        "Errors: 0"
+      ],
+      "next_actions": []
+    }
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "layers": {
+    "ui": {
+      "python_files": 1,
+      "type": "other"
+    },
+    "fetchers": {
+      "python_files": 2,
+      "type": "data_layer"
+    },
+    "hardware": {
+      "python_files": 10,
+      "type": "other"
+    },
+    "infrastructure": {
+      "python_files": 9,
+      "type": "other"
+    },
+    "alpha": {
+      "python_files": 12,
+      "type": "signal_layer"
+    },
+    "bin": {
+      "python_files": 3,
+      "type": "other"
+    },
+    "examples": {
+      "python_files": 1,
+      "type": "other"
+    },
+    "audit": {
+      "python_files": 4,
+      "type": "other"
+    },
+    "arbitrage": {
+      "python_files": 10,
+      "type": "other"
+    },
+    "health": {
+      "python_files": 3,
+      "type": "other"
+    },
+    "revenue": {
+      "python_files": 1,
+      "type": "other"
+    },
+    "security": {
+      "python_files": 7,
+      "type": "other"
+    },
+    "scheduler": {
+      "python_files": 3,
+      "type": "other"
+    },
+    "reports": {
+      "python_files": 4,
+      "type": "other"
+    },
+    "autonomous": {
+      "python_files": 96,
+      "type": "core_automation"
+    },
+    "tests": {
+      "python_files": 31,
+      "type": "quality"
+    },
+    "finance": {
+      "python_files": 10,
+      "type": "other"
+    },
+    "api": {
+      "python_files": 6,
+      "type": "other"
+    },
+    "state": {
+      "python_files": 1,
+      "type": "persistence"
+    },
+    "tools": {
+      "python_files": 1,
+      "type": "other"
+    },
+    "trading": {
+      "python_files": 6,
+      "type": "trading_layer"
+    },
+    "telegram": {
+      "python_files": 2,
+      "type": "other"
+    },
+    "decider": {
+      "python_files": 1,
+      "type": "other"
+    },
+    "ai": {
+      "python_files": 22,
+      "type": "ai_layer"
+    },
+    "executor": {
+      "python_files": 66,
+      "type": "execution_layer"
+    },
+    "termux-hands-off": {
+      "python_files": 49,
+      "type": "other"
+    },
+    "scripts": {
+      "python_files": 35,
+      "type": "tooling"
+    },
+    "ai_nexus_backup": {
+      "python_files": 5,
+      "type": "other"
+    },
+    "ai_nexus": {
+      "python_files": 34,
+      "type": "ai_coordination"
+    },
+    "llm": {
+      "python_files": 3,
+      "type": "other"
+    }
+  },
+  "boundaries": {},
+  "data_flow": {},
+  "integration_points": [
+    "integrafix.py",
+    "autonomous/backend_loop.py",
+    "ai/ho_brain_orchestrator.py",
+    "ai_nexus/nexus_core.py"
+  ],
+  "score": 100
+}

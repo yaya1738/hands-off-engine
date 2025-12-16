@@ -1,0 +1,12 @@
+{"type": "execution_success_rate", "value": 0.0, "sample_size": 15, "timestamp": "2025-12-03T15:07:32.884402+00:00"}
+{"type": "average_decision_confidence", "value": 0.75, "sample_size": 15, "timestamp": "2025-12-03T15:07:32.884418+00:00"}
+[]
+[]
+{"type": "execution_success_rate", "value": 0.0, "sample_size": 15, "timestamp": "2025-12-03T15:07:48.476164+00:00"}
+{"type": "average_decision_confidence", "value": 0.75, "sample_size": 15, "timestamp": "2025-12-03T15:07:48.476174+00:00"}
+[]
+[]
+{"type": "execution_success_rate", "value": 0.0, "sample_size": 15, "timestamp": "2025-12-03T15:19:34.977888+00:00"}
+{"type": "average_decision_confidence", "value": 0.75, "sample_size": 15, "timestamp": "2025-12-03T15:19:34.977899+00:00"}
+[]
+[]

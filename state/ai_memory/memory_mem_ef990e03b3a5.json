@@ -1,0 +1,17 @@
+{
+  "id": "mem_ef990e03b3a5",
+  "memory_type": "context",
+  "priority": 4,
+  "content": "Session ended.\nOutcomes: ['Integration: 80.6% \u2192 80.6%', 'Errors: 0']\nNext: []",
+  "context": "",
+  "tags": [
+    "session_end"
+  ],
+  "created_at": "2025-12-03T16:00:47.720437+00:00",
+  "session_id": "session_20251203_160047",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

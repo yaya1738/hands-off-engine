@@ -1,0 +1,19 @@
+{
+  "id": "mem_3768fb21a64c",
+  "memory_type": "learning",
+  "priority": 3,
+  "content": "LOSS: YES on 'test-market-2' | P&L: $-1.39 | Edge: 3.0%",
+  "context": "Trade loss: Edge predicted: 3.0%",
+  "tags": [
+    "trading",
+    "loss",
+    "yes"
+  ],
+  "created_at": "2025-12-04T12:33:35.808966+00:00",
+  "session_id": "session_20251204_062856",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

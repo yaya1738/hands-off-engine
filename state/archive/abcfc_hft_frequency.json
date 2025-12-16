@@ -1,0 +1,20 @@
+{
+  "timestamp": "2025-12-03T23:56:09.562375+00:00",
+  "total_abcfc": {
+    "worst": -13758.475,
+    "best": 120501.22500000003,
+    "expected": 14553.875000000047
+  },
+  "trading_abcfc": {
+    "worst": 0.0,
+    "best": 0.0,
+    "expected": 0.0
+  },
+  "events_per_second": 0,
+  "latency_us": 0,
+  "cost_per_sec": 139.5730357142857,
+  "profit_per_sec": 172.21149999999986,
+  "net_per_sec": 32.63846428571415,
+  "current_action": "hold",
+  "action_confidence": 0.0
+}

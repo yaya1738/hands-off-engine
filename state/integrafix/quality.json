@@ -1,0 +1,26 @@
+{
+  "standards": {
+    "total_py_files": 443,
+    "key_files_with_docstrings": 3,
+    "key_files_total": 3
+  },
+  "testing": {
+    "test_files_found": 28,
+    "tests_dir_exists": true,
+    "locations": [
+      "tests/test_alpha_pipeline.py",
+      "tests/unit/test_tri_agent_cpu_v02.py",
+      "tests/unit/test_history_to_kernels.py",
+      "tests/unit/test_spark_plug_history_bridge.py",
+      "tests/unit/test_spark_plug_autokernel.py",
+      "tests/unit/test_history_logger.py",
+      "tests/unit/test_executor_shadow_mode.py",
+      "tests/unit/test_ai_runner.py",
+      "tests/unit/test_history_event.py",
+      "tests/unit/test_txt_viewer.py"
+    ]
+  },
+  "validation": {},
+  "metrics": {},
+  "score": 100
+}

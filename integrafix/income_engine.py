@@ -273,13 +273,26 @@ class IncomeEngine:
         """
         Draft a proposal for an opportunity.
         AI generates the proposal content.
+
+        INTEGRAFIX FIX (FP-007): Don't re-draft if proposal already exists.
         """
         opp = self.state["opportunities"].get(opportunity_id)
         if not opp:
             return {"error": f"Opportunity {opportunity_id} not found"}
 
+        # Check if proposal already exists
+        proposal_id = f"prop_{opportunity_id}"
+        if proposal_id in self.state["proposals"]:
+            existing = self.state["proposals"][proposal_id]
+            return {
+                "status": "already_drafted",
+                "proposal_id": proposal_id,
+                "created_at": existing.get("created_at"),
+                "message": "Proposal already exists, not re-drafting"
+            }
+
         proposal = {
-            "id": f"prop_{opportunity_id}",
+            "id": proposal_id,
             "opportunity_id": opportunity_id,
             "created_at": datetime.now().isoformat(),
             "status": "draft",
@@ -384,6 +397,57 @@ Would love to schedule a brief call to discuss how we might help.
             self._save_state()
             return {"status": "marked_sent", "id": proposal_id}
         return {"error": "Proposal not found"}
+
+    def record_job_offer_from_email(self, source: str, title: str, rate: float = 0,
+                                    details: str = "", sender_email: str = "") -> Dict:
+        """
+        INTEGRAFIX: Receive job offer notification from email_inbox_handler.
+
+        Called automatically when email_inbox_handler detects job offer/acceptance emails.
+        Creates opportunity and optionally starts work tracking.
+        """
+        # Create opportunity from email
+        opp_id = hashlib.md5(f"{source}_{title}_{sender_email}".encode()).hexdigest()[:12]
+
+        opportunity = {
+            "id": opp_id,
+            "source": source,
+            "title": title,
+            "description": details,
+            "discovered_at": datetime.now().isoformat(),
+            "status": "offer_received",
+            "from_email": sender_email,
+            "offered_rate": rate,
+            "abcfc_score": 0,  # Can calculate later
+            "type": "email_offer"
+        }
+
+        self.state["opportunities"][opp_id] = opportunity
+        self.state["stats"]["opportunities_found"] += 1
+
+        # Auto-start work tracking if rate provided
+        if rate > 0:
+            work_result = self.start_work(opp_id, accepted_rate=rate)
+            self._save_state()
+
+            print(f"✓ Job offer recorded: {title} at ${rate}")
+            print(f"✓ Work tracking started: {work_result['id']}")
+
+            return {
+                "status": "offer_recorded_and_started",
+                "opportunity_id": opp_id,
+                "work_id": work_result['id'],
+                "rate": rate
+            }
+
+        self._save_state()
+        print(f"✓ Job offer recorded: {title} from {source}")
+
+        return {
+            "status": "offer_recorded",
+            "opportunity_id": opp_id,
+            "instruction": "Call start_work() when ready to begin"
+        }
 
     # ========== PHASE 3: WORK ==========
 
