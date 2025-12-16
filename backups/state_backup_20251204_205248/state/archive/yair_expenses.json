@@ -1,0 +1,28 @@
+{
+  "expenses": [
+    {
+      "name": "Server Costs",
+      "category": "business",
+      "monthly_amount": 50,
+      "worst_monthly": 100,
+      "best_monthly": 30,
+      "required": true
+    },
+    {
+      "name": "API Subscriptions",
+      "category": "business",
+      "monthly_amount": 478.5,
+      "worst_monthly": 717.75,
+      "best_monthly": 239.25,
+      "required": true
+    },
+    {
+      "name": "Trading Fees",
+      "category": "variable",
+      "monthly_amount": 20,
+      "worst_monthly": 100,
+      "best_monthly": 5,
+      "required": false
+    }
+  ]
+}

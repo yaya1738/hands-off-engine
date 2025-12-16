@@ -1,0 +1,3956 @@
+{
+  "root": "Yair Siegel",
+  "risk_aversion": 0.5,
+  "last_updated": "2025-12-04T20:47:27.003255+00:00",
+  "total_expected": 12876.937564102565,
+  "total_bounds": [
+    -14623.0,
+    117153.68782051283
+  ],
+  "positions": [
+    {
+      "category": "Trading",
+      "subcategory": "Polymarket",
+      "name": "Yair_Total_Finance",
+      "worst": -14613.0,
+      "best": 116709.0,
+      "expected": 12618.0
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_abcfc_integration_060504",
+      "worst": 0,
+      "best": 100,
+      "expected": 80
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_state_harmonization_060504",
+      "worst": -10,
+      "best": 200,
+      "expected": 120
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_YES_171501",
+      "worst": 0,
+      "best": 0.21428571428571455,
+      "expected": 0.04285714285714291
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_171639",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_171640",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_171641",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_171642",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_172330",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_172331",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_172332",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_172443",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_172444",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_172445",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_173050",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_173051",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_173052",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174042",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174043",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174044",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174045",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174122",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174123",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174124",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174702",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174703",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174704",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174758",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174759",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_174800",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_175342",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_175343",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_175344",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_175918",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_175919",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_175920",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_YES_180001",
+      "worst": 0,
+      "best": 0.21428571428571455,
+      "expected": 0.04285714285714291
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_180459",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_180500",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_180501",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_181047",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_181048",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_181049",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_YES_181501",
+      "worst": 0,
+      "best": 0.21428571428571455,
+      "expected": 0.04285714285714291
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_181615",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_181616",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_181617",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_182201",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_182202",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_182203",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_182718",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_182719",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_182720",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_YES_183001",
+      "worst": 0,
+      "best": 0.21428571428571455,
+      "expected": 0.04285714285714291
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_183313",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_183314",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_183315",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_YES_184501",
+      "worst": 0,
+      "best": 0.21428571428571455,
+      "expected": 0.04285714285714291
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_184949",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_184950",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_184951",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_185512",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_185513",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_185514",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_190100",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_190101",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_190102",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_190103",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_190658",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_190659",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_190700",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_191249",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_191250",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_191251",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_191837",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_191838",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_191839",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_192454",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_192455",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_192456",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_193044",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_193045",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_193046",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_193633",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_193634",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_193635",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_194250",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_194251",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_194252",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_YES_194501",
+      "worst": 0,
+      "best": 0.21428571428571455,
+      "expected": 0.04285714285714291
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_194759",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_194800",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_194801",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_195354",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_195355",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_195356",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_195829",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_195830",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_195831",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_YES_200002",
+      "worst": 0,
+      "best": 0.21428571428571455,
+      "expected": 0.04285714285714291
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_200456",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_200457",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_200458",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_201052",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_201053",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_201054",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_201648",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_201649",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_201650",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_202305",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_202306",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_202307",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_202901",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_202902",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_202903",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_203459",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_203500",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_203501",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_204105",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_204106",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_204107",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_204702",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_204703",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_204704",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_205258",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_205259",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_205300",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_205859",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_205900",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_205901",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_210451",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_210452",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_210453",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_211044",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_211045",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_211046",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_211645",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_211646",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_211647",
+      "worst": 0,
+      "best": 0.3750000000000002,
+      "expected": 0.07500000000000004
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_211648",
+      "worst": 0,
+      "best": 0.2499999999999993,
+      "expected": 0.04999999999999986
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212115",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212116",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212117",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212118",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212119",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212120",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212714",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212715",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212716",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212717",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212718",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_212719",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213319",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213320",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213321",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213322",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213323",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213324",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213914",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213915",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213916",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213917",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213918",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_213919",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_214509",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_214510",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_214511",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_214512",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_214513",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_214514",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215110",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215111",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215112",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215113",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215114",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215115",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215704",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215705",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215706",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215707",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215708",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_215709",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220258",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220259",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220300",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220301",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220302",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220303",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220859",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220900",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220901",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220902",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220903",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_220904",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_221451",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_221452",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_221453",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_221454",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_221455",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_221456",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222042",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222043",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222044",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222045",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222046",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222047",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222640",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222641",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222642",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222643",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222644",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_222645",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223229",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223230",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223231",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223232",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223233",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223234",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223815",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223816",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223817",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223818",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223819",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_223820",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_224432",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_224433",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_224434",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_224435",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_224436",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_224437",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225022",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225023",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225024",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225025",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225026",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225027",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225609",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225610",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225611",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225612",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225613",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_225614",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230202",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230203",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230204",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230205",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230206",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230207",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230745",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230746",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230747",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230748",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230749",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_230750",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231327",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231328",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231329",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231330",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231331",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231332",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231920",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231921",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231922",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231923",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231924",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_231925",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_232502",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_232503",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_232504",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_232505",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_232506",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_232507",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233041",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233042",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233043",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233044",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233045",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233046",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233628",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233629",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233630",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233631",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233632",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_233633",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234205",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234206",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234207",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234208",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234209",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234210",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234742",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234743",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234744",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234745",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234746",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_234747",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235326",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235327",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235328",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235329",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235330",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235331",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235900",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235901",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235902",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235903",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235904",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_235905",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_000436",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_000437",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_000438",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_000439",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_000440",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_000441",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001019",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001020",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001021",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001022",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001023",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001024",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001552",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001553",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001554",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001555",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001556",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_001557",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002123",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002124",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002125",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002126",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002127",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002128",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002706",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002707",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002708",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002709",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002710",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_002711",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003236",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003237",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003238",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003239",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003240",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003241",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003808",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003809",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003810",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003811",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003812",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_003813",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004348",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004349",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004350",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004351",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004352",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004353",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004918",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004919",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004920",
+      "worst": 0,
+      "best": 0.8333333333333318,
+      "expected": 0.16666666666666635
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004921",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004922",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_004923",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_005444",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_005445",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_005446",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_005447",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_005448",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_005449",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010042",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010043",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010044",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010045",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010046",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010047",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010616",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010617",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010618",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010619",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010620",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_010621",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011139",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011140",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011141",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011142",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011143",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011144",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011701",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011702",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011703",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011704",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011705",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_011706",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012231",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012232",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012233",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012234",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012235",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012236",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012756",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012757",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012758",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012759",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012800",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_012801",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013317",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013318",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013319",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013320",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013321",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013322",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013845",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013846",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013847",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013848",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013849",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_013850",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014404",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014405",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014406",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014407",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014408",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014409",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014410",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014928",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014929",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014930",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014931",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014932",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_014933",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_015450",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_015451",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_015452",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_015453",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_015454",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_015455",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020009",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020010",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020011",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020012",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020013",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020014",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020528",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020529",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020530",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020531",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020532",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_020533",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021100",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021101",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021102",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021103",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021104",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021105",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021619",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021620",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021621",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021622",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021623",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_021624",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022138",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022139",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022140",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022141",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022142",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022143",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022706",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022707",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022708",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022709",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022710",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_022711",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023224",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023225",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023226",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023227",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023228",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023742",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023743",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023744",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023745",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_023746",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024308",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024309",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024310",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024311",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024312",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024826",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024827",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024828",
+      "worst": 0,
+      "best": 0.5769230769230752,
+      "expected": 0.11538461538461504
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024829",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024830",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Claude",
+      "subcategory": "ValueDelivery",
+      "name": "claude_trade_NO_024831",
+      "worst": 0,
+      "best": 0.1,
+      "expected": 0.02
+    },
+    {
+      "category": "Meta",
+      "subcategory": "SystemDesign",
+      "name": "recursive_abcfc_decision",
+      "worst": 0,
+      "best": 50,
+      "expected": 40
+    }
+  ]
+}

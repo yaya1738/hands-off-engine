@@ -1,0 +1,816 @@
+{
+  "last_save": "2025-12-04T20:51:53.347781",
+  "hostname": "ho-cli-main",
+  "uptime_hours": 17.98163698138889,
+  "healing_actions": [
+    {
+      "timestamp": "2025-12-04T18:11:01.869745",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:11:03.887738",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:16:06.069529",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:16:08.086263",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:16:10.103364",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:21:12.262536",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:21:14.277166",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:21:16.291870",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:26:18.465426",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:26:20.480640",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:26:22.495096",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:31:24.649543",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:31:26.663635",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:31:28.677860",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:36:30.857429",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:36:32.871898",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:36:34.886441",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:41:37.042831",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:41:39.058474",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:41:41.074386",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:46:43.238724",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:46:45.253891",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:46:47.270159",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:51:49.429472",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:51:51.443677",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:51:53.459134",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:56:55.629419",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:56:57.645168",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T18:56:59.661914",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:02:01.819900",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:02:03.834884",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:02:05.850007",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:07:08.032114",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:07:10.045940",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:07:12.060570",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:12:14.216878",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:12:16.232486",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:12:18.250716",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:17:20.434565",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:17:22.450352",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:17:24.463926",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:22:26.626216",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:22:28.642784",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:22:30.658509",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:27:32.830668",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:27:34.845067",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:27:36.858917",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:32:39.016773",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:32:41.032950",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:32:43.048401",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:37:45.215449",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:37:47.230876",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:37:49.245864",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:42:51.405693",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:42:53.419749",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:42:55.434130",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:47:57.625814",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:47:59.640716",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:48:01.657596",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:53:03.865719",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:53:05.880116",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:53:07.897122",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:58:10.347430",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:58:12.385623",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T19:58:14.431656",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:03:16.717066",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:03:18.731122",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:03:20.790481",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:08:22.990873",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:08:25.005568",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:08:27.029837",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:13:29.347876",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:13:31.364002",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:13:33.378920",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:18:35.662134",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:18:37.691648",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:18:39.738114",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:23:41.978345",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:23:43.991733",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:23:46.005950",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:28:48.331494",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:28:50.347925",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:28:52.363615",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:33:54.652587",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:33:56.690394",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:33:58.758797",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:39:01.042952",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:39:03.057846",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:39:05.072610",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:44:07.390237",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:44:09.460793",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:44:11.474967",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:47:13.643620",
+      "action_type": "restart_process",
+      "target": "backend-loop",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:48:20.821752",
+      "action_type": "restart_process",
+      "target": "backend-loop",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:49:27.936305",
+      "action_type": "restart_process",
+      "target": "backend-loop",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:49:35.128908",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:49:37.144149",
+      "action_type": "start_service",
+      "target": "infra-monitor.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:49:39.157562",
+      "action_type": "start_service",
+      "target": "self-healing-agent.service",
+      "reason": "Service was inactive",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:50:41.249773",
+      "action_type": "restart_process",
+      "target": "backend-loop",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-04T20:51:48.310850",
+      "action_type": "restart_process",
+      "target": "backend-loop",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    }
+  ],
+  "restart_counts": {
+    "backend-loop": [
+      "2025-12-04T20:47:13.643614",
+      "2025-12-04T20:48:20.821747",
+      "2025-12-04T20:49:27.936300",
+      "2025-12-04T20:50:41.249768",
+      "2025-12-04T20:51:48.310845"
+    ]
+  }
+}

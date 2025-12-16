@@ -1,0 +1,96 @@
+{
+  "timestamp": "2025-12-03T22:23:59.619488+00:00",
+  "built": true,
+  "hierarchy": {
+    "name": "Yair Siegel",
+    "level": 0,
+    "worst": -705.0,
+    "best": 9590.0,
+    "expected": 735.0,
+    "duration": 30.0,
+    "children": [
+      {
+        "name": "Trading",
+        "level": 1,
+        "worst": -450.0,
+        "best": 750.0,
+        "expected": 150.0,
+        "duration": 30.0,
+        "children": [
+          {
+            "name": "Polymarket",
+            "level": 2,
+            "worst": 0.0,
+            "best": 0.0,
+            "expected": 0.0,
+            "duration": 30.0,
+            "children": []
+          },
+          {
+            "name": "Robinhood",
+            "level": 2,
+            "worst": -450.0,
+            "best": 750.0,
+            "expected": 150.0,
+            "duration": 30.0,
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Business",
+        "level": 1,
+        "worst": -255,
+        "best": 840,
+        "expected": 585,
+        "duration": 30.0,
+        "children": [
+          {
+            "name": "AI_Services",
+            "level": 2,
+            "worst": -255,
+            "best": 840,
+            "expected": 585,
+            "duration": 30.0,
+            "children": []
+          }
+        ]
+      },
+      {
+        "name": "Employment",
+        "level": 1,
+        "worst": 0,
+        "best": 8000,
+        "expected": 0,
+        "duration": 30.0,
+        "children": []
+      }
+    ]
+  },
+  "risk_modifiers": [
+    "No LLC Protection",
+    "Centralization Risk",
+    "Critical Runway",
+    "High Credit Utilization"
+  ],
+  "summary": {
+    "bounds": {
+      "worst": -705.0,
+      "best": 9590.0,
+      "expected": 735.0
+    },
+    "risk_adjusted": {
+      "worst": -1057.5,
+      "expected": 269.5,
+      "worst_multiplier": 1.5,
+      "confidence": 0.7
+    },
+    "risk_modifiers": [
+      "No LLC Protection",
+      "Centralization Risk",
+      "Critical Runway",
+      "High Credit Utilization"
+    ],
+    "hierarchy_nodes": 7
+  }
+}

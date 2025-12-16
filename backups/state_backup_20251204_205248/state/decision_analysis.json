@@ -1,0 +1,72 @@
+{
+  "timestamp": "2025-12-04T20:35:34.116036+00:00",
+  "options": [
+    {
+      "name": "Option 5: Hybrid - Scan + Scale Money Printer",
+      "expected_value": 2000,
+      "probability": 0.45,
+      "time_cost_hours": 5,
+      "worst_case": -200,
+      "abcfc_score": 867.0,
+      "hourly_rate": 180.0,
+      "risk_adjusted_value": 790.0,
+      "details": "Expand bounty scanner + optimize Money Printer in parallel. Best of both worlds."
+    },
+    {
+      "name": "Option 3: Create New Income Stream",
+      "expected_value": 5000,
+      "probability": 0.15,
+      "time_cost_hours": 40,
+      "worst_case": -1200,
+      "abcfc_score": 444.0,
+      "hourly_rate": 18.75,
+      "risk_adjusted_value": -270.0,
+      "details": "Build novel autonomous service/tool. High upside, high uncertainty, high time cost."
+    },
+    {
+      "name": "Option 1: Expand Bounty Scanning (10x sources)",
+      "expected_value": 1500,
+      "probability": 0.3,
+      "time_cost_hours": 3,
+      "worst_case": -90,
+      "abcfc_score": 431.1,
+      "hourly_rate": 150.0,
+      "risk_adjusted_value": 387.0,
+      "details": "Scan 100+ GitHub repos, GitLab, dev boards. High volume, low conversion."
+    },
+    {
+      "name": "Option 4: Scale Money Printer",
+      "expected_value": 500,
+      "probability": 0.6,
+      "time_cost_hours": 2,
+      "worst_case": -200,
+      "abcfc_score": 276.0,
+      "hourly_rate": 150.0,
+      "risk_adjusted_value": 220.0,
+      "details": "Optimize existing Money Printer. Low time cost, proven strategy, moderate upside."
+    },
+    {
+      "name": "Option 2: Compete on Open PRs",
+      "expected_value": 1750,
+      "probability": 0.2,
+      "time_cost_hours": 15,
+      "worst_case": -500,
+      "abcfc_score": 230.0,
+      "hourly_rate": 23.333333333333332,
+      "risk_adjusted_value": -50.0,
+      "details": "Build better implementation for dojo-spas open PRs. High risk of rejection/waste."
+    }
+  ],
+  "winner": {
+    "name": "Option 5: Hybrid - Scan + Scale Money Printer",
+    "expected_value": 2000,
+    "probability": 0.45,
+    "time_cost_hours": 5,
+    "worst_case": -200,
+    "abcfc_score": 867.0,
+    "hourly_rate": 180.0,
+    "risk_adjusted_value": 790.0,
+    "details": "Expand bounty scanner + optimize Money Printer in parallel. Best of both worlds."
+  },
+  "methodology": "Component ABCFC with risk aversion = 0.3"
+}

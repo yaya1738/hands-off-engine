@@ -1,0 +1,270 @@
+{
+  "timestamp": "2025-12-03T20:00:03.605215+00:00",
+  "requests": [
+    {
+      "request_id": "prob_will-openai-have-the-top-ai-model-on-december-31_1764791057",
+      "input_type": "probability",
+      "market_id": "will-openai-have-the-top-ai-model-on-december-31",
+      "question": "Will OpenAI have the top AI model on December 31?",
+      "current_price": 0.0965,
+      "machine_estimate": 0.0565,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "NO"
+      },
+      "created_at": "2025-12-03T19:44:16.675799+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_will-bitcoin-reach-110000-by-december-31-2025-793_1764791057",
+      "input_type": "probability",
+      "market_id": "will-bitcoin-reach-110000-by-december-31-2025-793",
+      "question": "Will Bitcoin reach $110,000 by December 31, 2025?",
+      "current_price": 0.18,
+      "machine_estimate": 0.14,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "NO"
+      },
+      "created_at": "2025-12-03T19:44:16.675940+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_will-a-minecraft-movie-be-the-top-grossing-movie-of-2025_1764791057",
+      "input_type": "probability",
+      "market_id": "will-a-minecraft-movie-be-the-top-grossing-movie-of-2025",
+      "question": "Will A Minecraft Movie be the top grossing movie of 2025?",
+      "current_price": 0.927,
+      "machine_estimate": 0.887,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "NO"
+      },
+      "created_at": "2025-12-03T19:44:16.676088+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_hailey-bieber-pregnant-in-2025_1764791057",
+      "input_type": "probability",
+      "market_id": "hailey-bieber-pregnant-in-2025",
+      "question": "Hailey Bieber pregnant in 2025?",
+      "current_price": 0.11,
+      "machine_estimate": 0.15,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "YES"
+      },
+      "created_at": "2025-12-03T19:44:16.676445+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_microstrategy-sells-any-bitcoin-by-june-30-2026_1764791057",
+      "input_type": "probability",
+      "market_id": "microstrategy-sells-any-bitcoin-by-june-30-2026",
+      "question": "MicroStrategy sells any Bitcoin by June 30, 2026?",
+      "current_price": 0.21,
+      "machine_estimate": 0.25,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "YES"
+      },
+      "created_at": "2025-12-03T19:44:16.676937+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_will-company-g-be-the-largest-company-in-the-world-by-market-cap-on-december-31_1764792004",
+      "input_type": "probability",
+      "market_id": "will-company-g-be-the-largest-company-in-the-world-by-market-cap-on-december-31",
+      "question": "Will Company G be the largest company in the world by market cap on December 31?",
+      "current_price": 0.495,
+      "machine_estimate": 0.455,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "NO",
+        "success_patterns": [
+          "merge_arb",
+          "new_market_edge",
+          "espn_comparison"
+        ],
+        "recommendations": [
+          "Use Kelly Criterion for position sizing",
+          "Monitor VaR for portfolio risk limits",
+          "Use minimum edge of 3% based on past accuracy",
+          "Favor spread_arbitrage signals - historically outperforming",
+          "Use minimum edge of 3% based on past accuracy"
+        ],
+        "past_learnings": [
+          "Edge predictions only 3% accurate - worse than coin flip",
+          "Source spread_arbitrage has 67% win rate - outperforming",
+          "Edge predictions only 3% accurate - worse than coin flip"
+        ]
+      },
+      "created_at": "2025-12-03T20:00:03.594140+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_will-openai-have-the-top-ai-model-on-december-31_1764792004",
+      "input_type": "probability",
+      "market_id": "will-openai-have-the-top-ai-model-on-december-31",
+      "question": "Will OpenAI have the top AI model on December 31?",
+      "current_price": 0.0965,
+      "machine_estimate": 0.1365,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "YES",
+        "success_patterns": [
+          "merge_arb",
+          "new_market_edge",
+          "espn_comparison"
+        ],
+        "recommendations": [
+          "Use Kelly Criterion for position sizing",
+          "Monitor VaR for portfolio risk limits",
+          "Use minimum edge of 3% based on past accuracy",
+          "Favor spread_arbitrage signals - historically outperforming",
+          "Use minimum edge of 3% based on past accuracy"
+        ],
+        "past_learnings": [
+          "Edge predictions only 3% accurate - worse than coin flip",
+          "Source spread_arbitrage has 67% win rate - outperforming",
+          "Edge predictions only 3% accurate - worse than coin flip"
+        ]
+      },
+      "created_at": "2025-12-03T20:00:03.596924+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_will-bitcoin-dip-to-75000-by-december-31-2025-515_1764792004",
+      "input_type": "probability",
+      "market_id": "will-bitcoin-dip-to-75000-by-december-31-2025-515",
+      "question": "Will Bitcoin dip to $75,000 by December 31, 2025?",
+      "current_price": 0.115,
+      "machine_estimate": 0.155,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "YES",
+        "success_patterns": [
+          "merge_arb",
+          "new_market_edge",
+          "espn_comparison"
+        ],
+        "recommendations": [
+          "Use Kelly Criterion for position sizing",
+          "Monitor VaR for portfolio risk limits",
+          "Use minimum edge of 3% based on past accuracy",
+          "Favor spread_arbitrage signals - historically outperforming",
+          "Use minimum edge of 3% based on past accuracy"
+        ],
+        "past_learnings": [
+          "Edge predictions only 3% accurate - worse than coin flip",
+          "Source spread_arbitrage has 67% win rate - outperforming",
+          "Edge predictions only 3% accurate - worse than coin flip"
+        ]
+      },
+      "created_at": "2025-12-03T20:00:03.599573+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_will-a-minecraft-movie-be-the-top-grossing-movie-of-2025_1764792004",
+      "input_type": "probability",
+      "market_id": "will-a-minecraft-movie-be-the-top-grossing-movie-of-2025",
+      "question": "Will A Minecraft Movie be the top grossing movie of 2025?",
+      "current_price": 0.927,
+      "machine_estimate": 0.887,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "NO",
+        "success_patterns": [
+          "merge_arb",
+          "new_market_edge",
+          "espn_comparison"
+        ],
+        "recommendations": [
+          "Use Kelly Criterion for position sizing",
+          "Monitor VaR for portfolio risk limits",
+          "Use minimum edge of 3% based on past accuracy",
+          "Favor spread_arbitrage signals - historically outperforming",
+          "Use minimum edge of 3% based on past accuracy"
+        ],
+        "past_learnings": [
+          "Edge predictions only 3% accurate - worse than coin flip",
+          "Source spread_arbitrage has 67% win rate - outperforming",
+          "Edge predictions only 3% accurate - worse than coin flip"
+        ]
+      },
+      "created_at": "2025-12-03T20:00:03.602412+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    },
+    {
+      "request_id": "prob_weed-rescheduled-in-2025_1764792004",
+      "input_type": "probability",
+      "market_id": "weed-rescheduled-in-2025",
+      "question": "Weed rescheduled in 2025?",
+      "current_price": 0.0935,
+      "machine_estimate": 0.1335,
+      "machine_confidence": 0.7,
+      "urgency": "medium",
+      "context": {
+        "liquidity": 1000.0,
+        "suggested_side": "YES",
+        "success_patterns": [
+          "merge_arb",
+          "new_market_edge",
+          "espn_comparison"
+        ],
+        "recommendations": [
+          "Use Kelly Criterion for position sizing",
+          "Monitor VaR for portfolio risk limits",
+          "Use minimum edge of 3% based on past accuracy",
+          "Favor spread_arbitrage signals - historically outperforming",
+          "Use minimum edge of 3% based on past accuracy"
+        ],
+        "past_learnings": [
+          "Edge predictions only 3% accurate - worse than coin flip",
+          "Source spread_arbitrage has 67% win rate - outperforming",
+          "Edge predictions only 3% accurate - worse than coin flip"
+        ]
+      },
+      "created_at": "2025-12-03T20:00:03.605202+00:00",
+      "expires_at": null,
+      "human_response": null,
+      "responded_at": null
+    }
+  ]
+}

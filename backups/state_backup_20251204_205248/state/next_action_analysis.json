@@ -1,0 +1,88 @@
+{
+  "timestamp": "2025-12-04T20:05:39.428900+00:00",
+  "context": {
+    "capital": 2218.7,
+    "open_orders": 6,
+    "mode": "MONEY_PRINTER",
+    "applications_ready": 7
+  },
+  "risk_aversion": 0.6,
+  "actions_analyzed": 7,
+  "results": [
+    {
+      "rank": 1,
+      "action_id": "submit_job_apps",
+      "action_name": "Submit 7 Job Applications",
+      "abcfc_score": 3745.8,
+      "decision": "TAKE",
+      "expected_value": 12500.0,
+      "probability": 0.3,
+      "worst_case": -10
+    },
+    {
+      "rank": 2,
+      "action_id": "hunt_bounties",
+      "action_name": "Hunt and Complete High-Value Bounties",
+      "abcfc_score": 482.0,
+      "decision": "TAKE",
+      "expected_value": 2000,
+      "probability": 0.25,
+      "worst_case": -40
+    },
+    {
+      "rank": 3,
+      "action_id": "trading_analytics",
+      "action_name": "Build Live Trading Analytics Dashboard",
+      "abcfc_score": 67.3,
+      "decision": "TAKE",
+      "expected_value": 100,
+      "probability": 0.7,
+      "worst_case": -15
+    },
+    {
+      "rank": 4,
+      "action_id": "launch_service",
+      "action_name": "Launch Paid Polymarket Analytics Service",
+      "abcfc_score": 44.400000000000006,
+      "decision": "TAKE",
+      "expected_value": 500,
+      "probability": 0.15,
+      "worst_case": -60
+    },
+    {
+      "rank": 5,
+      "action_id": "scale_backend_loop",
+      "action_name": "Scale Backend Loop to Higher Frequency",
+      "abcfc_score": 28.5,
+      "decision": "TAKE",
+      "expected_value": 75,
+      "probability": 0.5,
+      "worst_case": -30
+    },
+    {
+      "rank": 6,
+      "action_id": "optimize_fishing",
+      "action_name": "Optimize Current Fishing Order Strategy",
+      "abcfc_score": 16.8,
+      "decision": "TAKE",
+      "expected_value": 30,
+      "probability": 0.6,
+      "worst_case": -5
+    },
+    {
+      "rank": 7,
+      "action_id": "enhance_money_printer",
+      "action_name": "Deploy More Aggressive Trading Orders",
+      "abcfc_score": 11.0,
+      "decision": "TAKE",
+      "expected_value": 50,
+      "probability": 0.4,
+      "worst_case": -25
+    }
+  ],
+  "top_3": [
+    "submit_job_apps",
+    "hunt_bounties",
+    "trading_analytics"
+  ]
+}

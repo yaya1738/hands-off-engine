@@ -1,0 +1,317 @@
+{
+  "created_at": "2025-12-03T18:20:18.760391+00:00",
+  "last_assessment": null,
+  "overall_risk_score": 19.357142857142858,
+  "risks_identified": 14,
+  "risks_mitigated": 0,
+  "updated_at": "2025-12-04T20:47:27.312348+00:00",
+  "accounts": [
+    {
+      "id": "polymarket",
+      "name": "Polymarket Trading Wallet",
+      "type": "crypto_wallet",
+      "balance": 8.99,
+      "available": 8.99,
+      "institution": "Polymarket (Polygon)",
+      "ownership": "individual",
+      "insured": false,
+      "custodial": false,
+      "active": true
+    },
+    {
+      "id": "robinhood",
+      "name": "Robinhood Brokerage",
+      "type": "brokerage",
+      "balance": 1500,
+      "available": 1500,
+      "institution": "Robinhood",
+      "ownership": "individual",
+      "insured": true,
+      "custodial": true,
+      "active": true
+    },
+    {
+      "id": "paypal",
+      "name": "PayPal Business",
+      "type": "payment_processor",
+      "balance": 1000,
+      "available": 1000,
+      "institution": "PayPal",
+      "ownership": "individual",
+      "insured": false,
+      "custodial": true,
+      "active": true
+    },
+    {
+      "id": "credit_cards",
+      "name": "Credit Cards (Combined)",
+      "type": "credit",
+      "balance": -18000,
+      "available": 6000,
+      "institution": "",
+      "ownership": "individual",
+      "insured": false,
+      "custodial": false,
+      "active": true
+    },
+    {
+      "id": "bank_primary",
+      "name": "Primary Bank Account",
+      "type": "bank",
+      "balance": 0,
+      "available": 0.0,
+      "institution": "Unknown",
+      "ownership": "individual",
+      "insured": true,
+      "custodial": true,
+      "active": true
+    }
+  ],
+  "risks": [
+    {
+      "id": "no_incorporation",
+      "name": "No Business Entity",
+      "description": "Operating as individual without LLC/Corp protection. Personal assets at risk from business liabilities.",
+      "category": "legal",
+      "level": "high",
+      "potential_loss": 50000,
+      "probability": 0.15,
+      "risk_score": 11.249999999999998,
+      "expected_loss": 7500.0,
+      "mitigations": [
+        "Form LLC in Wyoming or Delaware ($100-500)",
+        "Open business bank account",
+        "Separate business and personal finances",
+        "Get business insurance (E&O, General Liability)"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "mixed_finances",
+      "name": "Commingled Finances",
+      "description": "Business and personal finances mixed. Pierces corporate veil if ever incorporated. Tax complexity.",
+      "category": "legal",
+      "level": "medium",
+      "potential_loss": 10000,
+      "probability": 0.3,
+      "risk_score": 15.0,
+      "expected_loss": 3000.0,
+      "mitigations": [
+        "Open dedicated business account",
+        "Use business card for business expenses",
+        "Track all business transactions separately"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "no_liability_insurance",
+      "name": "No Liability Insurance",
+      "description": "No E&O or general liability insurance. One lawsuit could be catastrophic.",
+      "category": "legal",
+      "level": "medium",
+      "potential_loss": 100000,
+      "probability": 0.05,
+      "risk_score": 2.5,
+      "expected_loss": 5000.0,
+      "mitigations": [
+        "Get E&O insurance ($500-1500/yr)",
+        "Get general liability insurance ($400-600/yr)",
+        "Consider umbrella policy"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "tax_complexity",
+      "name": "Individual Tax Complexity",
+      "description": "Crypto trading + income as individual creates complex tax situation. Self-employment tax at full rate.",
+      "category": "regulatory",
+      "level": "medium",
+      "potential_loss": 5000,
+      "probability": 0.8,
+      "risk_score": 40.0,
+      "expected_loss": 4000.0,
+      "mitigations": [
+        "Form S-Corp for tax efficiency (save 15.3% SE tax)",
+        "Use crypto tax software (Koinly, CoinTracker)",
+        "Work with crypto-aware CPA"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "single_wallet",
+      "name": "Single Crypto Wallet",
+      "description": "All crypto in one wallet. If compromised, everything lost.",
+      "category": "concentration",
+      "level": "high",
+      "potential_loss": 108.99,
+      "probability": 0.05,
+      "risk_score": 3.7500000000000004,
+      "expected_loss": 5.4495000000000005,
+      "mitigations": [
+        "Create multiple wallets (hot/cold split)",
+        "Use hardware wallet for cold storage",
+        "Never keep >$1000 in hot wallet",
+        "Use multisig for large amounts"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "single_exchange",
+      "name": "Single Exchange Dependency",
+      "description": "All trading on Polymarket. Platform risk (regulatory, hack, shutdown).",
+      "category": "concentration",
+      "level": "medium",
+      "potential_loss": 1000,
+      "probability": 0.1,
+      "risk_score": 5.0,
+      "expected_loss": 100.0,
+      "mitigations": [
+        "Diversify to other prediction markets (Kalshi)",
+        "Keep minimal balance on exchange",
+        "Withdraw profits regularly"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "single_server",
+      "name": "Single Server Infrastructure",
+      "description": "All systems on one server. Hardware failure = total system failure.",
+      "category": "technical",
+      "level": "high",
+      "potential_loss": 5000,
+      "probability": 0.1,
+      "risk_score": 7.500000000000001,
+      "expected_loss": 500.0,
+      "mitigations": [
+        "Set up backup server (standby)",
+        "Use cloud provider with redundancy",
+        "Implement automated backups to multiple locations",
+        "Document recovery procedures"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "single_api_key",
+      "name": "Single API Key Exposure",
+      "description": "API keys in environment. If server compromised, all keys exposed.",
+      "category": "technical",
+      "level": "medium",
+      "potential_loss": 2000,
+      "probability": 0.1,
+      "risk_score": 5.0,
+      "expected_loss": 200.0,
+      "mitigations": [
+        "Use secrets manager (AWS Secrets, HashiCorp Vault)",
+        "Implement key rotation",
+        "Use minimal-permission API keys",
+        "Set up IP whitelisting where possible"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "no_backup",
+      "name": "Inadequate Backup Strategy",
+      "description": "State files and code not properly backed up. Data loss risk.",
+      "category": "technical",
+      "level": "medium",
+      "potential_loss": 10000,
+      "probability": 0.15,
+      "risk_score": 7.5,
+      "expected_loss": 1500.0,
+      "mitigations": [
+        "Automate daily backups to cloud storage",
+        "Backup to multiple providers (S3 + GCS)",
+        "Test restore procedures monthly",
+        "Version control all code (GitHub)"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "concentration_robinhood",
+      "name": "Asset Concentration: Robinhood Brokerage",
+      "description": "60% of assets in Robinhood Brokerage. Institution failure = major loss.",
+      "category": "concentration",
+      "level": "medium",
+      "potential_loss": 1500,
+      "probability": 0.02,
+      "risk_score": 1.0,
+      "expected_loss": 30.0,
+      "mitigations": [
+        "Diversify across multiple institutions",
+        "Keep emergency fund in separate bank",
+        "Reduce Robinhood Brokerage concentration to <30%"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "credit_utilization",
+      "name": "High Credit Utilization",
+      "description": "75% credit utilization damages credit score. Limits future borrowing capacity.",
+      "category": "financial",
+      "level": "high",
+      "potential_loss": 5000,
+      "probability": 0.8,
+      "risk_score": 60.00000000000001,
+      "expected_loss": 4000.0,
+      "mitigations": [
+        "Pay down to <30% utilization",
+        "Request credit limit increases",
+        "Consider balance transfer offers"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "runway_critical",
+      "name": "Critical Runway",
+      "description": "<1 month runway. Existential risk to operations.",
+      "category": "financial",
+      "level": "critical",
+      "potential_loss": 50000,
+      "probability": 0.7,
+      "risk_score": 70.0,
+      "expected_loss": 35000.0,
+      "mitigations": [
+        "Generate immediate income",
+        "Reduce non-essential expenses",
+        "Liquidate if necessary",
+        "Seek bridge funding/loan"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "no_emergency_fund",
+      "name": "No Emergency Fund",
+      "description": "No separate emergency fund. One emergency = financial crisis.",
+      "category": "financial",
+      "level": "high",
+      "potential_loss": 3000,
+      "probability": 0.5,
+      "risk_score": 37.5,
+      "expected_loss": 1500.0,
+      "mitigations": [
+        "Build 3-month emergency fund ($10k target)",
+        "Keep in high-yield savings account",
+        "Do not touch for trading"
+      ],
+      "mitigated": false
+    },
+    {
+      "id": "paypal_freeze",
+      "name": "PayPal Freeze Risk",
+      "description": "PayPal can freeze accounts without notice. $1000 at risk.",
+      "category": "operational",
+      "level": "medium",
+      "potential_loss": 1000,
+      "probability": 0.1,
+      "risk_score": 5.0,
+      "expected_loss": 100.0,
+      "mitigations": [
+        "Keep minimal balance in PayPal",
+        "Transfer to bank regularly",
+        "Diversify payment processors",
+        "Set up Stripe as backup"
+      ],
+      "mitigated": false
+    }
+  ]
+}

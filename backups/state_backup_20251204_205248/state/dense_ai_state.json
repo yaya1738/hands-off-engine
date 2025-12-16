@@ -1,0 +1,10 @@
+{
+  "total_calls": 374,
+  "ai_calls": 0,
+  "web_calls": 374,
+  "local_calls": 374,
+  "cache_hits": 0,
+  "provider_usage": {},
+  "last_call": "2025-12-04T20:52:48.646650+00:00",
+  "errors": 0
+}

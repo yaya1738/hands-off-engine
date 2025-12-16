@@ -398,6 +398,68 @@ Would love to schedule a brief call to discuss how we might help.
             return {"status": "marked_sent", "id": proposal_id}
         return {"error": "Proposal not found"}
 
+    def auto_send_proposal(self, proposal_id: str) -> Dict:
+        """
+        INTEGRAFIX: Auto-send proposal if bypass approved.
+
+        Checks proposal_bypass.should_bypass() and if approved:
+        - Marks proposal as sent
+        - Records auto-send action
+        - Returns success
+
+        If not approved:
+        - Queues for human review
+        - Returns reason for manual review
+        """
+        if proposal_id not in self.state["proposals"]:
+            return {"error": "Proposal not found"}
+
+        proposal = self.state["proposals"][proposal_id]
+
+        try:
+            # Check bypass approval
+            import sys
+            sys.path.insert(0, str(Path(__file__).parent.parent))
+            from integrafix.proposal_bypass import ProposalBypass
+
+            bypass = ProposalBypass()
+            bypass_result = bypass.should_bypass(proposal)
+
+            if bypass_result["approved"]:
+                # Auto-send approved
+                self.mark_proposal_sent(proposal_id)
+
+                # Record bypass action
+                proposal["auto_sent"] = True
+                proposal["bypass_reason"] = bypass_result["reason"]
+                self._save_state()
+
+                print(f"✓ Proposal {proposal_id} auto-sent (bypass approved)")
+                print(f"  Reason: {bypass_result['reason']}")
+
+                return {
+                    "status": "auto_sent",
+                    "proposal_id": proposal_id,
+                    "bypass_result": bypass_result
+                }
+            else:
+                # Queue for human review
+                proposal["requires_human_review"] = True
+                proposal["bypass_reason"] = bypass_result["reason"]
+                self._save_state()
+
+                print(f"⏸ Proposal {proposal_id} queued for human review")
+                print(f"  Reason: {bypass_result['reason']}")
+
+                return {
+                    "status": "manual_review_required",
+                    "proposal_id": proposal_id,
+                    "bypass_result": bypass_result
+                }
+
+        except Exception as e:
+            return {"error": f"Bypass check failed: {e}"}
+
     def record_job_offer_from_email(self, source: str, title: str, rate: float = 0,
                                     details: str = "", sender_email: str = "") -> Dict:
         """

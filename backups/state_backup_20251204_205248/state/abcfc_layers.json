@@ -1,0 +1,292 @@
+{
+  "saved_at": "2025-12-04T02:48:31.188484+00:00",
+  "nodes": {
+    "total_finance": {
+      "name": "Total Finance",
+      "layer": "total_finance",
+      "parent": null,
+      "best_case": 0.56,
+      "worst_case": -19.77,
+      "expected": -18.75,
+      "is_leaf": false,
+      "children": [
+        "trading",
+        "handsoff",
+        "other_finance"
+      ],
+      "metadata": {}
+    },
+    "trading": {
+      "name": "Trading",
+      "layer": "trading",
+      "parent": "total_finance",
+      "best_case": 0.56,
+      "worst_case": -19.77,
+      "expected": -18.75,
+      "is_leaf": false,
+      "children": [
+        "polymarket"
+      ],
+      "metadata": {}
+    },
+    "polymarket": {
+      "name": "Polymarket",
+      "layer": "polymarket",
+      "parent": "trading",
+      "best_case": 0.56,
+      "worst_case": -19.77,
+      "expected": -18.75,
+      "is_leaf": false,
+      "children": [
+        "market:tether-insolvent-in-2025",
+        "market:will-bitcoin-reach-1000000-by-december-31-2025",
+        "market:will-bitcoin-reach-250000-by-december-31-2025",
+        "market:will-bitcoin-reach-200000-by-december-31-2025",
+        "market:will-bitcoin-reach-150000-by-december-31-2025-188",
+        "market:will-bitcoin-reach-130000-by-december-31-2025-911-832",
+        "market:will-bitcoin-dip-to-70000-by-december-31-2025-193-726-878-775-359-968-264-727-793-714-257-318-569-865-147",
+        "market:will-bitcoin-dip-to-50000-by-december-31-2025-391-715-682-587-692-994-786-318-267-857-157-791-189-328-186",
+        "market:will-bitcoin-dip-to-20000-by-december-31-2025-942-621-278-695-321-896-769-417-957-733-354-361-233-126-159",
+        "market:will-ethereum-hit-10000-by-december-31-218-525",
+        "market:will-ethereum-hit-8000-by-december-31-124-489",
+        "market:will-ethereum-hit-7000-by-december-31-733-852",
+        "market:will-ethereum-hit-6000-by-december-31-843-315",
+        "market:will-ethereum-hit-5000-by-december-31-796-376",
+        "market:will-ethereum-dip-to-1000-by-december-31-498-391-185-526-541-347-589"
+      ],
+      "metadata": {}
+    },
+    "handsoff": {
+      "name": "Hands-off System",
+      "layer": "handsoff",
+      "parent": "total_finance",
+      "best_case": 0.0,
+      "worst_case": 0.0,
+      "expected": 0.0,
+      "is_leaf": false,
+      "children": [],
+      "metadata": {}
+    },
+    "other_finance": {
+      "name": "Other Finance",
+      "layer": "other_finance",
+      "parent": "total_finance",
+      "best_case": 0.0,
+      "worst_case": 0.0,
+      "expected": 0.0,
+      "is_leaf": false,
+      "children": [],
+      "metadata": {}
+    },
+    "market:tether-insolvent-in-2025": {
+      "name": "tether-insolvent-in-2025",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "tether-insolvent-in-2025"
+      }
+    },
+    "market:will-bitcoin-reach-1000000-by-december-31-2025": {
+      "name": "will-bitcoin-reach-1000000-by-december-31-2025",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.0,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-reach-1000000-by-december-31-2025"
+      }
+    },
+    "market:will-bitcoin-reach-250000-by-december-31-2025": {
+      "name": "will-bitcoin-reach-250000-by-december-31-2025",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.0,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-reach-250000-by-december-31-2025"
+      }
+    },
+    "market:will-bitcoin-reach-200000-by-december-31-2025": {
+      "name": "will-bitcoin-reach-200000-by-december-31-2025",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.0,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-reach-200000-by-december-31-2025"
+      }
+    },
+    "market:will-bitcoin-reach-150000-by-december-31-2025-188": {
+      "name": "will-bitcoin-reach-150000-by-december-31-2025-188",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-reach-150000-by-december-31-2025-188"
+      }
+    },
+    "market:will-bitcoin-reach-130000-by-december-31-2025-911-832": {
+      "name": "will-bitcoin-reach-130000-by-december-31-2025-911-832",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.03,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-reach-130000-by-december-31-2025-911-832"
+      }
+    },
+    "market:will-bitcoin-dip-to-70000-by-december-31-2025-193-726-878-775-359-968-264-727-793-714-257-318-569-865-147": {
+      "name": "will-bitcoin-dip-to-70000-by-december-31-2025-193-726-878-775-359-968-264-727-793-714-257-318-569-865-147",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.4,
+      "worst_case": -5.77,
+      "expected": -5.46,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-dip-to-70000-by-december-31-2025-193-726-878-775-359-968-264-727-793-714-257-318-569-865-147"
+      }
+    },
+    "market:will-bitcoin-dip-to-50000-by-december-31-2025-391-715-682-587-692-994-786-318-267-857-157-791-189-328-186": {
+      "name": "will-bitcoin-dip-to-50000-by-december-31-2025-391-715-682-587-692-994-786-318-267-857-157-791-189-328-186",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-dip-to-50000-by-december-31-2025-391-715-682-587-692-994-786-318-267-857-157-791-189-328-186"
+      }
+    },
+    "market:will-bitcoin-dip-to-20000-by-december-31-2025-942-621-278-695-321-896-769-417-957-733-354-361-233-126-159": {
+      "name": "will-bitcoin-dip-to-20000-by-december-31-2025-942-621-278-695-321-896-769-417-957-733-354-361-233-126-159",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.0,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-bitcoin-dip-to-20000-by-december-31-2025-942-621-278-695-321-896-769-417-957-733-354-361-233-126-159"
+      }
+    },
+    "market:will-ethereum-hit-10000-by-december-31-218-525": {
+      "name": "will-ethereum-hit-10000-by-december-31-218-525",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-ethereum-hit-10000-by-december-31-218-525"
+      }
+    },
+    "market:will-ethereum-hit-8000-by-december-31-124-489": {
+      "name": "will-ethereum-hit-8000-by-december-31-124-489",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-ethereum-hit-8000-by-december-31-124-489"
+      }
+    },
+    "market:will-ethereum-hit-7000-by-december-31-733-852": {
+      "name": "will-ethereum-hit-7000-by-december-31-733-852",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-ethereum-hit-7000-by-december-31-733-852"
+      }
+    },
+    "market:will-ethereum-hit-6000-by-december-31-843-315": {
+      "name": "will-ethereum-hit-6000-by-december-31-843-315",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-ethereum-hit-6000-by-december-31-843-315"
+      }
+    },
+    "market:will-ethereum-hit-5000-by-december-31-796-376": {
+      "name": "will-ethereum-hit-5000-by-december-31-796-376",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.04,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-ethereum-hit-5000-by-december-31-796-376"
+      }
+    },
+    "market:will-ethereum-dip-to-1000-by-december-31-498-391-185-526-541-347-589": {
+      "name": "will-ethereum-dip-to-1000-by-december-31-498-391-185-526-541-347-589",
+      "layer": "market",
+      "parent": "polymarket",
+      "best_case": 0.01,
+      "worst_case": -1.0,
+      "expected": -0.95,
+      "is_leaf": true,
+      "children": [],
+      "metadata": {
+        "source": "polymarket",
+        "slug": "will-ethereum-dip-to-1000-by-december-31-498-391-185-526-541-347-589"
+      }
+    }
+  }
+}

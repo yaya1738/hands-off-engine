@@ -1,0 +1,17 @@
+{
+  "id": "mem_1e2170229ae0",
+  "memory_type": "decision",
+  "priority": 4,
+  "content": "Decision: Trade buy with size 3.2\nReasoning: Edge 60.0% vs threshold 10.0%",
+  "context": "",
+  "tags": [
+    "decision"
+  ],
+  "created_at": "2025-12-03T16:56:36.089891+00:00",
+  "session_id": "orchestrator_20251203",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

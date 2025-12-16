@@ -1,0 +1,10 @@
+{
+  "components": [
+    {
+      "class": "UnifiedAI",
+      "module": "ai.unified_ai",
+      "registered": "2025-12-01T16:00:06.092718+00:00"
+    }
+  ],
+  "master": "Yair Siegel"
+}

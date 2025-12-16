@@ -1,0 +1,16 @@
+{
+  "target_frequency": 200000,
+  "current_capacity": 63000,
+  "wallet_count": 63,
+  "last_scale_time": 1764687190.3979585,
+  "last_scale_action": "none",
+  "scaling_history": [
+    {
+      "time": "2025-12-02T14:53:10.397961+00:00",
+      "action": "scale_up",
+      "count": 57,
+      "target": 62500
+    }
+  ],
+  "updated_at": "2025-12-02T14:53:36.998942+00:00"
+}

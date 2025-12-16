@@ -1,1 +1,2 @@
 {"id": "77a55ad3", "timestamp": "2025-12-03T16:18:13.481681+00:00", "lever": "pricing", "variation": "$99", "original": "$500", "hypothesis": "Price may be too high for cold traffic", "status": "active", "visitors": 0, "conversions": 0, "outcome": null}
+{"id": "55eda17e", "timestamp": "2025-12-16T06:01:44.715915+00:00", "lever": "pricing", "variation": "$199", "original": "$500", "hypothesis": "Price may be too high for cold traffic", "status": "active", "visitors": 0, "conversions": 0, "outcome": null}

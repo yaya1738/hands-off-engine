@@ -1,0 +1,246 @@
+{
+  "master": "Yair Siegel",
+  "initialized": "2025-12-04T20:47:28.656024+00:00",
+  "knowledge_bases": {
+    "total": 20,
+    "loaded": 20,
+    "reality_connected": 20
+  },
+  "by_category": {
+    "core": {
+      "total": 3,
+      "loaded": 3
+    },
+    "memory": {
+      "total": 4,
+      "loaded": 4
+    },
+    "engine": {
+      "total": 3,
+      "loaded": 3
+    },
+    "yair": {
+      "total": 2,
+      "loaded": 2
+    },
+    "abcfc": {
+      "total": 5,
+      "loaded": 5
+    },
+    "integrafix": {
+      "total": 3,
+      "loaded": 3
+    }
+  },
+  "reality_connections": 9,
+  "total_queries": 0,
+  "total_reality_syncs": 1,
+  "integration_score": 1.0,
+  "last_updated": "2025-12-04T20:47:28.899503+00:00",
+  "knowledge_bases_detail": {
+    "computing": {
+      "name": "Computing Knowledge",
+      "category": "core",
+      "loaded": true,
+      "error": null,
+      "entry_count": 19,
+      "reality_connected": true
+    },
+    "business": {
+      "name": "Business Knowledge",
+      "category": "core",
+      "loaded": true,
+      "error": null,
+      "entry_count": 20,
+      "reality_connected": true
+    },
+    "money": {
+      "name": "Money Knowledge",
+      "category": "core",
+      "loaded": true,
+      "error": null,
+      "entry_count": 12,
+      "reality_connected": true
+    },
+    "memory_kernels": {
+      "name": "Memory Kernels",
+      "category": "memory",
+      "loaded": true,
+      "error": null,
+      "entry_count": 10,
+      "reality_connected": true
+    },
+    "ai_memory": {
+      "name": "AI Memory",
+      "category": "memory",
+      "loaded": true,
+      "error": null,
+      "entry_count": 3806,
+      "reality_connected": true
+    },
+    "trading_memory": {
+      "name": "Trading Memory",
+      "category": "memory",
+      "loaded": true,
+      "error": null,
+      "entry_count": 0,
+      "reality_connected": true
+    },
+    "system_bootstrap": {
+      "name": "System Bootstrap",
+      "category": "memory",
+      "loaded": true,
+      "error": null,
+      "entry_count": 0,
+      "reality_connected": true
+    },
+    "knowledge_nexus": {
+      "name": "Knowledge Nexus",
+      "category": "engine",
+      "loaded": true,
+      "error": null,
+      "entry_count": 6,
+      "reality_connected": true
+    },
+    "knowledge_fusion": {
+      "name": "Knowledge Fusion",
+      "category": "engine",
+      "loaded": true,
+      "error": null,
+      "entry_count": 5,
+      "reality_connected": true
+    },
+    "knowledge_crosschain": {
+      "name": "Knowledge Crosschain",
+      "category": "engine",
+      "loaded": true,
+      "error": null,
+      "entry_count": 4,
+      "reality_connected": true
+    },
+    "yair_knowledge": {
+      "name": "Yair Knowledge Bridge",
+      "category": "yair",
+      "loaded": true,
+      "error": null,
+      "entry_count": 16,
+      "reality_connected": true
+    },
+    "trading_teachings": {
+      "name": "Trading Teachings",
+      "category": "yair",
+      "loaded": true,
+      "error": null,
+      "entry_count": 8,
+      "reality_connected": true
+    },
+    "abcfc_system": {
+      "name": "ABCFC System",
+      "category": "abcfc",
+      "loaded": true,
+      "error": null,
+      "entry_count": 1,
+      "reality_connected": true
+    },
+    "abcfc_nexus": {
+      "name": "ABCFC Nexus",
+      "category": "abcfc",
+      "loaded": true,
+      "error": null,
+      "entry_count": 1,
+      "reality_connected": true
+    },
+    "abcfc_cloudflyer": {
+      "name": "ABCFC CloudFlyer",
+      "category": "abcfc",
+      "loaded": true,
+      "error": null,
+      "entry_count": 1,
+      "reality_connected": true
+    },
+    "abcfc_layers": {
+      "name": "ABCFC Layers",
+      "category": "abcfc",
+      "loaded": true,
+      "error": null,
+      "entry_count": 1,
+      "reality_connected": true
+    },
+    "abcfc_state": {
+      "name": "ABCFC Unified State",
+      "category": "abcfc",
+      "loaded": true,
+      "error": null,
+      "entry_count": 0,
+      "reality_connected": true
+    },
+    "fair_price": {
+      "name": "Fair Price Estimator",
+      "category": "integrafix",
+      "loaded": true,
+      "error": null,
+      "entry_count": 0,
+      "reality_connected": true
+    },
+    "outcome_tracker": {
+      "name": "Outcome Tracker",
+      "category": "integrafix",
+      "loaded": true,
+      "error": null,
+      "entry_count": 0,
+      "reality_connected": true
+    },
+    "reality_bridge": {
+      "name": "Reality Bridge",
+      "category": "integrafix",
+      "loaded": true,
+      "error": null,
+      "entry_count": 5,
+      "reality_connected": true
+    }
+  },
+  "last_sync": {
+    "timestamp": "2025-12-04T20:47:28.897423+00:00",
+    "syncs": [],
+    "reality_state": {
+      "financial": {
+        "source": "capital_management",
+        "synced": false,
+        "monthly_value": 0,
+        "roi_multiplier": 0
+      },
+      "trading": {
+        "source": "abcfc_unified_state",
+        "synced": true,
+        "position_count": 493,
+        "total_expected": 12876.937564102565,
+        "total_bounds": [
+          -14623.0,
+          117153.68782051283
+        ],
+        "open_orders": 6,
+        "pipeline_trades": 1315,
+        "win_rate": 0
+      },
+      "infrastructure": {
+        "source": "reality_bridge",
+        "synced": true,
+        "health": "healthy",
+        "daemons": 3,
+        "bridges": 74,
+        "cron_jobs": 10,
+        "health_score": 1.0,
+        "phase": "operational",
+        "vcpus": 68,
+        "nodes": "9/9"
+      },
+      "temporal": {
+        "timestamp": "2025-12-04T20:47:28.899426+00:00",
+        "hour": 20,
+        "day_of_week": "Thursday",
+        "market_hours": true,
+        "synced": true
+      }
+    }
+  }
+}

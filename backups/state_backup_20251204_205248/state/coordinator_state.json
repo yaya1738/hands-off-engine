@@ -1,0 +1,391 @@
+{
+  "created_at": "2025-12-02T13:56:35.762273+00:00",
+  "coordination_runs": 7,
+  "systems_status": {
+    "yair_wisdom": {
+      "status": "healthy",
+      "last_updated": "2025-12-03T16:38:52.015485+00:00",
+      "file_exists": true
+    },
+    "probability_calibration": {
+      "status": "healthy",
+      "last_updated": "2025-12-03T15:12:56.644031+00:00",
+      "file_exists": true
+    },
+    "capital_state": {
+      "status": "missing",
+      "file_exists": false
+    },
+    "glitch_detection": {
+      "status": "healthy",
+      "last_updated": "2025-12-03T16:28:30.482438+00:00",
+      "file_exists": true
+    },
+    "skill_growth": {
+      "status": "healthy",
+      "last_updated": "2025-12-03T18:33:38.902625+00:00",
+      "file_exists": true
+    },
+    "pipeline_state": {
+      "status": "healthy",
+      "last_updated": "2025-12-03T18:15:03.168215+00:00",
+      "file_exists": true
+    },
+    "learning_insights": {
+      "status": "missing",
+      "file_exists": false
+    }
+  },
+  "data_flows": [
+    {
+      "from": "wisdom_engine",
+      "to": "concrete_executor",
+      "status": "connected"
+    }
+  ],
+  "learning_progress": {
+    "skills": {
+      "probability_estimation": {
+        "measurements": [
+          {
+            "timestamp": "2025-12-03T16:41:42.987994+00:00",
+            "score": 0.30250000000000005
+          },
+          {
+            "timestamp": "2025-12-03T17:16:55.337779+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:16:55.340512+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:16:55.343711+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:16:55.346752+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:16:55.349937+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:23:47.331720+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:23:47.334207+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:23:47.336270+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:23:47.338224+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:23:47.340265+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:24:59.830173+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:24:59.832512+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:24:59.834711+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:24:59.836976+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:24:59.839523+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:41:42.914513+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:41:42.916986+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:41:42.919231+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:41:42.921513+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:41:42.923940+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:47:22.074208+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:47:22.076594+00:00",
+            "score": 0.42250000000000004
+          },
+          {
+            "timestamp": "2025-12-03T17:47:22.079317+00:00",
+            "score": 0.30250000000000005
+          },
+          {
+            "timestamp": "2025-12-03T17:47:22.082061+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:47:22.084618+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:48:20.695919+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:48:20.698686+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:48:20.701061+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:48:20.703609+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:48:20.706168+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:54:02.987379+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:54:02.991017+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:54:02.994457+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:54:02.997961+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:54:03.002188+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:59:40.652499+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:59:40.655335+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T17:59:40.658747+00:00",
+            "score": 0.12249999999999998
+          },
+          {
+            "timestamp": "2025-12-03T17:59:40.661388+00:00",
+            "score": 0.30250000000000005
+          },
+          {
+            "timestamp": "2025-12-03T17:59:40.664049+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:05:23.637226+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:05:23.640537+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:05:23.643447+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:05:23.646473+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:05:23.649448+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:11:09.815025+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:11:09.818221+00:00",
+            "score": 0.36
+          },
+          {
+            "timestamp": "2025-12-03T18:11:09.821034+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:11:09.823954+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:11:09.827136+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:16:40.101554+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:16:40.104743+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:16:40.107773+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:16:40.110810+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:16:40.114089+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:22:25.148957+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:22:25.152489+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:22:25.156436+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:22:25.161624+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:22:25.166523+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:27:43.165969+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:27:43.169534+00:00",
+            "score": 0.12249999999999998
+          },
+          {
+            "timestamp": "2025-12-03T18:27:43.172963+00:00",
+            "score": 0.2025
+          },
+          {
+            "timestamp": "2025-12-03T18:27:43.176550+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:27:43.180696+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:33:38.888959+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:33:38.892623+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:33:38.895734+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:33:38.898782+00:00",
+            "score": 0.25
+          },
+          {
+            "timestamp": "2025-12-03T18:33:38.901893+00:00",
+            "score": 0.25
+          }
+        ],
+        "current_level": 0.24125,
+        "growth_rate": 0.011817460317460338,
+        "target": 0.15,
+        "at_target": false
+      },
+      "category_politics": {
+        "measurements": [],
+        "current_level": 0.0,
+        "growth_rate": 0.0,
+        "target": 0.6,
+        "at_target": false
+      },
+      "category_sports": {
+        "measurements": [],
+        "current_level": 0.0,
+        "growth_rate": 0.0,
+        "target": 0.55,
+        "at_target": false
+      },
+      "category_war": {
+        "measurements": [],
+        "current_level": 0.0,
+        "growth_rate": 0.0,
+        "target": 0.55,
+        "at_target": false
+      },
+      "risk_management": {
+        "measurements": [],
+        "current_level": 0.0,
+        "growth_rate": 0.0,
+        "target": 0.95,
+        "at_target": false
+      },
+      "timing_accuracy": {
+        "measurements": [],
+        "current_level": 0.0,
+        "growth_rate": 0.0,
+        "target": 0.6,
+        "at_target": false
+      },
+      "teaching_application": {
+        "measurements": [],
+        "current_level": 0.0,
+        "growth_rate": 0.0,
+        "target": 0.5,
+        "at_target": false
+      }
+    },
+    "calibration": {
+      "outcomes_recorded": 0,
+      "brier_score": null
+    }
+  },
+  "last_updated": "2025-12-03T18:45:01.559711+00:00",
+  "total_runs": 1,
+  "successful_tasks": 1
+}

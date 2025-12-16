@@ -1,0 +1,109 @@
+{
+  "created_at": "2025-12-04T20:51:03.654260+00:00",
+  "programs_tracked": 9,
+  "bugs_found": 10,
+  "bugs_submitted": 0,
+  "total_earned": 0.0,
+  "programs": [
+    {
+      "name": "Shopify",
+      "handle": "shopify",
+      "min_bounty": 500,
+      "max_bounty": 50000,
+      "scope": [
+        "*.shopify.com",
+        "shopify.dev"
+      ],
+      "platform": "hackerone"
+    },
+    {
+      "name": "GitHub",
+      "handle": "github",
+      "min_bounty": 617,
+      "max_bounty": 30000,
+      "scope": [
+        "github.com",
+        "api.github.com"
+      ],
+      "platform": "hackerone"
+    },
+    {
+      "name": "Coinbase",
+      "handle": "coinbase",
+      "min_bounty": 200,
+      "max_bounty": 50000,
+      "scope": [
+        "coinbase.com",
+        "api.coinbase.com"
+      ],
+      "platform": "hackerone"
+    },
+    {
+      "name": "GitLab",
+      "handle": "gitlab",
+      "min_bounty": 100,
+      "max_bounty": 33510,
+      "scope": [
+        "gitlab.com",
+        "about.gitlab.com"
+      ],
+      "platform": "hackerone"
+    },
+    {
+      "name": "Slack",
+      "handle": "slack",
+      "min_bounty": 100,
+      "max_bounty": 25000,
+      "scope": [
+        "slack.com",
+        "api.slack.com"
+      ],
+      "platform": "hackerone"
+    },
+    {
+      "name": "Tesla",
+      "handle": "tesla",
+      "min_bounty": 100,
+      "max_bounty": 15000,
+      "scope": [
+        "tesla.com",
+        "teslamotors.com"
+      ],
+      "platform": "bugcrowd"
+    },
+    {
+      "name": "Mozilla",
+      "handle": "mozilla",
+      "min_bounty": 500,
+      "max_bounty": 10000,
+      "scope": [
+        "mozilla.org",
+        "firefox.com"
+      ],
+      "platform": "bugcrowd"
+    },
+    {
+      "name": "MasterCard",
+      "handle": "mastercard",
+      "min_bounty": 250,
+      "max_bounty": 15000,
+      "scope": [
+        "mastercard.com",
+        "mastercard.us"
+      ],
+      "platform": "bugcrowd"
+    },
+    {
+      "name": "Various EU Companies",
+      "handle": "intigriti-programs",
+      "min_bounty": 250,
+      "max_bounty": 10000,
+      "scope": [
+        "various"
+      ],
+      "platform": "intigriti"
+    }
+  ],
+  "bugs": [],
+  "last_updated": "2025-12-04T20:52:33.797731+00:00"
+}

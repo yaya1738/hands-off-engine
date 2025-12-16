@@ -15877,3 +15877,23 @@
 {"event": "goal_registered", "goal_id": "goal_206262e8", "name": "System Health", "target_value": 3, "logged_at": "2025-12-16T05:50:50.222224+00:00"}
 {"event": "effect_recorded", "effect_id": "effect_b0bedd09", "name": "Trading P&L", "value": -714.7572081128319, "goal_ids": null, "logged_at": "2025-12-16T05:50:50.792117+00:00"}
 {"event": "effect_recorded", "effect_id": "effect_51d775c2", "name": "Trades Resolved", "value": 2648, "goal_ids": null, "logged_at": "2025-12-16T05:50:51.114790+00:00"}
+{"event": "goal_registered", "goal_id": "goal_35a59a11", "name": "Master Directive", "target_value": null, "logged_at": "2025-12-16T06:02:58.939054+00:00"}
+{"event": "goal_registered", "goal_id": "goal_a8a7ff83", "name": "Trading Win Rate", "target_value": 0.6, "logged_at": "2025-12-16T06:02:59.199623+00:00"}
+{"event": "goal_registered", "goal_id": "goal_e000b7ba", "name": "System Health", "target_value": 3, "logged_at": "2025-12-16T06:02:59.457921+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_290f8447", "name": "Trading P&L", "value": -714.7572081128319, "goal_ids": null, "logged_at": "2025-12-16T06:03:00.014406+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_9c607176", "name": "Trades Resolved", "value": 2648, "goal_ids": null, "logged_at": "2025-12-16T06:03:00.360849+00:00"}
+{"event": "goal_registered", "goal_id": "goal_d3ddf5b2", "name": "Master Directive", "target_value": null, "logged_at": "2025-12-16T06:03:02.863047+00:00"}
+{"event": "goal_registered", "goal_id": "goal_01f0b50b", "name": "Trading Win Rate", "target_value": 0.6, "logged_at": "2025-12-16T06:03:03.147260+00:00"}
+{"event": "goal_registered", "goal_id": "goal_9267e60e", "name": "System Health", "target_value": 3, "logged_at": "2025-12-16T06:03:03.424722+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_a8a7d72e", "name": "Trading P&L", "value": -714.7572081128319, "goal_ids": null, "logged_at": "2025-12-16T06:03:04.080767+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_b0507a67", "name": "Trades Resolved", "value": 2648, "goal_ids": null, "logged_at": "2025-12-16T06:03:04.341371+00:00"}
+{"event": "goal_registered", "goal_id": "goal_f57fa7ea", "name": "Master Directive", "target_value": null, "logged_at": "2025-12-16T06:08:23.293146+00:00"}
+{"event": "goal_registered", "goal_id": "goal_ef2a703e", "name": "Trading Win Rate", "target_value": 0.6, "logged_at": "2025-12-16T06:08:23.543962+00:00"}
+{"event": "goal_registered", "goal_id": "goal_17dbe81a", "name": "System Health", "target_value": 3, "logged_at": "2025-12-16T06:08:23.804870+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_e37799d5", "name": "Trading P&L", "value": -714.7572081128319, "goal_ids": null, "logged_at": "2025-12-16T06:08:24.416179+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_410f2e75", "name": "Trades Resolved", "value": 2648, "goal_ids": null, "logged_at": "2025-12-16T06:08:24.675658+00:00"}
+{"event": "goal_registered", "goal_id": "goal_450c9505", "name": "Master Directive", "target_value": null, "logged_at": "2025-12-16T06:13:43.233254+00:00"}
+{"event": "goal_registered", "goal_id": "goal_88945453", "name": "Trading Win Rate", "target_value": 0.6, "logged_at": "2025-12-16T06:13:43.506423+00:00"}
+{"event": "goal_registered", "goal_id": "goal_7a89ef26", "name": "System Health", "target_value": 3, "logged_at": "2025-12-16T06:13:43.786877+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_7f4e391e", "name": "Trading P&L", "value": -714.7572081128319, "goal_ids": null, "logged_at": "2025-12-16T06:13:44.405570+00:00"}
+{"event": "effect_recorded", "effect_id": "effect_e72346a2", "name": "Trades Resolved", "value": 2648, "goal_ids": null, "logged_at": "2025-12-16T06:13:44.662200+00:00"}

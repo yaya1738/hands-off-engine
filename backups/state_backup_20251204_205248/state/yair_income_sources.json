@@ -1,0 +1,31 @@
+{
+  "sources": [
+    {
+      "name": "Consulting",
+      "category": "consulting",
+      "monthly_amount": 2000,
+      "worst_monthly": 0,
+      "best_monthly": 5000,
+      "certainty": 0.5,
+      "active": true
+    },
+    {
+      "name": "Freelance Projects",
+      "category": "freelance",
+      "monthly_amount": 1000,
+      "worst_monthly": 0,
+      "best_monthly": 3000,
+      "certainty": 0.3,
+      "active": true
+    },
+    {
+      "name": "Trading Profits",
+      "category": "trading",
+      "monthly_amount": 500,
+      "worst_monthly": -500,
+      "best_monthly": 2000,
+      "certainty": 0.6,
+      "active": true
+    }
+  ]
+}

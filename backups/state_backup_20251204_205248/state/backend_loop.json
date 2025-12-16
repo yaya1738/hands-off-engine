@@ -1,0 +1,654 @@
+{
+  "cycle": 1,
+  "started_at": "2025-12-04T20:47:13.754206+00:00",
+  "circuit_board": {
+    "success": true,
+    "power_voltage": 1.0,
+    "signals_sent": 9,
+    "transistors_active": 9,
+    "transistors_total": 9,
+    "cycle": 1
+  },
+  "ai_core": {
+    "success": true,
+    "cycle": 1,
+    "total_power": 8.0,
+    "insights": 4,
+    "patterns": 1,
+    "actions": 5,
+    "decision": "Optimize hot paths in trading execution",
+    "clarity": 0.74,
+    "strength": "CLEAR"
+  },
+  "knowledge_nexus": {
+    "success": true,
+    "knowledge_bases_loaded": 3,
+    "inflection_points_connected": 4,
+    "active_tools": 11,
+    "recommendations": 6
+  },
+  "crosschain": {
+    "success": true,
+    "crosslinks": 4,
+    "injection_points": 8,
+    "total_queries": 0,
+    "total_injections": 4,
+    "calculations": {
+      "risk_adjusted_growth": null,
+      "efficient_capital": null,
+      "unified_npv": {
+        "base_npv": 1065.258831053517,
+        "tech_adjusted_npv": 1011.995889500841,
+        "tech_cost_impact": 53.26294155267601
+      }
+    },
+    "process_injections": {
+      "backend_loop": {
+        "domains": [
+          "computing",
+          "business",
+          "money"
+        ],
+        "tools": 14,
+        "recommendations": 3
+      },
+      "trade_executor": {
+        "domains": [
+          "money",
+          "computing"
+        ],
+        "tools": 9,
+        "recommendations": 3
+      },
+      "ai_core": {
+        "domains": [
+          "computing",
+          "business",
+          "money"
+        ],
+        "tools": 14,
+        "recommendations": 3
+      },
+      "circuit_board": {
+        "domains": [
+          "computing",
+          "business",
+          "money"
+        ],
+        "tools": 14,
+        "recommendations": 0
+      }
+    }
+  },
+  "fusion": {
+    "success": true,
+    "fusions_performed": 5,
+    "avg_confidence": 0.8399999999999999,
+    "top_action": "Execute trades with optimal sizing and low latency",
+    "process_confidence": 0.85,
+    "insights": [
+      {
+        "topic": "trading",
+        "confidence": 0.9,
+        "action": "Execute trades with optimal sizing and low latency"
+      },
+      {
+        "topic": "scaling",
+        "confidence": 0.85,
+        "action": "Scale horizontally with cost-aware resource alloca"
+      },
+      {
+        "topic": "revenue",
+        "confidence": 0.8,
+        "action": "Optimize pricing with data-driven experiments"
+      },
+      {
+        "topic": "healing",
+        "confidence": 0.9,
+        "action": "Implement proactive healing with cost-benefit awar"
+      },
+      {
+        "topic": "strategic",
+        "confidence": 0.75,
+        "action": "Invest in sustainable competitive advantages"
+      }
+    ]
+  },
+  "mega_coordinator": {
+    "success": true,
+    "vcpus": 68,
+    "nodes": "9/9",
+    "health": {
+      "hardware": 100.0,
+      "system": 80.0,
+      "nodes": "9/9",
+      "scaling": "259.6%"
+    }
+  },
+  "process_endpoints": {
+    "success": true,
+    "endpoints": {
+      "trading_check": true,
+      "reality_check": true,
+      "outreach": true
+    }
+  },
+  "trading": {
+    "success": true,
+    "open_orders": 6,
+    "orders": [
+      {
+        "side": "BUY",
+        "price": "0.02",
+        "size": "5"
+      },
+      {
+        "side": "BUY",
+        "price": "0.04",
+        "size": "35"
+      },
+      {
+        "side": "SELL",
+        "price": "0.047",
+        "size": "119.99"
+      },
+      {
+        "side": "BUY",
+        "price": "0.001",
+        "size": "2000"
+      },
+      {
+        "side": "BUY",
+        "price": "0.06",
+        "size": "29"
+      }
+    ]
+  },
+  "hft_execution": {
+    "success": true,
+    "yair_strategies": [
+      "merge_arb",
+      "spread_capture",
+      "thin_book",
+      "fishing"
+    ],
+    "opportunities_found": 0,
+    "orders_placed": 0,
+    "merge_arbs": 0,
+    "spread_opps": 0,
+    "thin_books": 0,
+    "wallets_active": 63,
+    "capacity": "15,120/sec",
+    "cumulative_stats": {
+      "cycles": 1,
+      "merge_arbs_executed": 0,
+      "spread_captures": 0,
+      "thin_book_plays": 0,
+      "total_orders": 0,
+      "profit_estimated": 0.0
+    }
+  },
+  "abcfc_cloud_flyer": {
+    "success": true,
+    "state": {
+      "name": "Yair Siegel",
+      "best": 1968.84639,
+      "worst": -9.873610000000003,
+      "expected": 979.48639
+    },
+    "actions_evaluated": 35,
+    "best_action": "hedge_50",
+    "expected_improvement": -49.46799999999996,
+    "nexus_cloud_size": 35
+  },
+  "abcfc_unified_state": {
+    "success": true,
+    "total_expected": 14605.987564102565,
+    "total_bounds": [
+      -13758.475,
+      120611.78782051284
+    ],
+    "n_positions": 493,
+    "last_updated": "2025-12-04T20:46:12.696209+00:00",
+    "decision": "hedge_50",
+    "decision_target": "Claude",
+    "decision_score": 50.036693910256176,
+    "current_expected": 14605.987564102565,
+    "new_expected": 14595.870368589744,
+    "n_futures_evaluated": 2495
+  },
+  "abcfc_layers": {
+    "success": true,
+    "total_finance": {
+      "best": 120501.22500000003,
+      "worst": -13758.475,
+      "expected": 14553.875000000047,
+      "children": 3
+    },
+    "trading": {
+      "best": 120201.22500000003,
+      "worst": -13748.475,
+      "expected": 14353.875000000047,
+      "children": 1
+    },
+    "polymarket": {
+      "best": 120201.22500000003,
+      "worst": -13748.475,
+      "expected": 14353.875000000047,
+      "positions": 98
+    },
+    "handsoff": {
+      "best": 300.0,
+      "worst": -10.0,
+      "expected": 200.0,
+      "streams": 2
+    }
+  },
+  "abcfc_pure_2d": {
+    "success": true,
+    "bounds": [
+      -13758.48,
+      120611.79
+    ],
+    "duration_days": 30,
+    "density_type": "time_evolving",
+    "positions_loaded": 0,
+    "expected_trajectory": {
+      "t0": 43205.99,
+      "t10": 44879.74,
+      "t20": 47695.41,
+      "t30": 53426.66
+    },
+    "variance_evolution": {
+      "var_t0": 2654706878.28,
+      "var_t15": 2140432042.62,
+      "var_t30": 752307033.81,
+      "std_t0": 51523.85,
+      "std_t30": 27428.22
+    },
+    "quantiles_t15": {
+      "q10": -7850.39,
+      "q25": 1984.44,
+      "median": 34494.15,
+      "q75": 94752.72,
+      "q90": 111681.51
+    },
+    "confidence_intervals": {
+      "ci_80_width": 119531.91,
+      "ci_50_width": 92768.28
+    },
+    "cdf_probabilities": {
+      "prob_below_expected": 0.387,
+      "prob_loss": 0.2224,
+      "prob_profit": 0.7776
+    },
+    "unified_expected": 14605.987564102565,
+    "chart_generated": true,
+    "chart_path": "/root/hands-off-engine/state/abcfc_2d_chart.png"
+  },
+  "abcfc_nexus": {
+    "success": true,
+    "steady_state_expected": 14553.88,
+    "actions_evaluated": 4,
+    "nexus_cloud_size": 1,
+    "best_action": "hold",
+    "expected_improvement": 0,
+    "synced_to_unified": true,
+    "evaluation": {
+      "actions_ranked": 0
+    }
+  },
+  "abcfc_live_builder": {
+    "success": true,
+    "positions_built": 6,
+    "total_expected": 985.00593,
+    "total_best": 2094.35593,
+    "total_worst": -124.34406999999999
+  },
+  "abcfc_system": {
+    "success": true,
+    "positions_loaded": 50,
+    "total_expected": 14550.35357142857,
+    "total_bounds": [
+      -13758.475,
+      120483.61785714286
+    ],
+    "best_action": "Hedge50",
+    "best_node": "Claude",
+    "best_score": 56.09486607142838,
+    "nexus_cloud_futures": 162,
+    "cloud_best_expected": 14550.35357142857
+  },
+  "yair_financial_abcfc": {
+    "success": true,
+    "total_expected": 12618.0,
+    "total_bounds": [
+      -14613.0,
+      116709.0
+    ],
+    "income_sources": 3,
+    "trading_positions": 490,
+    "payments_received": 0,
+    "net_expected": 12618.0
+  },
+  "quantum_abcfc": {
+    "success": true,
+    "wave_functions": 0,
+    "uncertainty_spheres": 0,
+    "entangled_pairs": 0,
+    "uncertainty_status": {},
+    "superposition_status": {},
+    "classical_system": "Yair Siegel Quantum"
+  },
+  "abcfc_orchestrator": {
+    "success": true,
+    "hierarchy_nodes": 0,
+    "total_expected": 0,
+    "risk_aversion": 0.6,
+    "dry_run": true,
+    "history_entries": 1
+  },
+  "abcfc_live_nexus": {
+    "success": true,
+    "markets_loaded": 20,
+    "current_positions": 0,
+    "actions_proposed": 6,
+    "actions_executed": 0,
+    "min_edge": 0.05,
+    "risk_aversion": 0.6,
+    "dry_run": true
+  },
+  "autonomous_abcfc_executor": {
+    "success": true,
+    "executor_tier": "Foundation",
+    "live_mode": false,
+    "trades_executed": 0,
+    "daily_trades": 0,
+    "current_exposure": 18.33,
+    "max_exposure": 5000,
+    "total_pnl": 0,
+    "win_rate": 0,
+    "kelly_fraction": 0.3
+  },
+  "abcfc_hft_frequency": {
+    "success": true,
+    "timestamp_us": 1764881248622754,
+    "total_expected": 14553.875000000047,
+    "total_bounds": [
+      -13758.475,
+      120501.22500000003
+    ],
+    "events_per_second": 0,
+    "latency_us": 0,
+    "cost_per_sec": 211.320869,
+    "profit_per_sec": 253.214785,
+    "net_per_sec": 41.893916,
+    "action": "hold",
+    "confidence": 0.0,
+    "signal_strength": -0.5782449983129705,
+    "recommended_side": "SELL"
+  },
+  "polymarket_fundamentals": {
+    "success": true,
+    "collateral_total": 0.0,
+    "collateral_available": 0.0,
+    "collateral_utilization": 0,
+    "wallets_tracked": 0,
+    "markets_with_orders": 0,
+    "yair_rules": [
+      "Be the house, not the gambler",
+      "Reusable collateral - fish everywhere",
+      "Patient liquidity provider wins"
+    ]
+  },
+  "claude_abcfc": {
+    "success": false,
+    "error": "Claude ABCFC not available: No module named 'integrafix.claude_abcfc'"
+  },
+  "integrafix_full": {
+    "success": true,
+    "components_loaded": 21,
+    "components_total": 21,
+    "components_runnable": 20,
+    "claude_sessions": 0,
+    "integration_runs": 1,
+    "integration_score": 0.7421568627450981,
+    "last_run": "2025-12-03T17:45:04.610628+00:00"
+  },
+  "knowledge_reality": {
+    "success": true,
+    "knowledge_bases_total": 20,
+    "knowledge_bases_loaded": 20,
+    "reality_connected": 20,
+    "integration_score": 1.0,
+    "by_category": {
+      "core": {
+        "total": 3,
+        "loaded": 3
+      },
+      "memory": {
+        "total": 4,
+        "loaded": 4
+      },
+      "engine": {
+        "total": 3,
+        "loaded": 3
+      },
+      "yair": {
+        "total": 2,
+        "loaded": 2
+      },
+      "abcfc": {
+        "total": 5,
+        "loaded": 5
+      },
+      "integrafix": {
+        "total": 3,
+        "loaded": 3
+      }
+    },
+    "reality_state": {
+      "financial": {
+        "source": "capital_management",
+        "synced": false,
+        "monthly_value": 0,
+        "roi_multiplier": 0
+      },
+      "trading": {
+        "source": "abcfc_unified_state",
+        "synced": true,
+        "position_count": 493,
+        "total_expected": 12876.937564102565,
+        "total_bounds": [
+          -14623.0,
+          117153.68782051283
+        ],
+        "open_orders": 6,
+        "pipeline_trades": 1315,
+        "win_rate": 0
+      },
+      "infrastructure": {
+        "source": "reality_bridge",
+        "synced": true,
+        "health": "healthy",
+        "daemons": 3,
+        "bridges": 74,
+        "cron_jobs": 10,
+        "health_score": 1.0,
+        "phase": "operational",
+        "vcpus": 68,
+        "nodes": "9/9"
+      },
+      "temporal": {
+        "timestamp": "2025-12-04T20:47:28.899426+00:00",
+        "hour": 20,
+        "day_of_week": "Thursday",
+        "market_hours": true,
+        "synced": true
+      }
+    }
+  },
+  "hardware_preservation": {
+    "success": true,
+    "layers_total": 5,
+    "layers_loaded": 5,
+    "signal_handlers": true,
+    "mcp_servers": 3,
+    "total_blocks": 23,
+    "hardware_droplets": 9,
+    "hardware_vcpus": 68,
+    "upgrade_available": false,
+    "repairs": []
+  },
+  "durable_upgrades": {
+    "success": true,
+    "droplets": 9,
+    "total_vcpus": 68,
+    "total_memory_gb": 136,
+    "active_upgrades": 0,
+    "completed_upgrades": 0,
+    "opportunities": 0,
+    "patterns": [
+      "blue_green",
+      "canary",
+      "rolling",
+      "expand_contract"
+    ]
+  },
+  "credit_optimizer": {
+    "success": true,
+    "monthly_cost": 478.5,
+    "monthly_value": 1729.05,
+    "roi_multiplier": 3.6134796238244515,
+    "runway_days": 15.662100456621005,
+    "providers": 5,
+    "alerts": 1,
+    "recommendations": 3,
+    "abcfc_synced": true,
+    "net_contribution": 1250.55
+  },
+  "hft_monitor": {
+    "success": true,
+    "timestamp_us": 1764881255342275,
+    "scan_latency_us": 1767008,
+    "wallets": 63,
+    "capacity_per_sec": 0,
+    "positions": 0,
+    "unrealized_pnl": 0,
+    "health_pct": 100.0,
+    "avg_latency_us": 291352,
+    "roi": 3.6134796238244515,
+    "runway_days": 15.662100456621005,
+    "droplets": 9,
+    "backend_loop": true,
+    "self_healer": true,
+    "cost_per_sec": 31.456069610277844,
+    "profit_per_sec": 37.69216897133171,
+    "net_per_sec": 6.236099361053867,
+    "cost_per_hour": 113241.85059700024
+  },
+  "hft_economics": {
+    "success": true,
+    "timestamp_us": 1764881255343357,
+    "total_cost": 211.32086904761903,
+    "total_profit": 253.21478499999932,
+    "total_net": 41.8939159523803,
+    "total_events": 319,
+    "cost_per_sec": 31.455512417094187,
+    "profit_per_sec": 37.69150131577625,
+    "net_per_sec": 6.235988898682063,
+    "cost_per_hour": 113239.84470153907,
+    "profit_per_hour": 135689.4047367945,
+    "roi_multiplier": 1.1982478878739606,
+    "emergent_monthly_cost": 81532336.23406152,
+    "emergent_monthly_profit": 97695949.6858938,
+    "net_worst": -47.180508622698675,
+    "net_expected": 6.235624122179463,
+    "net_best": 59.6517568670576,
+    "emergent_net_worst": -122291605.31594394,
+    "emergent_net_expected": 16162701.639067939,
+    "emergent_net_best": 154617008.59407982
+  },
+  "capital_bridge": {
+    "success": true,
+    "balance_usdc": 0.0,
+    "activation_threshold": 50.0,
+    "gap_to_activation": 50.0,
+    "ready_to_trade": false,
+    "live_mode": false,
+    "total_earned": 0,
+    "total_injected": 0,
+    "sources_available": 6,
+    "next_action": "Freelance Development",
+    "next_action_score": 300.0
+  },
+  "income_engine": {
+    "success": true,
+    "pipeline": {
+      "new_opportunities": 6,
+      "proposals_draft": 0,
+      "proposals_sent": 0,
+      "work_in_progress": 0,
+      "awaiting_payment": 0
+    },
+    "stats": {
+      "opportunities_found": 6,
+      "proposals_drafted": 0,
+      "proposals_sent": 0,
+      "work_completed": 0,
+      "total_earned_usd": 0
+    },
+    "next_action": "draft_proposal",
+    "next_priority": "MEDIUM",
+    "next_instruction": "AI should draft proposal for this opportunity",
+    "top_opportunities": 5
+  },
+  "integrafix_pipeline": {
+    "success": true,
+    "markets_scanned": 100,
+    "signals_detected": 0,
+    "trades_executed": 0,
+    "capital_deployed": 0,
+    "dry_run": false,
+    "total_signals": 12186,
+    "total_trades": 1315,
+    "win_rate": 0.4444444444444444,
+    "total_pnl": 3.916000000000003,
+    "top_trades": []
+  },
+  "outcome_tracker": {
+    "success": true,
+    "pending_trades": 0,
+    "resolved_this_cycle": 0,
+    "total_resolved": 0,
+    "win_rate": 0,
+    "total_pnl": 0,
+    "recent_outcomes": []
+  },
+  "golden_state": {
+    "success": true,
+    "current_tier": 1,
+    "tier_name": "Foundation",
+    "total_trades": 164,
+    "total_pnl": 7.9840714285714505,
+    "win_rate": 0.524390243902439,
+    "tier_trades": 164,
+    "tier_pnl": 7.9840714285714505,
+    "monthly_projection": 73.02504355400715,
+    "golden_achieved": false,
+    "scaling_action": null,
+    "scaling_reason": "Need 336 more trades"
+  },
+  "trading_memory": {
+    "success": true,
+    "trading_memories": 5,
+    "recent_wins": 5,
+    "recent_losses": 0,
+    "insights": 5,
+    "wisdom": [
+      "Current strategy is working well (100% win rate)",
+      "YES bets have been more successful recently"
+    ]
+  },
+  "last_updated": "2025-12-04T20:47:35.998103+00:00"
+}

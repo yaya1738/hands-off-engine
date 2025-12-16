@@ -1,0 +1,261 @@
+{
+  "master": "Yair Siegel",
+  "start_time": "2025-12-04T20:47:33.575164+00:00",
+  "last_scan": {
+    "trading": {
+      "wallets": 63,
+      "capacity_per_sec": 0,
+      "orders_pending": 0,
+      "positions": 0,
+      "unrealized_pnl": 0,
+      "open_orders": 0
+    },
+    "abcfc": {
+      "total_expected": 0,
+      "bounds": [
+        0,
+        0
+      ],
+      "positions_valued": 0,
+      "decision": "unknown",
+      "score": 0,
+      "financial_expected": 14347.05,
+      "net_expected": 12618.0
+    },
+    "infrastructure": {
+      "droplets": 9,
+      "vcpus": 0,
+      "memory_gb": 0,
+      "backend_loop_running": true,
+      "self_healer_running": true
+    },
+    "credits": {
+      "monthly_cost": 478.5,
+      "monthly_value": 1729.05,
+      "roi": 3.6134796238244515,
+      "runway_days": 15.662100456621005,
+      "alerts": 1
+    },
+    "aggregate": {
+      "components_healthy": 27,
+      "components_total": 27,
+      "health_pct": 100.0,
+      "avg_latency_us": 291352,
+      "total_pnl": 0.0,
+      "realized_pnl": 0.0,
+      "unrealized_pnl": 0,
+      "positions_count": 0,
+      "orders_total": 0,
+      "fill_rate": 0,
+      "uptime_seconds": 1
+    },
+    "scan_latency_us": 1767008,
+    "timestamp": "2025-12-04T20:47:35.342264+00:00",
+    "timestamp_us": 1764881255342275
+  },
+  "components": {
+    "circuit_board": {
+      "name": "circuit_board",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342173,
+      "errors": 0
+    },
+    "ai_core": {
+      "name": "ai_core",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342177,
+      "errors": 0
+    },
+    "knowledge_nexus": {
+      "name": "knowledge_nexus",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342179,
+      "errors": 0
+    },
+    "knowledge_crosschain": {
+      "name": "knowledge_crosschain",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342180,
+      "errors": 0
+    },
+    "knowledge_fusion": {
+      "name": "knowledge_fusion",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342182,
+      "errors": 0
+    },
+    "mega_coordinator": {
+      "name": "mega_coordinator",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342183,
+      "errors": 0
+    },
+    "hft_execution": {
+      "name": "hft_execution",
+      "status": "healthy",
+      "latency_us": 60,
+      "last_update_us": 1764881255342186,
+      "errors": 0
+    },
+    "yair_auto_trader": {
+      "name": "yair_auto_trader",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342185,
+      "errors": 0
+    },
+    "polymarket_api": {
+      "name": "polymarket_api",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342209,
+      "errors": 0
+    },
+    "order_book": {
+      "name": "order_book",
+      "status": "healthy",
+      "latency_us": 230,
+      "last_update_us": 1764881255342211,
+      "errors": 0
+    },
+    "position_manager": {
+      "name": "position_manager",
+      "status": "healthy",
+      "latency_us": 199,
+      "last_update_us": 1764881255342212,
+      "errors": 0
+    },
+    "abcfc_cloud_flyer": {
+      "name": "abcfc_cloud_flyer",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342190,
+      "errors": 0
+    },
+    "abcfc_unified_state": {
+      "name": "abcfc_unified_state",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342192,
+      "errors": 0
+    },
+    "abcfc_layers": {
+      "name": "abcfc_layers",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342193,
+      "errors": 0
+    },
+    "abcfc_live_builder": {
+      "name": "abcfc_live_builder",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342195,
+      "errors": 0
+    },
+    "abcfc_system": {
+      "name": "abcfc_system",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342197,
+      "errors": 0
+    },
+    "yair_financial_abcfc": {
+      "name": "yair_financial_abcfc",
+      "status": "healthy",
+      "latency_us": 644,
+      "last_update_us": 1764881255342198,
+      "errors": 0
+    },
+    "integrafix_pipeline": {
+      "name": "integrafix_pipeline",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342199,
+      "errors": 0
+    },
+    "outcome_tracker": {
+      "name": "outcome_tracker",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342201,
+      "errors": 0
+    },
+    "trading_memory": {
+      "name": "trading_memory",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342202,
+      "errors": 0
+    },
+    "knowledge_reality": {
+      "name": "knowledge_reality",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342204,
+      "errors": 0
+    },
+    "hardware_preservation": {
+      "name": "hardware_preservation",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342205,
+      "errors": 0
+    },
+    "durable_upgrades": {
+      "name": "durable_upgrades",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881255342207,
+      "errors": 0
+    },
+    "credit_optimizer": {
+      "name": "credit_optimizer",
+      "status": "healthy",
+      "latency_us": 982666,
+      "last_update_us": 1764881255342208,
+      "errors": 0
+    },
+    "backend_loop": {
+      "name": "backend_loop",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881254350078,
+      "errors": 0
+    },
+    "self_healer": {
+      "name": "self_healer",
+      "status": "healthy",
+      "latency_us": 0,
+      "last_update_us": 1764881254359066,
+      "errors": 0
+    },
+    "digitalocean_api": {
+      "name": "digitalocean_api",
+      "status": "healthy",
+      "latency_us": 764315,
+      "last_update_us": 1764881254340480,
+      "errors": 0
+    }
+  },
+  "orders": {
+    "orders_per_sec": 0,
+    "orders_total": 0,
+    "orders_filled": 0,
+    "orders_cancelled": 0,
+    "orders_rejected": 0,
+    "fill_rate": 0,
+    "avg_fill_time_us": 0
+  },
+  "pnl": {
+    "total": 0.0,
+    "realized": 0.0,
+    "unrealized": 0
+  }
+}

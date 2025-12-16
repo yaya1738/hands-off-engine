@@ -1,0 +1,79 @@
+{
+  "master": "Yair Siegel",
+  "initialized": "2025-12-04T20:47:15.228561+00:00",
+  "cycles": 2,
+  "total_power_output": 16.0,
+  "amplifiers": {
+    "trading": {
+      "mode": "normal",
+      "gain": 5.0,
+      "peak_output": 1.5,
+      "signals_amplified": 2
+    },
+    "infrastructure": {
+      "mode": "normal",
+      "gain": 5.0,
+      "peak_output": 1.5,
+      "signals_amplified": 2
+    },
+    "revenue": {
+      "mode": "normal",
+      "gain": 5.0,
+      "peak_output": 2.5,
+      "signals_amplified": 2
+    },
+    "reality": {
+      "mode": "normal",
+      "gain": 5.0,
+      "peak_output": 2.5,
+      "signals_amplified": 2
+    }
+  },
+  "components": {
+    "synthesizer": {
+      "power": 8.0,
+      "synthesis_count": 2
+    },
+    "recognizer": {
+      "power": 7.0,
+      "patterns_detected": 2
+    },
+    "generator": {
+      "power": 9.0,
+      "actions_generated": 10
+    },
+    "crystallizer": {
+      "power": 10.0,
+      "decisions_made": 2
+    }
+  },
+  "recent_decisions": [
+    {
+      "timestamp": "2025-12-04T20:47:15.228678+00:00",
+      "decision_id": 1,
+      "clarity": 0.74,
+      "action": "Optimize hot paths in trading execution",
+      "rationale": [
+        "Primary signal: synthesis:tech_finance",
+        "Supporting signals: 1",
+        "Synthesis vectors: 4"
+      ],
+      "confidence": 0.85,
+      "strength": "CLEAR"
+    },
+    {
+      "timestamp": "2025-12-04T20:52:37.279503+00:00",
+      "decision_id": 2,
+      "clarity": 0.74,
+      "action": "Optimize hot paths in trading execution",
+      "rationale": [
+        "Primary signal: synthesis:tech_finance",
+        "Supporting signals: 1",
+        "Synthesis vectors: 4"
+      ],
+      "confidence": 0.85,
+      "strength": "CLEAR"
+    }
+  ],
+  "saved_at": "2025-12-04T20:52:37.279528+00:00"
+}

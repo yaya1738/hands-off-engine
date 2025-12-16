@@ -1,0 +1,47 @@
+{
+  "backend_loop": {
+    "name": "backend_loop",
+    "pid": 692422,
+    "status": "running",
+    "restarts": 0,
+    "last_restart": null,
+    "last_health_check": "2025-12-03T21:55:55.166465+00:00",
+    "health_status": "healthy"
+  },
+  "self_healer": {
+    "name": "self_healer",
+    "pid": 689515,
+    "status": "running",
+    "restarts": 0,
+    "last_restart": null,
+    "last_health_check": "2025-12-03T21:55:55.181409+00:00",
+    "health_status": "healthy"
+  },
+  "hardware_brain": {
+    "name": "hardware_brain",
+    "pid": 387868,
+    "status": "running",
+    "restarts": 0,
+    "last_restart": null,
+    "last_health_check": "2025-12-03T21:55:55.200245+00:00",
+    "health_status": "healthy"
+  },
+  "scaling_engine": {
+    "name": "scaling_engine",
+    "pid": 387894,
+    "status": "running",
+    "restarts": 0,
+    "last_restart": null,
+    "last_health_check": "2025-12-03T21:55:55.220052+00:00",
+    "health_status": "healthy"
+  },
+  "infra_manager": {
+    "name": "infra_manager",
+    "pid": 388008,
+    "status": "running",
+    "restarts": 0,
+    "last_restart": null,
+    "last_health_check": "2025-12-03T21:55:55.238535+00:00",
+    "health_status": "healthy"
+  }
+}

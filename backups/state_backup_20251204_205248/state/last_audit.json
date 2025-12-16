@@ -1,0 +1,95 @@
+{
+  "timestamp": "2025-12-01T16:57:24.506773+00:00",
+  "source": "claude_cli_7point_audit",
+  "master": "Yair Siegel",
+  "sections": {
+    "1_infrastructure": {
+      "status": "healthy",
+      "droplets": [
+        {
+          "name": "pm-helper",
+          "ip": "138.68.103.156",
+          "status": "active",
+          "memory": 8192
+        },
+        {
+          "name": "ho-compute-2",
+          "ip": "142.93.63.109",
+          "status": "active",
+          "memory": 16384
+        },
+        {
+          "name": "ho-compute-2",
+          "ip": "159.203.184.188",
+          "status": "active",
+          "memory": 16384
+        },
+        {
+          "name": "ho-scale-1764543864",
+          "ip": "162.243.175.211",
+          "status": "active",
+          "memory": 16384
+        }
+      ],
+      "total_droplets": 4,
+      "all_active": true
+    },
+    "2_processes": {
+      "python_node_claude": 19,
+      "key_monitors_running": 2,
+      "status": "healthy"
+    },
+    "3_cron_jobs": {
+      "total": 24,
+      "key_jobs": [
+        "position_monitor (*/30 min)",
+        "healthcheck (30 min)",
+        "claude_task_processor (*/6 hours)"
+      ],
+      "status": "healthy"
+    },
+    "4_financial": {
+      "liquid": 8.99,
+      "positions": 85.49,
+      "total": 94.48,
+      "trading_threshold": 50,
+      "gap_to_trading": 41.01,
+      "trading_enabled": false,
+      "status": "blocked_capital"
+    },
+    "5_resources": {
+      "disk_used": "12G",
+      "disk_total": "155G",
+      "disk_percent": 8,
+      "memory_used": "1.0Gi",
+      "memory_total": "7.8Gi",
+      "memory_percent": 13,
+      "status": "healthy"
+    },
+    "6_errors": {
+      "recent_critical": 0,
+      "status": "healthy"
+    },
+    "7_git": {
+      "modified_files": 77,
+      "deleted_files": 9,
+      "untracked_files": 14,
+      "latest_commit": "6b6bbdd",
+      "commit_message": "80-mile cascade architecture",
+      "note": "state files gitignored by design"
+    }
+  },
+  "overall_health": 95,
+  "issues": [
+    {
+      "issue": "capital_gap",
+      "severity": "blocker",
+      "type": "external",
+      "gap": 41.01
+    }
+  ],
+  "system_actions_required": [],
+  "external_actions_required": [
+    "capital_injection_41.01"
+  ]
+}

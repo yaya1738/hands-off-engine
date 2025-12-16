@@ -1,0 +1,47 @@
+{
+  "integrated_at": "2025-12-01T18:00:04.770797+00:00",
+  "documents": {
+    "polymarket_api": {
+      "path": "docs/POLYMARKET_API_INTEGRATION.md",
+      "size": 6165,
+      "indexed": true
+    },
+    "polymarket_platform": {
+      "path": "docs/knowledge/POLYMARKET_SPECIFIC.md",
+      "size": 8596,
+      "indexed": true
+    },
+    "trading_strategy": {
+      "path": "docs/knowledge/TRADING_STRATEGY.md",
+      "size": 17940,
+      "indexed": true
+    },
+    "market_fundamentals": {
+      "path": "docs/knowledge/MARKET_FUNDAMENTALS.md",
+      "size": 7861,
+      "indexed": true
+    },
+    "new_market_edge": {
+      "path": "docs/knowledge/NEW_MARKET_EDGE.md",
+      "size": 1062,
+      "indexed": true
+    }
+  },
+  "key_concepts": {
+    "resolution": "UMA oracle based resolution",
+    "fast_edge": "React quickly to news, get there first",
+    "smart_edge": "Better analysis than market",
+    "liquidity": "Check liquidity before trading"
+  },
+  "trading_rules": [
+    "Respect safety limits on position size",
+    "Follow phased deployment: shadow -> micro -> normal",
+    "Monitor and capture spreads",
+    "Look for arbitrage opportunities",
+    "Prefer high-volume markets"
+  ],
+  "platform_specifics": {
+    "api_host": "https://clob.polymarket.com",
+    "collateral": "Collateral is reusable"
+  }
+}

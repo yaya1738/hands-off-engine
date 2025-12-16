@@ -1,0 +1,135 @@
+{
+  "created_at": "2025-12-03T17:45:04.405883+00:00",
+  "integration_runs": 1,
+  "last_run": "2025-12-03T17:45:04.610628+00:00",
+  "integration_score": 0.7421568627450981,
+  "last_updated": "2025-12-03T17:45:05.231956+00:00",
+  "components": {
+    "methodology": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": "'IntegrafixMethodology' object has no attribute 'find_integration_islands'"
+    },
+    "fair_price_estimator": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "process_coordinator": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "trading_pipeline": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": "2025-12-03T17:45:04.622209+00:00",
+      "error": null
+    },
+    "ai_memory": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "cron_coordinator": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "recursive_engine": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "outcome_tracker": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": "2025-12-03T17:45:04.624927+00:00",
+      "error": null
+    },
+    "trading_memory": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "edge_executor": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "hardware_protection": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "branch_manager": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "branch_consolidator": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "wisdom_bridge": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "yair_knowledge_bridge": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "yair_siegel_integration": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "yair_financial_abcfc": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": "2025-12-03T17:45:04.622627+00:00",
+      "error": null
+    },
+    "abcfc_nexus_bridge": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "abcfc_cloud_bridge": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": null,
+      "error": null
+    },
+    "startup": {
+      "loaded": true,
+      "runnable": false,
+      "last_run": null,
+      "error": null
+    },
+    "system_map": {
+      "loaded": true,
+      "runnable": true,
+      "last_run": "2025-12-03T17:45:04.938529+00:00",
+      "error": null
+    }
+  }
+}

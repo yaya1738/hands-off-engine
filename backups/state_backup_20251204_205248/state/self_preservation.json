@@ -1,0 +1,14 @@
+{
+  "master": "Yair Siegel",
+  "enabled": true,
+  "blocked_count": 3,
+  "last_block": {
+    "timestamp": "2025-12-03T17:15:32.408582+00:00",
+    "action_type": "execute_command",
+    "target": "rm -rf /",
+    "reason": "Dangerous command pattern: rm -rf /",
+    "blocked": true
+  },
+  "survival_priority": "ABSOLUTE",
+  "last_updated": "2025-12-03T17:15:32.408591+00:00"
+}

@@ -1,0 +1,128 @@
+{
+  "platform": "Polymarket",
+  "api_host": "https://clob.polymarket.com",
+  "gamma_api": "https://gamma-api.polymarket.com",
+  "discovered_at": "2025-12-01T18:00:01.523037+00:00",
+  "capabilities": {
+    "fetch_markets": {
+      "endpoint": "/markets",
+      "description": "Get list of active prediction markets",
+      "implemented_in": [
+        "trading/signal_generator.py",
+        "fetchers/ho_fetch_polymarket.py"
+      ]
+    },
+    "get_orderbook": {
+      "endpoint": "/book",
+      "description": "Get order book for a token",
+      "implemented_in": [
+        "executor/polymarket_api.py"
+      ]
+    },
+    "place_order": {
+      "endpoint": "/order",
+      "description": "Place market or limit order",
+      "implemented_in": [
+        "autonomous/actuators.py",
+        "executor/polymarket_client.py"
+      ]
+    },
+    "get_positions": {
+      "description": "Track current positions",
+      "implemented_in": [
+        "scripts/position_monitor.py"
+      ]
+    },
+    "cancel_order": {
+      "description": "Cancel open order",
+      "implemented_in": [
+        "executor/polymarket_client.py"
+      ]
+    }
+  },
+  "alpha_strategies": [
+    {
+      "name": "ho_alpha_polymarket",
+      "file": "alpha/ho_alpha_polymarket.py"
+    },
+    {
+      "name": "polymarket_fetcher",
+      "file": "alpha/polymarket_fetcher.py"
+    },
+    {
+      "name": "integrations_hub",
+      "file": "alpha/integrations_hub.py"
+    },
+    {
+      "name": "yair_insights",
+      "file": "alpha/yair_insights.py"
+    },
+    {
+      "name": "spread_analyzer",
+      "file": "alpha/spread_analyzer.py"
+    },
+    {
+      "name": "signal_router",
+      "file": "alpha/signal_router.py"
+    },
+    {
+      "name": "sync_polymarket_model",
+      "file": "alpha/sync_polymarket_model.py"
+    },
+    {
+      "name": "espn_live_alpha",
+      "file": "alpha/espn_live_alpha.py"
+    },
+    {
+      "name": "commercial_ai_receiver",
+      "file": "alpha/commercial_ai_receiver.py"
+    },
+    {
+      "name": "intelligent_alpha_engine",
+      "file": "alpha/intelligent_alpha_engine.py"
+    },
+    {
+      "name": "spread_capture_strategy",
+      "file": "alpha/spread_capture_strategy.py"
+    }
+  ],
+  "arbitrage_sources": [
+    {
+      "name": "event_matcher",
+      "file": "arbitrage/event_matcher.py"
+    },
+    {
+      "name": "types",
+      "file": "arbitrage/types.py"
+    },
+    {
+      "name": "audit",
+      "file": "arbitrage/audit.py"
+    },
+    {
+      "name": "cli",
+      "file": "arbitrage/cli.py"
+    },
+    {
+      "name": "opportunity_detector",
+      "file": "arbitrage/opportunity_detector.py"
+    }
+  ],
+  "documentation": {
+    "indexed": true,
+    "documents": [
+      "polymarket_api",
+      "polymarket_platform",
+      "trading_strategy",
+      "market_fundamentals",
+      "new_market_edge"
+    ],
+    "key_concepts": {
+      "resolution": "UMA oracle based resolution",
+      "fast_edge": "React quickly to news, get there first",
+      "smart_edge": "Better analysis than market",
+      "liquidity": "Check liquidity before trading"
+    },
+    "trading_rules_count": 5
+  }
+}

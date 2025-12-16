@@ -1,0 +1,8 @@
+{
+  "timestamp": "2025-12-04T20:47:28.614337+00:00",
+  "risk_aversion": 0.6,
+  "dry_run": true,
+  "proposed_actions": 6,
+  "executed_actions": 0,
+  "current_exposure": 0
+}

@@ -1,0 +1,101 @@
+{
+  "last_updated": "2025-12-03T16:10:47.754563+00:00",
+  "processes": {
+    "backend_loop": {
+      "name": "backend_loop",
+      "pid": 600990,
+      "state": "starting",
+      "last_heartbeat": "2025-12-03T16:10:47.752655+00:00",
+      "current_action": null,
+      "waiting_on": [],
+      "holding_locks": [],
+      "pending_signals": [],
+      "state_file": "/root/hands-off-engine/state/backend_loop.json",
+      "capabilities": []
+    },
+    "hardware_brain": {
+      "name": "hardware_brain",
+      "pid": 600990,
+      "state": "starting",
+      "last_heartbeat": "2025-12-03T16:10:47.753195+00:00",
+      "current_action": null,
+      "waiting_on": [],
+      "holding_locks": [],
+      "pending_signals": [],
+      "state_file": "/root/hands-off-engine/state/brain_state.json",
+      "capabilities": []
+    },
+    "scaling_engine": {
+      "name": "scaling_engine",
+      "pid": 600990,
+      "state": "starting",
+      "last_heartbeat": "2025-12-03T16:10:47.754546+00:00",
+      "current_action": null,
+      "waiting_on": [],
+      "holding_locks": [],
+      "pending_signals": [],
+      "state_file": "/root/hands-off-engine/state/scaling_state.json",
+      "capabilities": []
+    },
+    "infra_manager": {
+      "name": "infra_manager",
+      "pid": 388008,
+      "state": "running",
+      "last_heartbeat": "2025-12-03T15:54:27.855691+00:00",
+      "current_action": "active",
+      "waiting_on": [],
+      "holding_locks": [],
+      "pending_signals": [],
+      "state_file": "/root/hands-off-engine/state/infra_manager.json",
+      "capabilities": []
+    },
+    "self_healer": {
+      "name": "self_healer",
+      "pid": 432577,
+      "state": "running",
+      "last_heartbeat": "2025-12-03T15:18:28.654973+00:00",
+      "current_action": "healing",
+      "waiting_on": [],
+      "holding_locks": [],
+      "pending_signals": [],
+      "state_file": null,
+      "capabilities": [
+        "self_heal"
+      ]
+    }
+  },
+  "locks": {},
+  "signals": {
+    "sig_20251203153457634834": {
+      "id": "sig_20251203153457634834",
+      "from_process": "integrafix_cli",
+      "to_process": "backend_loop",
+      "signal_type": "event",
+      "payload": {
+        "event": "integrafix_active",
+        "integration_score": 0.833,
+        "gaps_fixed": 11,
+        "action": "coordinate_trading",
+        "timestamp": "2025-12-03T15:34:57.634827+00:00"
+      },
+      "created_at": "2025-12-03T15:34:57.634854+00:00",
+      "acknowledged": false,
+      "acknowledged_at": null,
+      "response": null
+    },
+    "sig_20251203155427856194": {
+      "id": "sig_20251203155427856194",
+      "from_process": "integrafix_cli",
+      "to_process": "backend_loop",
+      "signal_type": "command",
+      "payload": {
+        "command": "run_trading_pipeline",
+        "timestamp": "2025-12-03T15:54:27.856186+00:00"
+      },
+      "created_at": "2025-12-03T15:54:27.856218+00:00",
+      "acknowledged": false,
+      "acknowledged_at": null,
+      "response": null
+    }
+  }
+}

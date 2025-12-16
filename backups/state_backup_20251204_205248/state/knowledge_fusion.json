@@ -1,0 +1,73 @@
+{
+  "master": "Yair Siegel",
+  "initialized": "2025-12-04T20:47:15.231232+00:00",
+  "computing_loaded": true,
+  "business_loaded": true,
+  "money_loaded": true,
+  "fusion_matrix_size": 5,
+  "fusions_performed": 18,
+  "insights_generated": 18,
+  "last_updated": "2025-12-04T20:52:37.280300+00:00",
+  "recent_insights": [
+    {
+      "topic": "strategic",
+      "synthesis": "STRATEGIC FUSION: Computing: Build scalable architecture for future growth. Business: Develop compet",
+      "confidence": 0.75,
+      "created_at": "2025-12-04T20:47:15.231350+00:00"
+    },
+    {
+      "topic": "trading",
+      "synthesis": "TRADING FUSION: Computing suggests Use O(1) or O(log n) algorithms for hot paths. Business advises F",
+      "confidence": 0.9,
+      "created_at": "2025-12-04T20:52:37.280188+00:00"
+    },
+    {
+      "topic": "scaling",
+      "synthesis": "SCALING FUSION: Computing: Profile before optimizing. Business: Maximize variable costs for scalabil",
+      "confidence": 0.85,
+      "created_at": "2025-12-04T20:52:37.280206+00:00"
+    },
+    {
+      "topic": "revenue",
+      "synthesis": "REVENUE FUSION: Computing: A/B test pricing changes. Business: Value-based pricing for differentiate",
+      "confidence": 0.8,
+      "created_at": "2025-12-04T20:52:37.280220+00:00"
+    },
+    {
+      "topic": "healing",
+      "synthesis": "HEALING FUSION: Computing: Fail fast, recover gracefully. Business: Monitor and alert before breach.",
+      "confidence": 0.9,
+      "created_at": "2025-12-04T20:52:37.280231+00:00"
+    },
+    {
+      "topic": "strategic",
+      "synthesis": "STRATEGIC FUSION: Computing: Build scalable architecture for future growth. Business: Develop compet",
+      "confidence": 0.75,
+      "created_at": "2025-12-04T20:52:37.280241+00:00"
+    },
+    {
+      "topic": "trading",
+      "synthesis": "TRADING FUSION: Computing suggests Use O(1) or O(log n) algorithms for hot paths. Business advises F",
+      "confidence": 0.9,
+      "created_at": "2025-12-04T20:52:37.280255+00:00"
+    },
+    {
+      "topic": "scaling",
+      "synthesis": "SCALING FUSION: Computing: Profile before optimizing. Business: Maximize variable costs for scalabil",
+      "confidence": 0.85,
+      "created_at": "2025-12-04T20:52:37.280268+00:00"
+    },
+    {
+      "topic": "healing",
+      "synthesis": "HEALING FUSION: Computing: Fail fast, recover gracefully. Business: Monitor and alert before breach.",
+      "confidence": 0.9,
+      "created_at": "2025-12-04T20:52:37.280278+00:00"
+    },
+    {
+      "topic": "strategic",
+      "synthesis": "STRATEGIC FUSION: Computing: Build scalable architecture for future growth. Business: Develop compet",
+      "confidence": 0.75,
+      "created_at": "2025-12-04T20:52:37.280288+00:00"
+    }
+  ]
+}

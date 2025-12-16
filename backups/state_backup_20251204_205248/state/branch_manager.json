@@ -1,0 +1,1648 @@
+{
+  "created_at": "2025-12-03T15:55:12.967456+00:00",
+  "branches_analyzed": 182,
+  "prs_created": 2,
+  "branches_deleted": 108,
+  "last_cleanup": null,
+  "last_updated": "2025-12-03T16:18:23.609028+00:00",
+  "actions": [
+    {
+      "branch": "alpha/scoring-upgrade",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:37.606485+00:00"
+    },
+    {
+      "branch": "claude/add-chatgpt-integration-013q1QuAVy9dM16yqL23Pm1g",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:37.998337+00:00"
+    },
+    {
+      "branch": "claude/add-github-rate-limit-client-01CkdCPiip9UYahAygkP78ud",
+      "action": "review",
+      "reason": "6 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/add-logging-json-generation-018vWVqn9gaPDJcJBfYT3Pwf",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:38.397348+00:00"
+    },
+    {
+      "branch": "claude/add-monetization-self-improvement-01L9s1QXfXh46qtnjo2pq1Yz",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:38.777086+00:00"
+    },
+    {
+      "branch": "claude/add-standard-instructions-019TsC9NXytzdv4ZMciBSt4a",
+      "action": "review",
+      "reason": "6 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/agent-collaboration-setup-011332H1TnThjb8ofjm2b55z",
+      "action": "review",
+      "reason": "Large branch (14 commits) - needs manual review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/ai-coordination-operations-01TXwsyXP6GYni4kNbS3JiKr",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:39.166628+00:00"
+    },
+    {
+      "branch": "claude/ai-runner-component-01VfeG9F6tQRgdXdQThhmXuq",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:39.537277+00:00"
+    },
+    {
+      "branch": "claude/analyze-market-spreads-01YPJEUYoTYXfZczvicrWd4A",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:39.931826+00:00"
+    },
+    {
+      "branch": "claude/arbitrage-detection-011SoRdQ3iAo9xRecHmenLgT",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:40.366737+00:00"
+    },
+    {
+      "branch": "claude/assess-hands-off-engine-01UKjdNKpC8eV1D4qcfLXtNd",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:40.789011+00:00"
+    },
+    {
+      "branch": "claude/audit-deployment-pipeline-01FoB8BBrBVBUrWuuiiBkjcv",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/audit-logging-system-018RdQwvmiKYYt1G9hZeNdgr",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:41.226616+00:00"
+    },
+    {
+      "branch": "claude/automate-market-trading-01RpZiFeAjzbxXZHN5pmyphM",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:41.670746+00:00"
+    },
+    {
+      "branch": "claude/automate-repo-management-01AJoZrHK9xhXTWytkzQtJkb",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:42.096500+00:00"
+    },
+    {
+      "branch": "claude/autonomous-hardware-monitoring-018Zmksp8vodwHm5wWUFiWUi",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:42.591163+00:00"
+    },
+    {
+      "branch": "claude/batch-10-autoloop-orchestrator-01VL45FJhWXKbMNz17rNvUsd",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:42.959956+00:00"
+    },
+    {
+      "branch": "claude/batch-11-scheduler-0197jQ3frnJ8VCPCAmE6Kn91",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:43.387403+00:00"
+    },
+    {
+      "branch": "claude/batch-12-polymarket-fetcher-0172f77pN2bJC6vZkCfapEat",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:43.764382+00:00"
+    },
+    {
+      "branch": "claude/batch-13-history-analytics-016yfk84EZ8UCyaSvb2zFzpa",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:44.155617+00:00"
+    },
+    {
+      "branch": "claude/batch-14-healthcheck-01Lk8vJ7uxvXAwdz4HTEckWr",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:44.546658+00:00"
+    },
+    {
+      "branch": "claude/batch-15-ai-runner-01Rf64w29aFLTJoVzUE2NmJE",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:44.929402+00:00"
+    },
+    {
+      "branch": "claude/batch-17-ai-loop-013FwwFSHZbbthyCKBN3hNcU",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:45.315730+00:00"
+    },
+    {
+      "branch": "claude/batch-18-brain-summary-01MQgkAoSYMkhf7Dy6GzLiXc",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:45.742363+00:00"
+    },
+    {
+      "branch": "claude/batch-19-policy-agent-01YCNDFoyp2b6Ap8B4DfUfsu",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:46.192838+00:00"
+    },
+    {
+      "branch": "claude/batch-20-policy-executor-012rkyrm2W826cDykvURPw5g",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:46.576810+00:00"
+    },
+    {
+      "branch": "claude/batch-21-action-verifier-01AuNRXshH9SRNc2rjGzmDX2",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:46.950481+00:00"
+    },
+    {
+      "branch": "claude/batch-22-consensus-engine-01H6ggzSCceSADmTr5BQZdqq",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:47.333110+00:00"
+    },
+    {
+      "branch": "claude/batch-23-learning-layer-011NHxUyaF3P5gr1SdMp3PbJ",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:47.697393+00:00"
+    },
+    {
+      "branch": "claude/batch-26-wiring-v4-013UWgoGyFrjjnmYviFGfgWy",
+      "action": "review",
+      "reason": "6 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/batch-7-archaeology-plan-01FkRDpXVDq1Wrafso4NMARV",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:48.125368+00:00"
+    },
+    {
+      "branch": "claude/batch-8-verify-harden-01LRgnaVhwcCcWgcY73XsfUW",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:48.516406+00:00"
+    },
+    {
+      "branch": "claude/batch-9-expose-results-017rVfjrhpmqT8vbQpxwm5LX",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:48.927459+00:00"
+    },
+    {
+      "branch": "claude/brain-orchestrator-01PQww1SqRFdpGz9okDveVfw",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:49.287763+00:00"
+    },
+    {
+      "branch": "claude/cash-explosion-operation-01B7mmzyE1AqaKXZWtE8i5uu",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/clarify-requirements-01HidjoX4EJtA5YNrEvbkkNL",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:49.653192+00:00"
+    },
+    {
+      "branch": "claude/clarify-web-functionality-01AUfUCawarFmY9tuDYgxXZx",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/cleanup-engine-branch-01DQEkGirheto8EXsZYGMfwB",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:50.001717+00:00"
+    },
+    {
+      "branch": "claude/complete-copilot-work-016JoaZ1U7V3bqhUBcgD53Ge",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:50.395221+00:00"
+    },
+    {
+      "branch": "claude/connect-system-components-01CkUxQAxWKaannbqEpff5F6",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:50.777653+00:00"
+    },
+    {
+      "branch": "claude/debug-auto-expansion-012ovnLZ62ziJuY7ZtUTSYBh",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:51.148171+00:00"
+    },
+    {
+      "branch": "claude/decouple-executor-planner-01TsfnMVJFXtztpunrPLEkHY",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:51.553238+00:00"
+    },
+    {
+      "branch": "claude/document-integration-layer-01BChvsejb2su3kRd3GnigNV",
+      "action": "pr",
+      "reason": "Integration branch with 3 commits - should merge",
+      "priority": 1,
+      "pr_url": "https://github.com/yaya1738/hands-off-engine/pull/114",
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:21.115417+00:00"
+    },
+    {
+      "branch": "claude/dual-claude-integration-01M1hf8J2Z5B9aGY82fZMo2B",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:51.912800+00:00"
+    },
+    {
+      "branch": "claude/engine-snapshot-budget-014TEzB7fsTQE1bv6kSgKm4V",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/enhance-ai-self-monitoring-01BqhUw7HYboxQ4tzR8urSfB",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:52.273108+00:00"
+    },
+    {
+      "branch": "claude/evaluate-hardware-upgrade-01Md4RDyW9hE25uRXhTNbfGu",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:52.639587+00:00"
+    },
+    {
+      "branch": "claude/fault-tolerant-service-01AN4AUPEMLjq2ijzvvvEgUM",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:53.041146+00:00"
+    },
+    {
+      "branch": "claude/finalize-phase-1-plan-01T17XBFRtcB4CU5thp7mZEp",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:53.426355+00:00"
+    },
+    {
+      "branch": "claude/financial-data-integration-01Pfez7eX7RgoSmwdBpjnM1y",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:53.789309+00:00"
+    },
+    {
+      "branch": "claude/fix-ai-intake-workflow-019TsC9NXytzdv4ZMciBSt4a",
+      "action": "review",
+      "reason": "9 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/fix-automation-issues-01MWGecuZeTR9WucejQgfMLk",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:54.166104+00:00"
+    },
+    {
+      "branch": "claude/fix-cli-droplet-timeout-018K1x5pkaUzuhHLP7EvetDX",
+      "action": "pr",
+      "reason": "Fix branch with 4 commits - likely ready",
+      "priority": 2,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/fix-git-index-lock-01XCziXRMCtupe3SRDFEHG73",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:54.548601+00:00"
+    },
+    {
+      "branch": "claude/fix-termux-ssh-01X8miKfSZRoDhXbopur5ygh",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:54.905771+00:00"
+    },
+    {
+      "branch": "claude/hands-off-engine-init-0177FH8xnoX6TQ8jMH6uRA1M",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:55.259192+00:00"
+    },
+    {
+      "branch": "claude/hands-off-strategy-session-019WQ3y5cWgTJu7iojhBa9qV",
+      "action": "review",
+      "reason": "8 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/harmonize-hands-off-system-01XqtW7RzGfJSgwNRmKDMVqN",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:55.634390+00:00"
+    },
+    {
+      "branch": "claude/harmonize-repo-state-015hJg3aLNWPbuPF6nEH4uPd",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:55.981421+00:00"
+    },
+    {
+      "branch": "claude/implement-payment-system-01M23FfCiBZk5zQC38ngdQX1",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:56.374690+00:00"
+    },
+    {
+      "branch": "claude/implement-task-generator-019YNXvUCKP9Tzay12jvrr3H",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:56.816155+00:00"
+    },
+    {
+      "branch": "claude/improve-hands-off-state-017H11BjgJqBsZC4KRsUD5QB",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:57.178371+00:00"
+    },
+    {
+      "branch": "claude/improve-handsoff-ux-01BfHMdHbxsARHCrKXzfKf2G",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:57.556026+00:00"
+    },
+    {
+      "branch": "claude/improve-repository-01H1KCgr4QpgUz7cRH7bokCH",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:57.968851+00:00"
+    },
+    {
+      "branch": "claude/improve-state-management-017UeszDc9ABsopLtYC6DEEB",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:58.350526+00:00"
+    },
+    {
+      "branch": "claude/integrate-api-costs-tracking-01CAaaxQLqrgZneDrHthsvE6",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:58.712575+00:00"
+    },
+    {
+      "branch": "claude/integrate-consensus-layer-016tsey7bhT8isQD3i6FUvhc",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:59.096236+00:00"
+    },
+    {
+      "branch": "claude/integrate-polling-script-0129DciDYioTJdDJ9uBd6DyT",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:59.487142+00:00"
+    },
+    {
+      "branch": "claude/integrate-yair-siegel-business-016igG61abUtVenUDoTHqo4x",
+      "action": "pr",
+      "reason": "Integration branch with 4 commits - should merge",
+      "priority": 1,
+      "pr_url": "https://github.com/yaya1738/hands-off-engine/pull/115",
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:23.147623+00:00"
+    },
+    {
+      "branch": "claude/investigate-financial-system-01ESDN2JcFRVuAcpmzsBQ92J",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:17:59.851374+00:00"
+    },
+    {
+      "branch": "claude/merge-github-mcp-main-013ca9wMzirjQqHA1YrbDyV8",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:00.225305+00:00"
+    },
+    {
+      "branch": "claude/merge-pending-changes-011ekrkLucL6G3L4V4NfKog9",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/next-task-01WSGto5DUaBoP7RxY44xgQq",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:00.642192+00:00"
+    },
+    {
+      "branch": "claude/optimize-aiops-workflow-01XR8qXvNBgKk1KnsGpcqVii",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:01.056691+00:00"
+    },
+    {
+      "branch": "claude/optimize-polymarket-trading-01Q6DBk4VELF3btHJ1PFPiRm",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:01.464953+00:00"
+    },
+    {
+      "branch": "claude/orchestrate-production-workflow-01LcX2xhhuGhKh4niPLekDy6",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:01.900128+00:00"
+    },
+    {
+      "branch": "claude/plan-next-steps-01G21u3FuQGpiHrmHBL2F917",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:02.414703+00:00"
+    },
+    {
+      "branch": "claude/polymarket-arbitrage-01PiYwbxgBMJQF9LEy7nTNS9",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:02.810821+00:00"
+    },
+    {
+      "branch": "claude/polymarket-component-fixes-0152ziFgHRH8ttV72BXixDEE",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:03.195072+00:00"
+    },
+    {
+      "branch": "claude/polymarket-trade-analysis-01Abker56K3GF83pqf11WgvT",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:03.616072+00:00"
+    },
+    {
+      "branch": "claude/prediction-market-research-01Y6Nqn7RepM7pAJxHUTw7gC",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:04.013979+00:00"
+    },
+    {
+      "branch": "claude/risk-position-sizing-v2-01RrPN1JNHqJCGT8UbEARvkM",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:04.388513+00:00"
+    },
+    {
+      "branch": "claude/riskv2-consensus-upgrade-01DofKqgGU7HRGaB5DM6aGQU",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:04.771891+00:00"
+    },
+    {
+      "branch": "claude/see-cli-la-01UJvyPBT1Y7C9TC4Qr4BXg6",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:05.184690+00:00"
+    },
+    {
+      "branch": "claude/self-learning-backend-01MoDNmEJuucu134WvMzhNVs",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:05.596552+00:00"
+    },
+    {
+      "branch": "claude/setup-claude-cli-01DpuJGv8LbPo1Rjaa3kMM1F",
+      "action": "review",
+      "reason": "6 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "claude/setup-github-mcp-server-01FmTbY12CxqEHgE9C5u9VPZ",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:06.006758+00:00"
+    },
+    {
+      "branch": "claude/setup-mcp-servers-01SNZCq9RQzXucg9qmzEM14q",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:06.402415+00:00"
+    },
+    {
+      "branch": "claude/streamline-brain-trades-pipeline-01Ar6W5gCn1bi6JVearzD3X2",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:06.783916+00:00"
+    },
+    {
+      "branch": "claude/sync-live-deployment-01BAFRPvE5b3j4j6fNzHzNC1",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:07.186367+00:00"
+    },
+    {
+      "branch": "claude/unify-handsoff-sphere-01RUvfByTANT1bgPQVdipJyx",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:07.593072+00:00"
+    },
+    {
+      "branch": "claude/upgrade-hardware-opus-011oYZ1ZAbiZF2FaCZxfGccE",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:07.983413+00:00"
+    },
+    {
+      "branch": "claude/wealth-compounding-pipeline-01XrL7kASbgacYTYcJAdCejX",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:08.363365+00:00"
+    },
+    {
+      "branch": "claude/wealth-system-phases-01UXxq2bd1cFDZBS7nZnaZW3",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:08.764028+00:00"
+    },
+    {
+      "branch": "claude/wire-brain-orchestrator-011tcKo5Je83zwZT19cXxu84",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:09.138996+00:00"
+    },
+    {
+      "branch": "codex/clarify-mcp-references-in-aider-logs",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:09.542908+00:00"
+    },
+    {
+      "branch": "copilot/add-ci-and-health-check-workflows",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/add-decider-v1-documentation",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/add-fed-rate-analyzer",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/add-github-playwright-mcp-servers",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:09.979751+00:00"
+    },
+    {
+      "branch": "copilot/add-github-rate-limit-scripts",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/add-github-rate-limit-scripts-again",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/add-tier-2-ai-commands",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:10.355774+00:00"
+    },
+    {
+      "branch": "copilot/analyze-api-costs-usage-limits",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:10.744777+00:00"
+    },
+    {
+      "branch": "copilot/assist-agent-sessions",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:11.128943+00:00"
+    },
+    {
+      "branch": "copilot/audit-everything-in-repo",
+      "action": "review",
+      "reason": "7 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/automate-hardware-and-software",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/automate-merge-process",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:11.502764+00:00"
+    },
+    {
+      "branch": "copilot/automate-repo-management",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/check-repo-automation-status",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/clean-up-obsolete-draft-prs",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/complete-spark-plug-implementation",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/complete-sparkplug-implementation",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/continue-agent-session",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/continue-automation-success",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/continue-automation-success-again",
+      "action": "review",
+      "reason": "7 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/continue-cash-flow-implementation",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/continue-collaboration-on-handoff-system",
+      "action": "review",
+      "reason": "6 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/coordinate-pr-reviews",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:11.877177+00:00"
+    },
+    {
+      "branch": "copilot/create-alpha-model-v2",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:12.290767+00:00"
+    },
+    {
+      "branch": "copilot/create-api-documentation",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:12.641714+00:00"
+    },
+    {
+      "branch": "copilot/create-automated-testing-infrastructure",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-autonomous-trading-loop",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-configuration-management-system",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-custom-agents",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-execution-simulator",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-live-execution-pipeline",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-main-branch-if-needed",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:13.019498+00:00"
+    },
+    {
+      "branch": "copilot/create-new-agent-sessions",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-polymarket-api-client",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-polymarket-api-integration",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:13.385238+00:00"
+    },
+    {
+      "branch": "copilot/create-portfolio-tracker-system",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-production-deployment-system",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:13.793229+00:00"
+    },
+    {
+      "branch": "copilot/create-revenue-tracking-system",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:14.167080+00:00"
+    },
+    {
+      "branch": "copilot/create-scheduled-task-runner",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-self-healing-agent-system",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/create-system-dashboard-docs",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:14.547346+00:00"
+    },
+    {
+      "branch": "copilot/debug-handoff-system",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/document-automation-success",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/document-system-request-analysis",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:14.941159+00:00"
+    },
+    {
+      "branch": "copilot/edit-repo-with-claude",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:15.279380+00:00"
+    },
+    {
+      "branch": "copilot/enhance-polymarket-data-pipeline",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/enhance-telegram-bot-integration",
+      "action": "pr",
+      "reason": "Integration branch with 5 commits - should merge",
+      "priority": 1,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/ensure-agent-session-order",
+      "action": "review",
+      "reason": "10 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/ensure-session-order-compliance",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/establish-main-branch-default",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:15.667917+00:00"
+    },
+    {
+      "branch": "copilot/fetch-polymarket-live-data",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/find-current-copilot-mentions",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:16.021596+00:00"
+    },
+    {
+      "branch": "copilot/fix-agent-session-problems",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:16.398376+00:00"
+    },
+    {
+      "branch": "copilot/fix-auto-management-infra",
+      "action": "pr",
+      "reason": "Fix branch with 4 commits - likely ready",
+      "priority": 2,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/fix-fat-pockets-issue",
+      "action": "pr",
+      "reason": "Fix branch with 4 commits - likely ready",
+      "priority": 2,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/fix-github-repo-automation",
+      "action": "pr",
+      "reason": "Fix branch with 3 commits - likely ready",
+      "priority": 2,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/fix-handsoff-system-issues",
+      "action": "review",
+      "reason": "6 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/fix-issues-identified-by-claude",
+      "action": "pr",
+      "reason": "Fix branch with 4 commits - likely ready",
+      "priority": 2,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/handle-prs-internally",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:16.809322+00:00"
+    },
+    {
+      "branch": "copilot/improve-github-automations",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/improve-handoff-system",
+      "action": "review",
+      "reason": "7 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/improve-system-communication",
+      "action": "review",
+      "reason": "9 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/investigate-cash-flow-issues",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/manage-pull-requests-system",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:17.171454+00:00"
+    },
+    {
+      "branch": "copilot/merge-github-rate-limit-fix",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:17.560031+00:00"
+    },
+    {
+      "branch": "copilot/monitor-ai-nexus-integration",
+      "action": "pr",
+      "reason": "Integration branch with 4 commits - should merge",
+      "priority": 1,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/optimize-communication-procedures",
+      "action": "review",
+      "reason": "7 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/optimize-hardware-stack",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/propose-next-steps",
+      "action": "review",
+      "reason": "7 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/reimplement-audit-infrastructure",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:17.937884+00:00"
+    },
+    {
+      "branch": "copilot/remove-pebbles-blocking-cash-flow",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/review-all-prs",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (1 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:18.310291+00:00"
+    },
+    {
+      "branch": "copilot/set-up-ai-communication",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/setup-github-authentication",
+      "action": "delete",
+      "reason": "No commits ahead of main - fully merged or empty",
+      "priority": 1,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:18.730087+00:00"
+    },
+    {
+      "branch": "copilot/summarize-audit-propagate-system",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/sync-handsoff-flow-state",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/sync-server-with-repo",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/track-yair-siegel-accounts",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:19.147009+00:00"
+    },
+    {
+      "branch": "copilot/unify-business-integration",
+      "action": "pr",
+      "reason": "Integration branch with 3 commits - should merge",
+      "priority": 1,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/update-claude-cli-integration",
+      "action": "delete",
+      "reason": "Stale (999 days) with minimal changes (2 commits)",
+      "priority": 2,
+      "pr_url": null,
+      "executed": true,
+      "executed_at": "2025-12-03T16:18:19.537566+00:00"
+    },
+    {
+      "branch": "copilot/update-execution-plan-to-live",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/update-status-short",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/upgrade-current-hardware",
+      "action": "review",
+      "reason": "4 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "copilot/view-failed-timedout-sessions",
+      "action": "review",
+      "reason": "3 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    },
+    {
+      "branch": "local-sync",
+      "action": "review",
+      "reason": "5 commits, 999 days old - needs review",
+      "priority": 3,
+      "pr_url": null,
+      "executed": false,
+      "executed_at": null
+    }
+  ]
+}

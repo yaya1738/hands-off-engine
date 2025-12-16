@@ -1,0 +1,15 @@
+{
+  "live_trading_enabled": true,
+  "reason": "config_sync",
+  "auto_paused": false,
+  "safeguards": {
+    "max_per_trade": 5.0,
+    "max_daily_loss": 20.0,
+    "max_open_positions": 5,
+    "min_edge_required": 0.05,
+    "require_human_approval_above": 10.0
+  },
+  "synced_from": "config/trading_config.json",
+  "synced_at": "2025-12-03T22:45:00Z",
+  "note": "INTEGRAFIX: Single source of truth - config controls, state reflects"
+}

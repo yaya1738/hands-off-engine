@@ -1,0 +1,80 @@
+{
+  "master": "Yair Siegel",
+  "initialized": "2025-12-02T21:17:37.902126+00:00",
+  "knowledge_bases": {
+    "computing": {
+      "loaded": true
+    },
+    "business": {
+      "loaded": true
+    },
+    "money": {
+      "loaded": true
+    }
+  },
+  "crosslinks": 4,
+  "injection_points": 8,
+  "total_queries": 0,
+  "total_injections": 8,
+  "processes": {
+    "hardware_brain": {
+      "domains": [
+        "computing"
+      ],
+      "injection_count": 1
+    },
+    "scaling_engine": {
+      "domains": [
+        "computing",
+        "business"
+      ],
+      "injection_count": 1
+    },
+    "self_healer": {
+      "domains": [
+        "computing"
+      ],
+      "injection_count": 1
+    },
+    "backend_loop": {
+      "domains": [
+        "computing",
+        "business",
+        "money"
+      ],
+      "injection_count": 1
+    },
+    "trade_executor": {
+      "domains": [
+        "money",
+        "computing"
+      ],
+      "injection_count": 1
+    },
+    "reality_feedback": {
+      "domains": [
+        "computing",
+        "business",
+        "money"
+      ],
+      "injection_count": 1
+    },
+    "ai_core": {
+      "domains": [
+        "computing",
+        "business",
+        "money"
+      ],
+      "injection_count": 1
+    },
+    "circuit_board": {
+      "domains": [
+        "computing",
+        "business",
+        "money"
+      ],
+      "injection_count": 1
+    }
+  },
+  "saved_at": "2025-12-02T21:17:37.908660+00:00"
+}

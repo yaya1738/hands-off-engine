@@ -1,0 +1,223 @@
+{
+  "last_updated": "2025-12-03T21:45:01.917974+00:00",
+  "jobs": {
+    "trade_executor": {
+      "name": "trade_executor",
+      "script": "/root/hands-off-engine/executor/trade_executor.py",
+      "schedule": "0 * * * *",
+      "priority": "critical",
+      "conflict_groups": [
+        "trading"
+      ],
+      "description": "Execute trades from detected edges",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "outcome_recorder": {
+      "name": "outcome_recorder",
+      "script": "/root/hands-off-engine/scripts/outcome_recorder.py",
+      "schedule": "30 * * * *",
+      "priority": "high",
+      "conflict_groups": [
+        "trading"
+      ],
+      "description": "Record outcomes of resolved trades",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "concrete_executor": {
+      "name": "concrete_executor",
+      "script": "/root/hands-off-engine/executor/concrete_executor.py",
+      "schedule": "15,45 * * * *",
+      "priority": "critical",
+      "conflict_groups": [
+        "trading"
+      ],
+      "description": "Execute concrete trades on Polymarket",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "polymarket_sync": {
+      "name": "polymarket_sync",
+      "script": "/root/hands-off-engine/alpha/sync_polymarket_model.py",
+      "schedule": "*/30 * * * *",
+      "priority": "high",
+      "conflict_groups": [
+        "data"
+      ],
+      "description": "Sync Polymarket data and generate alpha signals",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "polymarket_live": {
+      "name": "polymarket_live",
+      "script": "/root/hands-off-engine/scripts/polymarket_live.py",
+      "schedule": "0 */2 * * *",
+      "priority": "medium",
+      "conflict_groups": [
+        "data"
+      ],
+      "description": "Fetch live Polymarket data",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "scaling_engine": {
+      "name": "scaling_engine",
+      "script": "/root/hands-off-engine/autonomous/scaling_engine.py",
+      "schedule": "0 */4 * * *",
+      "priority": "high",
+      "conflict_groups": [
+        "infrastructure"
+      ],
+      "description": "Manage infrastructure scaling",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "hardware_brain": {
+      "name": "hardware_brain",
+      "script": "/root/hands-off-engine/autonomous/hardware_brain.py",
+      "schedule": "*/10 * * * *",
+      "priority": "high",
+      "conflict_groups": [
+        "infrastructure"
+      ],
+      "description": "Monitor and heal infrastructure",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "self_healer": {
+      "name": "self_healer",
+      "script": "/root/hands-off-engine/autonomous/self_healer.py",
+      "schedule": "*/15 * * * *",
+      "priority": "medium",
+      "conflict_groups": [
+        "infrastructure"
+      ],
+      "description": "Self-healing operations",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "learning_engine": {
+      "name": "learning_engine",
+      "script": "/root/hands-off-engine/scripts/learning_engine.py",
+      "schedule": "0 */6 * * *",
+      "priority": "medium",
+      "conflict_groups": [
+        "ai"
+      ],
+      "description": "Learn from trade outcomes",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "compound_growth": {
+      "name": "compound_growth",
+      "script": "/root/hands-off-engine/scripts/compound_growth.py",
+      "schedule": "0 */4 * * *",
+      "priority": "low",
+      "conflict_groups": [
+        "ai",
+        "trading"
+      ],
+      "description": "Reinvest profits",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "backend_loop": {
+      "name": "backend_loop",
+      "script": "/root/hands-off-engine/autonomous/backend_loop.py",
+      "schedule": "*/5 * * * *",
+      "priority": "critical",
+      "conflict_groups": [],
+      "description": "Main integration loop",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "integrafix_engine": {
+      "name": "integrafix_engine",
+      "script": "/root/hands-off-engine/integrafix/recursive_engine.py",
+      "schedule": "0 */2 * * *",
+      "priority": "high",
+      "conflict_groups": [
+        "ai"
+      ],
+      "description": "Run recursive integrafix for continuous improvement",
+      "enabled": true,
+      "last_run": null,
+      "last_duration_sec": null,
+      "last_success": null,
+      "run_count": 0,
+      "fail_count": 0
+    },
+    "trading_pipeline": {
+      "name": "trading_pipeline",
+      "script": "/root/hands-off-engine/integrafix/trading_pipeline.py",
+      "schedule": "*/15 * * * *",
+      "priority": "critical",
+      "conflict_groups": [
+        "trading"
+      ],
+      "description": "Run integrated trading pipeline",
+      "enabled": true,
+      "last_run": "2025-12-03T21:45:01.917889+00:00",
+      "last_duration_sec": 0.124729,
+      "last_success": true,
+      "run_count": 26,
+      "fail_count": 0
+    }
+  },
+  "run_history": [
+    {
+      "job_name": "trading_pipeline",
+      "started_at": "2025-12-03T21:45:01.793160+00:00",
+      "ended_at": "2025-12-03T21:45:01.917889+00:00",
+      "success": true,
+      "duration_sec": 0.124729,
+      "output": "======================================================================\nINTEGRAFIX: Trading Pipeline Test\n======================================================================\n\nMarkets scanned: 2\nSignals detected: 2\nTrades executed: 2\nTotal deployed: $30.00\n\nTrades:\n  trade_20251203214501... | test-market-2 | YES | $15.00\n  trade_20251203214501... | test-market-1 | YES | $15.00\n\nPipeline Status:\n{\n  \"state\": {\n    \"created_at\": \"2025-12-03T15:51:51.523596+00:00\",\n    \"total_signals\": 2584,\n    \"total_trades\": 507,\n    \"total_resolved\": 12,\n    \"win_rate\": 0.6666666666666666,\n    \"total_pnl\": 8.125000000000002,\n    \"source_performance\": {\n      \"spread_arbitrage\": {\n        \"trades\": 12,\n        \"wins\": 8,\n        \"pnl\": 8.125000000000002\n      }\n    },\n    \"category_performance\": {},\n    \"learnings_applied\": 519,\n    \"last_updated\": \"2025-12-03T21:45:01.898387+00:00\"\n  },\n  \"pending_signals\": 2,\n  \"active_trades\": 2,\n  \"pending_outcomes\": 0\n}\n",
+      "blocked_by": null
+    }
+  ]
+}

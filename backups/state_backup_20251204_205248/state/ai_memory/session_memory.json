@@ -1,0 +1,15 @@
+{
+  "created_at": "2025-12-03T14:42:00.567824+00:00",
+  "total_sessions": 2,
+  "key_learnings": [],
+  "integration_progress": {
+    "trading_pipeline": "connected"
+  },
+  "last_session": {
+    "timestamp": "2025-12-03T14:43:21.680456+00:00",
+    "session_type": "integrafix",
+    "actions": 3,
+    "errors": 0,
+    "dry_run": true
+  }
+}

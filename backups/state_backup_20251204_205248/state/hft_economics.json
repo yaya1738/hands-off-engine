@@ -1,0 +1,29 @@
+{
+  "master": "Yair Siegel",
+  "timestamp_us": 1764881255343140,
+  "total_cost": 211.32086904761903,
+  "total_profit": 253.21478499999932,
+  "total_events": 319,
+  "net": 41.8939159523803,
+  "provider_costs": {
+    "anthropic": 0.00875,
+    "polymarket": 211.31211904761903
+  },
+  "provider_profits": {
+    "polymarket": 253.1147849999993,
+    "system": 0.09999999999999999
+  },
+  "provider_events": {
+    "anthropic": 10,
+    "polymarket": 299,
+    "system": 10
+  },
+  "flow_rate": {
+    "cost_per_sec": 31.455091023594502,
+    "profit_per_sec": 37.690996381905286,
+    "net_per_sec": 6.235905358310784,
+    "cost_per_hour": 113238.3276849402,
+    "profit_per_hour": 135687.58697485903,
+    "net_per_hour": 22449.259289918824
+  }
+}

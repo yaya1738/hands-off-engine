@@ -1,0 +1,77 @@
+{
+  "timestamp": "2025-12-03T19:05:44.234748+00:00",
+  "wisdom_cache": {
+    "will-3-fed-rate-cuts-happen-in-2025": {
+      "probability": 0.75,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.231062+00:00",
+      "source": "yair_siegel"
+    },
+    "will-bitcoin-dip-to-70000-by-december-31-2025-193-726-878-775-359-968-264-727-793-714-257-318-569-865-147": {
+      "probability": 0.35,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.231222+00:00",
+      "source": "yair_siegel"
+    },
+    "will-bitcoin-reach-105000-by-december-31-2025-784-751": {
+      "probability": 0.6,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.231353+00:00",
+      "source": "yair_siegel"
+    },
+    "will-bitcoin-reach-105000-by-december-31-2025-159-849-483-977": {
+      "probability": 0.6,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.231831+00:00",
+      "source": "yair_siegel"
+    },
+    "maduro-out-in-2025-411": {
+      "probability": 0.175,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.232260+00:00",
+      "source": "yair_siegel"
+    },
+    "cardano-etf-in-2025": {
+      "probability": 0.235,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.232712+00:00",
+      "source": "yair_siegel"
+    },
+    "which-company-has-best-ai-model-end-of-2025": {
+      "probability": 0.95,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.233293+00:00",
+      "source": "yair_siegel"
+    },
+    "will-bitcoin-dip-to-80000-by-december-31-2025-118-573-457-488-883-987-884-891-557": {
+      "probability": 0.35,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.233824+00:00",
+      "source": "yair_siegel"
+    },
+    "will-bitcoin-reach-100000-by-december-31-2025-213-146-883-729-282": {
+      "probability": 0.6,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.234258+00:00",
+      "source": "yair_siegel"
+    },
+    "will-bitcoin-reach-95000-by-december-31-2025-818-596-821-318-841": {
+      "probability": 0.6,
+      "confidence": 0.75,
+      "notes": "Yair estimate",
+      "submitted_at": "2025-12-03T19:05:44.234741+00:00",
+      "source": "yair_siegel"
+    }
+  },
+  "auto_approve_threshold": 25.0,
+  "total_estimates": 10
+}

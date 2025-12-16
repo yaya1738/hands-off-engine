@@ -1,0 +1,5 @@
+{
+  "generated_at": "2025-12-03T21:00:01.611497+00:00",
+  "session_id": "session_20251203_210001",
+  "context": "=== PREVIOUS SESSIONS ===\n\n[2025-12-03] Recursive integrafix engine run\n  Outcomes: Integration: 80.6% \u2192 80.6%, Errors: 0\n  Next actions: \n\n[2025-12-03] Recursive integrafix engine run\n  Outcomes: Integration: 80.6% \u2192 80.6%, Errors: 0\n  Next actions: \n\n[2025-12-03] Testing integrafix startup\n  Outcomes: \n  Next actions: \n\n\n=== KEY LEARNINGS ===\n\n- LOSS: NO on '0xd1a5513fa75fd1d158f430161adf2e3df88511' | P&L: $-1.88 | Edge: 3.0%\n\n- LOSS: NO on '0x8f4eb73b94bd4c714314450e4c53e03f9f6672' | P&L: $-1.25 | Edge: 3.0%\n\n- LOSS: NO on '0xca848e711a27bec13d15c4161f2f857d39931f' | P&L: $-1.88 | Edge: 3.0%\n\n- LOSS: NO on '0x562a1c278fd84b9cd2147253fc9497ca07a616' | P&L: $-1.88 | Edge: 3.0%\n\n- LOSS: NO on '0x8f4eb73b94bd4c714314450e4c53e03f9f6672' | P&L: $-1.25 | Edge: 3.0%\n\n\n=== WHAT WORKED ===\n\n- TEST: WIN on market xyz | P&L: $5.00\n\n- WIN: YES on 'will-spacex-have-200-or-more-launches-in-2025' | P&L: $+15.04 | Edge: 3.0%\n\n- WIN: YES on 'will-spacex-have-200-or-more-launches-in-2025' | P&L: $+15.04 | Edge: 3.0%"
+}

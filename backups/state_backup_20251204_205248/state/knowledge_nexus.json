@@ -1,0 +1,29 @@
+{
+  "master": "Yair Siegel",
+  "initialized": "2025-12-02T21:19:32.253987+00:00",
+  "knowledge_bases": {
+    "computing": {
+      "loaded": true,
+      "error": null
+    },
+    "business": {
+      "loaded": true,
+      "error": null
+    },
+    "money": {
+      "loaded": true,
+      "error": null
+    }
+  },
+  "connections": {
+    "trading": true,
+    "infrastructure": true,
+    "revenue": true,
+    "reality": true,
+    "self_healing": false,
+    "strategic": false
+  },
+  "total_loaded": 3,
+  "query_counts": {},
+  "last_updated": "2025-12-04T20:52:37.279857+00:00"
+}

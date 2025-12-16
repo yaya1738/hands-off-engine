@@ -1,0 +1,268 @@
+{
+  "timestamp": "2025-12-03T18:29:03.932285+00:00",
+  "actions": [
+    {
+      "id": "income_trading_deploy",
+      "name": "Deploy Trading Capital",
+      "description": "Deploy $241 deployable to highest-edge opportunities",
+      "category": "income",
+      "priority": "CRITICAL",
+      "status": "in_progress",
+      "expected_value": 163,
+      "cost": 0,
+      "roi": Infinity,
+      "progress": 0.0,
+      "steps": [
+        "Check current Polymarket balance",
+        "Scan for merge arbitrage opportunities",
+        "Identify top 3 edge positions",
+        "Execute trades with proper sizing",
+        "Set exit targets"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-04T18:27:57.705283+00:00",
+      "created_at": "2025-12-03T18:27:57.705365+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "income_ai_monetize",
+      "name": "Monetize AI Services",
+      "description": "Extract value from AI subscriptions ($840/mo potential)",
+      "category": "income",
+      "priority": "CRITICAL",
+      "status": "pending",
+      "expected_value": 585,
+      "cost": 255,
+      "roi": 2.3,
+      "progress": 0.0,
+      "steps": [
+        "Audit current AI service usage",
+        "Identify underutilized subscriptions",
+        "Find revenue opportunities (consulting, automation)",
+        "List services on freelance platforms",
+        "Create value proposition document"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-10T18:27:57.705371+00:00",
+      "created_at": "2025-12-03T18:27:57.705378+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "income_reduce_burn",
+      "name": "Reduce Monthly Burn",
+      "description": "Cut non-essential expenses to extend runway",
+      "category": "income",
+      "priority": "HIGH",
+      "status": "in_progress",
+      "expected_value": 500,
+      "cost": 0,
+      "roi": Infinity,
+      "progress": 0.0,
+      "steps": [
+        "List all recurring expenses",
+        "Identify non-essential subscriptions",
+        "Cancel or pause low-ROI services",
+        "Negotiate better rates where possible",
+        "Track savings achieved"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-06T18:27:57.705382+00:00",
+      "created_at": "2025-12-03T18:27:57.705386+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "debt_strategy",
+      "name": "Credit Card Strategy",
+      "description": "Optimize $18k credit card debt management",
+      "category": "debt",
+      "priority": "HIGH",
+      "status": "pending",
+      "expected_value": 160,
+      "cost": 0,
+      "roi": 160,
+      "progress": 0.0,
+      "steps": [
+        "List all cards with balances and APRs",
+        "Identify highest APR cards",
+        "Check balance transfer offers (0% APR)",
+        "Calculate optimal payment allocation",
+        "Set up autopay minimums"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-10T18:27:57.705389+00:00",
+      "created_at": "2025-12-03T18:27:57.705393+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "debt_cycling",
+      "name": "Credit Cycling Opportunities",
+      "description": "Use credit card arbitrage for short-term capital",
+      "category": "debt",
+      "priority": "MEDIUM",
+      "status": "pending",
+      "expected_value": 100,
+      "cost": 0,
+      "roi": 100,
+      "progress": 0.0,
+      "steps": [
+        "Check statement closing dates",
+        "Identify 0% purchase APR periods",
+        "Calculate safe cycling amounts",
+        "Deploy cycled capital to trading",
+        "Track repayment schedule"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-17T18:27:57.705396+00:00",
+      "created_at": "2025-12-03T18:27:57.705400+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "sep_llc",
+      "name": "Form Wyoming LLC",
+      "description": "Establish LLC for liability protection",
+      "category": "separation",
+      "priority": "HIGH",
+      "status": "in_progress",
+      "expected_value": 7500,
+      "cost": 152,
+      "roi": 49.3,
+      "progress": 0.0,
+      "steps": [
+        "Choose LLC name (Yair Siegel LLC or similar)",
+        "Go to Wyoming Secretary of State website",
+        "File Articles of Organization ($100)",
+        "Create Operating Agreement (template)",
+        "Get EIN from IRS (free, online)",
+        "File for registered agent ($52/yr)"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-17T18:27:57.705403+00:00",
+      "created_at": "2025-12-03T18:27:57.705407+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "sep_bank",
+      "name": "Open Business Bank Account",
+      "description": "Separate business and personal finances",
+      "category": "separation",
+      "priority": "MEDIUM",
+      "status": "pending",
+      "expected_value": 50,
+      "cost": 0,
+      "roi": Infinity,
+      "progress": 0.0,
+      "steps": [
+        "Get EIN (required for business account)",
+        "Research no-fee business accounts (Mercury, Relay)",
+        "Gather required documents (EIN, LLC docs, ID)",
+        "Open account online",
+        "Set up transfers from trading accounts"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-24T18:27:57.705414+00:00",
+      "created_at": "2025-12-03T18:27:57.705418+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "risk_wallet",
+      "name": "Secure Crypto Storage",
+      "description": "Move crypto to hardware wallet",
+      "category": "risk",
+      "priority": "MEDIUM",
+      "status": "pending",
+      "expected_value": 100,
+      "cost": 150,
+      "roi": 0.67,
+      "progress": 0.0,
+      "steps": [
+        "Purchase Ledger/Trezor ($100-150)",
+        "Set up hardware wallet",
+        "Transfer majority of crypto to cold storage",
+        "Keep only trading float in hot wallet",
+        "Secure seed phrase properly"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2026-01-02T18:27:57.705420+00:00",
+      "created_at": "2025-12-03T18:27:57.705425+00:00",
+      "completed_at": null
+    },
+    {
+      "id": "risk_backup",
+      "name": "System Backup",
+      "description": "Create cloud backup for trading infrastructure",
+      "category": "risk",
+      "priority": "MEDIUM",
+      "status": "pending",
+      "expected_value": 100,
+      "cost": 5,
+      "roi": 20,
+      "progress": 0.0,
+      "steps": [
+        "Identify critical state files",
+        "Set up encrypted cloud backup (Backblaze/S3)",
+        "Create automated backup script",
+        "Test restore procedure",
+        "Document recovery process"
+      ],
+      "completed_steps": [],
+      "blockers": [],
+      "deadline": "2025-12-10T18:27:57.705427+00:00",
+      "created_at": "2025-12-03T18:27:57.705431+00:00",
+      "completed_at": null
+    }
+  ],
+  "summary": {
+    "total_actions": 9,
+    "completed": 0,
+    "in_progress": 3,
+    "blocked": 0,
+    "pending": 6,
+    "total_expected_value": 9258,
+    "value_captured": 0,
+    "value_in_progress": 0.0,
+    "progress_percent": 0.0,
+    "by_category": {
+      "income": {
+        "total": 3,
+        "completed": 0,
+        "actions": [
+          "Deploy Trading Capital",
+          "Monetize AI Services",
+          "Reduce Monthly Burn"
+        ]
+      },
+      "debt": {
+        "total": 2,
+        "completed": 0,
+        "actions": [
+          "Credit Card Strategy",
+          "Credit Cycling Opportunities"
+        ]
+      },
+      "separation": {
+        "total": 2,
+        "completed": 0,
+        "actions": [
+          "Form Wyoming LLC",
+          "Open Business Bank Account"
+        ]
+      },
+      "risk": {
+        "total": 2,
+        "completed": 0,
+        "actions": [
+          "Secure Crypto Storage",
+          "System Backup"
+        ]
+      }
+    }
+  }
+}

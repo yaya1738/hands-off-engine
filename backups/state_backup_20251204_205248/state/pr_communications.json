@@ -1,0 +1,56 @@
+{
+  "last_check": "2025-12-04T20:49:04.030112+00:00",
+  "communications": [
+    {
+      "type": "comment",
+      "pr": 239,
+      "repo": "cortexlinux/cortex",
+      "sent_at": "2025-12-04T20:28:06.811827+00:00",
+      "body_preview": "Thank you @coderabbitai for the detailed review!\n\nI'll address the feedback you've provided:\n\n**Code"
+    },
+    {
+      "type": "comment",
+      "pr": 240,
+      "repo": "cortexlinux/cortex",
+      "sent_at": "2025-12-04T20:28:08.199584+00:00",
+      "body_preview": "Thank you for the quality check!\n\n\u2713 Quality gate passed\n\u2713 All checks completed\n\nReady for maintainer"
+    },
+    {
+      "type": "comment",
+      "pr": 241,
+      "repo": "cortexlinux/cortex",
+      "sent_at": "2025-12-04T20:28:09.204856+00:00",
+      "body_preview": "Thank you for the quality check!\n\n\u2713 Quality gate passed\n\u2713 All checks completed\n\nReady for maintainer"
+    },
+    {
+      "type": "comment",
+      "pr": 239,
+      "repo": "cortexlinux/cortex",
+      "sent_at": "2025-12-04T20:28:56.466157+00:00",
+      "body_preview": "Thank you @coderabbitai for the detailed review!\n\nI'll address the feedback you've provided:\n\n**Code"
+    },
+    {
+      "type": "comment",
+      "pr": 239,
+      "repo": "cortexlinux/cortex",
+      "sent_at": "2025-12-04T20:33:58.447545+00:00",
+      "body_preview": "Thank you @coderabbitai for the detailed review!\n\nI'll address the feedback you've provided:\n\n**Code"
+    },
+    {
+      "type": "comment",
+      "pr": 239,
+      "repo": "cortexlinux/cortex",
+      "sent_at": "2025-12-04T20:39:00.669649+00:00",
+      "body_preview": "Thank you @coderabbitai for the detailed review!\n\nI'll address the feedback you've provided:\n\n**Code"
+    },
+    {
+      "type": "comment",
+      "pr": 239,
+      "repo": "cortexlinux/cortex",
+      "sent_at": "2025-12-04T20:44:02.478313+00:00",
+      "body_preview": "Thank you @coderabbitai for the detailed review!\n\nI'll address the feedback you've provided:\n\n**Code"
+    }
+  ],
+  "responses_sent": 7,
+  "prs_tracked": 3
+}

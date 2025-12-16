@@ -1,0 +1,234 @@
+{
+  "created": "2025-12-04T00:08:01.884407",
+  "last_updated": "2025-12-04T20:47:35.344579",
+  "wallet_balance_usdc": 0.0,
+  "activation_threshold": 50.0,
+  "live_mode_active": false,
+  "income_sources": {
+    "freelance_dev": {
+      "name": "Freelance Development",
+      "status": "available",
+      "effort_hours_weekly": 10,
+      "est_hourly_rate": 50,
+      "est_weekly_usd": 500,
+      "probability": 0.6,
+      "notes": "Upwork, direct clients, contract work"
+    },
+    "ai_consulting": {
+      "name": "AI/ML Consulting",
+      "status": "available",
+      "effort_hours_weekly": 5,
+      "est_hourly_rate": 75,
+      "est_weekly_usd": 375,
+      "probability": 0.4,
+      "notes": "Leverage this system as portfolio"
+    },
+    "system_productization": {
+      "name": "Productize Trading System",
+      "status": "not_started",
+      "effort_hours_once": 40,
+      "est_once_usd": 2000,
+      "probability": 0.3,
+      "notes": "SaaS, open source with paid tier, or sell"
+    },
+    "quick_gigs": {
+      "name": "Quick Technical Gigs",
+      "status": "available",
+      "effort_hours_weekly": 5,
+      "est_hourly_rate": 30,
+      "est_weekly_usd": 150,
+      "probability": 0.7,
+      "notes": "Bug bounties, small fixes, code reviews"
+    },
+    "consulting": {
+      "name": "Consulting",
+      "status": "available",
+      "est_weekly_usd": 500.0,
+      "probability": 0.5,
+      "notes": "From yair_income_sources (best: $5000/mo)"
+    },
+    "freelance_projects": {
+      "name": "Freelance Projects",
+      "status": "available",
+      "est_weekly_usd": 250.0,
+      "probability": 0.3,
+      "notes": "From yair_income_sources (best: $3000/mo)"
+    },
+    "trading_profits": {
+      "name": "Trading Profits",
+      "status": "available",
+      "est_weekly_usd": 125.0,
+      "probability": 0.6,
+      "notes": "From yair_income_sources (best: $2000/mo)"
+    }
+  },
+  "income_history": [],
+  "capital_injections": [],
+  "abcfc_recommendations": [
+    {
+      "rank": 1,
+      "source": "freelance_dev",
+      "name": "Freelance Development",
+      "expected": 500,
+      "probability": 0.6,
+      "best": 750.0,
+      "worst": 0,
+      "abcfc_score": 300.0,
+      "status": "available",
+      "recommendation": "HIGH PRIORITY: Start immediately"
+    },
+    {
+      "rank": 2,
+      "source": "consulting",
+      "name": "Consulting",
+      "expected": 500.0,
+      "probability": 0.5,
+      "best": 750.0,
+      "worst": 0,
+      "abcfc_score": 250.0,
+      "status": "available",
+      "recommendation": "HIGH PRIORITY: Start immediately"
+    },
+    {
+      "rank": 3,
+      "source": "ai_consulting",
+      "name": "AI/ML Consulting",
+      "expected": 375,
+      "probability": 0.4,
+      "best": 562.5,
+      "worst": 0,
+      "abcfc_score": 150.0,
+      "status": "available",
+      "recommendation": "RECOMMENDED: Good risk-adjusted return"
+    },
+    {
+      "rank": 4,
+      "source": "quick_gigs",
+      "name": "Quick Technical Gigs",
+      "expected": 150,
+      "probability": 0.7,
+      "best": 225.0,
+      "worst": 0,
+      "abcfc_score": 105.0,
+      "status": "available",
+      "recommendation": "RECOMMENDED: Good risk-adjusted return"
+    },
+    {
+      "rank": 5,
+      "source": "freelance_projects",
+      "name": "Freelance Projects",
+      "expected": 250.0,
+      "probability": 0.3,
+      "best": 375.0,
+      "worst": 0,
+      "abcfc_score": 75.0,
+      "status": "available",
+      "recommendation": "VIABLE: Positive expected value"
+    },
+    {
+      "rank": 6,
+      "source": "trading_profits",
+      "name": "Trading Profits",
+      "expected": 125.0,
+      "probability": 0.6,
+      "best": 187.5,
+      "worst": 0,
+      "abcfc_score": 75.0,
+      "status": "available",
+      "recommendation": "VIABLE: Positive expected value"
+    },
+    {
+      "rank": 7,
+      "source": "system_productization",
+      "name": "Productize Trading System",
+      "expected": 500.0,
+      "probability": 0.3,
+      "best": 1000.0,
+      "worst": -400,
+      "abcfc_score": -18.0,
+      "status": "not_started",
+      "recommendation": "LOW PRIORITY: Negative risk-adjusted score"
+    }
+  ],
+  "zero_capital_strategies": [
+    {
+      "name": "ai_micro_tasks",
+      "capital_required": 0,
+      "time_to_first_dollar": "hours",
+      "potential_daily": "5-20",
+      "difficulty": "low",
+      "steps": [
+        "Register on Remotasks/Scale/Appen",
+        "Find tasks compatible with AI execution",
+        "Use Groq/Google free APIs to complete",
+        "Withdraw earnings to crypto wallet"
+      ],
+      "immediate_action": "Register accounts, verify crypto payout",
+      "roi_multiplier": "infinite (zero capital, automated)"
+    },
+    {
+      "name": "polymarket_referral",
+      "capital_required": 0,
+      "time_to_first_dollar": "24-72 hours",
+      "potential_daily": "5-50",
+      "difficulty": "medium",
+      "steps": [
+        "Get referral link from Polymarket account",
+        "Share on Twitter/Reddit with market insights",
+        "Create value content (market analysis)",
+        "Earn 25% of trading fees from referrals"
+      ],
+      "immediate_action": "Extract referral code from Polymarket account",
+      "roi_multiplier": "infinite (zero capital)"
+    },
+    {
+      "name": "data_bounties",
+      "capital_required": 0,
+      "time_to_first_dollar": "1-7 days",
+      "potential_daily": "10-100",
+      "difficulty": "medium",
+      "steps": [
+        "Find active bounties on Dune, Ocean, API3",
+        "Write valuable queries/datasets",
+        "Submit and earn crypto",
+        "Convert to USDC for trading"
+      ],
+      "immediate_action": "Scan bounty boards for data tasks",
+      "roi_multiplier": "infinite (zero capital)"
+    },
+    {
+      "name": "prediction_arbitrage",
+      "capital_required": 7.99,
+      "time_to_first_dollar": "hours",
+      "potential_daily": "1-5",
+      "difficulty": "low",
+      "steps": [
+        "Scan markets on Polymarket, Kalshi, Manifold",
+        "Find identical events with >5% price difference",
+        "Buy low, sell high (instant profit)",
+        "Compound gains"
+      ],
+      "immediate_action": "Build market scanner for 3 platforms",
+      "roi_multiplier": "1.1-1.3x per trade"
+    },
+    {
+      "name": "market_making",
+      "capital_required": 7.99,
+      "time_to_first_dollar": "hours",
+      "potential_daily": "0.5-2",
+      "difficulty": "medium",
+      "steps": [
+        "Find markets with >3% spreads",
+        "Place limit orders inside spread",
+        "Earn on fills + maker rebates",
+        "Compound earnings"
+      ],
+      "immediate_action": "Build spread scanner and order placer",
+      "roi_multiplier": "1.02-1.05x per fill"
+    }
+  ],
+  "consolidated_from": [
+    "yair_income_sources.json",
+    "zero_capital_income.json"
+  ]
+}

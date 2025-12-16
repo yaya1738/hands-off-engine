@@ -1,0 +1,48 @@
+{
+  "timestamp": "2025-12-03T22:24:00.249311+00:00",
+  "hierarchy_nodes": 7,
+  "total_bounds": [
+    -705.0,
+    9590.0
+  ],
+  "total_expected": 735.0,
+  "risk_modifiers": [
+    "No LLC Protection",
+    "Centralization Risk",
+    "Critical Runway",
+    "High Credit Utilization"
+  ],
+  "risk_adjusted_worst": -1057.5,
+  "risk_adjusted_expected": 269.5,
+  "cloud_size": 30,
+  "cloud_bounds": {
+    "worst_possible": -3705.0,
+    "best_possible": 9745.625,
+    "best_expected": 748.0625,
+    "worst_expected": 535.0
+  },
+  "recommended_action": "hedge_50pct",
+  "recommended_node": "Business",
+  "recommended_score": 313.125,
+  "sources_loaded": [
+    "YairMasterABCFC",
+    "RealityBridge",
+    "RiskManagementBridge",
+    "GoalsEffectsBridge",
+    "PaymentsBridge",
+    "ABCFCLiveNexus"
+  ],
+  "history_length": 1,
+  "hierarchy": {
+    "claude_sessions": {
+      "name": "Claude CLI Sessions",
+      "description": "AI-assisted development and decision-making",
+      "best_outcome": 100.0,
+      "worst_outcome": -20.0,
+      "expected_outcome": 10.0,
+      "bridge_module": "integrafix.claude_abcfc_bridge",
+      "state_file": "state/claude_abcfc_bridge.json"
+    }
+  },
+  "last_updated": "2025-12-03T23:10:21.205650+00:00"
+}

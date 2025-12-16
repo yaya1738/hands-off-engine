@@ -1,0 +1,89 @@
+{
+  "master": "Yair Siegel",
+  "updated_at": "2025-12-04T04:00:00.000000",
+  "master_abcfc": {
+    "assertion": "Can't lose. Always win. Nothing wrong.",
+    "parameters": {
+      "worst_case": 0,
+      "probability": 1.0,
+      "risk_aversion": 0
+    },
+    "trajectory": "STRAIGHT_LINE_UP",
+    "interpretation": "All outcomes are positive inputs to trajectory. Variance is in the HOW, not the WHAT.",
+    "formula": "score = expected (no worst case, prob=1, risk=0)"
+  },
+  "component_abcfc": {
+    "formula": "score = expected × prob - risk_aversion × |worst| × (1 - prob)",
+    "default_risk_aversion": 0.6,
+    "note": "Component-level decisions have variance. Master-level frame is always positive."
+  },
+  "active_estimates": {},
+  "risk_preferences": {
+    "max_per_trade": 25,
+    "max_daily_loss": 100,
+    "categories": [
+      "politics",
+      "crypto",
+      "tech",
+      "finance"
+    ]
+  },
+  "trading_rules": {
+    "min_edge": 0.03,
+    "kelly_fraction": 0.25
+  },
+  "golden_bridge": true,
+  "polymarket_wallet": "0xB314345D218ED4CF75C17636a2307244E7dA761b",
+  "open_orders": 6,
+  "estimates": {},
+  "preferences": {
+    "max_per_trade": 25,
+    "max_daily_loss": 100,
+    "categories": [
+      "politics",
+      "crypto",
+      "tech",
+      "finance"
+    ]
+  },
+  "rules": {
+    "min_edge": 0.03,
+    "kelly_fraction": 0.25
+  },
+  "expenses": [
+    {
+      "name": "Server Costs",
+      "category": "business",
+      "monthly_amount": 50,
+      "worst_monthly": 100,
+      "best_monthly": 30,
+      "required": true
+    },
+    {
+      "name": "API Subscriptions",
+      "category": "business",
+      "monthly_amount": 478.5,
+      "worst_monthly": 717.75,
+      "best_monthly": 239.25,
+      "required": true
+    },
+    {
+      "name": "Trading Fees",
+      "category": "variable",
+      "monthly_amount": 20,
+      "worst_monthly": 100,
+      "best_monthly": 5,
+      "required": false
+    }
+  ],
+  "wisdom": {
+    "teachings_applied": 42,
+    "profitable_applications": 0,
+    "category_performance": {}
+  },
+  "consolidated_from": [
+    "yair_golden_bridge.json",
+    "yair_expenses.json",
+    "yair_wisdom.json"
+  ]
+}

@@ -1,0 +1,64 @@
+{
+  "task": "complete_naming_refactor",
+  "status": "deferred",
+  "created": "2024-12-01T13:15:00Z",
+  "priority": "low",
+  "description": "Complete the naming convention refactor - rename state files and update remaining references",
+
+  "completed": {
+    "python_modules": [
+      "system_doctor.py -> health_diagnostics.py",
+      "system_sage.py -> advisor.py",
+      "system_immunity.py -> security_layer.py",
+      "system_topology.py -> infrastructure_map.py",
+      "system_battery.py -> resource_tracker.py",
+      "fuel_system.py -> capital_tracker.py",
+      "feedback_system.py -> feedback_loop.py",
+      "living_system.py -> self_awareness.py",
+      "unified_system.py -> orchestrator.py"
+    ],
+    "imports_updated": true,
+    "classes_renamed": true,
+    "verification": "9/9 modules import correctly"
+  },
+
+  "remaining": {
+    "state_files_to_rename": {
+      "state/unified_system_state.json": "state/orchestrator_state.json",
+      "state/system_topology.json": "state/infrastructure_map.json",
+      "state/fuel_system.json": "state/capital_tracker.json",
+      "state/feedback_system.json": "state/feedback_loop.json",
+      "state/living_system.json": "state/self_awareness.json",
+      "state/system_battery.json": "state/resource_tracker.json"
+    },
+    "code_files_to_update": [
+      "ai/integration/ai_nexus_hub.py",
+      "ai/unified_ai.py",
+      "autonomous/capital_tracker.py",
+      "autonomous/dimensional_continuum.py",
+      "autonomous/feedback_loop.py",
+      "autonomous/harm_prevention.py",
+      "autonomous/helicopter.py",
+      "autonomous/infrastructure_map.py",
+      "autonomous/process_endpoints.py",
+      "autonomous/reality_bridge.py",
+      "autonomous/self_awareness.py",
+      "autonomous/self_integrator.py",
+      "autonomous/self_preservation.py",
+      "autonomous/threat_analysis.py",
+      "scripts/backup_critical.py",
+      "autonomous/claude_optimizer.py",
+      "autonomous/__init__.py",
+      "hardware/hardware_collector.py",
+      "hardware/trading_protection.py"
+    ]
+  },
+
+  "risk_assessment": {
+    "data_loss_risk": "medium - state files contain runtime data",
+    "mitigation": "backup state files before rename, update code atomically",
+    "recommended_approach": "single transaction: backup -> rename files -> update code"
+  },
+
+  "notes": "Core functionality works. This is cosmetic cleanup for naming consistency."
+}

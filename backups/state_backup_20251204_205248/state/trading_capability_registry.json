@@ -1,0 +1,44 @@
+{
+  "discovered_at": "2025-12-01T18:00:01.504113+00:00",
+  "modules": {
+    "executor": [
+      "polymarket_api.py",
+      "polymarket_client.py",
+      "trading_safeguards.py"
+    ],
+    "trading": [
+      "signal_generator.py",
+      "signal_executor_bridge.py",
+      "trading_brain.py"
+    ],
+    "alpha": [
+      "ho_alpha_polymarket.py",
+      "polymarket_fetcher.py",
+      "integrations_hub.py",
+      "yair_insights.py",
+      "spread_analyzer.py",
+      "signal_router.py",
+      "sync_polymarket_model.py",
+      "espn_live_alpha.py",
+      "commercial_ai_receiver.py",
+      "intelligent_alpha_engine.py",
+      "spread_capture_strategy.py"
+    ],
+    "arbitrage": [
+      "event_matcher.py",
+      "types.py",
+      "audit.py",
+      "cli.py",
+      "opportunity_detector.py"
+    ]
+  },
+  "capabilities": {
+    "market_data": false,
+    "signal_generation": true,
+    "execution": true,
+    "safeguards": true,
+    "alpha_strategies": true,
+    "arbitrage": true
+  },
+  "unified": true
+}

@@ -1,0 +1,61 @@
+{
+  "discovered": "2025-12-03T15:51:00Z",
+  "murdered_by": "CLI loop kills resetting position sizing state",
+  "status": "RECOVERABLE",
+  "analysis_timestamp": "2025-12-03T21:15:00Z",
+
+  "root_cause": {
+    "issue": "Position sizing state got reset by loop kills",
+    "effect": "Capital fragmented from $15-25 bets to $0-5 bets",
+    "proof": {
+      "$15-20_trades": {"count": 30, "pnl": 155.39, "avg_per_trade": 5.18},
+      "$0-5_trades": {"count": 254, "pnl": 87.23, "avg_per_trade": 0.34}
+    }
+  },
+
+  "golden_config": {
+    "capital": 100,
+    "max_per_trade": 25,
+    "source": "https://gamma-api.polymarket.com/markets",
+    "use_slugs": true,
+    "strategy": "Low-price YES bets on named markets"
+  },
+
+  "golden_trades": [
+    {"market": "will-5-fed-rate-cuts-happen-in-2025", "size": 16, "entry": 0.0015, "pnl": 15.98, "pnl_pct": 99.85},
+    {"market": "will-spacex-have-200-or-more-launches-in-2025", "size": 15, "entry": 0.006, "pnl": 15.04, "pnl_pct": 99.4},
+    {"market": "nara-lucky-divorce-in-2025", "size": 20, "entry": 0.038, "pnl": 19.11, "pnl_pct": 96.2},
+    {"market": "hailey-bieber-pregnant-in-2025", "size": 25, "entry": 0.11, "pnl": 22.25, "pnl_pct": 89.0}
+  ],
+
+  "golden_flow_rates": {
+    "cost_per_sec": 0.00875,
+    "profit_per_sec": 2.08,
+    "net_per_sec": 2.07,
+    "emergent_monthly": 5000000
+  },
+
+  "code_paths": {
+    "market_source": "integrafix/recursive_engine.py:180 → gamma-api.polymarket.com/markets",
+    "market_id": "integrafix/trading_pipeline.py:241 → market.get('slug')",
+    "position_sizing": "integrafix/trading_pipeline.py:411 → _abcfc_position_size()",
+    "execution": "integrafix/trading_pipeline.py:292 → execute_signal()"
+  },
+
+  "total_trade_analysis": {
+    "total_trades": 292,
+    "named_markets": {"count": 36, "pnl": 96.31, "avg": 2.68, "win_rate": "55.6%"},
+    "hex_markets": {"count": 256, "pnl": 175.62, "avg": 0.69, "win_rate": "61.3%"},
+    "insight": "Named markets have 4x higher avg PnL per trade"
+  },
+
+  "restoration_steps": [
+    "1. Ensure capital=$100, max_per_trade=$25 in recursive_engine.py",
+    "2. Verify gamma-api is being used (not fallback)",
+    "3. Verify ABCFC position sizing is active",
+    "4. DO NOT KILL THE LOOPS",
+    "5. Let positions accumulate to $15-25 range"
+  ],
+
+  "lesson_learned": "System was working. Loop kills reset position sizing state. Big bets became small bets. Same strategy, worse execution."
+}

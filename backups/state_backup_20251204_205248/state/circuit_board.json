@@ -1,0 +1,82 @@
+{
+  "master": "Yair Siegel",
+  "initialized": "2025-12-04T20:47:13.868270+00:00",
+  "power_on": true,
+  "power_rail": {
+    "voltage": 1.0,
+    "sources": {
+      "computing": true,
+      "business": true,
+      "money": true
+    }
+  },
+  "transistors": {
+    "T1_TRADING": {
+      "state": "saturated",
+      "threshold": 0.4,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T2_INFRA": {
+      "state": "saturated",
+      "threshold": 0.6,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T3_REVENUE": {
+      "state": "saturated",
+      "threshold": 0.5,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T4_REALITY": {
+      "state": "saturated",
+      "threshold": 0.3,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T5_HEALING": {
+      "state": "off",
+      "threshold": 0.7,
+      "processed": 0,
+      "blocked": 0
+    },
+    "T6_TRADE_INFRA": {
+      "state": "saturated",
+      "threshold": 0.5,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T7_REVENUE_TRADE": {
+      "state": "saturated",
+      "threshold": 0.5,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T8_REALITY_HEAL": {
+      "state": "saturated",
+      "threshold": 0.6,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T9_FEEDBACK_TRADE": {
+      "state": "saturated",
+      "threshold": 0.4,
+      "processed": 2,
+      "blocked": 0
+    },
+    "T10_FEEDBACK_REVENUE": {
+      "state": "saturated",
+      "threshold": 0.4,
+      "processed": 2,
+      "blocked": 0
+    }
+  },
+  "state": {
+    "power_on": true,
+    "cycles": 2,
+    "total_signals": 18,
+    "last_cycle": "2025-12-04T20:52:36.045605+00:00"
+  },
+  "saved_at": "2025-12-04T20:52:37.278860+00:00"
+}

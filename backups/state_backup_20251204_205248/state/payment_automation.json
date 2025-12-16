@@ -1,0 +1,44 @@
+{
+  "total_income": 0.0,
+  "pending_income": 16666.666666666668,
+  "income_streams": [
+    {
+      "type": "employment",
+      "company": "Pydantic",
+      "amount_annual": 200000,
+      "amount_monthly": 16666.666666666668,
+      "status": "accepted",
+      "start_date": "2025-01-15",
+      "accepted_at": "2025-12-04T20:47:59.787421+00:00"
+    }
+  ],
+  "contracts_accepted": 1,
+  "payments_received": 0,
+  "payment_methods": {
+    "bank": {
+      "configured": false,
+      "routing": "",
+      "account": ""
+    },
+    "crypto": {
+      "configured": true,
+      "address": "0xB314345D218ED4CF75C17636a2307244E7dA761b"
+    },
+    "paypal": {
+      "configured": false,
+      "email": ""
+    },
+    "stripe": {
+      "configured": false,
+      "account_id": ""
+    },
+    "venmo": {
+      "configured": false,
+      "handle": ""
+    },
+    "zelle": {
+      "configured": false,
+      "email": ""
+    }
+  }
+}

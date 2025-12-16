@@ -1,0 +1,38 @@
+{
+  "created_at": "2025-12-04T19:57:37.623322+00:00",
+  "active_decisions": [],
+  "last_brain_decision": {
+    "action": "upgrade_node",
+    "node_id": "droplet-123",
+    "reason": "CPU threshold exceeded",
+    "timestamp": "2025-12-04T19:57:37.623607+00:00"
+  },
+  "last_scaling_decision": {
+    "action": "create_node",
+    "size": "s-2vcpu-4gb",
+    "reason": "Load high across cluster",
+    "timestamp": "2025-12-04T19:57:37.726322+00:00"
+  },
+  "last_backend_decision": {
+    "action": "continue_normal_operation",
+    "reason": "Infra changes handled by brain/scaling",
+    "timestamp": "2025-12-04T19:57:37.727765+00:00"
+  },
+  "decision_history": [
+    {
+      "id": "hardware_brain_node_upgrade_1764878257",
+      "actor": "hardware_brain",
+      "type": "node_upgrade",
+      "completed_at": "2025-12-04T19:57:37.724445+00:00"
+    },
+    {
+      "id": "scaling_engine_scale_up_1764878257",
+      "actor": "scaling_engine",
+      "type": "scale_up",
+      "completed_at": "2025-12-04T19:57:37.726680+00:00"
+    }
+  ],
+  "locks_held": 2,
+  "race_conditions_prevented": 1,
+  "last_updated": "2025-12-04T19:57:37.727773+00:00"
+}

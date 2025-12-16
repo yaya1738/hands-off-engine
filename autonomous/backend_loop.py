@@ -2271,6 +2271,15 @@ def run_income_engine():
                 result = engine.draft_proposal(opp_id)
                 status["auto_drafted"] = not ("error" in result)
 
+                # INTEGRAFIX: Auto-send if bypass approved
+                if "proposal_id" in result:
+                    proposal_id = result["proposal_id"]
+                    bypass_result = engine.auto_send_proposal(proposal_id)
+                    status["bypass_check"] = bypass_result["status"]
+                    if bypass_result["status"] == "auto_sent":
+                        status["auto_sent"] = True
+                        status["bypass_reason"] = bypass_result.get("bypass_result", {}).get("reason", "")
+
         return {
             "success": True,
             "pipeline": status["pipeline"],
@@ -2278,7 +2287,52 @@ def run_income_engine():
             "next_action": next_action["action"],
             "next_priority": next_action["priority"],
             "next_instruction": next_action["instruction"],
-            "top_opportunities": len(status.get("top_opportunities", []))
+            "top_opportunities": len(status.get("top_opportunities", [])),
+            "auto_sent": status.get("auto_sent", False),
+            "bypass_check": status.get("bypass_check", "N/A")
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+
+def run_capital_monitor():
+    """
+    INTEGRAFIX: Capital Monitor - Auto-detect and inject capital
+
+    Monitors multiple capital sources:
+    1. payment_handler (auto-detect job payments)
+    2. crypto wallet deposits (on-chain)
+    3. manual entries (bank transfers)
+
+    Auto-injects to capital_bridge and triggers trading activation.
+    """
+    try:
+        import sys
+        sys.path.insert(0, str(PROJECT_ROOT))
+        from integrafix.capital_monitor import CapitalMonitor
+
+        monitor = CapitalMonitor()
+
+        # Check all sources
+        detected = monitor.check_all_sources()
+
+        # Inject any detected capital
+        injected = []
+        if detected:
+            injected = monitor.inject_detected(detected)
+
+        # Get status
+        status = monitor.get_status()
+
+        return {
+            "success": True,
+            "sources_checked": len(monitor.state["sources"]),
+            "detected": detected,
+            "injected_count": len(injected),
+            "total_injected": status["total_injected"],
+            "injection_count": status["injection_count"],
+            "capital_bridge_ready": status.get("capital_bridge", {}).get("ready", False)
         }
 
     except Exception as e:
@@ -2855,8 +2909,28 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  Capital Bridge: {capital_result.get('error', 'unknown')}")
 
+        # 9.55. Capital Monitor - Auto-detect and inject capital
+        log("[9.55/28] Running Capital Monitor (Auto-Inject)...")
+        capital_monitor_result = run_capital_monitor()
+        state["capital_monitor"] = capital_monitor_result
+        if capital_monitor_result.get("success"):
+            detected = capital_monitor_result.get("detected", {})
+            injected_count = capital_monitor_result.get("injected_count", 0)
+            total_injected = capital_monitor_result.get("total_injected", 0)
+            ready = capital_monitor_result.get("capital_bridge_ready", False)
+            ready_icon = "✓" if ready else "⏸"
+            log(f"  Detected: {len(detected)} sources | "
+                f"Injected: {injected_count} | "
+                f"Total: ${total_injected:.2f} | "
+                f"Bridge: {ready_icon}")
+            if detected:
+                for source, amount in detected.items():
+                    log(f"    {source}: ${amount:.2f}")
+        else:
+            log(f"  Capital Monitor: {capital_monitor_result.get('error', 'unknown')}")
+
         # 9.6. Income Engine - Active capital generation
-        log("[9.6/27] Running Income Engine (AI as Production Engine)...")
+        log("[9.6/28] Running Income Engine (AI as Production Engine)...")
         income_result = run_income_engine()
         state["income_engine"] = income_result
         if income_result.get("success"):
@@ -2871,6 +2945,11 @@ def run_loop(interval_sec: int = 300):
                 f"${stats.get('total_earned_usd', 0):.2f} earned")
             log(f"  NEXT [{income_result.get('next_priority', 'N/A')}]: "
                 f"{income_result.get('next_action', 'none')}")
+            # Show bypass status if proposal was drafted
+            if income_result.get("auto_sent"):
+                log(f"  🚀 AUTO-SENT: {income_result.get('bypass_check', 'N/A')}")
+            elif income_result.get("bypass_check") == "manual_review_required":
+                log(f"  ⏸ Manual review required")
         else:
             log(f"  Income Engine: {income_result.get('error', 'unknown')}")
 

@@ -1,0 +1,53 @@
+{
+  "timestamp": "2025-12-04T20:10:53.834717+00:00",
+  "orders": {
+    "total_orders": 6,
+    "buy_orders": 4,
+    "sell_orders": 2,
+    "total_exposure": 2218.7,
+    "buy_exposure": 2069.0,
+    "sell_exposure": 149.7,
+    "orders_by_price": {
+      "min": 0.001,
+      "max": 0.84,
+      "avg": 0.168,
+      "extreme_orders": 4
+    },
+    "fishing_strategy": {
+      "extreme_low": 4,
+      "extreme_high": 0,
+      "merge_arb": 0,
+      "thin_book": 0,
+      "normal": 0
+    }
+  },
+  "pnl": {
+    "resolved_pnl": 0,
+    "executor_pnl": 0.0,
+    "pm_live_pnl": 0.0,
+    "total_pnl": 0,
+    "wins": 0,
+    "losses": 0,
+    "win_rate": 0,
+    "total_bets": 0,
+    "avg_win": 0,
+    "avg_loss": 0
+  },
+  "strategies": {
+    "status": "No data yet (need fills)"
+  },
+  "capital": {
+    "total_capital": 2218.7,
+    "capital_deployed": 2218.7,
+    "capital_idle": 0,
+    "daily_trades": 0,
+    "roi_percent": 0.0,
+    "capital_turnover": "Fishing strategy (capital reusable)"
+  },
+  "timing": {
+    "wallet_sync": "51s ago",
+    "pm_live_update": "1h ago",
+    "executor_update": "21h ago",
+    "data_freshness": "Current"
+  }
+}

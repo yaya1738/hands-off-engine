@@ -1,0 +1,54 @@
+{
+  "pending_actions": [
+    {
+      "timestamp": "2025-12-04T05:21:50.050800+00:00",
+      "action": "BUY",
+      "side": "YES",
+      "market": "Fed rate hike in 2025?",
+      "price": 0.0065,
+      "size": 100,
+      "status": "PENDING",
+      "abcfc_approved": true
+    },
+    {
+      "timestamp": "2025-12-04T05:21:50.050853+00:00",
+      "action": "BUY",
+      "side": "YES",
+      "market": "US recession in 2025?",
+      "price": 0.025,
+      "size": 100,
+      "status": "PENDING",
+      "abcfc_approved": true
+    },
+    {
+      "timestamp": "2025-12-04T05:21:50.050859+00:00",
+      "action": "BUY",
+      "side": "YES",
+      "market": "Fed emergency rate cut in 2025?",
+      "price": 0.013,
+      "size": 100,
+      "status": "PENDING",
+      "abcfc_approved": true
+    },
+    {
+      "timestamp": "2025-12-04T05:21:50.050863+00:00",
+      "action": "BUY",
+      "side": "YES",
+      "market": "Tether insolvent in 2025?",
+      "price": 0.0075,
+      "size": 100,
+      "status": "PENDING",
+      "abcfc_approved": true
+    },
+    {
+      "timestamp": "2025-12-04T05:21:50.050867+00:00",
+      "action": "BUY",
+      "side": "YES",
+      "market": "USDT depeg in 2025?",
+      "price": 0.0025,
+      "size": 100,
+      "status": "PENDING",
+      "abcfc_approved": true
+    }
+  ]
+}

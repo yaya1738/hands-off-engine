@@ -1,0 +1,11 @@
+{
+  "active_sessions": [
+    "trading",
+    "dev"
+  ],
+  "last_trading_session": "2025-12-03T17:47:12.817253+00:00",
+  "last_dev_session": "2025-12-03T17:47:12.817465+00:00",
+  "github_sync_at": null,
+  "automations_last_run": null,
+  "updated_at": "2025-12-03T17:47:12.817471+00:00"
+}

@@ -1,0 +1,406 @@
+{
+  "timestamp": "2025-12-04T05:58:47.279876+00:00",
+  "status": "INTEGRAFIXED",
+  "gates_passed": [
+    "wisdom",
+    "probability",
+    "glitch",
+    "abcfc_pipeline",
+    "abcfc_bridge",
+    "nexus_final"
+  ],
+  "total_actions": 17,
+  "actions": [
+    {
+      "market": "Fed rate hike in 2025?",
+      "market_id": "0x4319532e181605cb15b1bd677759a3bc7f7394b2fdf145195b700eeaedfd5221",
+      "direction": "YES",
+      "price": 0.0065,
+      "edge": 0.5,
+      "volume": 947556.444353,
+      "liquidity": 61349.22238,
+      "abcfc_score": 27.32125,
+      "token_ids": [
+        "60487116984468020978247225474488676749601001829886755968952521846780452448915",
+        "81104637750588840860328515305303028259865221573278091453716127842023614249200"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.057901+00:00"
+    },
+    {
+      "market": "US recession in 2025?",
+      "market_id": "0xfa48a99317daef1654d5b03e30557c4222f276657275628d9475e141c64b545d",
+      "direction": "YES",
+      "price": 0.02,
+      "edge": 0.5,
+      "volume": 10541049.620917,
+      "liquidity": 94470.35547,
+      "abcfc_score": 26.95,
+      "token_ids": [
+        "104173557214744537570424345347209544585775842950109756851652855913015295701992",
+        "44528029102356085806317866371026691780796471200782980570839327755136990994869"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.127459+00:00"
+    },
+    {
+      "market": "Fed emergency rate cut in 2025?",
+      "market_id": "0xcddb4f52babca280f8e5fc4b9146f2520f0bfb88e134ff9ac8d52ea674185d79",
+      "direction": "YES",
+      "price": 0.013,
+      "edge": 0.5,
+      "volume": 1288840.863713,
+      "liquidity": 35114.30233,
+      "abcfc_score": 27.142500000000474,
+      "token_ids": [
+        "86651051340048717188016545368005905974650771288612142430184256026061526806964",
+        "75975189968532037196988790733987170931760654987961628737079930912099775045276"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.200182+00:00"
+    },
+    {
+      "market": "Tether insolvent in 2025?",
+      "market_id": "0x1bbdc459d73e6972f5ba1f687d739fde70a9774f4875611699fb00a9eb28f090",
+      "direction": "YES",
+      "price": 0.0075,
+      "edge": 0.5,
+      "volume": 437431.687273,
+      "liquidity": 39150.83607,
+      "abcfc_score": 27.29375,
+      "token_ids": [
+        "22999731098119206643487263219621291731133602508852896696306511964985382013346",
+        "106084157476430127474305779279927384795500511917821868577175586516676591227184"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.271579+00:00"
+    },
+    {
+      "market": "USDT depeg in 2025?",
+      "market_id": "0x416316490efec1038ce09ec0184f82f1f7921876ee0594a30c783635ea6983d0",
+      "direction": "YES",
+      "price": 0.003,
+      "edge": 0.5,
+      "volume": 1429122.136446,
+      "liquidity": 159530.39608,
+      "abcfc_score": 27.417500000000473,
+      "token_ids": [
+        "27041836805134371913740407263212214733159750380813540071930429439405154056312",
+        "23920013258819752881197525832650639378445397094039587501841819155943480602942"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.343097+00:00"
+    },
+    {
+      "market": "Ukraine joins NATO in 2025?",
+      "market_id": "0x9bacdaac65cbe257e96e58daf343c56879ea9003bdaed7cdb8cfcd1a82121d3a",
+      "direction": "YES",
+      "price": 0.0035,
+      "edge": 0.5,
+      "volume": 209987.037417,
+      "liquidity": 28254.3643,
+      "abcfc_score": 27.40375000000022,
+      "token_ids": [
+        "5802460671946751538636185453975614627729230853286731735057811449821051691611",
+        "104795148936930645520469554178353538587130154145659561962269514319642274480768"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.410284+00:00"
+    },
+    {
+      "market": "Khamenei out as Supreme Leader of Iran in 2025?",
+      "market_id": "0x1b6f76e5b8587ee896c35847e12d11e75290a8c3934c5952e8a9d6e4c6f03cfa",
+      "direction": "YES",
+      "price": 0.0255,
+      "edge": 0.5,
+      "volume": 9819729.059534,
+      "liquidity": 75960.11309,
+      "abcfc_score": 26.798750000000474,
+      "token_ids": [
+        "75505728818237076147318796536066812362152358606307154083407489467059230821371",
+        "67369669271127885658944531351746308398542291270457462650056001798232262328240"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.479709+00:00"
+    },
+    {
+      "market": "Russia x Ukraine ceasefire in 2025?",
+      "market_id": "0x8ee2f1640386310eb5e7ffa596ba9335f2d324e303d21b0dfea6998874445791",
+      "direction": "YES",
+      "price": 0.045,
+      "edge": 0.5,
+      "volume": 49225305.851342,
+      "liquidity": 1081149.1071,
+      "abcfc_score": 26.2625,
+      "token_ids": [
+        "15974786252393396629980467963784550802583781222733347534844974829144359265969",
+        "42351579455604873042957090441032286075880144797259231030267680078160718556927"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.550137+00:00"
+    },
+    {
+      "market": "Putin out as President of Russia in 2025?",
+      "market_id": "0x324d699420ad881471d0fd29acc86e664e397bd6461b3fa440dcd3efc514ac79",
+      "direction": "YES",
+      "price": 0.014,
+      "edge": 0.5,
+      "volume": 1801280.938934,
+      "liquidity": 36929.30522,
+      "abcfc_score": 27.115,
+      "token_ids": [
+        "17194352395514663527290362639703875985320281242609142069125752934895379462929",
+        "13310920295352519429188380245880301405446543407852746139009983343885307875580"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.622531+00:00"
+    },
+    {
+      "market": "Netanyahu out by 2025?",
+      "market_id": "0x641c8b680947405e097da700c54f344556bb59e2093acdf1576c1c68e795bddf",
+      "direction": "YES",
+      "price": 0.0175,
+      "edge": 0.5,
+      "volume": 813092.708297,
+      "liquidity": 28432.14471,
+      "abcfc_score": 27.01875,
+      "token_ids": [
+        "82262334590322112030479175248768626867077550633396243763664995176806543239207",
+        "45722115916732810898219488036693645243339896695711013827089932274679164666342"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.716753+00:00"
+    },
+    {
+      "market": "Will 4 Fed rate cuts happen in 2025?",
+      "market_id": "0xc2846f35e85eb09a094edbd4e93e345d3c682dc0436615adc27122222fccbd81",
+      "direction": "YES",
+      "price": 0.0065,
+      "edge": 0.5,
+      "volume": 2949465.983655,
+      "liquidity": 139152.7031,
+      "abcfc_score": 27.32125,
+      "token_ids": [
+        "89004595068776945908481855030043950109477136860300352348370395226706216458498",
+        "66497712136360061394637670796773281770486705493678163278744913561923724550407"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.798795+00:00"
+    },
+    {
+      "market": "Will 5 Fed rate cuts happen in 2025?",
+      "market_id": "0x6ee22365b6602d928aa7136f549cc0d718bb16b044a6d15191041b84b5f1f43d",
+      "direction": "YES",
+      "price": 0.0005,
+      "edge": 0.5,
+      "volume": 2226541.586375,
+      "liquidity": 300300.77847,
+      "abcfc_score": 27.486250000000474,
+      "token_ids": [
+        "302273160494790559492931429044277112497487176914839291053945756072421867571",
+        "71168072025438256100937333610884784661496543167790290367141049156834121296266"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.873299+00:00"
+    },
+    {
+      "market": "Will 8+ Fed rate cuts happen in 2025?",
+      "market_id": "0x12b6268efb832fe64bb746b9f50a51245b761d6b170e172b3cd81a7c4f39432b",
+      "direction": "YES",
+      "price": 0.0005,
+      "edge": 0.5,
+      "volume": 2418146.305117,
+      "liquidity": 189378.73837,
+      "abcfc_score": 27.486250000000474,
+      "token_ids": [
+        "61673387045681238454585997121170806826401631642653090831500827557099057497566",
+        "75673530794317709253317435585138828689432689207295322743064114581203964183879"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:46.943470+00:00"
+    },
+    {
+      "market": "Will 7 Fed rate cuts happen in 2025?",
+      "market_id": "0xf4d03ce9ce65ea06654f23e26dead828005511d65bb650cd5a9dc77891406d12",
+      "direction": "YES",
+      "price": 0.0005,
+      "edge": 0.5,
+      "volume": 3309057.80764,
+      "liquidity": 260208.39725,
+      "abcfc_score": 27.486250000000474,
+      "token_ids": [
+        "106637218023173886895550072700357013102189022015797096007920322441434274793343",
+        "79328870430805014620288089322067795525620481132773427804769291919755554601870"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:47.014565+00:00"
+    },
+    {
+      "market": "Will 6 Fed rate cuts happen in 2025?",
+      "market_id": "0x37100ed3560699c48d90a027e65da10a04e395785b598289163e3bbfdaca99e6",
+      "direction": "YES",
+      "price": 0.0005,
+      "edge": 0.5,
+      "volume": 2608864.167032,
+      "liquidity": 361771.4249,
+      "abcfc_score": 27.486250000000474,
+      "token_ids": [
+        "35428628589990747181456921610814206632405028717182760412162159083085892664954",
+        "33673334616268013961585301204311121178127515047580027207826322300546567181423"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:47.104400+00:00"
+    },
+    {
+      "market": "Will SpaceX have 200 or more launches in 2025?",
+      "market_id": "0xc4e2af103f1f6e153cb07f9977b3cbdb5f04bb856a69036bbe8bd3921d2bfb00",
+      "direction": "YES",
+      "price": 0.005,
+      "edge": 0.5,
+      "volume": 156689.033392,
+      "liquidity": 28533.77915,
+      "abcfc_score": 27.3625,
+      "token_ids": [
+        "38063503183705122532872124861335482304302428705511103180903835309939984819049",
+        "109732097296274938096182423749888761687849274537978276274505831591869560180531"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:47.195987+00:00"
+    },
+    {
+      "market": "Will Microsoft be the largest company in the world",
+      "market_id": "0x5a542fe246448e58671948b2f28bb746d7694172ad3c57b28d5cf86126834cf0",
+      "direction": "YES",
+      "price": 0.0035,
+      "edge": 0.5,
+      "volume": 1706042.211328,
+      "liquidity": 145504.01967,
+      "abcfc_score": 27.40375000000022,
+      "token_ids": [
+        "51657657151055530627321198005838882818455292318658915621742481565942363716363",
+        "11283302747327789018087926846254253631780904936940686956275996205259552151441"
+      ],
+      "integrafix_gates": {
+        "wisdom": true,
+        "probability": true,
+        "glitch": true,
+        "abcfc_pipeline": true,
+        "abcfc_bridge": true,
+        "nexus_final": true
+      },
+      "timestamp": "2025-12-04T05:58:47.279706+00:00"
+    }
+  ]
+}

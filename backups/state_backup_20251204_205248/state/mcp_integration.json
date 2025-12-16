@@ -1,0 +1,37 @@
+{
+  "initialized": "2025-12-04T20:47:28.906539+00:00",
+  "servers": {
+    "github": {
+      "name": "GitHub MCP",
+      "transport": "stdio",
+      "endpoint": "@modelcontextprotocol/server-github",
+      "enabled": true,
+      "tools": [
+        "search_repositories",
+        "create_issue",
+        "list_commits"
+      ]
+    },
+    "filesystem": {
+      "name": "Filesystem MCP",
+      "transport": "stdio",
+      "endpoint": "@modelcontextprotocol/server-filesystem",
+      "enabled": true,
+      "tools": [
+        "read_file",
+        "list_directory"
+      ]
+    },
+    "playwright": {
+      "name": "Playwright MCP",
+      "transport": "stdio",
+      "endpoint": "@playwright/mcp",
+      "enabled": true,
+      "tools": [
+        "browser_navigate",
+        "browser_snapshot",
+        "browser_click"
+      ]
+    }
+  }
+}

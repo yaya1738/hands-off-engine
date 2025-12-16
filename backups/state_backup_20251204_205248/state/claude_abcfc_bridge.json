@@ -1,0 +1,61 @@
+{
+  "created_at": "2025-12-03T23:07:14.417068+00:00",
+  "total_sessions": 7,
+  "total_value_generated": 14.0,
+  "total_integrafix_fixes": 4,
+  "session_history": [
+    {
+      "session_id": "test_integration",
+      "started_at": "2025-12-03T23:07:14.417371+00:00",
+      "ended_at": "2025-12-03T23:07:14.417769+00:00",
+      "actions": 1,
+      "integrafix_fixes": 1,
+      "value": 2.5,
+      "summary": "Integration test"
+    },
+    {
+      "session_id": "claude_abcfc_integration",
+      "started_at": "2025-12-03T23:17:24.758453+00:00",
+      "ended_at": "2025-12-03T23:17:24.759094+00:00",
+      "actions": 5,
+      "integrafix_fixes": 1,
+      "value": 4.5,
+      "summary": "INTEGRAFIX: Wired Claude CLI \u2194 ABCFC ecosystem beyachad"
+    },
+    {
+      "session_id": "claude_20251203_233245",
+      "started_at": "2025-12-03T23:32:45.359538+00:00",
+      "ended_at": "2025-12-03T23:32:45.359944+00:00",
+      "actions": 1,
+      "integrafix_fixes": 1,
+      "value": 2.5,
+      "summary": "INTEGRAFIX: Complete system integration achieved"
+    },
+    {
+      "session_id": "integration_test",
+      "started_at": "2025-12-03T23:38:27.878945+00:00",
+      "ended_at": "2025-12-03T23:38:27.993195+00:00",
+      "actions": 2,
+      "integrafix_fixes": 0,
+      "value": 1.0,
+      "summary": "Integration test: 1 failures"
+    },
+    {
+      "session_id": "abcfc_full_integration",
+      "started_at": "2025-12-04T00:43:15.844721+00:00",
+      "ended_at": "2025-12-04T00:43:15.845898+00:00",
+      "actions": 3,
+      "integrafix_fixes": 1,
+      "value": 3.5,
+      "summary": "INTEGRAFIX: Claude bridge now uses intelligent P(x,t) density"
+    }
+  ],
+  "abcfc_hierarchy": {
+    "name": "Claude Sessions",
+    "best": 100.0,
+    "worst": -20.0,
+    "expected": 10.0,
+    "children": []
+  },
+  "last_updated": "2025-12-04T00:43:15.845905+00:00"
+}

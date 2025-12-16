@@ -1,0 +1,54 @@
+{
+  "session": "claude_abcfc_deep_integration",
+  "timestamp": "2025-12-04T03:00:00.000000+00:00",
+  "status": "COMPLETED",
+  "completed": [
+    "Bridge uses real ABCFC scoring formula",
+    "evaluate_trading_decision() with nexus cloud",
+    "evaluate_binary_market() with P(x,t) density",
+    "State persistence for trading decisions",
+    "100% integrafixation on bridge task",
+    "evaluate_with_density_constraints() - proper P(ruin) queries",
+    "calculate_acceptable_ruin_probability() - hierarchy-derived thresholds",
+    "evaluate_claude_action() - Claude session scoring",
+    "Wired unified state into nexus cloud",
+    "Wired trade_executor to ABCFC",
+    "Wired concrete_executor ABCFC validation",
+    "Fixed buy probability bias in abcfc_system.py",
+    "Buy actions now use actual edge/probability instead of hardcoded 50%",
+    "HIGHER: Live trading ABCFC gate (backend_loop.py)",
+    "HIGHER: Fallback execution ABCFC gate",
+    "HIGHER: Outcome -> hierarchy sync (_update_hierarchy_with_outcome)",
+    "HIGHER: Signal generation ABCFC validation",
+    "HIGHER: Nexus enforcement before execution"
+  ],
+  "insights": [
+    "Bounds encode risk tolerance, not separate coefficient",
+    "Query P(x < threshold) directly from density",
+    "Be precise about what x is in each ABCFC",
+    "Price is an ABCFC (order flow density), not scalar",
+    "Theoretical stack vs implementation stack distinction",
+    "LLM thinking drifts to fake precision - ABCFC requires real grounding",
+    "Hardcoded assumptions (50% prob) break edge-based decision making - always pass actual edge through params",
+    "Higher-level integrafix = wire ABCFC at every decision boundary, not just computation"
+  ],
+  "integrafix_stats": {
+    "gaps_fixed": 26,
+    "wires_created": 20
+  },
+  "key_files_wired": [
+    "backend_loop.py",
+    "concrete_executor.py",
+    "trade_executor.py",
+    "market_data_pipeline.py",
+    "trading_pipeline.py",
+    "abcfc_system.py",
+    "polymarket_live.py"
+  ],
+  "open_for_next_session": [
+    "Precise ABCFC definitions for implementation stack",
+    "ABCFC time itself - what does it mean?",
+    "Position aggregation implementation",
+    "ABCFC \u2192 trade execution math from Yair"
+  ]
+}

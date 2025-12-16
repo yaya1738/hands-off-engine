@@ -1,0 +1,27 @@
+{
+  "timestamp": "2025-12-04T20:52:38.185729",
+  "master": "Yair Siegel",
+  "total_vcpus": 68,
+  "total_ram_gb": 136.0,
+  "total_disk_gb": 2720,
+  "healthy_nodes": 9,
+  "total_nodes": 9,
+  "target_vcpus": 26,
+  "target_ram_gb": 52.800000000000004,
+  "scaling_progress_pct": 259.6,
+  "daily_growth_rate": 1.1,
+  "evolution_generation": 1,
+  "balance_usd": 8.99,
+  "monthly_infra_cost": 944.0,
+  "trading_enabled": false,
+  "hardware_health_score": 100.0,
+  "system_health_score": 80.0,
+  "active_alerts": [],
+  "components_running": {
+    "hardware_brain": true,
+    "scaling_engine": true,
+    "self_healer": true,
+    "state_sync": false,
+    "infra_monitor": false
+  }
+}

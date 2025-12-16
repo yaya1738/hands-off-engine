@@ -1,0 +1,25 @@
+{
+  "migration_started": "2025-12-01T16:31:12.982480",
+  "current_provider": "openai",
+  "target_providers": [
+    "groq",
+    "google_ai"
+  ],
+  "monthly_cost_before": 250,
+  "monthly_cost_after": 0,
+  "monthly_savings": 250,
+  "providers_tested": {
+    "groq": {
+      "status": "needs_setup",
+      "timestamp": "2025-12-01T16:31:12.982532"
+    },
+    "google_ai": {
+      "status": "needs_setup",
+      "timestamp": "2025-12-01T16:31:12.982552"
+    }
+  },
+  "providers_enabled": {},
+  "callsites_migrated": 0,
+  "total_callsites": 0,
+  "migration_status": "blocked_needs_api_keys"
+}

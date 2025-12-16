@@ -1,0 +1,85 @@
+{
+  "master": "Yair Siegel",
+  "initialized": "2025-12-04T20:47:31.589196+00:00",
+  "last_updated": "2025-12-04T20:47:35.340928+00:00",
+  "roi": {
+    "total_cost": 478.5,
+    "total_value": 1729.05,
+    "roi_multiplier": 3.6134796238244515,
+    "cost_per_day": 15.95,
+    "value_per_day": 57.635,
+    "runway_days": 15.662100456621005
+  },
+  "balances": {
+    "digitalocean": {
+      "provider": "digitalocean",
+      "total_credits": 500,
+      "used_credits": 328.5,
+      "remaining_credits": 171.5,
+      "utilization_pct": 65.7,
+      "status": "CreditStatus.CAUTION",
+      "days_remaining": 15.662100456621005,
+      "monthly_cost": 328.5,
+      "monthly_value": 1084.05,
+      "roi": 3.3,
+      "last_updated": "2025-12-04T20:47:35.340827+00:00"
+    },
+    "anthropic": {
+      "provider": "anthropic",
+      "total_credits": 1000,
+      "used_credits": 100,
+      "remaining_credits": 900,
+      "utilization_pct": 10,
+      "status": "CreditStatus.HEALTHY",
+      "days_remaining": 270,
+      "monthly_cost": 100,
+      "monthly_value": 330,
+      "roi": 3.3,
+      "last_updated": "2025-12-04T20:47:35.340867+00:00"
+    },
+    "openai": {
+      "provider": "openai",
+      "total_credits": 200,
+      "used_credits": 50,
+      "remaining_credits": 150,
+      "utilization_pct": 25,
+      "status": "CreditStatus.HEALTHY",
+      "days_remaining": 90,
+      "monthly_cost": 50,
+      "monthly_value": 165,
+      "roi": 3.3,
+      "last_updated": "2025-12-04T20:47:35.340877+00:00"
+    },
+    "groq": {
+      "provider": "groq",
+      "total_credits": Infinity,
+      "used_credits": 0,
+      "remaining_credits": Infinity,
+      "utilization_pct": 0,
+      "status": "CreditStatus.HEALTHY",
+      "days_remaining": Infinity,
+      "monthly_cost": 0,
+      "monthly_value": 100,
+      "roi": Infinity,
+      "last_updated": "2025-12-04T20:47:35.340889+00:00"
+    },
+    "google": {
+      "provider": "google",
+      "total_credits": Infinity,
+      "used_credits": 0,
+      "remaining_credits": Infinity,
+      "utilization_pct": 0,
+      "status": "CreditStatus.HEALTHY",
+      "days_remaining": Infinity,
+      "monthly_cost": 0,
+      "monthly_value": 50,
+      "roi": Infinity,
+      "last_updated": "2025-12-04T20:47:35.340897+00:00"
+    }
+  },
+  "monthly_summary": {
+    "cost": 478.5,
+    "value": 1729.05,
+    "roi": 3.6134796238244515
+  }
+}

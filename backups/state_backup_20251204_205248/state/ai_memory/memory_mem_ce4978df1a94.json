@@ -1,0 +1,17 @@
+{
+  "id": "mem_ce4978df1a94",
+  "memory_type": "context",
+  "priority": 4,
+  "content": "Session ended.\nOutcomes: ['Integration: 82.2% \u2192 82.2%', 'Errors: 0']\nNext: []",
+  "context": "",
+  "tags": [
+    "session_end"
+  ],
+  "created_at": "2025-12-03T15:52:05.109091+00:00",
+  "session_id": "session_20251203_155205",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

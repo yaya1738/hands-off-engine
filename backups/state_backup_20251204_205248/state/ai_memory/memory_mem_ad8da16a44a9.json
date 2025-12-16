@@ -1,0 +1,19 @@
+{
+  "id": "mem_ad8da16a44a9",
+  "memory_type": "success",
+  "priority": 3,
+  "content": "WIN: NO on '0xd1a5513fa75fd1d158f430161adf2e3df88511' | P&L: $+1.88 | Edge: 3.0%",
+  "context": "Trade win: Edge predicted: 3.0%",
+  "tags": [
+    "trading",
+    "win",
+    "no"
+  ],
+  "created_at": "2025-12-04T07:33:11.579497+00:00",
+  "session_id": "session_20251204_062856",
+  "relevance_score": 1.0,
+  "access_count": 0,
+  "last_accessed": null,
+  "compressed": false,
+  "compressed_content": null
+}

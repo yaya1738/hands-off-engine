@@ -1,0 +1,58 @@
+{
+  "discovered": "2025-12-03T16:00:00Z",
+  "murdered_by": "CLI loop kills",
+  "status": "RECOVERABLE",
+
+  "winning_strategy": {
+    "name": "Low-Price YES on Named Markets",
+    "description": "Buy YES on low-probability events via gamma-api slugs",
+    "entry_criteria": {
+      "source": "https://gamma-api.polymarket.com/markets",
+      "use_slugs": true,
+      "avoid_condition_ids": true,
+      "yes_price_max": 0.10,
+      "min_volume": 10000
+    },
+    "expected_outcome": "Most resolve NO (lose small), occasional YES (win 99%+)",
+    "net_result": "Highly profitable due to asymmetric payoffs"
+  },
+
+  "key_trades": [
+    {
+      "market": "will-5-fed-rate-cuts-happen-in-2025",
+      "entry_price": 0.0015,
+      "pnl_pct": 99.85,
+      "result": "WIN"
+    },
+    {
+      "market": "will-spacex-have-200-or-more-launches-in-2025",
+      "entry_price": 0.006,
+      "pnl_pct": 99.4,
+      "result": "WIN"
+    }
+  ],
+
+  "flow_rates_at_golden": {
+    "cost_per_sec": 0.00875,
+    "profit_per_sec": 2.08,
+    "net_per_sec": 2.07,
+    "emergent_monthly": 5000000
+  },
+
+  "code_path": {
+    "working": "integrafix/recursive_engine.py:run_trading_pipeline()",
+    "uses": "gamma-api slugs",
+    "broken_fallback": "abcfc_live_nexus.py condition_ids",
+    "broken_result": "50/50 coin flip hex markets"
+  },
+
+  "restoration": {
+    "ensure_gamma_api": true,
+    "use_slugs_only": true,
+    "filter_low_price_yes": true,
+    "avoid_condition_id_markets": true,
+    "dont_kill_working_loops": true
+  },
+
+  "lesson": "System was FINE. CLI intervention killed it. Leave working things alone."
+}

@@ -1,0 +1,248 @@
+{
+  "created_at": "2025-12-04T20:24:00.926465+00:00",
+  "total_bounties_found": 62,
+  "total_bounties_completed": 0,
+  "total_earned": 550.0,
+  "success_rate": 1.0,
+  "active_bounties": [
+    {
+      "id": "Chakra-Network/dojo-spas-2",
+      "repo": "Chakra-Network/dojo-spas",
+      "issue_number": 2,
+      "title": "Bounty: Quickbooks SPA",
+      "description": "# Bounty: QuickBooks Single-Page Application\n\n- **Reward:** $2,000 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nBuild a modular accounting SPA that emulates QuickBooks-style bookkeeping so reinforcement-learning agents can rehearse finance workflows without touching live ledgers.\n\n## Minimal Functionality\n- **Financial dashboard:** surface cash flow, profit & loss, and outstanding invoices using shared state fed through `useDojoState`",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "javascript",
+        "go",
+        "react",
+        "typescript"
+      ],
+      "url": "https://github.com/Chakra-Network/dojo-spas/issues/2",
+      "created_at": "2025-10-23T21:51:09Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    },
+    {
+      "id": "tenstorrent/tt-mlir-4349",
+      "repo": "tenstorrent/tt-mlir",
+      "issue_number": 4349,
+      "title": "[Bounty $2000] Tune a model - VoVNet",
+      "description": "_This is a technical bounty suitable for developers with experience in ML model optimization, C++, and performance engineering. Knowledge of neural network architectures and low-level optimization techniques is highly beneficial._\n\n## Goal\n\nYour mission, should you choose to accept it, is to optimize VoVNet model to achieve **~1400 FPS** throughput using our TT-NN C++ library. \n\n**Starting Point**: Use our existing toolchain to bootstrap your optimization:\n- Leverage our `tt-mlir` compiler throu",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "python",
+        "javascript",
+        "go",
+        "typescript"
+      ],
+      "url": "https://github.com/tenstorrent/tt-mlir/issues/4349",
+      "created_at": "2025-08-05T09:32:51Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    },
+    {
+      "id": "Chakra-Network/dojo-spas-4",
+      "repo": "Chakra-Network/dojo-spas",
+      "issue_number": 4,
+      "title": "Bounty: HubSpot SPA",
+      "description": "# Bounty: HubSpot Marketing SPA\n\n- **Reward:** $1,500 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nCreate a HubSpot-inspired marketing automation SPA so reinforcement-learning agents can orchestrate campaigns, manage contacts, and interpret analytics in a controlled environment.\n\n## Minimal Functionality\n- **Marketing overview:** dashboard summarizing campaign performance, lead funnel, and email engagement metrics seeded through `useD",
+      "amount": 1500.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "javascript",
+        "go",
+        "react",
+        "typescript"
+      ],
+      "url": "https://github.com/Chakra-Network/dojo-spas/issues/4",
+      "created_at": "2025-10-23T21:53:23Z",
+      "feasibility_score": 0.9500000000000001,
+      "status": "discovered",
+      "notes": "ABCFC Score: 1423.00"
+    },
+    {
+      "id": "Chakra-Network/dojo-spas-2",
+      "repo": "Chakra-Network/dojo-spas",
+      "issue_number": 2,
+      "title": "Bounty: Quickbooks SPA",
+      "description": "# Bounty: QuickBooks Single-Page Application\n\n- **Reward:** $2,000 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nBuild a modular accounting SPA that emulates QuickBooks-style bookkeeping so reinforcement-learning agents can rehearse finance workflows without touching live ledgers.\n\n## Minimal Functionality\n- **Financial dashboard:** surface cash flow, profit & loss, and outstanding invoices using shared state fed through `useDojoState`",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "javascript",
+        "go",
+        "react",
+        "typescript"
+      ],
+      "url": "https://github.com/Chakra-Network/dojo-spas/issues/2",
+      "created_at": "2025-10-23T21:51:09Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    },
+    {
+      "id": "tenstorrent/tt-mlir-4349",
+      "repo": "tenstorrent/tt-mlir",
+      "issue_number": 4349,
+      "title": "[Bounty $2000] Tune a model - VoVNet",
+      "description": "_This is a technical bounty suitable for developers with experience in ML model optimization, C++, and performance engineering. Knowledge of neural network architectures and low-level optimization techniques is highly beneficial._\n\n## Goal\n\nYour mission, should you choose to accept it, is to optimize VoVNet model to achieve **~1400 FPS** throughput using our TT-NN C++ library. \n\n**Starting Point**: Use our existing toolchain to bootstrap your optimization:\n- Leverage our `tt-mlir` compiler throu",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "python",
+        "javascript",
+        "go",
+        "typescript"
+      ],
+      "url": "https://github.com/tenstorrent/tt-mlir/issues/4349",
+      "created_at": "2025-08-05T09:32:51Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    },
+    {
+      "id": "Chakra-Network/dojo-spas-4",
+      "repo": "Chakra-Network/dojo-spas",
+      "issue_number": 4,
+      "title": "Bounty: HubSpot SPA",
+      "description": "# Bounty: HubSpot Marketing SPA\n\n- **Reward:** $1,500 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nCreate a HubSpot-inspired marketing automation SPA so reinforcement-learning agents can orchestrate campaigns, manage contacts, and interpret analytics in a controlled environment.\n\n## Minimal Functionality\n- **Marketing overview:** dashboard summarizing campaign performance, lead funnel, and email engagement metrics seeded through `useD",
+      "amount": 1500.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "javascript",
+        "go",
+        "react",
+        "typescript"
+      ],
+      "url": "https://github.com/Chakra-Network/dojo-spas/issues/4",
+      "created_at": "2025-10-23T21:53:23Z",
+      "feasibility_score": 0.9500000000000001,
+      "status": "discovered",
+      "notes": "ABCFC Score: 1423.00"
+    },
+    {
+      "id": "tenstorrent/tt-forge-52",
+      "repo": "tenstorrent/tt-forge",
+      "issue_number": 52,
+      "title": "[$3000 BOUNTY] Add a Tensor parallel JAX Qwen2.5-7B Model to TT-xla Model Demos",
+      "description": "### **\\[$3000 BOUNTY\\] Add a JAX Qwen2.5-7B Model to TT-xla Model Demos**\n\n**Background:**  \nTT-Forge is a growing collection of model demos showcasing the capabilities of AI models running on Tenstorrent hardware. This bounty aims to bring up the **tensor parallelized** (not data parallelized) implementation of the **Qwen2.5-7B** model using the **JAX framework**. This is an opportunity for AI developers to contribute to cutting-edge research and earn rewards.\n\n**Requirements:**\n\n* **Tensor Par",
+      "amount": 3000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "python",
+        "javascript",
+        "typescript"
+      ],
+      "url": "https://github.com/tenstorrent/tt-forge/issues/52",
+      "created_at": "2025-02-28T15:34:01Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 3000.00"
+    },
+    {
+      "id": "Chakra-Network/dojo-spas-2",
+      "repo": "Chakra-Network/dojo-spas",
+      "issue_number": 2,
+      "title": "Bounty: Quickbooks SPA",
+      "description": "# Bounty: QuickBooks Single-Page Application\n\n- **Reward:** $2,000 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nBuild a modular accounting SPA that emulates QuickBooks-style bookkeeping so reinforcement-learning agents can rehearse finance workflows without touching live ledgers.\n\n## Minimal Functionality\n- **Financial dashboard:** surface cash flow, profit & loss, and outstanding invoices using shared state fed through `useDojoState`",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "javascript",
+        "go",
+        "react",
+        "typescript"
+      ],
+      "url": "https://github.com/Chakra-Network/dojo-spas/issues/2",
+      "created_at": "2025-10-23T21:51:09Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    },
+    {
+      "id": "tenstorrent/tt-mlir-4349",
+      "repo": "tenstorrent/tt-mlir",
+      "issue_number": 4349,
+      "title": "[Bounty $2000] Tune a model - VoVNet",
+      "description": "_This is a technical bounty suitable for developers with experience in ML model optimization, C++, and performance engineering. Knowledge of neural network architectures and low-level optimization techniques is highly beneficial._\n\n## Goal\n\nYour mission, should you choose to accept it, is to optimize VoVNet model to achieve **~1400 FPS** throughput using our TT-NN C++ library. \n\n**Starting Point**: Use our existing toolchain to bootstrap your optimization:\n- Leverage our `tt-mlir` compiler throu",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "python",
+        "javascript",
+        "go",
+        "typescript"
+      ],
+      "url": "https://github.com/tenstorrent/tt-mlir/issues/4349",
+      "created_at": "2025-08-05T09:32:51Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    },
+    {
+      "id": "tenstorrent/tt-forge-52",
+      "repo": "tenstorrent/tt-forge",
+      "issue_number": 52,
+      "title": "[$3000 BOUNTY] Add a Tensor parallel JAX Qwen2.5-7B Model to TT-xla Model Demos",
+      "description": "### **\\[$3000 BOUNTY\\] Add a JAX Qwen2.5-7B Model to TT-xla Model Demos**\n\n**Background:**  \nTT-Forge is a growing collection of model demos showcasing the capabilities of AI models running on Tenstorrent hardware. This bounty aims to bring up the **tensor parallelized** (not data parallelized) implementation of the **Qwen2.5-7B** model using the **JAX framework**. This is an opportunity for AI developers to contribute to cutting-edge research and earn rewards.\n\n**Requirements:**\n\n* **Tensor Par",
+      "amount": 3000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "python",
+        "javascript",
+        "typescript"
+      ],
+      "url": "https://github.com/tenstorrent/tt-forge/issues/52",
+      "created_at": "2025-02-28T15:34:01Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 3000.00"
+    },
+    {
+      "id": "Chakra-Network/dojo-spas-2",
+      "repo": "Chakra-Network/dojo-spas",
+      "issue_number": 2,
+      "title": "Bounty: Quickbooks SPA",
+      "description": "# Bounty: QuickBooks Single-Page Application\n\n- **Reward:** $2,000 (USD) paid after merge\n- **Status:** Open \u2013 comment in the GitHub issue to claim before you start\n\n## Goal\nBuild a modular accounting SPA that emulates QuickBooks-style bookkeeping so reinforcement-learning agents can rehearse finance workflows without touching live ledgers.\n\n## Minimal Functionality\n- **Financial dashboard:** surface cash flow, profit & loss, and outstanding invoices using shared state fed through `useDojoState`",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "javascript",
+        "go",
+        "react",
+        "typescript"
+      ],
+      "url": "https://github.com/Chakra-Network/dojo-spas/issues/2",
+      "created_at": "2025-10-23T21:51:09Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    },
+    {
+      "id": "tenstorrent/tt-mlir-4349",
+      "repo": "tenstorrent/tt-mlir",
+      "issue_number": 4349,
+      "title": "[Bounty $2000] Tune a model - VoVNet",
+      "description": "_This is a technical bounty suitable for developers with experience in ML model optimization, C++, and performance engineering. Knowledge of neural network architectures and low-level optimization techniques is highly beneficial._\n\n## Goal\n\nYour mission, should you choose to accept it, is to optimize VoVNet model to achieve **~1400 FPS** throughput using our TT-NN C++ library. \n\n**Starting Point**: Use our existing toolchain to bootstrap your optimization:\n- Leverage our `tt-mlir` compiler throu",
+      "amount": 2000.0,
+      "difficulty": "easy",
+      "tech_stack": [
+        "python",
+        "javascript",
+        "go",
+        "typescript"
+      ],
+      "url": "https://github.com/tenstorrent/tt-mlir/issues/4349",
+      "created_at": "2025-08-05T09:32:51Z",
+      "feasibility_score": 1.0,
+      "status": "discovered",
+      "notes": "ABCFC Score: 2000.00"
+    }
+  ],
+  "last_updated": "2025-12-04T20:52:26.223489+00:00"
+}

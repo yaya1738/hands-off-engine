@@ -1,0 +1,188 @@
+{
+  "created_at": "2025-12-03T23:01:14.630376+00:00",
+  "master": "Yair Siegel",
+  "total_files": 37,
+  "total_lines": 52528,
+  "categories": {
+    "computing": [
+      "KNOWLEDGE",
+      "KNOWLEDGE_ADVANCED"
+    ],
+    "business": [
+      "KNOWLEDGE",
+      "KNOWLEDGE_ADVANCED"
+    ],
+    "money": [
+      "KNOWLEDGE",
+      "KNOWLEDGE_ADVANCED"
+    ],
+    "docs": [
+      "DEVELOPMENT_STANDARDS",
+      "BATCH_20_COMPLETE_OUTPUT",
+      "BATCH_22_IMPLEMENTATION_LOG",
+      "SPARK_PLUG_PART3_USER_CONNECTOR_v0.1",
+      "BATCH_21_COMPLETE_TRANSCRIPT",
+      "BATCH_23_STATUS_REPORT",
+      "SPARK_PLUG_v0.5_PER_KERNEL_HISTORY_POLICY",
+      "SPARK_PLUG_ARCHITECTURE_v0.1",
+      "BATCH_20_STATUS_REPORT",
+      "BATCH_21_STATUS_REPORT",
+      "BATCH_22_STATUS_REPORT",
+      "BATCH_19_IMPLEMENTATION_SESSION",
+      "BATCH_22_SESSION_TRANSCRIPT",
+      "BATCH_11_STATUS_REPORT",
+      "SPARK_PLUG_v0.4_AI_RUNNER_INTEGRATION",
+      "BATCH_19_FULL_IMPLEMENTATION_OUTPUT",
+      "BATCH_18_STATUS_REPORT",
+      "BATCH_19_STATUS_REPORT"
+    ],
+    "root": [
+      "SUCCESS_ADVANCED",
+      "SUCCESS",
+      "KNOWLEDGE_ADVANCED",
+      "KNOWLEDGE",
+      "BATCH_15_STATUS_REPORT"
+    ],
+    "uma": [
+      "KNOWLEDGE_ADVANCED",
+      "KNOWLEDGE"
+    ],
+    "polymarket": [
+      "KNOWLEDGE",
+      "KNOWLEDGE_ADVANCED"
+    ],
+    "knowledge": [
+      "TRADING_STRATEGY"
+    ],
+    "infrastructure": [
+      "README",
+      "INSTALLATION"
+    ],
+    "math": [
+      "KNOWLEDGE_ADVANCED"
+    ]
+  },
+  "files": [
+    {
+      "path": "executor/computing/KNOWLEDGE.md",
+      "lines": 4295,
+      "category": "computing",
+      "name": "KNOWLEDGE"
+    },
+    {
+      "path": "executor/business/KNOWLEDGE.md",
+      "lines": 3574,
+      "category": "business",
+      "name": "KNOWLEDGE"
+    },
+    {
+      "path": "executor/computing/KNOWLEDGE_ADVANCED.md",
+      "lines": 3303,
+      "category": "computing",
+      "name": "KNOWLEDGE_ADVANCED"
+    },
+    {
+      "path": "executor/money/KNOWLEDGE.md",
+      "lines": 2959,
+      "category": "money",
+      "name": "KNOWLEDGE"
+    },
+    {
+      "path": "docs/DEVELOPMENT_STANDARDS.md",
+      "lines": 2808,
+      "category": "docs",
+      "name": "DEVELOPMENT_STANDARDS"
+    },
+    {
+      "path": "executor/business/KNOWLEDGE_ADVANCED.md",
+      "lines": 2661,
+      "category": "business",
+      "name": "KNOWLEDGE_ADVANCED"
+    },
+    {
+      "path": "executor/money/KNOWLEDGE_ADVANCED.md",
+      "lines": 2652,
+      "category": "money",
+      "name": "KNOWLEDGE_ADVANCED"
+    },
+    {
+      "path": "SUCCESS_ADVANCED.md",
+      "lines": 2375,
+      "category": "root",
+      "name": "SUCCESS_ADVANCED"
+    },
+    {
+      "path": "SUCCESS.md",
+      "lines": 2218,
+      "category": "root",
+      "name": "SUCCESS"
+    },
+    {
+      "path": "KNOWLEDGE_ADVANCED.md",
+      "lines": 2195,
+      "category": "root",
+      "name": "KNOWLEDGE_ADVANCED"
+    },
+    {
+      "path": "executor/uma/KNOWLEDGE_ADVANCED.md",
+      "lines": 2068,
+      "category": "uma",
+      "name": "KNOWLEDGE_ADVANCED"
+    },
+    {
+      "path": "executor/uma/KNOWLEDGE.md",
+      "lines": 1885,
+      "category": "uma",
+      "name": "KNOWLEDGE"
+    },
+    {
+      "path": "KNOWLEDGE.md",
+      "lines": 1809,
+      "category": "root",
+      "name": "KNOWLEDGE"
+    },
+    {
+      "path": "executor/polymarket/KNOWLEDGE.md",
+      "lines": 1178,
+      "category": "polymarket",
+      "name": "KNOWLEDGE"
+    },
+    {
+      "path": "docs/BATCH_20_COMPLETE_OUTPUT.md",
+      "lines": 1077,
+      "category": "docs",
+      "name": "BATCH_20_COMPLETE_OUTPUT"
+    },
+    {
+      "path": "docs/BATCH_22_IMPLEMENTATION_LOG.md",
+      "lines": 1039,
+      "category": "docs",
+      "name": "BATCH_22_IMPLEMENTATION_LOG"
+    },
+    {
+      "path": "docs/SPARK_PLUG_PART3_USER_CONNECTOR_v0.1.md",
+      "lines": 884,
+      "category": "docs",
+      "name": "SPARK_PLUG_PART3_USER_CONNECTOR_v0.1"
+    },
+    {
+      "path": "docs/BATCH_21_COMPLETE_TRANSCRIPT.md",
+      "lines": 848,
+      "category": "docs",
+      "name": "BATCH_21_COMPLETE_TRANSCRIPT"
+    },
+    {
+      "path": "executor/polymarket/KNOWLEDGE_ADVANCED.md",
+      "lines": 836,
+      "category": "polymarket",
+      "name": "KNOWLEDGE_ADVANCED"
+    },
+    {
+      "path": "docs/BATCH_23_STATUS_REPORT.md",
+      "lines": 826,
+      "category": "docs",
+      "name": "BATCH_23_STATUS_REPORT"
+    }
+  ],
+  "integrafix": true
+}

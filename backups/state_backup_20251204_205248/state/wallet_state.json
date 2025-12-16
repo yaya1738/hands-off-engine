@@ -1,0 +1,46 @@
+{
+  "address": "0xB314345D218ED4CF75C17636a2307244E7dA761b",
+  "open_orders": 6,
+  "buy_total": 2069.0,
+  "sell_total": 149.7,
+  "total_value": 2218.7,
+  "last_sync": "2025-12-04T20:50:02.625874+00:00",
+  "orders": [
+    {
+      "side": "BUY",
+      "size": 5.0,
+      "price": 0.02,
+      "status": "LIVE"
+    },
+    {
+      "side": "BUY",
+      "size": 35.0,
+      "price": 0.04,
+      "status": "LIVE"
+    },
+    {
+      "side": "SELL",
+      "size": 119.99,
+      "price": 0.047,
+      "status": "LIVE"
+    },
+    {
+      "side": "BUY",
+      "size": 2000.0,
+      "price": 0.001,
+      "status": "LIVE"
+    },
+    {
+      "side": "BUY",
+      "size": 29.0,
+      "price": 0.06,
+      "status": "LIVE"
+    },
+    {
+      "side": "SELL",
+      "size": 29.71,
+      "price": 0.84,
+      "status": "LIVE"
+    }
+  ]
+}

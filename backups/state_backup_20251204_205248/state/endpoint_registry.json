@@ -1,0 +1,22 @@
+{
+  "cycles": 1129,
+  "endpoints": {
+    "trading_check": {
+      "executions": 381,
+      "successes": 381
+    },
+    "reality_check": {
+      "executions": 378,
+      "successes": 378
+    },
+    "outreach": {
+      "executions": 370,
+      "successes": 370
+    }
+  },
+  "last_cycle": {
+    "endpoint": "outreach",
+    "timestamp": "2025-12-04T20:52:48.745286+00:00",
+    "success": true
+  }
+}
