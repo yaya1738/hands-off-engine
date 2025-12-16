@@ -46,6 +46,23 @@ class CapitalBridge:
     def __init__(self):
         self.state = self._load_state()
 
+    def _load_state(self):
+        """Load or create state."""
+        if self.state_file.exists():
+            return json.loads(self.state_file.read_text())
+        return {
+            "created": datetime.now(timezone.utc).isoformat(),
+            "total_earned": 0,
+            "total_injected": 0,
+            "injection_history": []
+        }
+
+    def _save_state(self):
+        """Save state."""
+        self.state["last_updated"] = datetime.now(timezone.utc).isoformat()
+        self.state_file.parent.mkdir(parents=True, exist_ok=True)
+        self.state_file.write_text(json.dumps(self.state, indent=2))
+
     def _load_state(self) -> Dict:
         """Load or initialize capital bridge state."""
         if CAPITAL_STATE_FILE.exists():
