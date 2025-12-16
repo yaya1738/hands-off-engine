@@ -116,7 +116,11 @@ Questions? Reply to this thread - monitored 24/7 by autonomous system.
         tx_hash: Optional[str] = None,
         notes: str = ""
     ):
-        """Record a received payment."""
+        """
+        Record a received payment.
+
+        INTEGRAFIX: Auto-inject into capital_bridge and income_engine.
+        """
         payment = {
             "amount": amount,
             "source": source,
@@ -138,6 +142,45 @@ Questions? Reply to this thread - monitored 24/7 by autonomous system.
         print(f"✅ Payment recorded: ${amount:,.2f} from {source}")
         if tx_hash:
             print(f"   TX: {tx_hash}")
+
+        # INTEGRAFIX: Auto-inject into capital_bridge
+        self._inject_to_capital_bridge(amount, source, notes)
+
+        # INTEGRAFIX: Record in income_engine
+        self._record_in_income_engine(amount, source, notes)
+
+    def _inject_to_capital_bridge(self, amount: float, source: str, notes: str):
+        """Inject payment into capital bridge."""
+        try:
+            import sys
+            sys.path.insert(0, str(PROJECT_ROOT))
+            from integrafix.capital_bridge import CapitalBridge
+
+            bridge = CapitalBridge()
+            bridge.inject_capital(amount, source, notes)
+
+            status = bridge.check_activation_ready()
+            print(f"✓ Capital bridge: ${status['balance']:.2f} (${status.get('gap', 0):.2f} to activation)")
+        except Exception as e:
+            print(f"Capital bridge injection failed: {e}")
+
+    def _record_in_income_engine(self, amount: float, source: str, notes: str):
+        """Record payment in income engine."""
+        try:
+            import sys
+            sys.path.insert(0, str(PROJECT_ROOT))
+            from integrafix.income_engine import IncomeEngine
+
+            engine = IncomeEngine()
+
+            # Find matching work and record payment
+            for work_id, work in engine.state.get('active_work', {}).items():
+                if work.get('status') == 'delivered':
+                    result = engine.record_payment(work_id, amount, 'crypto', notes)
+                    print(f"✓ Income engine: Payment recorded for {work_id}")
+                    break
+        except Exception as e:
+            print(f"Income engine payment record failed: {e}")
 
     def get_payment_instructions(self, bounty_repo: str, bounty_id: str) -> str:
         """Get payment instructions for a specific bounty."""
