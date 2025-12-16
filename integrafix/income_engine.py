@@ -184,28 +184,130 @@ class IncomeEngine:
         return new_opportunities
 
     def _scan_github_bounties(self) -> List[Dict]:
-        """Scan GitHub for bounty-labeled issues."""
+        """
+        Scan GitHub for REAL bounty-labeled issues using GitHub REST API.
+
+        INTEGRAFIX: Now uses actual GitHub REST API instead of placeholder.
+        """
         opportunities = []
 
-        # Known repos with bounties
-        bounty_repos = [
-            "anthropics/anthropic-cookbook",
-            "langchain-ai/langchain",
-            "openai/openai-python",
-            "huggingface/transformers",
-        ]
+        try:
+            import requests
+            import os
 
-        # In real implementation, would use GitHub API
-        # For now, create placeholder that human can populate
-        opportunities.append({
-            "type": "scan_task",
-            "title": "Check GitHub bounty repos",
-            "description": f"Repos to check: {', '.join(bounty_repos)}",
-            "action_url": "https://github.com/search?q=label%3Abounty+is%3Aissue+is%3Aopen&type=issues",
-            "human_action": "Click link, find suitable bounties, add to system"
-        })
+            # Use GitHub token if available
+            github_token = os.getenv('GITHUB_TOKEN', '')
+            headers = {'Accept': 'application/vnd.github.v3+json'}
+            if github_token:
+                headers['Authorization'] = f'token {github_token}'
+
+            # Search for open issues with "bounty" label across GitHub
+            search_url = 'https://api.github.com/search/issues'
+            params = {
+                'q': 'label:bounty is:open is:issue',
+                'sort': 'created',
+                'order': 'desc',
+                'per_page': 20
+            }
+
+            response = requests.get(search_url, headers=headers, params=params, timeout=10)
+
+            if response.status_code == 200:
+                data = response.json()
+                issues = data.get('items', [])
+
+                for issue in issues:
+                    # Extract bounty amount from labels/title/body
+                    bounty_amount = self._extract_bounty_amount(issue)
+
+                    # Get repo name
+                    repo_url = issue.get('repository_url', '')
+                    repo_name = repo_url.split('/repos/')[-1] if repo_url else 'Unknown'
+
+                    opportunities.append({
+                        "type": "github_bounty",
+                        "title": issue.get('title', 'Untitled'),
+                        "description": (issue.get('body', '')[:500] + "...") if issue.get('body') else "No description",
+                        "action_url": issue.get('html_url', ''),
+                        "repository": repo_name,
+                        "est_value": bounty_amount,
+                        "created_at": issue.get('created_at'),
+                        "labels": [label.get('name') for label in issue.get('labels', [])],
+                        "human_action": "Review bounty, draft proposal if suitable",
+                        "issue_number": issue.get('number'),
+                        "state": issue.get('state')
+                    })
+
+                # If no bounties found, note it
+                if not issues:
+                    opportunities.append({
+                        "type": "scan_task",
+                        "title": "No active bounties found",
+                        "description": "GitHub search returned 0 bounty-labeled issues",
+                        "action_url": "https://github.com/search?q=label%3Abounty+is%3Aissue+is%3Aopen&type=issues",
+                        "human_action": "Check search manually or try different labels"
+                    })
+
+            elif response.status_code == 403:
+                # Rate limited
+                opportunities.append({
+                    "type": "scan_task",
+                    "title": "GitHub API rate limited",
+                    "description": "Add GITHUB_TOKEN to .env to increase rate limit",
+                    "action_url": "https://github.com/settings/tokens",
+                    "human_action": "Create token and add to .env.github"
+                })
+
+            else:
+                # API error
+                opportunities.append({
+                    "type": "scan_task",
+                    "title": f"GitHub API error ({response.status_code})",
+                    "description": f"Error: {response.text[:200]}",
+                    "action_url": "https://github.com/search?q=label%3Abounty+is%3Aissue+is%3Aopen&type=issues",
+                    "human_action": "Check search manually"
+                })
+
+        except Exception as e:
+            # Fallback to placeholder on any error
+            opportunities.append({
+                "type": "scan_task",
+                "title": "GitHub bounty scan error",
+                "description": f"Error: {str(e)}",
+                "action_url": "https://github.com/search?q=label%3Abounty+is%3Aissue+is%3Aopen&type=issues",
+                "human_action": "Check search manually"
+            })
 
         return opportunities
+
+    def _extract_bounty_amount(self, issue: Dict) -> int:
+        """
+        Try to extract bounty amount from issue labels, title, or body.
+        Returns estimated value in USD.
+        """
+        import re
+
+        # Check labels for amount (e.g., "bounty: $500")
+        for label in issue.get('labels', []):
+            label_name = label.get('name', '').lower()
+            match = re.search(r'\$(\d+)', label_name)
+            if match:
+                return int(match.group(1))
+
+        # Check title
+        title = issue.get('title', '')
+        match = re.search(r'\$(\d+)', title)
+        if match:
+            return int(match.group(1))
+
+        # Check body (first 1000 chars)
+        body = (issue.get('body') or '')[:1000]
+        match = re.search(r'bounty[:\s]*\$(\d+)', body, re.IGNORECASE)
+        if match:
+            return int(match.group(1))
+
+        # Default estimate based on repo/difficulty
+        return 100  # Default bounty estimate
 
     def _scan_web_source(self, source: Dict) -> List[Dict]:
         """Scan a web source for opportunities."""
