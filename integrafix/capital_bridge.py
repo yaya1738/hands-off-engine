@@ -114,6 +114,36 @@ class CapitalBridge:
         with open(CAPITAL_STATE_FILE, 'w') as f:
             json.dump(state, f, indent=2)
 
+    def inject_capital(self, amount: float, source: str, notes: str = "") -> Dict:
+        """
+        Inject capital from income sources.
+
+        INTEGRAFIX: Called by payment_handler when payments received.
+        """
+        # Ensure fields exist
+        if "total_earned" not in self.state:
+            self.state["total_earned"] = 0
+        if "total_injected" not in self.state:
+            self.state["total_injected"] = 0
+        if "injection_history" not in self.state:
+            self.state["injection_history"] = []
+
+        injection = {
+            "amount": amount,
+            "source": source,
+            "notes": notes,
+            "timestamp": datetime.now(timezone.utc).isoformat()
+        }
+
+        self.state["total_earned"] += amount
+        self.state["total_injected"] += amount
+        self.state["injection_history"].append(injection)
+
+        self._save_state()
+
+        print(f"✓ Capital injected: ${amount:.2f} from {source}")
+        return injection
+
     def get_wallet_balance(self) -> float:
         """Get current wallet USDC balance from Polymarket."""
         try:
