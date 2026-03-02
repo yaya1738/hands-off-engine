@@ -108,7 +108,7 @@ jobs:
       
       - name: Upload Configuration Logs
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: github-setup-logs
           path: logs/github_setup.jsonl
