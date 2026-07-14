@@ -45,3 +45,28 @@ class GmailCredentialAdapter:
 
     def validate(self):
         return self.status()
+
+    def recover(self, identity):
+        """
+        Attempt Gmail credential recovery.
+
+        Returns an outcome only.
+        Lifecycle owns state transitions.
+        """
+
+        status = self.status()
+
+        if status.get("connected") and status.get("token_present"):
+            return {
+                "success": True,
+                "identity": identity,
+                "provider": self.provider(),
+                "action": "credential_available",
+            }
+
+        return {
+            "success": False,
+            "identity": identity,
+            "provider": self.provider(),
+            "action": "reauthorization_required",
+        }
