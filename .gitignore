@@ -48,3 +48,7 @@ ENV/
 # OS
 .DS_Store
 Thumbs.db
+
+# Gmail OAuth secrets
+credentials.json
+data/secrets/gmail_token.json
