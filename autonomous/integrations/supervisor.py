@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from autonomous.integrations.integration_health_monitor import IntegrationHealthMonitor
+from autonomous.credentials.supervisor import CredentialSupervisor
 
 
 class IntegrationSupervisor:
@@ -16,15 +17,19 @@ class IntegrationSupervisor:
     def __init__(self):
         self.events = Path("data/integration_events.jsonl")
         self.monitor = IntegrationHealthMonitor()
+        self.credentials = CredentialSupervisor()
 
     def run_once(self):
 
         report = self.monitor.check()
 
+        credential_results = self.credentials.check_all()
+
         event = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "healthy": report["healthy"],
             "integrations": report["integrations"],
+            "credentials": credential_results,
         }
 
         self.events.parent.mkdir(
