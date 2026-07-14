@@ -10,19 +10,22 @@ from autonomous.credentials.transition import (
 )
 
 from autonomous.credentials.audit import CredentialAudit
+from autonomous.credentials.credential_state import CredentialStateStore
 
 
 class CredentialLifecycle:
 
     def __init__(self):
         self.audit = CredentialAudit()
-        self.states = {}
+        self.store = CredentialStateStore()
 
     def get_state(self, identity):
-        return self.states.get(
-            identity,
-            CredentialState.REQUESTED.value
-        )
+        existing = self.store.get(identity)
+
+        if existing:
+            return existing["state"]
+
+        return CredentialState.REQUESTED.value
 
     def transition(
         self,
@@ -37,7 +40,10 @@ class CredentialLifecycle:
             target,
         )
 
-        self.states[identity] = target
+        self.store.save(
+            identity,
+            target,
+        )
 
         self.audit.record(
             identity=identity,
