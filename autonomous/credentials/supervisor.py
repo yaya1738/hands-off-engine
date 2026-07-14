@@ -14,17 +14,38 @@ class CredentialSupervisor:
 
     def __init__(self):
         self.orchestrator = CredentialOrchestrator()
-        self.state_file = Path("data/credentials/state.json")
+        self.identity_file = Path("data/credentials/state.json")
+        self.registry_file = Path("state/credentials/registry.json")
 
     def _load_identities(self):
-        if not self.state_file.exists():
-            return []
 
-        data = json.loads(
-            self.state_file.read_text()
-        )
+        identities = {}
 
-        return list(data.values())
+        # Provider metadata
+        if self.identity_file.exists():
+            data = json.loads(
+                self.identity_file.read_text()
+            )
+
+            identities.update(data)
+
+        # Lifecycle reality
+        if self.registry_file.exists():
+            registry = json.loads(
+                self.registry_file.read_text()
+            )
+
+            for identity, state in registry.items():
+                if identity in identities:
+                    identities[identity]["lifecycle_state"] = state["state"]
+                else:
+                    identities[identity] = {
+                        "identity": identity,
+                        "provider": identity,
+                        "lifecycle_state": state["state"],
+                    }
+
+        return list(identities.values())
 
     def check(self, provider, identity):
         return self.orchestrator.monitor_and_recover(
