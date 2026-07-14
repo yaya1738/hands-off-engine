@@ -52,3 +52,6 @@ Thumbs.db
 # Gmail OAuth secrets
 credentials.json
 data/secrets/gmail_token.json
+
+# Hands-Off credential vault
+data/secrets/integrations.json
