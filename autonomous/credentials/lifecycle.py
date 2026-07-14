@@ -11,6 +11,7 @@ from autonomous.credentials.transition import (
 
 from autonomous.credentials.audit import CredentialAudit
 from autonomous.credentials.credential_state import CredentialStateStore
+from autonomous.credentials.health import CredentialHealthMonitor
 
 
 class CredentialLifecycle:
@@ -18,6 +19,7 @@ class CredentialLifecycle:
     def __init__(self):
         self.audit = CredentialAudit()
         self.store = CredentialStateStore()
+        self.health = CredentialHealthMonitor()
 
     def get_state(self, identity):
         existing = self.store.get(identity)
@@ -58,3 +60,11 @@ class CredentialLifecycle:
             "to": target,
             "reason": reason,
         }
+
+    def health_check(self, identity):
+        state = self.get_state(identity)
+
+        return self.health.check(
+            identity,
+            state,
+        )
