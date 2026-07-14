@@ -5,11 +5,15 @@ Single entry point for autonomous loops.
 """
 
 from autonomous.integrations.supervisor import IntegrationSupervisor
+from autonomous.credentials.reconciler import CredentialStateReconciler
 
 
 def heartbeat():
 
     result = IntegrationSupervisor().run_once()
+
+    credential_sync = CredentialStateReconciler().reconcile()
+    result["credential_reconciliation"] = credential_sync
 
     failures = []
 

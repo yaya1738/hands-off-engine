@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from autonomous.integrations.integration_health_monitor import IntegrationHealthMonitor
+from credential_integration_bridge import run as credential_bridge
 from autonomous.credentials.supervisor import CredentialSupervisor
 
 
@@ -23,12 +24,15 @@ class IntegrationSupervisor:
 
         report = self.monitor.check()
 
+        credential_sync = credential_bridge()
+
         credential_results = self.credentials.check_all()
 
         event = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "healthy": report["healthy"],
             "integrations": report["integrations"],
+            "credential_sync": credential_sync,
             "credentials": credential_results,
         }
 
