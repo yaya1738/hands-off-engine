@@ -1,40 +1,49 @@
 from ai.factory.optimization_feedback import (
-    OptimizationFeedback,
+    FactoryOptimizationFeedback,
 )
 
 
-def test_high_performance():
-    feedback = OptimizationFeedback()
-
-    result = feedback.build_feedback(
-        {
-            "success_rate": 0.95,
+class FakeMetrics:
+    def snapshot(self):
+        return {
+            "cycles": 10,
+            "successes": 9,
         }
+
+
+def build():
+    return FactoryOptimizationFeedback(
+        FakeMetrics()
     )
 
-    assert result["trend"] == "healthy"
-    assert result["recommendation"] == "continue"
+
+def test_analyze():
+    feedback = build()
+
+    result = feedback.analyze()
+
+    assert result["analyzed"] is True
 
 
-def test_medium_performance():
-    feedback = OptimizationFeedback()
+def test_recommend():
+    feedback = build()
 
-    result = feedback.build_feedback(
-        {
-            "success_rate": 0.7,
-        }
-    )
+    result = feedback.recommend()
 
-    assert result["recommendation"] == "review"
+    assert result["recommendation"] == "OPTIMIZE"
 
 
-def test_low_performance():
-    feedback = OptimizationFeedback()
+def test_apply_feedback():
+    feedback = build()
 
-    result = feedback.build_feedback(
-        {
-            "success_rate": 0.2,
-        }
-    )
+    result = feedback.apply_feedback()
 
-    assert result["recommendation"] == "improve"
+    assert result["status"] == "APPLIED"
+
+
+def test_history():
+    feedback = build()
+
+    feedback.analyze()
+
+    assert len(feedback.history()) == 1

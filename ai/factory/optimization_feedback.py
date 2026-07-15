@@ -1,47 +1,56 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
-class OptimizationFeedback:
-    def build_feedback(
+class FactoryOptimizationFeedback:
+    def __init__(
         self,
-        metrics: Dict[str, Any],
-    ) -> Dict[str, Any]:
-        success_rate = metrics.get(
-            "success_rate",
-            0,
-        )
+        metrics=None,
+    ):
+        self.metrics = metrics
+        self._history: List[Dict[str, Any]] = []
 
-        if success_rate >= 0.9:
-            trend = "healthy"
-            recommendation = "continue"
-
-        elif success_rate >= 0.5:
-            trend = "unstable"
-            recommendation = "review"
+    def analyze(self):
+        if self.metrics:
+            snapshot = self.metrics.snapshot()
 
         else:
-            trend = "poor"
-            recommendation = "improve"
+            snapshot = {}
 
-        return {
-            "performance": success_rate,
-            "trend": trend,
-            "recommendation": recommendation,
+        result = {
+            "metrics": snapshot,
+            "analyzed": True,
         }
 
-    def score_performance(
-        self,
-        metrics: Dict[str, Any],
-    ):
-        return metrics.get(
-            "success_rate",
-            0,
+        self._history.append(
+            result
         )
 
-    def recommend(
-        self,
-        metrics: Dict[str, Any],
-    ):
-        return self.build_feedback(
-            metrics
-        )["recommendation"]
+        return result
+
+    def recommend(self):
+        analysis = self.analyze()
+
+        result = {
+            "recommendation": "OPTIMIZE",
+            "based_on": analysis,
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def apply_feedback(self):
+        result = {
+            "status": "APPLIED",
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def history(self):
+        return self._history
