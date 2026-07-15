@@ -55,3 +55,17 @@ data/secrets/gmail_token.json
 
 # Hands-Off credential vault
 data/secrets/integrations.json
+
+# Local environments
+.venv/
+__pycache__/
+*.pyc
+
+# Local AI/tool caches
+.aider.*
+.credential_bridge_engine/
+
+# Runtime artifacts
+*.log
+*.tmp
+*.bak
