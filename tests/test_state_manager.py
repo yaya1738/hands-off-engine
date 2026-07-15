@@ -3,37 +3,49 @@ from ai.factory.state_manager import (
 )
 
 
-def test_set_and_get():
-    state = FactoryStateManager()
+def test_save():
+    manager = FactoryStateManager()
 
-    state.set(
-        "runtime",
-        "active",
-    )
-
-    assert state.get("runtime") == "active"
-
-
-def test_default():
-    state = FactoryStateManager()
-
-    assert state.get(
-        "missing",
-        "unknown",
-    ) == "unknown"
-
-
-def test_update():
-    state = FactoryStateManager()
-
-    state.update(
+    result = manager.save(
         {
-            "jobs": 3,
-            "health": "healthy",
+            "running": True,
         }
     )
 
-    snapshot = state.snapshot()
+    assert result["status"] == "SAVED"
 
-    assert snapshot["jobs"] == 3
-    assert snapshot["health"] == "healthy"
+
+def test_load():
+    manager = FactoryStateManager()
+
+    manager.save(
+        {
+            "mode": "AUTO",
+        }
+    )
+
+    result = manager.load()
+
+    assert result["state"]["mode"] == "AUTO"
+
+
+def test_checkpoint():
+    manager = FactoryStateManager()
+
+    manager.save(
+        {
+            "version": 1,
+        }
+    )
+
+    result = manager.checkpoint()
+
+    assert result["checkpoint"]["version"] == 1
+
+
+def test_history():
+    manager = FactoryStateManager()
+
+    manager.save({})
+
+    assert len(manager.history()) == 1

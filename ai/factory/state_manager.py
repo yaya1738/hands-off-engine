@@ -1,36 +1,49 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 class FactoryStateManager:
     def __init__(self):
-        self._state: Dict[str, Any] = {}
+        self.state: Dict[str, Any] = {}
+        self._history: List[Dict[str, Any]] = []
 
-    def set(
+    def save(
         self,
-        key: str,
-        value: Any,
+        state: Dict[str, Any],
     ):
-        self._state[key] = value
+        self.state = state.copy()
 
-    def get(
-        self,
-        key: str,
-        default=None,
-    ):
-        return self._state.get(
-            key,
-            default,
+        result = {
+            "status": "SAVED",
+            "state": self.state,
+        }
+
+        self._history.append(
+            result
         )
 
-    def update(
-        self,
-        values: Dict[str, Any],
-    ):
-        self._state.update(
-            values
+        return result
+
+    def load(self):
+        result = {
+            "state": self.state,
+        }
+
+        self._history.append(
+            result
         )
 
-    def snapshot(self):
-        return dict(
-            self._state
+        return result
+
+    def checkpoint(self):
+        result = {
+            "checkpoint": self.state.copy(),
+        }
+
+        self._history.append(
+            result
         )
+
+        return result
+
+    def history(self):
+        return self._history
