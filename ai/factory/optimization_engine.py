@@ -3,76 +3,64 @@ from typing import Any, Dict, List
 
 class FactoryOptimizationEngine:
     def __init__(self):
-        self.signals: List[Dict[str, Any]] = []
-        self.improvements: List[Dict[str, Any]] = []
+        self.optimizations: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
-    def collect_signals(
+    def evaluate_options(
         self,
-        signal: Dict[str, Any],
-    ):
-        self.signals.append(
-            signal
-        )
-
-        result = {
-            "collected": True,
-            "signal": signal,
-        }
-
-        self._history.append(
-            result
-        )
-
-        return result
-
-    def optimize(self):
-        result = {
-            "optimized": True,
-            "signals": len(
-                self.signals
-            ),
-        }
-
-        self.improvements.append(
-            result
-        )
-
-        self._history.append(
-            result
-        )
-
-        return result
-
-    def compare_versions(
-        self,
-        old: Dict[str, Any],
-        new: Dict[str, Any],
+        options: List[Dict[str, Any]],
     ):
         result = {
-            "compared": True,
-            "old": old,
-            "new": new,
+            "evaluated": True,
+            "count": len(options),
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def recommend_improvement(self):
+    def rank_improvements(
+        self,
+        improvements: List[Dict[str, Any]],
+    ):
         result = {
-            "recommendation": (
-                "IMPROVE"
-                if self.signals
-                else "WAIT"
-            ),
+            "ranked": True,
+            "count": len(improvements),
         }
 
-        self._history.append(
-            result
+        self._history.append(result)
+
+        return result
+
+    def apply_optimization(
+        self,
+        optimization: Dict[str, Any],
+    ):
+        self.optimizations.append(
+            optimization
         )
+
+        result = {
+            "applied": True,
+            "optimization": optimization,
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def measure_gain(
+        self,
+        before: Dict[str, Any],
+        after: Dict[str, Any],
+    ):
+        result = {
+            "measured": True,
+            "before": before,
+            "after": after,
+        }
+
+        self._history.append(result)
 
         return result
 

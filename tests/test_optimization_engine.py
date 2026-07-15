@@ -7,50 +7,50 @@ def build():
     return FactoryOptimizationEngine()
 
 
-def test_collect_signals():
+def test_evaluate_options():
     engine = build()
 
-    result = engine.collect_signals(
-        {
-            "metric": "speed",
-        }
+    result = engine.evaluate_options(
+        []
     )
 
-    assert result["collected"] is True
+    assert result["evaluated"] is True
 
 
-def test_optimize():
+def test_rank_improvements():
     engine = build()
 
-    result = engine.optimize()
+    result = engine.rank_improvements(
+        []
+    )
 
-    assert result["optimized"] is True
+    assert result["ranked"] is True
 
 
-def test_compare_versions():
+def test_apply_optimization():
     engine = build()
 
-    result = engine.compare_versions(
+    result = engine.apply_optimization(
+        {}
+    )
+
+    assert result["applied"] is True
+
+
+def test_measure_gain():
+    engine = build()
+
+    result = engine.measure_gain(
         {},
         {},
     )
 
-    assert result["compared"] is True
-
-
-def test_recommend_improvement():
-    engine = build()
-
-    engine.collect_signals({})
-
-    result = engine.recommend_improvement()
-
-    assert result["recommendation"] == "IMPROVE"
+    assert result["measured"] is True
 
 
 def test_history():
     engine = build()
 
-    engine.optimize()
+    engine.apply_optimization({})
 
     assert len(engine.history()) == 1
