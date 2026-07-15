@@ -14,25 +14,33 @@ class FactoryEventBus:
         if event_type not in self._subscribers:
             self._subscribers[event_type] = []
 
-        self._subscribers[event_type].append(handler)
+        self._subscribers[event_type].append(
+            handler
+        )
 
     def publish(
         self,
         event_type: str,
-        payload: Dict[str, Any],
-    ) -> None:
+        payload: Any = None,
+    ):
         event = {
-            "type": event_type,
+            "event": event_type,
             "payload": payload,
         }
 
         self._history.append(event)
 
+        results = []
+
         for handler in self._subscribers.get(
             event_type,
             [],
         ):
-            handler(payload)
+            results.append(
+                handler(payload)
+            )
+
+        return results
 
     def history(self):
         return self._history
