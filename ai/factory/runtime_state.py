@@ -1,46 +1,66 @@
-import json
-from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
+import copy
 
 
 class FactoryRuntimeState:
-    def __init__(
-        self,
-        path="factory_runtime_state.json",
-    ):
-        self.path = Path(path)
+    def __init__(self):
+        self.state: Dict[str, Any] = {}
+        self._snapshots: List[Dict[str, Any]] = []
+        self._history: List[Dict[str, Any]] = []
 
-    def save(
-        self,
-        state: Dict[str, Any],
-    ):
-        self.path.write_text(
-            json.dumps(
-                state,
-                indent=2,
-            )
-        )
-
-        return state
-
-    def load(self):
-        if not self.path.exists():
-            return {}
-
-        return json.loads(
-            self.path.read_text()
-        )
-
-    def checkpoint(
+    def save_state(
         self,
         state: Dict[str, Any],
     ):
-        return self.save(
-            {
-                **state,
-                "checkpoint": True,
-            }
-        )
+        self.state = copy.deepcopy(state)
 
-    def restore(self):
-        return self.load()
+        result = {
+            "saved": True,
+            "state": self.state,
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def load_state(self):
+        result = {
+            "loaded": True,
+            "state": copy.deepcopy(self.state),
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def snapshot(self):
+        snapshot = copy.deepcopy(self.state)
+
+        self._snapshots.append(snapshot)
+
+        result = {
+            "snapshotted": True,
+            "snapshot": snapshot,
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def restore(
+        self,
+        snapshot: Dict[str, Any],
+    ):
+        self.state = copy.deepcopy(snapshot)
+
+        result = {
+            "restored": True,
+            "state": self.state,
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def history(self):
+        return self._history

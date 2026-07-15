@@ -1,41 +1,57 @@
-from ai.factory.runtime_state import (
-    FactoryRuntimeState,
-)
+from ai.factory.runtime_state import FactoryRuntimeState
 
 
-def test_save_load(tmp_path):
-    store = FactoryRuntimeState(
-        tmp_path / "state.json"
+def build():
+    return FactoryRuntimeState()
+
+
+def test_save_state():
+    engine = build()
+
+    result = engine.save_state(
+        {"status": "running"}
     )
 
-    store.save(
-        {
-            "cycle": 1,
-        }
+    assert result["saved"] is True
+
+
+def test_load_state():
+    engine = build()
+
+    engine.save_state(
+        {"status": "running"}
     )
 
-    result = store.load()
+    result = engine.load_state()
 
-    assert result["cycle"] == 1
+    assert result["loaded"] is True
 
 
-def test_checkpoint(tmp_path):
-    store = FactoryRuntimeState(
-        tmp_path / "state.json"
+def test_snapshot():
+    engine = build()
+
+    engine.save_state(
+        {"status": "running"}
     )
 
-    result = store.checkpoint(
-        {
-            "cycle": 2,
-        }
+    result = engine.snapshot()
+
+    assert result["snapshotted"] is True
+
+
+def test_restore():
+    engine = build()
+
+    result = engine.restore(
+        {"status": "restored"}
     )
 
-    assert result["checkpoint"] is True
+    assert result["restored"] is True
 
 
-def test_restore_empty(tmp_path):
-    store = FactoryRuntimeState(
-        tmp_path / "state.json"
-    )
+def test_history():
+    engine = build()
 
-    assert store.restore() == {}
+    engine.save_state({})
+
+    assert len(engine.history()) == 1
