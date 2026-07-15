@@ -73,3 +73,10 @@ __pycache__/
 # Runtime state and local Termux environment
 state/*.jsonl
 termux-hands-off/
+
+# Runtime state (recursive)
+state/**/*.json
+state/**/*.jsonl
+state/web_cache/
+state/intelligence/
+state/opportunities/
