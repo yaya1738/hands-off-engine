@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 from ai.factory.runtime_governance import FactoryRuntimeGovernance
 from ai.factory.runtime_observability import FactoryRuntimeObservability
 from ai.factory.runtime_state import FactoryRuntimeState
+from ai.factory.event_bus import FactoryEventBus
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
@@ -18,6 +19,7 @@ class FactoryRuntime:
         self.governance = FactoryRuntimeGovernance()
         self.observability = FactoryRuntimeObservability()
         self.state = FactoryRuntimeState()
+        self.events = FactoryEventBus()
         self.self_healing = FactorySelfHealingIntelligence()
 
         self.planning = FactoryPlanningIntelligence()
@@ -30,13 +32,15 @@ class FactoryRuntime:
 
         self._history: List[Dict[str, Any]] = []
 
-    def execute(
-        self,
-        goal: Dict[str, Any],
-    ):
+    def execute(self, goal: Dict[str, Any]):
         steps = []
 
-        previous_state = self.state.load_state()
+        self.events.emit_runtime_event(
+            "runtime.started",
+            {"goal": goal},
+        )
+
+        self.state.load_state()
         steps.append("state_loaded")
 
         self.governance.check_policy(goal)
@@ -55,44 +59,70 @@ class FactoryRuntime:
             plan = self.planning.create_plan(goal)
             steps.append("planning")
 
+            self.events.emit_runtime_event(
+                "plan.created",
+                {"plan": plan},
+            )
+
             simulation = self.simulation.run_simulation(plan)
             steps.append("simulation")
 
             decision = self.decision.create_decision(simulation)
             steps.append("decision")
 
-            self.orchestration.dispatch_tasks([decision])
+            self.events.emit_runtime_event(
+                "decision.created",
+                {"decision": decision},
+            )
+
+            self.orchestration.dispatch_tasks(
+                [decision]
+            )
             steps.append("orchestration")
 
             self.execution.create_execution(
                 "runtime-job",
                 decision,
             )
-            self.execution.start_execution("runtime-job")
-            self.execution.complete_execution("runtime-job")
+
+            self.events.emit_runtime_event(
+                "execution.started",
+                {"execution_id": "runtime-job"},
+            )
+
+            self.execution.start_execution(
+                "runtime-job"
+            )
+
+            self.execution.complete_execution(
+                "runtime-job"
+            )
 
             steps.append("execution")
+
+            self.events.emit_runtime_event(
+                "execution.completed",
+                {"execution_id": "runtime-job"},
+            )
 
         except Exception as error:
             self.self_healing.detect_failure(
                 {"error": str(error)}
             )
-            steps.append("failure_detected")
 
             self.self_healing.diagnose_issue(
                 {"error": str(error)}
             )
-            steps.append("diagnosis")
 
             self.self_healing.apply_recovery(
                 {"action": "restart_execution"}
             )
-            steps.append("recovery")
 
             self.self_healing.verify_recovery(
                 {"status": "recovered"}
             )
-            steps.append("recovery_verified")
+
+            steps.append("recovered")
 
         self.governance.audit_execution(
             {
@@ -100,7 +130,6 @@ class FactoryRuntime:
                 "steps": steps,
             }
         )
-        steps.append("audit")
 
         self.observability.record_metric(
             {
@@ -114,29 +143,39 @@ class FactoryRuntime:
                 "steps": steps,
             }
         )
+
         steps.append("learning")
+
+        self.events.emit_runtime_event(
+            "learning.recorded",
+            {"goal": goal},
+        )
 
         self.optimization.measure_performance(
             {
                 "steps": len(steps),
             }
         )
-        steps.append("optimization")
 
-        new_state = {
-            "last_goal": goal,
-            "last_steps": steps,
-        }
+        self.state.save_state(
+            {
+                "last_goal": goal,
+                "steps": steps,
+            }
+        )
 
-        self.state.save_state(new_state)
         self.state.snapshot()
-        steps.append("state_saved")
 
         result = {
             "success": True,
             "goal": goal,
             "steps_completed": steps,
         }
+
+        self.events.emit_runtime_event(
+            "runtime.completed",
+            result,
+        )
 
         self._history.append(result)
 
