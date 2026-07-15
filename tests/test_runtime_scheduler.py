@@ -3,53 +3,55 @@ from ai.factory.runtime_scheduler import (
 )
 
 
-def test_schedule():
-    scheduler = FactoryRuntimeScheduler()
+def fake_executor(task):
+    return {
+        "executed": task,
+    }
 
-    job = scheduler.schedule(
-        "cycle",
-        lambda: "done",
+
+def build():
+    return FactoryRuntimeScheduler(
+        executor=fake_executor
     )
 
-    assert job["status"] == "SCHEDULED"
+
+def test_schedule():
+    scheduler = build()
+
+    result = scheduler.schedule(
+        {
+            "name": "cycle",
+        }
+    )
+
+    assert result["status"] == "SCHEDULED"
 
 
-def test_run():
-    scheduler = FactoryRuntimeScheduler()
+def test_run_pending():
+    scheduler = build()
 
     scheduler.schedule(
-        "cycle",
-        lambda: "done",
+        {
+            "name": "cycle",
+        }
     )
 
-    result = scheduler.run()
+    result = scheduler.run_pending()
 
-    assert result[0]["result"] == "done"
+    assert result["status"] == "COMPLETED"
 
 
-def test_cancel():
-    scheduler = FactoryRuntimeScheduler()
+def test_pause():
+    scheduler = build()
 
-    job = scheduler.schedule(
-        "cycle",
-        lambda: "done",
-    )
+    result = scheduler.pause()
 
-    result = scheduler.cancel(
-        "cycle"
-    )
-
-    assert result["status"] == "CANCELLED"
+    assert result["status"] == "PAUSED"
 
 
 def test_history():
-    scheduler = FactoryRuntimeScheduler()
+    scheduler = build()
 
-    scheduler.schedule(
-        "cycle",
-        lambda: "done",
-    )
-
-    scheduler.run()
+    scheduler.schedule({})
 
     assert len(scheduler.history()) == 1

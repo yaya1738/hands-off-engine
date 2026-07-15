@@ -1,62 +1,79 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 
 
 class FactoryRuntimeScheduler:
-    def __init__(self):
-        self._jobs: List[Dict[str, Any]] = []
+    def __init__(
+        self,
+        executor=None,
+    ):
+        self.executor = executor
+        self.paused = False
+        self._queue: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
     def schedule(
         self,
-        name: str,
-        task: Callable,
+        task: Dict[str, Any],
     ):
-        job = {
-            "name": name,
-            "task": task,
-            "status": "SCHEDULED",
-        }
-
-        self._jobs.append(
-            job
+        self._queue.append(
+            task
         )
 
-        return job
+        result = {
+            "status": "SCHEDULED",
+            "task": task,
+        }
 
-    def run(self):
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def run_pending(self):
+        if self.paused:
+            return {
+                "status": "PAUSED",
+            }
+
         results = []
 
-        for job in self._jobs:
-            if job["status"] == "SCHEDULED":
-                result = job["task"]()
+        while self._queue:
+            task = self._queue.pop(0)
 
-                entry = {
-                    "name": job["name"],
-                    "result": result,
+            if self.executor:
+                result = self.executor(task)
+
+            else:
+                result = {
+                    "status": "NO_EXECUTOR",
                 }
 
-                job["status"] = "COMPLETE"
+            results.append(result)
 
-                self._history.append(
-                    entry
-                )
+        output = {
+            "status": "COMPLETED",
+            "results": results,
+        }
 
-                results.append(
-                    entry
-                )
+        self._history.append(
+            output
+        )
 
-        return results
+        return output
 
-    def cancel(
-        self,
-        name: str,
-    ):
-        for job in self._jobs:
-            if job["name"] == name:
-                job["status"] = "CANCELLED"
-                return job
+    def pause(self):
+        self.paused = True
 
-        return None
+        result = {
+            "status": "PAUSED",
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
 
     def history(self):
         return self._history
