@@ -80,3 +80,46 @@ state/**/*.jsonl
 state/web_cache/
 state/intelligence/
 state/opportunities/
+
+# Local runtime state and generated artifacts
+state/*
+!state/.gitkeep
+
+# Local investigation artifacts
+action_*.txt
+*_debug.txt
+*_report.txt
+path_report.txt
+report.txt
+
+# Temporary patch / diagnostic scripts
+patch_*.py
+patch_*.sh
+inspect_*.sh
+fix_*.sh
+check_*.sh
+verify_*.sh
+credential-*.sh
+credential_*.sh
+oauth-*.sh
+gmail-*.sh
+
+# Generated deliverables
+deliverables/work_*/
+
+# Operator workspace artifacts
+credential_*
+gmail_oauth_pending.json
+ho_*
+history_*
+lifecycle-*
+oauth-local-callback-test.py
+paste_here_credential_report.sh
+fix_brain_*
+add_stage25.py
+auto_copy_report.sh
+generate_integration_plan.sh
+data/
+deliverables/
+draft
+*.txt
