@@ -7,61 +7,52 @@ def build():
     return FactoryResourceAllocator()
 
 
-def test_request():
-    allocator = build()
+def test_registry():
+    engine = build()
 
-    result = allocator.request(
-        {
-            "compute": 10,
-        }
+    result = engine.resource_registry(
+        "compute",
+        {},
     )
 
-    assert result["requested"] is True
+    assert result["registered"] is True
+
+
+def test_estimate():
+    engine = build()
+
+    result = engine.estimate_cost({})
+
+    assert result["estimated"] is True
 
 
 def test_allocate():
-    allocator = build()
+    engine = build()
 
-    result = allocator.allocate(
-        {
-            "mission": "A",
-        }
-    )
+    result = engine.allocate_resources({})
 
     assert result["allocated"] is True
 
 
-def test_prioritize():
-    allocator = build()
+def test_rebalance():
+    engine = build()
 
-    result = allocator.prioritize(
-        [
-            {
-                "id": 1,
-            }
-        ]
-    )
+    result = engine.rebalance([])
 
-    assert result["priority"]["id"] == 1
+    assert result["rebalanced"] is True
 
 
-def test_utilization():
-    allocator = build()
+def test_efficiency():
+    engine = build()
 
-    allocator.request(
-        {
-            "cpu": 1,
-        }
-    )
+    result = engine.measure_efficiency({})
 
-    result = allocator.utilization()
-
-    assert result["resources"] == 1
+    assert result["measured"] is True
 
 
 def test_history():
-    allocator = build()
+    engine = build()
 
-    allocator.request({})
+    engine.allocate_resources({})
 
-    assert len(allocator.history()) == 1
+    assert len(engine.history()) == 1

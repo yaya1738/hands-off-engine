@@ -7,75 +7,81 @@ class FactoryResourceAllocator:
         self.allocations: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
-    def request(
+    def resource_registry(
         self,
+        name: str,
         resource: Dict[str, Any],
     ):
-        self.resources.update(
-            resource
-        )
+        self.resources[name] = resource
 
         result = {
-            "requested": True,
-            "resource": resource,
+            "registered": True,
+            "resource": name,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def allocate(
+    def estimate_cost(
         self,
-        target: Dict[str, Any],
+        task: Dict[str, Any],
     ):
+        result = {
+            "estimated": True,
+            "cost": 1,
+            "task": task,
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def allocate_resources(
+        self,
+        task: Dict[str, Any],
+        amount: int = 1,
+    ):
+        allocation = {
+            "task": task,
+            "amount": amount,
+        }
+
+        self.allocations.append(allocation)
+
         result = {
             "allocated": True,
-            "target": target,
+            "allocation": allocation,
         }
 
-        self.allocations.append(
-            result
-        )
-
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def prioritize(
+    def rebalance(
         self,
-        requests: List[Dict[str, Any]],
+        allocations: List[Dict[str, Any]],
     ):
         result = {
-            "priority": (
-                requests[0]
-                if requests
-                else None
-            ),
+            "rebalanced": True,
+            "count": len(allocations),
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def utilization(self):
+    def measure_efficiency(
+        self,
+        outcome: Dict[str, Any],
+    ):
         result = {
-            "resources": len(
-                self.resources
-            ),
-            "allocations": len(
-                self.allocations
-            ),
+            "measured": True,
+            "efficiency": 1,
+            "outcome": outcome,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
