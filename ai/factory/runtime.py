@@ -11,6 +11,8 @@ from ai.factory.diagnostic_intelligence import FactoryDiagnosticIntelligence
 from ai.factory.recommendation_feedback import FactoryRecommendationFeedback
 from ai.factory.meta_optimizer import FactoryMetaOptimizer
 from ai.factory.strategy_manager import FactoryStrategyManager
+from ai.factory.goal_management import FactoryGoalManagement
+from ai.factory.goal_optimizer import FactoryGoalOptimizer
 from ai.factory.resource_allocator import FactoryResourceAllocator
 
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
@@ -38,6 +40,11 @@ class FactoryRuntime:
         self.meta_optimizer = FactoryMetaOptimizer()
 
         self.strategy_manager = FactoryStrategyManager()
+
+        self.goal_management = FactoryGoalManagement()
+        self.goal_optimizer = FactoryGoalOptimizer(
+            self.goal_management
+        )
         self.strategy_manager.strategy_registry(
             "default",
             {
@@ -173,7 +180,33 @@ class FactoryRuntime:
             }
         )
 
+    def submit_goal(self, objective):
+        created = self.goal_management.create_goal(
+            objective
+        )
+
+        priority = self.goal_management.prioritize_goals()
+
+        optimized = self.goal_optimizer.select_best()
+
+        self.emit_event(
+            "goal.submitted",
+            {
+                "created": created,
+                "priority": priority,
+                "optimized": optimized,
+            },
+        )
+
+        return {
+            "goal": objective,
+            "priority": priority,
+            "optimized": optimized,
+        }
+
     def execute(self, goal):
+        self.submit_goal(goal)
+
         steps = []
 
         self.emit_event(
@@ -284,6 +317,17 @@ class FactoryRuntime:
         self.emit_event(
             "runtime.completed",
             result,
+        )
+
+        self.goal_management.complete_goal(
+            goal
+        )
+
+        self.emit_event(
+            "goal.completed",
+            {
+                "goal": goal,
+            },
         )
 
         self._history.append(result)
