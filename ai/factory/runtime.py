@@ -5,7 +5,10 @@ from ai.factory.runtime_observability import FactoryRuntimeObservability
 from ai.factory.runtime_state import FactoryRuntimeState
 from ai.factory.event_bus import FactoryEventBus
 from ai.factory.event_replay import FactoryEventReplay
+from ai.factory.diagnostic_intelligence import FactoryDiagnosticIntelligence
+from ai.factory.recommendation_feedback import FactoryRecommendationFeedback
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
+
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
 from ai.factory.decision_intelligence import FactoryDecisionIntelligence
@@ -23,6 +26,9 @@ class FactoryRuntime:
 
         self.events = FactoryEventBus()
         self.replay = FactoryEventReplay()
+
+        self.diagnostics = FactoryDiagnosticIntelligence()
+        self.recommendations = FactoryRecommendationFeedback()
 
         self.self_healing = FactorySelfHealingIntelligence()
 
@@ -56,6 +62,47 @@ class FactoryRuntime:
         )
 
         return event
+
+    def run_improvement_cycle(
+        self,
+        result: Dict[str, Any],
+    ):
+        analysis = self.diagnostics.analyze_execution(
+            result
+        )
+
+        self.diagnostics.detect_failure_patterns(
+            result.get("steps_completed", [])
+        )
+
+        self.diagnostics.explain_run(
+            result.get("steps_completed", [])
+        )
+
+        recommendation = self.diagnostics.generate_recommendations(
+            analysis
+        )
+
+        self.recommendations.collect_recommendations(
+            recommendation
+        )
+
+        self.recommendations.evaluate_recommendations(
+            recommendation
+        )
+
+        self.recommendations.apply_improvement(
+            {
+                "source": "diagnostics",
+                "recommendation": recommendation,
+            }
+        )
+
+        self.recommendations.track_effect(
+            {
+                "success": result.get("success"),
+            }
+        )
 
     def execute(
         self,
@@ -199,6 +246,10 @@ class FactoryRuntime:
             "goal": goal,
             "steps_completed": steps,
         }
+
+        self.run_improvement_cycle(
+            result
+        )
 
         self.emit_event(
             "runtime.completed",
