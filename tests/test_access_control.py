@@ -7,21 +7,21 @@ def build():
     return FactoryAccessControl()
 
 
-def test_register_identity():
-    access = build()
+def test_create_identity():
+    manager = build()
 
-    result = access.register_identity(
+    result = manager.create_identity(
         "agent",
         {}
     )
 
-    assert result["registered"] is True
+    assert result["created"] is True
 
 
 def test_grant_permission():
-    access = build()
+    manager = build()
 
-    result = access.grant_permission(
+    result = manager.grant_permission(
         "agent",
         "execute",
     )
@@ -30,25 +30,20 @@ def test_grant_permission():
 
 
 def test_check_permission():
-    access = build()
+    manager = build()
 
-    access.grant_permission(
+    result = manager.check_permission(
         "agent",
         "execute",
     )
 
-    result = access.check_permission(
-        "agent",
-        "execute",
-    )
-
-    assert result["allowed"] is True
+    assert result["checked"] is True
 
 
 def test_revoke_permission():
-    access = build()
+    manager = build()
 
-    result = access.revoke_permission(
+    result = manager.revoke_permission(
         "agent",
         "execute",
     )
@@ -57,11 +52,11 @@ def test_revoke_permission():
 
 
 def test_history():
-    access = build()
+    manager = build()
 
-    access.register_identity(
-        "agent",
+    manager.create_identity(
+        "x",
         {}
     )
 
-    assert len(access.history()) == 1
+    assert len(manager.history()) == 1

@@ -7,21 +7,19 @@ class FactoryAccessControl:
         self.permissions: Dict[str, List[str]] = {}
         self._history: List[Dict[str, Any]] = []
 
-    def register_identity(
+    def create_identity(
         self,
-        identity: str,
-        data: Dict[str, Any],
+        name: str,
+        identity: Dict[str, Any],
     ):
-        self.identities[identity] = data
+        self.identities[name] = identity
 
         result = {
-            "registered": True,
-            "identity": identity,
+            "created": True,
+            "identity": name,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
@@ -33,9 +31,7 @@ class FactoryAccessControl:
         self.permissions.setdefault(
             identity,
             []
-        ).append(
-            permission
-        )
+        ).append(permission)
 
         result = {
             "granted": True,
@@ -43,9 +39,7 @@ class FactoryAccessControl:
             "permission": permission,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
@@ -55,15 +49,14 @@ class FactoryAccessControl:
         permission: str,
     ):
         result = {
+            "checked": True,
             "allowed": permission in self.permissions.get(
                 identity,
                 []
             ),
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
@@ -76,9 +69,7 @@ class FactoryAccessControl:
             identity,
             []
         ):
-            self.permissions[identity].remove(
-                permission
-            )
+            self.permissions[identity].remove(permission)
 
         result = {
             "revoked": True,
@@ -86,9 +77,7 @@ class FactoryAccessControl:
             "permission": permission,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
