@@ -3,40 +3,41 @@ from ai.factory.alert_manager import (
 )
 
 
-def test_raise_alert():
+def test_critical_alert():
     manager = FactoryAlertManager()
 
-    alert = manager.raise_alert(
-        "HEALTH_FAILURE",
-        "scheduler",
+    result = manager.create_alert(
+        "failure"
     )
 
-    assert alert["status"] == "ACTIVE"
-    assert len(manager.active_alerts()) == 1
+    assert result["level"] == "CRITICAL"
 
 
-def test_resolve_alert():
+def test_warning_alert():
     manager = FactoryAlertManager()
 
-    manager.raise_alert(
-        "FAILURE",
-        "daemon",
+    result = manager.create_alert(
+        "degraded"
     )
 
-    result = manager.resolve_alert(
-        "daemon"
+    assert result["level"] == "WARNING"
+
+
+def test_info_alert():
+    manager = FactoryAlertManager()
+
+    result = manager.create_alert(
+        "notice"
     )
 
-    assert result[0]["status"] == "RESOLVED"
-    assert manager.active_alerts() == []
+    assert result["level"] == "INFO"
 
 
 def test_history():
     manager = FactoryAlertManager()
 
-    manager.raise_alert(
-        "TEST",
-        "runtime",
+    manager.create_alert(
+        "failure"
     )
 
     assert len(manager.history()) == 1

@@ -4,51 +4,46 @@ from typing import Any, Dict, List
 
 class FactoryAlertManager:
     def __init__(self):
-        self._active: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
-    def raise_alert(
+    def classify(
         self,
-        alert_type: str,
-        component: str,
-        details=None,
+        issue: str,
+    ):
+        if issue in (
+            "critical",
+            "failure",
+            "down",
+        ):
+            return "CRITICAL"
+
+        if issue in (
+            "degraded",
+            "warning",
+        ):
+            return "WARNING"
+
+        return "INFO"
+
+    def create_alert(
+        self,
+        issue: str,
     ):
         alert = {
-            "type": alert_type,
-            "component": component,
-            "details": details,
-            "status": "ACTIVE",
+            "issue": issue,
+            "level": self.classify(
+                issue
+            ),
             "timestamp": datetime.now(
                 timezone.utc
             ).isoformat(),
         }
 
-        self._active.append(alert)
-        self._history.append(alert)
+        self._history.append(
+            alert
+        )
 
         return alert
-
-    def resolve_alert(
-        self,
-        component: str,
-    ):
-        resolved = []
-
-        for alert in self._active:
-            if alert["component"] == component:
-                alert["status"] = "RESOLVED"
-                resolved.append(alert)
-
-        self._active = [
-            alert
-            for alert in self._active
-            if alert["component"] != component
-        ]
-
-        return resolved
-
-    def active_alerts(self):
-        return self._active
 
     def history(self):
         return self._history
