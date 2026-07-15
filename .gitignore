@@ -148,3 +148,5 @@ check-gmail-setup.sh
 choose-gmail-setup.sh
 find-oauth-file.sh
 ho-diagnostic.sh
+
+ai/integration/.nexus_key
