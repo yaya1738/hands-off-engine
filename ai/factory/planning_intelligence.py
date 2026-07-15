@@ -4,74 +4,59 @@ from typing import Any, Dict, List
 class FactoryPlanningIntelligence:
     def __init__(self):
         self.plans: List[Dict[str, Any]] = []
-        self.tasks: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
     def create_plan(
         self,
         plan: Dict[str, Any],
     ):
-        self.plans.append(
-            plan
-        )
+        self.plans.append(plan)
 
         result = {
             "created": True,
             "plan": plan,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def prioritize_tasks(
+    def analyze_constraints(
         self,
-        tasks: List[Dict[str, Any]],
+        constraints: Dict[str, Any],
     ):
         result = {
-            "prioritized": True,
-            "count": len(tasks),
+            "analyzed": True,
+            "constraints": constraints,
         }
 
-        self.tasks.extend(
-            tasks
-        )
-
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def schedule_tasks(
+    def allocate_resources(
         self,
-        tasks: List[Dict[str, Any]],
+        resources: Dict[str, Any],
     ):
         result = {
-            "scheduled": True,
-            "count": len(tasks),
+            "allocated": True,
+            "resources": resources,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def validate_plan(
+    def evaluate_plan(
         self,
         plan: Dict[str, Any],
     ):
         result = {
-            "validated": True,
+            "evaluated": True,
             "plan": plan,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
