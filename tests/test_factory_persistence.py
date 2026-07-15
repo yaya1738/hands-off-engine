@@ -1,47 +1,43 @@
-from types import SimpleNamespace
-
-from ai.factory.persistence import FactoryPersistence
-
-
-class FakeRegistry:
-    def list_components(self):
-        return [
-            "planner",
-            "runner",
-        ]
+from ai.factory.persistence import (
+    FactoryPersistence,
+)
 
 
-class FakeRuntime:
-    registry = FakeRegistry()
+def test_save_and_load(tmp_path):
+    store = FactoryPersistence(
+        str(tmp_path / "state.json")
+    )
 
-    def status(self):
-        return {
+    store.save(
+        {
             "status": "HEALTHY",
         }
-
-
-def test_save_runtime():
-    persistence = FactoryPersistence()
-
-    snapshot = persistence.save_runtime(
-        FakeRuntime()
     )
 
-    assert "planner" in snapshot["components"]
-    assert snapshot["health"]["status"] == "HEALTHY"
+    result = store.load()
+
+    assert result["status"] == "HEALTHY"
 
 
-def test_restore_runtime():
-    persistence = FactoryPersistence()
+def test_missing_state(tmp_path):
+    store = FactoryPersistence(
+        str(tmp_path / "missing.json")
+    )
 
-    result = persistence.restore_runtime(
+    assert store.load() is None
+
+
+def test_clear(tmp_path):
+    store = FactoryPersistence(
+        str(tmp_path / "state.json")
+    )
+
+    store.save(
         {
-            "components": ["planner"],
-            "health": {
-                "status": "HEALTHY",
-            },
+            "version": 1,
         }
     )
 
-    assert result["restored"] is True
-    assert "planner" in result["components"]
+    store.clear()
+
+    assert store.exists() is False
