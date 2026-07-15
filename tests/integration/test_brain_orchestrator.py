@@ -47,12 +47,12 @@ class TestBrainOrchestrator(unittest.TestCase):
         self.assertIn("stages", report)
         self.assertIn("summary", report)
 
-        # All 7 stages should be recorded
-        self.assertEqual(len(report["stages"]), 7)
+        # All 8 stages should be recorded
+        self.assertEqual(len(report["stages"]), 8)
 
         # All should succeed
-        self.assertEqual(report["summary"]["stages_total"], 7)
-        self.assertEqual(report["summary"]["stages_ok"], 7)
+        self.assertEqual(report["summary"]["stages_total"], 8)
+        self.assertEqual(report["summary"]["stages_ok"], 8)
         self.assertEqual(report["summary"]["stages_error"], 0)
         self.assertEqual(report["summary"]["overall_status"], "ok")
 
@@ -133,7 +133,7 @@ class TestBrainOrchestrator(unittest.TestCase):
         # Verify JSON is valid
         with open(json_path) as f:
             loaded_report = json.load(f)
-            self.assertEqual(loaded_report["summary"]["stages_total"], 7)
+            self.assertEqual(loaded_report["summary"]["stages_total"], 8)
 
         # Verify TXT is non-empty
         txt_content = txt_path.read_text()
@@ -328,7 +328,7 @@ class TestBrainOrchestrator(unittest.TestCase):
             report = orchestrator.run_all()
 
             # All stages should fail
-            self.assertEqual(report["summary"]["stages_error"], 7)
+            self.assertEqual(report["summary"]["stages_error"], 8)
             self.assertEqual(report["summary"]["stages_ok"], 0)
 
             # Overall should be failed
@@ -437,7 +437,7 @@ class TestBrainOrchestrator(unittest.TestCase):
 
         report = orchestrator.run_all()
 
-        expected_batches = [18, 19, 20, 21, 22, 23, 24]
+        expected_batches = [18, 19, 20, 21, 22, 23, 24, 25]
 
         for i, stage in enumerate(report["stages"]):
             self.assertEqual(
