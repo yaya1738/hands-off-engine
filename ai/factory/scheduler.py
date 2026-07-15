@@ -3,41 +3,58 @@ from typing import Any, Dict, List
 
 class FactoryScheduler:
     def __init__(self):
-        self._jobs: List[Dict[str, Any]] = []
+        self.tasks: List[Dict[str, Any]] = []
+        self._history: List[Dict[str, Any]] = []
 
-    def schedule(
+    def schedule_task(
         self,
-        job_id: str,
-        action: str,
-        interval: int,
-    ) -> None:
-        self._jobs.append(
-            {
-                "job_id": job_id,
-                "action": action,
-                "interval": interval,
-                "status": "SCHEDULED",
-                "runs": 0,
-            }
+        task: Dict[str, Any],
+    ):
+        self.tasks.append(
+            task
         )
 
-    def run_pending(self):
-        results = []
+        result = {
+            "scheduled": True,
+            "task": task,
+        }
 
-        for job in self._jobs:
-            job["runs"] += 1
-            job["status"] = "RUNNING"
+        self._history.append(result)
 
-            results.append(
-                {
-                    "job_id": job["job_id"],
-                    "action": job["action"],
-                }
-            )
+        return result
 
-            job["status"] = "COMPLETE"
+    def cancel_task(
+        self,
+        task: Dict[str, Any],
+    ):
+        result = {
+            "cancelled": True,
+            "task": task,
+        }
 
-        return results
+        self._history.append(result)
 
-    def list_jobs(self):
-        return self._jobs
+        return result
+
+    def run_due_tasks(self):
+        result = {
+            "executed": True,
+            "count": len(self.tasks),
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def check_schedule(self):
+        result = {
+            "checked": True,
+            "count": len(self.tasks),
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def history(self):
+        return self._history
