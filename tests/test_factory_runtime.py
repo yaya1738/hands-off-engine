@@ -1,29 +1,32 @@
 from ai.factory.runtime import FactoryRuntime
 
 
-def test_runtime_status():
-    runtime = FactoryRuntime()
-
-    result = runtime.status()
-
-    assert result["status"] == "HEALTHY"
+def build():
+    return FactoryRuntime()
 
 
-def test_runtime_dashboard():
-    runtime = FactoryRuntime()
+def test_execute_pipeline():
+    runtime = build()
 
-    result = runtime.view()
-
-    assert "health" in result
-    assert "components" in result
-
-
-def test_runtime_runs_factory():
-    runtime = FactoryRuntime()
-
-    result = runtime.run(
-        "runtime-001",
-        "test integrated runtime",
+    result = runtime.execute(
+        {
+            "task": "test",
+        }
     )
 
-    assert result["execution"].status == "SUCCESS"
+    assert result["success"] is True
+    assert "planning" in result["steps_completed"]
+    assert "execution" in result["steps_completed"]
+    assert "learning" in result["steps_completed"]
+
+
+def test_history():
+    runtime = build()
+
+    runtime.execute(
+        {
+            "task": "test",
+        }
+    )
+
+    assert len(runtime.history()) == 1
