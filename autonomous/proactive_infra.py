@@ -428,6 +428,18 @@ class ProactiveInfraManager:
             for i in range(nodes_to_add):
                 result = engine.provision_node()
                 results.append(result)
+
+                if (
+                    not result.get("success")
+                    and (
+                        result.get("blocked")
+                        or result.get("blocked_by_cost")
+                        or result.get("blocked_by_cost_gate")
+                        or result.get("blocked_by_capital")
+                    )
+                ):
+                    break
+
                 if not result.get("success"):
                     break
 
