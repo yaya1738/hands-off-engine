@@ -1,26 +1,70 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 class FactoryBootstrap:
     def __init__(
         self,
-        components: Dict[str, Any],
+        config=None,
+        state=None,
+        control_plane=None,
     ):
-        self.components = components
-        self.runtime = None
+        self.config = config
+        self.state = state
+        self.control_plane = control_plane
+        self.initialized = False
+        self.running = False
+        self._history: List[Dict[str, Any]] = []
 
-    def create_factory(self):
-        self.runtime = self.components[
-            "runtime_coordinator"
-        ]
+    def initialize(self):
+        self.initialized = True
 
-        return self.runtime
+        result = {
+            "status": "INITIALIZED",
+        }
 
-    def start_factory(self):
-        if not self.runtime:
-            self.create_factory()
+        self._history.append(
+            result
+        )
 
-        return self.runtime.initialize()
+        return result
 
-    def get_runtime(self):
-        return self.runtime
+    def start(self):
+        if not self.initialized:
+            self.initialize()
+
+        if self.control_plane:
+            self.control_plane.start()
+
+        self.running = True
+
+        result = {
+            "status": "STARTED",
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def shutdown(self):
+        self.running = False
+
+        result = {
+            "status": "STOPPED",
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def status(self):
+        return {
+            "initialized": self.initialized,
+            "running": self.running,
+        }
+
+    def history(self):
+        return self._history
