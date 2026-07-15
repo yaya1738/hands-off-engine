@@ -123,3 +123,6 @@ data/
 deliverables/
 draft
 *.txt
+
+# Independent nested repositories
+hands-off-engine/
