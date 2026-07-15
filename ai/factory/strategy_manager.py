@@ -74,5 +74,26 @@ class FactoryStrategyManager:
 
         return result
 
+    def select_strategy(
+        self,
+        requested: str = "default",
+    ):
+        selected = (
+            requested
+            if requested in self.strategies
+            else "default"
+        )
+
+        result = {
+            "selected": selected,
+            "requested": requested,
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
     def history(self):
         return self._history
