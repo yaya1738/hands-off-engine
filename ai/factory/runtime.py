@@ -2,6 +2,7 @@ from typing import Any, Dict, List
 
 from ai.factory.runtime_governance import FactoryRuntimeGovernance
 from ai.factory.runtime_observability import FactoryRuntimeObservability
+from ai.factory.runtime_state import FactoryRuntimeState
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
@@ -16,6 +17,7 @@ class FactoryRuntime:
     def __init__(self):
         self.governance = FactoryRuntimeGovernance()
         self.observability = FactoryRuntimeObservability()
+        self.state = FactoryRuntimeState()
         self.self_healing = FactorySelfHealingIntelligence()
 
         self.planning = FactoryPlanningIntelligence()
@@ -33,6 +35,9 @@ class FactoryRuntime:
         goal: Dict[str, Any],
     ):
         steps = []
+
+        previous_state = self.state.load_state()
+        steps.append("state_loaded")
 
         self.governance.check_policy(goal)
         steps.append("policy_check")
@@ -63,14 +68,8 @@ class FactoryRuntime:
                 "runtime-job",
                 decision,
             )
-
-            self.execution.start_execution(
-                "runtime-job"
-            )
-
-            self.execution.complete_execution(
-                "runtime-job"
-            )
+            self.execution.start_execution("runtime-job")
+            self.execution.complete_execution("runtime-job")
 
             steps.append("execution")
 
@@ -123,6 +122,15 @@ class FactoryRuntime:
             }
         )
         steps.append("optimization")
+
+        new_state = {
+            "last_goal": goal,
+            "last_steps": steps,
+        }
+
+        self.state.save_state(new_state)
+        self.state.snapshot()
+        steps.append("state_saved")
 
         result = {
             "success": True,
