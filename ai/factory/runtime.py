@@ -4,6 +4,7 @@ from ai.factory.runtime_governance import FactoryRuntimeGovernance
 from ai.factory.runtime_observability import FactoryRuntimeObservability
 from ai.factory.runtime_state import FactoryRuntimeState
 from ai.factory.event_bus import FactoryEventBus
+from ai.factory.event_replay import FactoryEventReplay
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
@@ -19,7 +20,10 @@ class FactoryRuntime:
         self.governance = FactoryRuntimeGovernance()
         self.observability = FactoryRuntimeObservability()
         self.state = FactoryRuntimeState()
+
         self.events = FactoryEventBus()
+        self.replay = FactoryEventReplay()
+
         self.self_healing = FactorySelfHealingIntelligence()
 
         self.planning = FactoryPlanningIntelligence()
@@ -32,10 +36,34 @@ class FactoryRuntime:
 
         self._history: List[Dict[str, Any]] = []
 
-    def execute(self, goal: Dict[str, Any]):
-        steps = []
+    def emit_event(
+        self,
+        event_type: str,
+        payload: Dict[str, Any],
+    ):
+        event = {
+            "type": event_type,
+            "payload": payload,
+        }
 
         self.events.emit_runtime_event(
+            event_type,
+            payload,
+        )
+
+        self.replay.store_event(
+            event,
+        )
+
+        return event
+
+    def execute(
+        self,
+        goal: Dict[str, Any],
+    ):
+        steps = []
+
+        self.emit_event(
             "runtime.started",
             {"goal": goal},
         )
@@ -59,7 +87,7 @@ class FactoryRuntime:
             plan = self.planning.create_plan(goal)
             steps.append("planning")
 
-            self.events.emit_runtime_event(
+            self.emit_event(
                 "plan.created",
                 {"plan": plan},
             )
@@ -70,7 +98,7 @@ class FactoryRuntime:
             decision = self.decision.create_decision(simulation)
             steps.append("decision")
 
-            self.events.emit_runtime_event(
+            self.emit_event(
                 "decision.created",
                 {"decision": decision},
             )
@@ -85,7 +113,7 @@ class FactoryRuntime:
                 decision,
             )
 
-            self.events.emit_runtime_event(
+            self.emit_event(
                 "execution.started",
                 {"execution_id": "runtime-job"},
             )
@@ -100,7 +128,7 @@ class FactoryRuntime:
 
             steps.append("execution")
 
-            self.events.emit_runtime_event(
+            self.emit_event(
                 "execution.completed",
                 {"execution_id": "runtime-job"},
             )
@@ -115,11 +143,11 @@ class FactoryRuntime:
             )
 
             self.self_healing.apply_recovery(
-                {"action": "restart_execution"}
+                {"action": "restart_execution"},
             )
 
             self.self_healing.verify_recovery(
-                {"status": "recovered"}
+                {"status": "recovered"},
             )
 
             steps.append("recovered")
@@ -146,7 +174,7 @@ class FactoryRuntime:
 
         steps.append("learning")
 
-        self.events.emit_runtime_event(
+        self.emit_event(
             "learning.recorded",
             {"goal": goal},
         )
@@ -172,7 +200,7 @@ class FactoryRuntime:
             "steps_completed": steps,
         }
 
-        self.events.emit_runtime_event(
+        self.emit_event(
             "runtime.completed",
             result,
         )
