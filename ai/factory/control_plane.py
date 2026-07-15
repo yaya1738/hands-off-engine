@@ -1,45 +1,75 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 class FactoryControlPlane:
     def __init__(
         self,
-        runtime: Any,
-        snapshot_store: Any,
-        snapshot_diff: Any,
-        optimizer: Any,
+        runtime=None,
+        resilience=None,
+        state=None,
     ):
         self.runtime = runtime
-        self.snapshot_store = snapshot_store
-        self.snapshot_diff = snapshot_diff
-        self.optimizer = optimizer
+        self.resilience = resilience
+        self.state = state
+        self.running = False
+        self._history: List[Dict[str, Any]] = []
 
-    def inspect(self) -> Dict[str, Any]:
-        return {
-            "health": self.runtime.status(),
-            "dashboard": self.runtime.view(),
+    def start(self):
+        self.running = True
+
+        result = {
+            "status": "STARTED",
         }
 
-    def save_state(
-        self,
-        snapshot: Dict[str, Any],
-    ):
-        self.snapshot_store.save_snapshot(
-            snapshot
+        self._history.append(
+            result
         )
 
-    def latest_state(self):
-        return self.snapshot_store.get_latest()
+        return result
 
-    def compare_states(
+    def cycle(
         self,
-        before: Dict[str, Any],
-        after: Dict[str, Any],
+        metrics: Dict[str, Any],
     ):
-        return self.snapshot_diff.compare(
-            before,
-            after,
+        result = {}
+
+        if self.runtime:
+            result["runtime"] = (
+                self.runtime.run_once(
+                    metrics
+                )
+            )
+
+        if self.state:
+            result["checkpoint"] = (
+                self.state.checkpoint(
+                    result
+                )
+            )
+
+        self._history.append(
+            result
         )
 
-    def optimize(self):
-        return self.optimizer.optimize()
+        return result
+
+    def shutdown(self):
+        self.running = False
+
+        result = {
+            "status": "STOPPED",
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def status(self):
+        return {
+            "running": self.running,
+        }
+
+    def history(self):
+        return self._history
