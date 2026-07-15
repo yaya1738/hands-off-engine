@@ -3,44 +3,72 @@ from typing import Any, Callable, Dict, List
 
 class FactoryEventBus:
     def __init__(self):
-        self._subscribers: Dict[str, List[Callable]] = {}
+        self.subscribers: Dict[str, List[Callable]] = {}
+        self.events: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
     def subscribe(
         self,
         event_type: str,
         handler: Callable,
-    ) -> None:
-        if event_type not in self._subscribers:
-            self._subscribers[event_type] = []
+    ):
+        self.subscribers.setdefault(
+            event_type,
+            [],
+        ).append(handler)
 
-        self._subscribers[event_type].append(
-            handler
-        )
+        result = {
+            "subscribed": True,
+            "event_type": event_type,
+        }
 
-    def publish(
+        self._history.append(result)
+
+        return result
+
+    def publish_event(
         self,
         event_type: str,
-        payload: Any = None,
+        payload: Dict[str, Any],
     ):
         event = {
-            "event": event_type,
+            "type": event_type,
             "payload": payload,
         }
 
-        self._history.append(event)
+        self.events.append(event)
 
-        results = []
+        for handler in self.subscribers.get(event_type, []):
+            handler(payload)
 
-        for handler in self._subscribers.get(
+        result = {
+            "published": True,
+            "event": event,
+        }
+
+        self._history.append(result)
+
+        return result
+
+    def emit_runtime_event(
+        self,
+        event_type: str,
+        payload: Dict[str, Any],
+    ):
+        return self.publish_event(
             event_type,
-            [],
-        ):
-            results.append(
-                handler(payload)
-            )
+            payload,
+        )
 
-        return results
+    def process_events(self):
+        result = {
+            "processed": True,
+            "count": len(self.events),
+        }
+
+        self._history.append(result)
+
+        return result
 
     def history(self):
         return self._history

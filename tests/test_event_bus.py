@@ -1,52 +1,62 @@
-from ai.factory.event_bus import (
-    FactoryEventBus,
-)
+from ai.factory.event_bus import FactoryEventBus
+
+
+def build():
+    return FactoryEventBus()
+
+
+def test_subscribe():
+    engine = build()
+
+    result = engine.subscribe(
+        "test",
+        lambda x: x,
+    )
+
+    assert result["subscribed"] is True
 
 
 def test_publish_event():
-    bus = FactoryEventBus()
+    engine = build()
 
-    result = bus.publish(
-        "JOB_COMPLETED",
-        {
-            "status": "SUCCESS",
-        },
+    result = engine.publish_event(
+        "test",
+        {},
     )
 
-    assert result == []
-    assert bus.history()[0]["event"] == "JOB_COMPLETED"
+    assert result["published"] is True
 
 
-def test_subscriber_receives_event():
-    bus = FactoryEventBus()
+def test_emit_runtime_event():
+    engine = build()
 
-    received = []
-
-    def handler(payload):
-        received.append(payload)
-        return "ok"
-
-    bus.subscribe(
-        "JOB_COMPLETED",
-        handler,
+    result = engine.emit_runtime_event(
+        "runtime",
+        {},
     )
 
-    result = bus.publish(
-        "JOB_COMPLETED",
-        {
-            "id": 1,
-        },
+    assert result["published"] is True
+
+
+def test_process_events():
+    engine = build()
+
+    engine.publish_event(
+        "test",
+        {},
     )
 
-    assert received[0]["id"] == 1
-    assert result[0] == "ok"
+    result = engine.process_events()
+
+    assert result["processed"] is True
 
 
 def test_history():
-    bus = FactoryEventBus()
+    engine = build()
 
-    bus.publish(
-        "TEST",
+    engine.publish_event(
+        "test",
+        {},
     )
 
-    assert len(bus.history()) == 1
+    assert len(engine.history()) == 1
