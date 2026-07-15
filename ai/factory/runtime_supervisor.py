@@ -4,47 +4,54 @@ from typing import Any, Dict, List
 class FactoryRuntimeSupervisor:
     def __init__(
         self,
-        runtime,
+        recovery=None,
     ):
-        self.runtime = runtime
+        self.recovery = recovery
         self._history: List[Dict[str, Any]] = []
 
-    def check(self):
-        status = {
-            "running": self.runtime.running,
+    def monitor(
+        self,
+        components: Dict[str, Any],
+    ):
+        result = {
+            "components": components,
+            "healthy": all(
+                components.values()
+            ),
         }
 
         self._history.append(
-            status
+            result
         )
 
-        return status
+        return result
 
-    def monitor(self):
-        status = self.check()
-
-        if not status["running"]:
-            return {
-                "action": "RESTART_REQUIRED",
-                "status": status,
-            }
-
-        return {
-            "action": "HEALTHY",
-            "status": status,
+    def detect(
+        self,
+        status: Dict[str, Any],
+    ):
+        result = {
+            "failure": not status.get(
+                "healthy",
+                False,
+            ),
         }
 
-    def recover(self):
-        if not self.runtime.running:
-            self.runtime.running = True
+        self._history.append(
+            result
+        )
 
-            result = {
-                "action": "RECOVERED",
-            }
+        return result
+
+    def recover(
+        self,
+    ):
+        if self.recovery:
+            result = self.recovery.restore()
 
         else:
             result = {
-                "action": "NO_ACTION",
+                "status": "NO_RECOVERY",
             }
 
         self._history.append(

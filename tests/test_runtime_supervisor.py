@@ -3,49 +3,55 @@ from ai.factory.runtime_supervisor import (
 )
 
 
-class FakeRuntime:
-    def __init__(self):
-        self.running = False
-
-
-def test_check():
-    supervisor = FactoryRuntimeSupervisor(
-        FakeRuntime()
-    )
-
-    result = supervisor.check()
-
-    assert result["running"] is False
+class FakeRecovery:
+    def restore(self):
+        return {
+            "status": "RESTORED",
+        }
 
 
 def test_monitor():
-    supervisor = FactoryRuntimeSupervisor(
-        FakeRuntime()
+    supervisor = FactoryRuntimeSupervisor()
+
+    result = supervisor.monitor(
+        {
+            "scheduler": True,
+            "loop": True,
+        }
     )
 
-    result = supervisor.monitor()
+    assert result["healthy"] is True
 
-    assert result["action"] == "RESTART_REQUIRED"
+
+def test_detect_failure():
+    supervisor = FactoryRuntimeSupervisor()
+
+    result = supervisor.detect(
+        {
+            "healthy": False,
+        }
+    )
+
+    assert result["failure"] is True
 
 
 def test_recover():
-    runtime = FakeRuntime()
-
     supervisor = FactoryRuntimeSupervisor(
-        runtime
+        recovery=FakeRecovery()
     )
 
     result = supervisor.recover()
 
-    assert result["action"] == "RECOVERED"
-    assert runtime.running is True
+    assert result["status"] == "RESTORED"
 
 
 def test_history():
-    supervisor = FactoryRuntimeSupervisor(
-        FakeRuntime()
-    )
+    supervisor = FactoryRuntimeSupervisor()
 
-    supervisor.check()
+    supervisor.monitor(
+        {
+            "runtime": True,
+        }
+    )
 
     assert len(supervisor.history()) == 1
