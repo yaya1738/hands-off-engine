@@ -5,48 +5,54 @@ class FactoryDecisionEngine:
     def __init__(self):
         self._history: List[Dict[str, Any]] = []
 
-    def decide(
-        self,
-        feedback: Dict[str, Any],
-    ) -> Dict[str, Any]:
-
-        recommendation = feedback.get(
-            "recommendation",
-            "review",
-        )
-
-        performance = feedback.get(
-            "performance",
-            0,
-        )
-
-        if recommendation == "continue":
-            decision = "CONTINUE"
-
-        elif recommendation == "improve":
-            decision = "OPTIMIZE"
-
-        else:
-            decision = "REVIEW"
-
-        result = {
-            "decision": decision,
-            "confidence": performance,
-            "reason": feedback.get(
-                "trend",
-                "unknown",
-            ),
-        }
-
-        self._history.append(result)
-
-        return result
-
     def evaluate(
         self,
-        feedback: Dict[str, Any],
+        context: Dict[str, Any],
     ):
-        return self.decide(feedback)
+        health = context.get(
+            "health",
+            "UNKNOWN",
+        )
+
+        risk = context.get(
+            "risk",
+            "UNKNOWN",
+        )
+
+        if health == "DEGRADED":
+            decision = {
+                "decision": "RECOVER",
+                "reason": "health_degraded",
+                "confidence": 0.8,
+            }
+
+        elif risk == "HIGH":
+            decision = {
+                "decision": "ESCALATE",
+                "reason": "high_risk",
+                "confidence": 0.7,
+            }
+
+        else:
+            decision = {
+                "decision": "CONTINUE",
+                "reason": "stable",
+                "confidence": 0.9,
+            }
+
+        self._history.append(
+            decision
+        )
+
+        return decision
+
+    def decide(
+        self,
+        context,
+    ):
+        return self.evaluate(
+            context
+        )
 
     def history(self):
         return self._history
