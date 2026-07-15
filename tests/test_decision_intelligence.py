@@ -7,61 +7,51 @@ def build():
     return FactoryDecisionIntelligence()
 
 
-def test_analyze_options():
-    intelligence = build()
+def test_create_decision():
+    engine = build()
 
-    result = intelligence.analyze_options(
-        [
-            {
-                "id": 1,
-            }
-        ]
+    result = engine.create_decision(
+        {}
     )
 
-    assert result["analyzed"] is True
+    assert result["created"] is True
 
 
-def test_score_decisions():
-    intelligence = build()
+def test_evaluate_options():
+    engine = build()
 
-    result = intelligence.score_decisions(
-        [
-            {
-                "id": 1,
-            }
-        ]
+    result = engine.evaluate_options(
+        []
+    )
+
+    assert result["evaluated"] is True
+
+
+def test_score_decision():
+    engine = build()
+
+    result = engine.score_decision(
+        {}
     )
 
     assert result["scored"] is True
 
 
 def test_select_action():
-    intelligence = build()
+    engine = build()
 
-    result = intelligence.select_action(
-        [
-            {
-                "id": 1,
-            }
-        ]
+    result = engine.select_action(
+        []
     )
 
-    assert result["selected"]["id"] == 1
-
-
-def test_explain_decision():
-    intelligence = build()
-
-    result = intelligence.explain_decision(
-        {}
-    )
-
-    assert result["explained"] is True
+    assert result["selected"] is True
 
 
 def test_history():
-    intelligence = build()
+    engine = build()
 
-    intelligence.analyze_options([])
+    engine.create_decision(
+        {}
+    )
 
-    assert len(intelligence.history()) == 1
+    assert len(engine.history()) == 1

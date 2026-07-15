@@ -6,80 +6,57 @@ class FactoryDecisionIntelligence:
         self.decisions: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
-    def analyze_options(
+    def create_decision(
         self,
-        options: List[Dict[str, Any]],
+        decision: Dict[str, Any],
     ):
+        self.decisions.append(decision)
+
         result = {
-            "analyzed": True,
-            "count": len(options),
+            "created": True,
+            "decision": decision,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def score_decisions(
+    def evaluate_options(
         self,
         options: List[Dict[str, Any]],
     ):
-        scored = [
-            {
-                **option,
-                "score": 1,
-            }
-            for option in options
-        ]
-
         result = {
-            "scored": True,
-            "options": scored,
+            "evaluated": True,
+            "count": len(options),
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
+
+        return result
+
+    def score_decision(
+        self,
+        decision: Dict[str, Any],
+    ):
+        result = {
+            "scored": True,
+            "decision": decision,
+        }
+
+        self._history.append(result)
 
         return result
 
     def select_action(
         self,
-        options: List[Dict[str, Any]],
-    ):
-        action = (
-            options[0]
-            if options
-            else None
-        )
-
-        result = {
-            "selected": action,
-        }
-
-        self.decisions.append(
-            result
-        )
-
-        self._history.append(
-            result
-        )
-
-        return result
-
-    def explain_decision(
-        self,
-        decision: Dict[str, Any],
+        actions: List[Dict[str, Any]],
     ):
         result = {
-            "explained": True,
-            "decision": decision,
+            "selected": True,
+            "count": len(actions),
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
