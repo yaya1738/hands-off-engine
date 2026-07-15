@@ -3,58 +3,69 @@ from ai.factory.knowledge_retrieval import (
 )
 
 
-class FakeMemory:
-    def query(self, term):
+class FakeKnowledge:
+    def query(self, query):
         return [
             {
-                "lesson": "restart scheduler",
-                "confidence": 0.9,
-            },
-            {
-                "lesson": "check logs",
-                "confidence": 0.5,
-            },
+                "pattern": "stable",
+            }
         ]
 
 
-def test_retrieve():
-    engine = FactoryKnowledgeRetrieval(
-        FakeMemory()
+def build():
+    return FactoryKnowledgeRetrieval(
+        FakeKnowledge()
     )
 
-    result = engine.retrieve(
-        "scheduler"
+
+def test_retrieve_context():
+    retrieval = build()
+
+    result = retrieval.retrieve_context()
+
+    assert len(result["context"]) == 1
+
+
+def test_match():
+    retrieval = build()
+
+    result = retrieval.match(
+        {
+            "context": [
+                {}
+            ]
+        }
     )
 
-    assert len(result) == 2
+    assert result["matched"] is True
 
 
-def test_rank():
-    engine = FactoryKnowledgeRetrieval(
-        FakeMemory()
+def test_enrich():
+    retrieval = build()
+
+    result = retrieval.enrich(
+        {
+            "action": "RUN",
+        }
     )
 
-    result = engine.rank(
-        [
-            {
-                "confidence": 0.2,
-            },
-            {
-                "confidence": 0.8,
-            },
-        ]
-    )
-
-    assert result[0]["confidence"] == 0.8
+    assert result["enriched"] is True
 
 
 def test_recommend():
-    engine = FactoryKnowledgeRetrieval(
-        FakeMemory()
+    retrieval = build()
+
+    result = retrieval.recommend()
+
+    assert (
+        result["recommendation"]
+        == "USE_KNOWLEDGE"
     )
 
-    result = engine.recommend(
-        "scheduler"
-    )
 
-    assert result["confidence"] == 0.9
+def test_history():
+    retrieval = build()
+
+    retrieval.recommend()
+
+    assert len(retrieval.history()) == 1

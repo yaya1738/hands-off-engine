@@ -4,41 +4,77 @@ from typing import Any, Dict, List
 class FactoryKnowledgeRetrieval:
     def __init__(
         self,
-        memory,
+        knowledge=None,
     ):
-        self.memory = memory
+        self.knowledge = knowledge
+        self._history: List[Dict[str, Any]] = []
 
-    def retrieve(
+    def retrieve_context(
         self,
-        query: str,
+        query: str = None,
     ):
-        return self.memory.query(
-            query
+        if self.knowledge:
+            result = self.knowledge.query(
+                query
+            )
+
+        else:
+            result = []
+
+        output = {
+            "context": result,
+        }
+
+        self._history.append(
+            output
         )
 
-    def rank(
+        return output
+
+    def match(
         self,
-        entries: List[Dict[str, Any]],
+        context: Dict[str, Any],
     ):
-        return sorted(
-            entries,
-            key=lambda item: item.get(
-                "confidence",
-                0,
+        result = {
+            "matched": bool(
+                context.get(
+                    "context",
+                    [],
+                )
             ),
-            reverse=True,
+        }
+
+        self._history.append(
+            result
         )
 
-    def recommend(
+        return result
+
+    def enrich(
         self,
-        query: str,
+        decision: Dict[str, Any],
     ):
-        matches = self.retrieve(
-            query
+        result = {
+            "decision": decision,
+            "enriched": True,
+        }
+
+        self._history.append(
+            result
         )
 
-        ranked = self.rank(
-            matches
+        return result
+
+    def recommend(self):
+        result = {
+            "recommendation": "USE_KNOWLEDGE",
+        }
+
+        self._history.append(
+            result
         )
 
-        return ranked[0] if ranked else None
+        return result
+
+    def history(self):
+        return self._history
