@@ -3,81 +3,65 @@ from typing import Any, Dict, List
 
 class FactoryExperimentationEngine:
     def __init__(self):
-        self.experiments: List[Dict[str, Any]] = []
-        self.results: List[Dict[str, Any]] = []
+        self.experiments: Dict[str, Dict[str, Any]] = {}
+        self.trials: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
     def create_experiment(
         self,
+        name: str,
         experiment: Dict[str, Any],
     ):
-        self.experiments.append(
-            experiment
-        )
+        self.experiments[name] = experiment
 
         result = {
             "created": True,
-            "experiment": experiment,
+            "experiment": name,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def run_experiment(
+    def run_trial(
         self,
-        experiment: Dict[str, Any],
+        experiment: str,
+        trial: Dict[str, Any],
     ):
         result = {
             "run": True,
             "experiment": experiment,
-            "outcome": "COMPLETE",
+            "trial": trial,
         }
 
-        self.results.append(
-            result
-        )
-
-        self._history.append(
-            result
-        )
+        self.trials.append(result)
+        self._history.append(result)
 
         return result
 
-    def measure_result(
+    def compare_results(
         self,
-        result: Dict[str, Any],
+        results: List[Dict[str, Any]],
     ):
-        measured = {
-            "measured": True,
-            "result": result,
+        result = {
+            "compared": True,
+            "count": len(results),
         }
 
-        self._history.append(
-            measured
-        )
+        self._history.append(result)
 
-        return measured
+        return result
 
     def select_winner(
         self,
         candidates: List[Dict[str, Any]],
     ):
-        winner = (
-            candidates[0]
-            if candidates
-            else None
-        )
-
         result = {
-            "winner": winner,
+            "selected": True,
+            "count": len(candidates),
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
