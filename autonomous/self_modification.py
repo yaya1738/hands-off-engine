@@ -393,7 +393,7 @@ def system_health_score() -> Dict:
         if prot_data.get("protection_active"):
             protection_score = 25
     # Check for PROVISIONING_BLOCKED.txt (prevents runaway scaling)
-    block_file = PROJECT_ROOT / "PROVISIONING_BLOCKED.txt"
+    block_file = PROJECT_ROOT / "state" / "PROVISIONING_BLOCKED.txt"
     if block_file.exists():
         protection_score = min(protection_score + 5, 25)
     score["components"]["protection"] = {
@@ -1217,7 +1217,7 @@ def autonomous_action_executor() -> Dict:
         # Actually verify protection
         from pathlib import Path
         protection_file = STATE_DIR / "infra_protection_state.json"
-        block_file = PROJECT_ROOT / "PROVISIONING_BLOCKED.txt"
+        block_file = PROJECT_ROOT / "state" / "PROVISIONING_BLOCKED.txt"
 
         execution["action_taken"] = "VERIFIED_PROTECTION"
         execution["result"] = {
@@ -1326,7 +1326,7 @@ def live_status_pulse() -> Dict:
     # 3. System Health Quick Check
     try:
         autonomous_count = len(list(Path(__file__).parent.glob("*.py")))
-        protection_ok = (PROJECT_ROOT / "PROVISIONING_BLOCKED.txt").exists()
+        protection_ok = (PROJECT_ROOT / "state" / "PROVISIONING_BLOCKED.txt").exists()
         pulse["system"] = {
             "autonomous_modules": autonomous_count,
             "protection_active": protection_ok,
@@ -1734,7 +1734,7 @@ def autonomous_drift_detector() -> Dict:
 
     # 3. Protection Drift Analysis
     protection_file = STATE_DIR / "infra_protection_state.json"
-    block_file = PROJECT_ROOT / "PROVISIONING_BLOCKED.txt"
+    block_file = PROJECT_ROOT / "state" / "PROVISIONING_BLOCKED.txt"
 
     protection_score = 0
     if protection_file.exists():

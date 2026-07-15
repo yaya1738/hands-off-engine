@@ -324,8 +324,11 @@ class ScalingEngine:
             if not approved:
                 return {'success': False, 'error': f'COST GATE BLOCKED: {reason}', 'blocked_by_cost': True}
         except Exception as e:
-            # Cost gate error - log but allow (fail open for now)
-            print(f"[COST GATE] Warning during provision check: {e}")
+            return {
+                'success': False,
+                'error': f'COST GATE FAILURE - provisioning blocked: {e}',
+                'blocked_by_cost_gate': True,
+            }
 
         size = size or self.config.preferred_size
 
