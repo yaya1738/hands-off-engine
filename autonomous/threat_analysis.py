@@ -21,7 +21,27 @@ Serving: Yair Siegel
 import os
 import json
 import subprocess
-import psutil
+try:
+    import psutil
+except ImportError:
+    class DummyPsutil:
+        STATUS_ZOMBIE = "zombie"
+
+        def disk_usage(self, path):
+            class D:
+                percent = 0
+            return D()
+
+        def virtual_memory(self):
+            class M:
+                percent = 0
+            return M()
+
+        def process_iter(self, *args, **kwargs):
+            return []
+
+    psutil = DummyPsutil()
+
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Dict, List, Tuple, Optional
@@ -472,7 +492,7 @@ class ThreatAnalyzer:
 
         # Check for potential infinite loops in logs
         try:
-            log_dir = Path('/var/log/hands-off')
+            log_dir = Path(__file__).resolve().parent.parent / 'logs'
             if log_dir.exists():
                 for log_file in log_dir.glob('*.log'):
                     size = log_file.stat().st_size

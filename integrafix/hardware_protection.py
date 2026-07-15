@@ -412,7 +412,7 @@ def block_if_dangerous(action: str, target: str) -> Tuple[bool, str]:
     Returns: (allowed, reason)
 
     Example:
-        allowed, reason = block_if_dangerous("delete", "/root/hands-off-engine/autonomous")
+        allowed, reason = block_if_dangerous("delete", str(BASE_DIR / "autonomous"))
         if not allowed:
             print(f"Operation blocked: {reason}")
     """

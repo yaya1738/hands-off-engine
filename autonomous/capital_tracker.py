@@ -31,7 +31,7 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass, asdict, field
 from enum import Enum
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 FUEL_STATE = STATE_DIR / "fuel_system.json"
 FUEL_LOG = STATE_DIR / "fuel_operations.jsonl"

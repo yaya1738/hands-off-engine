@@ -334,6 +334,39 @@ class BrainOrchestrator:
         result["duration_ms"] = int(time.time() * 1000) - start_ms
         return result
 
+
+    def run_stage_25_policy_v2_adapter(self) -> Dict[str, Any]:
+        """Run Batch 25: Policy Brain v2 Adapter"""
+        stage_name = "policy_v2_adapter"
+        batch = 25
+
+        result = {
+            "name": stage_name,
+            "batch": batch,
+            "status": "ok",
+            "duration_ms": 0,
+            "input_files": [str(self.state_dir / "brain_policy_v2.json")],
+            "output_files": [],
+            "errors": []
+        }
+
+        start_ms = int(time.time() * 1000)
+
+        try:
+            from ai.ho_policy_v2_adapter import adapt_policy_v2
+            output = adapt_policy_v2(self.state_dir)
+
+            result["output_files"] = output.get("output_files", [])
+            result["status"] = output.get("status", "ok")
+
+        except Exception as e:
+            result["status"] = "error"
+            result["errors"].append(str(e))
+
+        result["duration_ms"] = int(time.time() * 1000) - start_ms
+        return result
+
+
     def run_all(self) -> Dict[str, Any]:
         """
         Run all stages in sequence.
@@ -362,6 +395,7 @@ class BrainOrchestrator:
             self.run_stage_22_consensus_engine,
             self.run_stage_23_learning_engine,
             self.run_stage_24_policy_brain_v2,
+            self.run_stage_25_policy_v2_adapter,
         ]:
             result = stage_func()
 

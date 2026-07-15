@@ -48,38 +48,38 @@ class ProcessConfig:
 CRITICAL_PROCESSES = {
     "backend_loop": ProcessConfig(
         name="backend_loop",
-        command="python3 /root/hands-off-engine/autonomous/backend_loop.py",
-        working_dir="/root/hands-off-engine",
+        command=f"python3 {PROJECT_ROOT}/autonomous/backend_loop.py",
+        working_dir=str(PROJECT_ROOT),
         required=True,
         max_restarts=20,
         restart_delay=10.0
     ),
     "self_healer": ProcessConfig(
         name="self_healer",
-        command="python3 /root/hands-off-engine/autonomous/self_healer.py run",
-        working_dir="/root/hands-off-engine",
+        command=f"python3 {PROJECT_ROOT}/autonomous/self_healer.py run",
+        working_dir=str(PROJECT_ROOT),
         required=True,
         max_restarts=20,
         restart_delay=5.0
     ),
     "hardware_brain": ProcessConfig(
         name="hardware_brain",
-        command="python3 /root/hands-off-engine/autonomous/hardware_brain.py run",
-        working_dir="/root/hands-off-engine",
+        command=f"python3 {PROJECT_ROOT}/autonomous/hardware_brain.py run",
+        working_dir=str(PROJECT_ROOT),
         required=False,
         max_restarts=10
     ),
     "scaling_engine": ProcessConfig(
         name="scaling_engine",
-        command="python3 /root/hands-off-engine/autonomous/scaling_engine.py run",
-        working_dir="/root/hands-off-engine",
+        command=f"python3 {PROJECT_ROOT}/autonomous/scaling_engine.py run",
+        working_dir=str(PROJECT_ROOT),
         required=False,
         max_restarts=10
     ),
     "infra_manager": ProcessConfig(
         name="infra_manager",
-        command="python3 /root/hands-off-engine/autonomous/infra_manager.py monitor",
-        working_dir="/root/hands-off-engine",
+        command=f"python3 {PROJECT_ROOT}/autonomous/infra_manager.py monitor",
+        working_dir=str(PROJECT_ROOT),
         required=False,
         max_restarts=10
     )
@@ -226,7 +226,7 @@ class SystemHardening:
         # Start new process
         try:
             env = os.environ.copy()
-            env["PYTHONPATH"] = "/root/hands-off-engine"
+            env["PYTHONPATH"] = "{PROJECT_ROOT}"
 
             subprocess.Popen(
                 config.command.split(),

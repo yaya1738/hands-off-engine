@@ -22,7 +22,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import random
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 CONVERSATION_LOG = STATE_DIR / "self_conversation.jsonl"
 CONVERSATION_STATE = STATE_DIR / "self_conversation_state.json"

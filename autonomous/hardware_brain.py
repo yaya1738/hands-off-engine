@@ -39,7 +39,7 @@ import urllib.error
 
 BASE_DIR = Path(__file__).parent.parent
 STATE_DIR = BASE_DIR / 'state'
-LOG_DIR = Path('/var/log/hands-off')
+LOG_DIR = Path(__file__).resolve().parent.parent / 'logs'
 
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)

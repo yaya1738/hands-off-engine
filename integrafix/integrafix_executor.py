@@ -14,8 +14,9 @@ from typing import List, Dict, Optional
 
 from integrafix.credential_loader import load_polymarket_key, get_wallet_address
 
-STATE_DIR = Path("/root/hands-off-engine/state")
-TERMUX_DIR = Path("/root/hands-off-engine/termux-hands-off")
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATE_DIR = BASE_DIR / "state"
+TERMUX_DIR = BASE_DIR / "termux-hands-off"
 
 class IntegrafixExecutor:
     """ABCFC-gated executor with credential handling."""

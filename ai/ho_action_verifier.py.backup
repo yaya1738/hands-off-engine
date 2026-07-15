@@ -1,0 +1,291 @@
+#!/usr/bin/env python3
+"""
+Batch 21: Action Verifier
+Analyzes action execution results and generates feedback.
+
+Action verifier that:
+- Reads executed actions
+- Verifies action outcomes
+- Detects issues and anomalies
+- Generates feedback for learning
+"""
+
+import json
+import argparse
+from pathlib import Path
+from datetime import datetime, timezone
+from typing import Dict, Any, List, Optional
+
+
+class ActionVerifier:
+    """
+    Action verification engine.
+
+    Analyzes executed actions and generates feedback:
+    - Verification status per action
+    - Issue detection
+    - Recommendations
+    - Overall health assessment
+    """
+
+    def __init__(
+        self,
+        actions_file: str = None,
+        output_file: str = None,
+        verbose: bool = False
+    ):
+        self.actions_file = Path(actions_file) if actions_file else None
+        self.output_file = Path(output_file) if output_file else None
+        self.verbose = verbose
+        self.actions_data: Dict = {}
+        self.errors: List[str] = []
+
+    def load_actions(self) -> bool:
+        """Load actions from file."""
+        if not self.actions_file:
+            self.errors.append("Actions file path not specified")
+            return False
+
+        if not self.actions_file.exists():
+            self.errors.append(f"Actions file not found: {self.actions_file}")
+            return False
+
+        try:
+            with open(self.actions_file, 'r') as f:
+                self.actions_data = json.load(f)
+            return True
+        except json.JSONDecodeError as e:
+            self.errors.append(f"Malformed JSON in actions file: {e}")
+            return False
+        except Exception as e:
+            self.errors.append(f"Error loading actions: {e}")
+            return False
+
+    def verify_action(self, action: Dict) -> Dict:
+        """Verify a single action."""
+        action_type = action.get("type", action.get("action", "unknown"))
+        status = action.get("status", "unknown")
+        details = action.get("details", {})
+
+        # Determine verification status
+        if status == "ok":
+            verification_status = "verified"
+            issues = []
+        elif status == "error":
+            verification_status = "failed"
+            issues = [{"severity": "high", "message": f"Action {action_type} failed"}]
+        else:
+            verification_status = "unknown"
+            issues = [{"severity": "medium", "message": f"Unknown status for {action_type}"}]
+
+        # Generate recommendations
+        recommendations = []
+        if verification_status == "verified":
+            recommendations.append("Continue monitoring")
+        elif verification_status == "failed":
+            recommendations.append("Investigate failure")
+            recommendations.append("Consider retry")
+
+        return {
+            "action": action_type,
+            "original_status": status,
+            "verification_status": verification_status,
+            "issues": issues,
+            "recommendations": recommendations,
+            "details": details
+        }
+
+    def compute_overall_health(self, feedback_items: List[Dict]) -> str:
+        """Compute overall health from feedback items."""
+        if not feedback_items:
+            return "unknown"
+
+        failed_count = sum(1 for f in feedback_items if f["verification_status"] == "failed")
+        unknown_count = sum(1 for f in feedback_items if f["verification_status"] == "unknown")
+        total = len(feedback_items)
+
+        if failed_count > 0:
+            if failed_count / total > 0.5:
+                return "critical"
+            return "degraded"
+        elif unknown_count > 0:
+            return "warning"
+        return "good"
+
+    def count_issues(self, feedback_items: List[Dict]) -> tuple:
+        """Count critical and warning issues."""
+        critical = 0
+        warnings = 0
+
+        for item in feedback_items:
+            for issue in item.get("issues", []):
+                severity = issue.get("severity", "medium")
+                if severity in ["critical", "high"]:
+                    critical += 1
+                else:
+                    warnings += 1
+
+        return critical, warnings
+
+    def generate_feedback(self) -> Dict:
+        """Backward-compatible feedback API wrapper."""
+        data = self.run()
+
+        metrics = data.get("metrics", {})
+        total = metrics.get("total_actions", 0)
+        verified = metrics.get("verified", 0)
+        failed = metrics.get("failed", 0)
+
+        success_rate = 1.0 if total == 0 else verified / total
+
+        data["summary"] = {
+            "actions_total": total,
+            "actions_successful": verified,
+            "actions_failed": failed,
+            "stub_count": 0,
+            "unknown_types": []
+        }
+
+        data["success_rate"] = success_rate
+        data["source"] = "action_verifier"
+
+        recommendations = []
+        if total == 0:
+            recommendations.append("No actions to verify")
+        elif failed == 0:
+            recommendations.append("All actions successful")
+        else:
+            recommendations.append("Investigate failed actions")
+
+        data["recommendations"] = recommendations
+
+        anomalies = []
+        if failed > 0 and total > 0 and failed / total > 0.5:
+            anomalies.append("CRITICAL: High failure rate detected")
+
+        data["anomalies"] = anomalies
+
+        return data
+
+    def run(self) -> Dict:
+        """Run verification and generate feedback."""
+        # Load actions
+        load_success = self.load_actions()
+
+        if not load_success:
+            # Return minimal feedback for missing file
+            feedback_data = {
+                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "based_on_actions": None,
+                "feedback": [],
+                "issues": [],
+                "metrics": {},
+                "overall_health": "unknown",
+                "critical_issues": 0,
+                "warnings": 0,
+                "errors": self.errors
+            }
+
+            if self.output_file:
+                self.output_file.parent.mkdir(parents=True, exist_ok=True)
+                with open(self.output_file, 'w') as f:
+                    json.dump(feedback_data, f, indent=2)
+
+            return feedback_data
+
+        # Verify each action
+        feedback_items = []
+        actions = self.actions_data.get("actions", [])
+
+        for action in actions:
+            feedback_item = self.verify_action(action)
+            feedback_items.append(feedback_item)
+
+        # Compute summary
+        overall_health = self.compute_overall_health(feedback_items)
+        critical, warnings = self.count_issues(feedback_items)
+
+        # Collect all issues
+        all_issues = []
+        for item in feedback_items:
+            all_issues.extend(item.get("issues", []))
+
+        # Build feedback data
+        feedback_data = {
+            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "based_on_actions": self.actions_data.get("generated_at"),
+            "feedback": feedback_items,
+            "issues": all_issues,
+            "metrics": {
+                "total_actions": len(actions),
+                "verified": sum(1 for f in feedback_items if f["verification_status"] == "verified"),
+                "failed": sum(1 for f in feedback_items if f["verification_status"] == "failed"),
+                "unknown": sum(1 for f in feedback_items if f["verification_status"] == "unknown")
+            },
+            "overall_health": overall_health,
+            "critical_issues": critical,
+            "warnings": warnings,
+            "errors": self.errors
+        }
+
+        # Write output
+        if self.output_file:
+            self.output_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.output_file, 'w') as f:
+                json.dump(feedback_data, f, indent=2)
+
+        return feedback_data
+
+
+def verify_actions(state_dir: Path = Path("state")) -> Dict[str, Any]:
+    """
+    Verify executed actions and generate feedback.
+
+    Args:
+        state_dir: Directory where state files are stored
+
+    Returns:
+        Dict with status info
+    """
+    state_dir = Path(state_dir)
+    actions_path = state_dir / "brain_actions.json"
+    feedback_path = state_dir / "brain_feedback.json"
+
+    verifier = ActionVerifier(
+        actions_file=str(actions_path),
+        output_file=str(feedback_path),
+        verbose=False
+    )
+
+    feedback = verifier.run()
+
+    return {
+        "status": "ok" if not verifier.errors else "error",
+        "output_files": [str(feedback_path)],
+        "errors": verifier.errors
+    }
+
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Action Verifier")
+    parser.add_argument("--actions", "-a", help="Actions file path")
+    parser.add_argument("--output", "-o", help="Output feedback file path")
+    parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
+    args = parser.parse_args()
+
+    if args.actions and args.output:
+        verifier = ActionVerifier(
+            actions_file=args.actions,
+            output_file=args.output,
+            verbose=args.verbose
+        )
+        feedback = verifier.run()
+        if args.verbose:
+            print(json.dumps(feedback, indent=2))
+        print(f"Feedback generated: {args.output}")
+    else:
+        # Default behavior
+        import sys
+        state_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("state")
+        result = verify_actions(state_dir)
+        print(f"Action verification complete: {result}")

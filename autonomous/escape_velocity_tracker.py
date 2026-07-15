@@ -20,6 +20,7 @@ Exponential Factors:
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -30,7 +31,7 @@ except ImportError:
 import json
 from datetime import datetime, timezone
 
-STATE_FILE = Path("/root/hands-off-engine/state/escape_velocity.json")
+STATE_FILE = BASE_DIR / "state" / "escape_velocity.json"
 
 
 def load_tracker() -> dict:
@@ -160,7 +161,7 @@ def get_escape_status() -> dict:
 if __name__ == "__main__":
     # Test measurement
     import sys
-    sys.path.insert(0, '/root/hands-off-engine')
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
     # Get current balance
     try:

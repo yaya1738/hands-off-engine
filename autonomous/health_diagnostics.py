@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Dict, List, Tuple
 from dataclasses import dataclass, asdict
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 
 # Doctor state files
@@ -339,7 +339,7 @@ class HealthDiagnostics:
     def check_log_files(self) -> List[Symptom]:
         """Check log file health."""
         symptoms = []
-        log_dir = Path("/var/log/hands-off")
+        log_dir = BASE_DIR / "logs"
 
         if not log_dir.exists():
             symptoms.append(Symptom(
@@ -696,7 +696,7 @@ class HealthDiagnostics:
 
         # Check Telegram
         try:
-            tg_env = Path("/root/hands-off/state/tg/bots/handsoff.env")
+            tg_env = BASE_DIR / "hands-off-engine/termux-hands-off/state/tg/bots/handsoff.env"
             if tg_env.exists():
                 content = tg_env.read_text()
                 if "BOT_TOKEN=" in content:
@@ -825,7 +825,7 @@ class HealthDiagnostics:
         import re
 
         # Check log files
-        log_dir = Path("/var/log/hands-off")
+        log_dir = BASE_DIR / "logs"
         if log_dir.exists():
             for log_file in log_dir.glob("*.log"):
                 try:

@@ -116,6 +116,25 @@ class ClaudeActionABCFC:
 
 
 class ClaudeABCFCBridge:
+
+    def get_abcfc(self):
+        """
+        Compatibility API for backend_loop legacy ABCFC calls.
+        """
+        h = self.state.get("abcfc_hierarchy", {})
+
+        return {
+            "worst": h.get("worst", -20.0),
+            "expected": h.get("expected", 10.0),
+            "best": h.get("best", 100.0),
+            "signal": "HOLD",
+            "sessions_total": self.state.get("total_sessions", 0),
+            "win_rate": 0,
+            "avg_delivery_score": 0,
+            "calibration_error": 0,
+            "position_in_range": 0.5,
+        }
+
     """
     Bridges Claude CLI sessions with ABCFC ecosystem.
 

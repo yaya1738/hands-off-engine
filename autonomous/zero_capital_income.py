@@ -19,12 +19,13 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 from typing import Dict, Any, List
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-STATE_FILE = Path("/root/hands-off-engine/state/zero_capital_income.json")
-LOG_FILE = Path("/root/hands-off-engine/state/moonshot_improvements.jsonl")
+STATE_FILE = BASE_DIR / "state" / "zero_capital_income.json"
+LOG_FILE = BASE_DIR / "state" / "moonshot_improvements.jsonl"
 
 
 class ZeroCapitalIncome:

@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional, Callable, Any
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 SLOT_FILE = STATE_DIR / "battery_slot.json"
 

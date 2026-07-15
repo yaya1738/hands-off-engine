@@ -43,6 +43,7 @@ _ALLOWED_TRANSITIONS = {
         CredentialState.RECOVERY,
     },
     CredentialState.RECOVERY: {
+        CredentialState.AWAITING_AUTHORIZATION,
         CredentialState.VALIDATING,
     },
 }

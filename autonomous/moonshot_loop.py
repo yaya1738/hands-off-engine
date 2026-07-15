@@ -22,14 +22,15 @@ import json
 import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 import time
 
 # UNIFIED AI - All systems serve Yair Siegel
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from ai.unified_ai import announce_agent, get_master, log_action, MASTER
 
-MOONSHOT_STATE = Path("/root/hands-off-engine/state/moonshot_state.json")
-MOONSHOT_LOG = Path("/var/log/hands-off/moonshot.log")
+MOONSHOT_STATE = BASE_DIR / "state" / "moonshot_state.json"
+MOONSHOT_LOG = BASE_DIR / "logs" / "moonshot.log"
 MAX_CYCLES_PER_DAY = 12  # Rate limit
 CYCLE_COOLDOWN_MINUTES = 30  # Minimum time between cycles
 
@@ -103,7 +104,7 @@ def get_system_metrics() -> dict:
 
     # Get balance
     try:
-        sys.path.insert(0, '/root/hands-off-engine')
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
         from executor.trading_safeguards import TradingSafeguards
         safeguards = TradingSafeguards()
         ok, msg = safeguards.check_wallet_balance(0)
@@ -134,7 +135,7 @@ def get_system_metrics() -> dict:
 
     # Load finance hub for full resource awareness
     try:
-        finance_hub = Path("/root/hands-off-engine/finance/yair_finance_hub.json")
+        finance_hub = BASE_DIR / "finance" / "yair_finance_hub.json"
         if finance_hub.exists():
             hub = json.load(open(finance_hub))
             metrics["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 3280)
@@ -279,14 +280,14 @@ def run_claude_cycle(state: dict, metrics: dict) -> dict:
             capture_output=True,
             text=True,
             timeout=600,  # 10 minute timeout
-            cwd="/root/hands-off-engine"
+            cwd=str(BASE_DIR)
         )
 
         output = result.stdout + result.stderr
         log(f"Cycle completed. Output length: {len(output)}")
 
         # Check for improvements made
-        improvements_file = Path("/root/hands-off-engine/state/moonshot_improvements.jsonl")
+        improvements_file = BASE_DIR / "state" / "moonshot_improvements.jsonl"
         if improvements_file.exists():
             lines = improvements_file.read_text().strip().split('\n')
             if lines:
@@ -352,7 +353,7 @@ def main():
     announce_agent("moonshot-loop")  # UNIFIED AI
 
     # Load environment
-    env_file = Path("/root/hands-off-engine/.env.polymarket")
+    env_file = BASE_DIR / ".env.polymarket"
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             if '=' in line and not line.startswith('#'):

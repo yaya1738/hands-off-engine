@@ -21,7 +21,8 @@ from typing import Dict, List, Optional, Callable
 from dataclasses import dataclass, asdict
 import threading
 
-STATE_DIR = Path("/root/hands-off-engine/state")
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATE_DIR = BASE_DIR / "state"
 MESSAGE_BUS = STATE_DIR / "message_bus.jsonl"
 LIVING_STATE = STATE_DIR / "living_system.json"
 

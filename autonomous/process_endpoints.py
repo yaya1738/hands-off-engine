@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Dict, Optional, Callable
 from dataclasses import dataclass
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 
 # Endpoint registry state

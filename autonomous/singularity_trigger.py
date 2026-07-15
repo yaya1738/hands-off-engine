@@ -18,6 +18,7 @@ collapses into instant execution.
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -32,9 +33,9 @@ import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, '/root/hands-off-engine')
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-TRIGGER_STATE = Path("/root/hands-off-engine/state/singularity_trigger.json")
+TRIGGER_STATE = BASE_DIR / "state" / "singularity_trigger.json"
 TRADING_THRESHOLD = 50.0
 MINIMUM_VIABLE_THRESHOLD = 25.0  # Can do small trades at $25
 
@@ -129,7 +130,7 @@ def execute_singularity():
     log("ACTION 3: Triggering moonshot improvement cycle...")
     try:
         # Reset moonshot cooldown to allow immediate execution
-        ms_state_file = Path("/root/hands-off-engine/state/moonshot_state.json")
+        ms_state_file = BASE_DIR / "state" / "moonshot_state.json"
         if ms_state_file.exists():
             ms_state = json.load(open(ms_state_file))
             ms_state["last_cycle"] = None  # Reset cooldown
@@ -218,7 +219,7 @@ def check_and_trigger():
 
         # Calculate new escape velocity
         try:
-            ev_file = Path("/root/hands-off-engine/state/escape_velocity.json")
+            ev_file = BASE_DIR / "state" / "escape_velocity.json"
             if ev_file.exists():
                 ev_data = json.load(open(ev_file))
                 state["escape_velocity_at_trigger"] = ev_data.get("current_velocity", 0)
@@ -293,7 +294,7 @@ def main():
     """Main entry point"""
 
     # Load env
-    env_file = Path("/root/hands-off-engine/.env.polymarket")
+    env_file = BASE_DIR / ".env.polymarket"
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             if '=' in line and not line.startswith('#'):

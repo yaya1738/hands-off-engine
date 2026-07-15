@@ -23,7 +23,7 @@ from typing import Dict, List, Optional
 from dataclasses import dataclass, field, asdict
 from enum import Enum
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 VESSEL_STATE = STATE_DIR / "capital_vessel.json"
 VESSEL_LOG = STATE_DIR / "vessel_transactions.jsonl"

@@ -148,6 +148,34 @@ def run_ai_core(system_state: dict = None):
         return {"success": False, "error": str(e)}
 
 
+def run_brain_orchestrator():
+    """
+    Run Brain Orchestrator cognitive pipeline.
+    """
+    try:
+        from ai.ho_brain_orchestrator import BrainOrchestrator
+
+        orchestrator = BrainOrchestrator(
+            state_dir=STATE_DIR,
+            verbose=False
+        )
+
+        report = orchestrator.run_all()
+
+        return {
+            "success": True,
+            "overall_status": report["summary"]["overall_status"],
+            "stages_ok": report["summary"]["stages_ok"],
+            "stages_error": report["summary"]["stages_error"]
+        }
+
+    except Exception as e:
+        return {
+            "success": False,
+            "error": str(e)
+        }
+
+
 def run_knowledge_nexus(system_state: dict = None):
     """
     Run knowledge nexus - route knowledge to inflection points.
@@ -2240,6 +2268,15 @@ def run_income_engine():
         status = engine.get_pipeline_status()
         next_action = engine.get_next_action()
 
+        # INTEGRAFIX: Automatic payment chase
+        payment_chaser_result = None
+        if next_action.get("action") == "chase_payment":
+            try:
+                from autonomous.payment_chaser import run_payment_chaser
+                payment_chaser_result = run_payment_chaser()
+            except Exception as e:
+                payment_chaser_result = {"error": str(e)}
+
         # Auto-scan if no recent scan (every 6 hours)
         last_scan = engine.state.get("last_scan")
         should_scan = False
@@ -2280,6 +2317,17 @@ def run_income_engine():
                         status["auto_sent"] = True
                         status["bypass_reason"] = bypass_result.get("bypass_result", {}).get("reason", "")
 
+        # AUTO-EXECUTE proposal approval/send flow
+        if next_action["action"] == "review_and_send":
+            proposal_id = next_action.get("details", {}).get("id")
+
+            if proposal_id:
+                result = engine.approve_and_send_proposal(proposal_id)
+                status["approval_send"] = result
+
+                if result.get("status") == "sent":
+                    status["auto_sent"] = True
+
         return {
             "success": True,
             "pipeline": status["pipeline"],
@@ -2289,7 +2337,8 @@ def run_income_engine():
             "next_instruction": next_action["instruction"],
             "top_opportunities": len(status.get("top_opportunities", [])),
             "auto_sent": status.get("auto_sent", False),
-            "bypass_check": status.get("bypass_check", "N/A")
+            "bypass_check": status.get("bypass_check", "N/A"),
+            "payment_chaser": payment_chaser_result
         }
 
     except Exception as e:
@@ -2929,6 +2978,35 @@ def run_loop(interval_sec: int = 300):
         else:
             log(f"  Capital Monitor: {capital_monitor_result.get('error', 'unknown')}")
 
+        # 9.56. Capital Reconciler - Verify capital accounting integrity
+        log("[9.56/28] Running Capital Reconciler...")
+
+        try:
+            from integrafix.capital_reconciler import reconcile
+
+            capital_reconciliation = {
+                "success": True,
+                "reconciliation": reconcile()
+            }
+
+            state["capital_reconciliation"] = capital_reconciliation
+
+            recon = capital_reconciliation["reconciliation"]
+            log(
+                f"  Capital Reconciliation: {recon.get('health')} | "
+                f"Events: {recon.get('events', 0)} | "
+                f"Value: ${recon.get('total_event_value', 0):.2f}"
+            )
+
+        except Exception as e:
+            capital_reconciliation = {
+                "success": False,
+                "error": str(e)
+            }
+
+            state["capital_reconciliation"] = capital_reconciliation
+            log(f"  Capital Reconciliation Error: {e}")
+
         # 9.6. Income Engine - Active capital generation
         log("[9.6/28] Running Income Engine (AI as Production Engine)...")
         income_result = run_income_engine()
@@ -2996,6 +3074,20 @@ def run_loop(interval_sec: int = 300):
                     log(f"    {outcome}")
         else:
             log(f"  Error: {outcome_result.get('error', 'unknown')}")
+
+        # 11.1. Brain Orchestrator - Cognitive decision synthesis
+        log("[11.1/26] Running Brain Orchestrator...")
+        brain_result = run_brain_orchestrator()
+        state["brain_orchestrator"] = brain_result
+
+        if brain_result.get("success"):
+            log(
+                f"  Brain Status: {brain_result.get('overall_status', 'unknown')} | "
+                f"Stages OK: {brain_result.get('stages_ok', 0)} | "
+                f"Errors: {brain_result.get('stages_error', 0)}"
+            )
+        else:
+            log(f"  Brain Error: {brain_result.get('error', 'unknown')}")
 
         # 11.5 Golden State Scaler - Progressive tier advancement
         log("[11.5/26] Running Golden State Auto-Scaler...")
@@ -3084,6 +3176,7 @@ def main():
             "integrafix_full": run_integrafix_full(),
             "integrafix_pipeline": run_integrafix_pipeline(),
             "outcome_tracker": run_outcome_tracker(),
+            "brain_orchestrator": run_brain_orchestrator(),
             "trading_memory": run_trading_memory(),
         }
         save_state(state)

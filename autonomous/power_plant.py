@@ -21,7 +21,7 @@ from pathlib import Path
 from typing import Dict, Optional, List
 from dataclasses import dataclass, asdict
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 PLANT_STATE = STATE_DIR / "power_plant.json"
 GENERATION_LOG = STATE_DIR / "power_generation.jsonl"

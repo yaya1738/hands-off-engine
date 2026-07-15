@@ -12,13 +12,14 @@ import os
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 from typing import Dict, Any, List
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-STATE_FILE = Path("/root/hands-off-engine/state/capital_recovery.json")
-LOG_FILE = Path("/root/hands-off-engine/state/moonshot_improvements.jsonl")
+STATE_FILE = BASE_DIR / "state" / "capital_recovery.json"
+LOG_FILE = BASE_DIR / "state" / "moonshot_improvements.jsonl"
 
 
 class CapitalAccelerator:
@@ -114,7 +115,7 @@ class CapitalAccelerator:
         opportunities = []
 
         # Check for recent service payments in financial logs
-        cost_decisions = Path("/root/hands-off-engine/finance/cost_decisions.jsonl")
+        cost_decisions = BASE_DIR / "finance" / "cost_decisions.jsonl"
         if cost_decisions.exists():
             with open(cost_decisions) as f:
                 for line in f:

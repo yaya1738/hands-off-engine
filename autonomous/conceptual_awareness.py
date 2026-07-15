@@ -26,7 +26,7 @@ from typing import Dict, List, Tuple, Optional
 from dataclasses import dataclass, asdict, field
 from collections import Counter
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 
 # State files

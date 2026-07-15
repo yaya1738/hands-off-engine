@@ -18,6 +18,7 @@ waiting for external events.
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -31,7 +32,7 @@ import json
 import subprocess
 from datetime import datetime, timezone
 
-sys.path.insert(0, '/root/hands-off-engine')
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 
 def log(msg: str):
@@ -59,7 +60,7 @@ def manifest_income_stream_3():
     log("Manifesting income stream #3...")
 
     # Create a GitHub sponsors-ready file
-    funding_file = Path("/root/hands-off-engine/.github/FUNDING.yml")
+    funding_file = BASE_DIR / ".github" / "FUNDING.yml"
     funding_file.parent.mkdir(parents=True, exist_ok=True)
 
     content = """# Funding options for this project
@@ -92,7 +93,7 @@ def manifest_maximum_automation():
     ]
 
     for script in scripts:
-        path = Path(f"/root/hands-off-engine/{script}")
+        path = BASE_DIR / script
         if path.exists():
             os.chmod(path, 0o755)
             actions.append(f"✓ {script}")
@@ -125,7 +126,7 @@ def manifest_signal_readiness():
     log("Manifesting signal readiness...")
 
     # Check current execution plan
-    exec_plan = Path("/root/hands-off-engine/executor/execution_plan.json")
+    exec_plan = BASE_DIR / "executor" / "execution_plan.json"
     if exec_plan.exists():
         plan = json.load(open(exec_plan))
         signals = plan.get('total_orders', 0)
@@ -170,7 +171,7 @@ System is READY to trade the moment
 capital returns.
 """
 
-    countdown_file = Path("/root/hands-off-engine/state/RESOLUTION_COUNTDOWN.txt")
+    countdown_file = BASE_DIR / "state" / "RESOLUTION_COUNTDOWN.txt"
     countdown_file.write_text(countdown)
 
     log(f"✓ {days} days {hours} hours until resolution")
@@ -249,7 +250,7 @@ def manifest_complete_state():
         }
     }
 
-    state_file = Path("/root/hands-off-engine/state/MANIFESTED_STATE.json")
+    state_file = BASE_DIR / "state" / "MANIFESTED_STATE.json"
     with open(state_file, 'w') as f:
         json.dump(state, f, indent=2)
 
@@ -320,7 +321,7 @@ _The future state exists. Only time separates us._
 
 if __name__ == "__main__":
     # Load env
-    env_file = Path("/root/hands-off-engine/.env.polymarket")
+    env_file = BASE_DIR / ".env.polymarket"
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             if '=' in line and not line.startswith('#'):

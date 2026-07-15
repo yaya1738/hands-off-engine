@@ -8,12 +8,13 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 class FreeTierMigration:
     """Manages migration to free AI tiers to save $250/month"""
 
     def __init__(self):
-        self.state_file = Path("/root/hands-off-engine/state/ai_provider_migration.json")
+        self.state_file = BASE_DIR / "state" / "ai_provider_migration.json"
         self.load_state()
 
     def load_state(self):
@@ -152,7 +153,7 @@ class FreeTierMigration:
         print("\nScanning for AI provider callsites...")
 
         callsites = []
-        code_root = Path("/root/hands-off-engine")
+        code_root = BASE_DIR
 
         # Patterns to search for
         patterns = [
@@ -314,7 +315,7 @@ def get_provider():
     return _provider
 '''
 
-        provider_file = Path("/root/hands-off-engine/autonomous/unified_ai_provider.py")
+        provider_file = BASE_DIR / "autonomous" / "unified_ai_provider.py"
         provider_file.write_text(provider_code)
         print(f"✓ Created {provider_file}")
 

@@ -17,6 +17,7 @@ The future is just unexplored present potential.
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -32,10 +33,10 @@ import threading
 from datetime import datetime, timezone
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-sys.path.insert(0, '/root/hands-off-engine')
+sys.path.insert(0, str(BASE_DIR))
 
-COLLAPSE_STATE = Path("/root/hands-off-engine/state/time_collapse.json")
-COLLAPSE_LOG = Path("/var/log/hands-off/time_collapse.log")
+COLLAPSE_STATE = BASE_DIR / "state" / "time_collapse.json"
+COLLAPSE_LOG = BASE_DIR / "logs" / "time_collapse.log"
 
 
 def log(msg: str):
@@ -169,7 +170,7 @@ def accelerate_intelligence():
 
     # Check if intelligent alpha can run
     try:
-        exec_plan = Path("/root/hands-off-engine/executor/execution_plan.json")
+        exec_plan = BASE_DIR / "executor" / "execution_plan.json"
         if exec_plan.exists():
             plan = json.load(open(exec_plan))
             results.append(f"Signals ready: {plan.get('total_orders', 0)}")
@@ -193,7 +194,7 @@ def accelerate_momentum():
 
     # Check escape velocity score
     try:
-        ev_state = Path("/root/hands-off-engine/state/escape_velocity.json")
+        ev_state = BASE_DIR / "state" / "escape_velocity.json"
         if ev_state.exists():
             data = json.load(open(ev_state))
             results.append(f"Velocity: ${data.get('current_velocity', 0):.2f}/period")
@@ -203,7 +204,7 @@ def accelerate_momentum():
 
     # Check moonshot state
     try:
-        ms_state = Path("/root/hands-off-engine/state/moonshot_state.json")
+        ms_state = BASE_DIR / "state" / "moonshot_state.json"
         if ms_state.exists():
             data = json.load(open(ms_state))
             results.append(f"Cycles: {data.get('total_cycles', 0)}")
@@ -371,7 +372,7 @@ def execute_immediate_actions():
     try:
         subprocess.run([
             'python3', 'scripts/capital_recovery_monitor.py'
-        ], cwd='/root/hands-off-engine', capture_output=True, timeout=30)
+        ], cwd=str(BASE_DIR), capture_output=True, timeout=30)
         actions.append("✓ Capital recovery sync")
     except:
         actions.append("✗ Capital recovery sync")
@@ -379,7 +380,7 @@ def execute_immediate_actions():
     try:
         subprocess.run([
             'python3', 'scripts/payment_monitor.py'
-        ], cwd='/root/hands-off-engine', capture_output=True, timeout=30)
+        ], cwd=str(BASE_DIR), capture_output=True, timeout=30)
         actions.append("✓ Payment monitor sync")
     except:
         actions.append("✗ Payment monitor sync")
@@ -389,7 +390,7 @@ def execute_immediate_actions():
     try:
         subprocess.run([
             'python3', 'autonomous/escape_velocity_tracker.py'
-        ], cwd='/root/hands-off-engine', capture_output=True, timeout=30)
+        ], cwd=str(BASE_DIR), capture_output=True, timeout=30)
         actions.append("✓ Escape velocity recorded")
     except:
         actions.append("✗ Escape velocity")
@@ -398,7 +399,7 @@ def execute_immediate_actions():
     log("Action 3: Verifying all services...")
     try:
         result = subprocess.run(['./scripts/healthcheck.sh'],
-            cwd='/root/hands-off-engine', capture_output=True, text=True, timeout=60)
+            cwd=str(BASE_DIR), capture_output=True, text=True, timeout=60)
         if 'passed' in result.stdout.lower():
             actions.append("✓ Healthcheck passed")
         else:
@@ -411,7 +412,7 @@ def execute_immediate_actions():
 
 if __name__ == "__main__":
     # Load environment
-    env_file = Path("/root/hands-off-engine/.env.polymarket")
+    env_file = BASE_DIR / ".env.polymarket"
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             if '=' in line and not line.startswith('#'):

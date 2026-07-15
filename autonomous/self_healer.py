@@ -35,7 +35,7 @@ import urllib.request
 
 BASE_DIR = Path(__file__).parent.parent
 STATE_DIR = BASE_DIR / 'state'
-LOG_DIR = Path('/var/log/hands-off')
+LOG_DIR = BASE_DIR / 'logs'
 
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 LOG_DIR.mkdir(parents=True, exist_ok=True)
@@ -46,7 +46,7 @@ class ProcessGuard:
     """Configuration for a guarded process."""
     name: str
     command: str
-    working_dir: str = '/root/hands-off-engine'
+    working_dir: str = str(BASE_DIR)
     restart_delay_sec: int = 10
     max_restarts_per_hour: int = 5
     critical: bool = True  # If True, system is degraded when down
@@ -79,25 +79,25 @@ class SelfHealer:
     GUARDED_PROCESSES = [
         ProcessGuard(
             name='backend-loop',
-            command='python3 /root/hands-off-engine/autonomous/backend_loop.py',
+            command='python3 /data/data/com.termux/files/home/hands-off-engine-forensic-jan9/autonomous/backend_loop.py',
             critical=True,
             restart_delay_sec=5,  # Fast restart - this is the main orchestrator
             max_restarts_per_hour=10,
-            code_file='/root/hands-off-engine/autonomous/backend_loop.py'
+            code_file=str(BASE_DIR) + '/autonomous/backend_loop.py'
         ),
         ProcessGuard(
             name='hardware-brain',
-            command='python3 /root/hands-off-engine/autonomous/hardware_brain.py run',
+            command='python3 /data/data/com.termux/files/home/hands-off-engine-forensic-jan9/autonomous/hardware_brain.py run',
             critical=True
         ),
         ProcessGuard(
             name='scaling-engine',
-            command='python3 /root/hands-off-engine/autonomous/scaling_engine.py run',
+            command='python3 /data/data/com.termux/files/home/hands-off-engine-forensic-jan9/autonomous/scaling_engine.py run',
             critical=True
         ),
         ProcessGuard(
             name='infra-monitor',
-            command='python3 /root/hands-off-engine/autonomous/infra_manager.py monitor',
+            command='python3 /data/data/com.termux/files/home/hands-off-engine-forensic-jan9/autonomous/infra_manager.py monitor',
             critical=True
         ),
         # NOTE: position_monitor is a check-and-exit script, not a daemon

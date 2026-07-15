@@ -425,17 +425,16 @@ def test_invoke_task_generator_missing_module(temp_dirs):
     assert "not available" in result["error"] or "No module" in result["error"]
 
 
-def test_invoke_ai_runner_missing_module(temp_dirs):
-    """Test AI runner invocation when module is missing."""
+def test_invoke_ai_runner_available(temp_dirs):
+    """Test AI runner invocation when module is available."""
     state_dir = temp_dirs["state_dir"]
     ai_dir = temp_dirs["ai_dir"]
 
-    # The module doesn't exist, so it should handle gracefully
     result = invoke_ai_runner(state_dir, ai_dir, verbose=False)
 
-    assert result["status"] == "error"
-    assert result["error"] is not None
-    assert "not available" in result["error"] or "No module" in result["error"]
+    assert result["status"] == "success"
+    assert result["result"] is not None
+    assert result["error"] is None
 
 
 # Additional test: Status determination in summary

@@ -14,7 +14,7 @@ import sys
 from datetime import datetime
 from typing import Dict, List, Optional
 
-from api_orchestrator import APIOrchestrator
+from integrafix.api_orchestrator import APIOrchestrator
 
 
 class APIDashboard:

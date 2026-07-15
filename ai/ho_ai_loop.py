@@ -179,7 +179,7 @@ def invoke_ai_runner(state_dir: str, ai_dir: str, verbose: bool = False) -> Dict
         # Import here to allow graceful fallback if not available
         from ai.ho_ai_runner import run_ai_runner
 
-        result = run_ai_runner(state_dir, ai_dir, verbose=verbose)
+        result = run_ai_runner(state_dir, ai_dir)
 
         return {
             "status": "success",

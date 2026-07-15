@@ -39,6 +39,7 @@ Serving: Yair Siegel
 import json
 import subprocess
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 from datetime import datetime, timezone
 from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict, field
@@ -457,7 +458,7 @@ class RealityBridge:
                 pass
 
         # Can I think? (AI available)
-        if Path("/root/hands-off-engine/.env").exists():
+        if BASE_DIR / ".env".exists():
             capabilities.append('think')
 
         # Can I act? (Agents running)

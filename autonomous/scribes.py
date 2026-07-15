@@ -21,7 +21,8 @@ from pathlib import Path
 from typing import Dict, List, Optional
 from collections import defaultdict
 
-STATE_DIR = Path("/root/hands-off-engine/state")
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATE_DIR = BASE_DIR / "state"
 SCRIBE_DIR = STATE_DIR / "scribes"
 SCRIBE_DIR.mkdir(exist_ok=True)
 

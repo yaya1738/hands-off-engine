@@ -5,6 +5,7 @@ Hands-Off Credential Recovery Orchestrator
 from autonomous.credentials.adapter_registry import CredentialAdapterRegistry
 from autonomous.credentials.recovery_executor import CredentialRecoveryExecutor
 from autonomous.credentials.lifecycle import CredentialLifecycle
+from autonomous.credentials.credential_request import CredentialRequest
 
 
 class CredentialOrchestrator:
@@ -34,6 +35,34 @@ class CredentialOrchestrator:
             provider,
             identity,
         )
+
+        if result.get("action") == "reauthorization_required":
+
+            self.lifecycle.transition(
+                identity,
+                "AWAITING_AUTHORIZATION",
+                "credential_recovery_requires_authorization",
+            )
+
+            request = CredentialRequest(
+                capability=provider,
+                provider=provider,
+                identity=identity,
+            )
+
+            adapter = self.registry.get(provider)
+
+            if adapter:
+                acquisition = adapter.acquire(
+                    request.to_dict()
+                )
+
+                return {
+                    "health": health,
+                    "decision": decision,
+                    "recovery": result,
+                    "acquisition": acquisition,
+                }
 
         return {
             "health": health,

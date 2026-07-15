@@ -16,12 +16,13 @@ import json
 import os
 from datetime import datetime, timezone
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 from typing import Dict, List, Optional, Tuple
 import random
 import hashlib
 
-STATE_FILE = Path("/root/hands-off-engine/state/conversion_optimizer.json")
-EXPERIMENTS_FILE = Path("/root/hands-off-engine/state/conversion_experiments.jsonl")
+STATE_FILE = BASE_DIR / "state" / "conversion_optimizer.json"
+EXPERIMENTS_FILE = BASE_DIR / "state" / "conversion_experiments.jsonl"
 
 # What we can vary to improve conversion
 CONVERSION_LEVERS = {
@@ -119,7 +120,7 @@ class ConversionOptimizer:
         Analyze why 85 visitors = 0 conversions.
         """
         # Get reality data
-        reality_file = Path("/root/hands-off-engine/state/reality_feedback.json")
+        reality_file = BASE_DIR / "state" / "reality_feedback.json"
         reality = {}
         if reality_file.exists():
             reality = json.loads(reality_file.read_text())

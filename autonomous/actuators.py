@@ -23,7 +23,7 @@ from pathlib import Path
 from typing import Dict, Optional
 from dotenv import load_dotenv
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 
 # Load polymarket env
@@ -34,7 +34,7 @@ ACTUATOR_STATE = STATE_DIR / "actuator_state.json"
 ACTUATOR_LOG = STATE_DIR / "actuator_log.jsonl"
 
 # Telegram config
-TG_ENV = Path("/root/hands-off/state/tg/bots/handsoff.env")
+TG_ENV = BASE_DIR / "hands-off-engine/termux-hands-off/state/tg/bots/handsoff.env"
 
 
 class TelegramActuator:

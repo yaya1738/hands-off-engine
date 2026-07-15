@@ -21,6 +21,7 @@ This script optimizes BOTH paths simultaneously.
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
@@ -35,7 +36,7 @@ import subprocess
 import requests
 from datetime import datetime, timezone
 
-sys.path.insert(0, '/root/hands-off-engine')
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 WALLET = "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D"
 GAP_TO_SINGULARITY = 41.01
@@ -69,7 +70,7 @@ def optimize_path_a():
 
     # 2. Pre-compute more signals
     try:
-        exec_plan = Path("/root/hands-off-engine/executor/execution_plan.json")
+        exec_plan = BASE_DIR / "executor" / "execution_plan.json"
         if exec_plan.exists():
             plan = json.load(open(exec_plan))
             optimizations.append(f"✓ {plan.get('total_orders', 0)} signals pre-computed")
@@ -78,7 +79,7 @@ def optimize_path_a():
         pass
 
     # 3. Verify singularity trigger is armed
-    trigger_file = Path("/root/hands-off-engine/state/singularity_trigger.json")
+    trigger_file = BASE_DIR / "state" / "singularity_trigger.json"
     if trigger_file.exists():
         trigger = json.load(open(trigger_file))
         if not trigger.get("triggered"):
@@ -126,7 +127,7 @@ def optimize_path_b():
         optimizations.append(f"! Balance check failed")
 
     # 3. Verify payment monitor is active
-    payment_state = Path("/root/hands-off-engine/state/payment_monitor.json")
+    payment_state = BASE_DIR / "state" / "payment_monitor.json"
     if payment_state.exists():
         optimizations.append("✓ Payment monitor ACTIVE")
 
@@ -187,7 +188,7 @@ def create_optimal_trigger():
         }
     }
 
-    config_file = Path("/root/hands-off-engine/state/optimal_trigger_config.json")
+    config_file = BASE_DIR / "state" / "optimal_trigger_config.json"
     with open(config_file, 'w') as f:
         json.dump(config, f, indent=2)
 
@@ -275,7 +276,7 @@ def main():
 
 if __name__ == "__main__":
     # Load env
-    env_file = Path("/root/hands-off-engine/.env.polymarket")
+    env_file = BASE_DIR / ".env.polymarket"
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             if '=' in line and not line.startswith('#'):

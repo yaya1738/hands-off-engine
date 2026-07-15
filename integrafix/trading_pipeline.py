@@ -23,6 +23,7 @@ import os
 import math
 from datetime import datetime, timezone
 from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field, asdict
 from enum import Enum
@@ -1214,7 +1215,7 @@ class TradingPipeline:
             from pathlib import Path
             import json
 
-            unified_file = Path("/root/hands-off-engine/state/abcfc_unified_state.json")
+            unified_file = BASE_DIR / "state" / "abcfc_unified_state.json"
             if not unified_file.exists():
                 return
 

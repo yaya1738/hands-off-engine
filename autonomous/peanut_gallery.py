@@ -16,7 +16,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Tuple
 
-STATE_DIR = Path("/root/hands-off-engine/state")
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATE_DIR = BASE_DIR / "state"
 GALLERY_LOG = STATE_DIR / "peanut_gallery.jsonl"
 MAIN_CONVO = STATE_DIR / "self_conversation.jsonl"
 

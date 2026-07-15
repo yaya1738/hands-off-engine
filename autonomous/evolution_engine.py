@@ -56,7 +56,7 @@ try:
 except ImportError:
     ARCH_AWARE = False
 
-BASE_DIR = Path("/root/hands-off-engine")
+BASE_DIR = Path(__file__).resolve().parent.parent
 STATE_DIR = BASE_DIR / "state"
 
 # What we watch

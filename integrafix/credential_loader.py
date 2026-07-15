@@ -12,7 +12,7 @@ Searches multiple sources for POLYMARKET_PRIVATE_KEY:
 import os
 import json
 from pathlib import Path
-
+BASE_DIR = Path(__file__).resolve().parent.parent
 def load_polymarket_key() -> str:
     """Load Polymarket private key from available sources."""
 
@@ -22,14 +22,14 @@ def load_polymarket_key() -> str:
         return key
 
     # Source 2: .env file
-    env_file = Path("/root/hands-off-engine/.env")
+    env_file = BASE_DIR / ".env"
     if env_file.exists():
         for line in env_file.read_text().split("\n"):
             if line.startswith("POLYMARKET_PRIVATE_KEY="):
                 return line.split("=", 1)[1].strip()
 
     # Source 3: Wallet registry (INTEGRAFIX: primary source)
-    registry_file = Path("/root/hands-off-engine/state/wallets/registry.json")
+    registry_file = BASE_DIR / "state" / "wallets" / "registry.json"
     if registry_file.exists():
         try:
             with open(registry_file) as f:
@@ -60,12 +60,12 @@ def load_polymarket_key() -> str:
         pass
 
     # Source 5: Secrets file
-    secrets_file = Path("/root/hands-off-engine/secrets/polymarket.key")
+    secrets_file = BASE_DIR / "secrets" / "polymarket.key"
     if secrets_file.exists():
         return secrets_file.read_text().strip()
 
     # Source 6: Termux sync
-    termux_cred = Path("/root/hands-off-engine/termux-hands-off/config/credentials.json")
+    termux_cred = BASE_DIR / "termux-hands-off" / "config" / "credentials.json"
     if termux_cred.exists():
         try:
             data = json.loads(termux_cred.read_text())
@@ -79,7 +79,7 @@ def load_polymarket_key() -> str:
 def get_wallet_address() -> str:
     """Get wallet address from config or registry."""
     # Try config first
-    config_file = Path("/root/hands-off-engine/config/trading_config.json")
+    config_file = BASE_DIR / "config" / "trading_config.json"
     if config_file.exists():
         try:
             with open(config_file) as f:
@@ -90,7 +90,7 @@ def get_wallet_address() -> str:
             pass
 
     # Try registry
-    registry_file = Path("/root/hands-off-engine/state/wallets/registry.json")
+    registry_file = BASE_DIR / "state" / "wallets" / "registry.json"
     if registry_file.exists():
         try:
             with open(registry_file) as f:

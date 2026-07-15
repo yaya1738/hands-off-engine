@@ -23,9 +23,10 @@ from typing import Dict, List, Optional
 import subprocess
 
 # Paths
-STATE_DIR = Path("/root/hands-off-engine/state")
+BASE_DIR = Path(__file__).resolve().parent.parent
+STATE_DIR = BASE_DIR / "state"
 CAPITAL_STATE_FILE = STATE_DIR / "capital_bridge.json"
-ENV_FILE = Path("/root/hands-off-engine/.env.polymarket")
+ENV_FILE = BASE_DIR / ".env.polymarket"
 
 
 class CapitalBridge:

@@ -125,7 +125,7 @@ class CronCoordinator:
             # Trading jobs
             CronJob(
                 name="trade_executor",
-                script="/root/hands-off-engine/executor/trade_executor.py",
+                script=str(BASE_DIR) + "/executor/trade_executor.py",
                 schedule="0 * * * *",  # Every hour
                 priority=JobPriority.CRITICAL,
                 conflict_groups=[ConflictGroup.TRADING],
@@ -133,7 +133,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="outcome_recorder",
-                script="/root/hands-off-engine/scripts/outcome_recorder.py",
+                script=str(BASE_DIR) + "/scripts/outcome_recorder.py",
                 schedule="30 * * * *",  # 30 min past each hour
                 priority=JobPriority.HIGH,
                 conflict_groups=[ConflictGroup.TRADING],
@@ -141,7 +141,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="concrete_executor",
-                script="/root/hands-off-engine/executor/concrete_executor.py",
+                script=str(BASE_DIR) + "/executor/concrete_executor.py",
                 schedule="15,45 * * * *",  # Every 30 min
                 priority=JobPriority.CRITICAL,
                 conflict_groups=[ConflictGroup.TRADING],
@@ -151,7 +151,7 @@ class CronCoordinator:
             # Data jobs
             CronJob(
                 name="polymarket_sync",
-                script="/root/hands-off-engine/alpha/sync_polymarket_model.py",
+                script=str(BASE_DIR) + "/alpha/sync_polymarket_model.py",
                 schedule="*/30 * * * *",  # Every 30 min
                 priority=JobPriority.HIGH,
                 conflict_groups=[ConflictGroup.DATA],
@@ -159,7 +159,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="polymarket_live",
-                script="/root/hands-off-engine/scripts/polymarket_live.py",
+                script=str(BASE_DIR) + "/scripts/polymarket_live.py",
                 schedule="0 */2 * * *",  # Every 2 hours
                 priority=JobPriority.MEDIUM,
                 conflict_groups=[ConflictGroup.DATA],
@@ -169,7 +169,7 @@ class CronCoordinator:
             # Infrastructure jobs
             CronJob(
                 name="scaling_engine",
-                script="/root/hands-off-engine/autonomous/scaling_engine.py",
+                script=str(BASE_DIR) + "/autonomous/scaling_engine.py",
                 schedule="0 */4 * * *",  # Every 4 hours
                 priority=JobPriority.HIGH,
                 conflict_groups=[ConflictGroup.INFRASTRUCTURE],
@@ -177,7 +177,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="hardware_brain",
-                script="/root/hands-off-engine/autonomous/hardware_brain.py",
+                script=str(BASE_DIR) + "/autonomous/hardware_brain.py",
                 schedule="*/10 * * * *",  # Every 10 min
                 priority=JobPriority.HIGH,
                 conflict_groups=[ConflictGroup.INFRASTRUCTURE],
@@ -185,7 +185,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="self_healer",
-                script="/root/hands-off-engine/autonomous/self_healer.py",
+                script=str(BASE_DIR) + "/autonomous/self_healer.py",
                 schedule="*/15 * * * *",  # Every 15 min
                 priority=JobPriority.MEDIUM,
                 conflict_groups=[ConflictGroup.INFRASTRUCTURE],
@@ -195,7 +195,7 @@ class CronCoordinator:
             # AI/Learning jobs
             CronJob(
                 name="learning_engine",
-                script="/root/hands-off-engine/scripts/learning_engine.py",
+                script=str(BASE_DIR) + "/scripts/learning_engine.py",
                 schedule="0 */6 * * *",  # Every 6 hours
                 priority=JobPriority.MEDIUM,
                 conflict_groups=[ConflictGroup.AI],
@@ -203,7 +203,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="compound_growth",
-                script="/root/hands-off-engine/scripts/compound_growth.py",
+                script=str(BASE_DIR) + "/scripts/compound_growth.py",
                 schedule="0 */4 * * *",  # Every 4 hours
                 priority=JobPriority.LOW,
                 conflict_groups=[ConflictGroup.AI, ConflictGroup.TRADING],
@@ -211,7 +211,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="backend_loop",
-                script="/root/hands-off-engine/autonomous/backend_loop.py",
+                script=str(BASE_DIR) + "/autonomous/backend_loop.py",
                 schedule="*/5 * * * *",  # Every 5 min
                 priority=JobPriority.CRITICAL,
                 conflict_groups=[],  # Doesn't conflict with anything
@@ -221,7 +221,7 @@ class CronCoordinator:
             # Integrafix jobs (NEW)
             CronJob(
                 name="integrafix_engine",
-                script="/root/hands-off-engine/integrafix/recursive_engine.py",
+                script=str(BASE_DIR) + "/integrafix/recursive_engine.py",
                 schedule="0 */2 * * *",  # Every 2 hours
                 priority=JobPriority.HIGH,
                 conflict_groups=[ConflictGroup.AI],
@@ -229,7 +229,7 @@ class CronCoordinator:
             ),
             CronJob(
                 name="trading_pipeline",
-                script="/root/hands-off-engine/integrafix/trading_pipeline.py",
+                script=str(BASE_DIR) + "/integrafix/trading_pipeline.py",
                 schedule="*/15 * * * *",  # Every 15 min
                 priority=JobPriority.CRITICAL,
                 conflict_groups=[ConflictGroup.TRADING],
@@ -422,7 +422,7 @@ class CronCoordinator:
             "# All jobs run through coordinator to prevent conflicts",
             "#",
             "SHELL=/bin/bash",
-            f"PYTHONPATH=/root/hands-off-engine",
+            f"PYTHONPATH={BASE_DIR}",
             "",
         ]
 
@@ -444,7 +444,7 @@ class CronCoordinator:
             for job in sorted(jobs, key=lambda j: j.priority.value, reverse=True):
                 # Wrap in coordinator
                 cmd = (
-                    f"cd /root/hands-off-engine && "
+                    f"cd {BASE_DIR} && "
                     f"python3 -c \"from integrafix.cron_coordinator import get_coordinator; "
                     f"get_coordinator().run_job('{job.name}')\""
                 )

@@ -26,10 +26,10 @@ from typing import Dict, List, Optional, Tuple
 import hashlib
 
 # Paths
-STATE_DIR = Path("/root/hands-off-engine/state")
+STATE_DIR = Path(__file__).resolve().parent.parent / "state"
 ENGINE_STATE_FILE = STATE_DIR / "income_engine.json"
 OPPORTUNITIES_DIR = STATE_DIR / "opportunities"
-DELIVERABLES_DIR = Path("/root/hands-off-engine/deliverables")
+DELIVERABLES_DIR = Path(__file__).resolve().parent.parent / "deliverables"
 
 # ABCFC risk aversion
 RISK_AVERSION = 0.6
@@ -387,6 +387,7 @@ class IncomeEngine:
         if proposal_id in self.state["proposals"]:
             existing = self.state["proposals"][proposal_id]
             return {
+                "id": proposal_id,
                 "status": "already_drafted",
                 "proposal_id": proposal_id,
                 "created_at": existing.get("created_at"),
@@ -499,6 +500,38 @@ Would love to schedule a brief call to discuss how we might help.
             self._save_state()
             return {"status": "marked_sent", "id": proposal_id}
         return {"error": "Proposal not found"}
+
+    def approve_and_send_proposal(self, proposal_id: str) -> Dict:
+        """
+        Human approval boundary.
+        draft -> sent
+        """
+
+        if proposal_id not in self.state["proposals"]:
+            return {"error": "Proposal not found"}
+
+        proposal = self.state["proposals"][proposal_id]
+
+        if proposal.get("status") != "draft":
+            return {
+                "error": "Proposal not awaiting approval",
+                "current_status": proposal.get("status")
+            }
+
+        proposal["approved_by_human"] = True
+        proposal["approved_at"] = datetime.now().isoformat()
+
+        self.mark_proposal_sent(proposal_id)
+
+        proposal["next_state"] = "response_waiting"
+
+        self._save_state()
+
+        return {
+            "status": "sent",
+            "proposal_id": proposal_id,
+            "next_action": "response_waiting"
+        }
 
     def auto_send_proposal(self, proposal_id: str) -> Dict:
         """
@@ -630,6 +663,8 @@ Would love to schedule a brief call to discuss how we might help.
             "started_at": datetime.now().isoformat(),
             "status": "in_progress",
             "accepted_rate": accepted_rate,
+            "client_email": opp.get("from_email", ""),
+            "client_name": opp.get("client_name", opp.get("title", "")),
             "deliverables": [],
             "time_logged_hours": 0,
             "notes": []
@@ -687,7 +722,8 @@ Would love to schedule a brief call to discuss how we might help.
         deliverable["file_path"] = str(file_path)
 
         self.state["deliverables"][deliverable["id"]] = deliverable
-        self.state["active_work"][work_id]["deliverables"].append(deliverable["id"])
+        if deliverable["id"] not in self.state["active_work"][work_id]["deliverables"]:
+            self.state["active_work"][work_id]["deliverables"].append(deliverable["id"])
         self._save_state()
 
         return deliverable
@@ -703,7 +739,14 @@ Would love to schedule a brief call to discuss how we might help.
             self.state["payments_pending"][work_id] = {
                 "work_id": work_id,
                 "expected_amount": work["accepted_rate"],
-                "delivered_at": work["delivered_at"]
+                "delivered_at": work["delivered_at"],
+                "email": work.get("client_email", "") or self.state["opportunities"].get(
+                    work.get("opportunity_id"), {}
+                ).get("from_email", ""),
+                "client_name": work.get("client_name", "") or self.state["opportunities"].get(
+                    work.get("opportunity_id"), {}
+                ).get("title", ""),
+                "opportunity_id": work.get("opportunity_id", "")
             }
 
             opp_id = work["opportunity_id"]
@@ -738,9 +781,55 @@ Would love to schedule a brief call to discuss how we might help.
         if work_id in self.state["active_work"]:
             self.state["active_work"][work_id]["status"] = "paid"
 
+        # INTEGRAFIX: emit capital event
+        payment["capital_event"] = {
+            "id": f"income_{work_id}_{payment['received_at']}",
+            "type": "income_received",
+            "amount_usd": amount_usd,
+            "work_id": work_id,
+            "timestamp": payment["received_at"],
+            "source": method,
+            "capital_bridge_injected": True
+        }
+
+        self.state.setdefault("capital_events", [])
+        self.state["capital_events"].append(payment["capital_event"])
+
         self._save_state()
 
         return payment
+
+
+    def complete_work(self, work_id: str, notes: str = "") -> Dict:
+        """Complete work and move it to payment pending."""
+
+        if work_id not in self.state["active_work"]:
+            return {"error": "Work not found"}
+
+        work = self.state["active_work"][work_id]
+
+        work["status"] = "completed"
+
+        if notes:
+            work["notes"].append({
+                "timestamp": datetime.now().isoformat(),
+                "note": notes
+            })
+
+        self.state["payments_pending"][work_id] = {
+            "work_id": work_id,
+            "amount_usd": work.get("accepted_rate", 0),
+            "status": "awaiting_payment",
+            "created_at": datetime.now().isoformat()
+        }
+
+        self._save_state()
+
+        return {
+            "status": "completed",
+            "work_id": work_id,
+            "payment_pending": work.get("accepted_rate", 0)
+        }
 
     # ========== PIPELINE MANAGEMENT ==========
 

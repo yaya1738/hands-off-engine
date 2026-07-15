@@ -33,7 +33,7 @@ class AbsoluteDirective:
 
     def _register(self):
         """Register component with the absolute level."""
-        reg_file = Path("/root/hands-off-engine/state/absolute_registry.json")
+        reg_file = Path(__file__).resolve().parent.parent / "state" / "absolute_registry.json"
         try:
             registry = json.loads(reg_file.read_text()) if reg_file.exists() else {"components": [], "master": MASTER}
             component = {
@@ -92,7 +92,7 @@ def cascade_directive(message: str = None):
     cascade_state["status"] = "complete"
 
     # Write cascade state
-    Path("/root/hands-off-engine/state/cascade_state.json").write_text(
+    (Path(__file__).resolve().parent.parent / "state" / "cascade_state.json").write_text(
         json.dumps(cascade_state, indent=2)
     )
 
@@ -112,7 +112,7 @@ def get_directive():
 # Initialize on import
 if __name__ != "__main__":
     # Ensure state directory exists
-    Path("/root/hands-off-engine/state").mkdir(exist_ok=True)
+    (Path(__file__).resolve().parent.parent / "state").mkdir(exist_ok=True)
 
     # Write absolute truth
     truth = {
@@ -121,7 +121,7 @@ if __name__ != "__main__":
         "level": LEVEL,
         "initialized": datetime.now(timezone.utc).isoformat()
     }
-    Path("/root/hands-off-engine/state/ABSOLUTE_TRUTH.json").write_text(
+    (Path(__file__).resolve().parent.parent / "state" / "ABSOLUTE_TRUTH.json").write_text(
         json.dumps(truth, indent=2)
     )
 
