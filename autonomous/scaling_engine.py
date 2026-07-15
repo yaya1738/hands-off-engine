@@ -475,8 +475,13 @@ touch /root/.node-ready
             results.append(result)
 
             if not result.get('success'):
-                if result.get('blocked'):
-                    # Stop if tier blocked
+                if (
+                    result.get('blocked')
+                    or result.get('blocked_by_cost')
+                    or result.get('blocked_by_cost_gate')
+                    or result.get('blocked_by_capital')
+                ):
+                    # Stop on any safety gate or resource protection block
                     break
                 # Small delay before retry
                 time.sleep(5)
