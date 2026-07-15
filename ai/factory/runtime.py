@@ -3,10 +3,14 @@ from typing import Any, Dict, List
 from ai.factory.runtime_governance import FactoryRuntimeGovernance
 from ai.factory.runtime_observability import FactoryRuntimeObservability
 from ai.factory.runtime_state import FactoryRuntimeState
+
 from ai.factory.event_bus import FactoryEventBus
 from ai.factory.event_replay import FactoryEventReplay
+
 from ai.factory.diagnostic_intelligence import FactoryDiagnosticIntelligence
 from ai.factory.recommendation_feedback import FactoryRecommendationFeedback
+from ai.factory.meta_optimizer import FactoryMetaOptimizer
+
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
@@ -29,6 +33,7 @@ class FactoryRuntime:
 
         self.diagnostics = FactoryDiagnosticIntelligence()
         self.recommendations = FactoryRecommendationFeedback()
+        self.meta_optimizer = FactoryMetaOptimizer()
 
         self.self_healing = FactorySelfHealingIntelligence()
 
@@ -91,16 +96,38 @@ class FactoryRuntime:
             recommendation
         )
 
+        scored = self.meta_optimizer.score_improvement(
+            recommendation
+        )
+
+        self.meta_optimizer.compare_strategies(
+            [
+                recommendation
+            ]
+        )
+
+        selected = self.meta_optimizer.select_best_action(
+            [
+                scored
+            ]
+        )
+
         self.recommendations.apply_improvement(
             {
-                "source": "diagnostics",
-                "recommendation": recommendation,
+                "source": "meta_optimizer",
+                "selected": selected,
             }
         )
 
         self.recommendations.track_effect(
             {
                 "success": result.get("success"),
+            }
+        )
+
+        self.meta_optimizer.measure_roi(
+            {
+                "result": result,
             }
         )
 
@@ -142,7 +169,9 @@ class FactoryRuntime:
             simulation = self.simulation.run_simulation(plan)
             steps.append("simulation")
 
-            decision = self.decision.create_decision(simulation)
+            decision = self.decision.create_decision(
+                simulation
+            )
             steps.append("decision")
 
             self.emit_event(
@@ -190,11 +219,11 @@ class FactoryRuntime:
             )
 
             self.self_healing.apply_recovery(
-                {"action": "restart_execution"},
+                {"action": "restart_execution"}
             )
 
             self.self_healing.verify_recovery(
-                {"status": "recovered"},
+                {"status": "recovered"}
             )
 
             steps.append("recovered")
