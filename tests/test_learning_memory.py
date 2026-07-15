@@ -3,52 +3,61 @@ from ai.factory.learning_memory import (
 )
 
 
-def test_store():
-    memory = FactoryLearningMemory()
+def build():
+    return FactoryLearningMemory()
 
-    result = memory.store(
+
+def test_remember():
+    memory = build()
+
+    result = memory.remember(
         {
-            "action": "IMPROVE",
+            "action": "OPTIMIZE",
         }
     )
 
-    assert result["action"] == "IMPROVE"
+    assert result["stored"] is True
 
 
-def test_recall():
-    memory = FactoryLearningMemory()
+def test_record_outcome():
+    memory = build()
 
-    memory.store(
+    result = memory.record_outcome(
         {
-            "decision": "RECOVER",
+            "success": True,
         }
     )
 
-    result = memory.recall(
-        "decision",
-        "RECOVER",
+    assert result["type"] == "OUTCOME"
+
+
+def test_retrieve():
+    memory = build()
+
+    memory.remember(
+        {
+            "mode": "AUTO",
+        }
     )
+
+    result = memory.retrieve()
 
     assert len(result) == 1
 
 
 def test_patterns():
-    memory = FactoryLearningMemory()
+    memory = build()
 
-    memory.store(
-        {
-            "action": "IMPROVE",
-        }
-    )
+    memory.remember({})
 
     result = memory.patterns()
 
-    assert result["IMPROVE"] == 1
+    assert result["count"] == 1
 
 
 def test_history():
-    memory = FactoryLearningMemory()
+    memory = build()
 
-    memory.store({})
+    memory.remember({})
 
     assert len(memory.history()) == 1

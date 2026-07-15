@@ -3,46 +3,81 @@ from typing import Any, Dict, List
 
 class FactoryLearningMemory:
     def __init__(self):
-        self._memory: List[Dict[str, Any]] = []
+        self.memory: List[Dict[str, Any]] = []
+        self._history: List[Dict[str, Any]] = []
 
-    def store(
+    def remember(
         self,
         experience: Dict[str, Any],
     ):
-        self._memory.append(
+        self.memory.append(
             experience
         )
 
-        return experience
+        result = {
+            "stored": True,
+            "experience": experience,
+        }
 
-    def recall(
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def record_outcome(
         self,
-        key: str,
-        value: Any,
+        outcome: Dict[str, Any],
     ):
-        return [
-            item
-            for item in self._memory
-            if item.get(key) == value
-        ]
+        entry = {
+            "type": "OUTCOME",
+            "data": outcome,
+        }
+
+        self.memory.append(
+            entry
+        )
+
+        self._history.append(
+            entry
+        )
+
+        return entry
+
+    def retrieve(
+        self,
+        key: str = None,
+    ):
+        if key is None:
+            result = self.memory
+
+        else:
+            result = [
+                item
+                for item in self.memory
+                if key in str(item)
+            ]
+
+        self._history.append(
+            {
+                "retrieved": result,
+            }
+        )
+
+        return result
 
     def patterns(self):
-        patterns = {}
+        result = {
+            "count": len(
+                self.memory
+            ),
+        }
 
-        for item in self._memory:
-            action = item.get(
-                "action",
-                "unknown",
-            )
+        self._history.append(
+            result
+        )
 
-            patterns[action] = (
-                patterns.get(
-                    action,
-                    0,
-                ) + 1
-            )
-
-        return patterns
+        return result
 
     def history(self):
-        return self._memory
+        return self._history
