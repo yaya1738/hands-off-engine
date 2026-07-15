@@ -7,55 +7,55 @@ def build():
     return FactoryStrategyEvolution()
 
 
-def test_store_strategy():
+def test_register_strategy():
     engine = build()
 
-    result = engine.store_strategy(
-        {
-            "name": "A",
-        }
+    result = engine.register_strategy(
+        "A",
+        {}
     )
 
-    assert result["stored"] is True
+    assert result["registered"] is True
 
 
 def test_evaluate_strategy():
     engine = build()
 
     result = engine.evaluate_strategy(
+        "A",
         {}
     )
 
     assert result["evaluated"] is True
 
 
-def test_evolve_strategy():
+def test_replace_strategy():
     engine = build()
 
-    result = engine.evolve_strategy(
-        {}
+    result = engine.replace_strategy(
+        "A",
+        "B",
     )
 
-    assert result["evolved"] is True
+    assert result["replaced"] is True
 
 
-def test_select_strategy():
+def test_activate_strategy():
     engine = build()
 
-    engine.store_strategy(
-        {
-            "id": 1,
-        }
+    result = engine.activate_strategy(
+        "B"
     )
 
-    result = engine.select_strategy()
-
-    assert result["selected"]["id"] == 1
+    assert result["activated"] is True
 
 
 def test_history():
     engine = build()
 
-    engine.store_strategy({})
+    engine.register_strategy(
+        "A",
+        {}
+    )
 
     assert len(engine.history()) == 1

@@ -3,71 +3,68 @@ from typing import Any, Dict, List
 
 class FactoryStrategyEvolution:
     def __init__(self):
-        self.strategies: List[Dict[str, Any]] = []
+        self.strategies: Dict[str, Dict[str, Any]] = {}
+        self.active_strategy = None
         self._history: List[Dict[str, Any]] = []
 
-    def store_strategy(
+    def register_strategy(
         self,
+        name: str,
         strategy: Dict[str, Any],
     ):
-        self.strategies.append(
-            strategy
-        )
+        self.strategies[name] = strategy
 
         result = {
-            "stored": True,
-            "strategy": strategy,
+            "registered": True,
+            "strategy": name,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
     def evaluate_strategy(
         self,
-        strategy: Dict[str, Any],
+        name: str,
+        metrics: Dict[str, Any],
     ):
         result = {
             "evaluated": True,
-            "strategy": strategy,
-            "score": 1,
+            "strategy": name,
+            "metrics": metrics,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def evolve_strategy(
+    def replace_strategy(
         self,
-        strategy: Dict[str, Any],
+        old: str,
+        new: str,
     ):
         result = {
-            "evolved": True,
-            "strategy": strategy,
+            "replaced": True,
+            "old": old,
+            "new": new,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def select_strategy(self):
+    def activate_strategy(
+        self,
+        name: str,
+    ):
+        self.active_strategy = name
+
         result = {
-            "selected": (
-                self.strategies[0]
-                if self.strategies
-                else None
-            ),
+            "activated": True,
+            "strategy": name,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
