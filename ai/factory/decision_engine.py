@@ -1,32 +1,52 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 
 class FactoryDecisionEngine:
-    def analyze(
+    def __init__(self):
+        self._history: List[Dict[str, Any]] = []
+
+    def decide(
         self,
-        health: Dict[str, Any],
-        history: list,
-        telemetry: Dict[str, Any],
+        feedback: Dict[str, Any],
     ) -> Dict[str, Any]:
 
-        if health.get("status") != "HEALTHY":
-            return {
-                "action": "investigate",
-                "reason": "factory_unhealthy",
-            }
+        recommendation = feedback.get(
+            "recommendation",
+            "review",
+        )
 
-        failed = telemetry.get(
-            "failed",
+        performance = feedback.get(
+            "performance",
             0,
         )
 
-        if failed > 0:
-            return {
-                "action": "review_failures",
-                "reason": "failed_executions_detected",
-            }
+        if recommendation == "continue":
+            decision = "CONTINUE"
 
-        return {
-            "action": "continue",
-            "reason": "factory_operating_normally",
+        elif recommendation == "improve":
+            decision = "OPTIMIZE"
+
+        else:
+            decision = "REVIEW"
+
+        result = {
+            "decision": decision,
+            "confidence": performance,
+            "reason": feedback.get(
+                "trend",
+                "unknown",
+            ),
         }
+
+        self._history.append(result)
+
+        return result
+
+    def evaluate(
+        self,
+        feedback: Dict[str, Any],
+    ):
+        return self.decide(feedback)
+
+    def history(self):
+        return self._history

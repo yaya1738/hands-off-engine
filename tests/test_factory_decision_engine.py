@@ -1,47 +1,44 @@
-from ai.factory.decision_engine import FactoryDecisionEngine
+from ai.factory.decision_engine import (
+    FactoryDecisionEngine,
+)
 
 
-def test_healthy_factory_continues():
+def test_continue_decision():
     engine = FactoryDecisionEngine()
 
-    result = engine.analyze(
+    result = engine.decide(
         {
-            "status": "HEALTHY",
-        },
-        [],
-        {
-            "failed": 0,
-        },
+            "recommendation": "continue",
+            "performance": 0.95,
+            "trend": "healthy",
+        }
     )
 
-    assert result["action"] == "continue"
+    assert result["decision"] == "CONTINUE"
+    assert result["confidence"] == 0.95
 
 
-def test_failure_triggers_review():
+def test_optimize_decision():
     engine = FactoryDecisionEngine()
 
-    result = engine.analyze(
+    result = engine.decide(
         {
-            "status": "HEALTHY",
-        },
-        [],
-        {
-            "failed": 2,
-        },
+            "recommendation": "improve",
+            "performance": 0.2,
+            "trend": "poor",
+        }
     )
 
-    assert result["action"] == "review_failures"
+    assert result["decision"] == "OPTIMIZE"
 
 
-def test_unhealthy_factory_investigates():
+def test_history():
     engine = FactoryDecisionEngine()
 
-    result = engine.analyze(
+    engine.decide(
         {
-            "status": "DEGRADED",
-        },
-        [],
-        {},
+            "recommendation": "review",
+        }
     )
 
-    assert result["action"] == "investigate"
+    assert len(engine.history()) == 1
