@@ -8,53 +8,51 @@ def build():
 
 
 def test_register_resource():
-    allocator = build()
+    manager = build()
 
-    result = allocator.register_resource(
+    result = manager.register_resource(
         "cpu",
-        10,
+        {}
     )
 
     assert result["registered"] is True
 
 
-def test_allocate():
-    allocator = build()
+def test_allocate_resource():
+    manager = build()
 
-    result = allocator.allocate(
+    result = manager.allocate_resource(
         "cpu",
-        {
-            "goal": "RUN",
-        }
+        {}
     )
 
     assert result["allocated"] is True
 
 
-def test_rebalance():
-    allocator = build()
+def test_release_resource():
+    manager = build()
 
-    result = allocator.rebalance()
-
-    assert result["rebalanced"] is True
-
-
-def test_availability():
-    allocator = build()
-
-    allocator.register_resource(
-        "memory",
-        5,
+    result = manager.release_resource(
+        "cpu"
     )
 
-    result = allocator.availability()
+    assert result["released"] is True
 
-    assert "memory" in result["resources"]
+
+def test_optimize_allocation():
+    manager = build()
+
+    result = manager.optimize_allocation()
+
+    assert result["optimized"] is True
 
 
 def test_history():
-    allocator = build()
+    manager = build()
 
-    allocator.rebalance()
+    manager.register_resource(
+        "x",
+        {}
+    )
 
-    assert len(allocator.history()) == 1
+    assert len(manager.history()) == 1

@@ -3,75 +3,62 @@ from typing import Any, Dict, List
 
 class FactoryResourceAllocation:
     def __init__(self):
-        self.resources: Dict[str, Any] = {}
+        self.resources: Dict[str, Dict[str, Any]] = {}
         self.allocations: List[Dict[str, Any]] = []
         self._history: List[Dict[str, Any]] = []
 
     def register_resource(
         self,
         name: str,
-        value: Any,
+        resource: Dict[str, Any],
     ):
-        self.resources[name] = value
+        self.resources[name] = resource
 
         result = {
             "registered": True,
             "resource": name,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def allocate(
+    def allocate_resource(
         self,
-        resource: str,
-        goal: Dict[str, Any],
+        name: str,
+        allocation: Dict[str, Any],
     ):
-        allocation = {
-            "resource": resource,
-            "goal": goal,
-        }
-
-        self.allocations.append(
-            allocation
-        )
-
         result = {
             "allocated": True,
+            "resource": name,
             "allocation": allocation,
         }
 
-        self._history.append(
-            result
-        )
+        self.allocations.append(result)
+        self._history.append(result)
 
         return result
 
-    def rebalance(self):
+    def release_resource(
+        self,
+        name: str,
+    ):
         result = {
-            "rebalanced": True,
-            "allocation_count": len(
-                self.allocations
-            ),
+            "released": True,
+            "resource": name,
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
-    def availability(self):
+    def optimize_allocation(self):
         result = {
-            "resources": self.resources,
+            "optimized": True,
+            "resources": len(self.resources),
         }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 
