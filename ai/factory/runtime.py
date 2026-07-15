@@ -11,6 +11,7 @@ from ai.factory.diagnostic_intelligence import FactoryDiagnosticIntelligence
 from ai.factory.recommendation_feedback import FactoryRecommendationFeedback
 from ai.factory.meta_optimizer import FactoryMetaOptimizer
 from ai.factory.strategy_manager import FactoryStrategyManager
+from ai.factory.resource_allocator import FactoryResourceAllocator
 
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 
@@ -44,6 +45,15 @@ class FactoryRuntime:
             },
         )
 
+        self.resource_allocator = FactoryResourceAllocator()
+        self.resource_allocator.resource_registry(
+            "runtime_compute",
+            {
+                "capacity": 1,
+                "type": "default",
+            },
+        )
+
         self.self_healing = FactorySelfHealingIntelligence()
 
         self.planning = FactoryPlanningIntelligence()
@@ -56,11 +66,7 @@ class FactoryRuntime:
 
         self._history: List[Dict[str, Any]] = []
 
-    def emit_event(
-        self,
-        event_type: str,
-        payload: Dict[str, Any],
-    ):
+    def emit_event(self, event_type, payload):
         event = {
             "type": event_type,
             "payload": payload,
@@ -77,10 +83,7 @@ class FactoryRuntime:
 
         return event
 
-    def manage_strategy(
-        self,
-        result: Dict[str, Any],
-    ):
+    def manage_strategy(self, result):
         self.strategy_manager.evaluate_strategy(
             "default",
         )
@@ -98,11 +101,36 @@ class FactoryRuntime:
             "runtime_success": result.get("success"),
         }
 
-    def run_improvement_cycle(
-        self,
-        result: Dict[str, Any],
-    ):
-        analysis = self.diagnostics.analyze_execution(result)
+    def manage_resources(self, result):
+        estimate = self.resource_allocator.estimate_cost(
+            result
+        )
+
+        allocation = self.resource_allocator.allocate_resources(
+            result,
+            amount=estimate.get("cost", 1),
+        )
+
+        self.resource_allocator.rebalance(
+            [
+                allocation,
+            ]
+        )
+
+        efficiency = self.resource_allocator.measure_efficiency(
+            result
+        )
+
+        return {
+            "estimate": estimate,
+            "allocation": allocation,
+            "efficiency": efficiency,
+        }
+
+    def run_improvement_cycle(self, result):
+        analysis = self.diagnostics.analyze_execution(
+            result
+        )
 
         self.diagnostics.detect_failure_patterns(
             result.get("steps_completed", [])
@@ -117,10 +145,6 @@ class FactoryRuntime:
         )
 
         self.recommendations.collect_recommendations(
-            recommendation
-        )
-
-        self.recommendations.evaluate_recommendations(
             recommendation
         )
 
@@ -143,22 +167,13 @@ class FactoryRuntime:
             }
         )
 
-        self.recommendations.track_effect(
-            {
-                "success": result.get("success"),
-            }
-        )
-
         self.meta_optimizer.measure_roi(
             {
                 "result": result,
             }
         )
 
-    def execute(
-        self,
-        goal: Dict[str, Any],
-    ):
+    def execute(self, goal):
         steps = []
 
         self.emit_event(
@@ -185,21 +200,11 @@ class FactoryRuntime:
             plan = self.planning.create_plan(goal)
             steps.append("planning")
 
-            self.emit_event(
-                "plan.created",
-                {"plan": plan},
-            )
-
             simulation = self.simulation.run_simulation(plan)
             steps.append("simulation")
 
             decision = self.decision.create_decision(simulation)
             steps.append("decision")
-
-            self.emit_event(
-                "decision.created",
-                {"decision": decision},
-            )
 
             self.orchestration.dispatch_tasks(
                 [decision]
@@ -228,14 +233,6 @@ class FactoryRuntime:
 
             self.self_healing.diagnose_issue(
                 {"error": str(error)}
-            )
-
-            self.self_healing.apply_recovery(
-                {"action": "restart_execution"}
-            )
-
-            self.self_healing.verify_recovery(
-                {"status": "recovered"}
             )
 
             steps.append("recovered")
@@ -270,17 +267,18 @@ class FactoryRuntime:
             "steps_completed": steps,
         }
 
-        self.run_improvement_cycle(
-            result,
-        )
+        self.run_improvement_cycle(result)
 
-        strategy_result = self.manage_strategy(
-            result,
-        )
-
+        strategy_result = self.manage_strategy(result)
         self.emit_event(
             "strategy.evaluated",
             strategy_result,
+        )
+
+        resource_result = self.manage_resources(result)
+        self.emit_event(
+            "resources.evaluated",
+            resource_result,
         )
 
         self.emit_event(
