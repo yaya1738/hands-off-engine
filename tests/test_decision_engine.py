@@ -3,36 +3,36 @@ from ai.factory.decision_engine import (
 )
 
 
-def test_recovery_decision():
+def test_recover():
     engine = FactoryDecisionEngine()
 
     result = engine.decide(
         {
-            "health": "DEGRADED",
+            "health": "DOWN",
         }
     )
 
     assert result["decision"] == "RECOVER"
 
 
-def test_escalation_decision():
+def test_improve():
     engine = FactoryDecisionEngine()
 
     result = engine.decide(
         {
-            "risk": "HIGH",
+            "success_rate": 0.5,
         }
     )
 
-    assert result["decision"] == "ESCALATE"
+    assert result["decision"] == "IMPROVE"
 
 
-def test_continue_decision():
+def test_continue():
     engine = FactoryDecisionEngine()
 
     result = engine.decide(
         {
-            "health": "HEALTHY",
+            "success_rate": 1,
         }
     )
 

@@ -7,51 +7,55 @@ class FactoryDecisionEngine:
 
     def evaluate(
         self,
-        context: Dict[str, Any],
+        state: Dict[str, Any],
     ):
-        health = context.get(
-            "health",
-            "UNKNOWN",
-        )
+        if state.get(
+            "health"
+        ) == "DOWN":
+            return "RECOVER"
 
-        risk = context.get(
-            "risk",
-            "UNKNOWN",
-        )
+        if state.get(
+            "success_rate",
+            1,
+        ) < 0.8:
+            return "IMPROVE"
 
-        if health == "DEGRADED":
-            decision = {
-                "decision": "RECOVER",
-                "reason": "health_degraded",
-                "confidence": 0.8,
-            }
-
-        elif risk == "HIGH":
-            decision = {
-                "decision": "ESCALATE",
-                "reason": "high_risk",
-                "confidence": 0.7,
-            }
-
-        else:
-            decision = {
-                "decision": "CONTINUE",
-                "reason": "stable",
-                "confidence": 0.9,
-            }
-
-        self._history.append(
-            decision
-        )
-
-        return decision
+        return "CONTINUE"
 
     def decide(
         self,
-        context,
+        state: Dict[str, Any],
     ):
-        return self.evaluate(
-            context
+        decision = self.evaluate(
+            state
+        )
+
+        result = {
+            "decision": decision,
+            "reason": self.reason(
+                decision
+            ),
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def reason(
+        self,
+        decision: str,
+    ):
+        reasons = {
+            "RECOVER": "runtime health failure",
+            "IMPROVE": "performance below target",
+            "CONTINUE": "system operating normally",
+        }
+
+        return reasons.get(
+            decision,
+            "unknown",
         )
 
     def history(self):
