@@ -6,42 +6,19 @@ class FactoryKnowledgeRetrieval:
         self,
         knowledge=None,
     ):
-        self.knowledge = knowledge
+        self.knowledge = knowledge or []
         self._history: List[Dict[str, Any]] = []
 
-    def retrieve_context(
+    def search(
         self,
-        query: str = None,
-    ):
-        if self.knowledge:
-            result = self.knowledge.query(
-                query
-            )
-
-        else:
-            result = []
-
-        output = {
-            "context": result,
-        }
-
-        self._history.append(
-            output
-        )
-
-        return output
-
-    def match(
-        self,
-        context: Dict[str, Any],
+        query: Any,
     ):
         result = {
-            "matched": bool(
-                context.get(
-                    "context",
-                    [],
-                )
-            ),
+            "matches": [
+                item
+                for item in self.knowledge
+                if query in str(item)
+            ],
         }
 
         self._history.append(
@@ -50,13 +27,13 @@ class FactoryKnowledgeRetrieval:
 
         return result
 
-    def enrich(
+    def match_context(
         self,
-        decision: Dict[str, Any],
+        context: Dict[str, Any],
     ):
         result = {
-            "decision": decision,
-            "enriched": True,
+            "matched": True,
+            "context": context,
         }
 
         self._history.append(
@@ -67,7 +44,11 @@ class FactoryKnowledgeRetrieval:
 
     def recommend(self):
         result = {
-            "recommendation": "USE_KNOWLEDGE",
+            "recommendation": (
+                self.knowledge[0]
+                if self.knowledge
+                else None
+            ),
         }
 
         self._history.append(

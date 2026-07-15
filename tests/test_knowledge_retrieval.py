@@ -3,53 +3,34 @@ from ai.factory.knowledge_retrieval import (
 )
 
 
-class FakeKnowledge:
-    def query(self, query):
-        return [
-            {
-                "pattern": "stable",
-            }
-        ]
-
-
 def build():
     return FactoryKnowledgeRetrieval(
-        FakeKnowledge()
+        [
+            {
+                "pattern": "SUCCESS",
+            }
+        ]
     )
 
 
-def test_retrieve_context():
+def test_search():
     retrieval = build()
 
-    result = retrieval.retrieve_context()
+    result = retrieval.search(
+        "SUCCESS"
+    )
 
-    assert len(result["context"]) == 1
+    assert len(result["matches"]) == 1
 
 
-def test_match():
+def test_match_context():
     retrieval = build()
 
-    result = retrieval.match(
-        {
-            "context": [
-                {}
-            ]
-        }
+    result = retrieval.match_context(
+        {}
     )
 
     assert result["matched"] is True
-
-
-def test_enrich():
-    retrieval = build()
-
-    result = retrieval.enrich(
-        {
-            "action": "RUN",
-        }
-    )
-
-    assert result["enriched"] is True
 
 
 def test_recommend():
@@ -57,15 +38,22 @@ def test_recommend():
 
     result = retrieval.recommend()
 
-    assert (
-        result["recommendation"]
-        == "USE_KNOWLEDGE"
-    )
+    assert result["recommendation"] is not None
+
+
+def test_empty_recommend():
+    retrieval = FactoryKnowledgeRetrieval()
+
+    result = retrieval.recommend()
+
+    assert result["recommendation"] is None
 
 
 def test_history():
     retrieval = build()
 
-    retrieval.recommend()
+    retrieval.search(
+        "SUCCESS"
+    )
 
     assert len(retrieval.history()) == 1
