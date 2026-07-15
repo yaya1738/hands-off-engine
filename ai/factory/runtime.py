@@ -1,5 +1,6 @@
 from typing import Any, Dict, List
 
+from ai.factory.runtime_governance import FactoryRuntimeGovernance
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
 from ai.factory.decision_intelligence import FactoryDecisionIntelligence
@@ -11,6 +12,8 @@ from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence
 
 class FactoryRuntime:
     def __init__(self):
+        self.governance = FactoryRuntimeGovernance()
+
         self.planning = FactoryPlanningIntelligence()
         self.simulation = FactorySimulationIntelligence()
         self.decision = FactoryDecisionIntelligence()
@@ -26,6 +29,18 @@ class FactoryRuntime:
         goal: Dict[str, Any],
     ):
         steps = []
+
+        self.governance.check_policy(goal)
+        steps.append("policy_check")
+
+        self.governance.check_permission(goal)
+        steps.append("permission_check")
+
+        self.governance.assess_risk(goal)
+        steps.append("risk_check")
+
+        self.governance.authorize_execution(goal)
+        steps.append("authorization")
 
         plan = self.planning.create_plan(goal)
         steps.append("planning")
@@ -52,6 +67,14 @@ class FactoryRuntime:
             "runtime-job"
         )
         steps.append("execution")
+
+        self.governance.audit_execution(
+            {
+                "goal": goal,
+                "steps": steps,
+            }
+        )
+        steps.append("audit")
 
         self.learning.record_experience(
             {
