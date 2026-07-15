@@ -621,6 +621,22 @@ class HardwareBrain:
         ok, keys_data = self._api_request('GET', '/account/keys')
         ssh_keys = [k['id'] for k in keys_data.get('ssh_keys', [])] if ok else []
 
+        from finance.autonomous_cost_gate import get_cost_gate
+
+        gate = get_cost_gate()
+        approved, reason = gate.pre_scale_cost_check(
+            size=params.get('size', 's-8vcpu-16gb-amd'),
+            hours=24
+        )
+
+        if not approved:
+            return {
+                'success': False,
+                'blocked': True,
+                'blocked_by_cost_gate': True,
+                'reason': reason,
+            }
+
         droplet_data = {
             'name': params.get('name', f'ho-compute-{int(time.time())}'),
             'region': 'nyc1',
