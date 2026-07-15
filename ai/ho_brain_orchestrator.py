@@ -347,16 +347,32 @@ class BrainOrchestrator:
 
         self.start_time = datetime.utcnow()
 
-        # Run all stages
-        self.stages_results = [
-            self.run_stage_18_brain_summary(),
-            self.run_stage_19_policy_agent(),
-            self.run_stage_20_policy_executor(),
-            self.run_stage_21_action_verifier(),
-            self.run_stage_22_consensus_engine(),
-            self.run_stage_23_learning_engine(),
-            self.run_stage_24_policy_brain_v2(),
-        ]
+        # Run stages sequentially with dependency propagation
+        self.stages_results = []
+
+        stage_18 = self.run_stage_18_brain_summary()
+        self.stages_results.append(stage_18)
+
+        previous_failed = stage_18["status"] != "ok"
+
+        for stage_func in [
+            self.run_stage_19_policy_agent,
+            self.run_stage_20_policy_executor,
+            self.run_stage_21_action_verifier,
+            self.run_stage_22_consensus_engine,
+            self.run_stage_23_learning_engine,
+            self.run_stage_24_policy_brain_v2,
+        ]:
+            result = stage_func()
+
+            if previous_failed:
+                if result["status"] == "ok":
+                    result["status"] = "error"
+                result["errors"].append(
+                    "Blocked by failed dependency: Stage 18 brain_summary"
+                )
+
+            self.stages_results.append(result)
 
         self.end_time = datetime.utcnow()
 
