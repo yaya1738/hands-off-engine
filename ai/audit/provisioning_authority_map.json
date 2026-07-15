@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "provisioning_paths": [
+    {
+      "module": "hardware_brain",
+      "action": "create_droplet",
+      "current_mode": "direct_api",
+      "target_owner": "ProvisioningGateway",
+      "provenance_required": true
+    },
+    {
+      "module": "infra_manager",
+      "action": "create_droplet",
+      "current_mode": "direct_api",
+      "target_owner": "ProvisioningGateway",
+      "provenance_required": true
+    },
+    {
+      "module": "scaling_engine",
+      "action": "create_droplet",
+      "current_mode": "direct_api",
+      "target_owner": "ProvisioningGateway",
+      "provenance_required": true
+    }
+  ]
+}
