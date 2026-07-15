@@ -4,13 +4,15 @@ from typing import Any, Dict, List
 class FactoryControlPlane:
     def __init__(
         self,
-        runtime=None,
-        resilience=None,
-        state=None,
+        scheduler=None,
+        supervisor=None,
+        recovery=None,
+        orchestrator=None,
     ):
-        self.runtime = runtime
-        self.resilience = resilience
-        self.state = state
+        self.scheduler = scheduler
+        self.supervisor = supervisor
+        self.recovery = recovery
+        self.orchestrator = orchestrator
         self.running = False
         self._history: List[Dict[str, Any]] = []
 
@@ -29,21 +31,28 @@ class FactoryControlPlane:
 
     def cycle(
         self,
-        metrics: Dict[str, Any],
+        state: Dict[str, Any],
     ):
         result = {}
 
-        if self.runtime:
-            result["runtime"] = (
-                self.runtime.run_once(
-                    metrics
+        if self.supervisor:
+            result["health"] = (
+                self.supervisor.monitor(
+                    {
+                        "runtime": True,
+                    }
                 )
             )
 
-        if self.state:
-            result["checkpoint"] = (
-                self.state.checkpoint(
-                    result
+        if self.scheduler:
+            result["schedule"] = (
+                self.scheduler.run_pending()
+            )
+
+        if self.orchestrator:
+            result["orchestration"] = (
+                self.orchestrator.run(
+                    state
                 )
             )
 
@@ -53,23 +62,25 @@ class FactoryControlPlane:
 
         return result
 
-    def shutdown(self):
-        self.running = False
-
-        result = {
-            "status": "STOPPED",
-        }
-
-        self._history.append(
-            result
-        )
-
-        return result
-
-    def status(self):
+    def health(self):
         return {
             "running": self.running,
         }
+
+    def recover(self):
+        if self.recovery:
+            result = self.recovery.restore()
+
+        else:
+            result = {
+                "status": "NO_RECOVERY",
+            }
+
+        self._history.append(
+            result
+        )
+
+        return result
 
     def history(self):
         return self._history

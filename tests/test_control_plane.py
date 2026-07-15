@@ -3,22 +3,45 @@ from ai.factory.control_plane import (
 )
 
 
-class FakeRuntime:
-    def run_once(self, metrics):
+class FakeScheduler:
+    def run_pending(self):
         return {
-            "cycle": 1,
+            "status": "DONE",
         }
 
 
-class FakeState:
-    def checkpoint(self, state):
+class FakeSupervisor:
+    def monitor(self, data):
         return {
-            "saved": True,
+            "healthy": True,
         }
+
+
+class FakeRecovery:
+    def restore(self):
+        return {
+            "status": "RESTORED",
+        }
+
+
+class FakeOrchestrator:
+    def run(self, state):
+        return {
+            "cycle": True,
+        }
+
+
+def build():
+    return FactoryControlPlane(
+        scheduler=FakeScheduler(),
+        supervisor=FakeSupervisor(),
+        recovery=FakeRecovery(),
+        orchestrator=FakeOrchestrator(),
+    )
 
 
 def test_start():
-    plane = FactoryControlPlane()
+    plane = build()
 
     result = plane.start()
 
@@ -26,33 +49,24 @@ def test_start():
 
 
 def test_cycle():
-    plane = FactoryControlPlane(
-        runtime=FakeRuntime(),
-        state=FakeState(),
-    )
+    plane = build()
 
-    result = plane.cycle(
-        {
-            "success_rate": 1,
-        }
-    )
+    result = plane.cycle({})
 
-    assert result["runtime"]["cycle"] == 1
+    assert result["health"]["healthy"] is True
 
 
-def test_shutdown():
-    plane = FactoryControlPlane()
+def test_recover():
+    plane = build()
 
-    plane.start()
+    result = plane.recover()
 
-    result = plane.shutdown()
-
-    assert result["status"] == "STOPPED"
+    assert result["status"] == "RESTORED"
 
 
-def test_status():
-    plane = FactoryControlPlane()
+def test_history():
+    plane = build()
 
     plane.start()
 
-    assert plane.status()["running"] is True
+    assert len(plane.history()) == 1
