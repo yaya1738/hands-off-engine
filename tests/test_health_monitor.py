@@ -3,42 +3,61 @@ from ai.factory.health_monitor import (
 )
 
 
-def test_healthy():
-    monitor = FactoryHealthMonitor(
+def test_collect():
+    monitor = FactoryHealthMonitor()
+
+    result = monitor.collect(
         {
-            "runtime": lambda: True,
-            "state": lambda: True,
+            "health": "HEALTHY",
         }
     )
-
-    result = monitor.check()
 
     assert result["health"] == "HEALTHY"
-    assert result["issues"] == []
 
 
-def test_degraded():
-    monitor = FactoryHealthMonitor(
+def test_detect_change():
+    monitor = FactoryHealthMonitor()
+
+    monitor.collect(
         {
-            "runtime": lambda: False,
+            "health": "HEALTHY",
         }
     )
 
-    result = monitor.check()
-
-    assert result["health"] == "DEGRADED"
-    assert "runtime" in result["issues"]
-
-
-def test_alerts():
-    monitor = FactoryHealthMonitor(
+    monitor.collect(
         {
-            "scheduler": lambda: False,
+            "health": "DEGRADED",
         }
     )
 
-    monitor.check()
+    result = monitor.detect_change()
 
-    assert monitor.alerts() == [
-        "scheduler"
-    ]
+    assert result["changed"] is True
+    assert result["previous"] == "HEALTHY"
+    assert result["current"] == "DEGRADED"
+
+
+def test_no_change():
+    monitor = FactoryHealthMonitor()
+
+    monitor.collect(
+        {
+            "health": "HEALTHY",
+        }
+    )
+
+    result = monitor.detect_change()
+
+    assert result["changed"] is False
+
+
+def test_history():
+    monitor = FactoryHealthMonitor()
+
+    monitor.collect(
+        {
+            "health": "HEALTHY",
+        }
+    )
+
+    assert len(monitor.history()) == 1

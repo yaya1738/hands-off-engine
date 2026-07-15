@@ -2,51 +2,51 @@ from typing import Any, Dict, List
 
 
 class FactoryHealthMonitor:
-    def __init__(
+    def __init__(self):
+        self._history: List[Dict[str, Any]] = []
+
+    def collect(
         self,
-        checks: Dict[str, Any] = None,
+        snapshot: Dict[str, Any],
     ):
-        self.checks = checks or {}
-        self._last_status = None
-        self._alerts: List[str] = []
-
-    def check(self):
-        results = {}
-        self._alerts = []
-
-        for name, check in self.checks.items():
-            try:
-                result = check()
-
-                results[name] = result
-
-                if not result:
-                    self._alerts.append(
-                        name
-                    )
-
-            except Exception:
-                results[name] = False
-                self._alerts.append(
-                    name
-                )
-
-        health = (
-            "HEALTHY"
-            if not self._alerts
-            else "DEGRADED"
+        self._history.append(
+            snapshot
         )
 
-        self._last_status = {
-            "health": health,
-            "checks": results,
-            "issues": self._alerts,
+        return snapshot
+
+    def compare(
+        self,
+        previous: Dict[str, Any],
+        current: Dict[str, Any],
+    ):
+        previous_health = previous.get(
+            "health"
+        )
+
+        current_health = current.get(
+            "health"
+        )
+
+        return {
+            "previous": previous_health,
+            "current": current_health,
+            "changed": (
+                previous_health
+                != current_health
+            ),
         }
 
-        return self._last_status
+    def detect_change(self):
+        if len(self._history) < 2:
+            return {
+                "changed": False,
+            }
 
-    def status(self):
-        return self._last_status
+        return self.compare(
+            self._history[-2],
+            self._history[-1],
+        )
 
-    def alerts(self):
-        return self._alerts
+    def history(self):
+        return self._history
