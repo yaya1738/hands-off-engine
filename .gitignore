@@ -126,3 +126,25 @@ draft
 
 # Independent nested repositories
 hands-off-engine/
+
+# Hands-Off operator workflow artifacts
+autonomous_architecture_decider.sh
+autonomous_bridge_next_step.sh
+autonomous_intake_discovery.sh
+build_credential_supervisor_v2.sh
+finish_credential_heartbeat.sh
+hard_limits_only.sh
+integrate_credential_heartbeat.py
+run_income_worker.sh
+send_me_credential_state.sh
+start_work
+test_credential_discovery.py
+test_hands_off_bridge_reader.py
+wire_credential_heartbeat.py
+wire_reconciler_into_heartbeat.sh
+how-ref
+
+check-gmail-setup.sh
+choose-gmail-setup.sh
+find-oauth-file.sh
+ho-diagnostic.sh
