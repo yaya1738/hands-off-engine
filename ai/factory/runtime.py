@@ -10,6 +10,7 @@ from ai.factory.event_replay import FactoryEventReplay
 from ai.factory.diagnostic_intelligence import FactoryDiagnosticIntelligence
 from ai.factory.recommendation_feedback import FactoryRecommendationFeedback
 from ai.factory.meta_optimizer import FactoryMetaOptimizer
+from ai.factory.strategy_manager import FactoryStrategyManager
 
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 
@@ -34,6 +35,14 @@ class FactoryRuntime:
         self.diagnostics = FactoryDiagnosticIntelligence()
         self.recommendations = FactoryRecommendationFeedback()
         self.meta_optimizer = FactoryMetaOptimizer()
+
+        self.strategy_manager = FactoryStrategyManager()
+        self.strategy_manager.strategy_registry(
+            "default",
+            {
+                "mode": "baseline",
+            },
+        )
 
         self.self_healing = FactorySelfHealingIntelligence()
 
@@ -68,13 +77,32 @@ class FactoryRuntime:
 
         return event
 
+    def manage_strategy(
+        self,
+        result: Dict[str, Any],
+    ):
+        self.strategy_manager.evaluate_strategy(
+            "default",
+        )
+
+        self.strategy_manager.strategy_performance(
+            "default",
+        )
+
+        self.strategy_manager.activate_strategy(
+            "default",
+        )
+
+        return {
+            "strategy": "default",
+            "runtime_success": result.get("success"),
+        }
+
     def run_improvement_cycle(
         self,
         result: Dict[str, Any],
     ):
-        analysis = self.diagnostics.analyze_execution(
-            result
-        )
+        analysis = self.diagnostics.analyze_execution(result)
 
         self.diagnostics.detect_failure_patterns(
             result.get("steps_completed", [])
@@ -101,15 +129,11 @@ class FactoryRuntime:
         )
 
         self.meta_optimizer.compare_strategies(
-            [
-                recommendation
-            ]
+            [recommendation]
         )
 
         selected = self.meta_optimizer.select_best_action(
-            [
-                scored
-            ]
+            [scored]
         )
 
         self.recommendations.apply_improvement(
@@ -169,9 +193,7 @@ class FactoryRuntime:
             simulation = self.simulation.run_simulation(plan)
             steps.append("simulation")
 
-            decision = self.decision.create_decision(
-                simulation
-            )
+            decision = self.decision.create_decision(simulation)
             steps.append("decision")
 
             self.emit_event(
@@ -189,11 +211,6 @@ class FactoryRuntime:
                 decision,
             )
 
-            self.emit_event(
-                "execution.started",
-                {"execution_id": "runtime-job"},
-            )
-
             self.execution.start_execution(
                 "runtime-job"
             )
@@ -203,11 +220,6 @@ class FactoryRuntime:
             )
 
             steps.append("execution")
-
-            self.emit_event(
-                "execution.completed",
-                {"execution_id": "runtime-job"},
-            )
 
         except Exception as error:
             self.self_healing.detect_failure(
@@ -228,19 +240,6 @@ class FactoryRuntime:
 
             steps.append("recovered")
 
-        self.governance.audit_execution(
-            {
-                "goal": goal,
-                "steps": steps,
-            }
-        )
-
-        self.observability.record_metric(
-            {
-                "steps": len(steps),
-            }
-        )
-
         self.learning.record_experience(
             {
                 "goal": goal,
@@ -249,11 +248,6 @@ class FactoryRuntime:
         )
 
         steps.append("learning")
-
-        self.emit_event(
-            "learning.recorded",
-            {"goal": goal},
-        )
 
         self.optimization.measure_performance(
             {
@@ -277,7 +271,16 @@ class FactoryRuntime:
         }
 
         self.run_improvement_cycle(
-            result
+            result,
+        )
+
+        strategy_result = self.manage_strategy(
+            result,
+        )
+
+        self.emit_event(
+            "strategy.evaluated",
+            strategy_result,
         )
 
         self.emit_event(
