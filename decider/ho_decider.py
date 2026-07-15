@@ -19,10 +19,10 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 from audit import AuditLogger
 
 try:
-    from ai_nexus.history_log import log_kernel_history_event
+    from ai_nexus import history_log
 except ImportError:
     # History log may not be available in all configurations
-    log_kernel_history_event = None
+    history_log = None
 
 
 @dataclass
@@ -193,9 +193,9 @@ class Decider:
             planned_actions.append(action)
 
             # Log risk decision for Spark Plug kernels (if available)
-            if log_kernel_history_event:
+            if history_log and history_log.log_kernel_history_event:
                 try:
-                    log_kernel_history_event(
+                    history_log.log_kernel_history_event(
                         kernel_ids=["risk_model_v2", "trading_philosophy"],
                         kind="risk_decision",
                         source="risk_model_v2",
@@ -220,13 +220,13 @@ class Decider:
                     print(f"[history_log] Warning: Failed to log risk decision: {e}")
 
         # Log aggregate decider outcome for Spark Plug kernels (if available)
-        if log_kernel_history_event:
+        if history_log and history_log.log_kernel_history_event:
             try:
                 total_risk_usd = sum(action.amount for action in planned_actions)
                 num_buys = sum(1 for action in planned_actions if action.side == "YES")
                 num_sells = sum(1 for action in planned_actions if action.side == "NO")
 
-                log_kernel_history_event(
+                history_log.log_kernel_history_event(
                     kernel_ids=["risk_model_v2", "alpha_polymarket_core", "trading_philosophy"],
                     kind="decider_outcome",
                     source="ho_decider",

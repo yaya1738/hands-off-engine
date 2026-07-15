@@ -63,7 +63,11 @@ print()
 
 print("Pending Actions:")
 for action in data.get("credential_sync", {}).get("actions", []):
-    print(
-        f"  {action.get('identity')}: "
-        f"{action.get('action')}"
-    )
+    identity = action.get("identity")
+    state = action.get("action")
+
+    print(f"  {identity}:")
+    print(f"    Status: {state}")
+
+    if state == "awaiting_external_authorization":
+        print("    Next: provide OAuth authorization and resume setup")

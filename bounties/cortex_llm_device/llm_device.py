@@ -39,6 +39,23 @@ from dataclasses import dataclass, field
 
 try:
     from fuse import FUSE, FuseOSError, Operations
+    FUSE_AVAILABLE = True
+except Exception:
+    FUSE_AVAILABLE = False
+    FUSE = None
+
+    class FuseOSError(Exception):
+        pass
+
+    class Operations:
+        pass
+    FUSE = None
+
+    class FuseOSError(Exception):
+        pass
+
+    class Operations:
+        pass
 except ImportError:
     from fusepy import FUSE, FuseOSError, Operations
 

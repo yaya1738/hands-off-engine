@@ -89,11 +89,18 @@ def resolve_token_id(market_slug: str, side: str) -> Optional[str]:
 if _ENV_OVERRIDE == "0":
     _ENV_LIVE_TRADING = False
     LOG.info("Live trading force-disabled by environment variable")
+elif os.getenv("HANDS_OFF_EXECUTOR_MODE", "").lower() == "dryrun":
+    _ENV_LIVE_TRADING = False
+    LOG.info("Dryrun mode forced by executor mode")
+elif os.getenv("HANDS_OFF_EXECUTOR_MODE", "").lower() == "shadow":
+    _ENV_LIVE_TRADING = False
+    LOG.info("Shadow mode forced by executor mode")
 elif _STATE_FILE_TRADING:
     _ENV_LIVE_TRADING = True
     LOG.info("Live trading enabled by state file")
 else:
-    _ENV_LIVE_TRADING = os.getenv("LIVE_TRADING_ENABLED", "0") == "1"
+    _ENV_LIVE_TRADING = False
+    LOG.info("Live trading disabled by default")
 
 
 def get_executor_mode() -> str:
@@ -208,7 +215,21 @@ class Executor:
         Args:
             dryrun: If True, no actual trades are executed (default: True)
         """
-        self.dryrun = dryrun
+        executor_mode = get_executor_mode()
+
+        # Environment/config mode overrides constructor defaults.
+        # Safety invariant: live must never be the implicit default.
+        if executor_mode == "shadow":
+            self.dryrun = False
+            self.shadow_mode = True
+        elif executor_mode == "dryrun":
+            self.dryrun = True
+            self.shadow_mode = False
+        else:
+            self.dryrun = False
+            self.shadow_mode = False
+
+        self.mode = executor_mode
         self.audit = AuditLogger()
 
         # Load dynamic risk parameters
@@ -279,7 +300,7 @@ class Executor:
         results = []
 
         # UNIFIED AI CHECK: All trading serves Yair Siegel
-        if planned_actions:
+        if planned_actions and get_executor_mode() == "live":
             total_amount = sum(a.amount for a in planned_actions)
             allowed, reason = check_trading_allowed(total_amount)
             if not allowed:

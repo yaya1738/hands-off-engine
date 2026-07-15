@@ -24,9 +24,21 @@ def run():
 
 
     # Integration reality
-    from autonomous.integrations.heartbeat import heartbeat
+    from autonomous.integrations.providers.gmail_oauth import GmailOAuth
 
-    integration = heartbeat()
+    gmail = GmailOAuth()
+
+    integration = {
+        "healthy": gmail.status().get("connected", False),
+        "failures": []
+            if gmail.status().get("connected", False)
+            else [
+                {
+                    "integration": "gmail",
+                    "reason": "not_connected"
+                }
+            ]
+    }
 
     result["integration"] = integration
 

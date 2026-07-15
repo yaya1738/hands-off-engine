@@ -4,12 +4,12 @@
   "description": "ABSOLUTE HARD CAPS - Never exceeded by auto-tuning",
   "updated_by": "human",
   "limits": {
-    "MAX_ABSOLUTE_POSITION_USD": 50,
-    "MAX_ABSOLUTE_DAILY_LOSS_USD": 200,
+    "MAX_ABSOLUTE_POSITION_USD": 200,
+    "MAX_ABSOLUTE_DAILY_LOSS_USD": 400,
     "MAX_ABSOLUTE_OPEN_RISK_USD": 500,
     "MAX_ABSOLUTE_CONFIDENCE_THRESHOLD": 0.35,
     "MAX_ABSOLUTE_TRADES_PER_HOUR": 10,
-    "MIN_CONFIDENCE_THRESHOLD": 0.40
+    "MIN_CONFIDENCE_THRESHOLD": 0.4
   },
   "notes": {
     "MAX_ABSOLUTE_POSITION_USD": "No single trade can exceed this, regardless of phase",

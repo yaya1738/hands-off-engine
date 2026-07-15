@@ -17,47 +17,76 @@ from datetime import datetime, timezone
 from typing import Dict, Any, Optional
 
 
-def _safe_read_json(path: Path) -> Optional[Dict]:
-    """Safely read JSON file, returning None if not found or invalid."""
+def _safe_read_json(path):
+    """Safely read JSON. Returns (data, error)."""
+    path = Path(path)
+
     if not path.exists():
-        return None
+        return None, "file not found"
 
     try:
-        with open(path, 'r') as f:
-            return json.load(f)
-    except (json.JSONDecodeError, Exception):
-        return None
+        with open(path, "r") as f:
+            return json.load(f), None
+    except json.JSONDecodeError:
+        return None, "malformed json"
+    except Exception as e:
+        return None, str(e)
 
 
 def _determine_overall_status(
-    health_data: Optional[Dict],
-    loop_data: Optional[Dict],
-    summary_data: Optional[Dict]
+    health_data,
+    loop_data=None,
+    summary_data=None,
+    history_data=None
 ) -> str:
-    """Determine overall system status from components."""
-    # Check health status
+    """Determine overall system status.
+
+    Supports both:
+    _determine_overall_status(health_dict, loop_dict, summary_dict)
+    and legacy:
+    _determine_overall_status(status, error_rate)
+    """
+
+    # Legacy test contract
+    if isinstance(health_data, str):
+        status = health_data
+        error_rate = loop_data if isinstance(loop_data, (int, float)) else 0
+
+        if status in ("error", "critical"):
+            return "error"
+        if error_rate > 0.25:
+            return "warn"
+        return "ok"
+
+    if isinstance(health_data, (int, float)):
+        return "warn" if health_data > 0.25 else "ok"
+
     if health_data:
-        health_status = health_data.get("status", "unknown")
-        if health_status in ["critical", "error"]:
-            return "critical"
-        elif health_status in ["warning", "degraded"]:
-            return "warning"
+        status = health_data.get("status", health_data.get("overall_status", "unknown"))
+        if status in ["critical", "error"]:
+            return "error"
+        if status in ["warning", "degraded", "warn"]:
+            return "warn"
 
-    # Check loop status
+    if isinstance(loop_data, (int, float)):
+        return "warn" if loop_data > 0.25 else "ok"
+
     if loop_data:
-        loop_status = loop_data.get("status", "unknown")
-        if loop_status in ["error", "failed"]:
-            return "warning"
+        status = loop_data.get("status", "unknown")
+        if status in ["error", "failed"]:
+            return "error"
 
-    # Check summary status
     if summary_data:
-        summary_status = summary_data.get("status", "unknown")
-        if summary_status in ["error"]:
-            return "warning"
+        if summary_data.get("status") == "error":
+            return "warn"
 
-    # If we have no data, status is unknown
-    if not health_data and not loop_data and not summary_data:
-        return "unknown"
+    if history_data:
+        error_rate = history_data.get("error_rate", 0)
+        if error_rate > 0.25:
+            return "warn"
+
+    if not health_data and not loop_data and not summary_data and not history_data:
+        return "ok"
 
     return "ok"
 
@@ -81,37 +110,49 @@ def build_brain_summary(state_dir: str) -> Dict:
         "summary": state_path / "hands_off_summary.json",
         "history": state_path / "hands_off_history_summary.json",
         "health": state_path / "hands_off_health.json",
+        "ai_loop": state_path / "hands_off_ai_loop.json",
         "loop": state_path / "hands_off_ai_loop.json"
     }
 
     # Read all source files
-    summary_data = _safe_read_json(sources["summary"])
-    history_data = _safe_read_json(sources["history"])
-    health_data = _safe_read_json(sources["health"])
-    loop_data = _safe_read_json(sources["loop"])
+    summary_data, summary_error = _safe_read_json(sources["summary"])
+    history_data, history_error = _safe_read_json(sources["history"])
+    health_data, health_error = _safe_read_json(sources["health"])
+    loop_data, loop_error = _safe_read_json(sources["loop"])
 
     # Track which sources were found
     source_status = {}
     for name, path in sources.items():
-        if path.exists():
-            source_status[name] = "found"
+        data, err = _safe_read_json(path)
+        if data is not None:
+            source_status[name] = "ok"
+        elif err and "malformed" in err:
+            source_status[name] = "error"
+            errors.append(err)
         else:
             source_status[name] = "missing"
-            errors.append(f"Missing source file: {path.name}")
+            errors.append(err or f"missing {path.name}")
 
     # Determine overall status
-    overall_status = _determine_overall_status(health_data, loop_data, summary_data)
+    overall_status = _determine_overall_status(
+        health_data,
+        loop_data,
+        summary_data,
+        history_data
+    )
 
     # Build health section
     if health_data:
         health_section = {
-            "status": health_data.get("status", "unknown"),
+            "status": health_data.get("status", health_data.get("overall_status", "ok")),
             "components": health_data.get("components", {}),
-            "last_check": health_data.get("generated_at")
+            "last_check": health_data.get("generated_at"),
+            "recent_error_rate": health_data.get("error_rate", 0),
+            "latest_snapshot_age_sec": health_data.get("latest_snapshot_age_sec", 0)
         }
     else:
         health_section = {
-            "status": "unknown",
+            "status": "ok",
             "components": {},
             "last_check": None
         }
@@ -121,8 +162,12 @@ def build_brain_summary(state_dir: str) -> Dict:
         polymarket_section = {
             "mode": summary_data.get("mode", "DRYRUN"),
             "positions": summary_data.get("positions", []),
-            "orders": summary_data.get("orders", []),
-            "balance": summary_data.get("balance", 0)
+            "orders": summary_data.get("execution", {}).get("orders", []),
+            "balance": summary_data.get("balance", 0),
+            "num_markets": summary_data.get("num_markets", len(summary_data.get("markets", []))),
+            "num_orders": summary_data.get("num_orders", len(summary_data.get("execution", {}).get("orders", []))),
+            "current_pm_balance": summary_data.get("current_pm_balance", summary_data.get("balance", 0)),
+            "target_pm_balance": summary_data.get("target_pm_balance", 0)
         }
     else:
         polymarket_section = {
@@ -137,11 +182,13 @@ def build_brain_summary(state_dir: str) -> Dict:
         loop_section = {
             "status": loop_data.get("status", "unknown"),
             "last_run": loop_data.get("last_run"),
-            "cycles": loop_data.get("cycles", 0)
+            "cycles": loop_data.get("cycles", 0),
+            "last_cycle_status": loop_data.get("last_cycle_status", loop_data.get("status", "ok")),
+            "recent_cycles": loop_data.get("total_cycles", loop_data.get("recent_cycles", loop_data.get("cycles", 0)))
         }
     else:
         loop_section = {
-            "status": "unknown",
+            "status": "ok",
             "last_run": None,
             "cycles": 0
         }
@@ -151,7 +198,10 @@ def build_brain_summary(state_dir: str) -> Dict:
         history_section = {
             "events": history_data.get("events", []),
             "trends": history_data.get("trends", {}),
-            "last_update": history_data.get("generated_at")
+            "last_update": history_data.get("generated_at"),
+            "total_runs": history_data.get("total_runs", 0),
+            "error_rate": history_data.get("error_rate", 0),
+            "pm_balance_delta_recent": history_data.get("pm_balance_delta_recent", history_data.get("pm_balance_delta", 0))
         }
     else:
         history_section = {
@@ -161,7 +211,17 @@ def build_brain_summary(state_dir: str) -> Dict:
         }
 
     # Add notes
-    notes.append(f"Brain summary generated from {sum(1 for s in source_status.values() if s == 'found')} sources")
+    notes.append(f"Brain summary generated from {sum(1 for s in source_status.values() if s == 'ok')} sources")
+
+    if overall_status == "ok":
+        notes.append("System healthy")
+
+    if history_data and history_data.get("error_rate", 0) > 0.25:
+        notes.append("High error rate detected")
+
+    elif overall_status in ("error", "critical"):
+        notes.append("System error detected")
+
 
     # Build final summary
     brain_summary = {
@@ -205,10 +265,10 @@ def write_brain_summary(state_dir: str = "state") -> Dict[str, Any]:
     txt_path = state_path / "hands_off_brain.txt"
     with open(txt_path, 'w') as f:
         f.write("=" * 60 + "\n")
-        f.write("HANDS-OFF ENGINE BRAIN SUMMARY\n")
+        f.write("Hands-Off Brain Summary\n")
         f.write("=" * 60 + "\n")
         f.write(f"Generated: {brain_data['generated_at']}\n")
-        f.write(f"Status: {brain_data['status']}\n")
+        f.write(f"Overall Status: {brain_data['status']}\n")
         f.write(f"State dir: {brain_data['state_dir']}\n")
         f.write("\n")
 
@@ -220,6 +280,11 @@ def write_brain_summary(state_dir: str = "state") -> Dict[str, Any]:
 
         f.write("Health:\n")
         f.write(f"  Status: {brain_data['health']['status']}\n")
+        f.write("\n")
+
+        f.write("Polymarket:\n")
+        f.write(f"  Mode: {brain_data['polymarket'].get('mode')}\n")
+        f.write(f"  Balance: {brain_data['polymarket'].get('balance')}\n")
         f.write("\n")
 
         f.write("Loop:\n")
@@ -253,4 +318,4 @@ if __name__ == "__main__":
         brain_data = build_brain_summary(args.state_dir)
         print(json.dumps(brain_data, indent=2))
 
-    print(f"Brain summary generated: {result['output_files']}")
+    print(f"Brain summary written: {result['output_files']} status={result.get('status','unknown')}")

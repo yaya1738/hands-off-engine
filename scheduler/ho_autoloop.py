@@ -112,13 +112,12 @@ def run_all(state_dir: str) -> Dict[str, Any]:
     except Exception as e:
         result["status"] = "error"
         result["pipelines"]["polymarket"] = {
-            "status": "error",
-            "error": str(e),
-            "note": "Unexpected error in pipeline execution"
-        }
-
-    # Calculate total execution time
-    result["total_execution_time_sec"] = round(time.time() - start_time, 3)
+              "status": "error",
+              "mode": "DRYRUN",
+              "timestamp": datetime.now(timezone.utc).isoformat(),
+              "error": str(e),
+              "note": "Unexpected error in pipeline execution"
+          }
 
     # Generate summary
     pipeline_statuses = [p["status"] for p in result["pipelines"].values()]

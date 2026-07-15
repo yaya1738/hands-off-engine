@@ -38,7 +38,6 @@ restore-chat-history: false
 watch-files: false
 
 # LLM settings
-max-tokens: 8192
 timeout: 120
 
 # Upgrade check (disable on mobile to save bandwidth)

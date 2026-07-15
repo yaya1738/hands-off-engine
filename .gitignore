@@ -69,3 +69,7 @@ __pycache__/
 *.log
 *.tmp
 *.bak
+
+# Runtime state and local Termux environment
+state/*.jsonl
+termux-hands-off/
