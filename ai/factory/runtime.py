@@ -1,6 +1,8 @@
 from typing import Any, Dict, List
 
 from ai.factory.runtime_governance import FactoryRuntimeGovernance
+from ai.factory.runtime_observability import FactoryRuntimeObservability
+from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
 from ai.factory.decision_intelligence import FactoryDecisionIntelligence
@@ -13,6 +15,8 @@ from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence
 class FactoryRuntime:
     def __init__(self):
         self.governance = FactoryRuntimeGovernance()
+        self.observability = FactoryRuntimeObservability()
+        self.self_healing = FactorySelfHealingIntelligence()
 
         self.planning = FactoryPlanningIntelligence()
         self.simulation = FactorySimulationIntelligence()
@@ -42,31 +46,54 @@ class FactoryRuntime:
         self.governance.authorize_execution(goal)
         steps.append("authorization")
 
-        plan = self.planning.create_plan(goal)
-        steps.append("planning")
+        try:
+            plan = self.planning.create_plan(goal)
+            steps.append("planning")
 
-        simulation = self.simulation.run_simulation(plan)
-        steps.append("simulation")
+            simulation = self.simulation.run_simulation(plan)
+            steps.append("simulation")
 
-        decision = self.decision.create_decision(simulation)
-        steps.append("decision")
+            decision = self.decision.create_decision(simulation)
+            steps.append("decision")
 
-        self.orchestration.dispatch_tasks(
-            [decision]
-        )
-        steps.append("orchestration")
+            self.orchestration.dispatch_tasks([decision])
+            steps.append("orchestration")
 
-        self.execution.create_execution(
-            "runtime-job",
-            decision,
-        )
-        self.execution.start_execution(
-            "runtime-job"
-        )
-        self.execution.complete_execution(
-            "runtime-job"
-        )
-        steps.append("execution")
+            self.execution.create_execution(
+                "runtime-job",
+                decision,
+            )
+
+            self.execution.start_execution(
+                "runtime-job"
+            )
+
+            self.execution.complete_execution(
+                "runtime-job"
+            )
+
+            steps.append("execution")
+
+        except Exception as error:
+            self.self_healing.detect_failure(
+                {"error": str(error)}
+            )
+            steps.append("failure_detected")
+
+            self.self_healing.diagnose_issue(
+                {"error": str(error)}
+            )
+            steps.append("diagnosis")
+
+            self.self_healing.apply_recovery(
+                {"action": "restart_execution"}
+            )
+            steps.append("recovery")
+
+            self.self_healing.verify_recovery(
+                {"status": "recovered"}
+            )
+            steps.append("recovery_verified")
 
         self.governance.audit_execution(
             {
@@ -75,6 +102,12 @@ class FactoryRuntime:
             }
         )
         steps.append("audit")
+
+        self.observability.record_metric(
+            {
+                "steps": len(steps),
+            }
+        )
 
         self.learning.record_experience(
             {
