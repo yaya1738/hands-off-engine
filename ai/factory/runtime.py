@@ -1,41 +1,85 @@
-from ai.factory.controller import FactoryController
-from ai.factory.registry import FactoryRegistry
-from ai.factory.health import FactoryHealth
-from ai.factory.dashboard import FactoryDashboard
+from typing import Any, Dict, List
 
 
 class FactoryRuntime:
-    def __init__(self):
-        self.controller = FactoryController()
-        self.registry = FactoryRegistry()
-        self.health = FactoryHealth()
-        self.dashboard = FactoryDashboard()
+    def __init__(
+        self,
+        bootstrap=None,
+        control_plane=None,
+    ):
+        self.bootstrap = bootstrap
+        self.control_plane = control_plane
+        self.running = False
+        self.cycles = 0
+        self._history: List[Dict[str, Any]] = []
 
-        self._register_components()
+    def start(self):
+        if self.bootstrap:
+            self.bootstrap.start()
 
-    def _register_components(self):
-        self.registry.register("planner", "planning")
-        self.registry.register("runner", "execution")
-        self.registry.register("verifier", "validation")
-        self.registry.register("memory", "learning")
+        self.running = True
+
+        result = {
+            "status": "RUNNING",
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def run(
+        self,
+        state=None,
+    ):
+        if not self.running:
+            self.start()
+
+        if self.control_plane:
+            result = self.control_plane.cycle(
+                state or {}
+            )
+
+        else:
+            result = {
+                "status": "NO_CONTROL_PLANE",
+            }
+
+        self.cycles += 1
+
+        output = {
+            "cycle": self.cycles,
+            "result": result,
+        }
+
+        self._history.append(
+            output
+        )
+
+        return output
+
+    def stop(self):
+        self.running = False
+
+        result = {
+            "status": "STOPPED",
+        }
+
+        self._history.append(
+            result
+        )
+
+        return result
+
+    def heartbeat(self):
+        return {
+            "running": self.running,
+            "cycles": self.cycles,
+        }
 
     def status(self):
-        return self.health.check(
-            registry=self.registry,
-            memory=self.controller.memory,
-            state={},
-        )
+        return self.heartbeat()
 
-    def view(self):
-        return self.dashboard.snapshot(
-            health=self.status(),
-            registry=self.registry.list_components(),
-            telemetry={},
-            state={},
-        )
-
-    def run(self, task_id: str, goal: str):
-        return self.controller.build(
-            task_id,
-            goal,
-        )
+    def history(self):
+        return self._history
