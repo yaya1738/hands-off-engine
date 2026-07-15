@@ -1,57 +1,67 @@
-from typing import Any, Callable, Dict, List
+from typing import Any, Dict, List
 
 
 class FactoryActionRouter:
-    def __init__(self):
-        self._handlers: Dict[str, Callable] = {}
-        self._history: List[Dict[str, Any]] = []
-
-    def register_handler(
+    def __init__(
         self,
-        action: str,
-        handler: Callable,
+        recovery=None,
+        improvement=None,
     ):
-        self._handlers[action] = handler
+        self.recovery = recovery
+        self.improvement = improvement
+        self._history: List[Dict[str, Any]] = []
 
     def route(
         self,
         decision: Dict[str, Any],
     ):
         action = decision.get(
-            "decision",
-            "UNKNOWN",
+            "decision"
         )
 
-        handler = self._handlers.get(
-            action
-        )
+        if action == "RECOVER":
+            target = "runtime_recovery"
 
-        if not handler:
-            result = {
-                "action": action,
-                "status": "NO_HANDLER",
-            }
+        elif action == "IMPROVE":
+            target = "improvement_pipeline"
 
         else:
-            try:
-                output = handler()
+            target = "continue"
 
-                result = {
-                    "action": action,
-                    "status": "ROUTED",
-                    "output": output,
-                }
+        result = {
+            "decision": action,
+            "action": target,
+        }
 
-            except Exception as exc:
-                result = {
-                    "action": action,
-                    "status": "FAILED",
-                    "error": str(exc),
-                }
-
-        self._history.append(result)
+        self._history.append(
+            result
+        )
 
         return result
+
+    def execute(
+        self,
+        routed: Dict[str, Any],
+    ):
+        action = routed.get(
+            "action"
+        )
+
+        if action == "runtime_recovery":
+            if self.recovery:
+                return self.recovery.recover(
+                    {
+                        "level": "CRITICAL",
+                    }
+                )
+
+        if action == "improvement_pipeline":
+            if self.improvement:
+                return self.improvement()
+
+        return {
+            "status": "NO_ACTION",
+        }
 
     def history(self):
         return self._history

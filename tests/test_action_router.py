@@ -3,13 +3,8 @@ from ai.factory.action_router import (
 )
 
 
-def test_route_recovery():
+def test_recovery_route():
     router = FactoryActionRouter()
-
-    router.register_handler(
-        "RECOVER",
-        lambda: "restarted",
-    )
 
     result = router.route(
         {
@@ -17,20 +12,31 @@ def test_route_recovery():
         }
     )
 
-    assert result["status"] == "ROUTED"
-    assert result["output"] == "restarted"
+    assert result["action"] == "runtime_recovery"
 
 
-def test_missing_handler():
+def test_improvement_route():
     router = FactoryActionRouter()
 
     result = router.route(
         {
-            "decision": "UNKNOWN",
+            "decision": "IMPROVE",
         }
     )
 
-    assert result["status"] == "NO_HANDLER"
+    assert result["action"] == "improvement_pipeline"
+
+
+def test_continue_route():
+    router = FactoryActionRouter()
+
+    result = router.route(
+        {
+            "decision": "CONTINUE",
+        }
+    )
+
+    assert result["action"] == "continue"
 
 
 def test_history():
@@ -38,7 +44,7 @@ def test_history():
 
     router.route(
         {
-            "decision": "UNKNOWN",
+            "decision": "CONTINUE",
         }
     )
 
