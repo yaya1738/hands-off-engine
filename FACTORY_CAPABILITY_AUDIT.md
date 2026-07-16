@@ -103,3 +103,49 @@ The first version should:
 - avoid autonomous uncontrolled modifications
 
 Human approval remains required for major modifications.
+
+## Improvement Pipeline Discovery
+
+The Factory already contains a complete improvement workflow:
+
+Self Assessment
+↓
+Improvement Planning
+↓
+Improvement Queue
+↓
+Approval Gate
+↓
+Improvement Execution
+↓
+Improvement Audit
+
+Verified components:
+- FactorySelfAssessment
+- FactoryImprovementOrchestrator
+- FactoryImprovementPlanner
+- FactoryImprovementQueue
+- FactoryImprovementApproval
+- FactoryImprovementExecutor
+- FactoryImprovementAudit
+
+These components are individually implemented and tested, but the pipeline is not yet invoked by FactoryRuntime.
+
+## Next Integration Target
+
+Connect the existing improvement pipeline to the runtime improvement cycle.
+
+Target flow:
+
+Runtime Analysis
+↓
+Self Assessment
+↓
+Improvement Proposal
+↓
+Human Approval
+↓
+Execution
+↓
+Audit History
+
