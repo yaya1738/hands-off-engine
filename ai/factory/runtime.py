@@ -25,6 +25,14 @@ from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligen
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
 from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence
+from ai.factory.self_assessment import FactorySelfAssessment
+from ai.factory.improvement_orchestrator import FactoryImprovementOrchestrator
+from ai.factory.improvement_planner import FactoryImprovementPlanner
+from ai.factory.improvement_queue import FactoryImprovementQueue
+from ai.factory.improvement_approval import FactoryImprovementApproval
+from ai.factory.improvement_executor import FactoryImprovementExecutor
+from ai.factory.improvement_audit import FactoryImprovementAudit
+
 
 
 class FactoryRuntime:
@@ -39,6 +47,23 @@ class FactoryRuntime:
         self.diagnostics = FactoryDiagnosticIntelligence()
         self.recommendations = FactoryRecommendationFeedback()
         self.meta_optimizer = FactoryMetaOptimizer()
+
+        self.improvement_assessment = FactorySelfAssessment()
+
+        self.improvement_planner = FactoryImprovementPlanner()
+
+        self.improvement_queue = FactoryImprovementQueue()
+
+        self.improvement_orchestrator = FactoryImprovementOrchestrator(
+            assessor=self.improvement_assessment,
+            planner=self.improvement_planner,
+            queue=self.improvement_queue,
+        )
+
+        self.improvement_approval = FactoryImprovementApproval()
+        self.improvement_executor = FactoryImprovementExecutor()
+        self.improvement_audit = FactoryImprovementAudit()
+
 
         self.strategy_manager = FactoryStrategyManager()
 
