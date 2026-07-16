@@ -13,6 +13,7 @@ from ai.factory.meta_optimizer import FactoryMetaOptimizer
 from ai.factory.strategy_manager import FactoryStrategyManager
 from ai.factory.goal_management import FactoryGoalManagement
 from ai.factory.goal_optimizer import FactoryGoalOptimizer
+from ai.factory.goal_genesis import FactoryGoalGenesis
 from ai.factory.resource_allocator import FactoryResourceAllocator
 
 from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
@@ -45,6 +46,7 @@ class FactoryRuntime:
         self.goal_optimizer = FactoryGoalOptimizer(
             self.goal_management
         )
+        self.goal_genesis = FactoryGoalGenesis()
         self.strategy_manager.strategy_registry(
             "default",
             {
@@ -309,6 +311,19 @@ class FactoryRuntime:
         }
 
         self.run_improvement_cycle(result)
+
+        candidate_goal = self.goal_genesis.generate_goal(
+            {
+                "objective": "Optimize runtime improvement loop",
+            }
+        )
+
+        self.emit_event(
+            "goal.generated",
+            {
+                "goal": candidate_goal,
+            },
+        )
 
         strategy_result = self.manage_strategy(result)
         self.emit_event(
