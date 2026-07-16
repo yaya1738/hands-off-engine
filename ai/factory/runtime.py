@@ -207,6 +207,20 @@ class FactoryRuntime:
             }
         )
 
+        improvement_cycle = self.improvement_orchestrator.run_cycle(
+            {
+                "success_rate": 1 if result.get("success") else 0,
+                "average_impact": 0.5,
+            }
+        )
+
+        self.improvement_audit.record(
+            {
+                "type": "runtime_improvement_cycle",
+                "proposal": improvement_cycle,
+            }
+        )
+
     def submit_goal(self, objective):
         goal = {
             "objective": objective,
