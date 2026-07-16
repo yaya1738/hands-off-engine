@@ -181,8 +181,15 @@ class FactoryRuntime:
         )
 
     def submit_goal(self, objective):
+        goal = {
+            "objective": objective,
+            "priority": 1,
+            "source": "runtime",
+            "status": "active",
+        }
+
         created = self.goal_management.create_goal(
-            objective
+            goal
         )
 
         priority = self.goal_management.prioritize_goals()
@@ -199,13 +206,14 @@ class FactoryRuntime:
         )
 
         return {
-            "goal": objective,
+            "goal": goal,
             "priority": priority,
             "optimized": optimized,
         }
 
     def execute(self, goal):
-        self.submit_goal(goal)
+        submitted = self.submit_goal(goal)
+        goal = submitted["goal"]
 
         steps = []
 
