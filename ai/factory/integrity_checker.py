@@ -45,6 +45,31 @@ class FactoryIntegrityChecker:
                 )
             )
 
+        behavior = {}
+
+        probes = {
+            "decision": "history",
+            "feedback": "history",
+            "learning_loop": "history",
+            "adaptive_decision": "history",
+        }
+
+        for component, method in probes.items():
+            instance = getattr(runtime, component, None)
+
+            try:
+                value = getattr(instance, method)()
+                behavior[component] = isinstance(value, list)
+            except Exception:
+                behavior[component] = False
+
+        checks.update(
+            {
+                f"{component}_behavior": healthy
+                for component, healthy in behavior.items()
+            }
+        )
+
         result = {
             "healthy": all(checks.values()),
             "checks": checks,
