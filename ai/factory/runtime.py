@@ -21,6 +21,10 @@ from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
 from ai.factory.decision_intelligence import FactoryDecisionIntelligence
+from ai.factory.feedback_engine import FactoryFeedbackEngine
+from ai.factory.learning_loop import FactoryLearningLoop
+from ai.factory.adaptive_decision import FactoryAdaptiveDecision
+from ai.factory.integrity_checker import FactoryIntegrityChecker
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
@@ -109,10 +113,21 @@ class FactoryRuntime:
         self.planning = FactoryPlanningIntelligence()
         self.simulation = FactorySimulationIntelligence()
         self.decision = FactoryDecisionIntelligence()
+        self.feedback_engine = FactoryFeedbackEngine()
+        self.feedback = self.feedback_engine
+        self.learning_loop = FactoryLearningLoop()
+        self.adaptive_decision = FactoryAdaptiveDecision(
+            feedback=self.feedback_engine
+        )
+        self.integrity_checker = FactoryIntegrityChecker()
         self.orchestration = FactoryOrchestrationIntelligence()
         self.execution = FactoryExecutionIntelligence()
         self.learning = FactoryLearningIntelligence()
         self.optimization = FactoryOptimizationIntelligence()
+
+        self.integrity_checker.check_runtime(
+            self
+        )
 
         self._history: List[Dict[str, Any]] = []
 
@@ -602,6 +617,18 @@ class FactoryRuntime:
         )
 
         self._history.append(result)
+
+        return result
+
+    def integrity_report(self):
+        result = self.integrity_checker.check_runtime(self)
+
+        self._history.append(
+            {
+                "type": "integrity_report",
+                "result": result,
+            }
+        )
 
         return result
 
