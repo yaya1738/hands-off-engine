@@ -1,9 +1,12 @@
+from ai.factory.development_executor import FactoryDevelopmentExecutor
+
 from typing import Any, Dict, List
 
 
 class FactoryDevelopmentOrchestrator:
     def __init__(self):
         self.tasks: List[Dict[str, Any]] = []
+        self.executor = FactoryDevelopmentExecutor()
         self._history: List[Dict[str, Any]] = []
 
     def create_development_task(
@@ -58,6 +61,20 @@ class FactoryDevelopmentOrchestrator:
         }
 
         self._history.append(result)
+
+        return result
+
+    def execute_task(
+        self,
+        task: Dict[str, Any],
+    ):
+        result = self.executor.execute(
+            task
+        )
+
+        self._history.append(
+            result
+        )
 
         return result
 
