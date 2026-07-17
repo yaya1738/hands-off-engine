@@ -1,52 +1,49 @@
-from typing import Any, Dict, List
+from typing import Any, Dict
+
+from ai.factory.development_orchestrator import FactoryDevelopmentOrchestrator
+from ai.factory.change_lifecycle_manager import FactoryChangeLifecycleManager
 
 
 class FactoryDevelopmentPipeline:
-    def __init__(
-        self,
-        advisor=None,
-        approval=None,
-    ):
-        self.advisor = advisor
-        self.approval = approval
-        self._history: List[Dict[str, Any]] = []
+    def __init__(self):
+        self.orchestrator = FactoryDevelopmentOrchestrator()
+        self.lifecycle = FactoryChangeLifecycleManager()
+        self._history = []
 
-    def process(
+    def run_development_cycle(
         self,
-        findings: Dict[str, Any],
+        task: Dict[str, Any],
     ):
-        recommendations = self.advisor.analyze(
-            findings
+        development_task = self.orchestrator.create_development_task(
+            task
         )
 
-        proposals = []
+        execution = self.orchestrator.execute_task(
+            task
+        )
 
-        for item in recommendations.get(
-            "recommendations",
-            [],
-        ):
-            proposal = {
-                "type": item["type"],
-                "target": item["target"],
-                "risk": item["risk"],
-                "requires_approval": item["requires_approval"],
-                "status": "pending_approval",
-            }
+        change = self.lifecycle.start_change(
+            task
+        )
 
-            if self.approval:
-                proposal = self.approval.request(
-                    proposal
-                )
-
-            proposals.append(proposal)
+        validation = self.lifecycle.validate_change(
+            task
+        )
 
         result = {
-            "proposals": proposals,
+            "task": development_task,
+            "execution": execution,
+            "change": change,
+            "validation": validation,
+            "status": "ready_for_review",
         }
 
         self._history.append(result)
 
         return result
 
-    def history(self):
-        return self._history
+    def report(self):
+        return {
+            "cycles": len(self._history),
+            "history": self._history,
+        }
