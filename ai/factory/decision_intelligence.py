@@ -67,5 +67,20 @@ class FactoryDecisionIntelligence:
 
         return result
 
+    def record_outcome(
+        self,
+        decision: Dict[str, Any],
+        outcome: Dict[str, Any],
+    ):
+        result = {
+            "decision": decision,
+            "outcome": outcome,
+            "learned": True,
+        }
+
+        self._history.append(result)
+
+        return result
+
     def history(self):
         return self._history

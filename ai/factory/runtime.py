@@ -423,12 +423,22 @@ class FactoryRuntime:
             }
         )
 
+        verification = {
+            "success": True,
+            "improvement": "factory_development_request_processed",
+        }
+
         task = self.development_tracker.verify_task(
             task["id"],
+            verification,
+        )
+
+        self.decision.record_outcome(
             {
-                "success": True,
-                "improvement": "factory_development_request_processed",
-            }
+                "name": "apply_improvement",
+                "score": 2,
+            },
+            verification,
         )
 
         result = {
