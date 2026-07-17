@@ -368,6 +368,21 @@ class FactoryRuntime:
             findings
         )
 
+        decision_options = [
+            {
+                "name": "continue_current_plan",
+                "score": 1,
+            },
+            {
+                "name": "apply_improvement",
+                "score": 2,
+            },
+        ]
+
+        decision = self.decision.select_action(
+            decision_options
+        )
+
         plan = self.improvement_planner.plan(
             {
                 "gaps": [
