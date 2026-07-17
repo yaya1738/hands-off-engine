@@ -380,10 +380,42 @@ class FactoryRuntime:
             }
         )
 
+        execution_plan = self.improvement_planner.plan(
+            {
+                "gaps": [
+                    objective
+                ],
+                "health": 1,
+                "context": context or "",
+                "target": "factory_runtime",
+                "development_type": "execution_planning_integration",
+                "components": [
+                    "FactoryRuntime",
+                    "FactoryImprovementPlanner",
+                    "FactoryDevelopmentTracker",
+                    "FactoryDecisionIntelligence",
+                ],
+                "integration_points": [
+                    "submit_development_request",
+                    "run_improvement_cycle",
+                ],
+                "validation": [
+                    "execution plan appears in audit",
+                    "development task contains implementation metadata",
+                    "decision data flows into planning",
+                ],
+                "rollback": [
+                    "remove execution planning fields",
+                    "preserve existing task tracking",
+                ],
+            }
+        )
+
         task = self.development_tracker.create_task(
             {
                 "objective": objective,
                 "proposal": development,
+                "plan": execution_plan,
                 "source": "factory_proposal",
             }
         )
