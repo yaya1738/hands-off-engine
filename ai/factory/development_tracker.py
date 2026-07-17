@@ -40,5 +40,18 @@ class FactoryDevelopmentTracker:
 
         return self._tasks[index]
 
+    def verify_task(
+        self,
+        index: int,
+        verification: Dict[str, Any],
+    ):
+        self._tasks[index]["verification"] = verification
+        self._tasks[index]["status"] = "verified"
+        self._tasks[index]["verified_at"] = (
+            datetime.now(timezone.utc).isoformat()
+        )
+
+        return self._tasks[index]
+
     def history(self):
         return self._tasks
