@@ -5,16 +5,20 @@ from typing import Any, Dict, List
 class FactoryDevelopmentTracker:
     def __init__(self):
         self._tasks: List[Dict[str, Any]] = []
+        self._next_id = 1
 
     def create_task(
         self,
         task: Dict[str, Any],
     ):
         record = {
+            "id": self._next_id,
             "task": task,
             "status": "active",
             "created_at": datetime.now(timezone.utc).isoformat(),
         }
+
+        self._next_id += 1
 
         self._tasks.append(record)
 
@@ -42,16 +46,20 @@ class FactoryDevelopmentTracker:
 
     def verify_task(
         self,
-        index: int,
+        task_id: int,
         verification: Dict[str, Any],
     ):
-        self._tasks[index]["verification"] = verification
-        self._tasks[index]["status"] = "verified"
-        self._tasks[index]["verified_at"] = (
-            datetime.now(timezone.utc).isoformat()
-        )
+        for task in self._tasks:
+            if task["id"] == task_id:
+                task["verification"] = verification
+                task["status"] = "verified"
+                task["verified_at"] = (
+                    datetime.now(timezone.utc).isoformat()
+                )
 
-        return self._tasks[index]
+                return task
+
+        return None
 
     def history(self):
         return self._tasks

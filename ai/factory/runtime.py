@@ -424,7 +424,7 @@ class FactoryRuntime:
         )
 
         task = self.development_tracker.verify_task(
-            0,
+            task["id"],
             {
                 "success": True,
                 "improvement": "factory_development_request_processed",
