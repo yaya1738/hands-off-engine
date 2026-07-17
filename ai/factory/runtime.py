@@ -35,6 +35,7 @@ from ai.factory.improvement_audit import FactoryImprovementAudit
 from ai.factory.development_advisor import FactoryDevelopmentAdvisor
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
 from ai.factory.development_translator import FactoryDevelopmentTranslator
+from ai.factory.development_tracker import FactoryDevelopmentTracker
 
 
 
@@ -68,6 +69,8 @@ class FactoryRuntime:
         self.development_advisor = FactoryDevelopmentAdvisor()
 
         self.development_translator = FactoryDevelopmentTranslator()
+
+        self.development_tracker = FactoryDevelopmentTracker()
 
         self.development_pipeline = FactoryDevelopmentPipeline(
             advisor=self.development_advisor,
@@ -326,9 +329,18 @@ class FactoryRuntime:
             findings
         )
 
+        task = self.development_tracker.create_task(
+            {
+                "objective": objective,
+                "proposal": development,
+                "source": "factory_proposal",
+            }
+        )
+
         result = {
             "goal": development_goal,
             "development": development,
+            "task": task,
         }
 
         self.improvement_audit.record(
