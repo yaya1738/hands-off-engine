@@ -542,10 +542,16 @@ class FactoryRuntime:
             or decision.get("classification") == "factory_ready"
         )
 
+        autonomy_report = self.report_autonomy_state(
+            objective,
+            decision,
+        )
+
         if not ready:
             return {
                 "status": "blocked",
                 "decision": decision,
+                "autonomy_report": autonomy_report,
             }
 
         result = self.execute(
@@ -556,6 +562,30 @@ class FactoryRuntime:
             "decision": decision,
             "execution": result,
         }
+
+
+
+    def report_autonomy_state(self, objective, decision):
+
+        report = {
+            "objective": objective,
+            "decision": decision,
+            "status": "recorded",
+        }
+
+        self.emit_event(
+            "autonomy.decision",
+            report,
+        )
+
+        self._history.append(
+            {
+                "type": "autonomy",
+                "report": report,
+            }
+        )
+
+        return report
 
 
     def execute(self, goal):
