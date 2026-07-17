@@ -290,6 +290,56 @@ class FactoryRuntime:
             "optimized": optimized,
         }
 
+    def submit_development_request(
+        self,
+        objective,
+        context=None,
+    ):
+        development_goal = {
+            "objective": objective,
+            "context": context or "",
+            "source": "development_request",
+            "status": "active",
+        }
+
+        self.goal_management.create_goal(
+            development_goal
+        )
+
+        translated = self.development_translator.translate(
+            {
+                "success": True,
+                "steps_completed": [],
+            }
+        )
+
+        findings = {
+            "objective": objective,
+            "context": context or "",
+            "gaps": translated.get(
+                "gaps",
+                [],
+            ),
+        }
+
+        development = self.development_pipeline.process(
+            findings
+        )
+
+        result = {
+            "goal": development_goal,
+            "development": development,
+        }
+
+        self.improvement_audit.record(
+            {
+                "type": "development_request",
+                "result": result,
+            }
+        )
+
+        return result
+
     def execute(self, goal):
         submitted = self.submit_goal(goal)
         goal = submitted["goal"]

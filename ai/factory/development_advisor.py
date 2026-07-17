@@ -21,6 +21,22 @@ class FactoryDevelopmentAdvisor:
                 }
             )
 
+        if findings.get("objective"):
+            recommendations.append(
+                {
+                    "type": "development_improvement",
+                    "target": findings.get(
+                        "objective"
+                    ),
+                    "context": findings.get(
+                        "context",
+                        "",
+                    ),
+                    "risk": "low",
+                    "requires_approval": True,
+                }
+            )
+
         result = {
             "recommendations": recommendations,
         }
