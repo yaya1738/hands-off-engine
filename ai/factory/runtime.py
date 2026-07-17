@@ -518,17 +518,31 @@ class FactoryRuntime:
 
     def autonomous_execute(self, objective):
 
-        from factory_autonomous_decision_reporter import (
-            FactoryAutonomousDecisionReporter
+        from factory_runtime_autonomy_gateway import (
+            FactoryRuntimeAutonomyGateway
         )
 
-        reporter = FactoryAutonomousDecisionReporter()
+        gateway = FactoryRuntimeAutonomyGateway()
 
-        decision = reporter.summarize(
+        evaluation = gateway.evaluate(
             objective
         )
 
-        if decision["status"] != "READY":
+        decision = evaluation.get(
+            "activation",
+            {}
+        ).get(
+            "decision",
+            {}
+        )
+
+        ready = (
+            decision.get("status") == "READY"
+            or decision.get("status") == "PASS"
+            or decision.get("classification") == "factory_ready"
+        )
+
+        if not ready:
             return {
                 "status": "blocked",
                 "decision": decision,
