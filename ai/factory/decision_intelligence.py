@@ -51,8 +51,15 @@ class FactoryDecisionIntelligence:
         self,
         actions: List[Dict[str, Any]],
     ):
+        ranked = sorted(
+            actions,
+            key=lambda action: action.get("score", 0),
+            reverse=True,
+        )
+
         result = {
-            "selected": True,
+            "selected": ranked[0] if ranked else None,
+            "ranking": ranked,
             "count": len(actions),
         }
 
