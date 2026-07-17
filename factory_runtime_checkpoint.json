@@ -1,0 +1,27 @@
+{
+  "timestamp": "2026-07-17T09:01:33.890662",
+  "checkpoint": "factory_runtime_reporting_restored",
+  "runtime_state": {
+    "factory_runtime_instantiates": true,
+    "reporting_authority": "FactoryRuntime",
+    "constructor_repair": {
+      "component": "FactoryDevelopmentPipeline",
+      "change": "removed stale advisor and approval constructor injection",
+      "validation": "passed"
+    }
+  },
+  "validated_capabilities": [
+    "factory_report",
+    "integrity_report",
+    "maintenance_status",
+    "operator_status",
+    "trend_report",
+    "history"
+  ],
+  "health_status": {
+    "factory_health": "healthy",
+    "contracts": "passing",
+    "maintenance_ready": true
+  },
+  "next_phase": "preflight_runtime_integration"
+}

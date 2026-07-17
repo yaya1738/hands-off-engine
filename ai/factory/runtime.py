@@ -1,4 +1,5 @@
 from typing import Any, Dict, List
+from ai.factory.registry import FactoryRegistry
 
 from ai.factory.runtime_governance import FactoryRuntimeGovernance
 from ai.factory.runtime_observability import FactoryRuntimeObservability
@@ -50,6 +51,8 @@ from ai.factory.development_tracker import FactoryDevelopmentTracker
 
 class FactoryRuntime:
     def __init__(self):
+        self.registry = FactoryRegistry()
+
         self.governance = FactoryRuntimeGovernance()
         self.observability = FactoryRuntimeObservability()
         self.state = FactoryRuntimeState()
@@ -81,10 +84,7 @@ class FactoryRuntime:
 
         self.development_tracker = FactoryDevelopmentTracker()
 
-        self.development_pipeline = FactoryDevelopmentPipeline(
-            advisor=self.development_advisor,
-            approval=self.improvement_approval,
-        )
+        self.development_pipeline = FactoryDevelopmentPipeline()
 
         self.improvement_executor = FactoryImprovementExecutor()
         self.improvement_audit = FactoryImprovementAudit()
@@ -150,6 +150,29 @@ class FactoryRuntime:
         )
 
         self._history: List[Dict[str, Any]] = []
+
+
+    def component_inventory(self):
+        components = []
+
+        for name, value in self.__dict__.items():
+            if name.startswith("_"):
+                continue
+
+            if value is self.registry:
+                continue
+
+            self.registry.register(
+                name,
+                value.__class__.__name__,
+            )
+
+        return {
+            "component_count": len(
+                self.registry.list_components()
+            ),
+            "components": self.registry.list_components(),
+        }
 
     def emit_event(self, event_type, payload):
         event = {
