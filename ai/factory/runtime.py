@@ -34,6 +34,7 @@ from ai.factory.improvement_executor import FactoryImprovementExecutor
 from ai.factory.improvement_audit import FactoryImprovementAudit
 from ai.factory.development_advisor import FactoryDevelopmentAdvisor
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
+from ai.factory.development_translator import FactoryDevelopmentTranslator
 
 
 
@@ -65,6 +66,8 @@ class FactoryRuntime:
         self.improvement_approval = FactoryImprovementApproval()
 
         self.development_advisor = FactoryDevelopmentAdvisor()
+
+        self.development_translator = FactoryDevelopmentTranslator()
 
         self.development_pipeline = FactoryDevelopmentPipeline(
             advisor=self.development_advisor,
@@ -224,14 +227,26 @@ class FactoryRuntime:
             }
         )
 
+        assessment_gaps = improvement_cycle.get(
+            "assessment",
+            {},
+        ).get(
+            "gaps",
+            [],
+        )
+
+        translated_findings = self.development_translator.translate(
+            result
+        )
+
         development_result = self.development_pipeline.process(
             {
-                "gaps": improvement_cycle.get(
-                    "assessment",
-                    {},
-                ).get(
-                    "gaps",
-                    [],
+                "gaps": (
+                    assessment_gaps
+                    + translated_findings.get(
+                        "gaps",
+                        [],
+                    )
                 )
             }
         )
