@@ -26,6 +26,7 @@ from ai.factory.learning_loop import FactoryLearningLoop
 from ai.factory.adaptive_decision import FactoryAdaptiveDecision
 from ai.factory.integrity_checker import FactoryIntegrityChecker
 from ai.factory.operator_agent import FactoryOperatorAgent
+from ai.factory.maintenance_agent import FactoryMaintenanceAgent
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
@@ -126,6 +127,10 @@ class FactoryRuntime:
             integrity_checker=self.integrity_checker,
             goal_management=self.goal_management,
             improvement_queue=self.improvement_queue,
+        )
+
+        self.maintenance = FactoryMaintenanceAgent(
+            operator=self.operator,
         )
 
         self.orchestration = FactoryOrchestrationIntelligence()
@@ -629,6 +634,20 @@ class FactoryRuntime:
         self._history.append(result)
 
         return result
+
+    def maintenance_status(self):
+        inspection = self.maintenance.inspect(
+            self
+        )
+
+        recommendation = self.maintenance.recommend(
+            inspection
+        )
+
+        return {
+            "inspection": inspection,
+            "recommendation": recommendation,
+        }
 
     def operator_status(self):
         assessment = self.operator.assess(self)
