@@ -22,12 +22,62 @@ class FactoryOperatorAgent:
         if self.integrity_checker:
             integrity = self.integrity_checker.check_runtime(runtime)
 
+        failed_components = []
+
+        if integrity:
+            failed_components = [
+                name
+                for name, healthy in integrity.get(
+                    "checks",
+                    {},
+                ).items()
+                if not healthy
+            ]
+
+        goal_count = 0
+        if self.goal_management:
+            goal_count = len(
+                getattr(
+                    self.goal_management,
+                    "_history",
+                    [],
+                )
+            )
+
+        improvement_count = 0
+        if self.improvement_queue:
+            improvement_count = len(
+                getattr(
+                    self.improvement_queue,
+                    "_history",
+                    [],
+                )
+            )
+
+        healthy = bool(
+            integrity
+            and integrity.get("healthy")
+        )
+
         result = {
             "integrity": integrity,
             "status": (
                 "healthy"
-                if integrity and integrity.get("healthy")
+                if healthy
                 else "attention_required"
+            ),
+            "failed_components": failed_components,
+            "goal_count": goal_count,
+            "improvement_queue_count": improvement_count,
+            "reason": (
+                "all factory contracts passing"
+                if healthy
+                else "factory components require inspection"
+            ),
+            "confidence": (
+                1.0
+                if healthy
+                else 0.5
             ),
         }
 
