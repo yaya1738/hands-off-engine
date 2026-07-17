@@ -375,18 +375,6 @@ class FactoryRuntime:
                 ],
                 "health": 1,
                 "context": context or "",
-                "target": "factory_core",
-                "development_type": "workflow_improvement",
-            }
-        )
-
-        execution_plan = self.improvement_planner.plan(
-            {
-                "gaps": [
-                    objective
-                ],
-                "health": 1,
-                "context": context or "",
                 "target": "factory_runtime",
                 "development_type": "execution_planning_integration",
                 "components": [
@@ -415,7 +403,7 @@ class FactoryRuntime:
             {
                 "objective": objective,
                 "proposal": development,
-                "plan": execution_plan,
+                "plan": plan,
                 "source": "factory_proposal",
             }
         )
