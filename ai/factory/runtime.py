@@ -226,9 +226,13 @@ class FactoryRuntime:
 
         development_result = self.development_pipeline.process(
             {
-                "gaps": [
-                    "runtime improvement cycle feedback loop"
-                ]
+                "gaps": improvement_cycle.get(
+                    "assessment",
+                    {},
+                ).get(
+                    "gaps",
+                    [],
+                )
             }
         )
 
@@ -297,6 +301,8 @@ class FactoryRuntime:
         self.governance.authorize_execution(goal)
         steps.append("authorization")
 
+        success = True
+
         try:
             plan = self.planning.create_plan(goal)
             steps.append("planning")
@@ -328,6 +334,8 @@ class FactoryRuntime:
             steps.append("execution")
 
         except Exception as error:
+            success = False
+
             self.self_healing.detect_failure(
                 {"error": str(error)}
             )
@@ -363,7 +371,7 @@ class FactoryRuntime:
         self.state.snapshot()
 
         result = {
-            "success": True,
+            "success": success,
             "goal": goal,
             "steps_completed": steps,
         }
