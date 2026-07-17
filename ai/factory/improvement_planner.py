@@ -25,6 +25,18 @@ class FactoryImprovementPlanner:
             "priority": self.prioritize(
                 assessment
             ),
+            "context": assessment.get(
+                "context",
+                "",
+            ),
+            "target": assessment.get(
+                "target",
+                "",
+            ),
+            "development_type": assessment.get(
+                "development_type",
+                "",
+            ),
         }
 
         self._history.append(

@@ -335,6 +335,9 @@ class FactoryRuntime:
                     objective
                 ],
                 "health": 1,
+                "context": context or "",
+                "target": "factory_core",
+                "development_type": "workflow_improvement",
             }
         )
 
