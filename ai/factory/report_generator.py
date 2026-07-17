@@ -1,4 +1,5 @@
 from typing import Any, Dict, List
+from datetime import datetime
 
 
 class FactoryReportGenerator:
@@ -25,6 +26,7 @@ class FactoryReportGenerator:
         )
 
         report = {
+            "timestamp": datetime.utcnow().isoformat(),
             "factory_health": (
                 "healthy"
                 if healthy
@@ -46,3 +48,9 @@ class FactoryReportGenerator:
 
     def history(self):
         return self._history
+
+    def latest(self):
+        if not self._history:
+            return None
+
+        return self._history[-1]
