@@ -37,6 +37,22 @@ class FactoryImprovementPlanner:
                 "development_type",
                 "",
             ),
+            "components": assessment.get(
+                "components",
+                [],
+            ),
+            "integration_points": assessment.get(
+                "integration_points",
+                [],
+            ),
+            "validation": assessment.get(
+                "validation",
+                [],
+            ),
+            "rollback": assessment.get(
+                "rollback",
+                [],
+            ),
         }
 
         self._history.append(
