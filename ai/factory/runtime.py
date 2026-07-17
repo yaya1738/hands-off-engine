@@ -29,6 +29,7 @@ from ai.factory.operator_agent import FactoryOperatorAgent
 from ai.factory.maintenance_agent import FactoryMaintenanceAgent
 from ai.factory.report_generator import FactoryReportGenerator
 from ai.factory.trend_analyzer import FactoryTrendAnalyzer
+from ai.factory.change_impact_analyzer import FactoryChangeImpactAnalyzer
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
@@ -137,6 +138,7 @@ class FactoryRuntime:
 
         self.report_generator = FactoryReportGenerator()
         self.trend_analyzer = FactoryTrendAnalyzer()
+        self.change_impact_analyzer = FactoryChangeImpactAnalyzer()
 
         self.orchestration = FactoryOrchestrationIntelligence()
         self.execution = FactoryExecutionIntelligence()
@@ -639,6 +641,16 @@ class FactoryRuntime:
         self._history.append(result)
 
         return result
+
+    def change_impact_report(
+        self,
+        before: Dict[str, Any],
+        after: Dict[str, Any],
+    ):
+        return self.change_impact_analyzer.analyze(
+            before,
+            after,
+        )
 
     def trend_report(self):
         reports = self.report_generator.history()
