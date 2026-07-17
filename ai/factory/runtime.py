@@ -230,6 +230,16 @@ class FactoryRuntime:
             }
         )
 
+        decision = self.decision.create_decision(
+            improvement_cycle
+        )
+
+        decision_selection = self.decision.select_action(
+            [
+                decision,
+            ]
+        )
+
         assessment_gaps = improvement_cycle.get(
             "assessment",
             {},
@@ -284,6 +294,7 @@ class FactoryRuntime:
             {
                 "type": "runtime_improvement_cycle",
                 "proposal": improvement_cycle,
+                "decision": decision_selection,
                 "development": development_result,
                 "plan": development_plan,
                 "task": development_task,
