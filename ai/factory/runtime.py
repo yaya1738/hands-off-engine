@@ -616,6 +616,8 @@ class FactoryRuntime:
             },
         )
 
+        self.integrity_report()
+
         self._history.append(result)
 
         return result
