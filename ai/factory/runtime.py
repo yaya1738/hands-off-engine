@@ -329,6 +329,15 @@ class FactoryRuntime:
             findings
         )
 
+        plan = self.improvement_planner.plan(
+            {
+                "gaps": [
+                    objective
+                ],
+                "health": 1,
+            }
+        )
+
         task = self.development_tracker.create_task(
             {
                 "objective": objective,
@@ -340,6 +349,7 @@ class FactoryRuntime:
         result = {
             "goal": development_goal,
             "development": development,
+            "plan": plan,
             "task": task,
         }
 
