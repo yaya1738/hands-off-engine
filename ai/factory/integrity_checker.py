@@ -8,19 +8,42 @@ class FactoryIntegrityChecker:
     def check_runtime(self, runtime):
         checks = {}
 
-        required_components = [
-            "decision",
-            "feedback",
-            "learning_loop",
-            "adaptive_decision",
-            "improvement_orchestrator",
-            "development_pipeline",
-            "strategy_manager",
-            "resource_allocator",
-        ]
+        component_contracts = {
+            "decision": [
+                "select_action",
+                "history",
+            ],
+            "feedback": [
+                "analyze",
+                "score",
+                "history",
+            ],
+            "learning_loop": [
+                "record_outcome",
+                "analyze_feedback",
+                "history",
+            ],
+            "adaptive_decision": [
+                "decide",
+                "learn",
+                "history",
+            ],
+            "improvement_orchestrator": [],
+            "development_pipeline": [],
+            "strategy_manager": [],
+            "resource_allocator": [],
+        }
 
-        for component in required_components:
-            checks[component] = hasattr(runtime, component)
+        for component, methods in component_contracts.items():
+            instance = getattr(runtime, component, None)
+
+            checks[component] = (
+                instance is not None
+                and all(
+                    hasattr(instance, method)
+                    for method in methods
+                )
+            )
 
         result = {
             "healthy": all(checks.values()),
