@@ -515,6 +515,35 @@ class FactoryRuntime:
 
         return result
 
+
+    def autonomous_execute(self, objective):
+
+        from factory_autonomous_decision_reporter import (
+            FactoryAutonomousDecisionReporter
+        )
+
+        reporter = FactoryAutonomousDecisionReporter()
+
+        decision = reporter.summarize(
+            objective
+        )
+
+        if decision["status"] != "READY":
+            return {
+                "status": "blocked",
+                "decision": decision,
+            }
+
+        result = self.execute(
+            objective
+        )
+
+        return {
+            "decision": decision,
+            "execution": result,
+        }
+
+
     def execute(self, goal):
         submitted = self.submit_goal(goal)
         goal = submitted["goal"]

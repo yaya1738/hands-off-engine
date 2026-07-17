@@ -42,6 +42,17 @@ class FactoryDevelopmentPipeline:
 
         return result
 
+
+
+    def process(
+        self,
+        findings: Dict[str, Any],
+    ):
+        return self.run_development_cycle(
+            findings
+        )
+
+
     def report(self):
         return {
             "cycles": len(self._history),
