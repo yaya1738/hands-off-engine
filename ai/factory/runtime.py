@@ -254,11 +254,39 @@ class FactoryRuntime:
             }
         )
 
+        development_plan = self.improvement_planner.plan(
+            {
+                "gaps": (
+                    assessment_gaps
+                    + translated_findings.get(
+                        "gaps",
+                        [],
+                    )
+                ),
+                "health": (
+                    1 if result.get("success") else 0
+                ),
+                "context": "runtime improvement cycle",
+                "target": "factory_runtime",
+                "development_type": "self_improvement",
+            }
+        )
+
+        development_task = self.development_tracker.create_task(
+            {
+                "objective": "Execute Factory improvement cycle",
+                "plan": development_plan,
+                "source": "factory_improvement_cycle",
+            }
+        )
+
         self.improvement_audit.record(
             {
                 "type": "runtime_improvement_cycle",
                 "proposal": improvement_cycle,
                 "development": development_result,
+                "plan": development_plan,
+                "task": development_task,
             }
         )
 
