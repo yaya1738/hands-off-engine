@@ -1,9 +1,12 @@
+from ai.factory.validation_runner import FactoryValidationRunner
+
 from typing import Any, Dict, List
 
 
 class FactoryChangeLifecycleManager:
     def __init__(self):
         self.changes: List[Dict[str, Any]] = []
+        self.validation_runner = FactoryValidationRunner()
         self._history: List[Dict[str, Any]] = []
 
     def start_change(
@@ -61,6 +64,20 @@ class FactoryChangeLifecycleManager:
         }
 
         self._history.append(result)
+
+        return result
+
+    def validate_change(
+        self,
+        change: Dict[str, Any],
+    ):
+        result = self.validation_runner.validate_change(
+            change
+        )
+
+        self._history.append(
+            result
+        )
 
         return result
 
