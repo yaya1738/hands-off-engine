@@ -28,6 +28,7 @@ from ai.factory.integrity_checker import FactoryIntegrityChecker
 from ai.factory.operator_agent import FactoryOperatorAgent
 from ai.factory.maintenance_agent import FactoryMaintenanceAgent
 from ai.factory.report_generator import FactoryReportGenerator
+from ai.factory.trend_analyzer import FactoryTrendAnalyzer
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
@@ -135,6 +136,7 @@ class FactoryRuntime:
         )
 
         self.report_generator = FactoryReportGenerator()
+        self.trend_analyzer = FactoryTrendAnalyzer()
 
         self.orchestration = FactoryOrchestrationIntelligence()
         self.execution = FactoryExecutionIntelligence()
@@ -637,6 +639,13 @@ class FactoryRuntime:
         self._history.append(result)
 
         return result
+
+    def trend_report(self):
+        reports = self.report_generator.history()
+
+        return self.trend_analyzer.analyze(
+            reports
+        )
 
     def factory_report(self):
         integrity = self.integrity_checker.check_runtime(
