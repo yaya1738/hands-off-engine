@@ -32,6 +32,8 @@ from ai.factory.improvement_queue import FactoryImprovementQueue
 from ai.factory.improvement_approval import FactoryImprovementApproval
 from ai.factory.improvement_executor import FactoryImprovementExecutor
 from ai.factory.improvement_audit import FactoryImprovementAudit
+from ai.factory.development_advisor import FactoryDevelopmentAdvisor
+from ai.factory.development_pipeline import FactoryDevelopmentPipeline
 
 
 
@@ -61,6 +63,14 @@ class FactoryRuntime:
         )
 
         self.improvement_approval = FactoryImprovementApproval()
+
+        self.development_advisor = FactoryDevelopmentAdvisor()
+
+        self.development_pipeline = FactoryDevelopmentPipeline(
+            advisor=self.development_advisor,
+            approval=self.improvement_approval,
+        )
+
         self.improvement_executor = FactoryImprovementExecutor()
         self.improvement_audit = FactoryImprovementAudit()
 
@@ -214,10 +224,19 @@ class FactoryRuntime:
             }
         )
 
+        development_result = self.development_pipeline.process(
+            {
+                "gaps": [
+                    "runtime improvement cycle feedback loop"
+                ]
+            }
+        )
+
         self.improvement_audit.record(
             {
                 "type": "runtime_improvement_cycle",
                 "proposal": improvement_cycle,
+                "development": development_result,
             }
         )
 
