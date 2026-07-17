@@ -49,9 +49,18 @@ from ai.factory.development_tracker import FactoryDevelopmentTracker
 
 
 
+
+from ai.factory.autonomy_manager import (
+    FactoryAutonomyManager
+)
+
 class FactoryRuntime:
     def __init__(self):
         self.registry = FactoryRegistry()
+
+        self.autonomy = FactoryAutonomyManager(
+            self
+        )
 
         self.governance = FactoryRuntimeGovernance()
         self.observability = FactoryRuntimeObservability()
