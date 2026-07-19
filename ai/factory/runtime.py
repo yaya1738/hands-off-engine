@@ -44,8 +44,10 @@ from ai.factory.improvement_executor import FactoryImprovementExecutor
 from ai.factory.improvement_audit import FactoryImprovementAudit
 from ai.factory.development_advisor import FactoryDevelopmentAdvisor
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
+from ai.factory.lifecycle_trace import FactoryLifecycleTrace
 from ai.factory.development_translator import FactoryDevelopmentTranslator
 from ai.factory.development_tracker import FactoryDevelopmentTracker
+from ai.factory.artifact_registry import FactoryArtifactRegistry
 
 
 
@@ -57,6 +59,8 @@ from ai.factory.autonomy_manager import (
 class FactoryRuntime:
     def __init__(self):
         self.registry = FactoryRegistry()
+
+        self.artifact_registry = FactoryArtifactRegistry()
 
         self.autonomy = FactoryAutonomyManager(
             self
@@ -93,7 +97,13 @@ class FactoryRuntime:
 
         self.development_tracker = FactoryDevelopmentTracker()
 
-        self.development_pipeline = FactoryDevelopmentPipeline()
+        self.lifecycle_trace = None
+
+        self.development_pipeline = FactoryDevelopmentPipeline(
+            artifact_registry=self.artifact_registry
+        )
+
+        self.lifecycle_trace = FactoryLifecycleTrace(self)
 
         self.improvement_executor = FactoryImprovementExecutor()
         self.improvement_audit = FactoryImprovementAudit()
@@ -415,6 +425,11 @@ class FactoryRuntime:
             development_goal
         )
 
+        discovery = self.autonomy.discovery_gate(
+            objective,
+            context or "",
+        )
+
         translated = self.development_translator.translate(
             {
                 "success": True,
@@ -429,6 +444,7 @@ class FactoryRuntime:
                 "gaps",
                 [],
             ),
+            "discovery": discovery,
         }
 
         development = self.development_pipeline.process(
@@ -490,6 +506,10 @@ class FactoryRuntime:
             }
         )
 
+        approval_request = self.improvement_approval.request(
+            task
+        )
+
         verification = {
             "success": True,
             "improvement": "factory_development_request_processed",
@@ -513,6 +533,7 @@ class FactoryRuntime:
             "development": development,
             "plan": plan,
             "task": task,
+            "approval": approval_request,
         }
 
         self.improvement_audit.record(
@@ -572,6 +593,94 @@ class FactoryRuntime:
             "execution": result,
         }
 
+
+
+    def execute_approved_improvement(
+        self,
+        improvement,
+        action,
+    ):
+        result = self.improvement_executor.execute(
+            improvement,
+            action,
+        )
+
+        self.improvement_audit.record(
+            {
+                "type": "approved_improvement_execution",
+                "improvement": improvement,
+                "result": result,
+            }
+        )
+
+        self.learning_loop.record_outcome(
+            {
+                "type": "improvement_execution",
+                "improvement": improvement,
+                "result": result,
+            }
+        )
+
+        self.feedback_engine.analyze()
+
+        return result
+
+
+    def process_approved_improvement(
+        self,
+        improvement,
+        action,
+    ):
+        if improvement.get("status") != "APPROVED":
+            return {
+                "status": "blocked",
+                "reason": "improvement_not_approved",
+            }
+
+        result = self.execute_approved_improvement(
+            improvement,
+            action,
+        )
+
+        self.improvement_audit.record(
+            {
+                "type": "approved_improvement_processed",
+                "result": result,
+            }
+        )
+
+        return result
+
+
+    def process_approval_pipeline(
+        self,
+        approval_request,
+        action,
+    ):
+        if approval_request.get("status") != "APPROVED":
+            return {
+                "status": "blocked",
+                "reason": "approval_not_ready",
+            }
+
+        improvement = approval_request.get(
+            "improvement"
+        )
+
+        result = self.process_approved_improvement(
+            improvement,
+            action,
+        )
+
+        self.improvement_audit.record(
+            {
+                "type": "approval_pipeline_processed",
+                "approval": approval_request,
+                "result": result,
+            }
+        )
+
+        return result
 
 
     def report_autonomy_state(self, objective, decision):
