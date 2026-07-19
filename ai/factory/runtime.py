@@ -22,6 +22,7 @@ from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence
 from ai.factory.planning_intelligence import FactoryPlanningIntelligence
 from ai.factory.simulation_intelligence import FactorySimulationIntelligence
 from ai.factory.decision_intelligence import FactoryDecisionIntelligence
+from ai.factory.decision_option_adapter import FactoryDecisionOptionAdapter
 from ai.factory.feedback_engine import FactoryFeedbackEngine
 from ai.factory.learning_loop import FactoryLearningLoop
 from ai.factory.adaptive_decision import FactoryAdaptiveDecision
@@ -137,6 +138,7 @@ class FactoryRuntime:
         self.planning = FactoryPlanningIntelligence()
         self.simulation = FactorySimulationIntelligence()
         self.decision = FactoryDecisionIntelligence()
+        self.decision_option_adapter = FactoryDecisionOptionAdapter()
         self.feedback_engine = FactoryFeedbackEngine()
         self.feedback = self.feedback_engine
         self.learning_loop = FactoryLearningLoop()
@@ -706,6 +708,20 @@ class FactoryRuntime:
         return report
 
 
+
+    def record_execution_metric(self, result):
+        self.observability.record_metric(
+            {
+                "type": "execution",
+                "success": bool(
+                    result.get("success")
+                    if isinstance(result, dict)
+                    else False
+                ),
+                "result_type": type(result).__name__,
+            }
+        )
+
     def execute(self, goal):
         submitted = self.submit_goal(goal)
         goal = submitted["goal"]
@@ -854,6 +870,7 @@ class FactoryRuntime:
 
         self._history.append(result)
 
+        self.record_execution_metric(result)
         return result
 
     def change_impact_report(
