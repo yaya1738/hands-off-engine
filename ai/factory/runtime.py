@@ -722,6 +722,39 @@ class FactoryRuntime:
             }
         )
 
+
+    def get_assessment_metrics(self):
+        metrics = self.observability.metrics
+
+        if not metrics:
+            return {
+                "success_rate": 0,
+                "average_impact": 0,
+            }
+
+        successes = [
+            m.get("success", False)
+            for m in metrics
+            if isinstance(m, dict)
+        ]
+
+        impacts = [
+            m.get("average_impact", 0)
+            for m in metrics
+            if isinstance(m, dict)
+        ]
+
+        return {
+            "success_rate": (
+                sum(successes) / len(successes)
+                if successes else 0
+            ),
+            "average_impact": (
+                sum(impacts) / len(impacts)
+                if impacts else 0
+            ),
+        }
+
     def execute(self, goal):
         submitted = self.submit_goal(goal)
         goal = submitted["goal"]
