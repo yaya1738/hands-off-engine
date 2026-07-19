@@ -42,6 +42,7 @@ from ai.factory.improvement_planner import FactoryImprovementPlanner
 from ai.factory.improvement_queue import FactoryImprovementQueue
 from ai.factory.improvement_approval import FactoryImprovementApproval
 from ai.factory.improvement_executor import FactoryImprovementExecutor
+from ai.factory.improvement_action_resolver import FactoryImprovementActionResolver
 from ai.factory.improvement_audit import FactoryImprovementAudit
 from ai.factory.development_advisor import FactoryDevelopmentAdvisor
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
@@ -107,6 +108,7 @@ class FactoryRuntime:
         self.lifecycle_trace = FactoryLifecycleTrace(self)
 
         self.improvement_executor = FactoryImprovementExecutor()
+        self.improvement_action_resolver = FactoryImprovementActionResolver()
         self.improvement_audit = FactoryImprovementAudit()
 
 
