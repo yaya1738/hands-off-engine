@@ -1,0 +1,115 @@
+{
+  "decisions": [
+    {
+      "action": "review_duplicates",
+      "capability": "audit",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "registry",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "health",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "diagnostic",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "inspect",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "orchestr",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "executor",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "runtime",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "scheduler",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "graph",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "review_duplicates",
+      "capability": "dependency",
+      "reason": "multiple implementations detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "audit",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "registry",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "health",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "diagnostic",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "inspect",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "orchestr",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "executor",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "runtime",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "scheduler",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "graph",
+      "reason": "multiple possible providers detected"
+    },
+    {
+      "action": "evaluate_integration",
+      "capability": "dependency",
+      "reason": "multiple possible providers detected"
+    }
+  ],
+  "decision_count": 22
+}

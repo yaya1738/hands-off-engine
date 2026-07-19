@@ -1,0 +1,1115 @@
+{
+  "validation_candidates": [
+    {
+      "file": "ai/factory/verifier.py",
+      "classes": [
+        "FactoryVerifier"
+      ],
+      "methods": [
+        "verify"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/audit_bridge.py",
+      "classes": [
+        "FactoryAuditBridge"
+      ],
+      "methods": [
+        "create_audit_event"
+      ],
+      "validation_hooks": [
+        {
+          "method": "create_audit_event",
+          "keyword": "audit"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/health.py",
+      "classes": [
+        "FactoryHealth"
+      ],
+      "methods": [
+        "check"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "classes": [
+        "FactoryRuntime"
+      ],
+      "methods": [
+        "__init__",
+        "component_inventory",
+        "emit_event",
+        "manage_strategy",
+        "manage_resources",
+        "run_improvement_cycle",
+        "submit_goal",
+        "submit_development_request",
+        "execute",
+        "change_impact_report",
+        "trend_report",
+        "factory_report",
+        "maintenance_status",
+        "operator_status",
+        "integrity_report",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "integrity_report",
+          "keyword": "integrity"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/snapshot_store.py",
+      "classes": [
+        "FactorySnapshotStore"
+      ],
+      "methods": [
+        "__init__",
+        "save_snapshot",
+        "get_latest",
+        "list_snapshots"
+      ],
+      "validation_hooks": [
+        {
+          "method": "get_latest",
+          "keyword": "test"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/control_plane.py",
+      "classes": [
+        "FactoryControlPlane"
+      ],
+      "methods": [
+        "__init__",
+        "start",
+        "cycle",
+        "health",
+        "recover",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/state_stream.py",
+      "classes": [
+        "FactoryStateStream"
+      ],
+      "methods": [
+        "__init__",
+        "publish_state",
+        "subscribe",
+        "latest"
+      ],
+      "validation_hooks": [
+        {
+          "method": "latest",
+          "keyword": "test"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/ide_controller.py",
+      "classes": [
+        "FactoryIDEController"
+      ],
+      "methods": [
+        "__init__",
+        "inspect",
+        "create_project",
+        "optimize",
+        "latest_state"
+      ],
+      "validation_hooks": [
+        {
+          "method": "latest_state",
+          "keyword": "test"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/scheduler.py",
+      "classes": [
+        "FactoryScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule_task",
+        "cancel_task",
+        "run_due_tasks",
+        "check_schedule",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_schedule",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/policy_guard.py",
+      "classes": [
+        "FactoryPolicyGuard"
+      ],
+      "methods": [
+        "__init__",
+        "add_rule",
+        "check",
+        "list_rules"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/observability.py",
+      "classes": [
+        "FactoryObservability"
+      ],
+      "methods": [
+        "__init__",
+        "health",
+        "snapshot",
+        "report"
+      ],
+      "validation_hooks": [
+        {
+          "method": "health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/config.py",
+      "classes": [
+        "FactoryConfig"
+      ],
+      "methods": [
+        "__init__",
+        "load",
+        "get",
+        "set_default",
+        "validate"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/config_validator.py",
+      "classes": [
+        "FactoryConfigValidator"
+      ],
+      "methods": [
+        "__init__",
+        "validate",
+        "apply_defaults",
+        "errors"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/state_manager.py",
+      "classes": [
+        "FactoryStateManager"
+      ],
+      "methods": [
+        "__init__",
+        "save",
+        "load",
+        "checkpoint",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "checkpoint",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/maintenance_planner.py",
+      "classes": [
+        "FactoryMaintenancePlanner"
+      ],
+      "methods": [
+        "__init__",
+        "analyze_health",
+        "plan",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "analyze_health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/startup_recovery.py",
+      "classes": [
+        "FactoryStartupRecovery"
+      ],
+      "methods": [
+        "__init__",
+        "restore",
+        "validate",
+        "startup",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_executor.py",
+      "classes": [
+        "FactoryImprovementExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "validate",
+        "execute",
+        "record",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_alerts.py",
+      "classes": [
+        "FactoryRuntimeAlerts"
+      ],
+      "methods": [
+        "__init__",
+        "check",
+        "alert",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/production_guard.py",
+      "classes": [
+        "FactoryProductionGuard"
+      ],
+      "methods": [
+        "__init__",
+        "validate",
+        "safe_mode",
+        "health_report",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate",
+          "keyword": "validate"
+        },
+        {
+          "method": "health_report",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_dashboard.py",
+      "classes": [
+        "FactoryRuntimeDashboard"
+      ],
+      "methods": [
+        "__init__",
+        "health",
+        "history",
+        "snapshot",
+        "summary",
+        "records"
+      ],
+      "validation_hooks": [
+        {
+          "method": "health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/config_manager.py",
+      "classes": [
+        "FactoryConfigManager"
+      ],
+      "methods": [
+        "__init__",
+        "load",
+        "validate",
+        "update",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recovery_orchestrator.py",
+      "classes": [
+        "FactoryRecoveryOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "detect",
+        "restore",
+        "verify",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/service_health.py",
+      "classes": [
+        "FactoryServiceHealth"
+      ],
+      "methods": [
+        "__init__",
+        "heartbeat",
+        "check",
+        "ready",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/service_recovery.py",
+      "classes": [
+        "FactoryServiceRecovery"
+      ],
+      "methods": [
+        "__init__",
+        "detect",
+        "recover",
+        "verify",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_improvement.py",
+      "classes": [
+        "FactorySelfImprovement"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "plan",
+        "execute",
+        "verify",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/risk_manager.py",
+      "classes": [
+        "FactoryRiskManager"
+      ],
+      "methods": [
+        "__init__",
+        "assess",
+        "check_constraints",
+        "approve",
+        "mitigate",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_constraints",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_healing.py",
+      "classes": [
+        "FactorySelfHealing"
+      ],
+      "methods": [
+        "__init__",
+        "detect_failure",
+        "diagnose_issue",
+        "repair_component",
+        "verify_recovery",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify_recovery",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/supervisor.py",
+      "classes": [
+        "FactorySupervisor"
+      ],
+      "methods": [
+        "__init__",
+        "register_component",
+        "check_status",
+        "coordinate_cycle",
+        "trigger_recovery",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_status",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/resource_management.py",
+      "classes": [
+        "FactoryResourceManagement"
+      ],
+      "methods": [
+        "__init__",
+        "register_resource",
+        "allocate_resource",
+        "release_resource",
+        "check_capacity",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_capacity",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/workflow_engine.py",
+      "classes": [
+        "FactoryWorkflowEngine"
+      ],
+      "methods": [
+        "__init__",
+        "create_workflow",
+        "add_step",
+        "execute_workflow",
+        "validate_workflow",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_workflow",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/health_monitoring.py",
+      "classes": [
+        "FactoryHealthMonitoring"
+      ],
+      "methods": [
+        "__init__",
+        "check_component_health",
+        "run_diagnostics",
+        "calculate_health_score",
+        "generate_report",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_component_health",
+          "keyword": "check"
+        },
+        {
+          "method": "check_component_health",
+          "keyword": "health"
+        },
+        {
+          "method": "calculate_health_score",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/configuration_intelligence.py",
+      "classes": [
+        "FactoryConfigurationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "load_config",
+        "validate_config",
+        "update_config",
+        "rollback_config",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_config",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/dependency_intelligence.py",
+      "classes": [
+        "FactoryDependencyIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "register_dependency",
+        "resolve_dependencies",
+        "check_dependency_health",
+        "update_dependency",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_dependency_health",
+          "keyword": "check"
+        },
+        {
+          "method": "check_dependency_health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/causal_analysis_intelligence.py",
+      "classes": [
+        "FactoryCausalAnalysisIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "record_cause",
+        "analyze_relationship",
+        "infer_impact",
+        "validate_causality",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_causality",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_healing_intelligence.py",
+      "classes": [
+        "FactorySelfHealingIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "detect_failure",
+        "diagnose_issue",
+        "apply_recovery",
+        "verify_recovery",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify_recovery",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_observability.py",
+      "classes": [
+        "FactoryRuntimeObservability"
+      ],
+      "methods": [
+        "__init__",
+        "record_metric",
+        "capture_health",
+        "detect_anomaly",
+        "generate_alert",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "capture_health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "classes": [
+        "FactoryDevelopmentTracker"
+      ],
+      "methods": [
+        "__init__",
+        "create_task",
+        "update_status",
+        "complete_task",
+        "verify_task",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify_task",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_governance.py",
+      "classes": [
+        "FactoryExecutionGovernance"
+      ],
+      "methods": [
+        "__init__",
+        "submit",
+        "validate",
+        "authorize",
+        "execute",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/strategy_execution_planner.py",
+      "classes": [
+        "FactoryStrategyExecutionPlanner"
+      ],
+      "methods": [
+        "__init__",
+        "create_plan",
+        "decompose",
+        "prioritize_tasks",
+        "validate_plan",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_plan",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_supervisor.py",
+      "classes": [
+        "FactoryAutonomousSupervisor"
+      ],
+      "methods": [
+        "__init__",
+        "check_health",
+        "inspect_pipeline",
+        "detect_issues",
+        "coordinate_recovery",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_health",
+          "keyword": "check"
+        },
+        {
+          "method": "check_health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/compliance_audit.py",
+      "classes": [
+        "FactoryComplianceAudit"
+      ],
+      "methods": [
+        "__init__",
+        "record_action",
+        "verify_compliance",
+        "generate_report",
+        "flag_violation",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify_compliance",
+          "keyword": "verify"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_telemetry.py",
+      "classes": [
+        "FactoryMetricsTelemetry"
+      ],
+      "methods": [
+        "__init__",
+        "record_metric",
+        "track_event",
+        "calculate_health",
+        "dashboard",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "calculate_health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/access_control.py",
+      "classes": [
+        "FactoryAccessControl"
+      ],
+      "methods": [
+        "__init__",
+        "create_identity",
+        "grant_permission",
+        "check_permission",
+        "revoke_permission",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_permission",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/configuration_management.py",
+      "classes": [
+        "FactoryConfigurationManagement"
+      ],
+      "methods": [
+        "__init__",
+        "set_config",
+        "get_config",
+        "update_config",
+        "validate_config",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_config",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/audit_trail.py",
+      "classes": [
+        "FactoryAuditTrail"
+      ],
+      "methods": [
+        "__init__",
+        "record_action",
+        "record_decision",
+        "query_records",
+        "verify_integrity",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify_integrity",
+          "keyword": "verify"
+        },
+        {
+          "method": "verify_integrity",
+          "keyword": "integrity"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/dependency_management.py",
+      "classes": [
+        "FactoryDependencyManagement"
+      ],
+      "methods": [
+        "__init__",
+        "register_dependency",
+        "remove_dependency",
+        "resolve_dependencies",
+        "check_health",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_health",
+          "keyword": "check"
+        },
+        {
+          "method": "check_health",
+          "keyword": "health"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recovery_management.py",
+      "classes": [
+        "FactoryRecoveryManagement"
+      ],
+      "methods": [
+        "__init__",
+        "detect_failure",
+        "attempt_recovery",
+        "validate_recovery",
+        "record_incident",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_recovery",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/audit_intelligence.py",
+      "classes": [
+        "FactoryAuditIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "record_event",
+        "query_events",
+        "verify_integrity",
+        "generate_audit_report",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "verify_integrity",
+          "keyword": "verify"
+        },
+        {
+          "method": "verify_integrity",
+          "keyword": "integrity"
+        },
+        {
+          "method": "generate_audit_report",
+          "keyword": "audit"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/version_intelligence.py",
+      "classes": [
+        "FactoryVersionIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "register_version",
+        "compare_versions",
+        "validate_upgrade",
+        "rollback_version",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_upgrade",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_governance.py",
+      "classes": [
+        "FactoryRuntimeGovernance"
+      ],
+      "methods": [
+        "__init__",
+        "check_policy",
+        "check_permission",
+        "assess_risk",
+        "authorize_execution",
+        "audit_execution",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_policy",
+          "keyword": "check"
+        },
+        {
+          "method": "check_permission",
+          "keyword": "check"
+        },
+        {
+          "method": "audit_execution",
+          "keyword": "audit"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/integrity_checker.py",
+      "classes": [
+        "FactoryIntegrityChecker"
+      ],
+      "methods": [
+        "__init__",
+        "check_runtime",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "check_runtime",
+          "keyword": "check"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/report_generator.py",
+      "classes": [
+        "FactoryReportGenerator"
+      ],
+      "methods": [
+        "__init__",
+        "generate",
+        "history",
+        "latest"
+      ],
+      "validation_hooks": [
+        {
+          "method": "latest",
+          "keyword": "test"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/change_lifecycle_manager.py",
+      "classes": [
+        "FactoryChangeLifecycleManager"
+      ],
+      "methods": [
+        "__init__",
+        "start_change",
+        "record_validation",
+        "complete_change",
+        "validate_change",
+        "report",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "validate_change",
+          "keyword": "validate"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/validation_runner.py",
+      "classes": [
+        "FactoryValidationRunner"
+      ],
+      "methods": [
+        "__init__",
+        "run_compile_check",
+        "run_test_check",
+        "validate_change",
+        "_run_command",
+        "report",
+        "history"
+      ],
+      "validation_hooks": [
+        {
+          "method": "run_compile_check",
+          "keyword": "check"
+        },
+        {
+          "method": "run_compile_check",
+          "keyword": "compile"
+        },
+        {
+          "method": "run_test_check",
+          "keyword": "test"
+        },
+        {
+          "method": "run_test_check",
+          "keyword": "check"
+        },
+        {
+          "method": "validate_change",
+          "keyword": "validate"
+        }
+      ]
+    }
+  ],
+  "candidate_count": 54,
+  "validation_required": true
+}

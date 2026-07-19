@@ -1,0 +1,120 @@
+{
+  "plans": [
+    {
+      "capability": "audit",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "registry",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "health",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "diagnostic",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "inspect",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "orchestr",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "executor",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "runtime",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "scheduler",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "graph",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "dependency",
+      "plan": "review duplicate implementations",
+      "next_step": "consolidation analysis"
+    },
+    {
+      "capability": "audit",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "registry",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "health",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "diagnostic",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "inspect",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "orchestr",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "executor",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "runtime",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "scheduler",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "graph",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    },
+    {
+      "capability": "dependency",
+      "plan": "evaluate existing implementations",
+      "next_step": "select integration target"
+    }
+  ],
+  "summary": {
+    "reuse": 0,
+    "integration": 11,
+    "review": 11,
+    "new_capability": 0
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "capability_scan": [
+    {
+      "tool": "factory_capability_analyzer",
+      "loaded": true,
+      "exports": [
+        "OUTPUT",
+        "Path",
+        "REPORT",
+        "RULES",
+        "analyze",
+        "json",
+        "load_report",
+        "main"
+      ]
+    },
+    {
+      "tool": "factory_capability_decision_engine",
+      "loaded": true,
+      "exports": [
+        "INPUT",
+        "OUTPUT",
+        "Path",
+        "decide",
+        "json",
+        "main"
+      ]
+    },
+    {
+      "tool": "factory_capability_integration_planner",
+      "loaded": true,
+      "exports": [
+        "INPUT",
+        "OUTPUT",
+        "Path",
+        "build_plan",
+        "json",
+        "main"
+      ]
+    },
+    {
+      "tool": "factory_execution_binding_planner",
+      "loaded": true,
+      "exports": [
+        "INPUT",
+        "OUTPUT",
+        "PREFERRED_WORDS",
+        "Path",
+        "build_plan",
+        "json",
+        "main",
+        "score_candidate"
+      ]
+    },
+    {
+      "tool": "factory_capability_safety_gate",
+      "loaded": true,
+      "exports": [
+        "INPUT",
+        "OUTPUT",
+        "Path",
+        "assess",
+        "json",
+        "main"
+      ]
+    },
+    {
+      "tool": "factory_artifact_registry",
+      "loaded": true,
+      "exports": [
+        "CLASS_MAP",
+        "Path",
+        "REGISTRY_FILE",
+        "build_registry",
+        "json",
+        "main",
+        "run_classifier",
+        "subprocess"
+      ]
+    }
+  ],
+  "decision": {
+    "request": {
+      "goal": "automatically validate and manage factory phase transitions"
+    },
+    "available_tools": [
+      "factory_capability_analyzer",
+      "factory_capability_decision_engine",
+      "factory_capability_integration_planner",
+      "factory_execution_binding_planner",
+      "factory_capability_safety_gate",
+      "factory_artifact_registry"
+    ],
+    "action": "compose_existing_capabilities",
+    "reason": "Existing factory tools available. Do not create new tool yet."
+  }
+}

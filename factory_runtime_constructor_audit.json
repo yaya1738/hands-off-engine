@@ -1,0 +1,230 @@
+{
+  "runtime_constructor_calls": [
+    {
+      "class": "FactoryRegistry",
+      "line": 54,
+      "keywords": []
+    },
+    {
+      "class": "FactoryRuntimeGovernance",
+      "line": 56,
+      "keywords": []
+    },
+    {
+      "class": "FactoryRuntimeObservability",
+      "line": 57,
+      "keywords": []
+    },
+    {
+      "class": "FactoryRuntimeState",
+      "line": 58,
+      "keywords": []
+    },
+    {
+      "class": "FactoryEventBus",
+      "line": 60,
+      "keywords": []
+    },
+    {
+      "class": "FactoryEventReplay",
+      "line": 61,
+      "keywords": []
+    },
+    {
+      "class": "FactoryDiagnosticIntelligence",
+      "line": 63,
+      "keywords": []
+    },
+    {
+      "class": "FactoryRecommendationFeedback",
+      "line": 64,
+      "keywords": []
+    },
+    {
+      "class": "FactoryMetaOptimizer",
+      "line": 65,
+      "keywords": []
+    },
+    {
+      "class": "FactorySelfAssessment",
+      "line": 67,
+      "keywords": []
+    },
+    {
+      "class": "FactoryImprovementPlanner",
+      "line": 69,
+      "keywords": []
+    },
+    {
+      "class": "FactoryImprovementQueue",
+      "line": 71,
+      "keywords": []
+    },
+    {
+      "class": "FactoryImprovementOrchestrator",
+      "line": 73,
+      "keywords": [
+        "assessor",
+        "planner",
+        "queue"
+      ]
+    },
+    {
+      "class": "FactoryImprovementApproval",
+      "line": 79,
+      "keywords": []
+    },
+    {
+      "class": "FactoryDevelopmentAdvisor",
+      "line": 81,
+      "keywords": []
+    },
+    {
+      "class": "FactoryDevelopmentTranslator",
+      "line": 83,
+      "keywords": []
+    },
+    {
+      "class": "FactoryDevelopmentTracker",
+      "line": 85,
+      "keywords": []
+    },
+    {
+      "class": "FactoryDevelopmentPipeline",
+      "line": 87,
+      "keywords": [
+        "advisor",
+        "approval"
+      ]
+    },
+    {
+      "class": "FactoryImprovementExecutor",
+      "line": 92,
+      "keywords": []
+    },
+    {
+      "class": "FactoryImprovementAudit",
+      "line": 93,
+      "keywords": []
+    },
+    {
+      "class": "FactoryStrategyManager",
+      "line": 96,
+      "keywords": []
+    },
+    {
+      "class": "FactoryGoalManagement",
+      "line": 98,
+      "keywords": []
+    },
+    {
+      "class": "FactoryGoalOptimizer",
+      "line": 99,
+      "keywords": []
+    },
+    {
+      "class": "FactoryGoalGenesis",
+      "line": 102,
+      "keywords": []
+    },
+    {
+      "class": "FactoryResourceAllocator",
+      "line": 110,
+      "keywords": []
+    },
+    {
+      "class": "FactorySelfHealingIntelligence",
+      "line": 119,
+      "keywords": []
+    },
+    {
+      "class": "FactoryPlanningIntelligence",
+      "line": 121,
+      "keywords": []
+    },
+    {
+      "class": "FactorySimulationIntelligence",
+      "line": 122,
+      "keywords": []
+    },
+    {
+      "class": "FactoryDecisionIntelligence",
+      "line": 123,
+      "keywords": []
+    },
+    {
+      "class": "FactoryFeedbackEngine",
+      "line": 124,
+      "keywords": []
+    },
+    {
+      "class": "FactoryLearningLoop",
+      "line": 126,
+      "keywords": []
+    },
+    {
+      "class": "FactoryAdaptiveDecision",
+      "line": 127,
+      "keywords": [
+        "feedback"
+      ]
+    },
+    {
+      "class": "FactoryIntegrityChecker",
+      "line": 130,
+      "keywords": []
+    },
+    {
+      "class": "FactoryOperatorAgent",
+      "line": 132,
+      "keywords": [
+        "integrity_checker",
+        "goal_management",
+        "improvement_queue"
+      ]
+    },
+    {
+      "class": "FactoryMaintenanceAgent",
+      "line": 138,
+      "keywords": [
+        "operator"
+      ]
+    },
+    {
+      "class": "FactoryReportGenerator",
+      "line": 142,
+      "keywords": []
+    },
+    {
+      "class": "FactoryTrendAnalyzer",
+      "line": 143,
+      "keywords": []
+    },
+    {
+      "class": "FactoryChangeImpactAnalyzer",
+      "line": 144,
+      "keywords": []
+    },
+    {
+      "class": "FactoryOrchestrationIntelligence",
+      "line": 146,
+      "keywords": []
+    },
+    {
+      "class": "FactoryExecutionIntelligence",
+      "line": 147,
+      "keywords": []
+    },
+    {
+      "class": "FactoryLearningIntelligence",
+      "line": 148,
+      "keywords": []
+    },
+    {
+      "class": "FactoryOptimizationIntelligence",
+      "line": 149,
+      "keywords": []
+    }
+  ],
+  "count": 42
+}

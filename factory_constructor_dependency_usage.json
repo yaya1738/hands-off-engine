@@ -1,0 +1,13 @@
+{
+  "file": "ai/factory/development_pipeline.py",
+  "dependencies": {
+    "advisor": {
+      "constructor_found": false,
+      "references": []
+    },
+    "approval": {
+      "constructor_found": false,
+      "references": []
+    }
+  }
+}

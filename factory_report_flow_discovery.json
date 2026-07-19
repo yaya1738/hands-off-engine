@@ -1,0 +1,180 @@
+{
+  "report_flow_candidates": [
+    {
+      "file": "ai/factory/cli.py",
+      "calls_found": [
+        "status",
+        "history"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "run",
+        "history"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "calls_found": [
+        "integrity_report",
+        "history"
+      ],
+      "methods": [
+        "__init__",
+        "component_inventory",
+        "emit_event",
+        "manage_strategy",
+        "manage_resources",
+        "run_improvement_cycle",
+        "submit_goal",
+        "submit_development_request",
+        "execute",
+        "change_impact_report",
+        "trend_report",
+        "factory_report",
+        "maintenance_status",
+        "operator_status",
+        "integrity_report",
+        "history"
+      ]
+    },
+    {
+      "file": "ai/factory/api.py",
+      "calls_found": [
+        "status"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "dashboard",
+        "run_task",
+        "history"
+      ]
+    },
+    {
+      "file": "ai/factory/command_router.py",
+      "calls_found": [
+        "status",
+        "dashboard",
+        "history"
+      ],
+      "methods": [
+        "__init__",
+        "dispatch"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_optimizer.py",
+      "calls_found": [
+        "status"
+      ],
+      "methods": [
+        "__init__",
+        "optimize"
+      ]
+    },
+    {
+      "file": "ai/factory/ide_model.py",
+      "calls_found": [
+        "status",
+        "history"
+      ],
+      "methods": [
+        "build"
+      ]
+    },
+    {
+      "file": "ai/factory/lifecycle.py",
+      "calls_found": [
+        "status"
+      ],
+      "methods": [
+        "__init__",
+        "startup",
+        "shutdown",
+        "recover",
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/daemon_scheduler.py",
+      "calls_found": [
+        "status",
+        "status"
+      ],
+      "methods": [
+        "__init__",
+        "run_cycle",
+        "tick",
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/observability.py",
+      "calls_found": [
+        "status",
+        "history"
+      ],
+      "methods": [
+        "__init__",
+        "health",
+        "snapshot",
+        "report"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_coordinator.py",
+      "calls_found": [
+        "status"
+      ],
+      "methods": [
+        "__init__",
+        "initialize",
+        "run_cycle",
+        "status",
+        "shutdown"
+      ]
+    },
+    {
+      "file": "ai/factory/resilience_controller.py",
+      "calls_found": [
+        "status"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "respond",
+        "history"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_dashboard.py",
+      "calls_found": [
+        "history"
+      ],
+      "methods": [
+        "__init__",
+        "health",
+        "history",
+        "snapshot",
+        "summary",
+        "records"
+      ]
+    },
+    {
+      "file": "ai/factory/external_interface.py",
+      "calls_found": [
+        "status",
+        "status"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "execute",
+        "request",
+        "history"
+      ]
+    }
+  ],
+  "count": 13
+}

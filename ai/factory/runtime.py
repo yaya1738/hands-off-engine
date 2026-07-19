@@ -42,6 +42,7 @@ from ai.factory.improvement_planner import FactoryImprovementPlanner
 from ai.factory.improvement_queue import FactoryImprovementQueue
 from ai.factory.improvement_approval import FactoryImprovementApproval
 from ai.factory.improvement_executor import FactoryImprovementExecutor
+from ai.factory.operations_intelligence import FactoryOperationsIntelligence
 from ai.factory.improvement_action_resolver import FactoryImprovementActionResolver
 from ai.factory.improvement_audit import FactoryImprovementAudit
 from ai.factory.development_advisor import FactoryDevelopmentAdvisor
@@ -141,6 +142,7 @@ class FactoryRuntime:
         self.simulation = FactorySimulationIntelligence()
         self.decision = FactoryDecisionIntelligence()
         self.decision_option_adapter = FactoryDecisionOptionAdapter()
+        self.operations_intelligence = FactoryOperationsIntelligence(self)
         self.feedback_engine = FactoryFeedbackEngine()
         self.feedback = self.feedback_engine
         self.learning_loop = FactoryLearningLoop()
@@ -983,6 +985,10 @@ class FactoryRuntime:
         )
 
         return result
+
+
+    def get_operations_report(self):
+        return self.operations_intelligence.generate_report()
 
     def history(self):
         return self._history

@@ -1,0 +1,168 @@
+{
+  "factory_report": {
+    "timestamp": "2026-07-17T09:00:32.214140",
+    "factory_health": "healthy",
+    "maintenance_ready": true,
+    "operator": {
+      "integrity": {
+        "healthy": true,
+        "checks": {
+          "decision": true,
+          "feedback": true,
+          "learning_loop": true,
+          "adaptive_decision": true,
+          "improvement_orchestrator": true,
+          "development_pipeline": true,
+          "strategy_manager": true,
+          "resource_allocator": true,
+          "decision_behavior": true,
+          "feedback_behavior": true,
+          "learning_loop_behavior": true,
+          "adaptive_decision_behavior": true
+        }
+      },
+      "status": "healthy",
+      "failed_components": [],
+      "goal_count": 0,
+      "improvement_queue_count": 0,
+      "reason": "all factory contracts passing",
+      "confidence": 1.0
+    },
+    "maintenance": {
+      "operator_status": {
+        "integrity": {
+          "healthy": true,
+          "checks": {
+            "decision": true,
+            "feedback": true,
+            "learning_loop": true,
+            "adaptive_decision": true,
+            "improvement_orchestrator": true,
+            "development_pipeline": true,
+            "strategy_manager": true,
+            "resource_allocator": true,
+            "decision_behavior": true,
+            "feedback_behavior": true,
+            "learning_loop_behavior": true,
+            "adaptive_decision_behavior": true
+          }
+        },
+        "status": "healthy",
+        "failed_components": [],
+        "goal_count": 0,
+        "improvement_queue_count": 0,
+        "reason": "all factory contracts passing",
+        "confidence": 1.0
+      },
+      "maintenance_ready": true
+    },
+    "next_step": "continue_development"
+  },
+  "trend_report": {
+    "reports_analyzed": 1,
+    "healthy_reports": 1,
+    "stability": "healthy"
+  },
+  "integrity_report": {
+    "healthy": true,
+    "checks": {
+      "decision": true,
+      "feedback": true,
+      "learning_loop": true,
+      "adaptive_decision": true,
+      "improvement_orchestrator": true,
+      "development_pipeline": true,
+      "strategy_manager": true,
+      "resource_allocator": true,
+      "decision_behavior": true,
+      "feedback_behavior": true,
+      "learning_loop_behavior": true,
+      "adaptive_decision_behavior": true
+    }
+  },
+  "maintenance_status": {
+    "inspection": {
+      "operator_status": {
+        "integrity": {
+          "healthy": true,
+          "checks": {
+            "decision": true,
+            "feedback": true,
+            "learning_loop": true,
+            "adaptive_decision": true,
+            "improvement_orchestrator": true,
+            "development_pipeline": true,
+            "strategy_manager": true,
+            "resource_allocator": true,
+            "decision_behavior": true,
+            "feedback_behavior": true,
+            "learning_loop_behavior": true,
+            "adaptive_decision_behavior": true
+          }
+        },
+        "status": "healthy",
+        "failed_components": [],
+        "goal_count": 0,
+        "improvement_queue_count": 0,
+        "reason": "all factory contracts passing",
+        "confidence": 1.0
+      },
+      "maintenance_ready": true
+    },
+    "recommendation": {
+      "recommended_action": "continue_development"
+    }
+  },
+  "operator_status": {
+    "assessment": {
+      "integrity": {
+        "healthy": true,
+        "checks": {
+          "decision": true,
+          "feedback": true,
+          "learning_loop": true,
+          "adaptive_decision": true,
+          "improvement_orchestrator": true,
+          "development_pipeline": true,
+          "strategy_manager": true,
+          "resource_allocator": true,
+          "decision_behavior": true,
+          "feedback_behavior": true,
+          "learning_loop_behavior": true,
+          "adaptive_decision_behavior": true
+        }
+      },
+      "status": "healthy",
+      "failed_components": [],
+      "goal_count": 0,
+      "improvement_queue_count": 0,
+      "reason": "all factory contracts passing",
+      "confidence": 1.0
+    },
+    "action": {
+      "action": "continue_improvement_cycle"
+    }
+  },
+  "history": [
+    {
+      "type": "integrity_report",
+      "result": {
+        "healthy": true,
+        "checks": {
+          "decision": true,
+          "feedback": true,
+          "learning_loop": true,
+          "adaptive_decision": true,
+          "improvement_orchestrator": true,
+          "development_pipeline": true,
+          "strategy_manager": true,
+          "resource_allocator": true,
+          "decision_behavior": true,
+          "feedback_behavior": true,
+          "learning_loop_behavior": true,
+          "adaptive_decision_behavior": true
+        }
+      }
+    }
+  ]
+}

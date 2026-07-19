@@ -1,0 +1,1416 @@
+{
+  "files_scanned": 231,
+  "execution_candidates": [
+    {
+      "file": "ai/factory/runner.py",
+      "classes": [
+        "FactoryRunner"
+      ],
+      "methods": [
+        "run"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/interface.py",
+      "classes": [
+        "FactoryInterface"
+      ],
+      "methods": [
+        "__init__",
+        "run_task",
+        "history",
+        "status"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/cli.py",
+      "classes": [
+        "FactoryCLI"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "run",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "classes": [
+        "FactoryRuntime"
+      ],
+      "methods": [
+        "__init__",
+        "component_inventory",
+        "emit_event",
+        "manage_strategy",
+        "manage_resources",
+        "run_improvement_cycle",
+        "submit_goal",
+        "submit_development_request",
+        "execute",
+        "change_impact_report",
+        "trend_report",
+        "factory_report",
+        "maintenance_status",
+        "operator_status",
+        "integrity_report",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_improvement_cycle",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_improvement_cycle",
+          "keyword": "improvement"
+        },
+        {
+          "type": "method",
+          "name": "submit_goal",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "submit_development_request",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "submit_development_request",
+          "keyword": "request"
+        },
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/api.py",
+      "classes": [
+        "FactoryAPI"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "dashboard",
+        "run_task",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/command_router.py",
+      "classes": [
+        "FactoryCommandRouter"
+      ],
+      "methods": [
+        "__init__",
+        "dispatch"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "dispatch",
+          "keyword": "dispatch"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimizer.py",
+      "classes": [
+        "FactoryOptimizer"
+      ],
+      "methods": [
+        "__init__",
+        "run_cycle"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/task_queue.py",
+      "classes": [
+        "FactoryTaskQueue"
+      ],
+      "methods": [
+        "__init__",
+        "add_task",
+        "next_task",
+        "complete_task",
+        "list_tasks"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "add_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "next_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "complete_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "list_tasks",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/workspace.py",
+      "classes": [
+        "FactoryWorkspace"
+      ],
+      "methods": [
+        "__init__",
+        "create_project",
+        "add_task",
+        "add_artifact",
+        "list_projects",
+        "get_project"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "add_task",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/artifact_registry.py",
+      "classes": [
+        "FactoryArtifactRegistry"
+      ],
+      "methods": [
+        "__init__",
+        "register_artifact",
+        "get_artifact",
+        "list_artifacts",
+        "find_by_task"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "find_by_task",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/event_bus.py",
+      "classes": [
+        "FactoryEventBus"
+      ],
+      "methods": [
+        "__init__",
+        "subscribe",
+        "publish_event",
+        "emit_runtime_event",
+        "process_events",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "emit_runtime_event",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/shell.py",
+      "classes": [
+        "FactoryShell"
+      ],
+      "methods": [
+        "__init__",
+        "available_commands",
+        "execute_command"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute_command",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/scheduler.py",
+      "classes": [
+        "FactoryScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule_task",
+        "cancel_task",
+        "run_due_tasks",
+        "check_schedule",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "schedule_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "cancel_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "run_due_tasks",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_due_tasks",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/daemon_scheduler.py",
+      "classes": [
+        "FactoryDaemonScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "run_cycle",
+        "tick",
+        "status"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/job_executor.py",
+      "classes": [
+        "FactoryJobExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "register_handler",
+        "execute",
+        "available_jobs"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        },
+        {
+          "type": "method",
+          "name": "available_jobs",
+          "keyword": "job"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/job_runner.py",
+      "classes": [
+        "FactoryJobRunner"
+      ],
+      "methods": [
+        "__init__",
+        "run_job",
+        "run_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_job",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_job",
+          "keyword": "job"
+        },
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/action_router.py",
+      "classes": [
+        "FactoryActionRouter"
+      ],
+      "methods": [
+        "__init__",
+        "route",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_coordinator.py",
+      "classes": [
+        "FactoryRuntimeCoordinator"
+      ],
+      "methods": [
+        "__init__",
+        "initialize",
+        "run_cycle",
+        "status",
+        "shutdown"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/event_integration.py",
+      "classes": [
+        "FactoryEventIntegration"
+      ],
+      "methods": [
+        "__init__",
+        "emit_job_event",
+        "emit_decision_event",
+        "emit_action_event"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "emit_job_event",
+          "keyword": "job"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/maintenance_executor.py",
+      "classes": [
+        "FactoryMaintenanceExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "register_action",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_executor.py",
+      "classes": [
+        "FactoryOptimizationExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "register_action",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experiment_framework.py",
+      "classes": [
+        "FactoryExperimentFramework"
+      ],
+      "methods": [
+        "__init__",
+        "create_experiment",
+        "run",
+        "evaluate",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_scheduler.py",
+      "classes": [
+        "FactoryImprovementScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule",
+        "run_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_approval.py",
+      "classes": [
+        "FactoryImprovementApproval"
+      ],
+      "methods": [
+        "__init__",
+        "request",
+        "approve",
+        "reject",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "request",
+          "keyword": "request"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_executor.py",
+      "classes": [
+        "FactoryImprovementExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "validate",
+        "execute",
+        "record",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_orchestrator.py",
+      "classes": [
+        "FactoryImprovementOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "run_cycle",
+        "process",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_runtime.py",
+      "classes": [
+        "FactoryImprovementRuntime"
+      ],
+      "methods": [
+        "__init__",
+        "run_once",
+        "start",
+        "stop",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_once",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_scheduler.py",
+      "classes": [
+        "FactoryRuntimeScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule",
+        "run_pending",
+        "pause",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_pending",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_loop.py",
+      "classes": [
+        "FactoryAutonomousLoop"
+      ],
+      "methods": [
+        "__init__",
+        "observe",
+        "decide",
+        "act",
+        "run_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/master_orchestrator.py",
+      "classes": [
+        "FactoryMasterOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "start",
+        "run",
+        "evolve",
+        "status",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/external_interface.py",
+      "classes": [
+        "FactoryExternalInterface"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "execute",
+        "request",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        },
+        {
+          "type": "method",
+          "name": "request",
+          "keyword": "request"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_improvement.py",
+      "classes": [
+        "FactorySelfImprovement"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "plan",
+        "execute",
+        "verify",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experimentation_engine.py",
+      "classes": [
+        "FactoryExperimentationEngine"
+      ],
+      "methods": [
+        "__init__",
+        "create_experiment",
+        "run_trial",
+        "compare_results",
+        "select_winner",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_trial",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_orchestration.py",
+      "classes": [
+        "FactoryExecutionOrchestration"
+      ],
+      "methods": [
+        "__init__",
+        "start_execution",
+        "coordinate_tasks",
+        "monitor_execution",
+        "recover_failure",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "coordinate_tasks",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_loop.py",
+      "classes": [
+        "FactoryRuntimeLoop"
+      ],
+      "methods": [
+        "__init__",
+        "start_cycle",
+        "run_cycle",
+        "pause_cycle",
+        "resume_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/workflow_engine.py",
+      "classes": [
+        "FactoryWorkflowEngine"
+      ],
+      "methods": [
+        "__init__",
+        "create_workflow",
+        "add_step",
+        "execute_workflow",
+        "validate_workflow",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute_workflow",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/learning_loop.py",
+      "classes": [
+        "FactoryLearningLoop"
+      ],
+      "methods": [
+        "__init__",
+        "record_outcome",
+        "analyze_feedback",
+        "update_model",
+        "generate_improvement",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "generate_improvement",
+          "keyword": "improvement"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/master_integration.py",
+      "classes": [
+        "FactoryMasterIntegration"
+      ],
+      "methods": [
+        "__init__",
+        "register_component",
+        "initialize_system",
+        "run_cycle",
+        "get_system_status",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/health_monitoring.py",
+      "classes": [
+        "FactoryHealthMonitoring"
+      ],
+      "methods": [
+        "__init__",
+        "check_component_health",
+        "run_diagnostics",
+        "calculate_health_score",
+        "generate_report",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_diagnostics",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/workflow_intelligence.py",
+      "classes": [
+        "FactoryWorkflowIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_workflow",
+        "add_step",
+        "execute_workflow",
+        "track_progress",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute_workflow",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/scheduling_intelligence.py",
+      "classes": [
+        "FactorySchedulingIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_schedule",
+        "queue_task",
+        "execute_due_tasks",
+        "prioritize_tasks",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "queue_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "execute_due_tasks",
+          "keyword": "execute"
+        },
+        {
+          "type": "method",
+          "name": "execute_due_tasks",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "prioritize_tasks",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experimentation_intelligence.py",
+      "classes": [
+        "FactoryExperimentationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_experiment",
+        "run_experiment",
+        "evaluate_experiment",
+        "promote_result",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_experiment",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/simulation_intelligence.py",
+      "classes": [
+        "FactorySimulationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_scenario",
+        "run_simulation",
+        "compare_outcomes",
+        "select_scenario",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_simulation",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/diagnostic_intelligence.py",
+      "classes": [
+        "FactoryDiagnosticIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "analyze_execution",
+        "detect_failure_patterns",
+        "explain_run",
+        "generate_recommendations",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "explain_run",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recommendation_feedback.py",
+      "classes": [
+        "FactoryRecommendationFeedback"
+      ],
+      "methods": [
+        "__init__",
+        "collect_recommendations",
+        "evaluate_recommendations",
+        "apply_improvement",
+        "track_effect",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "apply_improvement",
+          "keyword": "improvement"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/meta_optimizer.py",
+      "classes": [
+        "FactoryMetaOptimizer"
+      ],
+      "methods": [
+        "__init__",
+        "score_improvement",
+        "compare_strategies",
+        "select_best_action",
+        "measure_roi",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "score_improvement",
+          "keyword": "improvement"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "classes": [
+        "FactoryDevelopmentTracker"
+      ],
+      "methods": [
+        "__init__",
+        "create_task",
+        "update_status",
+        "complete_task",
+        "verify_task",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "create_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "complete_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "verify_task",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_executor.py",
+      "classes": [
+        "FactoryDevelopmentExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "execute",
+        "record_validation",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_governance.py",
+      "classes": [
+        "FactoryExecutionGovernance"
+      ],
+      "methods": [
+        "__init__",
+        "submit",
+        "validate",
+        "authorize",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "submit",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/strategy_execution_planner.py",
+      "classes": [
+        "FactoryStrategyExecutionPlanner"
+      ],
+      "methods": [
+        "__init__",
+        "create_plan",
+        "decompose",
+        "prioritize_tasks",
+        "validate_plan",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "prioritize_tasks",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_supervisor.py",
+      "classes": [
+        "FactoryAutonomousSupervisor"
+      ],
+      "methods": [
+        "__init__",
+        "check_health",
+        "inspect_pipeline",
+        "detect_issues",
+        "coordinate_recovery",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "inspect_pipeline",
+          "keyword": "pipeline"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_scheduler.py",
+      "classes": [
+        "FactoryAutonomousScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule_task",
+        "run_cycle",
+        "prioritize_schedule",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "schedule_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_event_bus.py",
+      "classes": [
+        "FactoryAutonomousEventBus"
+      ],
+      "methods": [
+        "__init__",
+        "publish",
+        "subscribe",
+        "dispatch",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "dispatch",
+          "keyword": "dispatch"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_engine.py",
+      "classes": [
+        "FactoryOptimizationEngine"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate_options",
+        "rank_improvements",
+        "apply_optimization",
+        "measure_gain",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "rank_improvements",
+          "keyword": "improvement"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_intelligence.py",
+      "classes": [
+        "FactoryOptimizationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "measure_performance",
+        "identify_improvement",
+        "optimize_process",
+        "compare_results",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "identify_improvement",
+          "keyword": "improvement"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/orchestration_intelligence.py",
+      "classes": [
+        "FactoryOrchestrationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "coordinate_agents",
+        "dispatch_tasks",
+        "manage_execution",
+        "monitor_execution",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "dispatch_tasks",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "dispatch_tasks",
+          "keyword": "dispatch"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/event_replay.py",
+      "classes": [
+        "FactoryEventReplay"
+      ],
+      "methods": [
+        "__init__",
+        "store_event",
+        "query_events",
+        "replay_execution",
+        "diagnose_run",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "diagnose_run",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_pipeline.py",
+      "classes": [
+        "FactoryDevelopmentPipeline"
+      ],
+      "methods": [
+        "__init__",
+        "run_development_cycle",
+        "report"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_development_cycle",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/integrity_checker.py",
+      "classes": [
+        "FactoryIntegrityChecker"
+      ],
+      "methods": [
+        "__init__",
+        "check_runtime",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "check_runtime",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_orchestrator.py",
+      "classes": [
+        "FactoryDevelopmentOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "create_development_task",
+        "update_status",
+        "record_validation",
+        "execute_task",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "create_development_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "execute_task",
+          "keyword": "execute"
+        },
+        {
+          "type": "method",
+          "name": "execute_task",
+          "keyword": "task"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/validation_runner.py",
+      "classes": [
+        "FactoryValidationRunner"
+      ],
+      "methods": [
+        "__init__",
+        "run_compile_check",
+        "run_test_check",
+        "validate_change",
+        "_run_command",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_compile_check",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_test_check",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "_run_command",
+          "keyword": "run"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_operator.py",
+      "classes": [
+        "FactoryDevelopmentOperator"
+      ],
+      "methods": [
+        "__init__",
+        "submit_task",
+        "execute_cycle",
+        "review_status",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "submit_task",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "submit_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "execute_cycle",
+          "keyword": "execute"
+        }
+      ]
+    }
+  ]
+}

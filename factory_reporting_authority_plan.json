@@ -1,0 +1,134 @@
+{
+  "recommended_authority": {
+    "component": "FactoryRuntime",
+    "file": "ai/factory/runtime.py",
+    "score": 30,
+    "reasons": [
+      {
+        "method": "change_impact_report",
+        "score": 5
+      },
+      {
+        "method": "trend_report",
+        "score": 5
+      },
+      {
+        "method": "factory_report",
+        "score": 5
+      },
+      {
+        "method": "maintenance_status",
+        "score": 4
+      },
+      {
+        "method": "operator_status",
+        "score": 4
+      },
+      {
+        "method": "integrity_report",
+        "score": 5
+      },
+      {
+        "method": "history",
+        "score": 2
+      }
+    ]
+  },
+  "ranked_candidates": [
+    {
+      "component": "FactoryRuntime",
+      "file": "ai/factory/runtime.py",
+      "score": 30,
+      "reasons": [
+        {
+          "method": "change_impact_report",
+          "score": 5
+        },
+        {
+          "method": "trend_report",
+          "score": 5
+        },
+        {
+          "method": "factory_report",
+          "score": 5
+        },
+        {
+          "method": "maintenance_status",
+          "score": 4
+        },
+        {
+          "method": "operator_status",
+          "score": 4
+        },
+        {
+          "method": "integrity_report",
+          "score": 5
+        },
+        {
+          "method": "history",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "component": "FactoryAPI",
+      "file": "ai/factory/api.py",
+      "score": 7,
+      "reasons": [
+        {
+          "method": "status",
+          "score": 3
+        },
+        {
+          "method": "dashboard",
+          "score": 3
+        },
+        {
+          "method": "history",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "component": "FactoryControlPlane",
+      "file": "ai/factory/control_plane.py",
+      "score": 7,
+      "reasons": [
+        {
+          "method": "health",
+          "score": 5
+        },
+        {
+          "method": "history",
+          "score": 2
+        }
+      ]
+    },
+    {
+      "component": "FactoryCLI",
+      "file": "ai/factory/cli.py",
+      "score": 3,
+      "reasons": [
+        {
+          "method": "status",
+          "score": 2
+        },
+        {
+          "method": "history",
+          "score": 1
+        }
+      ]
+    },
+    {
+      "component": "FactoryDashboard",
+      "file": "ai/factory/dashboard.py",
+      "score": 3,
+      "reasons": [
+        {
+          "method": "snapshot",
+          "score": 3
+        }
+      ]
+    }
+  ]
+}

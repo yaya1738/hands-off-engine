@@ -1,0 +1,862 @@
+{
+  "timestamp": "2026-07-19T07:52:50.552545+00:00",
+  "audit": "factory proposal bridge truth audit",
+  "target_flow": [
+    "verified task",
+    "proposal generation",
+    "approval boundary",
+    "FactoryImprovementExecutor.execute"
+  ],
+  "files": [
+    {
+      "file": "ai/factory/runtime.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 58
+        },
+        {
+          "name": "component_inventory",
+          "line": 164
+        },
+        {
+          "name": "emit_event",
+          "line": 186
+        },
+        {
+          "name": "manage_strategy",
+          "line": 203
+        },
+        {
+          "name": "manage_resources",
+          "line": 221
+        },
+        {
+          "name": "run_improvement_cycle",
+          "line": 247
+        },
+        {
+          "name": "submit_goal",
+          "line": 371
+        },
+        {
+          "name": "submit_development_request",
+          "line": 402
+        },
+        {
+          "name": "autonomous_execute",
+          "line": 534
+        },
+        {
+          "name": "report_autonomy_state",
+          "line": 583
+        },
+        {
+          "name": "execute",
+          "line": 606
+        },
+        {
+          "name": "change_impact_report",
+          "line": 756
+        },
+        {
+          "name": "trend_report",
+          "line": 766
+        },
+        {
+          "name": "factory_report",
+          "line": 773
+        },
+        {
+          "name": "maintenance_status",
+          "line": 794
+        },
+        {
+          "name": "operator_status",
+          "line": 808
+        },
+        {
+          "name": "integrity_report",
+          "line": 820
+        },
+        {
+          "name": "history",
+          "line": 832
+        }
+      ],
+      "matches": [
+        {
+          "line": 22,
+          "keyword": "plan",
+          "text": "from ai.factory.planning_intelligence import FactoryPlanningIntelligence"
+        },
+        {
+          "line": 32,
+          "keyword": "analyze",
+          "text": "from ai.factory.trend_analyzer import FactoryTrendAnalyzer"
+        },
+        {
+          "line": 33,
+          "keyword": "analyze",
+          "text": "from ai.factory.change_impact_analyzer import FactoryChangeImpactAnalyzer"
+        },
+        {
+          "line": 40,
+          "keyword": "plan",
+          "text": "from ai.factory.improvement_planner import FactoryImprovementPlanner"
+        },
+        {
+          "line": 78,
+          "keyword": "plan",
+          "text": "self.improvement_planner = FactoryImprovementPlanner()"
+        },
+        {
+          "line": 84,
+          "keyword": "plan",
+          "text": "planner=self.improvement_planner,"
+        },
+        {
+          "line": 127,
+          "keyword": "plan",
+          "text": "self.planning = FactoryPlanningIntelligence()"
+        },
+        {
+          "line": 149,
+          "keyword": "analyze",
+          "text": "self.trend_analyzer = FactoryTrendAnalyzer()"
+        },
+        {
+          "line": 150,
+          "keyword": "analyze",
+          "text": "self.change_impact_analyzer = FactoryChangeImpactAnalyzer()"
+        },
+        {
+          "line": 248,
+          "keyword": "analyze",
+          "text": "analysis = self.diagnostics.analyze_execution("
+        },
+        {
+          "line": 318,
+          "keyword": "translate",
+          "text": "translated_findings = self.development_translator.translate("
+        },
+        {
+          "line": 326,
+          "keyword": "translate",
+          "text": "+ translated_findings.get("
+        },
+        {
+          "line": 334,
+          "keyword": "plan",
+          "text": "development_plan = self.improvement_planner.plan("
+        },
+        {
+          "line": 338,
+          "keyword": "translate",
+          "text": "+ translated_findings.get("
+        },
+        {
+          "line": 354,
+          "keyword": "execute",
+          "text": "\"objective\": \"Execute Factory improvement cycle\","
+        },
+        {
+          "line": 355,
+          "keyword": "plan",
+          "text": "\"plan\": development_plan,"
+        },
+        {
+          "line": 363,
+          "keyword": "proposal",
+          "text": "\"proposal\": improvement_cycle,"
+        },
+        {
+          "line": 366,
+          "keyword": "plan",
+          "text": "\"plan\": development_plan,"
+        },
+        {
+          "line": 402,
+          "keyword": "request",
+          "text": "def submit_development_request("
+        },
+        {
+          "line": 410,
+          "keyword": "request",
+          "text": "\"source\": \"development_request\","
+        },
+        {
+          "line": 423,
+          "keyword": "translate",
+          "text": "translated = self.development_translator.translate("
+        },
+        {
+          "line": 433,
+          "keyword": "translate",
+          "text": "\"gaps\": translated.get("
+        },
+        {
+          "line": 446,
+          "keyword": "plan",
+          "text": "\"name\": \"continue_current_plan\","
+        },
+        {
+          "line": 459,
+          "keyword": "plan",
+          "text": "plan = self.improvement_planner.plan("
+        },
+        {
+          "line": 467,
+          "keyword": "plan",
+          "text": "\"development_type\": \"execution_planning_integration\","
+        },
+        {
+          "line": 470,
+          "keyword": "plan",
+          "text": "\"FactoryImprovementPlanner\","
+        },
+        {
+          "line": 475,
+          "keyword": "request",
+          "text": "\"submit_development_request\","
+        },
+        {
+          "line": 479,
+          "keyword": "plan",
+          "text": "\"execution plan appears in audit\","
+        },
+        {
+          "line": 481,
+          "keyword": "plan",
+          "text": "\"decision data flows into planning\","
+        },
+        {
+          "line": 484,
+          "keyword": "plan",
+          "text": "\"remove execution planning fields\","
+        },
+        {
+          "line": 493,
+          "keyword": "proposal",
+          "text": "\"proposal\": development,"
+        },
+        {
+          "line": 494,
+          "keyword": "plan",
+          "text": "\"plan\": plan,"
+        },
+        {
+          "line": 495,
+          "keyword": "proposal",
+          "text": "\"source\": \"factory_proposal\","
+        },
+        {
+          "line": 501,
+          "keyword": "request",
+          "text": "\"improvement\": \"factory_development_request_processed\","
+        },
+        {
+          "line": 504,
+          "keyword": "verify_task",
+          "text": "task = self.development_tracker.verify_task("
+        },
+        {
+          "line": 520,
+          "keyword": "plan",
+          "text": "\"plan\": plan,"
+        },
+        {
+          "line": 526,
+          "keyword": "request",
+          "text": "\"type\": \"development_request\","
+        },
+        {
+          "line": 534,
+          "keyword": "execute",
+          "text": "def autonomous_execute(self, objective):"
+        },
+        {
+          "line": 572,
+          "keyword": "execute",
+          "text": "result = self.execute("
+        },
+        {
+          "line": 606,
+          "keyword": "execute",
+          "text": "def execute(self, goal):"
+        },
+        {
+          "line": 635,
+          "keyword": "plan",
+          "text": "plan = self.planning.create_plan(goal)"
+        },
+        {
+          "line": 636,
+          "keyword": "plan",
+          "text": "steps.append(\"planning\")"
+        },
+        {
+          "line": 638,
+          "keyword": "plan",
+          "text": "simulation = self.simulation.run_simulation(plan)"
+        },
+        {
+          "line": 761,
+          "keyword": "analyze",
+          "text": "return self.change_impact_analyzer.analyze("
+        },
+        {
+          "line": 769,
+          "keyword": "analyze",
+          "text": "return self.trend_analyzer.analyze("
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 6
+        },
+        {
+          "name": "create_task",
+          "line": 10
+        },
+        {
+          "name": "update_status",
+          "line": 27
+        },
+        {
+          "name": "complete_task",
+          "line": 36
+        },
+        {
+          "name": "verify_task",
+          "line": 47
+        },
+        {
+          "name": "history",
+          "line": 64
+        }
+      ],
+      "matches": [
+        {
+          "line": 47,
+          "keyword": "verify_task",
+          "text": "def verify_task("
+        },
+        {
+          "line": 55,
+          "keyword": "verified",
+          "text": "task[\"status\"] = \"verified\""
+        },
+        {
+          "line": 56,
+          "keyword": "verified",
+          "text": "task[\"verified_at\"] = ("
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 5
+        },
+        {
+          "name": "translate",
+          "line": 8
+        },
+        {
+          "name": "history",
+          "line": 39
+        }
+      ],
+      "matches": [
+        {
+          "line": 8,
+          "keyword": "translate",
+          "text": "def translate("
+        },
+        {
+          "line": 29,
+          "keyword": "translate",
+          "text": "translated = {"
+        },
+        {
+          "line": 34,
+          "keyword": "translate",
+          "text": "translated"
+        },
+        {
+          "line": 37,
+          "keyword": "translate",
+          "text": "return translated"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_advisor.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 5
+        },
+        {
+          "name": "analyze",
+          "line": 8
+        },
+        {
+          "name": "history",
+          "line": 48
+        }
+      ],
+      "matches": [
+        {
+          "line": 8,
+          "keyword": "analyze",
+          "text": "def analyze("
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_planner.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 5
+        },
+        {
+          "name": "plan",
+          "line": 8
+        },
+        {
+          "name": "prioritize",
+          "line": 64
+        },
+        {
+          "name": "history",
+          "line": 78
+        }
+      ],
+      "matches": [
+        {
+          "line": 4,
+          "keyword": "plan",
+          "text": "class FactoryImprovementPlanner:"
+        },
+        {
+          "line": 8,
+          "keyword": "plan",
+          "text": "def plan("
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_approval.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 6
+        },
+        {
+          "name": "request",
+          "line": 9
+        },
+        {
+          "name": "approve",
+          "line": 27
+        },
+        {
+          "name": "reject",
+          "line": 35
+        },
+        {
+          "name": "history",
+          "line": 43
+        }
+      ],
+      "matches": [
+        {
+          "line": 7,
+          "keyword": "request",
+          "text": "self._requests: List[Dict[str, Any]] = []"
+        },
+        {
+          "line": 9,
+          "keyword": "request",
+          "text": "def request("
+        },
+        {
+          "line": 13,
+          "keyword": "request",
+          "text": "request = {"
+        },
+        {
+          "line": 21,
+          "keyword": "request",
+          "text": "self._requests.append("
+        },
+        {
+          "line": 22,
+          "keyword": "request",
+          "text": "request"
+        },
+        {
+          "line": 25,
+          "keyword": "request",
+          "text": "return request"
+        },
+        {
+          "line": 27,
+          "keyword": "approve",
+          "text": "def approve("
+        },
+        {
+          "line": 29,
+          "keyword": "request",
+          "text": "request: Dict[str, Any],"
+        },
+        {
+          "line": 31,
+          "keyword": "request",
+          "text": "request[\"status\"] = \"APPROVED\""
+        },
+        {
+          "line": 31,
+          "keyword": "approve",
+          "text": "request[\"status\"] = \"APPROVED\""
+        },
+        {
+          "line": 33,
+          "keyword": "request",
+          "text": "return request"
+        },
+        {
+          "line": 37,
+          "keyword": "request",
+          "text": "request: Dict[str, Any],"
+        },
+        {
+          "line": 39,
+          "keyword": "request",
+          "text": "request[\"status\"] = \"REJECTED\""
+        },
+        {
+          "line": 41,
+          "keyword": "request",
+          "text": "return request"
+        },
+        {
+          "line": 44,
+          "keyword": "request",
+          "text": "return self._requests"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_executor.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 6
+        },
+        {
+          "name": "validate",
+          "line": 9
+        },
+        {
+          "name": "execute",
+          "line": 20
+        },
+        {
+          "name": "record",
+          "line": 55
+        },
+        {
+          "name": "history",
+          "line": 74
+        }
+      ],
+      "matches": [
+        {
+          "line": 17,
+          "keyword": "approve",
+          "text": "== \"APPROVED\""
+        },
+        {
+          "line": 20,
+          "keyword": "execute",
+          "text": "def execute("
+        },
+        {
+          "line": 30,
+          "keyword": "approve",
+          "text": "\"reason\": \"not_approved\","
+        },
+        {
+          "line": 38,
+          "keyword": "execute",
+          "text": "\"status\": \"EXECUTED\","
+        }
+      ]
+    }
+  ],
+  "analysis": {
+    "verified_task_locations": [
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 504,
+        "text": "task = self.development_tracker.verify_task("
+      },
+      {
+        "file": "ai/factory/development_tracker.py",
+        "line": 47,
+        "text": "def verify_task("
+      },
+      {
+        "file": "ai/factory/development_tracker.py",
+        "line": 55,
+        "text": "task[\"status\"] = \"verified\""
+      },
+      {
+        "file": "ai/factory/development_tracker.py",
+        "line": 56,
+        "text": "task[\"verified_at\"] = ("
+      }
+    ],
+    "proposal_candidates": [
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 22,
+        "text": "from ai.factory.planning_intelligence import FactoryPlanningIntelligence"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 40,
+        "text": "from ai.factory.improvement_planner import FactoryImprovementPlanner"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 78,
+        "text": "self.improvement_planner = FactoryImprovementPlanner()"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 84,
+        "text": "planner=self.improvement_planner,"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 127,
+        "text": "self.planning = FactoryPlanningIntelligence()"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 318,
+        "text": "translated_findings = self.development_translator.translate("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 326,
+        "text": "+ translated_findings.get("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 334,
+        "text": "development_plan = self.improvement_planner.plan("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 338,
+        "text": "+ translated_findings.get("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 355,
+        "text": "\"plan\": development_plan,"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 363,
+        "text": "\"proposal\": improvement_cycle,"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 366,
+        "text": "\"plan\": development_plan,"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 423,
+        "text": "translated = self.development_translator.translate("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 433,
+        "text": "\"gaps\": translated.get("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 446,
+        "text": "\"name\": \"continue_current_plan\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 459,
+        "text": "plan = self.improvement_planner.plan("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 467,
+        "text": "\"development_type\": \"execution_planning_integration\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 470,
+        "text": "\"FactoryImprovementPlanner\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 479,
+        "text": "\"execution plan appears in audit\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 481,
+        "text": "\"decision data flows into planning\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 484,
+        "text": "\"remove execution planning fields\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 493,
+        "text": "\"proposal\": development,"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 494,
+        "text": "\"plan\": plan,"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 495,
+        "text": "\"source\": \"factory_proposal\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 520,
+        "text": "\"plan\": plan,"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 635,
+        "text": "plan = self.planning.create_plan(goal)"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 636,
+        "text": "steps.append(\"planning\")"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 638,
+        "text": "simulation = self.simulation.run_simulation(plan)"
+      },
+      {
+        "file": "ai/factory/development_translator.py",
+        "line": 8,
+        "text": "def translate("
+      },
+      {
+        "file": "ai/factory/development_translator.py",
+        "line": 29,
+        "text": "translated = {"
+      },
+      {
+        "file": "ai/factory/development_translator.py",
+        "line": 34,
+        "text": "translated"
+      },
+      {
+        "file": "ai/factory/development_translator.py",
+        "line": 37,
+        "text": "return translated"
+      },
+      {
+        "file": "ai/factory/improvement_planner.py",
+        "line": 4,
+        "text": "class FactoryImprovementPlanner:"
+      },
+      {
+        "file": "ai/factory/improvement_planner.py",
+        "line": 8,
+        "text": "def plan("
+      }
+    ],
+    "approval_candidates": [
+      {
+        "file": "ai/factory/improvement_approval.py",
+        "line": 27,
+        "text": "def approve("
+      },
+      {
+        "file": "ai/factory/improvement_approval.py",
+        "line": 31,
+        "text": "request[\"status\"] = \"APPROVED\""
+      },
+      {
+        "file": "ai/factory/improvement_approval.py",
+        "line": 31,
+        "text": "request[\"status\"] = \"APPROVED\""
+      },
+      {
+        "file": "ai/factory/improvement_executor.py",
+        "line": 17,
+        "text": "== \"APPROVED\""
+      },
+      {
+        "file": "ai/factory/improvement_executor.py",
+        "line": 30,
+        "text": "\"reason\": \"not_approved\","
+      }
+    ],
+    "executor_locations": [
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 354,
+        "text": "\"objective\": \"Execute Factory improvement cycle\","
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 534,
+        "text": "def autonomous_execute(self, objective):"
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 572,
+        "text": "result = self.execute("
+      },
+      {
+        "file": "ai/factory/runtime.py",
+        "line": 606,
+        "text": "def execute(self, goal):"
+      },
+      {
+        "file": "ai/factory/improvement_executor.py",
+        "line": 20,
+        "text": "def execute("
+      },
+      {
+        "file": "ai/factory/improvement_executor.py",
+        "line": 38,
+        "text": "\"status\": \"EXECUTED\","
+      }
+    ]
+  }
+}

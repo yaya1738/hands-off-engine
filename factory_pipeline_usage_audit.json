@@ -1,0 +1,26 @@
+{
+  "target": "FactoryDevelopmentPipeline",
+  "findings": [
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 87,
+      "attribute": "development_pipeline"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 87,
+      "type": "reference"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 316,
+      "attribute": "development_pipeline"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 428,
+      "attribute": "development_pipeline"
+    }
+  ],
+  "count": 4
+}

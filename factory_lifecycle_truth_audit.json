@@ -1,0 +1,820 @@
+{
+  "timestamp": "2026-07-19T07:47:49.661665",
+  "purpose": "factory lifecycle truth audit",
+  "target_flow": [
+    "verified development task",
+    "proposal representation",
+    "approval boundary",
+    "FactoryImprovementExecutor.execute"
+  ],
+  "files": [
+    {
+      "file": "ai/factory/runtime.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 58
+        },
+        {
+          "name": "component_inventory",
+          "line": 164
+        },
+        {
+          "name": "emit_event",
+          "line": 186
+        },
+        {
+          "name": "manage_strategy",
+          "line": 203
+        },
+        {
+          "name": "manage_resources",
+          "line": 221
+        },
+        {
+          "name": "run_improvement_cycle",
+          "line": 247
+        },
+        {
+          "name": "submit_goal",
+          "line": 371
+        },
+        {
+          "name": "submit_development_request",
+          "line": 402
+        },
+        {
+          "name": "autonomous_execute",
+          "line": 534
+        },
+        {
+          "name": "report_autonomy_state",
+          "line": 583
+        },
+        {
+          "name": "execute",
+          "line": 606
+        },
+        {
+          "name": "change_impact_report",
+          "line": 756
+        },
+        {
+          "name": "trend_report",
+          "line": 766
+        },
+        {
+          "name": "factory_report",
+          "line": 773
+        },
+        {
+          "name": "maintenance_status",
+          "line": 794
+        },
+        {
+          "name": "operator_status",
+          "line": 808
+        },
+        {
+          "name": "integrity_report",
+          "line": 820
+        },
+        {
+          "name": "history",
+          "line": 832
+        }
+      ],
+      "matches": [
+        {
+          "line": 22,
+          "keyword": "plan",
+          "text": "from ai.factory.planning_intelligence import FactoryPlanningIntelligence"
+        },
+        {
+          "line": 40,
+          "keyword": "plan",
+          "text": "from ai.factory.improvement_planner import FactoryImprovementPlanner"
+        },
+        {
+          "line": 42,
+          "keyword": "approval",
+          "text": "from ai.factory.improvement_approval import FactoryImprovementApproval"
+        },
+        {
+          "line": 43,
+          "keyword": "executor",
+          "text": "from ai.factory.improvement_executor import FactoryImprovementExecutor"
+        },
+        {
+          "line": 78,
+          "keyword": "plan",
+          "text": "self.improvement_planner = FactoryImprovementPlanner()"
+        },
+        {
+          "line": 84,
+          "keyword": "plan",
+          "text": "planner=self.improvement_planner,"
+        },
+        {
+          "line": 88,
+          "keyword": "approval",
+          "text": "self.improvement_approval = FactoryImprovementApproval()"
+        },
+        {
+          "line": 98,
+          "keyword": "executor",
+          "text": "self.improvement_executor = FactoryImprovementExecutor()"
+        },
+        {
+          "line": 127,
+          "keyword": "plan",
+          "text": "self.planning = FactoryPlanningIntelligence()"
+        },
+        {
+          "line": 334,
+          "keyword": "plan",
+          "text": "development_plan = self.improvement_planner.plan("
+        },
+        {
+          "line": 352,
+          "keyword": "create_task",
+          "text": "development_task = self.development_tracker.create_task("
+        },
+        {
+          "line": 354,
+          "keyword": "execute",
+          "text": "\"objective\": \"Execute Factory improvement cycle\","
+        },
+        {
+          "line": 355,
+          "keyword": "plan",
+          "text": "\"plan\": development_plan,"
+        },
+        {
+          "line": 363,
+          "keyword": "proposal",
+          "text": "\"proposal\": improvement_cycle,"
+        },
+        {
+          "line": 366,
+          "keyword": "plan",
+          "text": "\"plan\": development_plan,"
+        },
+        {
+          "line": 446,
+          "keyword": "plan",
+          "text": "\"name\": \"continue_current_plan\","
+        },
+        {
+          "line": 459,
+          "keyword": "plan",
+          "text": "plan = self.improvement_planner.plan("
+        },
+        {
+          "line": 467,
+          "keyword": "plan",
+          "text": "\"development_type\": \"execution_planning_integration\","
+        },
+        {
+          "line": 470,
+          "keyword": "plan",
+          "text": "\"FactoryImprovementPlanner\","
+        },
+        {
+          "line": 479,
+          "keyword": "plan",
+          "text": "\"execution plan appears in audit\","
+        },
+        {
+          "line": 481,
+          "keyword": "plan",
+          "text": "\"decision data flows into planning\","
+        },
+        {
+          "line": 484,
+          "keyword": "plan",
+          "text": "\"remove execution planning fields\","
+        },
+        {
+          "line": 490,
+          "keyword": "create_task",
+          "text": "task = self.development_tracker.create_task("
+        },
+        {
+          "line": 493,
+          "keyword": "proposal",
+          "text": "\"proposal\": development,"
+        },
+        {
+          "line": 494,
+          "keyword": "plan",
+          "text": "\"plan\": plan,"
+        },
+        {
+          "line": 495,
+          "keyword": "proposal",
+          "text": "\"source\": \"factory_proposal\","
+        },
+        {
+          "line": 504,
+          "keyword": "verify_task",
+          "text": "task = self.development_tracker.verify_task("
+        },
+        {
+          "line": 520,
+          "keyword": "plan",
+          "text": "\"plan\": plan,"
+        },
+        {
+          "line": 534,
+          "keyword": "execute",
+          "text": "def autonomous_execute(self, objective):"
+        },
+        {
+          "line": 572,
+          "keyword": "execute",
+          "text": "result = self.execute("
+        },
+        {
+          "line": 606,
+          "keyword": "execute",
+          "text": "def execute(self, goal):"
+        },
+        {
+          "line": 635,
+          "keyword": "plan",
+          "text": "plan = self.planning.create_plan(goal)"
+        },
+        {
+          "line": 636,
+          "keyword": "plan",
+          "text": "steps.append(\"planning\")"
+        },
+        {
+          "line": 638,
+          "keyword": "plan",
+          "text": "simulation = self.simulation.run_simulation(plan)"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 6
+        },
+        {
+          "name": "create_task",
+          "line": 10
+        },
+        {
+          "name": "update_status",
+          "line": 27
+        },
+        {
+          "name": "complete_task",
+          "line": 36
+        },
+        {
+          "name": "verify_task",
+          "line": 47
+        },
+        {
+          "name": "history",
+          "line": 64
+        }
+      ],
+      "matches": [
+        {
+          "line": 10,
+          "keyword": "create_task",
+          "text": "def create_task("
+        },
+        {
+          "line": 47,
+          "keyword": "verify_task",
+          "text": "def verify_task("
+        },
+        {
+          "line": 55,
+          "keyword": "verified",
+          "text": "task[\"status\"] = \"verified\""
+        },
+        {
+          "line": 56,
+          "keyword": "verified",
+          "text": "task[\"verified_at\"] = ("
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 5
+        },
+        {
+          "name": "translate",
+          "line": 8
+        },
+        {
+          "name": "history",
+          "line": 39
+        }
+      ],
+      "matches": []
+    },
+    {
+      "file": "ai/factory/development_advisor.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 5
+        },
+        {
+          "name": "analyze",
+          "line": 8
+        },
+        {
+          "name": "history",
+          "line": 48
+        }
+      ],
+      "matches": [
+        {
+          "line": 20,
+          "keyword": "approval",
+          "text": "\"requires_approval\": True,"
+        },
+        {
+          "line": 36,
+          "keyword": "approval",
+          "text": "\"requires_approval\": True,"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_planner.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 5
+        },
+        {
+          "name": "plan",
+          "line": 8
+        },
+        {
+          "name": "prioritize",
+          "line": 64
+        },
+        {
+          "name": "history",
+          "line": 78
+        }
+      ],
+      "matches": [
+        {
+          "line": 4,
+          "keyword": "plan",
+          "text": "class FactoryImprovementPlanner:"
+        },
+        {
+          "line": 8,
+          "keyword": "plan",
+          "text": "def plan("
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_approval.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 6
+        },
+        {
+          "name": "request",
+          "line": 9
+        },
+        {
+          "name": "approve",
+          "line": 27
+        },
+        {
+          "name": "reject",
+          "line": 35
+        },
+        {
+          "name": "history",
+          "line": 43
+        }
+      ],
+      "matches": [
+        {
+          "line": 5,
+          "keyword": "approval",
+          "text": "class FactoryImprovementApproval:"
+        },
+        {
+          "line": 27,
+          "keyword": "approve",
+          "text": "def approve("
+        },
+        {
+          "line": 31,
+          "keyword": "approve",
+          "text": "request[\"status\"] = \"APPROVED\""
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_executor.py",
+      "methods": [
+        {
+          "name": "__init__",
+          "line": 6
+        },
+        {
+          "name": "validate",
+          "line": 9
+        },
+        {
+          "name": "execute",
+          "line": 20
+        },
+        {
+          "name": "record",
+          "line": 55
+        },
+        {
+          "name": "history",
+          "line": 74
+        }
+      ],
+      "matches": [
+        {
+          "line": 5,
+          "keyword": "executor",
+          "text": "class FactoryImprovementExecutor:"
+        },
+        {
+          "line": 17,
+          "keyword": "approve",
+          "text": "== \"APPROVED\""
+        },
+        {
+          "line": 20,
+          "keyword": "execute",
+          "text": "def execute("
+        },
+        {
+          "line": 30,
+          "keyword": "approve",
+          "text": "\"reason\": \"not_approved\","
+        },
+        {
+          "line": 38,
+          "keyword": "execute",
+          "text": "\"status\": \"EXECUTED\","
+        }
+      ]
+    }
+  ],
+  "historical_artifacts": [
+    "./.aider.chat.history.md",
+    "./.aider.input.history",
+    "./FACTORY_HANDOFF.md",
+    "./AUDIT_NEXUS_SUMMARY.md",
+    "./BATCH_12_STATUS_REPORT.md",
+    "./BATCH_13_STATUS_REPORT.md",
+    "./BATCH_15_STATUS_REPORT.md",
+    "./path_report.txt",
+    "./credential_full_report_20260714_041759.txt",
+    "./report.txt",
+    "./credential_bridge_master_report.md",
+    "./credential-bridge-phase8-hardening-audit.sh",
+    "./credential-bridge-phase12-resilience-audit.sh",
+    "./credential-bridge-phase13-intelligence-audit.sh",
+    "./credential-bridge-phase18-history-intelligence.sh",
+    "./credential-bridge-phase41-intelligence-history.sh",
+    "./credential-bridge-phase70-audit-trail.sh",
+    "./FACTORY_CAPABILITY_AUDIT.md",
+    "./credential_full_report.sh",
+    "./paste_here_credential_report.sh",
+    "./auto_copy_report.sh",
+    "./credential-bridge-augmentation-audit.sh",
+    "./credential_bridge_audit_report.txt",
+    "./credential_bridge_phase9_hardening_report.md",
+    "./credential-bridge-phase17-report-runner.sh",
+    "./history_debug.sh",
+    "./credential-bridge-phase91-improvement-report-generator.sh",
+    "./factory_reporting_capability_discovery.json",
+    "./factory_reporting_dependency_mapper.py",
+    "./factory_reporting_dependency_graph.json",
+    "./factory_constructor_contract_audit.json",
+    "./factory_pipeline_usage_audit.py",
+    "./factory_architecture_audit.py",
+    "./factory_capability_constructor_report.json",
+    "./factory_runtime_autonomy_reporting_patch.py",
+    "./factory_runtime_autonomy_reporting_connect.py",
+    "./credential-bridge-phase102-improvement-pattern-report-generator.sh",
+    "./history_need.sh",
+    "./factory_autonomy_preflight_report.json",
+    "./factory_reporting_authority_ranker.py",
+    "./factory_reporting_authority_plan.json",
+    "./factory_constructor_contract_audit.py",
+    "./factory_runtime_unified_report.json",
+    "./factory_autonomous_decision_reporter.py",
+    "./factory_handoff_report.json",
+    "./factory_lifecycle_truth_audit.py",
+    "./credential-bridge-phase92-improvement-audit-trail.sh",
+    "./patch_decider_history_import.py",
+    "./factory_reporting_integration_resolver.py",
+    "./factory_report_flow_discovery.py",
+    "./factory_reporting_entrypoints.json",
+    "./factory_runtime_report_signature_discovery.py",
+    "./factory_runtime_report_signatures.json",
+    "./factory_runtime_constructor_audit.py",
+    "./factory_handoff_inspector.py",
+    "./credential-bridge-phase62-report-generator.sh",
+    "./credential-bridge-phase103-improvement-pattern-audit-trail.sh",
+    "./factory_capability_report.json",
+    "./factory_existing_reporting_discovery.py",
+    "./factory_reporting_integration_plan.json",
+    "./factory_report_flow_discovery.json",
+    "./factory_reporting_entrypoint_discovery.py",
+    "./factory_runtime_report_adapter.py",
+    "./factory_constructor_dependency_usage_audit.py",
+    "./factory_runtime_constructor_audit.json",
+    "./factory_pipeline_usage_audit.json",
+    "./.git/refs/heads/provisioning-safety-audit-complete-20260715",
+    "./.git/refs/heads/provisioning-gateway-audit-layer-20260715",
+    "./.git/logs/refs/heads/provisioning-safety-audit-complete-20260715",
+    "./.git/logs/refs/heads/provisioning-gateway-audit-layer-20260715",
+    "./.git/logs/refs/heads/claude/audit-deployment-pipeline-01FoB8BBrBVBUrWuuiiBkjcv",
+    "./.git/logs/refs/remotes/origin/claude/audit-deployment-pipeline-01FoB8BBrBVBUrWuuiiBkjcv",
+    "./.git/logs/refs/remotes/origin/claude/batch-13-history-analytics-016yfk84EZ8UCyaSvb2zFzpa",
+    "./.git/logs/refs/remotes/origin/claude/audit-logging-system-018RdQwvmiKYYt1G9hZeNdgr",
+    "./.git/logs/refs/remotes/origin/copilot/audit-everything-in-repo",
+    "./.git/logs/refs/remotes/origin/copilot/continue-collaboration-on-handoff-system",
+    "./.git/logs/refs/remotes/origin/copilot/reimplement-audit-infrastructure",
+    "./.git/logs/refs/remotes/origin/copilot/debug-handoff-system",
+    "./.git/logs/refs/remotes/origin/copilot/audit-claude-code-cli",
+    "./.git/logs/refs/remotes/origin/copilot/audit-handoff-system",
+    "./.git/logs/refs/remotes/origin/copilot/find-audit-agent-sessions",
+    "./.git/logs/refs/remotes/origin/copilot/audit-chatgpt-functionality",
+    "./.git/logs/refs/remotes/origin/copilot/audit-agent-sessions",
+    "./.git/logs/refs/remotes/origin/copilot/summarize-audit-propagate-system",
+    "./.git/logs/refs/remotes/origin/copilot/improve-handoff-system",
+    "./termux-hands-off/.venv/lib/python3.12/site-packages/pip/_internal/models/installation_report.py",
+    "./termux-hands-off/.venv/lib/python3.12/site-packages/pip/_internal/resolution/resolvelib/reporter.py",
+    "./termux-hands-off/.venv/lib/python3.12/site-packages/pip/_vendor/resolvelib/reporters.py",
+    "./termux-hands-off/agent/verify_handoff.sh",
+    "./termux-hands-off/agent/venv/lib/python3.12/site-packages/pip/_internal/models/installation_report.py",
+    "./termux-hands-off/agent/venv/lib/python3.12/site-packages/pip/_internal/resolution/resolvelib/reporter.py",
+    "./termux-hands-off/agent/venv/lib/python3.12/site-packages/pip/_vendor/resolvelib/reporters.py",
+    "./termux-hands-off/test-restore/hands-off-out/state/finance_report.json",
+    "./termux-hands-off/test-restore/hands-off-out/state/decision_report.json",
+    "./termux-hands-off/test-restore/hands-off-out/state/decision_report.raw.json",
+    "./termux-hands-off/test-restore/hands-off-out/state/executor_report.json",
+    "./termux-hands-off/test-restore/hands-off-out/state/finance_report.txt",
+    "./termux-hands-off/test-restore/hands-off-out/state/finance_report.json.bak-20251116T022451Z",
+    "./termux-hands-off/test-restore/hands-off-out/state/pnl_history.json",
+    "./termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md",
+    "./tests/test_credential_intelligence_report.py",
+    "./tests/test_credential_history.py",
+    "./tests/test_credential_report_generator.py",
+    "./tests/test_credential_audit_trail.py",
+    "./tests/test_credential_improvement_report_generator.py",
+    "./tests/test_credential_improvement_pattern_report_generator.py",
+    "./tests/test_credential_improvement_pattern_audit_trail.py",
+    "./tests/test_provisioning_audit_index.py",
+    "./tests/test_provisioning_audit_export.py",
+    "./tests/test_provisioning_audit_lifecycle.py",
+    "./tests/test_provisioning_audit_summary.py",
+    "./tests/test_provisioning_audit_report.py",
+    "./tests/test_provisioning_audit_snapshot_compare.py",
+    "./tests/test_provisioning_audit_control_matrix.py",
+    "./tests/test_provisioning_audit_attestation.py",
+    "./tests/test_provisioning_audit_package_validator.py",
+    "./tests/test_factory_command_history.py",
+    "./tests/test_credential_improvement_audit_trail.py",
+    "./tests/test_provisioning_audit_snapshot.py",
+    "./tests/test_provisioning_audit_retention.py",
+    "./tests/test_provisioning_audit_query.py",
+    "./tests/test_provisioning_audit_policy.py",
+    "./tests/test_provisioning_audit_governance.py",
+    "./tests/test_provisioning_audit_package.py",
+    "./tests/test_provisioning_audit_package_hash.py",
+    "./tests/test_provisioning_audit_package_compare.py",
+    "./tests/test_provisioning_audit_archive_index.py",
+    "./tests/test_factory_audit_log.py",
+    "./tests/test_audit_trail.py",
+    "./tests/test_factory_audit_bridge.py",
+    "./tests/test_improvement_audit.py",
+    "./tests/test_runtime_audit.py",
+    "./tests/test_action_audit.py",
+    "./tests/test_compliance_audit.py",
+    "./tests/test_audit_intelligence.py",
+    "./tests/unit/test_history_log.py",
+    "./tests/unit/test_history_event.py",
+    "./tests/unit/test_history_logger.py",
+    "./tests/unit/test_history_to_kernels.py",
+    "./tests/unit/test_spark_plug_history_bridge.py",
+    "./tests/unit/__pycache__/test_spark_plug_history_bridge.cpython-313-pytest-9.1.1.pyc",
+    "./tests/unit/__pycache__/test_history_event.cpython-313-pytest-9.1.1.pyc",
+    "./tests/unit/__pycache__/test_history_log.cpython-313-pytest-9.1.1.pyc",
+    "./tests/unit/__pycache__/test_history_logger.cpython-313-pytest-9.1.1.pyc",
+    "./tests/unit/__pycache__/test_history_to_kernels.cpython-313-pytest-9.1.1.pyc",
+    "./tests/integration/test_brain_report.py",
+    "./tests/integration/test_history_report.py",
+    "./tests/integration/test_polymarket_report.py",
+    "./tests/integration/__pycache__/test_brain_report.cpython-313-pytest-9.1.1.pyc",
+    "./tests/integration/__pycache__/test_history_report.cpython-313-pytest-9.1.1.pyc",
+    "./tests/integration/__pycache__/test_polymarket_report.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_action_audit.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_audit_intelligence.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_audit_trail.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_compliance_audit.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_audit_trail.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_history.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_improvement_audit_trail.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_improvement_pattern_audit_trail.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_intelligence_report.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_factory_audit_bridge.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_attestation.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_package_hash.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_control_matrix.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_retention.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_factory_audit_log.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_export.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_index.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_package_compare.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_snapshot_compare.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_improvement_report_generator.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_improvement_pattern_report_generator.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_factory_command_history.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_improvement_audit.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_archive_index.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_governance.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_lifecycle.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_package.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_snapshot.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_credential_report_generator.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_package_validator.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_policy.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_report.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_query.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_provisioning_audit_summary.cpython-313-pytest-9.1.1.pyc",
+    "./tests/__pycache__/test_runtime_audit.cpython-313-pytest-9.1.1.pyc",
+    "./hands-off-engine/termux-hands-off/agent/verify_handoff.sh",
+    "./hands-off-engine/termux-hands-off/state/decision_report.json",
+    "./hands-off-engine/termux-hands-off/state/finance_report.json",
+    "./hands-off-engine/termux-hands-off/state/pnl_history.json",
+    "./ai/coordination/handoffs.json",
+    "./ai/coordination/audit_feed.json",
+    "./ai/audit/provisioning_provenance.py",
+    "./ai/audit/provisioning_audit_index.py",
+    "./ai/audit/provisioning_audit_export.py",
+    "./ai/audit/provisioning_audit_lifecycle.py",
+    "./ai/audit/provisioning_audit_chain.py",
+    "./ai/audit/provisioning_audit_summary.py",
+    "./ai/audit/provisioning_audit_report.py",
+    "./ai/audit/provisioning_audit_snapshot.py",
+    "./ai/audit/provisioning_audit_snapshot_compare.py",
+    "./ai/audit/provisioning_audit_retention.py",
+    "./ai/audit/provisioning_audit_query.py",
+    "./ai/audit/provisioning_audit_policy.py",
+    "./ai/audit/provisioning_audit_control_matrix.py",
+    "./ai/audit/provisioning_audit_governance.py",
+    "./ai/audit/provisioning_audit_attestation.py",
+    "./ai/audit/provisioning_audit_package.py",
+    "./ai/audit/provisioning_audit_package_validator.py",
+    "./ai/audit/provisioning_audit_package_hash.py",
+    "./ai/audit/provisioning_audit_package_compare.py",
+    "./ai/audit/provisioning_audit_archive_index.py",
+    "./ai/audit/__pycache__/provisioning_audit_package_validator.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_archive_index.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_attestation.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_control_matrix.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_export.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_governance.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_index.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_lifecycle.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_package.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_package_compare.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_package_hash.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_policy.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_query.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_report.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_retention.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_snapshot.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_snapshot_compare.cpython-313.pyc",
+    "./ai/audit/__pycache__/provisioning_audit_summary.cpython-313.pyc",
+    "./ai/factory/audit_bridge.py",
+    "./ai/factory/command_history.py",
+    "./ai/factory/audit_log.py",
+    "./ai/factory/improvement_audit.py",
+    "./ai/factory/runtime_audit.py",
+    "./ai/factory/action_audit.py",
+    "./ai/factory/compliance_audit.py",
+    "./ai/factory/audit_trail.py",
+    "./ai/factory/audit_intelligence.py",
+    "./ai/factory/report_generator.py",
+    "./ai/factory/__pycache__/action_audit.cpython-313.pyc",
+    "./ai/factory/__pycache__/audit_intelligence.cpython-313.pyc",
+    "./ai/factory/__pycache__/audit_trail.cpython-313.pyc",
+    "./ai/factory/__pycache__/audit_bridge.cpython-313.pyc",
+    "./ai/factory/__pycache__/compliance_audit.cpython-313.pyc",
+    "./ai/factory/__pycache__/audit_log.cpython-313.pyc",
+    "./ai/factory/__pycache__/command_history.cpython-313.pyc",
+    "./ai/factory/__pycache__/report_generator.cpython-313.pyc",
+    "./ai/factory/__pycache__/improvement_audit.cpython-313.pyc",
+    "./ai/factory/__pycache__/runtime_audit.cpython-313.pyc",
+    "./docs/AI_INTAKE_IMPLEMENTATION_REPORT.md",
+    "./docs/AUDIT_SYSTEM.md",
+    "./docs/BATCH_10_STATUS_REPORT.md",
+    "./docs/BATCH_11_STATUS_REPORT.md",
+    "./docs/BATCH_17_STATUS_REPORT.md",
+    "./docs/BATCH_18_STATUS_REPORT.md",
+    "./docs/BATCH_19_STATUS_REPORT.md",
+    "./docs/BATCH_20_STATUS_REPORT.md",
+    "./docs/BATCH_21_STATUS_REPORT.md",
+    "./docs/BATCH_22_STATUS_REPORT.md",
+    "./docs/BATCH_23_STATUS_REPORT.md",
+    "./docs/BATCH_25_STATUS_REPORT.md",
+    "./docs/BATCH_9_STATUS_REPORT.md",
+    "./docs/SPARK_PLUG_v0.5_PER_KERNEL_HISTORY_POLICY.md",
+    "./logs/action_report_20251201.txt",
+    "./ai_nexus/history_demo.py",
+    "./ai_nexus/history_logger.py",
+    "./ai_nexus/history_log.py",
+    "./ai_nexus/history_to_kernels.py",
+    "./ai_nexus/spark_plug_history.py",
+    "./ai_nexus/__pycache__/history_log.cpython-313.pyc",
+    "./ai_nexus/__pycache__/history_logger.cpython-313.pyc",
+    "./ai_nexus/__pycache__/spark_plug_history.cpython-313.pyc",
+    "./ai_nexus/__pycache__/history_to_kernels.cpython-313.pyc",
+    "./audit/audit_logger.py",
+    "./audit/audit_viewer.py",
+    "./audit/__pycache__/audit_logger.cpython-313.pyc",
+    "./.venv/lib/python3.12/site-packages/pip/_internal/models/installation_report.py",
+    "./.venv/lib/python3.12/site-packages/pip/_internal/resolution/resolvelib/reporter.py",
+    "./.venv/lib/python3.12/site-packages/pip/_vendor/resolvelib/reporters.py",
+    "./__pycache__/factory_constructor_dependency_usage_audit.cpython-313.pyc",
+    "./__pycache__/factory_pipeline_usage_audit.cpython-313.pyc",
+    "./__pycache__/factory_autonomous_decision_reporter.cpython-313.pyc",
+    "./arbitrage/audit.py",
+    "./autonomous/credentials/audit.py",
+    "./autonomous/credentials/__pycache__/audit.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/report_runner.py",
+    "./autonomous/credentials/intelligence/history.py",
+    "./autonomous/credentials/intelligence/report_generator.py",
+    "./autonomous/credentials/intelligence/audit_trail.py",
+    "./autonomous/credentials/intelligence/improvement_report_generator.py",
+    "./autonomous/credentials/intelligence/improvement_audit_trail.py",
+    "./autonomous/credentials/intelligence/improvement_pattern_report_generator.py",
+    "./autonomous/credentials/intelligence/improvement_pattern_audit_trail.py",
+    "./autonomous/credentials/intelligence/__pycache__/audit_trail.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/__pycache__/improvement_audit_trail.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/__pycache__/history.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/__pycache__/improvement_pattern_audit_trail.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/__pycache__/improvement_report_generator.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/__pycache__/report_runner.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/__pycache__/improvement_pattern_report_generator.cpython-313.pyc",
+    "./autonomous/credentials/intelligence/__pycache__/report_generator.cpython-313.pyc",
+    "./backups/state_backup_20251204_205248/state/execution_history.jsonl",
+    "./backups/state_backup_20251204_205248/state/goals_effects_history.jsonl",
+    "./backups/state_backup_20251204_205248/state/last_audit.json",
+    "./backups/state_backup_20251204_205248/state/trade_history.jsonl",
+    "./backups/state_backup_20251204_205248/state/trading_dashboard_history.jsonl",
+    "./backups/state_backup_20251204_205248/state/reality_history.jsonl",
+    "./bug_bounties/coinbase_20251204_205110/report.md",
+    "./bug_bounties/coinbase_20251204_205233/report.md",
+    "./bug_bounties/github_20251204_205108/report.md",
+    "./bug_bounties/github_20251204_205230/report.md",
+    "./bug_bounties/shopify_20251204_205105/report.md",
+    "./bug_bounties/shopify_20251204_205228/report.md",
+    "./deliverables/work_9e5c1a493e34/delivery_report.md",
+    "./hardware/hardware_audit.py",
+    "./hardware/__pycache__/hardware_audit.cpython-313.pyc",
+    "./integrafix/insights/SYSTEM_AUDIT.md",
+    "./outreach/sample_audit_report.md",
+    "./reports/ho_brain_report.py",
+    "./reports/ho_history_report.py",
+    "./reports/ho_polymarket_report.py",
+    "./reports/__pycache__/ho_polymarket_report.cpython-313.pyc",
+    "./reports/__pycache__/ho_brain_report.cpython-313.pyc",
+    "./reports/__pycache__/ho_history_report.cpython-313.pyc",
+    "./security/verification_audit.jsonl",
+    "./state/execution_history.jsonl",
+    "./state/goals_effects_history.jsonl",
+    "./state/reality_history.jsonl",
+    "./state/trade_history.jsonl",
+    "./state/trading_dashboard_history.jsonl",
+    "./state/intelligence/test_history.jsonl"
+  ]
+}

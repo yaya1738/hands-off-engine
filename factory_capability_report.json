@@ -1,0 +1,4614 @@
+{
+  "files": [
+    {
+      "file": "ai/factory/__init__.py",
+      "classes": [],
+      "functions": [],
+      "imports": [],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/build_task.py",
+      "classes": [
+        "BuildTask"
+      ],
+      "functions": [
+        "complete",
+        "fail"
+      ],
+      "imports": [
+        "from dataclasses import dataclass, field",
+        "from typing import List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/execution_record.py",
+      "classes": [
+        "ExecutionRecord"
+      ],
+      "functions": [
+        "succeed",
+        "fail"
+      ],
+      "imports": [
+        "from dataclasses import dataclass, field",
+        "from typing import List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/planner.py",
+      "classes": [
+        "FactoryPlanner"
+      ],
+      "functions": [
+        "plan"
+      ],
+      "imports": [
+        "from typing import Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/runner.py",
+      "classes": [
+        "FactoryRunner"
+      ],
+      "functions": [
+        "run"
+      ],
+      "imports": [
+        "from ai.factory.execution_record import ExecutionRecord"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/verifier.py",
+      "classes": [
+        "FactoryVerifier"
+      ],
+      "functions": [
+        "verify"
+      ],
+      "imports": [
+        "from typing import Dict, Any"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/memory.py",
+      "classes": [
+        "FactoryMemory"
+      ],
+      "functions": [
+        "__init__",
+        "remember",
+        "recall_all",
+        "find_by_status"
+      ],
+      "imports": [
+        "from typing import Any, List, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/controller.py",
+      "classes": [
+        "FactoryController"
+      ],
+      "functions": [
+        "__init__",
+        "build"
+      ],
+      "imports": [
+        "from ai.factory.planner import FactoryPlanner",
+        "from ai.factory.runner import FactoryRunner",
+        "from ai.factory.verifier import FactoryVerifier",
+        "from ai.factory.memory import FactoryMemory"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/telemetry.py",
+      "classes": [
+        "FactoryTelemetry"
+      ],
+      "functions": [
+        "__init__",
+        "record",
+        "stats"
+      ],
+      "imports": [
+        "from typing import Dict, Any"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/event_log.py",
+      "classes": [
+        "FactoryEventLog"
+      ],
+      "functions": [
+        "__init__",
+        "record",
+        "all"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/audit_bridge.py",
+      "classes": [
+        "FactoryAuditBridge"
+      ],
+      "functions": [
+        "create_audit_event"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "audit"
+      ]
+    },
+    {
+      "file": "ai/factory/state_store.py",
+      "classes": [
+        "FactoryStateStore"
+      ],
+      "functions": [
+        "__init__",
+        "save",
+        "load",
+        "clear",
+        "snapshot"
+      ],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/interface.py",
+      "classes": [
+        "FactoryInterface"
+      ],
+      "functions": [
+        "__init__",
+        "run_task",
+        "history",
+        "status"
+      ],
+      "imports": [
+        "from typing import Any"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/cli.py",
+      "classes": [
+        "FactoryCLI"
+      ],
+      "functions": [
+        "__init__",
+        "status",
+        "run",
+        "history"
+      ],
+      "imports": [
+        "from ai.factory.controller import FactoryController",
+        "from ai.factory.interface import FactoryInterface"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/registry.py",
+      "classes": [
+        "FactoryRegistry"
+      ],
+      "functions": [
+        "__init__",
+        "register",
+        "list_components",
+        "describe"
+      ],
+      "imports": [
+        "from typing import Dict, List"
+      ],
+      "capabilities": [
+        "registry"
+      ]
+    },
+    {
+      "file": "ai/factory/health.py",
+      "classes": [
+        "FactoryHealth"
+      ],
+      "functions": [
+        "check"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "registry",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/dashboard.py",
+      "classes": [
+        "FactoryDashboard"
+      ],
+      "functions": [
+        "snapshot"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "registry",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "classes": [
+        "FactoryRuntime"
+      ],
+      "functions": [
+        "__init__",
+        "component_inventory",
+        "emit_event",
+        "manage_strategy",
+        "manage_resources",
+        "run_improvement_cycle",
+        "submit_goal",
+        "submit_development_request",
+        "execute",
+        "change_impact_report",
+        "trend_report",
+        "factory_report",
+        "maintenance_status",
+        "operator_status",
+        "integrity_report",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List",
+        "from ai.factory.registry import FactoryRegistry",
+        "from ai.factory.runtime_governance import FactoryRuntimeGovernance",
+        "from ai.factory.runtime_observability import FactoryRuntimeObservability",
+        "from ai.factory.runtime_state import FactoryRuntimeState",
+        "from ai.factory.event_bus import FactoryEventBus",
+        "from ai.factory.event_replay import FactoryEventReplay",
+        "from ai.factory.diagnostic_intelligence import FactoryDiagnosticIntelligence",
+        "from ai.factory.recommendation_feedback import FactoryRecommendationFeedback",
+        "from ai.factory.meta_optimizer import FactoryMetaOptimizer",
+        "from ai.factory.strategy_manager import FactoryStrategyManager",
+        "from ai.factory.goal_management import FactoryGoalManagement",
+        "from ai.factory.goal_optimizer import FactoryGoalOptimizer",
+        "from ai.factory.goal_genesis import FactoryGoalGenesis",
+        "from ai.factory.resource_allocator import FactoryResourceAllocator",
+        "from ai.factory.self_healing_intelligence import FactorySelfHealingIntelligence",
+        "from ai.factory.planning_intelligence import FactoryPlanningIntelligence",
+        "from ai.factory.simulation_intelligence import FactorySimulationIntelligence",
+        "from ai.factory.decision_intelligence import FactoryDecisionIntelligence",
+        "from ai.factory.feedback_engine import FactoryFeedbackEngine",
+        "from ai.factory.learning_loop import FactoryLearningLoop",
+        "from ai.factory.adaptive_decision import FactoryAdaptiveDecision",
+        "from ai.factory.integrity_checker import FactoryIntegrityChecker",
+        "from ai.factory.operator_agent import FactoryOperatorAgent",
+        "from ai.factory.maintenance_agent import FactoryMaintenanceAgent",
+        "from ai.factory.report_generator import FactoryReportGenerator",
+        "from ai.factory.trend_analyzer import FactoryTrendAnalyzer",
+        "from ai.factory.change_impact_analyzer import FactoryChangeImpactAnalyzer",
+        "from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence",
+        "from ai.factory.execution_intelligence import FactoryExecutionIntelligence",
+        "from ai.factory.learning_intelligence import FactoryLearningIntelligence",
+        "from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence",
+        "from ai.factory.self_assessment import FactorySelfAssessment",
+        "from ai.factory.improvement_orchestrator import FactoryImprovementOrchestrator",
+        "from ai.factory.improvement_planner import FactoryImprovementPlanner",
+        "from ai.factory.improvement_queue import FactoryImprovementQueue",
+        "from ai.factory.improvement_approval import FactoryImprovementApproval",
+        "from ai.factory.improvement_executor import FactoryImprovementExecutor",
+        "from ai.factory.improvement_audit import FactoryImprovementAudit",
+        "from ai.factory.development_advisor import FactoryDevelopmentAdvisor",
+        "from ai.factory.development_pipeline import FactoryDevelopmentPipeline",
+        "from ai.factory.development_translator import FactoryDevelopmentTranslator",
+        "from ai.factory.development_tracker import FactoryDevelopmentTracker"
+      ],
+      "capabilities": [
+        "diagnostic",
+        "inspect",
+        "audit",
+        "registry",
+        "orchestr",
+        "executor",
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/persistence.py",
+      "classes": [
+        "FactoryPersistence"
+      ],
+      "functions": [
+        "__init__",
+        "save",
+        "load",
+        "exists",
+        "clear"
+      ],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/api.py",
+      "classes": [
+        "FactoryAPI"
+      ],
+      "functions": [
+        "__init__",
+        "status",
+        "dashboard",
+        "run_task",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/command_router.py",
+      "classes": [
+        "FactoryCommandRouter"
+      ],
+      "functions": [
+        "__init__",
+        "dispatch"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/command_history.py",
+      "classes": [
+        "FactoryCommandHistory"
+      ],
+      "functions": [
+        "__init__",
+        "record",
+        "all",
+        "find"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/decision_engine.py",
+      "classes": [
+        "FactoryDecisionEngine"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate",
+        "decide",
+        "reason",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/policy_gate.py",
+      "classes": [
+        "FactoryPolicyGate"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate"
+      ],
+      "imports": [
+        "from typing import Dict, Any"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/optimizer.py",
+      "classes": [
+        "FactoryOptimizer"
+      ],
+      "functions": [
+        "__init__",
+        "run_cycle"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_optimizer.py",
+      "classes": [
+        "FactoryRuntimeOptimizer"
+      ],
+      "functions": [
+        "__init__",
+        "optimize"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/task_queue.py",
+      "classes": [
+        "FactoryTaskQueue"
+      ],
+      "functions": [
+        "__init__",
+        "add_task",
+        "next_task",
+        "complete_task",
+        "list_tasks"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/workspace.py",
+      "classes": [
+        "FactoryWorkspace"
+      ],
+      "functions": [
+        "__init__",
+        "create_project",
+        "add_task",
+        "add_artifact",
+        "list_projects",
+        "get_project"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/artifact_registry.py",
+      "classes": [
+        "FactoryArtifactRegistry"
+      ],
+      "functions": [
+        "__init__",
+        "register_artifact",
+        "get_artifact",
+        "list_artifacts",
+        "find_by_task"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "registry"
+      ]
+    },
+    {
+      "file": "ai/factory/verification_registry.py",
+      "classes": [
+        "FactoryVerificationRegistry"
+      ],
+      "functions": [
+        "__init__",
+        "record_verification",
+        "get_verification",
+        "find_by_artifact",
+        "list_verifications"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "registry"
+      ]
+    },
+    {
+      "file": "ai/factory/metrics.py",
+      "classes": [
+        "FactoryMetrics"
+      ],
+      "functions": [
+        "calculate"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/optimization_context.py",
+      "classes": [
+        "OptimizationContext"
+      ],
+      "functions": [
+        "build"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/state_snapshot.py",
+      "classes": [
+        "FactoryStateSnapshot"
+      ],
+      "functions": [
+        "create"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/snapshot_store.py",
+      "classes": [
+        "FactorySnapshotStore"
+      ],
+      "functions": [
+        "__init__",
+        "save_snapshot",
+        "get_latest",
+        "list_snapshots"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/snapshot_diff.py",
+      "classes": [
+        "FactorySnapshotDiff"
+      ],
+      "functions": [
+        "compare",
+        "changed_fields",
+        "summarize"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/control_plane.py",
+      "classes": [
+        "FactoryControlPlane"
+      ],
+      "functions": [
+        "__init__",
+        "start",
+        "cycle",
+        "health",
+        "recover",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr",
+        "scheduler",
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/event_bus.py",
+      "classes": [
+        "FactoryEventBus"
+      ],
+      "functions": [
+        "__init__",
+        "subscribe",
+        "publish_event",
+        "emit_runtime_event",
+        "process_events",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/state_stream.py",
+      "classes": [
+        "FactoryStateStream"
+      ],
+      "functions": [
+        "__init__",
+        "publish_state",
+        "subscribe",
+        "latest"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/ide_model.py",
+      "classes": [
+        "FactoryIDEModel"
+      ],
+      "functions": [
+        "build"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/ide_controller.py",
+      "classes": [
+        "FactoryIDEController"
+      ],
+      "functions": [
+        "__init__",
+        "inspect",
+        "create_project",
+        "optimize",
+        "latest_state"
+      ],
+      "imports": [
+        "from typing import Any"
+      ],
+      "capabilities": [
+        "inspect"
+      ]
+    },
+    {
+      "file": "ai/factory/shell.py",
+      "classes": [
+        "FactoryShell"
+      ],
+      "functions": [
+        "__init__",
+        "available_commands",
+        "execute_command"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "inspect"
+      ]
+    },
+    {
+      "file": "ai/factory/service.py",
+      "classes": [
+        "FactoryService"
+      ],
+      "functions": [
+        "__init__",
+        "start",
+        "stop",
+        "restart",
+        "status",
+        "heartbeat",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/daemon.py",
+      "classes": [
+        "FactoryDaemon"
+      ],
+      "functions": [
+        "__init__",
+        "start",
+        "stop",
+        "status",
+        "tick"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/lifecycle.py",
+      "classes": [
+        "FactoryLifecycle"
+      ],
+      "functions": [
+        "__init__",
+        "startup",
+        "shutdown",
+        "recover",
+        "status"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/scheduler.py",
+      "classes": [
+        "FactoryScheduler"
+      ],
+      "functions": [
+        "__init__",
+        "schedule_task",
+        "cancel_task",
+        "run_due_tasks",
+        "check_schedule",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "scheduler"
+      ]
+    },
+    {
+      "file": "ai/factory/daemon_scheduler.py",
+      "classes": [
+        "FactoryDaemonScheduler"
+      ],
+      "functions": [
+        "__init__",
+        "run_cycle",
+        "tick",
+        "status"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "scheduler"
+      ]
+    },
+    {
+      "file": "ai/factory/job_executor.py",
+      "classes": [
+        "FactoryJobExecutor"
+      ],
+      "functions": [
+        "__init__",
+        "register_handler",
+        "execute",
+        "available_jobs"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/job_runner.py",
+      "classes": [
+        "FactoryJobRunner"
+      ],
+      "functions": [
+        "__init__",
+        "run_job",
+        "run_cycle",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/job_results.py",
+      "classes": [
+        "FactoryJobResults"
+      ],
+      "functions": [
+        "__init__",
+        "record",
+        "get",
+        "list",
+        "find_by_status"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/result_metrics.py",
+      "classes": [
+        "ResultMetrics"
+      ],
+      "functions": [
+        "calculate",
+        "success_rate",
+        "failure_rate"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/optimization_feedback.py",
+      "classes": [
+        "FactoryOptimizationFeedback"
+      ],
+      "functions": [
+        "__init__",
+        "analyze",
+        "recommend",
+        "apply_feedback",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/action_router.py",
+      "classes": [
+        "FactoryActionRouter"
+      ],
+      "functions": [
+        "__init__",
+        "route",
+        "execute",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/policy_guard.py",
+      "classes": [
+        "FactoryPolicyGuard"
+      ],
+      "functions": [
+        "__init__",
+        "add_rule",
+        "check",
+        "list_rules"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/audit_log.py",
+      "classes": [
+        "FactoryAuditLog"
+      ],
+      "functions": [
+        "__init__",
+        "record_event",
+        "list_events",
+        "filter_events"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit"
+      ]
+    },
+    {
+      "file": "ai/factory/observability.py",
+      "classes": [
+        "FactoryObservability"
+      ],
+      "functions": [
+        "__init__",
+        "health",
+        "snapshot",
+        "report"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "audit",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/snapshot_publisher.py",
+      "classes": [
+        "FactorySnapshotPublisher"
+      ],
+      "functions": [
+        "__init__",
+        "publish",
+        "publish_now",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/runtime_coordinator.py",
+      "classes": [
+        "FactoryRuntimeCoordinator"
+      ],
+      "functions": [
+        "__init__",
+        "initialize",
+        "run_cycle",
+        "status",
+        "shutdown"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": [
+        "scheduler",
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/bootstrap.py",
+      "classes": [
+        "FactoryBootstrap"
+      ],
+      "functions": [
+        "__init__",
+        "initialize",
+        "start",
+        "shutdown",
+        "status",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/config.py",
+      "classes": [
+        "FactoryConfig"
+      ],
+      "functions": [
+        "__init__",
+        "load",
+        "get",
+        "set_default",
+        "validate"
+      ],
+      "imports": [
+        "import json",
+        "from pathlib import Path",
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/config_validator.py",
+      "classes": [
+        "FactoryConfigValidator"
+      ],
+      "functions": [
+        "__init__",
+        "validate",
+        "apply_defaults",
+        "errors"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/event_integration.py",
+      "classes": [
+        "FactoryEventIntegration"
+      ],
+      "functions": [
+        "__init__",
+        "emit_job_event",
+        "emit_decision_event",
+        "emit_action_event"
+      ],
+      "imports": [
+        "from typing import Any"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/state_manager.py",
+      "classes": [
+        "FactoryStateManager"
+      ],
+      "functions": [
+        "__init__",
+        "save",
+        "load",
+        "checkpoint",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/state_persistence.py",
+      "classes": [
+        "FactoryStatePersistence"
+      ],
+      "functions": [
+        "__init__",
+        "save_state",
+        "load_state",
+        "restore"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/health_monitor.py",
+      "classes": [
+        "FactoryHealthMonitor"
+      ],
+      "functions": [
+        "__init__",
+        "collect",
+        "compare",
+        "detect_change",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/alert_manager.py",
+      "classes": [
+        "FactoryAlertManager"
+      ],
+      "functions": [
+        "__init__",
+        "classify",
+        "create_alert",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/recovery_manager.py",
+      "classes": [
+        "FactoryRecoveryManager"
+      ],
+      "functions": [
+        "__init__",
+        "register_recovery",
+        "recover",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/recovery_policy.py",
+      "classes": [
+        "FactoryRecoveryPolicy"
+      ],
+      "functions": [
+        "__init__",
+        "add_rule",
+        "evaluate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/recovery_learning.py",
+      "classes": [
+        "FactoryRecoveryLearning"
+      ],
+      "functions": [
+        "analyze",
+        "success_rate",
+        "recommend"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/maintenance_planner.py",
+      "classes": [
+        "FactoryMaintenancePlanner"
+      ],
+      "functions": [
+        "__init__",
+        "analyze_health",
+        "plan",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/maintenance_executor.py",
+      "classes": [
+        "FactoryMaintenanceExecutor"
+      ],
+      "functions": [
+        "__init__",
+        "register_action",
+        "execute",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_loop.py",
+      "classes": [
+        "FactoryOptimizationLoop"
+      ],
+      "functions": [
+        "__init__",
+        "analyze",
+        "optimize",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/optimization_executor.py",
+      "classes": [
+        "FactoryOptimizationExecutor"
+      ],
+      "functions": [
+        "__init__",
+        "register_action",
+        "execute",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/experiment_framework.py",
+      "classes": [
+        "FactoryExperimentFramework"
+      ],
+      "functions": [
+        "__init__",
+        "create_experiment",
+        "run",
+        "evaluate",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/experiment_policy.py",
+      "classes": [
+        "FactoryExperimentPolicy"
+      ],
+      "functions": [
+        "__init__",
+        "add_rule",
+        "evaluate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/experiment_learning.py",
+      "classes": [
+        "FactoryExperimentLearning"
+      ],
+      "functions": [
+        "__init__",
+        "analyze",
+        "success_rate",
+        "recommend",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_memory.py",
+      "classes": [
+        "FactoryKnowledgeMemory"
+      ],
+      "functions": [
+        "__init__",
+        "store",
+        "query",
+        "learn",
+        "snapshot"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_retrieval.py",
+      "classes": [
+        "FactoryKnowledgeRetrieval"
+      ],
+      "functions": [
+        "__init__",
+        "search",
+        "match_context",
+        "recommend",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/decision_context.py",
+      "classes": [
+        "FactoryDecisionContext"
+      ],
+      "functions": [
+        "__init__",
+        "add_signal",
+        "build",
+        "snapshot"
+      ],
+      "imports": [
+        "from typing import Any, Dict"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/decision_policy.py",
+      "classes": [
+        "FactoryDecisionPolicy"
+      ],
+      "functions": [
+        "__init__",
+        "add_rule",
+        "evaluate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/result_collector.py",
+      "classes": [
+        "FactoryResultCollector"
+      ],
+      "functions": [
+        "__init__",
+        "collect",
+        "summarize",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/startup_recovery.py",
+      "classes": [
+        "FactoryStartupRecovery"
+      ],
+      "functions": [
+        "__init__",
+        "restore",
+        "validate",
+        "startup",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/health_snapshot.py",
+      "classes": [
+        "FactoryHealthSnapshot"
+      ],
+      "functions": [
+        "__init__",
+        "collect",
+        "status",
+        "snapshot",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/alert_escalation.py",
+      "classes": [
+        "FactoryAlertEscalation"
+      ],
+      "functions": [
+        "__init__",
+        "register_handler",
+        "escalate",
+        "resolve",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/incident_manager.py",
+      "classes": [
+        "FactoryIncidentManager"
+      ],
+      "functions": [
+        "__init__",
+        "create",
+        "update",
+        "close",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/post_incident_learning.py",
+      "classes": [
+        "FactoryPostIncidentLearning"
+      ],
+      "functions": [
+        "__init__",
+        "extract",
+        "store",
+        "learn",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_consolidator.py",
+      "classes": [
+        "FactoryKnowledgeConsolidator"
+      ],
+      "functions": [
+        "__init__",
+        "add_lesson",
+        "find_patterns",
+        "consolidate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/recommendation_engine.py",
+      "classes": [
+        "FactoryRecommendationEngine"
+      ],
+      "functions": [
+        "__init__",
+        "recommend",
+        "rank",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/decision_feedback.py",
+      "classes": [
+        "FactoryDecisionFeedback"
+      ],
+      "functions": [
+        "__init__",
+        "record_decision",
+        "record_outcome",
+        "evaluate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/improvement_scheduler.py",
+      "classes": [
+        "FactoryImprovementScheduler"
+      ],
+      "functions": [
+        "__init__",
+        "schedule",
+        "run_cycle",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": [
+        "scheduler"
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_policy.py",
+      "classes": [
+        "FactoryImprovementPolicy"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate",
+        "allow",
+        "block",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/improvement_approval.py",
+      "classes": [
+        "FactoryImprovementApproval"
+      ],
+      "functions": [
+        "__init__",
+        "request",
+        "approve",
+        "reject",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/improvement_executor.py",
+      "classes": [
+        "FactoryImprovementExecutor"
+      ],
+      "functions": [
+        "__init__",
+        "validate",
+        "execute",
+        "record",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_audit.py",
+      "classes": [
+        "FactoryImprovementAudit"
+      ],
+      "functions": [
+        "__init__",
+        "record",
+        "query",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit"
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_metrics.py",
+      "classes": [
+        "FactoryImprovementMetrics"
+      ],
+      "functions": [
+        "__init__",
+        "record_metric",
+        "calculate",
+        "summary",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/improvement_optimizer.py",
+      "classes": [
+        "FactoryImprovementOptimizer"
+      ],
+      "functions": [
+        "__init__",
+        "score",
+        "rank",
+        "select",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/self_assessment.py",
+      "classes": [
+        "FactorySelfAssessment"
+      ],
+      "functions": [
+        "__init__",
+        "assess",
+        "detect_gaps",
+        "recommend",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_planner.py",
+      "classes": [
+        "FactoryImprovementPlanner"
+      ],
+      "functions": [
+        "__init__",
+        "plan",
+        "prioritize",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_portfolio.py",
+      "classes": [
+        "FactoryImprovementPortfolio"
+      ],
+      "functions": [
+        "__init__",
+        "add",
+        "update",
+        "prioritize",
+        "active",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/improvement_queue.py",
+      "classes": [
+        "FactoryImprovementQueue"
+      ],
+      "functions": [
+        "__init__",
+        "enqueue",
+        "dequeue",
+        "complete",
+        "pending",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/improvement_orchestrator.py",
+      "classes": [
+        "FactoryImprovementOrchestrator"
+      ],
+      "functions": [
+        "__init__",
+        "run_cycle",
+        "process",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr"
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_runtime.py",
+      "classes": [
+        "FactoryImprovementRuntime"
+      ],
+      "functions": [
+        "__init__",
+        "run_once",
+        "start",
+        "stop",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr",
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_state.py",
+      "classes": [
+        "FactoryRuntimeState"
+      ],
+      "functions": [
+        "__init__",
+        "save_state",
+        "load_state",
+        "snapshot",
+        "restore",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List",
+        "import copy"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_scheduler.py",
+      "classes": [
+        "FactoryRuntimeScheduler"
+      ],
+      "functions": [
+        "__init__",
+        "schedule",
+        "run_pending",
+        "pause",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "scheduler",
+        "executor",
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_supervisor.py",
+      "classes": [
+        "FactoryRuntimeSupervisor"
+      ],
+      "functions": [
+        "__init__",
+        "monitor",
+        "detect",
+        "recover",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_health.py",
+      "classes": [
+        "FactoryRuntimeHealth"
+      ],
+      "functions": [
+        "__init__",
+        "collect",
+        "evaluate",
+        "status",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_alerts.py",
+      "classes": [
+        "FactoryRuntimeAlerts"
+      ],
+      "functions": [
+        "__init__",
+        "check",
+        "alert",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_recovery.py",
+      "classes": [
+        "FactoryRuntimeRecovery"
+      ],
+      "functions": [
+        "__init__",
+        "restart",
+        "restore",
+        "recover",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/resilience_controller.py",
+      "classes": [
+        "FactoryResilienceController"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate",
+        "respond",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_loop.py",
+      "classes": [
+        "FactoryAutonomousLoop"
+      ],
+      "functions": [
+        "__init__",
+        "observe",
+        "decide",
+        "act",
+        "run_cycle",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/learning_memory.py",
+      "classes": [
+        "FactoryLearningMemory"
+      ],
+      "functions": [
+        "__init__",
+        "remember",
+        "record_outcome",
+        "retrieve",
+        "patterns",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/feedback_engine.py",
+      "classes": [
+        "FactoryFeedbackEngine"
+      ],
+      "functions": [
+        "__init__",
+        "analyze",
+        "score",
+        "recommend",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/adaptive_decision.py",
+      "classes": [
+        "FactoryAdaptiveDecision"
+      ],
+      "functions": [
+        "__init__",
+        "learn",
+        "decide",
+        "adjust",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/self_optimizer.py",
+      "classes": [
+        "FactorySelfOptimizer"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate",
+        "tune",
+        "optimize",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/evolution_coordinator.py",
+      "classes": [
+        "FactoryEvolutionCoordinator"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate",
+        "upgrade",
+        "evolve",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/master_orchestrator.py",
+      "classes": [
+        "FactoryMasterOrchestrator"
+      ],
+      "functions": [
+        "__init__",
+        "start",
+        "run",
+        "evolve",
+        "status",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr"
+      ]
+    },
+    {
+      "file": "ai/factory/production_guard.py",
+      "classes": [
+        "FactoryProductionGuard"
+      ],
+      "functions": [
+        "__init__",
+        "validate",
+        "safe_mode",
+        "health_report",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/deployment_manager.py",
+      "classes": [
+        "FactoryDeploymentManager"
+      ],
+      "functions": [
+        "__init__",
+        "prepare",
+        "deploy",
+        "rollback",
+        "status",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/runtime_audit.py",
+      "classes": [
+        "FactoryRuntimeAudit"
+      ],
+      "functions": [
+        "__init__",
+        "record",
+        "query",
+        "export",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit",
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_dashboard.py",
+      "classes": [
+        "FactoryRuntimeDashboard"
+      ],
+      "functions": [
+        "__init__",
+        "health",
+        "history",
+        "snapshot",
+        "summary",
+        "records"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit",
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/external_interface.py",
+      "classes": [
+        "FactoryExternalInterface"
+      ],
+      "functions": [
+        "__init__",
+        "status",
+        "execute",
+        "request",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr"
+      ]
+    },
+    {
+      "file": "ai/factory/config_manager.py",
+      "classes": [
+        "FactoryConfigManager"
+      ],
+      "functions": [
+        "__init__",
+        "load",
+        "validate",
+        "update",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/recovery_orchestrator.py",
+      "classes": [
+        "FactoryRecoveryOrchestrator"
+      ],
+      "functions": [
+        "__init__",
+        "detect",
+        "restore",
+        "verify",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/service_health.py",
+      "classes": [
+        "FactoryServiceHealth"
+      ],
+      "functions": [
+        "__init__",
+        "heartbeat",
+        "check",
+        "ready",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/service_recovery.py",
+      "classes": [
+        "FactoryServiceRecovery"
+      ],
+      "functions": [
+        "__init__",
+        "detect",
+        "recover",
+        "verify",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_metrics.py",
+      "classes": [
+        "FactoryRuntimeMetrics"
+      ],
+      "functions": [
+        "__init__",
+        "increment",
+        "record",
+        "snapshot",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_integration.py",
+      "classes": [
+        "FactoryMetricsIntegration"
+      ],
+      "functions": [
+        "__init__",
+        "on_cycle",
+        "on_success",
+        "on_failure",
+        "snapshot",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/self_improvement.py",
+      "classes": [
+        "FactorySelfImprovement"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate",
+        "plan",
+        "execute",
+        "verify",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/evolution_controller.py",
+      "classes": [
+        "FactoryEvolutionController"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate_change",
+        "approve",
+        "apply",
+        "rollback",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/decision_integration.py",
+      "classes": [
+        "FactoryDecisionIntegration"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate",
+        "select",
+        "route",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/risk_manager.py",
+      "classes": [
+        "FactoryRiskManager"
+      ],
+      "functions": [
+        "__init__",
+        "assess",
+        "check_constraints",
+        "approve",
+        "mitigate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/goal_optimizer.py",
+      "classes": [
+        "FactoryGoalOptimizer"
+      ],
+      "functions": [
+        "__init__",
+        "score_goals",
+        "optimize",
+        "adjust",
+        "select_best",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/adaptive_strategy.py",
+      "classes": [
+        "FactoryAdaptiveStrategy"
+      ],
+      "functions": [
+        "__init__",
+        "create_strategy",
+        "evaluate_strategy",
+        "adapt",
+        "select_strategy",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/action_orchestrator.py",
+      "classes": [
+        "FactoryActionOrchestrator"
+      ],
+      "functions": [
+        "__init__",
+        "register_action",
+        "sequence",
+        "coordinate",
+        "monitor",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr"
+      ]
+    },
+    {
+      "file": "ai/factory/execution_recovery.py",
+      "classes": [
+        "FactoryExecutionRecovery"
+      ],
+      "functions": [
+        "__init__",
+        "detect_failure",
+        "retry",
+        "recover",
+        "escalate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/execution_learning.py",
+      "classes": [
+        "FactoryExecutionLearning"
+      ],
+      "functions": [
+        "__init__",
+        "capture_outcome",
+        "classify_result",
+        "update_memory",
+        "generate_learning_signal",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_consolidation.py",
+      "classes": [
+        "FactoryKnowledgeConsolidation"
+      ],
+      "functions": [
+        "__init__",
+        "capture_pattern",
+        "consolidate",
+        "retrieve_knowledge",
+        "rank_knowledge",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/decision_intelligence.py",
+      "classes": [
+        "FactoryDecisionIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_decision",
+        "evaluate_options",
+        "score_decision",
+        "select_action",
+        "record_outcome",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/goal_management.py",
+      "classes": [
+        "FactoryGoalManagement"
+      ],
+      "functions": [
+        "__init__",
+        "create_goal",
+        "prioritize_goals",
+        "track_progress",
+        "complete_goal",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/resource_allocation.py",
+      "classes": [
+        "FactoryResourceAllocation"
+      ],
+      "functions": [
+        "__init__",
+        "register_resource",
+        "allocate_resource",
+        "release_resource",
+        "optimize_allocation",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/risk_management.py",
+      "classes": [
+        "FactoryRiskManagement"
+      ],
+      "functions": [
+        "__init__",
+        "assess_risk",
+        "calculate_exposure",
+        "approve_action",
+        "reject_action",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/policy_enforcement.py",
+      "classes": [
+        "FactoryPolicyEnforcement"
+      ],
+      "functions": [
+        "__init__",
+        "register_policy",
+        "evaluate_policy",
+        "enforce_policy",
+        "exceptions",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/simulation_engine.py",
+      "classes": [
+        "FactorySimulationEngine"
+      ],
+      "functions": [
+        "__init__",
+        "create_scenario",
+        "simulate_action",
+        "evaluate_result",
+        "compare_outcomes",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/experimentation_engine.py",
+      "classes": [
+        "FactoryExperimentationEngine"
+      ],
+      "functions": [
+        "__init__",
+        "create_experiment",
+        "run_trial",
+        "compare_results",
+        "select_winner",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/strategy_evolution.py",
+      "classes": [
+        "FactoryStrategyEvolution"
+      ],
+      "functions": [
+        "__init__",
+        "register_strategy",
+        "evaluate_strategy",
+        "replace_strategy",
+        "activate_strategy",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_graph.py",
+      "classes": [
+        "FactoryKnowledgeGraph"
+      ],
+      "functions": [
+        "__init__",
+        "add_node",
+        "add_relationship",
+        "find_connections",
+        "query_graph",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "graph"
+      ]
+    },
+    {
+      "file": "ai/factory/forecasting_engine.py",
+      "classes": [
+        "FactoryForecastingEngine"
+      ],
+      "functions": [
+        "__init__",
+        "create_forecast",
+        "analyze_trends",
+        "predict_future",
+        "evaluate_accuracy",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/planning_intelligence.py",
+      "classes": [
+        "FactoryPlanningIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_plan",
+        "analyze_constraints",
+        "allocate_resources",
+        "evaluate_plan",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/execution_orchestration.py",
+      "classes": [
+        "FactoryExecutionOrchestration"
+      ],
+      "functions": [
+        "__init__",
+        "start_execution",
+        "coordinate_tasks",
+        "monitor_execution",
+        "recover_failure",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr"
+      ]
+    },
+    {
+      "file": "ai/factory/self_healing.py",
+      "classes": [
+        "FactorySelfHealing"
+      ],
+      "functions": [
+        "__init__",
+        "detect_failure",
+        "diagnose_issue",
+        "repair_component",
+        "verify_recovery",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/supervisor.py",
+      "classes": [
+        "FactorySupervisor"
+      ],
+      "functions": [
+        "__init__",
+        "register_component",
+        "check_status",
+        "coordinate_cycle",
+        "trigger_recovery",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_loop.py",
+      "classes": [
+        "FactoryRuntimeLoop"
+      ],
+      "functions": [
+        "__init__",
+        "start_cycle",
+        "run_cycle",
+        "pause_cycle",
+        "resume_cycle",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/state_management.py",
+      "classes": [
+        "FactoryStateManagement"
+      ],
+      "functions": [
+        "__init__",
+        "set_state",
+        "get_state",
+        "update_state",
+        "snapshot_state",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/event_processing.py",
+      "classes": [
+        "FactoryEventProcessing"
+      ],
+      "functions": [
+        "__init__",
+        "publish_event",
+        "subscribe",
+        "process_events",
+        "clear_events",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/resource_management.py",
+      "classes": [
+        "FactoryResourceManagement"
+      ],
+      "functions": [
+        "__init__",
+        "register_resource",
+        "allocate_resource",
+        "release_resource",
+        "check_capacity",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/alerting_notification.py",
+      "classes": [
+        "FactoryAlertingNotification"
+      ],
+      "functions": [
+        "__init__",
+        "create_alert",
+        "evaluate_condition",
+        "send_notification",
+        "resolve_alert",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/workflow_engine.py",
+      "classes": [
+        "FactoryWorkflowEngine"
+      ],
+      "functions": [
+        "__init__",
+        "create_workflow",
+        "add_step",
+        "execute_workflow",
+        "validate_workflow",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/version_management.py",
+      "classes": [
+        "FactoryVersionManagement"
+      ],
+      "functions": [
+        "__init__",
+        "create_version",
+        "compare_versions",
+        "rollback_version",
+        "promote_version",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/learning_loop.py",
+      "classes": [
+        "FactoryLearningLoop"
+      ],
+      "functions": [
+        "__init__",
+        "record_outcome",
+        "analyze_feedback",
+        "update_model",
+        "generate_improvement",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/master_integration.py",
+      "classes": [
+        "FactoryMasterIntegration"
+      ],
+      "functions": [
+        "__init__",
+        "register_component",
+        "initialize_system",
+        "run_cycle",
+        "get_system_status",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/health_monitoring.py",
+      "classes": [
+        "FactoryHealthMonitoring"
+      ],
+      "functions": [
+        "__init__",
+        "check_component_health",
+        "run_diagnostics",
+        "calculate_health_score",
+        "generate_report",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "diagnostic",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/configuration_intelligence.py",
+      "classes": [
+        "FactoryConfigurationIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "load_config",
+        "validate_config",
+        "update_config",
+        "rollback_config",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/alert_intelligence.py",
+      "classes": [
+        "FactoryAlertIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_alert",
+        "evaluate_alert",
+        "escalate_alert",
+        "resolve_alert",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/workflow_intelligence.py",
+      "classes": [
+        "FactoryWorkflowIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_workflow",
+        "add_step",
+        "execute_workflow",
+        "track_progress",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/scheduling_intelligence.py",
+      "classes": [
+        "FactorySchedulingIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_schedule",
+        "queue_task",
+        "execute_due_tasks",
+        "prioritize_tasks",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/dependency_intelligence.py",
+      "classes": [
+        "FactoryDependencyIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "register_dependency",
+        "resolve_dependencies",
+        "check_dependency_health",
+        "update_dependency",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "dependency",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/learning_intelligence.py",
+      "classes": [
+        "FactoryLearningIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "record_experience",
+        "analyze_outcome",
+        "extract_lesson",
+        "update_model",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/causal_analysis_intelligence.py",
+      "classes": [
+        "FactoryCausalAnalysisIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "record_cause",
+        "analyze_relationship",
+        "infer_impact",
+        "validate_causality",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/experimentation_intelligence.py",
+      "classes": [
+        "FactoryExperimentationIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_experiment",
+        "run_experiment",
+        "evaluate_experiment",
+        "promote_result",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_graph_intelligence.py",
+      "classes": [
+        "FactoryKnowledgeGraphIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "add_node",
+        "add_relationship",
+        "traverse_graph",
+        "find_connections",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "graph"
+      ]
+    },
+    {
+      "file": "ai/factory/simulation_intelligence.py",
+      "classes": [
+        "FactorySimulationIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_scenario",
+        "run_simulation",
+        "compare_outcomes",
+        "select_scenario",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/self_healing_intelligence.py",
+      "classes": [
+        "FactorySelfHealingIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "detect_failure",
+        "diagnose_issue",
+        "apply_recovery",
+        "verify_recovery",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/runtime_observability.py",
+      "classes": [
+        "FactoryRuntimeObservability"
+      ],
+      "functions": [
+        "__init__",
+        "record_metric",
+        "capture_health",
+        "detect_anomaly",
+        "generate_alert",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/diagnostic_intelligence.py",
+      "classes": [
+        "FactoryDiagnosticIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "analyze_execution",
+        "detect_failure_patterns",
+        "explain_run",
+        "generate_recommendations",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "diagnostic"
+      ]
+    },
+    {
+      "file": "ai/factory/recommendation_feedback.py",
+      "classes": [
+        "FactoryRecommendationFeedback"
+      ],
+      "functions": [
+        "__init__",
+        "collect_recommendations",
+        "evaluate_recommendations",
+        "apply_improvement",
+        "track_effect",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/meta_optimizer.py",
+      "classes": [
+        "FactoryMetaOptimizer"
+      ],
+      "functions": [
+        "__init__",
+        "score_improvement",
+        "compare_strategies",
+        "select_best_action",
+        "measure_roi",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/strategy_manager.py",
+      "classes": [
+        "FactoryStrategyManager"
+      ],
+      "functions": [
+        "__init__",
+        "strategy_registry",
+        "evaluate_strategy",
+        "activate_strategy",
+        "retire_strategy",
+        "strategy_performance",
+        "select_strategy",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "registry"
+      ]
+    },
+    {
+      "file": "ai/factory/goal_manager.py",
+      "classes": [
+        "FactoryGoalManager"
+      ],
+      "functions": [
+        "__init__",
+        "register_goal",
+        "prioritize_goals",
+        "evaluate_progress",
+        "complete_goal",
+        "revise_goal",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "classes": [
+        "FactoryDevelopmentTranslator"
+      ],
+      "functions": [
+        "__init__",
+        "translate",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "classes": [
+        "FactoryDevelopmentTracker"
+      ],
+      "functions": [
+        "__init__",
+        "create_task",
+        "update_status",
+        "complete_task",
+        "verify_task",
+        "history"
+      ],
+      "imports": [
+        "from datetime import datetime, timezone",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/operator_agent.py",
+      "classes": [
+        "FactoryOperatorAgent"
+      ],
+      "functions": [
+        "__init__",
+        "assess",
+        "choose_next_action",
+        "report"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "inspect",
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/trend_analyzer.py",
+      "classes": [
+        "FactoryTrendAnalyzer"
+      ],
+      "functions": [
+        "__init__",
+        "analyze",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/development_executor.py",
+      "classes": [
+        "FactoryDevelopmentExecutor"
+      ],
+      "functions": [
+        "__init__",
+        "execute",
+        "record_validation",
+        "report",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/learning_feedback.py",
+      "classes": [
+        "FactoryLearningFeedback"
+      ],
+      "functions": [
+        "__init__",
+        "record_decision",
+        "record_result",
+        "evaluate",
+        "learn",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_base.py",
+      "classes": [
+        "FactoryKnowledgeBase"
+      ],
+      "functions": [
+        "__init__",
+        "extract",
+        "summarize",
+        "query",
+        "confidence",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/intelligence_coordinator.py",
+      "classes": [
+        "FactoryIntelligenceCoordinator"
+      ],
+      "functions": [
+        "__init__",
+        "observe",
+        "analyze",
+        "decide",
+        "improve",
+        "evolve",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/mission_controller.py",
+      "classes": [
+        "FactoryMissionController"
+      ],
+      "functions": [
+        "__init__",
+        "set_goal",
+        "evaluate_progress",
+        "prioritize",
+        "advance",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/resource_allocator.py",
+      "classes": [
+        "FactoryResourceAllocator"
+      ],
+      "functions": [
+        "__init__",
+        "resource_registry",
+        "estimate_cost",
+        "allocate_resources",
+        "rebalance",
+        "measure_efficiency",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "registry"
+      ]
+    },
+    {
+      "file": "ai/factory/execution_governance.py",
+      "classes": [
+        "FactoryExecutionGovernance"
+      ],
+      "functions": [
+        "__init__",
+        "submit",
+        "validate",
+        "authorize",
+        "execute",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/action_audit.py",
+      "classes": [
+        "FactoryActionAudit"
+      ],
+      "functions": [
+        "__init__",
+        "record_action",
+        "record_decision",
+        "record_outcome",
+        "query",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit"
+      ]
+    },
+    {
+      "file": "ai/factory/performance_evaluation.py",
+      "classes": [
+        "FactoryPerformanceEvaluation"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate_action",
+        "measure_impact",
+        "compare_results",
+        "score_performance",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/optimization_connector.py",
+      "classes": [
+        "FactoryOptimizationConnector"
+      ],
+      "functions": [
+        "__init__",
+        "ingest_performance",
+        "update_metrics",
+        "generate_signal",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/strategy_execution_planner.py",
+      "classes": [
+        "FactoryStrategyExecutionPlanner"
+      ],
+      "functions": [
+        "__init__",
+        "create_plan",
+        "decompose",
+        "prioritize_tasks",
+        "validate_plan",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/execution_state_tracker.py",
+      "classes": [
+        "FactoryExecutionStateTracker"
+      ],
+      "functions": [
+        "__init__",
+        "create_execution",
+        "update_status",
+        "get_state",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/autonomous_supervisor.py",
+      "classes": [
+        "FactoryAutonomousSupervisor"
+      ],
+      "functions": [
+        "__init__",
+        "check_health",
+        "inspect_pipeline",
+        "detect_issues",
+        "coordinate_recovery",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "inspect",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_scheduler.py",
+      "classes": [
+        "FactoryAutonomousScheduler"
+      ],
+      "functions": [
+        "__init__",
+        "schedule_task",
+        "run_cycle",
+        "prioritize_schedule",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "scheduler"
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_event_bus.py",
+      "classes": [
+        "FactoryAutonomousEventBus"
+      ],
+      "functions": [
+        "__init__",
+        "publish",
+        "subscribe",
+        "dispatch",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Callable, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/autonomous_state_memory.py",
+      "classes": [
+        "FactoryAutonomousStateMemory"
+      ],
+      "functions": [
+        "__init__",
+        "store_state",
+        "retrieve_state",
+        "update_state",
+        "query_history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/compliance_audit.py",
+      "classes": [
+        "FactoryComplianceAudit"
+      ],
+      "functions": [
+        "__init__",
+        "record_action",
+        "verify_compliance",
+        "generate_report",
+        "flag_violation",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit"
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_telemetry.py",
+      "classes": [
+        "FactoryMetricsTelemetry"
+      ],
+      "functions": [
+        "__init__",
+        "record_metric",
+        "track_event",
+        "calculate_health",
+        "dashboard",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_engine.py",
+      "classes": [
+        "FactoryOptimizationEngine"
+      ],
+      "functions": [
+        "__init__",
+        "evaluate_options",
+        "rank_improvements",
+        "apply_optimization",
+        "measure_gain",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/causal_analysis.py",
+      "classes": [
+        "FactoryCausalAnalysis"
+      ],
+      "functions": [
+        "__init__",
+        "record_cause",
+        "record_effect",
+        "analyze_relationship",
+        "predict_outcome",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/access_control.py",
+      "classes": [
+        "FactoryAccessControl"
+      ],
+      "functions": [
+        "__init__",
+        "create_identity",
+        "grant_permission",
+        "check_permission",
+        "revoke_permission",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/configuration_management.py",
+      "classes": [
+        "FactoryConfigurationManagement"
+      ],
+      "functions": [
+        "__init__",
+        "set_config",
+        "get_config",
+        "update_config",
+        "validate_config",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/audit_trail.py",
+      "classes": [
+        "FactoryAuditTrail"
+      ],
+      "functions": [
+        "__init__",
+        "record_action",
+        "record_decision",
+        "query_records",
+        "verify_integrity",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit"
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_observability.py",
+      "classes": [
+        "FactoryMetricsObservability"
+      ],
+      "functions": [
+        "__init__",
+        "record_metric",
+        "calculate_score",
+        "get_dashboard",
+        "detect_anomaly",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/dependency_management.py",
+      "classes": [
+        "FactoryDependencyManagement"
+      ],
+      "functions": [
+        "__init__",
+        "register_dependency",
+        "remove_dependency",
+        "resolve_dependencies",
+        "check_health",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "dependency",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/recovery_management.py",
+      "classes": [
+        "FactoryRecoveryManagement"
+      ],
+      "functions": [
+        "__init__",
+        "detect_failure",
+        "attempt_recovery",
+        "validate_recovery",
+        "record_incident",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/policy_governance.py",
+      "classes": [
+        "FactoryPolicyGovernance"
+      ],
+      "functions": [
+        "__init__",
+        "create_policy",
+        "evaluate_policy",
+        "enforce_policy",
+        "update_policy",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/audit_intelligence.py",
+      "classes": [
+        "FactoryAuditIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "record_event",
+        "query_events",
+        "verify_integrity",
+        "generate_audit_report",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit"
+      ]
+    },
+    {
+      "file": "ai/factory/event_intelligence.py",
+      "classes": [
+        "FactoryEventIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "publish_event",
+        "subscribe",
+        "process_events",
+        "route_event",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/metrics_intelligence.py",
+      "classes": [
+        "FactoryMetricsIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "record_metric",
+        "aggregate_metrics",
+        "analyze_trends",
+        "detect_anomaly",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/version_intelligence.py",
+      "classes": [
+        "FactoryVersionIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "register_version",
+        "compare_versions",
+        "validate_upgrade",
+        "rollback_version",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/knowledge_intelligence.py",
+      "classes": [
+        "FactoryKnowledgeIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "store_knowledge",
+        "retrieve_knowledge",
+        "link_knowledge",
+        "search_knowledge",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/forecasting_intelligence.py",
+      "classes": [
+        "FactoryForecastingIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_forecast",
+        "analyze_pattern",
+        "predict_state",
+        "evaluate_accuracy",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/optimization_intelligence.py",
+      "classes": [
+        "FactoryOptimizationIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "measure_performance",
+        "identify_improvement",
+        "optimize_process",
+        "compare_results",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/strategy_evolution_intelligence.py",
+      "classes": [
+        "FactoryStrategyEvolutionIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "register_strategy",
+        "evaluate_strategy",
+        "select_strategy",
+        "evolve_strategy",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/orchestration_intelligence.py",
+      "classes": [
+        "FactoryOrchestrationIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "coordinate_agents",
+        "dispatch_tasks",
+        "manage_execution",
+        "monitor_execution",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr"
+      ]
+    },
+    {
+      "file": "ai/factory/execution_intelligence.py",
+      "classes": [
+        "FactoryExecutionIntelligence"
+      ],
+      "functions": [
+        "__init__",
+        "create_execution",
+        "start_execution",
+        "track_execution",
+        "complete_execution",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/runtime_governance.py",
+      "classes": [
+        "FactoryRuntimeGovernance"
+      ],
+      "functions": [
+        "__init__",
+        "check_policy",
+        "check_permission",
+        "assess_risk",
+        "authorize_execution",
+        "audit_execution",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "audit",
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/event_replay.py",
+      "classes": [
+        "FactoryEventReplay"
+      ],
+      "functions": [
+        "__init__",
+        "store_event",
+        "query_events",
+        "replay_execution",
+        "diagnose_run",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/goal_genesis.py",
+      "classes": [
+        "FactoryGoalGenesis"
+      ],
+      "functions": [
+        "__init__",
+        "generate_goal",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "runtime"
+      ]
+    },
+    {
+      "file": "ai/factory/development_advisor.py",
+      "classes": [
+        "FactoryDevelopmentAdvisor"
+      ],
+      "functions": [
+        "__init__",
+        "analyze",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/development_pipeline.py",
+      "classes": [
+        "FactoryDevelopmentPipeline"
+      ],
+      "functions": [
+        "__init__",
+        "run_development_cycle",
+        "report"
+      ],
+      "imports": [
+        "from typing import Any, Dict",
+        "from ai.factory.development_orchestrator import FactoryDevelopmentOrchestrator",
+        "from ai.factory.change_lifecycle_manager import FactoryChangeLifecycleManager"
+      ],
+      "capabilities": [
+        "orchestr"
+      ]
+    },
+    {
+      "file": "ai/factory/integrity_checker.py",
+      "classes": [
+        "FactoryIntegrityChecker"
+      ],
+      "functions": [
+        "__init__",
+        "check_runtime",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr",
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/maintenance_agent.py",
+      "classes": [
+        "FactoryMaintenanceAgent"
+      ],
+      "functions": [
+        "__init__",
+        "inspect",
+        "recommend",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "inspect",
+        "runtime",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/report_generator.py",
+      "classes": [
+        "FactoryReportGenerator"
+      ],
+      "functions": [
+        "__init__",
+        "generate",
+        "history",
+        "latest"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List",
+        "from datetime import datetime"
+      ],
+      "capabilities": [
+        "inspect",
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/change_impact_analyzer.py",
+      "classes": [
+        "FactoryChangeImpactAnalyzer"
+      ],
+      "functions": [
+        "__init__",
+        "analyze",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "health"
+      ]
+    },
+    {
+      "file": "ai/factory/development_orchestrator.py",
+      "classes": [
+        "FactoryDevelopmentOrchestrator"
+      ],
+      "functions": [
+        "__init__",
+        "create_development_task",
+        "update_status",
+        "record_validation",
+        "execute_task",
+        "report",
+        "history"
+      ],
+      "imports": [
+        "from ai.factory.development_executor import FactoryDevelopmentExecutor",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": [
+        "orchestr",
+        "executor"
+      ]
+    },
+    {
+      "file": "ai/factory/change_lifecycle_manager.py",
+      "classes": [
+        "FactoryChangeLifecycleManager"
+      ],
+      "functions": [
+        "__init__",
+        "start_change",
+        "record_validation",
+        "complete_change",
+        "validate_change",
+        "report",
+        "history"
+      ],
+      "imports": [
+        "from ai.factory.validation_runner import FactoryValidationRunner",
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/validation_runner.py",
+      "classes": [
+        "FactoryValidationRunner"
+      ],
+      "functions": [
+        "__init__",
+        "run_compile_check",
+        "run_test_check",
+        "validate_change",
+        "_run_command",
+        "report",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List",
+        "import subprocess"
+      ],
+      "capabilities": []
+    },
+    {
+      "file": "ai/factory/development_operator.py",
+      "classes": [
+        "FactoryDevelopmentOperator"
+      ],
+      "functions": [
+        "__init__",
+        "submit_task",
+        "execute_cycle",
+        "review_status",
+        "history"
+      ],
+      "imports": [
+        "from typing import Any, Dict, List"
+      ],
+      "capabilities": []
+    }
+  ],
+  "summary": {
+    "files_scanned": 231,
+    "capabilities_found": {
+      "audit": [
+        "ai/factory/audit_bridge.py",
+        "ai/factory/runtime.py",
+        "ai/factory/audit_log.py",
+        "ai/factory/observability.py",
+        "ai/factory/improvement_audit.py",
+        "ai/factory/runtime_audit.py",
+        "ai/factory/runtime_dashboard.py",
+        "ai/factory/action_audit.py",
+        "ai/factory/compliance_audit.py",
+        "ai/factory/audit_trail.py",
+        "ai/factory/audit_intelligence.py",
+        "ai/factory/runtime_governance.py"
+      ],
+      "registry": [
+        "ai/factory/registry.py",
+        "ai/factory/health.py",
+        "ai/factory/dashboard.py",
+        "ai/factory/runtime.py",
+        "ai/factory/artifact_registry.py",
+        "ai/factory/verification_registry.py",
+        "ai/factory/strategy_manager.py",
+        "ai/factory/resource_allocator.py"
+      ],
+      "health": [
+        "ai/factory/health.py",
+        "ai/factory/dashboard.py",
+        "ai/factory/runtime.py",
+        "ai/factory/decision_engine.py",
+        "ai/factory/optimizer.py",
+        "ai/factory/runtime_optimizer.py",
+        "ai/factory/optimization_context.py",
+        "ai/factory/state_snapshot.py",
+        "ai/factory/control_plane.py",
+        "ai/factory/ide_model.py",
+        "ai/factory/observability.py",
+        "ai/factory/health_monitor.py",
+        "ai/factory/maintenance_planner.py",
+        "ai/factory/health_snapshot.py",
+        "ai/factory/self_assessment.py",
+        "ai/factory/improvement_planner.py",
+        "ai/factory/runtime_supervisor.py",
+        "ai/factory/runtime_health.py",
+        "ai/factory/runtime_alerts.py",
+        "ai/factory/resilience_controller.py",
+        "ai/factory/adaptive_decision.py",
+        "ai/factory/production_guard.py",
+        "ai/factory/runtime_dashboard.py",
+        "ai/factory/recovery_orchestrator.py",
+        "ai/factory/service_health.py",
+        "ai/factory/service_recovery.py",
+        "ai/factory/supervisor.py",
+        "ai/factory/health_monitoring.py",
+        "ai/factory/dependency_intelligence.py",
+        "ai/factory/runtime_observability.py",
+        "ai/factory/operator_agent.py",
+        "ai/factory/trend_analyzer.py",
+        "ai/factory/autonomous_supervisor.py",
+        "ai/factory/metrics_telemetry.py",
+        "ai/factory/dependency_management.py",
+        "ai/factory/integrity_checker.py",
+        "ai/factory/maintenance_agent.py",
+        "ai/factory/report_generator.py",
+        "ai/factory/change_impact_analyzer.py"
+      ],
+      "diagnostic": [
+        "ai/factory/runtime.py",
+        "ai/factory/health_monitoring.py",
+        "ai/factory/diagnostic_intelligence.py"
+      ],
+      "inspect": [
+        "ai/factory/runtime.py",
+        "ai/factory/ide_controller.py",
+        "ai/factory/shell.py",
+        "ai/factory/operator_agent.py",
+        "ai/factory/autonomous_supervisor.py",
+        "ai/factory/maintenance_agent.py",
+        "ai/factory/report_generator.py"
+      ],
+      "orchestr": [
+        "ai/factory/runtime.py",
+        "ai/factory/control_plane.py",
+        "ai/factory/improvement_orchestrator.py",
+        "ai/factory/improvement_runtime.py",
+        "ai/factory/master_orchestrator.py",
+        "ai/factory/external_interface.py",
+        "ai/factory/recovery_orchestrator.py",
+        "ai/factory/action_orchestrator.py",
+        "ai/factory/execution_orchestration.py",
+        "ai/factory/orchestration_intelligence.py",
+        "ai/factory/development_pipeline.py",
+        "ai/factory/integrity_checker.py",
+        "ai/factory/development_orchestrator.py"
+      ],
+      "executor": [
+        "ai/factory/runtime.py",
+        "ai/factory/job_executor.py",
+        "ai/factory/job_runner.py",
+        "ai/factory/maintenance_executor.py",
+        "ai/factory/optimization_executor.py",
+        "ai/factory/improvement_executor.py",
+        "ai/factory/runtime_scheduler.py",
+        "ai/factory/self_improvement.py",
+        "ai/factory/development_executor.py",
+        "ai/factory/execution_governance.py",
+        "ai/factory/development_orchestrator.py"
+      ],
+      "runtime": [
+        "ai/factory/runtime.py",
+        "ai/factory/api.py",
+        "ai/factory/decision_engine.py",
+        "ai/factory/runtime_optimizer.py",
+        "ai/factory/control_plane.py",
+        "ai/factory/event_bus.py",
+        "ai/factory/ide_model.py",
+        "ai/factory/service.py",
+        "ai/factory/action_router.py",
+        "ai/factory/runtime_coordinator.py",
+        "ai/factory/improvement_runtime.py",
+        "ai/factory/runtime_state.py",
+        "ai/factory/runtime_scheduler.py",
+        "ai/factory/runtime_supervisor.py",
+        "ai/factory/runtime_health.py",
+        "ai/factory/runtime_alerts.py",
+        "ai/factory/runtime_recovery.py",
+        "ai/factory/resilience_controller.py",
+        "ai/factory/runtime_audit.py",
+        "ai/factory/runtime_dashboard.py",
+        "ai/factory/runtime_metrics.py",
+        "ai/factory/runtime_loop.py",
+        "ai/factory/runtime_observability.py",
+        "ai/factory/operator_agent.py",
+        "ai/factory/runtime_governance.py",
+        "ai/factory/goal_genesis.py",
+        "ai/factory/integrity_checker.py",
+        "ai/factory/maintenance_agent.py"
+      ],
+      "scheduler": [
+        "ai/factory/control_plane.py",
+        "ai/factory/scheduler.py",
+        "ai/factory/daemon_scheduler.py",
+        "ai/factory/runtime_coordinator.py",
+        "ai/factory/improvement_scheduler.py",
+        "ai/factory/runtime_scheduler.py",
+        "ai/factory/autonomous_scheduler.py"
+      ],
+      "graph": [
+        "ai/factory/knowledge_graph.py",
+        "ai/factory/knowledge_graph_intelligence.py"
+      ],
+      "dependency": [
+        "ai/factory/dependency_intelligence.py",
+        "ai/factory/dependency_management.py"
+      ]
+    },
+    "components": [
+      "BuildTask",
+      "ExecutionRecord",
+      "FactoryPlanner",
+      "FactoryRunner",
+      "FactoryVerifier",
+      "FactoryMemory",
+      "FactoryController",
+      "FactoryTelemetry",
+      "FactoryEventLog",
+      "FactoryAuditBridge",
+      "FactoryStateStore",
+      "FactoryInterface",
+      "FactoryCLI",
+      "FactoryRegistry",
+      "FactoryHealth",
+      "FactoryDashboard",
+      "FactoryRuntime",
+      "FactoryPersistence",
+      "FactoryAPI",
+      "FactoryCommandRouter",
+      "FactoryCommandHistory",
+      "FactoryDecisionEngine",
+      "FactoryPolicyGate",
+      "FactoryOptimizer",
+      "FactoryRuntimeOptimizer",
+      "FactoryTaskQueue",
+      "FactoryWorkspace",
+      "FactoryArtifactRegistry",
+      "FactoryVerificationRegistry",
+      "FactoryMetrics",
+      "OptimizationContext",
+      "FactoryStateSnapshot",
+      "FactorySnapshotStore",
+      "FactorySnapshotDiff",
+      "FactoryControlPlane",
+      "FactoryEventBus",
+      "FactoryStateStream",
+      "FactoryIDEModel",
+      "FactoryIDEController",
+      "FactoryShell",
+      "FactoryService",
+      "FactoryDaemon",
+      "FactoryLifecycle",
+      "FactoryScheduler",
+      "FactoryDaemonScheduler",
+      "FactoryJobExecutor",
+      "FactoryJobRunner",
+      "FactoryJobResults",
+      "ResultMetrics",
+      "FactoryOptimizationFeedback",
+      "FactoryActionRouter",
+      "FactoryPolicyGuard",
+      "FactoryAuditLog",
+      "FactoryObservability",
+      "FactorySnapshotPublisher",
+      "FactoryRuntimeCoordinator",
+      "FactoryBootstrap",
+      "FactoryConfig",
+      "FactoryConfigValidator",
+      "FactoryEventIntegration",
+      "FactoryStateManager",
+      "FactoryStatePersistence",
+      "FactoryHealthMonitor",
+      "FactoryAlertManager",
+      "FactoryRecoveryManager",
+      "FactoryRecoveryPolicy",
+      "FactoryRecoveryLearning",
+      "FactoryMaintenancePlanner",
+      "FactoryMaintenanceExecutor",
+      "FactoryOptimizationLoop",
+      "FactoryOptimizationExecutor",
+      "FactoryExperimentFramework",
+      "FactoryExperimentPolicy",
+      "FactoryExperimentLearning",
+      "FactoryKnowledgeMemory",
+      "FactoryKnowledgeRetrieval",
+      "FactoryDecisionContext",
+      "FactoryDecisionPolicy",
+      "FactoryResultCollector",
+      "FactoryStartupRecovery",
+      "FactoryHealthSnapshot",
+      "FactoryAlertEscalation",
+      "FactoryIncidentManager",
+      "FactoryPostIncidentLearning",
+      "FactoryKnowledgeConsolidator",
+      "FactoryRecommendationEngine",
+      "FactoryDecisionFeedback",
+      "FactoryImprovementScheduler",
+      "FactoryImprovementPolicy",
+      "FactoryImprovementApproval",
+      "FactoryImprovementExecutor",
+      "FactoryImprovementAudit",
+      "FactoryImprovementMetrics",
+      "FactoryImprovementOptimizer",
+      "FactorySelfAssessment",
+      "FactoryImprovementPlanner",
+      "FactoryImprovementPortfolio",
+      "FactoryImprovementQueue",
+      "FactoryImprovementOrchestrator",
+      "FactoryImprovementRuntime",
+      "FactoryRuntimeState",
+      "FactoryRuntimeScheduler",
+      "FactoryRuntimeSupervisor",
+      "FactoryRuntimeHealth",
+      "FactoryRuntimeAlerts",
+      "FactoryRuntimeRecovery",
+      "FactoryResilienceController",
+      "FactoryAutonomousLoop",
+      "FactoryLearningMemory",
+      "FactoryFeedbackEngine",
+      "FactoryAdaptiveDecision",
+      "FactorySelfOptimizer",
+      "FactoryEvolutionCoordinator",
+      "FactoryMasterOrchestrator",
+      "FactoryProductionGuard",
+      "FactoryDeploymentManager",
+      "FactoryRuntimeAudit",
+      "FactoryRuntimeDashboard",
+      "FactoryExternalInterface",
+      "FactoryConfigManager",
+      "FactoryRecoveryOrchestrator",
+      "FactoryServiceHealth",
+      "FactoryServiceRecovery",
+      "FactoryRuntimeMetrics",
+      "FactoryMetricsIntegration",
+      "FactorySelfImprovement",
+      "FactoryEvolutionController",
+      "FactoryDecisionIntegration",
+      "FactoryRiskManager",
+      "FactoryGoalOptimizer",
+      "FactoryAdaptiveStrategy",
+      "FactoryActionOrchestrator",
+      "FactoryExecutionRecovery",
+      "FactoryExecutionLearning",
+      "FactoryKnowledgeConsolidation",
+      "FactoryDecisionIntelligence",
+      "FactoryGoalManagement",
+      "FactoryResourceAllocation",
+      "FactoryRiskManagement",
+      "FactoryPolicyEnforcement",
+      "FactorySimulationEngine",
+      "FactoryExperimentationEngine",
+      "FactoryStrategyEvolution",
+      "FactoryKnowledgeGraph",
+      "FactoryForecastingEngine",
+      "FactoryPlanningIntelligence",
+      "FactoryExecutionOrchestration",
+      "FactorySelfHealing",
+      "FactorySupervisor",
+      "FactoryRuntimeLoop",
+      "FactoryStateManagement",
+      "FactoryEventProcessing",
+      "FactoryResourceManagement",
+      "FactoryAlertingNotification",
+      "FactoryWorkflowEngine",
+      "FactoryVersionManagement",
+      "FactoryLearningLoop",
+      "FactoryMasterIntegration",
+      "FactoryHealthMonitoring",
+      "FactoryConfigurationIntelligence",
+      "FactoryAlertIntelligence",
+      "FactoryWorkflowIntelligence",
+      "FactorySchedulingIntelligence",
+      "FactoryDependencyIntelligence",
+      "FactoryLearningIntelligence",
+      "FactoryCausalAnalysisIntelligence",
+      "FactoryExperimentationIntelligence",
+      "FactoryKnowledgeGraphIntelligence",
+      "FactorySimulationIntelligence",
+      "FactorySelfHealingIntelligence",
+      "FactoryRuntimeObservability",
+      "FactoryDiagnosticIntelligence",
+      "FactoryRecommendationFeedback",
+      "FactoryMetaOptimizer",
+      "FactoryStrategyManager",
+      "FactoryGoalManager",
+      "FactoryDevelopmentTranslator",
+      "FactoryDevelopmentTracker",
+      "FactoryOperatorAgent",
+      "FactoryTrendAnalyzer",
+      "FactoryDevelopmentExecutor",
+      "FactoryLearningFeedback",
+      "FactoryKnowledgeBase",
+      "FactoryIntelligenceCoordinator",
+      "FactoryMissionController",
+      "FactoryResourceAllocator",
+      "FactoryExecutionGovernance",
+      "FactoryActionAudit",
+      "FactoryPerformanceEvaluation",
+      "FactoryOptimizationConnector",
+      "FactoryStrategyExecutionPlanner",
+      "FactoryExecutionStateTracker",
+      "FactoryAutonomousSupervisor",
+      "FactoryAutonomousScheduler",
+      "FactoryAutonomousEventBus",
+      "FactoryAutonomousStateMemory",
+      "FactoryComplianceAudit",
+      "FactoryMetricsTelemetry",
+      "FactoryOptimizationEngine",
+      "FactoryCausalAnalysis",
+      "FactoryAccessControl",
+      "FactoryConfigurationManagement",
+      "FactoryAuditTrail",
+      "FactoryMetricsObservability",
+      "FactoryDependencyManagement",
+      "FactoryRecoveryManagement",
+      "FactoryPolicyGovernance",
+      "FactoryAuditIntelligence",
+      "FactoryEventIntelligence",
+      "FactoryMetricsIntelligence",
+      "FactoryVersionIntelligence",
+      "FactoryKnowledgeIntelligence",
+      "FactoryForecastingIntelligence",
+      "FactoryOptimizationIntelligence",
+      "FactoryStrategyEvolutionIntelligence",
+      "FactoryOrchestrationIntelligence",
+      "FactoryExecutionIntelligence",
+      "FactoryRuntimeGovernance",
+      "FactoryEventReplay",
+      "FactoryGoalGenesis",
+      "FactoryDevelopmentAdvisor",
+      "FactoryDevelopmentPipeline",
+      "FactoryIntegrityChecker",
+      "FactoryMaintenanceAgent",
+      "FactoryReportGenerator",
+      "FactoryChangeImpactAnalyzer",
+      "FactoryDevelopmentOrchestrator",
+      "FactoryChangeLifecycleManager",
+      "FactoryValidationRunner",
+      "FactoryDevelopmentOperator"
+    ]
+  }
+}

@@ -1,0 +1,3779 @@
+{
+  "existing_reporting_candidates": [
+    {
+      "file": "ai/factory/memory.py",
+      "classes": [
+        "FactoryMemory"
+      ],
+      "methods": [
+        "__init__",
+        "remember",
+        "recall_all",
+        "find_by_status"
+      ],
+      "matches": [
+        {
+          "name": "find_by_status",
+          "keyword": "status"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/interface.py",
+      "classes": [
+        "FactoryInterface"
+      ],
+      "methods": [
+        "__init__",
+        "run_task",
+        "history",
+        "status"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        },
+        {
+          "name": "status",
+          "keyword": "status"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/cli.py",
+      "classes": [
+        "FactoryCLI"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "run",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "classes": [
+        "FactoryRuntime"
+      ],
+      "methods": [
+        "__init__",
+        "component_inventory",
+        "emit_event",
+        "manage_strategy",
+        "manage_resources",
+        "run_improvement_cycle",
+        "submit_goal",
+        "submit_development_request",
+        "execute",
+        "change_impact_report",
+        "trend_report",
+        "factory_report",
+        "maintenance_status",
+        "operator_status",
+        "integrity_report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "change_impact_report",
+          "keyword": "report"
+        },
+        {
+          "name": "trend_report",
+          "keyword": "report"
+        },
+        {
+          "name": "factory_report",
+          "keyword": "report"
+        },
+        {
+          "name": "maintenance_status",
+          "keyword": "status"
+        },
+        {
+          "name": "operator_status",
+          "keyword": "status"
+        },
+        {
+          "name": "integrity_report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/api.py",
+      "classes": [
+        "FactoryAPI"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "dashboard",
+        "run_task",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "dashboard",
+          "keyword": "dashboard"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/decision_engine.py",
+      "classes": [
+        "FactoryDecisionEngine"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "decide",
+        "reason",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/control_plane.py",
+      "classes": [
+        "FactoryControlPlane"
+      ],
+      "methods": [
+        "__init__",
+        "start",
+        "cycle",
+        "health",
+        "recover",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/event_bus.py",
+      "classes": [
+        "FactoryEventBus"
+      ],
+      "methods": [
+        "__init__",
+        "subscribe",
+        "publish_event",
+        "emit_runtime_event",
+        "process_events",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/service.py",
+      "classes": [
+        "FactoryService"
+      ],
+      "methods": [
+        "__init__",
+        "start",
+        "stop",
+        "restart",
+        "status",
+        "heartbeat",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/daemon.py",
+      "classes": [
+        "FactoryDaemon"
+      ],
+      "methods": [
+        "__init__",
+        "start",
+        "stop",
+        "status",
+        "tick"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/lifecycle.py",
+      "classes": [
+        "FactoryLifecycle"
+      ],
+      "methods": [
+        "__init__",
+        "startup",
+        "shutdown",
+        "recover",
+        "status"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/scheduler.py",
+      "classes": [
+        "FactoryScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule_task",
+        "cancel_task",
+        "run_due_tasks",
+        "check_schedule",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/daemon_scheduler.py",
+      "classes": [
+        "FactoryDaemonScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "run_cycle",
+        "tick",
+        "status"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/job_runner.py",
+      "classes": [
+        "FactoryJobRunner"
+      ],
+      "methods": [
+        "__init__",
+        "run_job",
+        "run_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/job_results.py",
+      "classes": [
+        "FactoryJobResults"
+      ],
+      "methods": [
+        "__init__",
+        "record",
+        "get",
+        "list",
+        "find_by_status"
+      ],
+      "matches": [
+        {
+          "name": "find_by_status",
+          "keyword": "status"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_feedback.py",
+      "classes": [
+        "FactoryOptimizationFeedback"
+      ],
+      "methods": [
+        "__init__",
+        "analyze",
+        "recommend",
+        "apply_feedback",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/action_router.py",
+      "classes": [
+        "FactoryActionRouter"
+      ],
+      "methods": [
+        "__init__",
+        "route",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/observability.py",
+      "classes": [
+        "FactoryObservability"
+      ],
+      "methods": [
+        "__init__",
+        "health",
+        "snapshot",
+        "report"
+      ],
+      "matches": [
+        {
+          "name": "report",
+          "keyword": "report"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/snapshot_publisher.py",
+      "classes": [
+        "FactorySnapshotPublisher"
+      ],
+      "methods": [
+        "__init__",
+        "publish",
+        "publish_now",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_coordinator.py",
+      "classes": [
+        "FactoryRuntimeCoordinator"
+      ],
+      "methods": [
+        "__init__",
+        "initialize",
+        "run_cycle",
+        "status",
+        "shutdown"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/bootstrap.py",
+      "classes": [
+        "FactoryBootstrap"
+      ],
+      "methods": [
+        "__init__",
+        "initialize",
+        "start",
+        "shutdown",
+        "status",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/state_manager.py",
+      "classes": [
+        "FactoryStateManager"
+      ],
+      "methods": [
+        "__init__",
+        "save",
+        "load",
+        "checkpoint",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/health_monitor.py",
+      "classes": [
+        "FactoryHealthMonitor"
+      ],
+      "methods": [
+        "__init__",
+        "collect",
+        "compare",
+        "detect_change",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/alert_manager.py",
+      "classes": [
+        "FactoryAlertManager"
+      ],
+      "methods": [
+        "__init__",
+        "classify",
+        "create_alert",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recovery_manager.py",
+      "classes": [
+        "FactoryRecoveryManager"
+      ],
+      "methods": [
+        "__init__",
+        "register_recovery",
+        "recover",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recovery_policy.py",
+      "classes": [
+        "FactoryRecoveryPolicy"
+      ],
+      "methods": [
+        "__init__",
+        "add_rule",
+        "evaluate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/maintenance_planner.py",
+      "classes": [
+        "FactoryMaintenancePlanner"
+      ],
+      "methods": [
+        "__init__",
+        "analyze_health",
+        "plan",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/maintenance_executor.py",
+      "classes": [
+        "FactoryMaintenanceExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "register_action",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_loop.py",
+      "classes": [
+        "FactoryOptimizationLoop"
+      ],
+      "methods": [
+        "__init__",
+        "analyze",
+        "optimize",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_executor.py",
+      "classes": [
+        "FactoryOptimizationExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "register_action",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experiment_framework.py",
+      "classes": [
+        "FactoryExperimentFramework"
+      ],
+      "methods": [
+        "__init__",
+        "create_experiment",
+        "run",
+        "evaluate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experiment_policy.py",
+      "classes": [
+        "FactoryExperimentPolicy"
+      ],
+      "methods": [
+        "__init__",
+        "add_rule",
+        "evaluate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experiment_learning.py",
+      "classes": [
+        "FactoryExperimentLearning"
+      ],
+      "methods": [
+        "__init__",
+        "analyze",
+        "success_rate",
+        "recommend",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/knowledge_retrieval.py",
+      "classes": [
+        "FactoryKnowledgeRetrieval"
+      ],
+      "methods": [
+        "__init__",
+        "search",
+        "match_context",
+        "recommend",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/decision_policy.py",
+      "classes": [
+        "FactoryDecisionPolicy"
+      ],
+      "methods": [
+        "__init__",
+        "add_rule",
+        "evaluate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/result_collector.py",
+      "classes": [
+        "FactoryResultCollector"
+      ],
+      "methods": [
+        "__init__",
+        "collect",
+        "summarize",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/startup_recovery.py",
+      "classes": [
+        "FactoryStartupRecovery"
+      ],
+      "methods": [
+        "__init__",
+        "restore",
+        "validate",
+        "startup",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/health_snapshot.py",
+      "classes": [
+        "FactoryHealthSnapshot"
+      ],
+      "methods": [
+        "__init__",
+        "collect",
+        "status",
+        "snapshot",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/alert_escalation.py",
+      "classes": [
+        "FactoryAlertEscalation"
+      ],
+      "methods": [
+        "__init__",
+        "register_handler",
+        "escalate",
+        "resolve",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/incident_manager.py",
+      "classes": [
+        "FactoryIncidentManager"
+      ],
+      "methods": [
+        "__init__",
+        "create",
+        "update",
+        "close",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/post_incident_learning.py",
+      "classes": [
+        "FactoryPostIncidentLearning"
+      ],
+      "methods": [
+        "__init__",
+        "extract",
+        "store",
+        "learn",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/knowledge_consolidator.py",
+      "classes": [
+        "FactoryKnowledgeConsolidator"
+      ],
+      "methods": [
+        "__init__",
+        "add_lesson",
+        "find_patterns",
+        "consolidate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recommendation_engine.py",
+      "classes": [
+        "FactoryRecommendationEngine"
+      ],
+      "methods": [
+        "__init__",
+        "recommend",
+        "rank",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/decision_feedback.py",
+      "classes": [
+        "FactoryDecisionFeedback"
+      ],
+      "methods": [
+        "__init__",
+        "record_decision",
+        "record_outcome",
+        "evaluate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_scheduler.py",
+      "classes": [
+        "FactoryImprovementScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule",
+        "run_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_policy.py",
+      "classes": [
+        "FactoryImprovementPolicy"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "allow",
+        "block",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_approval.py",
+      "classes": [
+        "FactoryImprovementApproval"
+      ],
+      "methods": [
+        "__init__",
+        "request",
+        "approve",
+        "reject",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_executor.py",
+      "classes": [
+        "FactoryImprovementExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "validate",
+        "execute",
+        "record",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_audit.py",
+      "classes": [
+        "FactoryImprovementAudit"
+      ],
+      "methods": [
+        "__init__",
+        "record",
+        "query",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_metrics.py",
+      "classes": [
+        "FactoryImprovementMetrics"
+      ],
+      "methods": [
+        "__init__",
+        "record_metric",
+        "calculate",
+        "summary",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "summary",
+          "keyword": "summary"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_optimizer.py",
+      "classes": [
+        "FactoryImprovementOptimizer"
+      ],
+      "methods": [
+        "__init__",
+        "score",
+        "rank",
+        "select",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_assessment.py",
+      "classes": [
+        "FactorySelfAssessment"
+      ],
+      "methods": [
+        "__init__",
+        "assess",
+        "detect_gaps",
+        "recommend",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_planner.py",
+      "classes": [
+        "FactoryImprovementPlanner"
+      ],
+      "methods": [
+        "__init__",
+        "plan",
+        "prioritize",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_portfolio.py",
+      "classes": [
+        "FactoryImprovementPortfolio"
+      ],
+      "methods": [
+        "__init__",
+        "add",
+        "update",
+        "prioritize",
+        "active",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_queue.py",
+      "classes": [
+        "FactoryImprovementQueue"
+      ],
+      "methods": [
+        "__init__",
+        "enqueue",
+        "dequeue",
+        "complete",
+        "pending",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_orchestrator.py",
+      "classes": [
+        "FactoryImprovementOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "run_cycle",
+        "process",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/improvement_runtime.py",
+      "classes": [
+        "FactoryImprovementRuntime"
+      ],
+      "methods": [
+        "__init__",
+        "run_once",
+        "start",
+        "stop",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_state.py",
+      "classes": [
+        "FactoryRuntimeState"
+      ],
+      "methods": [
+        "__init__",
+        "save_state",
+        "load_state",
+        "snapshot",
+        "restore",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_scheduler.py",
+      "classes": [
+        "FactoryRuntimeScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule",
+        "run_pending",
+        "pause",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_supervisor.py",
+      "classes": [
+        "FactoryRuntimeSupervisor"
+      ],
+      "methods": [
+        "__init__",
+        "monitor",
+        "detect",
+        "recover",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_health.py",
+      "classes": [
+        "FactoryRuntimeHealth"
+      ],
+      "methods": [
+        "__init__",
+        "collect",
+        "evaluate",
+        "status",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_alerts.py",
+      "classes": [
+        "FactoryRuntimeAlerts"
+      ],
+      "methods": [
+        "__init__",
+        "check",
+        "alert",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_recovery.py",
+      "classes": [
+        "FactoryRuntimeRecovery"
+      ],
+      "methods": [
+        "__init__",
+        "restart",
+        "restore",
+        "recover",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/resilience_controller.py",
+      "classes": [
+        "FactoryResilienceController"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "respond",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_loop.py",
+      "classes": [
+        "FactoryAutonomousLoop"
+      ],
+      "methods": [
+        "__init__",
+        "observe",
+        "decide",
+        "act",
+        "run_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/learning_memory.py",
+      "classes": [
+        "FactoryLearningMemory"
+      ],
+      "methods": [
+        "__init__",
+        "remember",
+        "record_outcome",
+        "retrieve",
+        "patterns",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/feedback_engine.py",
+      "classes": [
+        "FactoryFeedbackEngine"
+      ],
+      "methods": [
+        "__init__",
+        "analyze",
+        "score",
+        "recommend",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/adaptive_decision.py",
+      "classes": [
+        "FactoryAdaptiveDecision"
+      ],
+      "methods": [
+        "__init__",
+        "learn",
+        "decide",
+        "adjust",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_optimizer.py",
+      "classes": [
+        "FactorySelfOptimizer"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "tune",
+        "optimize",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/evolution_coordinator.py",
+      "classes": [
+        "FactoryEvolutionCoordinator"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "upgrade",
+        "evolve",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/master_orchestrator.py",
+      "classes": [
+        "FactoryMasterOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "start",
+        "run",
+        "evolve",
+        "status",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/production_guard.py",
+      "classes": [
+        "FactoryProductionGuard"
+      ],
+      "methods": [
+        "__init__",
+        "validate",
+        "safe_mode",
+        "health_report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "health_report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/deployment_manager.py",
+      "classes": [
+        "FactoryDeploymentManager"
+      ],
+      "methods": [
+        "__init__",
+        "prepare",
+        "deploy",
+        "rollback",
+        "status",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_audit.py",
+      "classes": [
+        "FactoryRuntimeAudit"
+      ],
+      "methods": [
+        "__init__",
+        "record",
+        "query",
+        "export",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_dashboard.py",
+      "classes": [
+        "FactoryRuntimeDashboard"
+      ],
+      "methods": [
+        "__init__",
+        "health",
+        "history",
+        "snapshot",
+        "summary",
+        "records"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        },
+        {
+          "name": "summary",
+          "keyword": "summary"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/external_interface.py",
+      "classes": [
+        "FactoryExternalInterface"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "execute",
+        "request",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/config_manager.py",
+      "classes": [
+        "FactoryConfigManager"
+      ],
+      "methods": [
+        "__init__",
+        "load",
+        "validate",
+        "update",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recovery_orchestrator.py",
+      "classes": [
+        "FactoryRecoveryOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "detect",
+        "restore",
+        "verify",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/service_health.py",
+      "classes": [
+        "FactoryServiceHealth"
+      ],
+      "methods": [
+        "__init__",
+        "heartbeat",
+        "check",
+        "ready",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/service_recovery.py",
+      "classes": [
+        "FactoryServiceRecovery"
+      ],
+      "methods": [
+        "__init__",
+        "detect",
+        "recover",
+        "verify",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_metrics.py",
+      "classes": [
+        "FactoryRuntimeMetrics"
+      ],
+      "methods": [
+        "__init__",
+        "increment",
+        "record",
+        "snapshot",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_integration.py",
+      "classes": [
+        "FactoryMetricsIntegration"
+      ],
+      "methods": [
+        "__init__",
+        "on_cycle",
+        "on_success",
+        "on_failure",
+        "snapshot",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_improvement.py",
+      "classes": [
+        "FactorySelfImprovement"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "plan",
+        "execute",
+        "verify",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/evolution_controller.py",
+      "classes": [
+        "FactoryEvolutionController"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate_change",
+        "approve",
+        "apply",
+        "rollback",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/decision_integration.py",
+      "classes": [
+        "FactoryDecisionIntegration"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate",
+        "select",
+        "route",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/risk_manager.py",
+      "classes": [
+        "FactoryRiskManager"
+      ],
+      "methods": [
+        "__init__",
+        "assess",
+        "check_constraints",
+        "approve",
+        "mitigate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/goal_optimizer.py",
+      "classes": [
+        "FactoryGoalOptimizer"
+      ],
+      "methods": [
+        "__init__",
+        "score_goals",
+        "optimize",
+        "adjust",
+        "select_best",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/adaptive_strategy.py",
+      "classes": [
+        "FactoryAdaptiveStrategy"
+      ],
+      "methods": [
+        "__init__",
+        "create_strategy",
+        "evaluate_strategy",
+        "adapt",
+        "select_strategy",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/action_orchestrator.py",
+      "classes": [
+        "FactoryActionOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "register_action",
+        "sequence",
+        "coordinate",
+        "monitor",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_recovery.py",
+      "classes": [
+        "FactoryExecutionRecovery"
+      ],
+      "methods": [
+        "__init__",
+        "detect_failure",
+        "retry",
+        "recover",
+        "escalate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_learning.py",
+      "classes": [
+        "FactoryExecutionLearning"
+      ],
+      "methods": [
+        "__init__",
+        "capture_outcome",
+        "classify_result",
+        "update_memory",
+        "generate_learning_signal",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/knowledge_consolidation.py",
+      "classes": [
+        "FactoryKnowledgeConsolidation"
+      ],
+      "methods": [
+        "__init__",
+        "capture_pattern",
+        "consolidate",
+        "retrieve_knowledge",
+        "rank_knowledge",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/decision_intelligence.py",
+      "classes": [
+        "FactoryDecisionIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_decision",
+        "evaluate_options",
+        "score_decision",
+        "select_action",
+        "record_outcome",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/goal_management.py",
+      "classes": [
+        "FactoryGoalManagement"
+      ],
+      "methods": [
+        "__init__",
+        "create_goal",
+        "prioritize_goals",
+        "track_progress",
+        "complete_goal",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/resource_allocation.py",
+      "classes": [
+        "FactoryResourceAllocation"
+      ],
+      "methods": [
+        "__init__",
+        "register_resource",
+        "allocate_resource",
+        "release_resource",
+        "optimize_allocation",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/risk_management.py",
+      "classes": [
+        "FactoryRiskManagement"
+      ],
+      "methods": [
+        "__init__",
+        "assess_risk",
+        "calculate_exposure",
+        "approve_action",
+        "reject_action",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/policy_enforcement.py",
+      "classes": [
+        "FactoryPolicyEnforcement"
+      ],
+      "methods": [
+        "__init__",
+        "register_policy",
+        "evaluate_policy",
+        "enforce_policy",
+        "exceptions",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/simulation_engine.py",
+      "classes": [
+        "FactorySimulationEngine"
+      ],
+      "methods": [
+        "__init__",
+        "create_scenario",
+        "simulate_action",
+        "evaluate_result",
+        "compare_outcomes",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experimentation_engine.py",
+      "classes": [
+        "FactoryExperimentationEngine"
+      ],
+      "methods": [
+        "__init__",
+        "create_experiment",
+        "run_trial",
+        "compare_results",
+        "select_winner",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/strategy_evolution.py",
+      "classes": [
+        "FactoryStrategyEvolution"
+      ],
+      "methods": [
+        "__init__",
+        "register_strategy",
+        "evaluate_strategy",
+        "replace_strategy",
+        "activate_strategy",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/knowledge_graph.py",
+      "classes": [
+        "FactoryKnowledgeGraph"
+      ],
+      "methods": [
+        "__init__",
+        "add_node",
+        "add_relationship",
+        "find_connections",
+        "query_graph",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/forecasting_engine.py",
+      "classes": [
+        "FactoryForecastingEngine"
+      ],
+      "methods": [
+        "__init__",
+        "create_forecast",
+        "analyze_trends",
+        "predict_future",
+        "evaluate_accuracy",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/planning_intelligence.py",
+      "classes": [
+        "FactoryPlanningIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_plan",
+        "analyze_constraints",
+        "allocate_resources",
+        "evaluate_plan",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_orchestration.py",
+      "classes": [
+        "FactoryExecutionOrchestration"
+      ],
+      "methods": [
+        "__init__",
+        "start_execution",
+        "coordinate_tasks",
+        "monitor_execution",
+        "recover_failure",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_healing.py",
+      "classes": [
+        "FactorySelfHealing"
+      ],
+      "methods": [
+        "__init__",
+        "detect_failure",
+        "diagnose_issue",
+        "repair_component",
+        "verify_recovery",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/supervisor.py",
+      "classes": [
+        "FactorySupervisor"
+      ],
+      "methods": [
+        "__init__",
+        "register_component",
+        "check_status",
+        "coordinate_cycle",
+        "trigger_recovery",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "check_status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_loop.py",
+      "classes": [
+        "FactoryRuntimeLoop"
+      ],
+      "methods": [
+        "__init__",
+        "start_cycle",
+        "run_cycle",
+        "pause_cycle",
+        "resume_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/state_management.py",
+      "classes": [
+        "FactoryStateManagement"
+      ],
+      "methods": [
+        "__init__",
+        "set_state",
+        "get_state",
+        "update_state",
+        "snapshot_state",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/event_processing.py",
+      "classes": [
+        "FactoryEventProcessing"
+      ],
+      "methods": [
+        "__init__",
+        "publish_event",
+        "subscribe",
+        "process_events",
+        "clear_events",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/resource_management.py",
+      "classes": [
+        "FactoryResourceManagement"
+      ],
+      "methods": [
+        "__init__",
+        "register_resource",
+        "allocate_resource",
+        "release_resource",
+        "check_capacity",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/alerting_notification.py",
+      "classes": [
+        "FactoryAlertingNotification"
+      ],
+      "methods": [
+        "__init__",
+        "create_alert",
+        "evaluate_condition",
+        "send_notification",
+        "resolve_alert",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/workflow_engine.py",
+      "classes": [
+        "FactoryWorkflowEngine"
+      ],
+      "methods": [
+        "__init__",
+        "create_workflow",
+        "add_step",
+        "execute_workflow",
+        "validate_workflow",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/version_management.py",
+      "classes": [
+        "FactoryVersionManagement"
+      ],
+      "methods": [
+        "__init__",
+        "create_version",
+        "compare_versions",
+        "rollback_version",
+        "promote_version",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/learning_loop.py",
+      "classes": [
+        "FactoryLearningLoop"
+      ],
+      "methods": [
+        "__init__",
+        "record_outcome",
+        "analyze_feedback",
+        "update_model",
+        "generate_improvement",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/master_integration.py",
+      "classes": [
+        "FactoryMasterIntegration"
+      ],
+      "methods": [
+        "__init__",
+        "register_component",
+        "initialize_system",
+        "run_cycle",
+        "get_system_status",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "get_system_status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/health_monitoring.py",
+      "classes": [
+        "FactoryHealthMonitoring"
+      ],
+      "methods": [
+        "__init__",
+        "check_component_health",
+        "run_diagnostics",
+        "calculate_health_score",
+        "generate_report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "generate_report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/configuration_intelligence.py",
+      "classes": [
+        "FactoryConfigurationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "load_config",
+        "validate_config",
+        "update_config",
+        "rollback_config",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/alert_intelligence.py",
+      "classes": [
+        "FactoryAlertIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_alert",
+        "evaluate_alert",
+        "escalate_alert",
+        "resolve_alert",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/workflow_intelligence.py",
+      "classes": [
+        "FactoryWorkflowIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_workflow",
+        "add_step",
+        "execute_workflow",
+        "track_progress",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/scheduling_intelligence.py",
+      "classes": [
+        "FactorySchedulingIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_schedule",
+        "queue_task",
+        "execute_due_tasks",
+        "prioritize_tasks",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/dependency_intelligence.py",
+      "classes": [
+        "FactoryDependencyIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "register_dependency",
+        "resolve_dependencies",
+        "check_dependency_health",
+        "update_dependency",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/learning_intelligence.py",
+      "classes": [
+        "FactoryLearningIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "record_experience",
+        "analyze_outcome",
+        "extract_lesson",
+        "update_model",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/causal_analysis_intelligence.py",
+      "classes": [
+        "FactoryCausalAnalysisIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "record_cause",
+        "analyze_relationship",
+        "infer_impact",
+        "validate_causality",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/experimentation_intelligence.py",
+      "classes": [
+        "FactoryExperimentationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_experiment",
+        "run_experiment",
+        "evaluate_experiment",
+        "promote_result",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/knowledge_graph_intelligence.py",
+      "classes": [
+        "FactoryKnowledgeGraphIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "add_node",
+        "add_relationship",
+        "traverse_graph",
+        "find_connections",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/simulation_intelligence.py",
+      "classes": [
+        "FactorySimulationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_scenario",
+        "run_simulation",
+        "compare_outcomes",
+        "select_scenario",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/self_healing_intelligence.py",
+      "classes": [
+        "FactorySelfHealingIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "detect_failure",
+        "diagnose_issue",
+        "apply_recovery",
+        "verify_recovery",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_observability.py",
+      "classes": [
+        "FactoryRuntimeObservability"
+      ],
+      "methods": [
+        "__init__",
+        "record_metric",
+        "capture_health",
+        "detect_anomaly",
+        "generate_alert",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/diagnostic_intelligence.py",
+      "classes": [
+        "FactoryDiagnosticIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "analyze_execution",
+        "detect_failure_patterns",
+        "explain_run",
+        "generate_recommendations",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recommendation_feedback.py",
+      "classes": [
+        "FactoryRecommendationFeedback"
+      ],
+      "methods": [
+        "__init__",
+        "collect_recommendations",
+        "evaluate_recommendations",
+        "apply_improvement",
+        "track_effect",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/meta_optimizer.py",
+      "classes": [
+        "FactoryMetaOptimizer"
+      ],
+      "methods": [
+        "__init__",
+        "score_improvement",
+        "compare_strategies",
+        "select_best_action",
+        "measure_roi",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/strategy_manager.py",
+      "classes": [
+        "FactoryStrategyManager"
+      ],
+      "methods": [
+        "__init__",
+        "strategy_registry",
+        "evaluate_strategy",
+        "activate_strategy",
+        "retire_strategy",
+        "strategy_performance",
+        "select_strategy",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/goal_manager.py",
+      "classes": [
+        "FactoryGoalManager"
+      ],
+      "methods": [
+        "__init__",
+        "register_goal",
+        "prioritize_goals",
+        "evaluate_progress",
+        "complete_goal",
+        "revise_goal",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "classes": [
+        "FactoryDevelopmentTranslator"
+      ],
+      "methods": [
+        "__init__",
+        "translate",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "classes": [
+        "FactoryDevelopmentTracker"
+      ],
+      "methods": [
+        "__init__",
+        "create_task",
+        "update_status",
+        "complete_task",
+        "verify_task",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "update_status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/operator_agent.py",
+      "classes": [
+        "FactoryOperatorAgent"
+      ],
+      "methods": [
+        "__init__",
+        "assess",
+        "choose_next_action",
+        "report"
+      ],
+      "matches": [
+        {
+          "name": "report",
+          "keyword": "report"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/trend_analyzer.py",
+      "classes": [
+        "FactoryTrendAnalyzer"
+      ],
+      "methods": [
+        "__init__",
+        "analyze",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_executor.py",
+      "classes": [
+        "FactoryDevelopmentExecutor"
+      ],
+      "methods": [
+        "__init__",
+        "execute",
+        "record_validation",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/learning_feedback.py",
+      "classes": [
+        "FactoryLearningFeedback"
+      ],
+      "methods": [
+        "__init__",
+        "record_decision",
+        "record_result",
+        "evaluate",
+        "learn",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/knowledge_base.py",
+      "classes": [
+        "FactoryKnowledgeBase"
+      ],
+      "methods": [
+        "__init__",
+        "extract",
+        "summarize",
+        "query",
+        "confidence",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/intelligence_coordinator.py",
+      "classes": [
+        "FactoryIntelligenceCoordinator"
+      ],
+      "methods": [
+        "__init__",
+        "observe",
+        "analyze",
+        "decide",
+        "improve",
+        "evolve",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/mission_controller.py",
+      "classes": [
+        "FactoryMissionController"
+      ],
+      "methods": [
+        "__init__",
+        "set_goal",
+        "evaluate_progress",
+        "prioritize",
+        "advance",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/resource_allocator.py",
+      "classes": [
+        "FactoryResourceAllocator"
+      ],
+      "methods": [
+        "__init__",
+        "resource_registry",
+        "estimate_cost",
+        "allocate_resources",
+        "rebalance",
+        "measure_efficiency",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_governance.py",
+      "classes": [
+        "FactoryExecutionGovernance"
+      ],
+      "methods": [
+        "__init__",
+        "submit",
+        "validate",
+        "authorize",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/action_audit.py",
+      "classes": [
+        "FactoryActionAudit"
+      ],
+      "methods": [
+        "__init__",
+        "record_action",
+        "record_decision",
+        "record_outcome",
+        "query",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/performance_evaluation.py",
+      "classes": [
+        "FactoryPerformanceEvaluation"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate_action",
+        "measure_impact",
+        "compare_results",
+        "score_performance",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_connector.py",
+      "classes": [
+        "FactoryOptimizationConnector"
+      ],
+      "methods": [
+        "__init__",
+        "ingest_performance",
+        "update_metrics",
+        "generate_signal",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/strategy_execution_planner.py",
+      "classes": [
+        "FactoryStrategyExecutionPlanner"
+      ],
+      "methods": [
+        "__init__",
+        "create_plan",
+        "decompose",
+        "prioritize_tasks",
+        "validate_plan",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_state_tracker.py",
+      "classes": [
+        "FactoryExecutionStateTracker"
+      ],
+      "methods": [
+        "__init__",
+        "create_execution",
+        "update_status",
+        "get_state",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "update_status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_supervisor.py",
+      "classes": [
+        "FactoryAutonomousSupervisor"
+      ],
+      "methods": [
+        "__init__",
+        "check_health",
+        "inspect_pipeline",
+        "detect_issues",
+        "coordinate_recovery",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_scheduler.py",
+      "classes": [
+        "FactoryAutonomousScheduler"
+      ],
+      "methods": [
+        "__init__",
+        "schedule_task",
+        "run_cycle",
+        "prioritize_schedule",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_event_bus.py",
+      "classes": [
+        "FactoryAutonomousEventBus"
+      ],
+      "methods": [
+        "__init__",
+        "publish",
+        "subscribe",
+        "dispatch",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/autonomous_state_memory.py",
+      "classes": [
+        "FactoryAutonomousStateMemory"
+      ],
+      "methods": [
+        "__init__",
+        "store_state",
+        "retrieve_state",
+        "update_state",
+        "query_history"
+      ],
+      "matches": [
+        {
+          "name": "query_history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/compliance_audit.py",
+      "classes": [
+        "FactoryComplianceAudit"
+      ],
+      "methods": [
+        "__init__",
+        "record_action",
+        "verify_compliance",
+        "generate_report",
+        "flag_violation",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "generate_report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_telemetry.py",
+      "classes": [
+        "FactoryMetricsTelemetry"
+      ],
+      "methods": [
+        "__init__",
+        "record_metric",
+        "track_event",
+        "calculate_health",
+        "dashboard",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "dashboard",
+          "keyword": "dashboard"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_engine.py",
+      "classes": [
+        "FactoryOptimizationEngine"
+      ],
+      "methods": [
+        "__init__",
+        "evaluate_options",
+        "rank_improvements",
+        "apply_optimization",
+        "measure_gain",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/causal_analysis.py",
+      "classes": [
+        "FactoryCausalAnalysis"
+      ],
+      "methods": [
+        "__init__",
+        "record_cause",
+        "record_effect",
+        "analyze_relationship",
+        "predict_outcome",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/access_control.py",
+      "classes": [
+        "FactoryAccessControl"
+      ],
+      "methods": [
+        "__init__",
+        "create_identity",
+        "grant_permission",
+        "check_permission",
+        "revoke_permission",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/configuration_management.py",
+      "classes": [
+        "FactoryConfigurationManagement"
+      ],
+      "methods": [
+        "__init__",
+        "set_config",
+        "get_config",
+        "update_config",
+        "validate_config",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/audit_trail.py",
+      "classes": [
+        "FactoryAuditTrail"
+      ],
+      "methods": [
+        "__init__",
+        "record_action",
+        "record_decision",
+        "query_records",
+        "verify_integrity",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_observability.py",
+      "classes": [
+        "FactoryMetricsObservability"
+      ],
+      "methods": [
+        "__init__",
+        "record_metric",
+        "calculate_score",
+        "get_dashboard",
+        "detect_anomaly",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "get_dashboard",
+          "keyword": "dashboard"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/dependency_management.py",
+      "classes": [
+        "FactoryDependencyManagement"
+      ],
+      "methods": [
+        "__init__",
+        "register_dependency",
+        "remove_dependency",
+        "resolve_dependencies",
+        "check_health",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/recovery_management.py",
+      "classes": [
+        "FactoryRecoveryManagement"
+      ],
+      "methods": [
+        "__init__",
+        "detect_failure",
+        "attempt_recovery",
+        "validate_recovery",
+        "record_incident",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/policy_governance.py",
+      "classes": [
+        "FactoryPolicyGovernance"
+      ],
+      "methods": [
+        "__init__",
+        "create_policy",
+        "evaluate_policy",
+        "enforce_policy",
+        "update_policy",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/audit_intelligence.py",
+      "classes": [
+        "FactoryAuditIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "record_event",
+        "query_events",
+        "verify_integrity",
+        "generate_audit_report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "generate_audit_report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/event_intelligence.py",
+      "classes": [
+        "FactoryEventIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "publish_event",
+        "subscribe",
+        "process_events",
+        "route_event",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_intelligence.py",
+      "classes": [
+        "FactoryMetricsIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "record_metric",
+        "aggregate_metrics",
+        "analyze_trends",
+        "detect_anomaly",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/version_intelligence.py",
+      "classes": [
+        "FactoryVersionIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "register_version",
+        "compare_versions",
+        "validate_upgrade",
+        "rollback_version",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/knowledge_intelligence.py",
+      "classes": [
+        "FactoryKnowledgeIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "store_knowledge",
+        "retrieve_knowledge",
+        "link_knowledge",
+        "search_knowledge",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/forecasting_intelligence.py",
+      "classes": [
+        "FactoryForecastingIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_forecast",
+        "analyze_pattern",
+        "predict_state",
+        "evaluate_accuracy",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_intelligence.py",
+      "classes": [
+        "FactoryOptimizationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "measure_performance",
+        "identify_improvement",
+        "optimize_process",
+        "compare_results",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/strategy_evolution_intelligence.py",
+      "classes": [
+        "FactoryStrategyEvolutionIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "register_strategy",
+        "evaluate_strategy",
+        "select_strategy",
+        "evolve_strategy",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/orchestration_intelligence.py",
+      "classes": [
+        "FactoryOrchestrationIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "coordinate_agents",
+        "dispatch_tasks",
+        "manage_execution",
+        "monitor_execution",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/execution_intelligence.py",
+      "classes": [
+        "FactoryExecutionIntelligence"
+      ],
+      "methods": [
+        "__init__",
+        "create_execution",
+        "start_execution",
+        "track_execution",
+        "complete_execution",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_governance.py",
+      "classes": [
+        "FactoryRuntimeGovernance"
+      ],
+      "methods": [
+        "__init__",
+        "check_policy",
+        "check_permission",
+        "assess_risk",
+        "authorize_execution",
+        "audit_execution",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/event_replay.py",
+      "classes": [
+        "FactoryEventReplay"
+      ],
+      "methods": [
+        "__init__",
+        "store_event",
+        "query_events",
+        "replay_execution",
+        "diagnose_run",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/goal_genesis.py",
+      "classes": [
+        "FactoryGoalGenesis"
+      ],
+      "methods": [
+        "__init__",
+        "generate_goal",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_advisor.py",
+      "classes": [
+        "FactoryDevelopmentAdvisor"
+      ],
+      "methods": [
+        "__init__",
+        "analyze",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_pipeline.py",
+      "classes": [
+        "FactoryDevelopmentPipeline"
+      ],
+      "methods": [
+        "__init__",
+        "run_development_cycle",
+        "report"
+      ],
+      "matches": [
+        {
+          "name": "report",
+          "keyword": "report"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/integrity_checker.py",
+      "classes": [
+        "FactoryIntegrityChecker"
+      ],
+      "methods": [
+        "__init__",
+        "check_runtime",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/maintenance_agent.py",
+      "classes": [
+        "FactoryMaintenanceAgent"
+      ],
+      "methods": [
+        "__init__",
+        "inspect",
+        "recommend",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/report_generator.py",
+      "classes": [
+        "FactoryReportGenerator"
+      ],
+      "methods": [
+        "__init__",
+        "generate",
+        "history",
+        "latest"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/change_impact_analyzer.py",
+      "classes": [
+        "FactoryChangeImpactAnalyzer"
+      ],
+      "methods": [
+        "__init__",
+        "analyze",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_orchestrator.py",
+      "classes": [
+        "FactoryDevelopmentOrchestrator"
+      ],
+      "methods": [
+        "__init__",
+        "create_development_task",
+        "update_status",
+        "record_validation",
+        "execute_task",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "update_status",
+          "keyword": "status"
+        },
+        {
+          "name": "report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/change_lifecycle_manager.py",
+      "classes": [
+        "FactoryChangeLifecycleManager"
+      ],
+      "methods": [
+        "__init__",
+        "start_change",
+        "record_validation",
+        "complete_change",
+        "validate_change",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/validation_runner.py",
+      "classes": [
+        "FactoryValidationRunner"
+      ],
+      "methods": [
+        "__init__",
+        "run_compile_check",
+        "run_test_check",
+        "validate_change",
+        "_run_command",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "report",
+          "keyword": "report"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    },
+    {
+      "file": "ai/factory/development_operator.py",
+      "classes": [
+        "FactoryDevelopmentOperator"
+      ],
+      "methods": [
+        "__init__",
+        "submit_task",
+        "execute_cycle",
+        "review_status",
+        "history"
+      ],
+      "matches": [
+        {
+          "name": "review_status",
+          "keyword": "status"
+        },
+        {
+          "name": "history",
+          "keyword": "history"
+        }
+      ]
+    }
+  ],
+  "count": 187
+}

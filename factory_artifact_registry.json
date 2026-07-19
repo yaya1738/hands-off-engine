@@ -1,0 +1,335 @@
+{
+  "artifacts": [
+    {
+      "file": "factory_validation_resolver.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_execution_request.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_execution_adapter.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_execution_binding_plan.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_reporting_capability_discovery.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_reporting_dependency_mapper.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_reporting_dependency_graph.json",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_constructor_contract_audit.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_pipeline_usage_audit.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_constructor_repair_assistant.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_workspace_artifact_classifier.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_workflow_pattern_registry.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_workflow_execution_memory.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_workflow_execution_memory.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_architecture_audit.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_capability_constructor_report.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_analyzer.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_analysis.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_capability_decision_engine.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_decisions.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_integration_planner.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_safety_gate.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_execution_integration_discovery.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_validation_plan.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_autonomy_preflight.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_autonomy_preflight_report.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_reporting_authority_ranker.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_reporting_authority_plan.json",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_constructor_contract_audit.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_constructor_contract_analyzer.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_constructor_contract_analysis.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_runtime_unified_report.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_runtime_checkpoint_capture.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_milestone_gate.py",
+      "classifier_result": "control_tool",
+      "registry_category": "factory_tool"
+    },
+    {
+      "file": "factory_capability_orchestrator.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_orchestration_result.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_forensic_engine.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_capability_integration_plan.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_execution_plan.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_execution_binding_planner.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_reporting_integration_resolver.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_report_flow_discovery.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_reporting_entrypoints.json",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_runtime_report_signature_discovery.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_runtime_report_signatures.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_runtime_constructor_audit.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_phase_transition_gate.py",
+      "classifier_result": "control_tool",
+      "registry_category": "factory_tool"
+    },
+    {
+      "file": "factory_artifact_registry.json",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_workflow_patterns.json",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_capability_constructor.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_scanner.py",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_capability_report.json",
+      "classifier_result": "next_phase_candidate",
+      "registry_category": "active_phase_asset"
+    },
+    {
+      "file": "factory_execution_integration_discovery.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_existing_reporting_discovery.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_reporting_integration_plan.json",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_report_flow_discovery.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_reporting_entrypoint_discovery.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_runtime_report_adapter.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_constructor_dependency_usage_audit.py",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_constructor_dependency_usage.json",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_runtime_constructor_audit.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_pipeline_usage_audit.json",
+      "classifier_result": "historical_analysis_artifact",
+      "registry_category": "evidence"
+    },
+    {
+      "file": "factory_checkpoint_validator.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_artifact_registry.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    },
+    {
+      "file": "factory_workflow_executor.py",
+      "classifier_result": "unknown",
+      "registry_category": "unclassified"
+    }
+  ],
+  "summary": {
+    "evidence": 20,
+    "active_phase_asset": 23,
+    "factory_tool": 2,
+    "unclassified": 20
+  }
+}

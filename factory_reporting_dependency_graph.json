@@ -1,0 +1,116 @@
+{
+  "nodes": [
+    {
+      "file": "ai/factory/cli.py",
+      "calls": [
+        "history",
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "calls": [
+        "history",
+        "integrity_report",
+        "snapshot"
+      ]
+    },
+    {
+      "file": "ai/factory/api.py",
+      "calls": [
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/command_router.py",
+      "calls": [
+        "dashboard",
+        "history",
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_optimizer.py",
+      "calls": [
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/ide_model.py",
+      "calls": [
+        "history",
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/lifecycle.py",
+      "calls": [
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/daemon_scheduler.py",
+      "calls": [
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/optimization_feedback.py",
+      "calls": [
+        "snapshot"
+      ]
+    },
+    {
+      "file": "ai/factory/observability.py",
+      "calls": [
+        "history",
+        "snapshot",
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/snapshot_publisher.py",
+      "calls": [
+        "snapshot"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_coordinator.py",
+      "calls": [
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/state_persistence.py",
+      "calls": [
+        "snapshot"
+      ]
+    },
+    {
+      "file": "ai/factory/resilience_controller.py",
+      "calls": [
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/runtime_dashboard.py",
+      "calls": [
+        "history",
+        "snapshot"
+      ]
+    },
+    {
+      "file": "ai/factory/external_interface.py",
+      "calls": [
+        "status"
+      ]
+    },
+    {
+      "file": "ai/factory/metrics_integration.py",
+      "calls": [
+        "snapshot"
+      ]
+    }
+  ],
+  "node_count": 17
+}

@@ -1,0 +1,443 @@
+{
+  "runtime_type": "FactoryRuntime",
+  "components": {
+    "registry": {
+      "type": "FactoryRegistry",
+      "methods": {
+        "describe": "(name: str)",
+        "list_components": "() -> List[str]",
+        "register": "(name: str, component_type: str, version: str = '1.0') -> None"
+      }
+    },
+    "artifact_registry": {
+      "type": "FactoryArtifactRegistry",
+      "methods": {
+        "find_by_task": "(task_id: str)",
+        "get_artifact": "(artifact_id: str)",
+        "list_artifacts": "()",
+        "register_artifact": "(artifact_id: str, task_id: str, artifact_type: str, location: str) -> None"
+      }
+    },
+    "autonomy": {
+      "type": "FactoryAutonomyManager",
+      "methods": {
+        "capability_graph_analysis": "()",
+        "consolidation_analysis": "()",
+        "consolidation_decision_analysis": "()",
+        "discovery_gate": "(objective, context='')",
+        "evaluate": "(objective)",
+        "execute": "(objective)",
+        "role_analysis": "()",
+        "system_analysis": "()",
+        "usage_analysis": "()"
+      }
+    },
+    "governance": {
+      "type": "FactoryRuntimeGovernance",
+      "methods": {
+        "assess_risk": "(action: Dict[str, Any])",
+        "audit_execution": "(execution: Dict[str, Any])",
+        "authorize_execution": "(action: Dict[str, Any])",
+        "check_permission": "(action: Dict[str, Any])",
+        "check_policy": "(action: Dict[str, Any])",
+        "history": "()"
+      }
+    },
+    "observability": {
+      "type": "FactoryRuntimeObservability",
+      "methods": {
+        "capture_health": "(health: Dict[str, Any])",
+        "detect_anomaly": "(data: Dict[str, Any])",
+        "generate_alert": "(alert: Dict[str, Any])",
+        "history": "()",
+        "record_metric": "(metric: Dict[str, Any])"
+      }
+    },
+    "state": {
+      "type": "FactoryRuntimeState",
+      "methods": {
+        "history": "()",
+        "load_state": "()",
+        "restore": "(snapshot: Dict[str, Any])",
+        "save_state": "(state: Dict[str, Any])",
+        "snapshot": "()"
+      }
+    },
+    "events": {
+      "type": "FactoryEventBus",
+      "methods": {
+        "emit_runtime_event": "(event_type: str, payload: Dict[str, Any])",
+        "history": "()",
+        "process_events": "()",
+        "publish_event": "(event_type: str, payload: Dict[str, Any])",
+        "subscribe": "(event_type: str, handler: Callable)"
+      }
+    },
+    "replay": {
+      "type": "FactoryEventReplay",
+      "methods": {
+        "diagnose_run": "(events: List[Dict[str, Any]])",
+        "history": "()",
+        "query_events": "(event_type: str = None)",
+        "replay_execution": "(events: List[Dict[str, Any]])",
+        "store_event": "(event: Dict[str, Any])"
+      }
+    },
+    "diagnostics": {
+      "type": "FactoryDiagnosticIntelligence",
+      "methods": {
+        "analyze_execution": "(execution: Dict[str, Any])",
+        "detect_failure_patterns": "(events: List[Dict[str, Any]])",
+        "explain_run": "(events: List[Dict[str, Any]])",
+        "generate_recommendations": "(analysis: Dict[str, Any])",
+        "history": "()"
+      }
+    },
+    "recommendations": {
+      "type": "FactoryRecommendationFeedback",
+      "methods": {
+        "apply_improvement": "(improvement: Dict[str, Any])",
+        "collect_recommendations": "(recommendations: Dict[str, Any])",
+        "evaluate_recommendations": "(recommendations: Dict[str, Any])",
+        "history": "()",
+        "track_effect": "(effect: Dict[str, Any])"
+      }
+    },
+    "meta_optimizer": {
+      "type": "FactoryMetaOptimizer",
+      "methods": {
+        "compare_strategies": "(strategies: List[Dict[str, Any]])",
+        "history": "()",
+        "measure_roi": "(outcome: Dict[str, Any])",
+        "score_improvement": "(improvement: Dict[str, Any])",
+        "select_best_action": "(options: List[Dict[str, Any]])"
+      }
+    },
+    "improvement_assessment": {
+      "type": "FactorySelfAssessment",
+      "methods": {
+        "assess": "(metrics: Dict[str, Any])",
+        "detect_gaps": "(metrics: Dict[str, Any])",
+        "history": "()",
+        "recommend": "(assessment: Dict[str, Any])"
+      }
+    },
+    "improvement_planner": {
+      "type": "FactoryImprovementPlanner",
+      "methods": {
+        "history": "()",
+        "plan": "(assessment: Dict[str, Any])",
+        "prioritize": "(assessment: Dict[str, Any])"
+      }
+    },
+    "improvement_queue": {
+      "type": "FactoryImprovementQueue",
+      "methods": {
+        "complete": "(improvement: Dict[str, Any], result: Dict[str, Any])",
+        "dequeue": "()",
+        "enqueue": "(improvement: Dict[str, Any])",
+        "history": "()",
+        "pending": "()"
+      }
+    },
+    "improvement_orchestrator": {
+      "type": "FactoryImprovementOrchestrator",
+      "methods": {
+        "history": "()",
+        "process": "()",
+        "run_cycle": "(metrics: Dict[str, Any])"
+      }
+    },
+    "improvement_approval": {
+      "type": "FactoryImprovementApproval",
+      "methods": {
+        "approve": "(request: Dict[str, Any])",
+        "history": "()",
+        "reject": "(request: Dict[str, Any])",
+        "request": "(improvement: Dict[str, Any])"
+      }
+    },
+    "development_advisor": {
+      "type": "FactoryDevelopmentAdvisor",
+      "methods": {
+        "analyze": "(findings: Dict[str, Any])",
+        "history": "()"
+      }
+    },
+    "development_translator": {
+      "type": "FactoryDevelopmentTranslator",
+      "methods": {
+        "history": "()",
+        "translate": "(result: Dict[str, Any])"
+      }
+    },
+    "development_tracker": {
+      "type": "FactoryDevelopmentTracker",
+      "methods": {
+        "complete_task": "(index: int)",
+        "create_task": "(task: Dict[str, Any])",
+        "history": "()",
+        "update_status": "(index: int, status: str)",
+        "verify_task": "(task_id: int, verification: Dict[str, Any])"
+      }
+    },
+    "lifecycle_trace": {
+      "type": "FactoryLifecycleTrace",
+      "methods": {
+        "trace": "() -> Dict[str, Any]"
+      }
+    },
+    "development_pipeline": {
+      "type": "FactoryDevelopmentPipeline",
+      "methods": {
+        "process": "(findings: Dict[str, Any])",
+        "report": "()",
+        "run_development_cycle": "(task: Dict[str, Any])"
+      }
+    },
+    "improvement_executor": {
+      "type": "FactoryImprovementExecutor",
+      "methods": {
+        "execute": "(improvement: Dict[str, Any], action: Callable)",
+        "history": "()",
+        "record": "(improvement: Dict[str, Any], result: Dict[str, Any])",
+        "validate": "(improvement: Dict[str, Any])"
+      }
+    },
+    "improvement_action_resolver": {
+      "type": "FactoryImprovementActionResolver",
+      "methods": {
+        "register_action": "(name: str, handler: Callable)",
+        "resolve": "(action: Dict[str, Any]) -> Optional[Callable]"
+      }
+    },
+    "improvement_audit": {
+      "type": "FactoryImprovementAudit",
+      "methods": {
+        "history": "()",
+        "query": "(key: str, value: Any)",
+        "record": "(action: Dict[str, Any])"
+      }
+    },
+    "strategy_manager": {
+      "type": "FactoryStrategyManager",
+      "methods": {
+        "activate_strategy": "(name: str)",
+        "evaluate_strategy": "(name: str)",
+        "history": "()",
+        "retire_strategy": "(name: str)",
+        "select_strategy": "(requested: str = 'default')",
+        "strategy_performance": "(name: str)",
+        "strategy_registry": "(name: str, strategy: Dict[str, Any])"
+      }
+    },
+    "goal_management": {
+      "type": "FactoryGoalManagement",
+      "methods": {
+        "complete_goal": "(goal: Dict[str, Any])",
+        "create_goal": "(goal: Dict[str, Any])",
+        "history": "()",
+        "prioritize_goals": "()",
+        "track_progress": "(goal: Dict[str, Any], progress: Any)"
+      }
+    },
+    "goal_optimizer": {
+      "type": "FactoryGoalOptimizer",
+      "methods": {
+        "adjust": "(goal: Dict[str, Any])",
+        "history": "()",
+        "optimize": "()",
+        "score_goals": "()",
+        "select_best": "()"
+      }
+    },
+    "goal_genesis": {
+      "type": "FactoryGoalGenesis",
+      "methods": {
+        "generate_goal": "(recommendation: Dict[str, Any])",
+        "history": "()"
+      }
+    },
+    "resource_allocator": {
+      "type": "FactoryResourceAllocator",
+      "methods": {
+        "allocate_resources": "(task: Dict[str, Any], amount: int = 1)",
+        "estimate_cost": "(task: Dict[str, Any])",
+        "history": "()",
+        "measure_efficiency": "(outcome: Dict[str, Any])",
+        "rebalance": "(allocations: List[Dict[str, Any]])",
+        "resource_registry": "(name: str, resource: Dict[str, Any])"
+      }
+    },
+    "self_healing": {
+      "type": "FactorySelfHealingIntelligence",
+      "methods": {
+        "apply_recovery": "(recovery: Dict[str, Any])",
+        "detect_failure": "(failure: Dict[str, Any])",
+        "diagnose_issue": "(issue: Dict[str, Any])",
+        "history": "()",
+        "verify_recovery": "(recovery: Dict[str, Any])"
+      }
+    },
+    "planning": {
+      "type": "FactoryPlanningIntelligence",
+      "methods": {
+        "allocate_resources": "(resources: Dict[str, Any])",
+        "analyze_constraints": "(constraints: Dict[str, Any])",
+        "create_plan": "(plan: Dict[str, Any])",
+        "evaluate_plan": "(plan: Dict[str, Any])",
+        "history": "()"
+      }
+    },
+    "simulation": {
+      "type": "FactorySimulationIntelligence",
+      "methods": {
+        "compare_outcomes": "(outcomes: List[Dict[str, Any]])",
+        "create_scenario": "(scenario: Dict[str, Any])",
+        "history": "()",
+        "run_simulation": "(scenario: Dict[str, Any])",
+        "select_scenario": "(scenarios: List[Dict[str, Any]])"
+      }
+    },
+    "decision": {
+      "type": "FactoryDecisionIntelligence",
+      "methods": {
+        "create_decision": "(decision: Dict[str, Any])",
+        "evaluate_options": "(options: List[Dict[str, Any]])",
+        "history": "()",
+        "record_outcome": "(decision: Dict[str, Any], outcome: Dict[str, Any])",
+        "score_decision": "(decision: Dict[str, Any])",
+        "select_action": "(actions: List[Dict[str, Any]])"
+      }
+    },
+    "decision_option_adapter": {
+      "type": "FactoryDecisionOptionAdapter",
+      "methods": {
+        "build_options": "(plan: Dict[str, Any]) -> List[Dict[str, Any]]",
+        "history": "()"
+      }
+    },
+    "feedback_engine": {
+      "type": "FactoryFeedbackEngine",
+      "methods": {
+        "analyze": "()",
+        "history": "()",
+        "recommend": "()",
+        "score": "(experience: Dict[str, Any])"
+      }
+    },
+    "feedback": {
+      "type": "FactoryFeedbackEngine",
+      "methods": {
+        "analyze": "()",
+        "history": "()",
+        "recommend": "()",
+        "score": "(experience: Dict[str, Any])"
+      }
+    },
+    "learning_loop": {
+      "type": "FactoryLearningLoop",
+      "methods": {
+        "analyze_feedback": "(feedback: Dict[str, Any])",
+        "generate_improvement": "(idea: Dict[str, Any])",
+        "history": "()",
+        "record_outcome": "(outcome: Dict[str, Any])",
+        "update_model": "(update: Dict[str, Any])"
+      }
+    },
+    "adaptive_decision": {
+      "type": "FactoryAdaptiveDecision",
+      "methods": {
+        "adjust": "()",
+        "decide": "(state: Dict[str, Any])",
+        "history": "()",
+        "learn": "(recommendation: Dict[str, Any])"
+      }
+    },
+    "integrity_checker": {
+      "type": "FactoryIntegrityChecker",
+      "methods": {
+        "check_runtime": "(runtime)",
+        "history": "()"
+      }
+    },
+    "operator": {
+      "type": "FactoryOperatorAgent",
+      "methods": {
+        "assess": "(runtime)",
+        "choose_next_action": "(assessment: Dict[str, Any])",
+        "report": "()"
+      }
+    },
+    "maintenance": {
+      "type": "FactoryMaintenanceAgent",
+      "methods": {
+        "history": "()",
+        "inspect": "(runtime)",
+        "recommend": "(inspection: Dict[str, Any])"
+      }
+    },
+    "report_generator": {
+      "type": "FactoryReportGenerator",
+      "methods": {
+        "generate": "(integrity=None, operator=None, maintenance=None)",
+        "history": "()",
+        "latest": "()"
+      }
+    },
+    "trend_analyzer": {
+      "type": "FactoryTrendAnalyzer",
+      "methods": {
+        "analyze": "(reports: List[Dict[str, Any]])",
+        "history": "()"
+      }
+    },
+    "change_impact_analyzer": {
+      "type": "FactoryChangeImpactAnalyzer",
+      "methods": {
+        "analyze": "(before: Dict[str, Any], after: Dict[str, Any])",
+        "history": "()"
+      }
+    },
+    "orchestration": {
+      "type": "FactoryOrchestrationIntelligence",
+      "methods": {
+        "coordinate_agents": "(agents: List[Dict[str, Any]])",
+        "dispatch_tasks": "(tasks: List[Dict[str, Any]])",
+        "history": "()",
+        "manage_execution": "(execution: Dict[str, Any])",
+        "monitor_execution": "(execution: Dict[str, Any])"
+      }
+    },
+    "execution": {
+      "type": "FactoryExecutionIntelligence",
+      "methods": {
+        "complete_execution": "(execution_id: str)",
+        "create_execution": "(execution_id: str, execution: Dict[str, Any])",
+        "history": "()",
+        "start_execution": "(execution_id: str)",
+        "track_execution": "(execution_id: str)"
+      }
+    },
+    "learning": {
+      "type": "FactoryLearningIntelligence",
+      "methods": {
+        "analyze_outcome": "(outcome: Dict[str, Any])",
+        "extract_lesson": "(data: Dict[str, Any])",
+        "history": "()",
+        "record_experience": "(experience: Dict[str, Any])",
+        "update_model": "(name: str, update: Dict[str, Any])"
+      }
+    },
+    "optimization": {
+      "type": "FactoryOptimizationIntelligence",
+      "methods": {
+        "compare_results": "(before: Dict[str, Any], after: Dict[str, Any])",
+        "history": "()",
+        "identify_improvement": "(data: Dict[str, Any])",
+        "measure_performance": "(metrics: Dict[str, Any])",
+        "optimize_process": "(process: Dict[str, Any])"
+      }
+    }
+  }
+}

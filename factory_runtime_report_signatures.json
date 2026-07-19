@@ -1,0 +1,41 @@
+{
+  "class": "FactoryRuntime",
+  "methods": {
+    "trend_report": {
+      "arguments": [
+        "self"
+      ],
+      "line": 681
+    },
+    "factory_report": {
+      "arguments": [
+        "self"
+      ],
+      "line": 688
+    },
+    "maintenance_status": {
+      "arguments": [
+        "self"
+      ],
+      "line": 709
+    },
+    "operator_status": {
+      "arguments": [
+        "self"
+      ],
+      "line": 723
+    },
+    "integrity_report": {
+      "arguments": [
+        "self"
+      ],
+      "line": 735
+    },
+    "history": {
+      "arguments": [
+        "self"
+      ],
+      "line": 747
+    }
+  }
+}

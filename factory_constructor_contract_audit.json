@@ -1,0 +1,255 @@
+[
+  {
+    "file": "ai/factory/controller.py",
+    "calls": [
+      {
+        "class": "FactoryPlanner",
+        "keywords": []
+      },
+      {
+        "class": "FactoryRunner",
+        "keywords": []
+      },
+      {
+        "class": "FactoryVerifier",
+        "keywords": []
+      },
+      {
+        "class": "FactoryMemory",
+        "keywords": []
+      }
+    ]
+  },
+  {
+    "file": "ai/factory/cli.py",
+    "calls": [
+      {
+        "class": "FactoryController",
+        "keywords": []
+      },
+      {
+        "class": "FactoryInterface",
+        "keywords": []
+      }
+    ]
+  },
+  {
+    "file": "ai/factory/runtime.py",
+    "calls": [
+      {
+        "class": "FactoryRegistry",
+        "keywords": []
+      },
+      {
+        "class": "FactoryRuntimeGovernance",
+        "keywords": []
+      },
+      {
+        "class": "FactoryRuntimeObservability",
+        "keywords": []
+      },
+      {
+        "class": "FactoryRuntimeState",
+        "keywords": []
+      },
+      {
+        "class": "FactoryEventBus",
+        "keywords": []
+      },
+      {
+        "class": "FactoryEventReplay",
+        "keywords": []
+      },
+      {
+        "class": "FactoryDiagnosticIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactoryRecommendationFeedback",
+        "keywords": []
+      },
+      {
+        "class": "FactoryMetaOptimizer",
+        "keywords": []
+      },
+      {
+        "class": "FactorySelfAssessment",
+        "keywords": []
+      },
+      {
+        "class": "FactoryImprovementPlanner",
+        "keywords": []
+      },
+      {
+        "class": "FactoryImprovementQueue",
+        "keywords": []
+      },
+      {
+        "class": "FactoryImprovementOrchestrator",
+        "keywords": [
+          "assessor",
+          "planner",
+          "queue"
+        ]
+      },
+      {
+        "class": "FactoryImprovementApproval",
+        "keywords": []
+      },
+      {
+        "class": "FactoryDevelopmentAdvisor",
+        "keywords": []
+      },
+      {
+        "class": "FactoryDevelopmentTranslator",
+        "keywords": []
+      },
+      {
+        "class": "FactoryDevelopmentTracker",
+        "keywords": []
+      },
+      {
+        "class": "FactoryDevelopmentPipeline",
+        "keywords": [
+          "advisor",
+          "approval"
+        ]
+      },
+      {
+        "class": "FactoryImprovementExecutor",
+        "keywords": []
+      },
+      {
+        "class": "FactoryImprovementAudit",
+        "keywords": []
+      },
+      {
+        "class": "FactoryStrategyManager",
+        "keywords": []
+      },
+      {
+        "class": "FactoryGoalManagement",
+        "keywords": []
+      },
+      {
+        "class": "FactoryGoalOptimizer",
+        "keywords": []
+      },
+      {
+        "class": "FactoryGoalGenesis",
+        "keywords": []
+      },
+      {
+        "class": "FactoryResourceAllocator",
+        "keywords": []
+      },
+      {
+        "class": "FactorySelfHealingIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactoryPlanningIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactorySimulationIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactoryDecisionIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactoryFeedbackEngine",
+        "keywords": []
+      },
+      {
+        "class": "FactoryLearningLoop",
+        "keywords": []
+      },
+      {
+        "class": "FactoryAdaptiveDecision",
+        "keywords": [
+          "feedback"
+        ]
+      },
+      {
+        "class": "FactoryIntegrityChecker",
+        "keywords": []
+      },
+      {
+        "class": "FactoryOperatorAgent",
+        "keywords": [
+          "integrity_checker",
+          "goal_management",
+          "improvement_queue"
+        ]
+      },
+      {
+        "class": "FactoryMaintenanceAgent",
+        "keywords": [
+          "operator"
+        ]
+      },
+      {
+        "class": "FactoryReportGenerator",
+        "keywords": []
+      },
+      {
+        "class": "FactoryTrendAnalyzer",
+        "keywords": []
+      },
+      {
+        "class": "FactoryChangeImpactAnalyzer",
+        "keywords": []
+      },
+      {
+        "class": "FactoryOrchestrationIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactoryExecutionIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactoryLearningIntelligence",
+        "keywords": []
+      },
+      {
+        "class": "FactoryOptimizationIntelligence",
+        "keywords": []
+      }
+    ]
+  },
+  {
+    "file": "ai/factory/development_pipeline.py",
+    "calls": [
+      {
+        "class": "FactoryDevelopmentOrchestrator",
+        "keywords": []
+      },
+      {
+        "class": "FactoryChangeLifecycleManager",
+        "keywords": []
+      }
+    ]
+  },
+  {
+    "file": "ai/factory/development_orchestrator.py",
+    "calls": [
+      {
+        "class": "FactoryDevelopmentExecutor",
+        "keywords": []
+      }
+    ]
+  },
+  {
+    "file": "ai/factory/change_lifecycle_manager.py",
+    "calls": [
+      {
+        "class": "FactoryValidationRunner",
+        "keywords": []
+      }
+    ]
+  }
+]

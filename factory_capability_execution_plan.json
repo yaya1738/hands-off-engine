@@ -1,0 +1,270 @@
+{
+  "generated_at": "2026-07-17T08:49:59.002144+00:00",
+  "actions": [
+    {
+      "capability": "audit",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002018+00:00",
+        "capability": "audit"
+      }
+    },
+    {
+      "capability": "registry",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002040+00:00",
+        "capability": "registry"
+      }
+    },
+    {
+      "capability": "health",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002049+00:00",
+        "capability": "health"
+      }
+    },
+    {
+      "capability": "diagnostic",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002055+00:00",
+        "capability": "diagnostic"
+      }
+    },
+    {
+      "capability": "inspect",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002061+00:00",
+        "capability": "inspect"
+      }
+    },
+    {
+      "capability": "orchestr",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002066+00:00",
+        "capability": "orchestr"
+      }
+    },
+    {
+      "capability": "executor",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002071+00:00",
+        "capability": "executor"
+      }
+    },
+    {
+      "capability": "runtime",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002075+00:00",
+        "capability": "runtime"
+      }
+    },
+    {
+      "capability": "scheduler",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002080+00:00",
+        "capability": "scheduler"
+      }
+    },
+    {
+      "capability": "graph",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002084+00:00",
+        "capability": "graph"
+      }
+    },
+    {
+      "capability": "dependency",
+      "action": "review duplicate implementations",
+      "risk": "high",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002089+00:00",
+        "capability": "dependency"
+      }
+    },
+    {
+      "capability": "audit",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002094+00:00",
+        "capability": "audit"
+      }
+    },
+    {
+      "capability": "registry",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002098+00:00",
+        "capability": "registry"
+      }
+    },
+    {
+      "capability": "health",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002103+00:00",
+        "capability": "health"
+      }
+    },
+    {
+      "capability": "diagnostic",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002107+00:00",
+        "capability": "diagnostic"
+      }
+    },
+    {
+      "capability": "inspect",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002112+00:00",
+        "capability": "inspect"
+      }
+    },
+    {
+      "capability": "orchestr",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002116+00:00",
+        "capability": "orchestr"
+      }
+    },
+    {
+      "capability": "executor",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002121+00:00",
+        "capability": "executor"
+      }
+    },
+    {
+      "capability": "runtime",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002126+00:00",
+        "capability": "runtime"
+      }
+    },
+    {
+      "capability": "scheduler",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002130+00:00",
+        "capability": "scheduler"
+      }
+    },
+    {
+      "capability": "graph",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002135+00:00",
+        "capability": "graph"
+      }
+    },
+    {
+      "capability": "dependency",
+      "action": "evaluate existing implementations",
+      "risk": "medium",
+      "execution_status": "requires_review",
+      "validation_required": true,
+      "audit_event": {
+        "type": "capability_integration_request",
+        "timestamp": "2026-07-17T08:49:59.002139+00:00",
+        "capability": "dependency"
+      }
+    }
+  ],
+  "total_actions": 22
+}

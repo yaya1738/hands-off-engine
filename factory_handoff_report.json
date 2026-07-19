@@ -1,0 +1,716 @@
+{
+  "timestamp": "2026-07-19T07:32:10.125988",
+  "inspection": "factory proposal handoff audit",
+  "files": [
+    "ai/factory/runtime.py",
+    "ai/factory/development_tracker.py",
+    "ai/factory/development_translator.py",
+    "ai/factory/development_advisor.py",
+    "ai/factory/improvement_planner.py",
+    "ai/factory/improvement_approval.py",
+    "ai/factory/improvement_executor.py"
+  ],
+  "methods": [
+    {
+      "class": "FactoryRuntime",
+      "line": 57,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "__init__",
+      "line": 58,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "component_inventory",
+      "line": 164,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "emit_event",
+      "line": 186,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "manage_strategy",
+      "line": 203,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "manage_resources",
+      "line": 221,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "run_improvement_cycle",
+      "line": 247,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "submit_goal",
+      "line": 371,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "submit_development_request",
+      "line": 402,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "autonomous_execute",
+      "line": 534,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "report_autonomy_state",
+      "line": 583,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "execute",
+      "line": 606,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "change_impact_report",
+      "line": 756,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "trend_report",
+      "line": 766,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "factory_report",
+      "line": 773,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "maintenance_status",
+      "line": 794,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "operator_status",
+      "line": 808,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "integrity_report",
+      "line": 820,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "name": "history",
+      "line": 832,
+      "file": "ai/factory/runtime.py"
+    },
+    {
+      "class": "FactoryDevelopmentTracker",
+      "line": 5,
+      "file": "ai/factory/development_tracker.py"
+    },
+    {
+      "name": "__init__",
+      "line": 6,
+      "file": "ai/factory/development_tracker.py"
+    },
+    {
+      "name": "create_task",
+      "line": 10,
+      "file": "ai/factory/development_tracker.py"
+    },
+    {
+      "name": "update_status",
+      "line": 27,
+      "file": "ai/factory/development_tracker.py"
+    },
+    {
+      "name": "complete_task",
+      "line": 36,
+      "file": "ai/factory/development_tracker.py"
+    },
+    {
+      "name": "verify_task",
+      "line": 47,
+      "file": "ai/factory/development_tracker.py"
+    },
+    {
+      "name": "history",
+      "line": 64,
+      "file": "ai/factory/development_tracker.py"
+    },
+    {
+      "class": "FactoryDevelopmentTranslator",
+      "line": 4,
+      "file": "ai/factory/development_translator.py"
+    },
+    {
+      "name": "__init__",
+      "line": 5,
+      "file": "ai/factory/development_translator.py"
+    },
+    {
+      "name": "translate",
+      "line": 8,
+      "file": "ai/factory/development_translator.py"
+    },
+    {
+      "name": "history",
+      "line": 39,
+      "file": "ai/factory/development_translator.py"
+    },
+    {
+      "class": "FactoryDevelopmentAdvisor",
+      "line": 4,
+      "file": "ai/factory/development_advisor.py"
+    },
+    {
+      "name": "__init__",
+      "line": 5,
+      "file": "ai/factory/development_advisor.py"
+    },
+    {
+      "name": "analyze",
+      "line": 8,
+      "file": "ai/factory/development_advisor.py"
+    },
+    {
+      "name": "history",
+      "line": 48,
+      "file": "ai/factory/development_advisor.py"
+    },
+    {
+      "class": "FactoryImprovementPlanner",
+      "line": 4,
+      "file": "ai/factory/improvement_planner.py"
+    },
+    {
+      "name": "__init__",
+      "line": 5,
+      "file": "ai/factory/improvement_planner.py"
+    },
+    {
+      "name": "plan",
+      "line": 8,
+      "file": "ai/factory/improvement_planner.py"
+    },
+    {
+      "name": "prioritize",
+      "line": 64,
+      "file": "ai/factory/improvement_planner.py"
+    },
+    {
+      "name": "history",
+      "line": 78,
+      "file": "ai/factory/improvement_planner.py"
+    },
+    {
+      "class": "FactoryImprovementApproval",
+      "line": 5,
+      "file": "ai/factory/improvement_approval.py"
+    },
+    {
+      "name": "__init__",
+      "line": 6,
+      "file": "ai/factory/improvement_approval.py"
+    },
+    {
+      "name": "request",
+      "line": 9,
+      "file": "ai/factory/improvement_approval.py"
+    },
+    {
+      "name": "approve",
+      "line": 27,
+      "file": "ai/factory/improvement_approval.py"
+    },
+    {
+      "name": "reject",
+      "line": 35,
+      "file": "ai/factory/improvement_approval.py"
+    },
+    {
+      "name": "history",
+      "line": 43,
+      "file": "ai/factory/improvement_approval.py"
+    },
+    {
+      "class": "FactoryImprovementExecutor",
+      "line": 5,
+      "file": "ai/factory/improvement_executor.py"
+    },
+    {
+      "name": "__init__",
+      "line": 6,
+      "file": "ai/factory/improvement_executor.py"
+    },
+    {
+      "name": "validate",
+      "line": 9,
+      "file": "ai/factory/improvement_executor.py"
+    },
+    {
+      "name": "execute",
+      "line": 20,
+      "file": "ai/factory/improvement_executor.py"
+    },
+    {
+      "name": "record",
+      "line": 55,
+      "file": "ai/factory/improvement_executor.py"
+    },
+    {
+      "name": "history",
+      "line": 74,
+      "file": "ai/factory/improvement_executor.py"
+    }
+  ],
+  "keywords": [
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 22,
+      "keyword": "plan",
+      "text": "from ai.factory.planning_intelligence import FactoryPlanningIntelligence"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 40,
+      "keyword": "plan",
+      "text": "from ai.factory.improvement_planner import FactoryImprovementPlanner"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 42,
+      "keyword": "approval",
+      "text": "from ai.factory.improvement_approval import FactoryImprovementApproval"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 78,
+      "keyword": "plan",
+      "text": "self.improvement_planner = FactoryImprovementPlanner()"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 84,
+      "keyword": "plan",
+      "text": "planner=self.improvement_planner,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 88,
+      "keyword": "approval",
+      "text": "self.improvement_approval = FactoryImprovementApproval()"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 127,
+      "keyword": "plan",
+      "text": "self.planning = FactoryPlanningIntelligence()"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 318,
+      "keyword": "translate",
+      "text": "translated_findings = self.development_translator.translate("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 326,
+      "keyword": "translate",
+      "text": "+ translated_findings.get("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 334,
+      "keyword": "plan",
+      "text": "development_plan = self.improvement_planner.plan("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 338,
+      "keyword": "translate",
+      "text": "+ translated_findings.get("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 352,
+      "keyword": "task",
+      "text": "development_task = self.development_tracker.create_task("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 355,
+      "keyword": "plan",
+      "text": "\"plan\": development_plan,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 363,
+      "keyword": "proposal",
+      "text": "\"proposal\": improvement_cycle,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 366,
+      "keyword": "plan",
+      "text": "\"plan\": development_plan,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 367,
+      "keyword": "task",
+      "text": "\"task\": development_task,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 423,
+      "keyword": "translate",
+      "text": "translated = self.development_translator.translate("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 433,
+      "keyword": "translate",
+      "text": "\"gaps\": translated.get("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 446,
+      "keyword": "plan",
+      "text": "\"name\": \"continue_current_plan\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 459,
+      "keyword": "plan",
+      "text": "plan = self.improvement_planner.plan("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 467,
+      "keyword": "plan",
+      "text": "\"development_type\": \"execution_planning_integration\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 479,
+      "keyword": "plan",
+      "text": "\"execution plan appears in audit\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 480,
+      "keyword": "task",
+      "text": "\"development task contains implementation metadata\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 481,
+      "keyword": "plan",
+      "text": "\"decision data flows into planning\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 484,
+      "keyword": "plan",
+      "text": "\"remove execution planning fields\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 485,
+      "keyword": "task",
+      "text": "\"preserve existing task tracking\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 490,
+      "keyword": "task",
+      "text": "task = self.development_tracker.create_task("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 493,
+      "keyword": "proposal",
+      "text": "\"proposal\": development,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 494,
+      "keyword": "plan",
+      "text": "\"plan\": plan,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 495,
+      "keyword": "proposal",
+      "text": "\"source\": \"factory_proposal\","
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 504,
+      "keyword": "task",
+      "text": "task = self.development_tracker.verify_task("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 505,
+      "keyword": "task",
+      "text": "task[\"id\"],"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 520,
+      "keyword": "plan",
+      "text": "\"plan\": plan,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 521,
+      "keyword": "task",
+      "text": "\"task\": task,"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 534,
+      "keyword": "execute",
+      "text": "def autonomous_execute(self, objective):"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 572,
+      "keyword": "execute",
+      "text": "result = self.execute("
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 606,
+      "keyword": "execute",
+      "text": "def execute(self, goal):"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 635,
+      "keyword": "plan",
+      "text": "plan = self.planning.create_plan(goal)"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 636,
+      "keyword": "plan",
+      "text": "steps.append(\"planning\")"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 638,
+      "keyword": "plan",
+      "text": "simulation = self.simulation.run_simulation(plan)"
+    },
+    {
+      "file": "ai/factory/runtime.py",
+      "line": 644,
+      "keyword": "task",
+      "text": "self.orchestration.dispatch_tasks("
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 7,
+      "keyword": "task",
+      "text": "self._tasks: List[Dict[str, Any]] = []"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 10,
+      "keyword": "task",
+      "text": "def create_task("
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 12,
+      "keyword": "task",
+      "text": "task: Dict[str, Any],"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 16,
+      "keyword": "task",
+      "text": "\"task\": task,"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 23,
+      "keyword": "task",
+      "text": "self._tasks.append(record)"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 32,
+      "keyword": "task",
+      "text": "self._tasks[index][\"status\"] = status"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 34,
+      "keyword": "task",
+      "text": "return self._tasks[index]"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 36,
+      "keyword": "task",
+      "text": "def complete_task("
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 40,
+      "keyword": "task",
+      "text": "self._tasks[index][\"status\"] = \"completed\""
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 41,
+      "keyword": "task",
+      "text": "self._tasks[index][\"completed_at\"] = ("
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 45,
+      "keyword": "task",
+      "text": "return self._tasks[index]"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 47,
+      "keyword": "task",
+      "text": "def verify_task("
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 49,
+      "keyword": "task",
+      "text": "task_id: int,"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 52,
+      "keyword": "task",
+      "text": "for task in self._tasks:"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 53,
+      "keyword": "task",
+      "text": "if task[\"id\"] == task_id:"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 54,
+      "keyword": "task",
+      "text": "task[\"verification\"] = verification"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 55,
+      "keyword": "verified",
+      "text": "task[\"status\"] = \"verified\""
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 55,
+      "keyword": "task",
+      "text": "task[\"status\"] = \"verified\""
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 56,
+      "keyword": "verified",
+      "text": "task[\"verified_at\"] = ("
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 56,
+      "keyword": "task",
+      "text": "task[\"verified_at\"] = ("
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 60,
+      "keyword": "task",
+      "text": "return task"
+    },
+    {
+      "file": "ai/factory/development_tracker.py",
+      "line": 65,
+      "keyword": "task",
+      "text": "return self._tasks"
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "line": 8,
+      "keyword": "translate",
+      "text": "def translate("
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "line": 29,
+      "keyword": "translate",
+      "text": "translated = {"
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "line": 34,
+      "keyword": "translate",
+      "text": "translated"
+    },
+    {
+      "file": "ai/factory/development_translator.py",
+      "line": 37,
+      "keyword": "translate",
+      "text": "return translated"
+    },
+    {
+      "file": "ai/factory/development_advisor.py",
+      "line": 20,
+      "keyword": "approval",
+      "text": "\"requires_approval\": True,"
+    },
+    {
+      "file": "ai/factory/development_advisor.py",
+      "line": 36,
+      "keyword": "approval",
+      "text": "\"requires_approval\": True,"
+    },
+    {
+      "file": "ai/factory/improvement_planner.py",
+      "line": 8,
+      "keyword": "plan",
+      "text": "def plan("
+    },
+    {
+      "file": "ai/factory/improvement_planner.py",
+      "line": 17,
+      "keyword": "task",
+      "text": "tasks = ["
+    },
+    {
+      "file": "ai/factory/improvement_planner.py",
+      "line": 24,
+      "keyword": "task",
+      "text": "\"tasks\": tasks,"
+    },
+    {
+      "file": "ai/factory/improvement_executor.py",
+      "line": 20,
+      "keyword": "execute",
+      "text": "def execute("
+    }
+  ],
+  "analysis": {
+    "question_1": "Where does verified task creation exist?",
+    "question_2": "Where does proposal generation exist?",
+    "question_3": "What lifecycle bridge is missing?",
+    "next_step": "Review runtime transition and insert minimal adapter only if absent."
+  }
+}

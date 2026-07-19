@@ -30,6 +30,13 @@ class FactoryImprovementApproval:
     ):
         request["status"] = "APPROVED"
 
+        improvement = request.get(
+            "improvement"
+        )
+
+        if improvement:
+            improvement["status"] = "APPROVED"
+
         return request
 
     def reject(

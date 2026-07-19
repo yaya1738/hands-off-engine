@@ -1,0 +1,21 @@
+{
+  "contract_mismatches": [
+    {
+      "caller": "ai/factory/runtime.py",
+      "class": "FactoryDevelopmentPipeline",
+      "constructor_file": "ai/factory/development_pipeline.py",
+      "passed": [
+        "advisor",
+        "approval"
+      ],
+      "accepted": [
+        "self"
+      ],
+      "unknown_arguments": [
+        "advisor",
+        "approval"
+      ]
+    }
+  ],
+  "count": 1
+}

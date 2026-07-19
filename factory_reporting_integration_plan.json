@@ -1,0 +1,33 @@
+{
+  "selected_reporting_sources": [
+    {
+      "component": "FactoryRuntime",
+      "file": "ai/factory/runtime.py",
+      "available_methods": [
+        "factory_report",
+        "integrity_report",
+        "maintenance_status",
+        "operator_status",
+        "history"
+      ]
+    },
+    {
+      "component": "FactoryAPI",
+      "file": "ai/factory/api.py",
+      "available_methods": [
+        "dashboard",
+        "status",
+        "history"
+      ]
+    },
+    {
+      "component": "FactoryCLI",
+      "file": "ai/factory/cli.py",
+      "available_methods": [
+        "status",
+        "history"
+      ]
+    }
+  ],
+  "fallback_required": false
+}

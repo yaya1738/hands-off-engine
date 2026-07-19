@@ -1,0 +1,159 @@
+{
+  "execution_requests": [
+    {
+      "capability": "audit",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "registry",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "health",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "diagnostic",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "inspect",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "orchestr",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "executor",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "runtime",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "scheduler",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "graph",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "dependency",
+      "planned_action": "review duplicate implementations",
+      "next_step": "consolidation analysis",
+      "risk": "high",
+      "status": "requires_review"
+    },
+    {
+      "capability": "audit",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "registry",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "health",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "diagnostic",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "inspect",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "orchestr",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "executor",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "runtime",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "scheduler",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "graph",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    },
+    {
+      "capability": "dependency",
+      "planned_action": "evaluate existing implementations",
+      "next_step": "select integration target",
+      "risk": "medium",
+      "status": "requires_review"
+    }
+  ],
+  "count": 22
+}

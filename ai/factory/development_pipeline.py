@@ -2,20 +2,49 @@ from typing import Any, Dict
 
 from ai.factory.development_orchestrator import FactoryDevelopmentOrchestrator
 from ai.factory.change_lifecycle_manager import FactoryChangeLifecycleManager
+from ai.factory.development_artifact_generator import (
+    FactoryDevelopmentArtifactGenerator,
+)
+from ai.factory.artifact_registry import (
+    FactoryArtifactRegistry,
+)
 
 
 class FactoryDevelopmentPipeline:
-    def __init__(self):
+
+    def __init__(self, artifact_registry=None):
         self.orchestrator = FactoryDevelopmentOrchestrator()
         self.lifecycle = FactoryChangeLifecycleManager()
+        self.artifact_generator = FactoryDevelopmentArtifactGenerator()
+        self.artifact_registry = (
+            artifact_registry
+            or FactoryArtifactRegistry()
+        )
         self._history = []
+
 
     def run_development_cycle(
         self,
         task: Dict[str, Any],
     ):
+
         development_task = self.orchestrator.create_development_task(
             task
+        )
+
+        artifact = self.artifact_generator.generate(
+            task.get("objective")
+            or task.get("goal")
+            or "factory_development_task",
+            development_task,
+            task,
+        )
+
+        self.artifact_registry.register_artifact(
+            artifact["artifact_id"],
+            artifact.get("task_id"),
+            artifact["type"],
+            artifact["location"],
         )
 
         execution = self.orchestrator.execute_task(
@@ -32,6 +61,7 @@ class FactoryDevelopmentPipeline:
 
         result = {
             "task": development_task,
+            "artifact": artifact,
             "execution": execution,
             "change": change,
             "validation": validation,
@@ -41,7 +71,6 @@ class FactoryDevelopmentPipeline:
         self._history.append(result)
 
         return result
-
 
 
     def process(
@@ -57,4 +86,5 @@ class FactoryDevelopmentPipeline:
         return {
             "cycles": len(self._history),
             "history": self._history,
+            "artifacts": self.artifact_registry.list_artifacts(),
         }

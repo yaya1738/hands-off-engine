@@ -1,0 +1,290 @@
+{
+  "recommended_targets": [
+    {
+      "file": "ai/factory/runtime.py",
+      "classes": [
+        "FactoryRuntime"
+      ],
+      "methods": [
+        "__init__",
+        "component_inventory",
+        "emit_event",
+        "manage_strategy",
+        "manage_resources",
+        "run_improvement_cycle",
+        "submit_goal",
+        "submit_development_request",
+        "execute",
+        "change_impact_report",
+        "trend_report",
+        "factory_report",
+        "maintenance_status",
+        "operator_status",
+        "integrity_report",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_improvement_cycle",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_improvement_cycle",
+          "keyword": "improvement"
+        },
+        {
+          "type": "method",
+          "name": "submit_goal",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "submit_development_request",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "submit_development_request",
+          "keyword": "request"
+        },
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ],
+      "score": 5
+    },
+    {
+      "file": "ai/factory/validation_runner.py",
+      "classes": [
+        "FactoryValidationRunner"
+      ],
+      "methods": [
+        "__init__",
+        "run_compile_check",
+        "run_test_check",
+        "validate_change",
+        "_run_command",
+        "report",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_compile_check",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_test_check",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "_run_command",
+          "keyword": "run"
+        }
+      ],
+      "score": 3
+    },
+    {
+      "file": "ai/factory/job_runner.py",
+      "classes": [
+        "FactoryJobRunner"
+      ],
+      "methods": [
+        "__init__",
+        "run_job",
+        "run_cycle",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_job",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_job",
+          "keyword": "job"
+        },
+        {
+          "type": "method",
+          "name": "run_cycle",
+          "keyword": "run"
+        }
+      ],
+      "score": 2
+    },
+    {
+      "file": "ai/factory/execution_governance.py",
+      "classes": [
+        "FactoryExecutionGovernance"
+      ],
+      "methods": [
+        "__init__",
+        "submit",
+        "validate",
+        "authorize",
+        "execute",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "submit",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "execute",
+          "keyword": "execute"
+        }
+      ],
+      "score": 2
+    },
+    {
+      "file": "ai/factory/development_operator.py",
+      "classes": [
+        "FactoryDevelopmentOperator"
+      ],
+      "methods": [
+        "__init__",
+        "submit_task",
+        "execute_cycle",
+        "review_status",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "submit_task",
+          "keyword": "submit"
+        },
+        {
+          "type": "method",
+          "name": "submit_task",
+          "keyword": "task"
+        },
+        {
+          "type": "method",
+          "name": "execute_cycle",
+          "keyword": "execute"
+        }
+      ],
+      "score": 2
+    },
+    {
+      "file": "ai/factory/runner.py",
+      "classes": [
+        "FactoryRunner"
+      ],
+      "methods": [
+        "run"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run",
+          "keyword": "run"
+        }
+      ],
+      "score": 1
+    },
+    {
+      "file": "ai/factory/interface.py",
+      "classes": [
+        "FactoryInterface"
+      ],
+      "methods": [
+        "__init__",
+        "run_task",
+        "history",
+        "status"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "task"
+        }
+      ],
+      "score": 1
+    },
+    {
+      "file": "ai/factory/cli.py",
+      "classes": [
+        "FactoryCLI"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "run",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run",
+          "keyword": "run"
+        }
+      ],
+      "score": 1
+    },
+    {
+      "file": "ai/factory/api.py",
+      "classes": [
+        "FactoryAPI"
+      ],
+      "methods": [
+        "__init__",
+        "status",
+        "dashboard",
+        "run_task",
+        "history"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "run"
+        },
+        {
+          "type": "method",
+          "name": "run_task",
+          "keyword": "task"
+        }
+      ],
+      "score": 1
+    },
+    {
+      "file": "ai/factory/command_router.py",
+      "classes": [
+        "FactoryCommandRouter"
+      ],
+      "methods": [
+        "__init__",
+        "dispatch"
+      ],
+      "matches": [
+        {
+          "type": "method",
+          "name": "dispatch",
+          "keyword": "dispatch"
+        }
+      ],
+      "score": 1
+    }
+  ],
+  "selection_rule": "highest execution relevance score",
+  "requires_validation": true
+}

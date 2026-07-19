@@ -1,0 +1,300 @@
+{
+  "capabilities": {
+    "audit": {
+      "count": 12,
+      "files": [
+        "ai/factory/audit_bridge.py",
+        "ai/factory/runtime.py",
+        "ai/factory/audit_log.py",
+        "ai/factory/observability.py",
+        "ai/factory/improvement_audit.py",
+        "ai/factory/runtime_audit.py",
+        "ai/factory/runtime_dashboard.py",
+        "ai/factory/action_audit.py",
+        "ai/factory/compliance_audit.py",
+        "ai/factory/audit_trail.py",
+        "ai/factory/audit_intelligence.py",
+        "ai/factory/runtime_governance.py"
+      ]
+    },
+    "registry": {
+      "count": 8,
+      "files": [
+        "ai/factory/registry.py",
+        "ai/factory/health.py",
+        "ai/factory/dashboard.py",
+        "ai/factory/runtime.py",
+        "ai/factory/artifact_registry.py",
+        "ai/factory/verification_registry.py",
+        "ai/factory/strategy_manager.py",
+        "ai/factory/resource_allocator.py"
+      ]
+    },
+    "health": {
+      "count": 39,
+      "files": [
+        "ai/factory/health.py",
+        "ai/factory/dashboard.py",
+        "ai/factory/runtime.py",
+        "ai/factory/decision_engine.py",
+        "ai/factory/optimizer.py",
+        "ai/factory/runtime_optimizer.py",
+        "ai/factory/optimization_context.py",
+        "ai/factory/state_snapshot.py",
+        "ai/factory/control_plane.py",
+        "ai/factory/ide_model.py",
+        "ai/factory/observability.py",
+        "ai/factory/health_monitor.py",
+        "ai/factory/maintenance_planner.py",
+        "ai/factory/health_snapshot.py",
+        "ai/factory/self_assessment.py",
+        "ai/factory/improvement_planner.py",
+        "ai/factory/runtime_supervisor.py",
+        "ai/factory/runtime_health.py",
+        "ai/factory/runtime_alerts.py",
+        "ai/factory/resilience_controller.py",
+        "ai/factory/adaptive_decision.py",
+        "ai/factory/production_guard.py",
+        "ai/factory/runtime_dashboard.py",
+        "ai/factory/recovery_orchestrator.py",
+        "ai/factory/service_health.py",
+        "ai/factory/service_recovery.py",
+        "ai/factory/supervisor.py",
+        "ai/factory/health_monitoring.py",
+        "ai/factory/dependency_intelligence.py",
+        "ai/factory/runtime_observability.py",
+        "ai/factory/operator_agent.py",
+        "ai/factory/trend_analyzer.py",
+        "ai/factory/autonomous_supervisor.py",
+        "ai/factory/metrics_telemetry.py",
+        "ai/factory/dependency_management.py",
+        "ai/factory/integrity_checker.py",
+        "ai/factory/maintenance_agent.py",
+        "ai/factory/report_generator.py",
+        "ai/factory/change_impact_analyzer.py"
+      ]
+    },
+    "diagnostic": {
+      "count": 3,
+      "files": [
+        "ai/factory/runtime.py",
+        "ai/factory/health_monitoring.py",
+        "ai/factory/diagnostic_intelligence.py"
+      ]
+    },
+    "inspect": {
+      "count": 7,
+      "files": [
+        "ai/factory/runtime.py",
+        "ai/factory/ide_controller.py",
+        "ai/factory/shell.py",
+        "ai/factory/operator_agent.py",
+        "ai/factory/autonomous_supervisor.py",
+        "ai/factory/maintenance_agent.py",
+        "ai/factory/report_generator.py"
+      ]
+    },
+    "orchestr": {
+      "count": 13,
+      "files": [
+        "ai/factory/runtime.py",
+        "ai/factory/control_plane.py",
+        "ai/factory/improvement_orchestrator.py",
+        "ai/factory/improvement_runtime.py",
+        "ai/factory/master_orchestrator.py",
+        "ai/factory/external_interface.py",
+        "ai/factory/recovery_orchestrator.py",
+        "ai/factory/action_orchestrator.py",
+        "ai/factory/execution_orchestration.py",
+        "ai/factory/orchestration_intelligence.py",
+        "ai/factory/development_pipeline.py",
+        "ai/factory/integrity_checker.py",
+        "ai/factory/development_orchestrator.py"
+      ]
+    },
+    "executor": {
+      "count": 11,
+      "files": [
+        "ai/factory/runtime.py",
+        "ai/factory/job_executor.py",
+        "ai/factory/job_runner.py",
+        "ai/factory/maintenance_executor.py",
+        "ai/factory/optimization_executor.py",
+        "ai/factory/improvement_executor.py",
+        "ai/factory/runtime_scheduler.py",
+        "ai/factory/self_improvement.py",
+        "ai/factory/development_executor.py",
+        "ai/factory/execution_governance.py",
+        "ai/factory/development_orchestrator.py"
+      ]
+    },
+    "runtime": {
+      "count": 28,
+      "files": [
+        "ai/factory/runtime.py",
+        "ai/factory/api.py",
+        "ai/factory/decision_engine.py",
+        "ai/factory/runtime_optimizer.py",
+        "ai/factory/control_plane.py",
+        "ai/factory/event_bus.py",
+        "ai/factory/ide_model.py",
+        "ai/factory/service.py",
+        "ai/factory/action_router.py",
+        "ai/factory/runtime_coordinator.py",
+        "ai/factory/improvement_runtime.py",
+        "ai/factory/runtime_state.py",
+        "ai/factory/runtime_scheduler.py",
+        "ai/factory/runtime_supervisor.py",
+        "ai/factory/runtime_health.py",
+        "ai/factory/runtime_alerts.py",
+        "ai/factory/runtime_recovery.py",
+        "ai/factory/resilience_controller.py",
+        "ai/factory/runtime_audit.py",
+        "ai/factory/runtime_dashboard.py",
+        "ai/factory/runtime_metrics.py",
+        "ai/factory/runtime_loop.py",
+        "ai/factory/runtime_observability.py",
+        "ai/factory/operator_agent.py",
+        "ai/factory/runtime_governance.py",
+        "ai/factory/goal_genesis.py",
+        "ai/factory/integrity_checker.py",
+        "ai/factory/maintenance_agent.py"
+      ]
+    },
+    "scheduler": {
+      "count": 7,
+      "files": [
+        "ai/factory/control_plane.py",
+        "ai/factory/scheduler.py",
+        "ai/factory/daemon_scheduler.py",
+        "ai/factory/runtime_coordinator.py",
+        "ai/factory/improvement_scheduler.py",
+        "ai/factory/runtime_scheduler.py",
+        "ai/factory/autonomous_scheduler.py"
+      ]
+    },
+    "graph": {
+      "count": 2,
+      "files": [
+        "ai/factory/knowledge_graph.py",
+        "ai/factory/knowledge_graph_intelligence.py"
+      ]
+    },
+    "dependency": {
+      "count": 2,
+      "files": [
+        "ai/factory/dependency_intelligence.py",
+        "ai/factory/dependency_management.py"
+      ]
+    }
+  },
+  "classifications": [
+    {
+      "type": "multiple_implementations",
+      "capability": "audit",
+      "count": 12
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "registry",
+      "count": 8
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "health",
+      "count": 39
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "diagnostic",
+      "count": 3
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "inspect",
+      "count": 7
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "orchestr",
+      "count": 13
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "executor",
+      "count": 11
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "runtime",
+      "count": 28
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "scheduler",
+      "count": 7
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "graph",
+      "count": 2
+    },
+    {
+      "type": "multiple_implementations",
+      "capability": "dependency",
+      "count": 2
+    }
+  ],
+  "recommendations": [
+    {
+      "capability": "diagnostic",
+      "status": "present",
+      "note": "diagnostic capability detected"
+    },
+    {
+      "capability": "inspect",
+      "status": "present",
+      "note": "inspection capability detected"
+    },
+    {
+      "capability": "audit",
+      "status": "present",
+      "note": "audit capability detected"
+    },
+    {
+      "capability": "registry",
+      "status": "present",
+      "note": "registry capability detected"
+    },
+    {
+      "capability": "dependency",
+      "status": "present",
+      "note": "dependency capability detected"
+    },
+    {
+      "capability": "graph",
+      "status": "present",
+      "note": "graph capability detected"
+    },
+    {
+      "capability": "runtime",
+      "status": "present",
+      "note": "runtime capability detected"
+    },
+    {
+      "capability": "health",
+      "status": "present",
+      "note": "health capability detected"
+    },
+    {
+      "capability": "executor",
+      "status": "present",
+      "note": "execution capability detected"
+    },
+    {
+      "capability": "scheduler",
+      "status": "present",
+      "note": "scheduling capability detected"
+    }
+  ]
+}
