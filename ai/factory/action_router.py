@@ -26,7 +26,15 @@ class FactoryActionRouter:
             target = "improvement_pipeline"
 
         else:
-            target = "continue"
+            capability_context = decision.get(
+                "capability_context",
+                {}
+            )
+
+            if "self_improvement" in str(capability_context):
+                target = "improvement_pipeline"
+            else:
+                target = "continue"
 
         result = {
             "decision": action,
