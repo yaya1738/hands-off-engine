@@ -849,6 +849,10 @@ class FactoryRuntime:
                     "verification_requirements": [
                         "verify execution completion",
                     ],
+                    "capability_context": decision.get(
+                        "capability_context",
+                        {},
+                    ),
                 }
             )
 
