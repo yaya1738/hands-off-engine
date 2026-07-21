@@ -54,6 +54,7 @@ from ai.factory.development_tracker import FactoryDevelopmentTracker
 from ai.factory.artifact_registry import FactoryArtifactRegistry
 from ai.factory.capability_onboarding import FactoryCapabilityOnboarding
 from ai.factory.improvement_capability_registry import FactoryImprovementCapabilityRegistry
+from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntelligence
 
 
 
