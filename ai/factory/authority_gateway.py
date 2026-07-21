@@ -10,6 +10,7 @@ from ai.factory.runtime import (
 
 from ai.factory.artifact_registry import FactoryArtifactRegistry
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
+from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntelligence
 
 from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
@@ -37,6 +38,10 @@ class FactoryAuthorityGateway:
 
     def submit_goal(self, objective):
 
+        capability_graph = FactoryCapabilityGraphIntelligence(
+            self.runtime
+        ).analyze()
+
         development_request = self.runtime.submit_development_request(
             objective,
             "authority_gateway_submission",
@@ -44,6 +49,7 @@ class FactoryAuthorityGateway:
 
         return {
             "development_request": development_request,
+            "capability_graph": capability_graph,
             "state": "ready_for_review"
         }
 
