@@ -34,6 +34,7 @@ from ai.factory.trend_analyzer import FactoryTrendAnalyzer
 from ai.factory.change_impact_analyzer import FactoryChangeImpactAnalyzer
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
+from ai.factory.execution_handoff_adapter import FactoryExecutionHandoffAdapter
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
 from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence
 from ai.factory.self_assessment import FactorySelfAssessment
@@ -51,6 +52,8 @@ from ai.factory.lifecycle_trace import FactoryLifecycleTrace
 from ai.factory.development_translator import FactoryDevelopmentTranslator
 from ai.factory.development_tracker import FactoryDevelopmentTracker
 from ai.factory.artifact_registry import FactoryArtifactRegistry
+from ai.factory.capability_onboarding import FactoryCapabilityOnboarding
+from ai.factory.improvement_capability_registry import FactoryImprovementCapabilityRegistry
 
 
 
@@ -64,6 +67,8 @@ class FactoryRuntime:
         self.registry = FactoryRegistry()
 
         self.artifact_registry = FactoryArtifactRegistry()
+        self.capability_onboarding = FactoryCapabilityOnboarding()
+        self.improvement_capability_registry = FactoryImprovementCapabilityRegistry()
 
         self.autonomy = FactoryAutonomyManager(
             self
@@ -167,6 +172,7 @@ class FactoryRuntime:
 
         self.orchestration = FactoryOrchestrationIntelligence()
         self.execution = FactoryExecutionIntelligence()
+        self.execution_handoff = FactoryExecutionHandoffAdapter()
         self.learning = FactoryLearningIntelligence()
         self.optimization = FactoryOptimizationIntelligence()
 
@@ -455,6 +461,20 @@ class FactoryRuntime:
 
         development = self.development_pipeline.process(
             findings
+        )
+
+        self.improvement_audit.record(
+            {
+                "type": "development_pipeline_outcome",
+                "result": development,
+            }
+        )
+
+        self.learning_loop.record_outcome(
+            {
+                "type": "development_pipeline_outcome",
+                "result": development,
+            }
         )
 
         decision_options = [
@@ -802,9 +822,21 @@ class FactoryRuntime:
             )
             steps.append("orchestration")
 
+            handoff = self.execution_handoff.create_handoff(
+                {
+                    "target": "FactoryExecutionIntelligence",
+                    "execution_requirements": [
+                        "execute decision",
+                    ],
+                    "verification_requirements": [
+                        "verify execution completion",
+                    ],
+                }
+            )
+
             self.execution.create_execution(
                 "runtime-job",
-                decision,
+                handoff["handoff"],
             )
 
             self.execution.start_execution(
