@@ -58,6 +58,10 @@ class FactoryCapabilityGraphIntelligence:
             return "registered_improvement_capability"
 
         mappings = {
+            "capability": "capability_management",
+            "onboarding": "capability_management",
+            "development": "development_orchestration",
+            "entry": "development_orchestration",
             "goal": "objective_management",
             "decision": "decision_generation",
             "planning": "planning",
