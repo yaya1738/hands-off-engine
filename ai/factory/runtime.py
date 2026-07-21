@@ -824,7 +824,21 @@ class FactoryRuntime:
             simulation = self.simulation.run_simulation(plan)
             steps.append("simulation")
 
+            metrics = self.get_assessment_metrics()
+
+            adaptive_decision = self.adaptive_decision.decide(
+                {
+                    "health": "OK",
+                    "success_rate": (
+                        metrics["success_rate"]
+                        if self.observability.metrics
+                        else 1
+                    ),
+                }
+            )
+
             decision = self.decision.create_decision(simulation)
+            decision["adaptive_decision"] = adaptive_decision
             steps.append("decision")
 
             capability_graph = FactoryCapabilityGraphIntelligence(
