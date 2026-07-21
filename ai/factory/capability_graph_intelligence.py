@@ -43,6 +43,20 @@ class FactoryCapabilityGraphIntelligence:
 
     def infer_capability(self, name):
 
+        onboarded = self.runtime.capability_onboarding.list_capabilities()
+
+        for capability in onboarded:
+            if capability.get("name") == name:
+                return capability.get(
+                    "description",
+                    "onboarded_capability",
+                )
+
+        registered = self.runtime.improvement_capability_registry.list_capabilities()
+
+        if name in registered:
+            return "registered_improvement_capability"
+
         mappings = {
             "goal": "objective_management",
             "decision": "decision_generation",

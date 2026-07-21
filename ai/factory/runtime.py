@@ -203,6 +203,10 @@ class FactoryRuntime:
                 self.registry.list_components()
             ),
             "components": self.registry.list_components(),
+            "capabilities": {
+                "onboarded": self.capability_onboarding.list_capabilities(),
+                "registered": self.improvement_capability_registry.list_capabilities(),
+            },
         }
 
     def emit_event(self, event_type, payload):
