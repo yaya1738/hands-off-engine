@@ -26,9 +26,15 @@ class FactoryOrchestrationIntelligence:
     ):
         self.tasks.extend(tasks)
 
+        capability_context_count = sum(
+            1 for task in tasks
+            if "capability_context" in task
+        )
+
         result = {
             "dispatched": True,
             "count": len(tasks),
+            "capability_context_count": capability_context_count,
         }
 
         self._history.append(result)
