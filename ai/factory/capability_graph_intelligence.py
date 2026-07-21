@@ -21,7 +21,11 @@ class FactoryCapabilityGraphIntelligence:
         for component in components:
 
             graph[component] = {
-                "provides": self.infer_capability(component),
+                "provides": self.infer_capability(
+                    component + "_" + str(
+                        type(getattr(self.runtime, component)).__name__
+                    )
+                ),
                 "status": "active",
                 "redundancy": 0,
             }
