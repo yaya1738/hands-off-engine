@@ -31,6 +31,10 @@ class FactoryActionRouter:
         result = {
             "decision": action,
             "action": target,
+            "capability_context": decision.get(
+                "capability_context",
+                {}
+            ),
         }
 
         self._history.append(
