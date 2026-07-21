@@ -821,6 +821,15 @@ class FactoryRuntime:
             decision = self.decision.create_decision(simulation)
             steps.append("decision")
 
+            capability_graph = FactoryCapabilityGraphIntelligence(
+                self
+            ).analyze()
+
+            decision["capability_context"] = capability_graph.get(
+                "capability_graph",
+                {}
+            )
+
             self.orchestration.dispatch_tasks(
                 [decision]
             )
