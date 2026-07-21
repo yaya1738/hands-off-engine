@@ -533,6 +533,11 @@ class FactoryRuntime:
                 "proposal": development,
                 "plan": plan,
                 "source": "factory_proposal",
+                "capability_source": "capability_graph",
+                "capability_context": findings.get(
+                    "discovery",
+                    {}
+                ),
             }
         )
 
