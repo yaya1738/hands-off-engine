@@ -35,6 +35,7 @@ from ai.factory.change_impact_analyzer import FactoryChangeImpactAnalyzer
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
 from ai.factory.execution_handoff_adapter import FactoryExecutionHandoffAdapter
+from ai.factory.action_router import FactoryActionRouter
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
 from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence
 from ai.factory.self_assessment import FactorySelfAssessment
@@ -174,6 +175,11 @@ class FactoryRuntime:
         self.orchestration = FactoryOrchestrationIntelligence()
         self.execution = FactoryExecutionIntelligence()
         self.execution_handoff = FactoryExecutionHandoffAdapter()
+
+        self.action_router = FactoryActionRouter(
+            recovery=self.self_healing,
+            improvement=self.trigger_improvement_pipeline,
+        )
         self.learning = FactoryLearningIntelligence()
         self.optimization = FactoryOptimizationIntelligence()
 
@@ -425,6 +431,12 @@ class FactoryRuntime:
             "priority": priority,
             "optimized": optimized,
         }
+
+    def trigger_improvement_pipeline(self):
+        return self.submit_development_request(
+            "adaptive improvement request",
+            "generated from adaptive decision",
+        )
 
     def submit_development_request(
         self,
@@ -839,6 +851,11 @@ class FactoryRuntime:
 
             decision = self.decision.create_decision(simulation)
             decision["adaptive_decision"] = adaptive_decision
+
+            decision["routed_action"] = self.action_router.route(
+                adaptive_decision
+            )
+
             steps.append("decision")
 
             capability_graph = FactoryCapabilityGraphIntelligence(
