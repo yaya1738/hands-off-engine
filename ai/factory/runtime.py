@@ -1611,6 +1611,30 @@ class FactoryRuntime:
                     )
 
                 if (
+                    hasattr(self, "artifact_registry")
+                    and isinstance(result, dict)
+                ):
+                    self.artifact_registry.register_artifact(
+                        artifact_id=str(
+                            result.get(
+                                "artifact_id",
+                                f"improvement-{len(self.artifact_registry.list_artifacts())}"
+                            )
+                        ),
+                        task_id=str(
+                            approved.get(
+                                "id",
+                                approved.get(
+                                    "name",
+                                    "autonomous_improvement"
+                                )
+                            )
+                        ),
+                        artifact_type="autonomous_improvement",
+                        location="runtime_improvement_execution",
+                    )
+
+                if (
                     isinstance(result, dict)
                     and result.get("status") == "EXECUTED"
                     and hasattr(self, "checkpoint_manager")
