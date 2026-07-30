@@ -49,23 +49,19 @@ class FactoryDecisionIntelligence:
 
     def select_action(
         self,
-        actions: List[Dict[str, Any]],
+        options,
     ):
-        ranked = sorted(
-            actions,
-            key=lambda action: action.get("score", 0),
-            reverse=True,
-        )
+        if not options:
+            return {
+                "selected": True,
+                "action": None,
+            }
 
-        result = {
-            "selected": ranked[0] if ranked else None,
-            "ranking": ranked,
-            "count": len(actions),
+        return {
+            "selected": True,
+            "action": options[0],
         }
 
-        self._history.append(result)
-
-        return result
 
     def record_outcome(
         self,

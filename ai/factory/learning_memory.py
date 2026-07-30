@@ -81,3 +81,19 @@ class FactoryLearningMemory:
 
     def history(self):
         return self._history
+
+
+    def store(
+        self,
+        item,
+    ):
+        if not hasattr(self, "_memory"):
+            self._memory = []
+
+        self._memory.append(item)
+
+        return item
+
+
+    def history(self):
+        return self._history

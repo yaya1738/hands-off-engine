@@ -66,5 +66,35 @@ class FactoryBootstrap:
             "running": self.running,
         }
 
+    def create_factory(self):
+        runtime = None
+
+        if isinstance(self.config, dict):
+            runtime = self.config.get(
+                "runtime_coordinator"
+            )
+
+        self.runtime = runtime
+
+        self._history.append({
+            "type": "factory_created",
+            "runtime": str(runtime),
+        })
+
+        return runtime
+
+    def start_factory(self):
+        self.start()
+        return {
+            "status": "started",
+        }
+
+    def get_runtime(self):
+        return getattr(
+            self,
+            "runtime",
+            None,
+        )
+
     def history(self):
         return self._history

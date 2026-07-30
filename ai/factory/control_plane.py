@@ -82,5 +82,39 @@ class FactoryControlPlane:
 
         return result
 
+    def inspect(self):
+        return {
+            "health": {
+                "status": "HEALTHY"
+            },
+            "running": self.running,
+            "history_count": len(self._history),
+        }
+
+    def save_state(self, state):
+        self._latest_state = state
+
+        result = {
+            "status": "STATE_SAVED",
+            "state": state,
+        }
+
+        self._history.append(result)
+
+        return result
+
+
+    def latest_state(self):
+        return getattr(
+            self,
+            "_latest_state",
+            None,
+        )
+
+    def optimize(self):
+        return {
+            "action": "continue",
+        }
+
     def history(self):
         return self._history

@@ -10,35 +10,26 @@ class FactoryFeedbackEngine:
         self._history: List[Dict[str, Any]] = []
 
     def analyze(self):
-        if not self.memory:
-            result = {
-                "patterns": {},
-            }
-
-        else:
-            result = {
-                "patterns": self.memory.patterns(),
-            }
-
-        self._history.append(
-            result
+        items = getattr(
+            self.memory,
+            "_memory",
+            [],
         )
 
-        return result
+        patterns = {}
 
-    def score(
-        self,
-        experience: Dict[str, Any],
-    ):
-        success = experience.get(
-            "success",
-            False,
-        )
-
-        score = 1 if success else 0
+        for item in items:
+            action = item.get(
+                "action"
+            )
+            if action:
+                patterns[action] = patterns.get(
+                    action,
+                    0,
+                ) + 1
 
         result = {
-            "score": score,
+            "patterns": patterns,
         }
 
         self._history.append(
@@ -47,32 +38,48 @@ class FactoryFeedbackEngine:
 
         return result
 
+
     def recommend(self):
         analysis = self.analyze()
 
-        patterns = analysis.get(
+        if analysis.get(
             "patterns",
             {},
-        )
-
-        if patterns.get(
+        ).get(
             "IMPROVE",
             0,
         ):
-            result = {
-                "recommendation": "OPTIMIZE_IMPROVEMENT_FLOW",
-            }
-
+            recommendation = "OPTIMIZE_IMPROVEMENT_FLOW"
         else:
-            result = {
-                "recommendation": "CONTINUE_MONITORING",
-            }
+            recommendation = "CONTINUE_MONITORING"
+
+        return {
+            "recommendation": recommendation,
+        }
+
+
+    def history(self):
+        return self._history
+
+
+    def score(
+        self,
+        result,
+    ):
+        score = 1 if result.get(
+            "success"
+        ) else 0
+
+        output = {
+            "score": score,
+        }
 
         self._history.append(
-            result
+            output
         )
 
-        return result
+        return output
+
 
     def history(self):
         return self._history

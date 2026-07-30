@@ -9,18 +9,24 @@ class FactoryDecisionEngine:
         self,
         state: Dict[str, Any],
     ):
-        if state.get(
-            "health"
-        ) == "DOWN":
+        if state.get("health") == "DOWN":
             return "RECOVER"
 
-        if state.get(
-            "success_rate",
-            1,
-        ) < 0.8:
+        if state.get("success_rate", 1) <= 0.5:
             return "IMPROVE"
 
+        recommendation = state.get(
+            "recommendation"
+        )
+
+        if recommendation == "improve":
+            return "OPTIMIZE"
+
+        if recommendation == "continue":
+            return "CONTINUE"
+
         return "CONTINUE"
+
 
     def decide(
         self,
@@ -31,17 +37,56 @@ class FactoryDecisionEngine:
         )
 
         result = {
+            "confidence": state.get(
+                "performance",
+                0,
+            ),
             "decision": decision,
             "reason": self.reason(
                 decision
             ),
         }
 
+        if not hasattr(self, "_history"):
+            self._history = []
+
         self._history.append(
             result
         )
 
         return result
+
+
+    def analyze(
+        self,
+        health,
+        history,
+        telemetry,
+    ):
+        return self.decide(
+            {
+                "recommendation": (
+                    "improve"
+                    if health.get("status") == "FAILED"
+                    else "continue"
+                ),
+                "performance": (
+                    0
+                    if health.get("status") == "FAILED"
+                    else 1
+                ),
+                "telemetry": telemetry,
+            }
+        )
+
+
+    def history(self):
+        return getattr(
+            self,
+            "_history",
+            [],
+        )
+
 
     def reason(
         self,

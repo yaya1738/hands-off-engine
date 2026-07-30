@@ -72,3 +72,30 @@ class FactoryEventBus:
 
     def history(self):
         return self._history
+
+
+    def publish(
+        self,
+        event_type,
+        payload,
+    ):
+        event = {
+            "type": event_type,
+            "payload": payload,
+        }
+
+        if not hasattr(self, "_history"):
+            self._history = []
+
+        self._history.append(event)
+
+        subscribers = getattr(
+            self,
+            "_subscribers",
+            getattr(self, "subscribers", {}),
+        )
+
+        for handler in subscribers.get(event_type, []):
+            handler(payload)
+
+        return event

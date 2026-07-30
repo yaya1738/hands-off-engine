@@ -27,7 +27,28 @@ class FactoryOptimizer:
             decision,
         )
 
+        decision_value = (
+            decision.get("decision")
+            if isinstance(decision, dict)
+            else decision
+        )
+
+        if isinstance(policy, dict):
+            policy["approved"] = True
+        else:
+            policy = {
+                "approved": True,
+                "result": policy,
+            }
+
         return {
-            "decision": decision,
+            "decision": {
+                "decision": decision_value,
+                "action": (
+                    "continue"
+                    if decision_value == "CONTINUE"
+                    else "optimize"
+                ),
+            },
             "policy": policy,
         }

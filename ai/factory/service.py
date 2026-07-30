@@ -73,3 +73,25 @@ class FactoryService:
 
     def history(self):
         return self._history
+
+
+    def handle(
+        self,
+        command,
+    ):
+        if command == "status":
+            return {
+                "command": "status",
+                "ok": True,
+                **self.health(),
+            }
+
+        return {
+            "status": "unknown_command",
+        }
+
+
+    def health(self):
+        return {
+            "status": "running",
+        }

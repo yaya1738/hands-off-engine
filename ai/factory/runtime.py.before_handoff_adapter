@@ -1,5 +1,3 @@
-from ai.factory.gap_repair_controller import FactoryGapRepairController
-from ai.factory.gap_repair_controller import FactoryGapRepairController
 from typing import Any, Dict, List
 from ai.factory.registry import FactoryRegistry
 
@@ -27,7 +25,6 @@ from ai.factory.decision_intelligence import FactoryDecisionIntelligence
 from ai.factory.decision_option_adapter import FactoryDecisionOptionAdapter
 from ai.factory.feedback_engine import FactoryFeedbackEngine
 from ai.factory.learning_loop import FactoryLearningLoop
-from ai.factory.learning_improvement_adapter import FactoryLearningImprovementAdapter
 from ai.factory.adaptive_decision import FactoryAdaptiveDecision
 from ai.factory.integrity_checker import FactoryIntegrityChecker
 from ai.factory.operator_agent import FactoryOperatorAgent
@@ -37,8 +34,6 @@ from ai.factory.trend_analyzer import FactoryTrendAnalyzer
 from ai.factory.change_impact_analyzer import FactoryChangeImpactAnalyzer
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
-from ai.factory.execution_handoff_adapter import FactoryExecutionHandoffAdapter
-from ai.factory.action_router import FactoryActionRouter
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
 from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence
 from ai.factory.self_assessment import FactorySelfAssessment
@@ -50,46 +45,25 @@ from ai.factory.improvement_executor import FactoryImprovementExecutor
 from ai.factory.operations_intelligence import FactoryOperationsIntelligence
 from ai.factory.improvement_action_resolver import FactoryImprovementActionResolver
 from ai.factory.improvement_audit import FactoryImprovementAudit
-from ai.factory.autonomous_integration_supervisor import FactoryAutonomousIntegrationSupervisor
 from ai.factory.development_advisor import FactoryDevelopmentAdvisor
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
 from ai.factory.lifecycle_trace import FactoryLifecycleTrace
 from ai.factory.development_translator import FactoryDevelopmentTranslator
 from ai.factory.development_tracker import FactoryDevelopmentTracker
 from ai.factory.artifact_registry import FactoryArtifactRegistry
-from ai.factory.capability_onboarding import FactoryCapabilityOnboarding
-from ai.factory.improvement_capability_registry import FactoryImprovementCapabilityRegistry
-from ai.factory.change_validation import FactoryChangeValidation
-from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntelligence
 
 
 
 
 from ai.factory.autonomy_manager import (
-
-
     FactoryAutonomyManager
 )
 
-from ai.factory.checkpoint_executor import FactoryCheckpointExecutor
-from ai.factory.checkpoint_manager import FactoryCheckpointManager
 class FactoryRuntime:
-    def __init__(
-        self,
-        bootstrap=None,
-        control_plane=None,
-        **kwargs,
-    ):
-        self.bootstrap = bootstrap
-        self.control_plane = control_plane
-        self._history = []
-
+    def __init__(self):
         self.registry = FactoryRegistry()
 
         self.artifact_registry = FactoryArtifactRegistry()
-        self.capability_onboarding = FactoryCapabilityOnboarding()
-        self.improvement_capability_registry = FactoryImprovementCapabilityRegistry()
-        self.change_validation = FactoryChangeValidation()
 
         self.autonomy = FactoryAutonomyManager(
             self
@@ -113,7 +87,6 @@ class FactoryRuntime:
         self.improvement_queue = FactoryImprovementQueue()
 
         self.improvement_orchestrator = FactoryImprovementOrchestrator(
-
             assessor=self.improvement_assessment,
             planner=self.improvement_planner,
             queue=self.improvement_queue,
@@ -137,23 +110,7 @@ class FactoryRuntime:
 
         self.improvement_executor = FactoryImprovementExecutor()
         self.improvement_action_resolver = FactoryImprovementActionResolver()
-        self.improvement_action_resolver.register_action(
-            "address low success rate",
-            self.default_improvement_action,
-        )
-
-        self.improvement_action_resolver.register_action(
-            "address low improvement impact",
-            self.default_improvement_action,
-        )
-
-        self.improvement_action_resolver.register_action(
-            "generic_improvement",
-            self.default_improvement_action,
-        )
-
         self.improvement_audit = FactoryImprovementAudit()
-        self.integration_supervisor = FactoryAutonomousIntegrationSupervisor(self)
 
 
         self.strategy_manager = FactoryStrategyManager()
@@ -189,15 +146,10 @@ class FactoryRuntime:
         self.feedback_engine = FactoryFeedbackEngine()
         self.feedback = self.feedback_engine
         self.learning_loop = FactoryLearningLoop()
-        self.learning_improvement_adapter = FactoryLearningImprovementAdapter(self.learning_loop)
         self.adaptive_decision = FactoryAdaptiveDecision(
             feedback=self.feedback_engine
         )
         self.integrity_checker = FactoryIntegrityChecker()
-        self.checkpoint_executor = FactoryCheckpointExecutor(
-            audit=self.improvement_audit,
-        )
-        self.checkpoint_manager = FactoryCheckpointManager()
 
         self.operator = FactoryOperatorAgent(
             integrity_checker=self.integrity_checker,
@@ -215,39 +167,12 @@ class FactoryRuntime:
 
         self.orchestration = FactoryOrchestrationIntelligence()
         self.execution = FactoryExecutionIntelligence()
-        self.execution_handoff = FactoryExecutionHandoffAdapter()
-
-        self.action_router = FactoryActionRouter(
-            recovery=self.self_healing,
-            improvement=self.trigger_improvement_pipeline,
-        )
         self.learning = FactoryLearningIntelligence()
         self.optimization = FactoryOptimizationIntelligence()
 
         self.integrity_checker.check_runtime(
             self
         )
-
-        self.gap_repair_controller = FactoryGapRepairController()
-
-    # checkpoint_metadata_bridge
-
-    def build_checkpoint_context(self, improvement=None, result=None):
-        return {
-            "type": "autonomous_improvement",
-            "improvement": improvement or {},
-            "execution_result": result or {},
-            "audit_context": {
-                "component": "FactoryRuntime",
-                "source": "autonomous_improvement_loop",
-            },
-            "validation": {
-                "status": "recorded",
-            },
-            "rollback_context": {
-                "available": True,
-            },
-        }
 
         self._history: List[Dict[str, Any]] = []
 
@@ -272,10 +197,6 @@ class FactoryRuntime:
                 self.registry.list_components()
             ),
             "components": self.registry.list_components(),
-            "capabilities": {
-                "onboarded": self.capability_onboarding.list_capabilities(),
-                "registered": self.improvement_capability_registry.list_capabilities(),
-            },
         }
 
     def emit_event(self, event_type, payload):
@@ -414,36 +335,27 @@ class FactoryRuntime:
             result
         )
 
-        learning_gaps = []
-
-        if hasattr(self, "learning_improvement_adapter"):
-            learning_assessment = (
-                self.learning_improvement_adapter.generate_gap_assessment()
-            )
-
-            learning_gaps = learning_assessment.get(
-                "gaps",
-                [],
-            )
-
-        combined_gaps = (
-            assessment_gaps
-            + translated_findings.get(
-                "gaps",
-                [],
-            )
-            + learning_gaps
-        )
-
         development_result = self.development_pipeline.process(
             {
-                "gaps": combined_gaps
+                "gaps": (
+                    assessment_gaps
+                    + translated_findings.get(
+                        "gaps",
+                        [],
+                    )
+                )
             }
         )
 
         development_plan = self.improvement_planner.plan(
             {
-                "gaps": combined_gaps,
+                "gaps": (
+                    assessment_gaps
+                    + translated_findings.get(
+                        "gaps",
+                        [],
+                    )
+                ),
                 "health": (
                     1 if result.get("success") else 0
                 ),
@@ -503,27 +415,6 @@ class FactoryRuntime:
             "optimized": optimized,
         }
 
-    def trigger_improvement_pipeline(self):
-        return self.submit_development_request(
-            "adaptive improvement request",
-            "generated from adaptive decision",
-        )
-
-    def validate_factory_change(self):
-        result = (
-            self.change_validation
-            .validate_action_router_integration()
-        )
-
-        self.improvement_audit.record(
-            {
-                "type": "factory_change_validation",
-                "result": result,
-            }
-        )
-
-        return result
-
     def submit_development_request(
         self,
         objective,
@@ -564,20 +455,6 @@ class FactoryRuntime:
 
         development = self.development_pipeline.process(
             findings
-        )
-
-        self.improvement_audit.record(
-            {
-                "type": "development_pipeline_outcome",
-                "result": development,
-            }
-        )
-
-        self.learning_loop.record_outcome(
-            {
-                "type": "development_pipeline_outcome",
-                "result": development,
-            }
         )
 
         decision_options = [
@@ -632,11 +509,6 @@ class FactoryRuntime:
                 "proposal": development,
                 "plan": plan,
                 "source": "factory_proposal",
-                "capability_source": "capability_graph",
-                "capability_context": findings.get(
-                    "discovery",
-                    {}
-                ),
             }
         )
 
@@ -855,58 +727,6 @@ class FactoryRuntime:
         )
 
 
-    def run_checkpoint_cycle(self):
-        decision = self.checkpoint_manager.evaluate()
-
-        state = decision.get("state")
-
-        if hasattr(self, "learning"):
-            self.learning.record_experience(
-                {
-                    "type": "checkpoint_cycle_decision",
-                    "decision": decision,
-                    "state": state,
-                }
-            )
-
-        if state == "REVIEW_REQUIRED":
-            return {
-                "status": "COMPLETE",
-                "action": "SAFE_STOP",
-                "decision": decision,
-            }
-
-        if state == "BLOCKED":
-            return {
-                "status": "COMPLETE",
-                "action": "NO_EXECUTION",
-                "decision": decision,
-            }
-
-        if state != "READY_TO_COMMIT":
-            return {
-                "status": "NOT_READY",
-                "action": "WAIT",
-                "decision": decision,
-            }
-
-        result = self.checkpoint_executor.execute(
-            decision
-        )
-
-        self.improvement_audit.record(
-            {
-                "type": "checkpoint_cycle",
-                "result": result,
-            }
-        )
-
-        return {
-            "status": "COMPLETE",
-            "decision": decision,
-            "execution": result,
-        }
-
     def get_assessment_metrics(self):
         metrics = self.observability.metrics
 
@@ -914,11 +734,6 @@ class FactoryRuntime:
             return {
                 "success_rate": 0,
                 "average_impact": 0,
-                "learning_experience_count": (
-                    len(self.learning.experiences)
-                    if hasattr(self, "learning")
-                    else 0
-                ),
             }
 
         successes = [
@@ -941,11 +756,6 @@ class FactoryRuntime:
             "average_impact": (
                 sum(impacts) / len(impacts)
                 if impacts else 0
-            ),
-            "learning_experience_count": (
-                len(self.learning.experiences)
-                if hasattr(self, "learning")
-                else 0
             ),
         }
 
@@ -984,93 +794,17 @@ class FactoryRuntime:
             simulation = self.simulation.run_simulation(plan)
             steps.append("simulation")
 
-            metrics = self.get_assessment_metrics()
-
-            adaptive_decision = self.adaptive_decision.decide(
-                {
-                    "health": "OK",
-                    "success_rate": (
-                        metrics["success_rate"]
-                        if self.observability.metrics
-                        else 1
-                    ),
-                }
-            )
-
             decision = self.decision.create_decision(simulation)
-            decision["adaptive_decision"] = adaptive_decision
-
-            decision["routed_action"] = self.action_router.route(
-                adaptive_decision
-            )
-
-            objective = goal.get(
-                "objective",
-                {}
-            )
-
-            if (
-                isinstance(objective, dict)
-                and objective.get("type") == "capability_gap"
-            ):
-                improvement_cycle = self.improvement_orchestrator.run_cycle(
-                    self.get_assessment_metrics()
-                )
-
-                improvement_execution = self.execute_autonomous_improvements(
-                    improvement_cycle
-                )
-
-                decision["improvement_cycle"] = improvement_cycle
-                decision["improvement_execution"] = improvement_execution
-
-            elif decision["routed_action"].get("action") == "improvement_pipeline":
-                improvement_cycle = self.improvement_orchestrator.run_cycle(
-                    self.get_assessment_metrics()
-                )
-
-                improvement_execution = self.execute_autonomous_improvements(
-                    improvement_cycle
-                )
-
-                decision["improvement_cycle"] = improvement_cycle
-                decision["improvement_execution"] = improvement_execution
-
             steps.append("decision")
-
-            capability_graph = FactoryCapabilityGraphIntelligence(
-                self
-            ).analyze()
-
-            decision["capability_context"] = capability_graph.get(
-                "capability_graph",
-                {}
-            )
 
             self.orchestration.dispatch_tasks(
                 [decision]
             )
             steps.append("orchestration")
 
-            handoff = self.execution_handoff.create_handoff(
-                {
-                    "target": "FactoryExecutionIntelligence",
-                    "execution_requirements": [
-                        "execute decision",
-                    ],
-                    "verification_requirements": [
-                        "verify execution completion",
-                    ],
-                    "capability_context": decision.get(
-                        "capability_context",
-                        {},
-                    ),
-                }
-            )
-
             self.execution.create_execution(
                 "runtime-job",
-                handoff["handoff"],
+                decision,
             )
 
             self.execution.start_execution(
@@ -1256,274 +990,5 @@ class FactoryRuntime:
     def get_operations_report(self):
         return self.operations_intelligence.generate_report()
 
-
-
-    def route_autonomous_failure_repair(self, failure):
-        if hasattr(self, "integration_supervisor"):
-            return {
-                "status": "REPAIR_ROUTED_TO_SUPERVISOR",
-                "failure": failure,
-                "supervisor": self.integration_supervisor.inspect(),
-            }
-
-        return {
-            "status": "NO_REPAIR_ROUTER_AVAILABLE",
-            "failure": failure,
-        }
-
-
-    def start(self):
-        self._history.append(
-            {
-                "type": "runtime_started"
-            }
-        )
-
-        return {
-            "status": "RUNNING"
-        }
-
-
-    def run(self, payload):
-        result = self.execute(payload)
-
-        return {
-            "cycle": 1,
-            "result": result,
-        }
-
-
-
-    def heartbeat(self):
-        return {
-            "running": True,
-            "status": "HEALTHY"
-        }
-
-
-    def stop(self):
-        self._history.append(
-            {
-                "type": "runtime_stopped"
-            }
-        )
-
-        return {
-            "status": "STOPPED"
-        }
-
-    def run_autonomous_improvement(self):
-
-        # integration_supervisor_gate
-        if hasattr(self, "integration_supervisor"):
-            integration_report = self.integration_supervisor.inspect()
-
-            if not integration_report.get("healthy", False):
-                return {
-                    "status": "INTEGRATION_UNHEALTHY",
-                    "integration_report": integration_report,
-                }
-
-            self.last_integration_report = integration_report
-
-
-        try:
-            metrics = {}
-
-            if hasattr(self, "get_assessment_metrics"):
-                metrics = self.get_assessment_metrics()
-            elif hasattr(self, "improvement_assessment"):
-                assessment = self.improvement_assessment.assess()
-                metrics = {
-                    "assessment": assessment
-                }
-
-            cycle_result = self.improvement_orchestrator.run_cycle(
-                metrics
-            )
-
-            execution_result = self.execute_autonomous_improvements(
-                cycle_result
-            )
-
-            return {
-                "cycle": cycle_result,
-                "development": None,
-                "execution": execution_result
-            }
-
-        except Exception as e:
-            failure = {
-                "status": "FAILED",
-                "component": "run_autonomous_improvement",
-                "error": str(e)
-            }
-
-            diagnostics = None
-            feedback_goal = None
-            repair_route = None
-
-            if hasattr(self, "route_autonomous_failure_repair"):
-                repair_route = self.route_autonomous_failure_repair(
-                    failure
-                )
-
-            if hasattr(self, "improvement_audit"):
-                recovery_record = self.improvement_audit.record({
-                    "type": "autonomous_failure_recovery",
-                    "failure": failure,
-                    "repair_route": repair_route,
-                })
-
-                if hasattr(self, "learning_loop"):
-                    self.learning_loop.record_outcome(
-                        recovery_record
-                    )
-
-            if hasattr(self, "diagnostic_intelligence"):
-                diagnostics = self.diagnostic_intelligence.analyze(
-                    [failure]
-                )
-
-            if hasattr(self, "submit_goal"):
-                repair_objective = {
-                    "type": "capability_gap",
-                    "target": "AUTONOMOUS_FAILURE_REPAIR",
-                    "reason": str(e)
-                }
-
-                feedback_goal = self.submit_goal(
-                    repair_objective
-                )
-
-            repair_execution = None
-            validation_result = None
-
-            if hasattr(self, "route_autonomous_failure_repair"):
-                repair_execution = self.route_autonomous_failure_repair(
-                    failure
-                )
-
-            if hasattr(self, "improvement_assessment"):
-                validation_result = self.improvement_assessment.assess(
-                    self.get_assessment_metrics()
-                    if hasattr(self, "get_assessment_metrics")
-                    else {}
-                )
-
-            return {
-                "status": "AUTONOMOUS_IMPROVEMENT_FAILED",
-                "failure": failure,
-                "diagnostics": diagnostics,
-                "feedback_goal": feedback_goal,
-                "repair_route": repair_route,
-                "repair_execution": repair_execution,
-                "validation": validation_result
-            }
-
-
-    def default_improvement_action(self, *args, **kwargs):
-        result = {
-            "status": "COMPLETED",
-            "source": "runtime_default_improvement",
-            "impact": 1,
-        }
-
-        if hasattr(self, "improvement_audit"):
-            self.improvement_audit.record(
-                {
-                    "type": "autonomous_improvement_completed",
-                    "result": result,
-                }
-            )
-
-        return result
-
-    def execute_autonomous_improvements(self, cycle_result):
-        executed = []
-
-        queue = cycle_result.get("queued", [])
-
-        for item in queue:
-            approved = item
-
-            if hasattr(self, "improvement_approval"):
-                approval_result = self.improvement_approval.approve(
-                    item
-                )
-
-                if isinstance(approval_result, dict):
-                    approved = approval_result
-
-            action = approved
-
-            if hasattr(self, "improvement_action_resolver"):
-                resolver_input = {
-                    "action": approved.get(
-                        "name",
-                        approved.get("action"),
-                    ),
-                    **approved,
-                }
-
-                action = self.improvement_action_resolver.resolve(
-                    resolver_input
-                )
-
-            if hasattr(self, "improvement_executor"):
-                if action is None:
-                    executed.append({
-                        "status": "BLOCKED",
-                        "reason": "action_resolution_failed"
-                    })
-                    continue
-
-                result = self.improvement_executor.execute(
-                    approved,
-                    action
-                )
-
-                if hasattr(self, "improvement_audit"):
-                    self.improvement_audit.record(
-                        {
-                            "type": "autonomous_improvement_execution",
-                            "result": result,
-                        }
-                    )
-
-                if (
-                    isinstance(result, dict)
-                    and result.get("status") == "EXECUTED"
-                    and hasattr(self, "checkpoint_manager")
-                ):
-                    checkpoint_request = {
-                        "type": "autonomous_improvement",
-                        "improvement": approved,
-                        "result": result,
-                    }
-
-                    checkpoint_plan = self.checkpoint_manager.evaluate()
-
-                    if hasattr(self, "checkpoint_executor"):
-                        self.checkpoint_executor.execute(
-                            checkpoint_plan
-                        )
-
-                executed.append(result)
-
-        return {
-            "executed": executed,
-            "count": len(executed)
-        }
-
-
     def history(self):
-        return [
-            entry
-            for entry in self._history
-            if entry.get("type")
-            not in {
-                "integrity_report",
-                "runtime_stopped",
-            }
-        ]
+        return self._history

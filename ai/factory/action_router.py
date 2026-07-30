@@ -10,6 +10,21 @@ class FactoryActionRouter:
         self.recovery = recovery
         self.improvement = improvement
         self._history: List[Dict[str, Any]] = []
+        self.actions = {}
+
+
+    def register_action(
+        self,
+        name,
+        handler,
+    ):
+        self.actions[name] = handler
+
+        return {
+            "registered": True,
+            "action": name,
+        }
+
 
     def route(
         self,
@@ -19,6 +34,19 @@ class FactoryActionRouter:
             "decision"
         )
 
+        if action == "CONTINUE":
+            result = {
+                "decision": action,
+                "action": "continue",
+            }
+
+            if action in self.actions:
+                result["result"] = self.actions[action]()
+
+            self._history.append(result)
+
+            return result
+
         if action == "RECOVER":
             target = "runtime_recovery"
 
@@ -26,6 +54,23 @@ class FactoryActionRouter:
             target = "improvement_pipeline"
 
         else:
+            if (
+                action not in self.actions
+                and action not in {
+                    None,
+                    "RECOVER",
+                    "IMPROVE",
+                }
+            ):
+                result = {
+                    "error": "unknown_action",
+                    "decision": action,
+                }
+
+                self._history.append(result)
+
+                return result
+
             capability_context = decision.get(
                 "capability_context",
                 {}
@@ -44,6 +89,18 @@ class FactoryActionRouter:
                 {}
             ),
         }
+
+        if action in self.actions:
+            result["result"] = self.actions[action]()
+
+        if action in self.actions and "result" not in result:
+            result["result"] = self.actions[action]()
+
+        if action in self.actions and "result" not in result:
+            result["result"] = self.actions[action]()
+
+        if action in self.actions and "result" not in result:
+            result["result"] = self.actions[action]()
 
         self._history.append(
             result
