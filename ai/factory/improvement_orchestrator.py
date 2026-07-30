@@ -39,6 +39,14 @@ class FactoryImprovementOrchestrator:
                             "priority",
                             0,
                         ),
+                        "capability_context": plan.get(
+                            "capability_context",
+                            {},
+                        ),
+                        "capability_context": plan.get(
+                            "capability_context",
+                            {},
+                        ),
                     }
                 )
             )

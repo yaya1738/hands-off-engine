@@ -1,9 +1,37 @@
 from typing import Any, Dict, List
+from pathlib import Path
+import json
 
 
 class FactoryDecisionFeedback:
     def __init__(self):
         self._decisions: List[Dict[str, Any]] = []
+        self.state_path = Path(
+            "state/factory_decision_history.jsonl"
+        )
+        self._load_history()
+
+    def _load_history(self):
+        if not self.state_path.exists():
+            return
+
+        for line in self.state_path.read_text().splitlines():
+            if line.strip():
+                self._decisions.append(
+                    json.loads(line)
+                )
+
+    def _persist(self, entry):
+        self.state_path.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        with self.state_path.open("a") as f:
+            f.write(
+                json.dumps(entry)
+                + "\n"
+            )
 
     def record_decision(
         self,
@@ -17,6 +45,8 @@ class FactoryDecisionFeedback:
         self._decisions.append(
             entry
         )
+
+        self._persist(entry)
 
         return entry
 

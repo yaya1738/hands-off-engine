@@ -18,6 +18,7 @@ class FactoryPersistence:
             json.dumps(
                 state,
                 indent=2,
+                default=str,
             )
         )
 

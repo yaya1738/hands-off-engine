@@ -2,11 +2,7 @@ from typing import Any, Dict, List
 
 
 class FactoryJobRunner:
-    def __init__(
-        self,
-        executor: Any,
-    ):
-        self.executor = executor
+    def __init__(self):
         self._history: List[Dict[str, Any]] = []
 
     def run_job(
@@ -14,10 +10,12 @@ class FactoryJobRunner:
         job_type: str,
         payload: Any = None,
     ):
-        result = self.executor.execute(
-            job_type,
-            payload,
-        )
+        result = {
+            "status": "HANDOFF_REQUIRED",
+            "job_type": job_type,
+            "payload": payload,
+            "authority": "FactoryRuntime",
+        }
 
         record = {
             "job_type": job_type,

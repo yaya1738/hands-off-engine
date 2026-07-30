@@ -58,7 +58,10 @@ class FactoryIntelligenceCoordinator:
 
     def improve(self):
         if self.improvement:
-            result = self.improvement.execute()
+            result = {
+                "status": "HANDOFF_REQUIRED",
+                "authority": "FactoryRuntime",
+            }
 
         else:
             result = {

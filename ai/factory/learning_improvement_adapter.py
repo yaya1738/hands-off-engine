@@ -20,8 +20,18 @@ class FactoryLearningImprovementAdapter:
 
             action = outcome.get("action", {})
 
+            if not isinstance(action, dict):
+                action = {
+                    "type": action
+                }
+
             if action.get("type") == "autonomous_failure_recovery":
                 failure = action.get("failure", {})
+
+                if not isinstance(failure, dict):
+                    failure = {
+                        "error": str(failure)
+                    }
 
                 gaps.append(
                     f"prevent recurring failure: {failure.get('error')}"

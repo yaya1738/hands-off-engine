@@ -37,6 +37,10 @@ class FactoryImprovementPlanner:
                 "development_type",
                 "",
             ),
+            "capability_context": assessment.get(
+                "capability_context",
+                {},
+            ),
             "components": assessment.get(
                 "components",
                 [],

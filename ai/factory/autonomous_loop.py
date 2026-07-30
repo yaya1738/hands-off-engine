@@ -38,13 +38,8 @@ class FactoryAutonomousLoop:
             decision
         )
 
-        result = self.router.execute(
-            routed
-        )
-
         return {
             "route": routed,
-            "result": result,
         }
 
     def run_cycle(

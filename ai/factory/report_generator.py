@@ -11,6 +11,7 @@ class FactoryReportGenerator:
         integrity=None,
         operator=None,
         maintenance=None,
+        authority=None,
     ):
         healthy = bool(
             integrity
@@ -35,6 +36,7 @@ class FactoryReportGenerator:
             "maintenance_ready": ready,
             "operator": operator,
             "maintenance": maintenance,
+            "authority": authority,
             "next_step": (
                 "continue_development"
                 if healthy and ready

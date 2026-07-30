@@ -1,0 +1,538 @@
+{
+  "bootstrap": {
+    "type": "NoneType",
+    "module": "builtins",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "control_plane": {
+    "type": "NoneType",
+    "module": "builtins",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "_history": {
+    "type": "list",
+    "module": "builtins",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "registry": {
+    "type": "FactoryRegistry",
+    "module": "ai.factory.registry",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "artifact_registry": {
+    "type": "FactoryArtifactRegistry",
+    "module": "ai.factory.artifact_registry",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "capability_onboarding": {
+    "type": "FactoryCapabilityOnboarding",
+    "module": "ai.factory.capability_onboarding",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_capability_registry": {
+    "type": "FactoryImprovementCapabilityRegistry",
+    "module": "ai.factory.improvement_capability_registry",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "capability_graph_intelligence": {
+    "type": "FactoryCapabilityGraphIntelligence",
+    "module": "ai.factory.capability_graph_intelligence",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "capability_gap_analyzer": {
+    "type": "FactoryCapabilityGapAnalyzer",
+    "module": "ai.factory.capability_gap_analyzer",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "capability_consolidation_loader": {
+    "type": "FactoryCapabilityConsolidationLoader",
+    "module": "ai.factory.capability_consolidation_loader",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "capability_evolution_decision": {
+    "type": "FactoryCapabilityEvolutionDecision",
+    "module": "ai.factory.capability_evolution_decision",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "capability_evolution_context": {
+    "type": "FactoryCapabilityEvolutionContext",
+    "module": "ai.factory.capability_evolution_context",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "change_validation": {
+    "type": "FactoryChangeValidation",
+    "module": "ai.factory.change_validation",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "autonomy": {
+    "type": "FactoryAutonomyManager",
+    "module": "ai.factory.autonomy_manager",
+    "has_history": false,
+    "has_execute": true,
+    "has_run": false,
+    "has_record": false
+  },
+  "governance": {
+    "type": "FactoryRuntimeGovernance",
+    "module": "ai.factory.runtime_governance",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "observability": {
+    "type": "FactoryRuntimeObservability",
+    "module": "ai.factory.runtime_observability",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "state": {
+    "type": "FactoryRuntimeState",
+    "module": "ai.factory.runtime_state",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "events": {
+    "type": "FactoryEventBus",
+    "module": "ai.factory.event_bus",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "replay": {
+    "type": "FactoryEventReplay",
+    "module": "ai.factory.event_replay",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "diagnostics": {
+    "type": "FactoryDiagnosticIntelligence",
+    "module": "ai.factory.diagnostic_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "recommendations": {
+    "type": "FactoryRecommendationFeedback",
+    "module": "ai.factory.recommendation_feedback",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "meta_optimizer": {
+    "type": "FactoryMetaOptimizer",
+    "module": "ai.factory.meta_optimizer",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_assessment": {
+    "type": "FactorySelfAssessment",
+    "module": "ai.factory.self_assessment",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_planner": {
+    "type": "FactoryImprovementPlanner",
+    "module": "ai.factory.improvement_planner",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_queue": {
+    "type": "FactoryImprovementQueue",
+    "module": "ai.factory.improvement_queue",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_orchestrator": {
+    "type": "FactoryImprovementOrchestrator",
+    "module": "ai.factory.improvement_orchestrator",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_approval": {
+    "type": "FactoryImprovementApproval",
+    "module": "ai.factory.improvement_approval",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "development_advisor": {
+    "type": "FactoryDevelopmentAdvisor",
+    "module": "ai.factory.development_advisor",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "development_translator": {
+    "type": "FactoryDevelopmentTranslator",
+    "module": "ai.factory.development_translator",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "development_tracker": {
+    "type": "FactoryDevelopmentTracker",
+    "module": "ai.factory.development_tracker",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "lifecycle_trace": {
+    "type": "FactoryLifecycleTrace",
+    "module": "ai.factory.lifecycle_trace",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "development_pipeline": {
+    "type": "FactoryDevelopmentPipeline",
+    "module": "ai.factory.development_pipeline",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_executor": {
+    "type": "FactoryImprovementExecutor",
+    "module": "ai.factory.improvement_executor",
+    "has_history": true,
+    "has_execute": true,
+    "has_run": false,
+    "has_record": true
+  },
+  "improvement_action_resolver": {
+    "type": "FactoryImprovementActionResolver",
+    "module": "ai.factory.improvement_action_resolver",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "improvement_audit": {
+    "type": "FactoryImprovementAudit",
+    "module": "ai.factory.improvement_audit",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": true
+  },
+  "integration_supervisor": {
+    "type": "FactoryAutonomousIntegrationSupervisor",
+    "module": "ai.factory.autonomous_integration_supervisor",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "strategy_manager": {
+    "type": "FactoryStrategyManager",
+    "module": "ai.factory.strategy_manager",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "goal_management": {
+    "type": "FactoryGoalManagement",
+    "module": "ai.factory.goal_management",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "goal_optimizer": {
+    "type": "FactoryGoalOptimizer",
+    "module": "ai.factory.goal_optimizer",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "goal_genesis": {
+    "type": "FactoryGoalGenesis",
+    "module": "ai.factory.goal_genesis",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "resource_allocator": {
+    "type": "FactoryResourceAllocator",
+    "module": "ai.factory.resource_allocator",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "self_healing": {
+    "type": "FactorySelfHealingIntelligence",
+    "module": "ai.factory.self_healing_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "planning": {
+    "type": "FactoryPlanningIntelligence",
+    "module": "ai.factory.planning_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "simulation": {
+    "type": "FactorySimulationIntelligence",
+    "module": "ai.factory.simulation_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "decision": {
+    "type": "FactoryDecisionIntelligence",
+    "module": "ai.factory.decision_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "decision_option_adapter": {
+    "type": "FactoryDecisionOptionAdapter",
+    "module": "ai.factory.decision_option_adapter",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "operations_intelligence": {
+    "type": "FactoryOperationsIntelligence",
+    "module": "ai.factory.operations_intelligence",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "feedback_engine": {
+    "type": "FactoryFeedbackEngine",
+    "module": "ai.factory.feedback_engine",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "feedback": {
+    "type": "FactoryFeedbackEngine",
+    "module": "ai.factory.feedback_engine",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "learning_loop": {
+    "type": "FactoryLearningLoop",
+    "module": "ai.factory.learning_loop",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "learning_improvement_adapter": {
+    "type": "FactoryLearningImprovementAdapter",
+    "module": "ai.factory.learning_improvement_adapter",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "adaptive_decision": {
+    "type": "FactoryAdaptiveDecision",
+    "module": "ai.factory.adaptive_decision",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "integrity_checker": {
+    "type": "FactoryIntegrityChecker",
+    "module": "ai.factory.integrity_checker",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "checkpoint_executor": {
+    "type": "FactoryCheckpointExecutor",
+    "module": "ai.factory.checkpoint_executor",
+    "has_history": true,
+    "has_execute": true,
+    "has_run": false,
+    "has_record": false
+  },
+  "checkpoint_manager": {
+    "type": "FactoryCheckpointManager",
+    "module": "ai.factory.checkpoint_manager",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "operator": {
+    "type": "FactoryOperatorAgent",
+    "module": "ai.factory.operator_agent",
+    "has_history": false,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "maintenance": {
+    "type": "FactoryMaintenanceAgent",
+    "module": "ai.factory.maintenance_agent",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "report_generator": {
+    "type": "FactoryReportGenerator",
+    "module": "ai.factory.report_generator",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "trend_analyzer": {
+    "type": "FactoryTrendAnalyzer",
+    "module": "ai.factory.trend_analyzer",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "change_impact_analyzer": {
+    "type": "FactoryChangeImpactAnalyzer",
+    "module": "ai.factory.change_impact_analyzer",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "orchestration": {
+    "type": "FactoryOrchestrationIntelligence",
+    "module": "ai.factory.orchestration_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "execution": {
+    "type": "FactoryExecutionIntelligence",
+    "module": "ai.factory.execution_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "execution_handoff": {
+    "type": "FactoryExecutionHandoffAdapter",
+    "module": "ai.factory.execution_handoff_adapter",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "action_router": {
+    "type": "FactoryActionRouter",
+    "module": "ai.factory.action_router",
+    "has_history": true,
+    "has_execute": true,
+    "has_run": false,
+    "has_record": false
+  },
+  "learning": {
+    "type": "FactoryLearningIntelligence",
+    "module": "ai.factory.learning_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "optimization": {
+    "type": "FactoryOptimizationIntelligence",
+    "module": "ai.factory.optimization_intelligence",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  },
+  "gap_repair_controller": {
+    "type": "FactoryGapRepairController",
+    "module": "ai.factory.gap_repair_controller",
+    "has_history": true,
+    "has_execute": false,
+    "has_run": false,
+    "has_record": false
+  }
+}

@@ -1,12 +1,9 @@
-from ai.factory.development_executor import FactoryDevelopmentExecutor
-
 from typing import Any, Dict, List
 
 
 class FactoryDevelopmentOrchestrator:
     def __init__(self):
         self.tasks: List[Dict[str, Any]] = []
-        self.executor = FactoryDevelopmentExecutor()
         self._history: List[Dict[str, Any]] = []
 
     def create_development_task(
@@ -68,13 +65,13 @@ class FactoryDevelopmentOrchestrator:
         self,
         task: Dict[str, Any],
     ):
-        result = self.executor.execute(
-            task
-        )
+        result = {
+            "status": "HANDOFF_REQUIRED",
+            "task": task,
+            "authority": "FactoryRuntime",
+        }
 
-        self._history.append(
-            result
-        )
+        self._history.append(result)
 
         return result
 

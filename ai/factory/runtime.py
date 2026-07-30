@@ -57,10 +57,15 @@ from ai.factory.lifecycle_trace import FactoryLifecycleTrace
 from ai.factory.development_translator import FactoryDevelopmentTranslator
 from ai.factory.development_tracker import FactoryDevelopmentTracker
 from ai.factory.artifact_registry import FactoryArtifactRegistry
+from ai.factory.authority_registry import FactoryAuthorityRegistry
 from ai.factory.capability_onboarding import FactoryCapabilityOnboarding
 from ai.factory.improvement_capability_registry import FactoryImprovementCapabilityRegistry
 from ai.factory.change_validation import FactoryChangeValidation
 from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntelligence
+from ai.factory.capability_gap_analyzer import FactoryCapabilityGapAnalyzer
+from ai.factory.capability_evolution_decision import FactoryCapabilityEvolutionDecision
+from ai.factory.capability_evolution_context import FactoryCapabilityEvolutionContext
+from ai.factory.capability_consolidation_loader import FactoryCapabilityConsolidationLoader
 
 
 
@@ -89,6 +94,11 @@ class FactoryRuntime:
         self.artifact_registry = FactoryArtifactRegistry()
         self.capability_onboarding = FactoryCapabilityOnboarding()
         self.improvement_capability_registry = FactoryImprovementCapabilityRegistry()
+        self.capability_graph_intelligence = FactoryCapabilityGraphIntelligence(self)
+        self.capability_gap_analyzer = FactoryCapabilityGapAnalyzer(self)
+        self.capability_consolidation_loader = FactoryCapabilityConsolidationLoader()
+        self.capability_evolution_decision = FactoryCapabilityEvolutionDecision()
+        self.capability_evolution_context = FactoryCapabilityEvolutionContext()
         self.change_validation = FactoryChangeValidation()
 
         self.autonomy = FactoryAutonomyManager(
@@ -223,6 +233,10 @@ class FactoryRuntime:
         )
         self.learning = FactoryLearningIntelligence()
         self.optimization = FactoryOptimizationIntelligence()
+
+        self.authority_registry = FactoryAuthorityRegistry(
+            runtime=self
+        )
 
         self.integrity_checker.check_runtime(
             self
@@ -385,12 +399,36 @@ class FactoryRuntime:
             }
         )
 
-        improvement_cycle = self.improvement_orchestrator.run_cycle(
+        capability_gap_analysis = self.capability_gap_analyzer.analyze()
+
+        capability_consolidation = (
+            self.capability_consolidation_loader.load()
+        )
+
+        capability_evolution_decision = (
+            self.capability_evolution_decision.decide(
+                capability_gap_analysis,
+                capability_consolidation,
+            )
+        )
+
+        capability_context = (
+            self.capability_evolution_context.build(
+                capability_gap_analysis,
+                capability_consolidation,
+                capability_evolution_decision,
+            )
+        )
+
+        improvement_cycle = self.run_improvement_orchestrator_cycle(
             {
                 "success_rate": 1 if result.get("success") else 0,
                 "average_impact": 0.5,
             }
         )
+
+        improvement_cycle["capability_gap_analysis"] = capability_gap_analysis
+        improvement_cycle["capability_context"] = capability_context
 
         decision = self.decision.create_decision(
             improvement_cycle
@@ -450,6 +488,7 @@ class FactoryRuntime:
                 "context": "runtime improvement cycle",
                 "target": "factory_runtime",
                 "development_type": "self_improvement",
+                "capability_context": capability_context,
             }
         )
 
@@ -470,6 +509,53 @@ class FactoryRuntime:
                 "plan": development_plan,
                 "task": development_task,
             }
+        )
+
+        return {
+            "improvement_cycle": improvement_cycle,
+            "capability_gap_analysis": capability_gap_analysis,
+            "capability_consolidation": capability_consolidation,
+            "capability_evolution_decision": capability_evolution_decision,
+            "decision": decision_selection,
+            "development": development_result,
+            "plan": development_plan,
+            "task": development_task,
+        }
+
+
+    def run_improvement_orchestrator_cycle(self, metrics=None):
+        if metrics is None:
+            metrics = self.get_assessment_metrics()
+
+        capability_gap_analysis = (
+            self.capability_gap_analyzer.analyze()
+        )
+
+        capability_consolidation = (
+            self.capability_consolidation_loader.load()
+        )
+
+        capability_evolution_decision = (
+            self.capability_evolution_decision.decide(
+                capability_gap_analysis,
+                capability_consolidation,
+            )
+        )
+
+        capability_context = (
+            self.capability_evolution_context.build(
+                capability_gap_analysis,
+                capability_consolidation,
+                capability_evolution_decision,
+            )
+        )
+
+        metrics["capability_gap_analysis"] = capability_gap_analysis
+        metrics["capability_consolidation"] = capability_consolidation
+        metrics["capability_context"] = capability_context
+
+        return self.improvement_orchestrator.run_cycle(
+            metrics
         )
 
     def submit_goal(self, objective):
@@ -1013,9 +1099,7 @@ class FactoryRuntime:
                 isinstance(objective, dict)
                 and objective.get("type") == "capability_gap"
             ):
-                improvement_cycle = self.improvement_orchestrator.run_cycle(
-                    self.get_assessment_metrics()
-                )
+                improvement_cycle = self.run_improvement_orchestrator_cycle()
 
                 improvement_execution = self.execute_autonomous_improvements(
                     improvement_cycle
@@ -1025,9 +1109,7 @@ class FactoryRuntime:
                 decision["improvement_execution"] = improvement_execution
 
             elif decision["routed_action"].get("action") == "improvement_pipeline":
-                improvement_cycle = self.improvement_orchestrator.run_cycle(
-                    self.get_assessment_metrics()
-                )
+                improvement_cycle = self.run_improvement_orchestrator_cycle()
 
                 improvement_execution = self.execute_autonomous_improvements(
                     improvement_cycle
@@ -1038,9 +1120,7 @@ class FactoryRuntime:
 
             steps.append("decision")
 
-            capability_graph = FactoryCapabilityGraphIntelligence(
-                self
-            ).analyze()
+            capability_graph = self.capability_graph_intelligence.analyze()
 
             decision["capability_context"] = capability_graph.get(
                 "capability_graph",
@@ -1206,10 +1286,17 @@ class FactoryRuntime:
             self
         )
 
+        authority = (
+            self.authority_health()
+            if hasattr(self, "authority_health")
+            else None
+        )
+
         report = self.report_generator.generate(
             integrity=integrity,
             operator=operator,
             maintenance=maintenance,
+            authority=authority,
         )
 
         return report
@@ -1295,9 +1382,23 @@ class FactoryRuntime:
 
 
     def heartbeat(self):
+
+        authority_status = {
+            "available": False,
+            "validation": None,
+        }
+
+        if hasattr(self, "authority_registry"):
+
+            authority_status = {
+                "available": True,
+                "validation": self.validate_unique_authority(),
+            }
+
         return {
             "running": True,
-            "status": "HEALTHY"
+            "status": "HEALTHY",
+            "authority": authority_status,
         }
 
 
@@ -1338,7 +1439,7 @@ class FactoryRuntime:
                     "assessment": assessment
                 }
 
-            cycle_result = self.improvement_orchestrator.run_cycle(
+            cycle_result = self.run_improvement_orchestrator_cycle(
                 metrics
             )
 
@@ -1483,6 +1584,24 @@ class FactoryRuntime:
                     action
                 )
 
+                if hasattr(self, "learning_loop"):
+                    self.learning_loop.record_outcome(
+                        {
+                            "improvement": approved,
+                            "action": action,
+                            "result": result,
+                        }
+                    )
+
+                if hasattr(self, "decision"):
+                    self.decision.record_outcome(
+                        {
+                            "improvement": approved,
+                            "action": action,
+                        },
+                        result,
+                    )
+
                 if hasattr(self, "improvement_audit"):
                     self.improvement_audit.record(
                         {
@@ -1516,6 +1635,52 @@ class FactoryRuntime:
             "count": len(executed)
         }
 
+
+    def authority_map(self):
+        return self.authority_registry.registry()
+
+    def authority_health(self):
+
+        if not hasattr(self, "authority_registry"):
+            return {
+                "available": False,
+                "health": None,
+                "validation": None,
+            }
+
+        return {
+            "available": True,
+            "health": self.authority_registry.health(),
+            "validation": self.validate_unique_authority(),
+        }
+
+
+    def validate_unique_authority(self):
+        authorities = self.authority_registry.registry()
+
+        duplicates = {}
+
+        seen = {}
+
+        for authority, components in authorities.items():
+            for component in components:
+                if component in seen:
+                    duplicates.setdefault(
+                        component,
+                        []
+                    ).extend(
+                        [
+                            seen[component],
+                            authority,
+                        ]
+                    )
+                else:
+                    seen[component] = authority
+
+        return {
+            "healthy": not bool(duplicates),
+            "duplicates": duplicates,
+        }
 
     def history(self):
         return [
