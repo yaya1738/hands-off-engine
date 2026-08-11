@@ -54,6 +54,34 @@ class FactoryAuthorityGateway:
         }
 
 
+    def submit_development_request(
+        self,
+        objective,
+        context=None,
+    ):
+        """
+        External development-ingress authority.
+
+        The gateway owns the external submission boundary and
+        delegates the existing internal development workflow to
+        FactoryRuntime. Runtime remains the compatibility/internal
+        workflow owner during this migration seam.
+        """
+        if objective is None:
+            raise ValueError("objective is required")
+
+        objective = str(objective).strip()
+
+        if not objective:
+            raise ValueError("objective must not be empty")
+
+        context = context or ""
+
+        return self.runtime.submit_development_request(
+            objective,
+            context,
+        )
+
     def complete_reviewed_goal(
         self,
         review_request,
