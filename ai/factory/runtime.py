@@ -38,6 +38,7 @@ from ai.factory.change_impact_analyzer import FactoryChangeImpactAnalyzer
 from ai.factory.orchestration_intelligence import FactoryOrchestrationIntelligence
 from ai.factory.execution_intelligence import FactoryExecutionIntelligence
 from ai.factory.execution_handoff_adapter import FactoryExecutionHandoffAdapter
+from ai.factory.failure_registry import FactoryFailureRegistry
 from ai.factory.action_router import FactoryActionRouter
 from ai.factory.learning_intelligence import FactoryLearningIntelligence
 from ai.factory.optimization_intelligence import FactoryOptimizationIntelligence
@@ -57,6 +58,9 @@ from ai.factory.lifecycle_trace import FactoryLifecycleTrace
 from ai.factory.development_translator import FactoryDevelopmentTranslator
 from ai.factory.development_tracker import FactoryDevelopmentTracker
 from ai.factory.artifact_registry import FactoryArtifactRegistry
+from ai.factory.routine_builder import FactoryRoutineBuilder
+from ai.factory.capability_selector import FactoryCapabilitySelector
+from ai.factory.capability_performance import FactoryCapabilityPerformance
 from ai.factory.authority_registry import FactoryAuthorityRegistry
 from ai.factory.capability_onboarding import FactoryCapabilityOnboarding
 from ai.factory.improvement_capability_registry import FactoryImprovementCapabilityRegistry
@@ -162,11 +166,25 @@ class FactoryRuntime:
             self.default_improvement_action,
         )
 
+        self.improvement_action_resolver.register_action(
+            "failure_repair",
+            self.default_improvement_action,
+        )
+
         self.improvement_audit = FactoryImprovementAudit()
         self.integration_supervisor = FactoryAutonomousIntegrationSupervisor(self)
 
 
         self.strategy_manager = FactoryStrategyManager()
+
+        self.routine_builder = FactoryRoutineBuilder()
+        self.capability_selector = FactoryCapabilitySelector(self)
+        self.capability_performance = FactoryCapabilityPerformance()
+
+        self.improvement_capability_registry.register(
+            "failure_repair",
+            self.execute_selected_failure_repair,
+        )
 
         self.goal_management = FactoryGoalManagement()
         self.goal_optimizer = FactoryGoalOptimizer(
@@ -226,6 +244,7 @@ class FactoryRuntime:
         self.orchestration = FactoryOrchestrationIntelligence()
         self.execution = FactoryExecutionIntelligence()
         self.execution_handoff = FactoryExecutionHandoffAdapter()
+        self.failure_registry = FactoryFailureRegistry()
 
         self.action_router = FactoryActionRouter(
             recovery=self.self_healing,
@@ -848,14 +867,27 @@ class FactoryRuntime:
 
     def process_approved_improvement(
         self,
-        improvement,
+        approval_request,
         action,
     ):
-        if improvement.get("status") != "APPROVED":
+        if not hasattr(self, "improvement_approval"):
             return {
                 "status": "blocked",
-                "reason": "improvement_not_approved",
+                "reason": "approval_authority_unavailable",
             }
+
+        validation = (
+            self.improvement_approval.validate_approved_request(
+                approval_request
+            )
+        )
+
+        if validation.get("status") != "APPROVED":
+            return validation
+
+        improvement = validation.get(
+            "improvement"
+        )
 
         result = self.execute_approved_improvement(
             improvement,
@@ -865,6 +897,9 @@ class FactoryRuntime:
         self.improvement_audit.record(
             {
                 "type": "approved_improvement_processed",
+                "approval_id": validation.get(
+                    "approval_id"
+                ),
                 "result": result,
             }
         )
@@ -883,12 +918,8 @@ class FactoryRuntime:
                 "reason": "approval_not_ready",
             }
 
-        improvement = approval_request.get(
-            "improvement"
-        )
-
         result = self.process_approved_improvement(
-            improvement,
+            approval_request,
             action,
         )
 
@@ -1157,8 +1188,28 @@ class FactoryRuntime:
                 "runtime-job"
             )
 
-            self.execution.complete_execution(
+            execution_result = self.execution.complete_execution(
                 "runtime-job"
+            )
+
+            artifact_history = self.artifact_registry.list_artifacts()
+
+            if artifact_history:
+                latest_artifact = artifact_history[-1]
+
+                self.artifact_registry.complete_artifact(
+                    latest_artifact["artifact_id"],
+                    {
+                        "execution_result": execution_result,
+                        "execution_status": "completed",
+                    },
+                )
+
+            self.learning.record_experience(
+                {
+                    "execution_outcome": execution_result,
+                    "artifact_updated": bool(artifact_history),
+                }
             )
 
             steps.append("execution")
@@ -1345,12 +1396,157 @@ class FactoryRuntime:
 
 
 
+    def execute_selected_failure_repair(self, failure):
+        fingerprint = None
+
+        if hasattr(self, "failure_registry"):
+            fingerprint = self.failure_registry.fingerprint(
+                failure
+            )
+
+        improvement = {
+            "action": "failure_repair",
+            "failure": failure,
+            "failure_fingerprint": fingerprint,
+        }
+
+        if not hasattr(self, "improvement_approval"):
+            return {
+                "status": "BLOCKED",
+                "reason": "approval_authority_unavailable",
+            }
+
+        approval_request = self.improvement_approval.request(
+            improvement
+        )
+
+        return {
+            "status": "PENDING_APPROVAL",
+            "approval_request": approval_request,
+            "failure_fingerprint": fingerprint,
+        }
+
+
     def route_autonomous_failure_repair(self, failure):
+        supervisor_report = None
+        capability_recommendation = None
+        capability_execution = None
+        failure_fingerprint = None
+
+        if hasattr(self, "failure_registry"):
+            try:
+                failure_fingerprint = self.failure_registry.fingerprint(
+                    failure
+                )
+            except Exception:
+                failure_fingerprint = None
+
+        if hasattr(self, "capability_selector"):
+            try:
+                capability_recommendation = (
+                    self.capability_selector.select("repair")
+                )
+
+                if (
+                    capability_recommendation.get("selected")
+                    and hasattr(
+                        self,
+                        "improvement_capability_registry",
+                    )
+                ):
+                    capability_name = (
+                        capability_recommendation.get(
+                            "capability"
+                        )
+                    )
+
+                    handler = (
+                        self.improvement_capability_registry.resolve(
+                            capability_name
+                        )
+                    )
+
+                    if handler:
+                        try:
+                            capability_execution = handler(
+                                failure
+                            )
+
+                            if (
+                                hasattr(self, "failure_registry")
+                                and failure_fingerprint
+                                and isinstance(
+                                    capability_execution,
+                                    dict,
+                                )
+                                and capability_execution.get(
+                                    "status"
+                                )
+                                in (
+                                    "EXECUTED",
+                                    "COMPLETED",
+                                )
+                            ):
+                                self.failure_registry.resolve(
+                                    failure_fingerprint,
+                                    {
+                                        "status": "EXECUTED",
+                                        "source": (
+                                            "autonomous_capability_repair"
+                                        ),
+                                    },
+                                )
+
+                            if (
+                                hasattr(
+                                    self,
+                                    "capability_performance",
+                                )
+                            ):
+                                self.capability_performance.record(
+                                    capability_name,
+                                    {
+                                        "status": (
+                                            "COMPLETED"
+                                            if isinstance(
+                                                capability_execution,
+                                                dict,
+                                            )
+                                            else "EXECUTED"
+                                        ),
+                                        "source": (
+                                            "autonomous_capability_repair"
+                                        ),
+                                    },
+                                )
+
+                        except Exception as error:
+                            capability_execution = {
+                                "status": "FAILED",
+                                "error": str(error),
+                            }
+
+            except Exception as error:
+                capability_recommendation = {
+                    "selected": False,
+                    "error": str(error),
+                }
+
         if hasattr(self, "integration_supervisor"):
+            try:
+                supervisor_report = self.integration_supervisor.inspect()
+            except Exception as error:
+                supervisor_report = {
+                    "error": str(error),
+                    "status": "SUPERVISOR_INSPECTION_FAILED",
+                }
+
             return {
                 "status": "REPAIR_ROUTED_TO_SUPERVISOR",
                 "failure": failure,
-                "supervisor": self.integration_supervisor.inspect(),
+                "supervisor": supervisor_report,
+                "recommended_capability": capability_recommendation,
+                "capability_execution": capability_execution,
             }
 
         return {
@@ -1413,7 +1609,10 @@ class FactoryRuntime:
             "status": "STOPPED"
         }
 
-    def run_autonomous_improvement(self):
+    def run_autonomous_improvement(
+        self,
+        objective=None,
+    ):
 
         # integration_supervisor_gate
         if hasattr(self, "integration_supervisor"):
@@ -1431,8 +1630,16 @@ class FactoryRuntime:
         try:
             metrics = {}
 
+            if objective:
+                metrics["objective"] = objective
+
             if hasattr(self, "get_assessment_metrics"):
-                metrics = self.get_assessment_metrics()
+                assessment_metrics = self.get_assessment_metrics()
+
+                if objective:
+                    assessment_metrics["objective"] = objective
+
+                metrics = assessment_metrics
             elif hasattr(self, "improvement_assessment"):
                 assessment = self.improvement_assessment.assess()
                 metrics = {
@@ -1469,11 +1676,21 @@ class FactoryRuntime:
                     failure
                 )
 
+            failure_registry_record = None
+
+            if hasattr(self, "failure_registry"):
+                failure_registry_record = (
+                    self.failure_registry.record_failure(
+                        failure
+                    )
+                )
+
             if hasattr(self, "improvement_audit"):
                 recovery_record = self.improvement_audit.record({
                     "type": "autonomous_failure_recovery",
                     "failure": failure,
                     "repair_route": repair_route,
+                    "failure_registry": failure_registry_record,
                 })
 
                 if hasattr(self, "learning_loop"):
@@ -1497,13 +1714,8 @@ class FactoryRuntime:
                     repair_objective
                 )
 
-            repair_execution = None
+            repair_execution = repair_route
             validation_result = None
-
-            if hasattr(self, "route_autonomous_failure_repair"):
-                repair_execution = self.route_autonomous_failure_repair(
-                    failure
-                )
 
             if hasattr(self, "improvement_assessment"):
                 validation_result = self.improvement_assessment.assess(
@@ -1543,18 +1755,77 @@ class FactoryRuntime:
     def execute_autonomous_improvements(self, cycle_result):
         executed = []
 
-        queue = cycle_result.get("queued", [])
+        queue = cycle_result.get(
+            "queued",
+            cycle_result.get("queue", [])
+        )
 
         for item in queue:
-            approved = item
+            if (
+                isinstance(item, dict)
+                and item.get("action") == "ENQUEUE"
+                and isinstance(item.get("improvement"), dict)
+            ):
+                approved = item["improvement"]
+            else:
+                approved = item
 
             if hasattr(self, "improvement_approval"):
-                approval_result = self.improvement_approval.approve(
-                    item
+                approval_request = approved.get(
+                    "approval_request"
                 )
 
-                if isinstance(approval_result, dict):
-                    approved = approval_result
+                if approval_request is None:
+                    approval_request = (
+                        self.improvement_approval.request(
+                            approved
+                        )
+                    )
+
+                    approved["approval_request"] = (
+                        approval_request
+                    )
+
+                    executed.append({
+                        "status": "PENDING_APPROVAL",
+                        "approval_request": approval_request,
+                        "improvement": approved,
+                    })
+                    continue
+
+                if approval_request.get("status") != "APPROVED":
+                    executed.append({
+                        "status": "PENDING_APPROVAL",
+                        "approval_request": approval_request,
+                        "improvement": approved,
+                    })
+                    continue
+
+                approval_result = (
+                    self.improvement_approval.approve(
+                        approval_request
+                    )
+                )
+
+                if (
+                    not isinstance(
+                        approval_result,
+                        dict,
+                    )
+                    or approval_result.get("status")
+                    != "APPROVED"
+                ):
+                    executed.append({
+                        "status": "BLOCKED",
+                        "reason": "approval_transition_failed",
+                        "approval_request": approval_request,
+                    })
+                    continue
+
+                approved = approval_result.get(
+                    "improvement",
+                    approved,
+                )
 
             action = approved
 
@@ -1583,6 +1854,41 @@ class FactoryRuntime:
                     approved,
                     action
                 )
+
+                if (
+                    hasattr(self, "failure_registry")
+                    and isinstance(result, dict)
+                    and result.get("status") == "EXECUTED"
+                ):
+                    failure_context = approved.get(
+                        "failure",
+                        {}
+                    )
+
+                    if failure_context:
+                        fingerprint = self.failure_registry.fingerprint(
+                            failure_context
+                        )
+
+                        self.failure_registry.resolve(
+                            fingerprint,
+                            result,
+                        )
+
+                if hasattr(self, "failure_registry"):
+                    if result.get("status") == "EXECUTED":
+                        failure_fingerprint = approved.get(
+                            "failure_fingerprint"
+                        )
+
+                        if failure_fingerprint:
+                            self.failure_registry.resolve(
+                                failure_fingerprint,
+                                {
+                                    "status": "EXECUTED",
+                                    "source": "autonomous_improvement_execution",
+                                },
+                            )
 
                 if hasattr(self, "learning_loop"):
                     self.learning_loop.record_outcome(
@@ -1614,13 +1920,15 @@ class FactoryRuntime:
                     hasattr(self, "artifact_registry")
                     and isinstance(result, dict)
                 ):
+                    artifact_id = str(
+                        result.get(
+                            "artifact_id",
+                            f"improvement-{len(self.artifact_registry.list_artifacts())}"
+                        )
+                    )
+
                     self.artifact_registry.register_artifact(
-                        artifact_id=str(
-                            result.get(
-                                "artifact_id",
-                                f"improvement-{len(self.artifact_registry.list_artifacts())}"
-                            )
-                        ),
+                        artifact_id=artifact_id,
                         task_id=str(
                             approved.get(
                                 "id",
@@ -1632,6 +1940,17 @@ class FactoryRuntime:
                         ),
                         artifact_type="autonomous_improvement",
                         location="runtime_improvement_execution",
+                    )
+
+                    self.artifact_registry.complete_artifact(
+                        artifact_id,
+                        {
+                            "execution_result": result,
+                            "execution_status": result.get(
+                                "status",
+                                "UNKNOWN",
+                            ),
+                        },
                     )
 
                 if (
@@ -1704,6 +2023,56 @@ class FactoryRuntime:
         return {
             "healthy": not bool(duplicates),
             "duplicates": duplicates,
+        }
+
+
+    def create_factory_routine(
+        self,
+        name: str,
+        purpose: str,
+        steps: List[str],
+    ):
+        result = self.routine_builder.create_routine(
+            name,
+            purpose,
+            steps,
+        )
+
+        if hasattr(
+            self,
+            "improvement_capability_registry",
+        ):
+            self.improvement_capability_registry.register(
+                name,
+                lambda: self.execute_factory_routine(name),
+            )
+
+        return result
+
+    def execute_factory_routine(
+        self,
+        name: str,
+    ):
+        routine = self.routine_builder.execute_routine(
+            name
+        )
+
+        if not routine.get("executed"):
+            return routine
+
+        autonomous_result = None
+
+        if (
+            "improvement" in name.lower()
+            or "repair" in name.lower()
+        ):
+            autonomous_result = self.run_autonomous_improvement()
+
+        return {
+            "routine": name,
+            "status": "EXECUTED",
+            "steps": routine.get("steps", []),
+            "autonomous": autonomous_result,
         }
 
     def history(self):
