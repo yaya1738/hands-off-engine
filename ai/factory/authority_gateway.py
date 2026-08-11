@@ -42,7 +42,7 @@ class FactoryAuthorityGateway:
             self.runtime
         ).analyze()
 
-        development_request = self.runtime.submit_development_request(
+        development_request = self.submit_development_request(
             objective,
             "authority_gateway_submission",
         )
