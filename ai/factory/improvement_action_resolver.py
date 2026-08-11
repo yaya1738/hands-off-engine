@@ -19,6 +19,16 @@ class FactoryImprovementActionResolver:
         name = action.get("action")
 
         if not name:
+            if action.get("failure_fingerprint"):
+                return self._actions.get("failure_repair")
             return None
 
-        return self._actions.get(name)
+        resolved = self._actions.get(name)
+
+        if resolved:
+            return resolved
+
+        if action.get("failure_fingerprint"):
+            return self._actions.get("failure_repair")
+
+        return None

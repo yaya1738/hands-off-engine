@@ -21,6 +21,25 @@ class FactorySelfAssessment:
             "gaps": self.detect_gaps(
                 metrics
             ),
+            "objective": metrics.get(
+                "objective"
+            ),
+            "context": metrics.get(
+                "context",
+                "",
+            ),
+            "target": metrics.get(
+                "target",
+                "",
+            ),
+            "development_type": metrics.get(
+                "development_type",
+                "",
+            ),
+            "capability_context": metrics.get(
+                "capability_context",
+                {},
+            ),
         }
 
         self._history.append(

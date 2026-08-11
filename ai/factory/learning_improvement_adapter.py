@@ -33,6 +33,14 @@ class FactoryLearningImprovementAdapter:
                         "error": str(failure)
                     }
 
+                repair_route = action.get(
+                    "repair_route",
+                    {}
+                )
+
+                if repair_route.get("status") == "REPAIR_ROUTED_TO_SUPERVISOR":
+                    continue
+
                 gaps.append(
                     f"prevent recurring failure: {failure.get('error')}"
                 )

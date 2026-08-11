@@ -85,3 +85,25 @@ class FactoryCapabilityGraphIntelligence:
                 return value
 
         return "general_factory_capability"
+
+
+    def discover_capability(
+        self,
+        name,
+    ):
+        handler = self.runtime.improvement_capability_registry.resolve(
+            name
+        )
+
+        if handler:
+            return {
+                "found": True,
+                "name": name,
+                "type": "registered_capability",
+                "handler": str(handler),
+            }
+
+        return {
+            "found": False,
+            "name": name,
+        }

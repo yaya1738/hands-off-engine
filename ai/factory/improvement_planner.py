@@ -20,7 +20,10 @@ class FactoryImprovementPlanner:
         ]
 
         result = {
-            "goal": "improve factory performance",
+            "goal": assessment.get(
+                "objective",
+                "improve factory performance",
+            ),
             "tasks": tasks,
             "priority": self.prioritize(
                 assessment
