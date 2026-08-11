@@ -2,8 +2,9 @@ from typing import Any, Dict, List
 
 
 class FactoryDevelopmentOrchestrator:
-    def __init__(self):
+    def __init__(self, executor=None):
         self.tasks: List[Dict[str, Any]] = []
+        self.executor = executor
         self._history: List[Dict[str, Any]] = []
 
     def create_development_task(
@@ -65,6 +66,13 @@ class FactoryDevelopmentOrchestrator:
         self,
         task: Dict[str, Any],
     ):
+        if self.executor:
+            result = self.executor.execute(task)
+
+            self._history.append(result)
+
+            return result
+
         result = {
             "status": "HANDOFF_REQUIRED",
             "task": task,

@@ -13,5 +13,6 @@ def test_runtime_creates_artifact():
     artifacts = runtime.artifact_registry.list_artifacts()
 
     assert len(artifacts) > 0
-    assert artifacts[0]["status"] == "CREATED"
+    assert artifacts[0]["status"] == "COMPLETED"
+    assert "outcome" in artifacts[0]
     assert artifacts[0]["type"] == "development_proposal"

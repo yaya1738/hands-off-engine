@@ -22,6 +22,34 @@ class FactoryArtifactRegistry:
             }
         )
 
+
+
+    def update_artifact(
+        self,
+        artifact_id: str,
+        updates: Dict[str, Any],
+    ):
+        for artifact in self._artifacts:
+            if artifact["artifact_id"] == artifact_id:
+                artifact.update(updates)
+                return artifact
+
+        return None
+
+
+    def complete_artifact(
+        self,
+        artifact_id: str,
+        outcome: Dict[str, Any],
+    ):
+        return self.update_artifact(
+            artifact_id,
+            {
+                "status": "COMPLETED",
+                "outcome": outcome,
+            },
+        )
+
     def get_artifact(
         self,
         artifact_id: str,

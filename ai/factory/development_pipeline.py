@@ -5,6 +5,8 @@ from ai.factory.change_lifecycle_manager import FactoryChangeLifecycleManager
 from ai.factory.development_artifact_generator import (
     FactoryDevelopmentArtifactGenerator,
 )
+from ai.factory.development_executor import FactoryDevelopmentExecutor
+
 from ai.factory.artifact_registry import (
     FactoryArtifactRegistry,
 )
@@ -13,7 +15,12 @@ from ai.factory.artifact_registry import (
 class FactoryDevelopmentPipeline:
 
     def __init__(self, artifact_registry=None):
-        self.orchestrator = FactoryDevelopmentOrchestrator()
+        self.executor = FactoryDevelopmentExecutor()
+
+        self.orchestrator = FactoryDevelopmentOrchestrator(
+            executor=self.executor
+        )
+
         self.lifecycle = FactoryChangeLifecycleManager()
         self.artifact_generator = FactoryDevelopmentArtifactGenerator()
         self.artifact_registry = (
@@ -57,6 +64,15 @@ class FactoryDevelopmentPipeline:
 
         validation = self.lifecycle.validate_change(
             task
+        )
+
+        self.artifact_registry.complete_artifact(
+            artifact["artifact_id"],
+            {
+                "execution": execution,
+                "change": change,
+                "validation": validation,
+            },
         )
 
         result = {
