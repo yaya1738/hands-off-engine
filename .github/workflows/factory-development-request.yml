@@ -1,0 +1,23 @@
+name: Factory Development Request
+
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  acknowledge-factory-request:
+    if: github.event.label.name == 'factory-development'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Record autonomous-development handoff
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "$REPOSITORY" --body \
+            'Factory development request accepted. Execution target: isolated branch + coding agent + tests + PR. Direct merge remains subject to Factory validation.'
