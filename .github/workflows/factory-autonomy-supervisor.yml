@@ -1,0 +1,48 @@
+name: Factory Autonomy Supervisor
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: factory-autonomy-supervisor
+  cancel-in-progress: false
+
+jobs:
+  supervise:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Inspect live Factory canary
+        id: inspect
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          runs="$(gh run list --repo "$REPOSITORY" --workflow factory-ollama-canary.yml --branch factory-ollama-canary-20260812 --limit 10 --json databaseId,status,conclusion --jq '[.[] | select(.status == "in_progress" or .status == "queued") | .databaseId] | length')"
+          echo "active_runs=$runs" >> "$GITHUB_OUTPUT"
+          echo "Factory Ollama active runs: $runs"
+
+      - name: Keep autonomous canary moving
+        if: steps.inspect.outputs.active_runs == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          gh workflow run factory-ollama-canary.yml \
+            --repo "$REPOSITORY" \
+            --ref factory-ollama-canary-20260812
+          echo 'FACTORY_AUTONOMY_SUPERVISOR=DISPATCHED'
+
+      - name: Report idle-safe state
+        if: steps.inspect.outputs.active_runs != '0'
+        run: |
+          echo 'FACTORY_AUTONOMY_SUPERVISOR=ALREADY_RUNNING'
+          echo 'No duplicate canary was started.'
