@@ -70,8 +70,8 @@ jobs:
           set -euo pipefail
           cat > /tmp/task.txt <<'TASK'
           Return ONLY one valid JSON object with exactly these fields:
-          {"path":"tools/factory_canary.md","content":"# Factory autonomous-development canary\n\nCANARY_RUN=20260812\nCANARY_STATUS=AGENT_COMPLETED\n"}
-          The only permitted change is replacing the status line in tools/factory_canary.md with CANARY_STATUS=AGENT_COMPLETED. Do not propose commands and do not mention any other file.
+          {"path":"tools/factory_canary.md","operation":"set_status","value":"AGENT_COMPLETED"}
+          The only permitted operation is setting the status line to CANARY_STATUS=AGENT_COMPLETED. Do not return file contents, commands, or any other file.
           TASK
           ollama run qwen2.5-coder:1.5b "$(cat /tmp/task.txt)" > /tmp/ollama_agent_output.txt
 
@@ -89,14 +89,18 @@ jobs:
           if start < 0 or end < start:
               raise SystemExit('Fallback agent returned no JSON object')
           data = json.loads(raw[start:end + 1])
-          if set(data) != {'path', 'content'}:
+          if set(data) != {'path', 'operation', 'value'}:
               raise SystemExit('Fallback agent schema violation')
-          if data['path'] != 'tools/factory_canary.md':
-              raise SystemExit('Fallback agent attempted unauthorized path')
-          expected = '# Factory autonomous-development canary\n\nCANARY_RUN=20260812\nCANARY_STATUS=AGENT_COMPLETED\n'
-          if data['content'] != expected:
-              raise SystemExit('Fallback agent content violation')
-          Path(data['path']).write_text(data['content'])
+          if data != {'path': 'tools/factory_canary.md', 'operation': 'set_status', 'value': 'AGENT_COMPLETED'}:
+              raise SystemExit('Fallback agent operation violation')
+          p = Path(data['path'])
+          original = p.read_text()
+          lines = original.splitlines()
+          matches = [i for i, line in enumerate(lines) if line.startswith('CANARY_STATUS=')]
+          if len(matches) != 1 or lines[matches[0]] != 'CANARY_STATUS=BASELINE':
+              raise SystemExit('Canary status precondition violation')
+          lines[matches[0]] = 'CANARY_STATUS=AGENT_COMPLETED'
+          p.write_text('\n'.join(lines) + '\n')
           PY
 
       - name: Verify bounded change
@@ -124,4 +128,4 @@ jobs:
           else
             echo 'execution_backend=local-ollama-fallback'
           fi
-          echo 'Bounded agent change was independently verified and persisted.'
+          echo 'Bounded agent operation was independently verified and persisted.'
