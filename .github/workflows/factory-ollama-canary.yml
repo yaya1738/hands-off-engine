@@ -64,8 +64,11 @@ jobs:
           import json
           from pathlib import Path
 
-          raw = Path('/tmp/ollama_agent_output.txt').read_text()
-          data = json.loads(raw)
+          raw = Path('/tmp/ollama_agent_output.txt').read_text().strip()
+          decoder = json.JSONDecoder()
+          data, end = decoder.raw_decode(raw)
+          if raw[end:].strip():
+              raise SystemExit('Agent response contains trailing non-JSON output')
           allowed_path = 'tools/factory_forensics/ollama_canary_result.txt'
           if set(data) != {'path', 'content'}:
               raise SystemExit('Agent response schema violation')
