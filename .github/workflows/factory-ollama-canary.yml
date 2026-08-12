@@ -1,0 +1,65 @@
+name: Factory Ollama Local Agent Canary
+
+on:
+  push:
+    branches:
+      - factory-ollama-canary-20260812
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  ollama-canary:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Install Ollama
+        shell: bash
+        run: |
+          set -euo pipefail
+          curl -fsSL https://ollama.com/install.sh | sh
+          ollama serve > /tmp/ollama.log 2>&1 &
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:11434/api/tags >/dev/null 2>&1; then break; fi
+            sleep 1
+          done
+          curl -fsS http://127.0.0.1:11434/api/tags >/dev/null
+
+      - name: Pull small coder model
+        shell: bash
+        run: ollama pull qwen2.5-coder:1.5b
+
+      - name: Prove local model execution
+        shell: bash
+        run: |
+          set -euo pipefail
+          result="$(ollama run qwen2.5-coder:1.5b 'Reply with exactly: FACTORY_OLLAMA_READY')"
+          printf '%s\n' "$result"
+          test "$result" = "FACTORY_OLLAMA_READY"
+
+      - name: Bounded coding canary
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > /tmp/task.txt <<'TASK'
+Make exactly one change in the repository: create tools/factory_forensics/ollama_canary_result.txt containing exactly the text OLLAMA_CODE_EDIT_READY followed by a newline. Do not modify any other file.
+TASK
+          ollama run qwen2.5-coder:1.5b "$(cat /tmp/task.txt)"
+
+      - name: Verify bounded result
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f tools/factory_forensics/ollama_canary_result.txt
+          test "$(cat tools/factory_forensics/ollama_canary_result.txt)" = "OLLAMA_CODE_EDIT_READY"
+          git diff --exit-code -- ':!tools/factory_forensics/ollama_canary_result.txt' || {
+            echo 'Unexpected files modified.'
+            git status --short
+            exit 1
+          }
