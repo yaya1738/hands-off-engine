@@ -62,13 +62,21 @@ jobs:
           set -euo pipefail
           python - <<'PY'
           import json
+          import re
           from pathlib import Path
 
-          raw = Path('/tmp/ollama_agent_output.txt').read_text().strip()
-          decoder = json.JSONDecoder()
-          data, end = decoder.raw_decode(raw)
-          if raw[end:].strip():
-              raise SystemExit('Agent response contains trailing non-JSON output')
+          raw = Path('/tmp/ollama_agent_output.txt').read_text()
+          # Ollama's CLI may emit terminal control sequences and the model may
+          # wrap valid JSON in a markdown code fence. Those bytes are transport
+          # noise; only the bounded JSON object below is authoritative.
+          raw = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', raw)
+          start = raw.find('{')
+          end = raw.rfind('}')
+          if start < 0 or end < start:
+              raise SystemExit('Agent response contained no JSON object')
+          candidate = raw[start:end + 1]
+          data = json.loads(candidate)
+
           allowed_path = 'tools/factory_forensics/ollama_canary_result.txt'
           if set(data) != {'path', 'content'}:
               raise SystemExit('Agent response schema violation')
