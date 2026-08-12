@@ -11,16 +11,20 @@ class FactoryArtifactRegistry:
         task_id: str,
         artifact_type: str,
         location: str,
+        approval_id=None,
     ) -> None:
-        self._artifacts.append(
-            {
-                "artifact_id": artifact_id,
-                "task_id": task_id,
-                "type": artifact_type,
-                "location": location,
-                "status": "CREATED",
-            }
-        )
+        artifact = {
+            "artifact_id": artifact_id,
+            "task_id": task_id,
+            "type": artifact_type,
+            "location": location,
+            "status": "CREATED",
+        }
+
+        if approval_id:
+            artifact["approval_id"] = approval_id
+
+        self._artifacts.append(artifact)
 
 
 

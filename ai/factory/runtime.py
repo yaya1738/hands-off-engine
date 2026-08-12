@@ -838,15 +838,23 @@ class FactoryRuntime:
         self,
         improvement,
         action,
+        approval_id=None,
     ):
         result = self.improvement_executor.execute(
             improvement,
             action,
         )
 
+        if isinstance(result, dict) and approval_id:
+            result = {
+                **result,
+                "approval_id": approval_id,
+            }
+
         self.improvement_audit.record(
             {
                 "type": "approved_improvement_execution",
+                "approval_id": approval_id,
                 "improvement": improvement,
                 "result": result,
             }
@@ -855,6 +863,7 @@ class FactoryRuntime:
         self.learning_loop.record_outcome(
             {
                 "type": "improvement_execution",
+                "approval_id": approval_id,
                 "improvement": improvement,
                 "result": result,
             }
@@ -892,6 +901,9 @@ class FactoryRuntime:
         result = self.execute_approved_improvement(
             improvement,
             action,
+            approval_id=validation.get(
+                "approval_id"
+            ),
         )
 
         self.improvement_audit.record(
@@ -1801,26 +1813,11 @@ class FactoryRuntime:
                     })
                     continue
 
-                approval_result = (
-                    self.improvement_approval.approve(
-                        approval_request
-                    )
-                )
+                approval_result = approval_request
 
-                if (
-                    not isinstance(
-                        approval_result,
-                        dict,
-                    )
-                    or approval_result.get("status")
-                    != "APPROVED"
-                ):
-                    executed.append({
-                        "status": "BLOCKED",
-                        "reason": "approval_transition_failed",
-                        "approval_request": approval_request,
-                    })
-                    continue
+                approval_id = approval_result.get(
+                    "approval_id"
+                )
 
                 approved = approval_result.get(
                     "improvement",
@@ -1854,6 +1851,12 @@ class FactoryRuntime:
                     approved,
                     action
                 )
+
+                if isinstance(result, dict) and approval_id:
+                    result = {
+                        **result,
+                        "approval_id": approval_id,
+                    }
 
                 if (
                     hasattr(self, "failure_registry")
@@ -1893,6 +1896,7 @@ class FactoryRuntime:
                 if hasattr(self, "learning_loop"):
                     self.learning_loop.record_outcome(
                         {
+                            "approval_id": approval_id,
                             "improvement": approved,
                             "action": action,
                             "result": result,
@@ -1902,6 +1906,7 @@ class FactoryRuntime:
                 if hasattr(self, "decision"):
                     self.decision.record_outcome(
                         {
+                            "approval_id": approval_id,
                             "improvement": approved,
                             "action": action,
                         },
@@ -1912,6 +1917,7 @@ class FactoryRuntime:
                     self.improvement_audit.record(
                         {
                             "type": "autonomous_improvement_execution",
+                            "approval_id": approval_id,
                             "result": result,
                         }
                     )
@@ -1940,11 +1946,13 @@ class FactoryRuntime:
                         ),
                         artifact_type="autonomous_improvement",
                         location="runtime_improvement_execution",
+                        approval_id=approval_id,
                     )
 
                     self.artifact_registry.complete_artifact(
                         artifact_id,
                         {
+                            "approval_id": approval_id,
                             "execution_result": result,
                             "execution_status": result.get(
                                 "status",
