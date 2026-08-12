@@ -43,14 +43,41 @@ jobs:
           printf '%s\n' "$result"
           test "$result" = "FACTORY_OLLAMA_READY"
 
-      - name: Bounded coding canary
+      - name: Bounded agent execution bridge
         shell: bash
         run: |
           set -euo pipefail
           cat > /tmp/task.txt <<'TASK'
-          Make exactly one change in the repository: create tools/factory_forensics/ollama_canary_result.txt containing exactly the text OLLAMA_CODE_EDIT_READY followed by a newline. Do not modify any other file.
+          You are a bounded coding agent. Return ONLY one valid JSON object, with no markdown and no extra text, in exactly this schema:
+          {"path":"tools/factory_forensics/ollama_canary_result.txt","content":"OLLAMA_CODE_EDIT_READY\n"}
+          The requested change is to create that one file with exactly that content. You are not being asked to execute shell commands. Do not propose commands. Do not include any other file or field.
           TASK
-          ollama run qwen2.5-coder:1.5b "$(cat /tmp/task.txt)"
+
+          ollama run qwen2.5-coder:1.5b "$(cat /tmp/task.txt)" > /tmp/ollama_agent_output.txt
+          cat /tmp/ollama_agent_output.txt
+
+      - name: Apply model edit through bounded executor
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          raw = Path('/tmp/ollama_agent_output.txt').read_text()
+          data = json.loads(raw)
+          allowed_path = 'tools/factory_forensics/ollama_canary_result.txt'
+          if set(data) != {'path', 'content'}:
+              raise SystemExit('Agent response schema violation')
+          if data['path'] != allowed_path:
+              raise SystemExit(f'Agent attempted unauthorized path: {data["path"]!r}')
+          if data['content'] != 'OLLAMA_CODE_EDIT_READY\n':
+              raise SystemExit('Agent content violation')
+
+          target = Path(data['path'])
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_text(data['content'])
+          PY
 
       - name: Verify bounded result
         shell: bash
