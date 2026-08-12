@@ -1,6 +1,8 @@
 name: Factory Autonomy Supervisor
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: '*/15 * * * *'
   workflow_dispatch:
