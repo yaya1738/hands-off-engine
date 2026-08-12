@@ -1,0 +1,84 @@
+name: Factory Free Local Agent Canary
+
+on:
+  pull_request:
+    branches:
+      - factory-free-local-agent-20260812
+    types: [opened, synchronize]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  local-agent-canary:
+    if: github.event.pull_request.head.repo.full_name == github.repository || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: Start local model
+        run: |
+          set -euo pipefail
+          nohup ollama serve >/tmp/ollama.log 2>&1 &
+          for i in $(seq 1 30); do curl -fsS http://127.0.0.1:11434/api/tags >/dev/null && break; sleep 2; done
+          ollama pull qwen2.5-coder:0.5b
+
+      - name: Run bounded local coding agent
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json, urllib.request
+          from pathlib import Path
+
+          target = Path('tools/factory_canary.md')
+          before = target.read_text()
+          prompt = f'''You are a bounded autonomous coding agent. Modify ONLY the file tools/factory_canary.md.
+Change exactly the single line CANARY_STATUS=BASELINE to CANARY_STATUS=AGENT_COMPLETED.
+Do not change any other text. Return ONLY the complete resulting file contents.
+Current file:
+{before}'''
+          body = json.dumps({
+              'model': 'qwen2.5-coder:0.5b',
+              'prompt': prompt,
+              'stream': False,
+          }).encode()
+          req = urllib.request.Request('http://127.0.0.1:11434/api/generate', data=body, headers={'Content-Type':'application/json'})
+          with urllib.request.urlopen(req, timeout=300) as r:
+              result = json.load(r)['response'].strip()
+          if result.count('CANARY_STATUS=AGENT_COMPLETED') != 1:
+              raise SystemExit('local agent did not produce the required status')
+          target.write_text(result + '\n')
+          PY
+
+      - name: Verify bounded change
+        run: |
+          set -euo pipefail
+          test -f tools/factory_canary.md
+          grep -qx 'CANARY_STATUS=AGENT_COMPLETED' tools/factory_canary.md
+          test "$(git status --porcelain | wc -l)" -eq 1
+          test "$(git status --porcelain | awk '{print $2}')" = 'tools/factory_canary.md'
+
+      - name: Persist local-agent change
+        run: |
+          set -euo pipefail
+          git config user.name 'factory-free-local-agent'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add tools/factory_canary.md
+          git commit -m 'Factory canary: persist free local agent change'
+          if [ "${{ github.event_name }}" = 'pull_request' ]; then
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          else
+            git push origin HEAD:factory-free-local-agent-20260812
+          fi
+
+      - name: Report result
+        run: echo 'FACTORY_FREE_LOCAL_AGENT=PASS'
