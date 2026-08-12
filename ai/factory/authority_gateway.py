@@ -11,6 +11,8 @@ from ai.factory.runtime import (
 from ai.factory.artifact_registry import FactoryArtifactRegistry
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
 from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntelligence
+from ai.factory.action_audit import FactoryActionAudit
+from ai.factory.capability_execution_gateway import FactoryCapabilityExecutionGateway
 
 from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
@@ -27,6 +29,12 @@ class FactoryAuthorityGateway:
         self.registry = self.runtime.artifact_registry
 
         self.pipeline = self.runtime.development_pipeline
+
+        self.action_audit = FactoryActionAudit()
+        self.runtime.action_audit = self.action_audit
+        self.capability_execution = FactoryCapabilityExecutionGateway(
+            self.runtime
+        )
 
         self.completion = FactoryCompletionWiringAdapter(
             tracker=self.tracker,
@@ -82,6 +90,18 @@ class FactoryAuthorityGateway:
             context,
         )
 
+
+    def execute_capability(self, request):
+        """
+        Single external-agent execution ingress.
+
+        Callers provide only bounded, data-only capability requests. The
+        Factory owns routing, execution handoff, verification, audit, and
+        learning after this boundary.
+        """
+        return self.capability_execution.submit(request)
+
+
     def complete_reviewed_goal(
         self,
         review_request,
@@ -104,7 +124,9 @@ class FactoryAuthorityGateway:
         return {
             "component": "FactoryAuthorityGateway",
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "shared_state": True
+            "shared_state": True,
+            "capability_execution": True,
+            "audit": True,
         }
 
 
