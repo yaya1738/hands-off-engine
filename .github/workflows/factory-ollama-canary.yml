@@ -48,8 +48,8 @@ jobs:
         run: |
           set -euo pipefail
           cat > /tmp/task.txt <<'TASK'
-Make exactly one change in the repository: create tools/factory_forensics/ollama_canary_result.txt containing exactly the text OLLAMA_CODE_EDIT_READY followed by a newline. Do not modify any other file.
-TASK
+          Make exactly one change in the repository: create tools/factory_forensics/ollama_canary_result.txt containing exactly the text OLLAMA_CODE_EDIT_READY followed by a newline. Do not modify any other file.
+          TASK
           ollama run qwen2.5-coder:1.5b "$(cat /tmp/task.txt)"
 
       - name: Verify bounded result
