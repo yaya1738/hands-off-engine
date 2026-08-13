@@ -59,6 +59,21 @@ def execute_bounded_edit(model: str, task: BoundedTask) -> dict:
 
 
 def prove_local_execution(model: str, expected: str = "FACTORY_OLLAMA_READY") -> bool:
-    """Mirror the 'Prove local model execution' canary step."""
-    result = run_ollama(model, "Reply with exactly: " + expected).strip()
-    return result == expected
+    """Mirror the 'Prove local model execution' canary step with retry tolerance.
+
+    Ollama inference is locally deterministic for a fixed prompt/model in the
+    normal case, but transient startup/model-load failures can otherwise turn
+    a healthy canary into a false negative. Retry the bounded proof a small
+    number of times without weakening the exact-output requirement.
+    """
+    for _ in range(3):
+        try:
+            result = run_ollama(
+                model,
+                "Reply with exactly: " + expected,
+            ).strip()
+        except subprocess.CalledProcessError:
+            continue
+        if result == expected:
+            return True
+    return False
