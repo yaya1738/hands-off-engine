@@ -17,15 +17,13 @@ from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
 class FactoryAuthorityGateway:
 
-    def __init__(self):
-
-        self.runtime = FactoryRuntime()
+    def __init__(self, runtime=None):
+        self.runtime = runtime or FactoryRuntime()
 
         self.tracker = self.runtime.development_tracker
         self.approval = self.runtime.improvement_approval
         self.queue = self.runtime.improvement_queue
         self.registry = self.runtime.artifact_registry
-
         self.pipeline = self.runtime.development_pipeline
 
         self.completion = FactoryCompletionWiringAdapter(
@@ -35,9 +33,18 @@ class FactoryAuthorityGateway:
             queue=self.queue,
         )
 
+    def execute_autonomous(self, objective):
+        """Authority-owned execution ingress over the supplied runtime."""
+        if objective is None:
+            raise ValueError("objective is required")
+
+        objective = str(objective).strip()
+        if not objective:
+            raise ValueError("objective must not be empty")
+
+        return self.runtime.execute(objective)
 
     def submit_goal(self, objective):
-
         capability_graph = FactoryCapabilityGraphIntelligence(
             self.runtime
         ).analyze()
@@ -53,33 +60,18 @@ class FactoryAuthorityGateway:
             "state": "ready_for_review"
         }
 
-
-    def submit_development_request(
-        self,
-        objective,
-        context=None,
-    ):
-        """
-        External development-ingress authority.
-
-        The gateway owns the external submission boundary and
-        delegates the existing internal development workflow to
-        FactoryRuntime. Runtime remains the compatibility/internal
-        workflow owner during this migration seam.
-        """
+    def submit_development_request(self, objective, context=None):
+        """External development-ingress authority."""
         if objective is None:
             raise ValueError("objective is required")
 
         objective = str(objective).strip()
-
         if not objective:
             raise ValueError("objective must not be empty")
 
-        context = context or ""
-
         return self.runtime.submit_development_request(
             objective,
-            context,
+            context or "",
         )
 
     def complete_reviewed_goal(
@@ -89,7 +81,6 @@ class FactoryAuthorityGateway:
         result,
         artifact
     ):
-
         return self.completion.complete_reviewed_task(
             review_request,
             0,
@@ -98,9 +89,7 @@ class FactoryAuthorityGateway:
             artifact
         )
 
-
     def report(self):
-
         return {
             "component": "FactoryAuthorityGateway",
             "timestamp": datetime.now(timezone.utc).isoformat(),
