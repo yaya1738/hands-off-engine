@@ -13,7 +13,8 @@
     "docs/knowledge/TRADING_STRATEGY.md",
     "docs/knowledge/NEW_MARKET_EDGE.md",
     "ai/integration/AI_NEXUS_PROTOCOL.md",
-    "ai/coordination/CLUSTER_PLAN.md"
+    "ai/coordination/CLUSTER_PLAN.md",
+    "docs/executor-architecture-implementation.md"
   ],
   "agent_instruction_files": [
     ".claude/instructions.md",
@@ -81,6 +82,15 @@
     "docs/BATCH_11_STATUS_REPORT.md",
     "docs/BATCH_17_SPEC.md",
     "docs/BATCH_17_STATUS_REPORT.md",
+    "docs/BATCH_19_FULL_IMPLEMENTATION_OUTPUT.md",
+    "docs/BATCH_20_STATUS_REPORT.md",
+    "docs/BATCH_21_COMPLETE_TRANSCRIPT_CHUNK_2_of_4.md",
+    "docs/BATCH_21_COMPLETE_TRANSCRIPT_CHUNK_3_of_4.md",
+    "docs/BATCH_21_STATUS_REPORT.md",
+    "docs/BATCH_22_RAW_CLAUDE_OUTPUT_PART_1.md",
+    "docs/BATCH_22_RAW_CLAUDE_OUTPUT_PART_2.md",
+    "docs/BATCH_22_RAW_CLAUDE_OUTPUT_PART_3.md",
+    "docs/BATCH_23_STATUS_REPORT.md",
     "docs/GITHUB_SPARK_INTEGRATION.md",
     "docs/TELEGRAM_COPILOT_INTEGRATION.md"
   ],
