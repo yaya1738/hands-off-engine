@@ -2,6 +2,14 @@ from ai.factory.autonomy_manager import FactoryAutonomyManager
 from ai.factory.authority_gateway import FactoryAuthorityGateway
 
 
+class FakeJournal:
+    def __init__(self):
+        self.records = []
+
+    def record(self, execution_id, status, payload=None):
+        self.records.append((execution_id, status, payload))
+
+
 class FakeRuntime:
     def __init__(self):
         self.legacy_called = False
@@ -44,8 +52,10 @@ def test_execute_routes_through_authority_gateway_without_legacy_bypass():
 
 def test_authority_gateway_routes_autonomous_execution_through_runtime_gate():
     runtime = FakeRuntime()
+    journal = FakeJournal()
     gateway = FactoryAuthorityGateway.__new__(FactoryAuthorityGateway)
     gateway.runtime = runtime
+    gateway.execution_journal = journal
 
     result = gateway.execute_autonomous("preserve autonomous readiness")
 
@@ -55,3 +65,4 @@ def test_authority_gateway_routes_autonomous_execution_through_runtime_gate():
     }
     assert runtime.autonomous_called is True
     assert runtime.executed is True
+    assert [status for _, status, _ in journal.records] == ["STARTED", "COMPLETED"]
