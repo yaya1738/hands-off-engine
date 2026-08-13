@@ -15,6 +15,7 @@ from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntel
 from ai.factory.execution_journal import FactoryExecutionJournal
 from ai.factory.execution_reconciler import FactoryExecutionReconciler
 from ai.factory.restart_reconciliation import FactoryRestartReconciliation
+from factory_runtime_autonomy_gateway import FactoryRuntimeAutonomyGateway
 
 from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
@@ -43,7 +44,7 @@ class FactoryAuthorityGateway:
         )
 
     def execute_autonomous(self, objective):
-        """Authority-owned autonomous ingress preserving runtime readiness gates."""
+        """Authoritative autonomous ingress; never delegates to the legacy runtime autonomous wrapper."""
         if objective is None:
             raise ValueError("objective is required")
 
@@ -56,19 +57,41 @@ class FactoryAuthorityGateway:
         self.execution_journal.record(execution_id, "STARTED", intent)
 
         try:
-            result = self.runtime.autonomous_execute(objective)
-            if isinstance(result, dict) and result.get("blocked"):
+            evaluation = FactoryRuntimeAutonomyGateway().evaluate(objective)
+            decision = evaluation.get("activation", {}).get("decision", {})
+            ready = (
+                decision.get("status") in {"READY", "PASS"}
+                or decision.get("classification") == "factory_ready"
+            )
+
+            autonomy_report = self.runtime.report_autonomy_state(
+                objective,
+                decision,
+            )
+
+            if not ready:
+                result = {
+                    "status": "blocked",
+                    "decision": decision,
+                    "autonomy_report": autonomy_report,
+                }
                 self.execution_journal.record(
                     execution_id,
                     "CANCELLED",
                     {**intent, "result": result},
                 )
-            else:
-                self.execution_journal.record(
-                    execution_id,
-                    "COMPLETED",
-                    {**intent, "result": result},
-                )
+                return result
+
+            execution = self.runtime.execute(objective)
+            result = {
+                "decision": decision,
+                "execution": execution,
+            }
+            self.execution_journal.record(
+                execution_id,
+                "COMPLETED",
+                {**intent, "result": result},
+            )
             return result
         except Exception as exc:
             self.execution_journal.record(
