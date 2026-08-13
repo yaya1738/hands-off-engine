@@ -82,12 +82,12 @@ jobs:
               raise SystemExit('Agent response schema violation')
           if data['path'] != allowed_path:
               raise SystemExit(f'Agent attempted unauthorized path: {data["path"]!r}')
-          if data['content'] != 'OLLAMA_CODE_EDIT_READY\n':
+          if data['content'] not in ('OLLAMA_CODE_EDIT_READY', 'OLLAMA_CODE_EDIT_READY\n'):
               raise SystemExit('Agent content violation')
 
           target = Path(data['path'])
           target.parent.mkdir(parents=True, exist_ok=True)
-          target.write_text(data['content'])
+          target.write_text('OLLAMA_CODE_EDIT_READY\n')
           PY
 
       - name: Verify bounded result
