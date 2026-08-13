@@ -13,6 +13,8 @@ from ai.factory.artifact_registry import FactoryArtifactRegistry
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
 from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntelligence
 from ai.factory.execution_journal import FactoryExecutionJournal
+from ai.factory.execution_reconciler import FactoryExecutionReconciler
+from ai.factory.restart_reconciliation import FactoryRestartReconciliation
 
 from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
@@ -22,6 +24,10 @@ class FactoryAuthorityGateway:
     def __init__(self, runtime=None, execution_journal=None):
         self.runtime = runtime or FactoryRuntime()
         self.execution_journal = execution_journal or FactoryExecutionJournal()
+        self.restart_reconciliation = FactoryRestartReconciliation(
+            FactoryExecutionReconciler(self.execution_journal)
+        )
+        self.startup_reconciliation = self.restart_reconciliation.on_startup()
 
         self.tracker = self.runtime.development_tracker
         self.approval = self.runtime.improvement_approval
@@ -121,7 +127,8 @@ class FactoryAuthorityGateway:
         return {
             "component": "FactoryAuthorityGateway",
             "timestamp": datetime.now(timezone.utc).isoformat(),
-            "shared_state": True
+            "shared_state": True,
+            "startup_reconciliation": self.startup_reconciliation,
         }
 
 
