@@ -1,12 +1,12 @@
-from factory_autonomous_controller import FactoryAutonomousController
+from ai.factory.authority_gateway import FactoryAuthorityGateway
 
 
 class FactoryRuntimeAutonomyGateway:
+    """Compatibility adapter whose execution path is the Authority Gateway."""
 
     def __init__(self):
-        self.controller = FactoryAutonomousController()
+        self.authority = FactoryAuthorityGateway()
 
     def evaluate(self, objective):
-        return self.controller.evaluate_and_execute(
-            objective
-        )
+        """Execute through the single supported Factory execution ingress."""
+        return self.authority.execute(objective)
