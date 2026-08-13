@@ -1,3 +1,3 @@
 # Factory autonomous-development canary
 
-CANARY_STATUS=BASELINE
+CANARY_STATUS=AGENT_COMPLETED
