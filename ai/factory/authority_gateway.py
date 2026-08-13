@@ -34,7 +34,7 @@ class FactoryAuthorityGateway:
         )
 
     def execute_autonomous(self, objective):
-        """Authority-owned execution ingress over the supplied runtime."""
+        """Authority-owned autonomous ingress preserving runtime readiness gates."""
         if objective is None:
             raise ValueError("objective is required")
 
@@ -42,7 +42,7 @@ class FactoryAuthorityGateway:
         if not objective:
             raise ValueError("objective must not be empty")
 
-        return self.runtime.execute(objective)
+        return self.runtime.autonomous_execute(objective)
 
     def submit_goal(self, objective):
         capability_graph = FactoryCapabilityGraphIntelligence(
