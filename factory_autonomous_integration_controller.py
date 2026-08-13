@@ -22,6 +22,11 @@ class FactoryAutonomousIntegrationController:
                 "submit_goal"
             ),
 
+            "execution_ingress": hasattr(
+                self.gateway,
+                "execute"
+            ),
+
             "construction_pipeline": hasattr(
                 self.gateway,
                 "pipeline"
@@ -43,6 +48,7 @@ class FactoryAutonomousIntegrationController:
 
         required = [
             "authority_gateway",
+            "execution_ingress",
             "construction_pipeline",
             "completion_adapter",
             "artifact_registry",
@@ -107,8 +113,11 @@ class FactoryAutonomousIntegrationController:
 
         else:
 
+            # The authority gateway is the single supported execution
+            # ingress. Autonomous activation must use it rather than
+            # bypassing directly into submit_goal or runtime internals.
             result["activation"] = (
-                self.gateway.submit_goal(
+                self.gateway.execute(
                     goal
                 )
             )
