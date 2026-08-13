@@ -11,5 +11,6 @@ class FactoryCoordinationAuthority:
 
     def trigger_self_improvement(self, context="Improve system"):
         return self.authority.execute_autonomous(
-            f"Run the Factory self-improvement cycle for this coordination context: {context}"
+            "Run the Factory self-improvement cycle for this coordination context: "
+            f"{context}"
         )
