@@ -66,24 +66,38 @@ jobs:
           from pathlib import Path
 
           raw = Path('/tmp/ollama_agent_output.txt').read_text()
-          # Ollama's CLI may emit terminal control sequences and the model may
-          # wrap valid JSON in a markdown code fence. Those bytes are transport
-          # noise; only the bounded JSON object below is authoritative.
           raw = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', raw)
-          start = raw.find('{')
-          end = raw.rfind('}')
-          if start < 0 or end < start:
-              raise SystemExit('Agent response contained no JSON object')
-          candidate = raw[start:end + 1]
-          data = json.loads(candidate)
 
           allowed_path = 'tools/factory_forensics/ollama_canary_result.txt'
-          if set(data) != {'path', 'content'}:
-              raise SystemExit('Agent response schema violation')
-          if data['path'] != allowed_path:
-              raise SystemExit(f'Agent attempted unauthorized path: {data["path"]!r}')
-          if data['content'] not in ('OLLAMA_CODE_EDIT_READY', 'OLLAMA_CODE_EDIT_READY\n'):
-              raise SystemExit('Agent content violation')
+          allowed_contents = {'OLLAMA_CODE_EDIT_READY', 'OLLAMA_CODE_EDIT_READY\n'}
+          decoder = json.JSONDecoder()
+          data = None
+          errors = []
+
+          # Models can repeat, truncate, or fence JSON. Scan every plausible
+          # object start and accept only the exact bounded schema we authorize.
+          for match in re.finditer(r'\{', raw):
+              try:
+                  candidate, _ = decoder.raw_decode(raw[match.start():])
+              except json.JSONDecodeError as exc:
+                  errors.append(str(exc))
+                  continue
+              if not isinstance(candidate, dict):
+                  continue
+              if set(candidate) != {'path', 'content'}:
+                  continue
+              if candidate.get('path') != allowed_path:
+                  continue
+              if candidate.get('content') not in allowed_contents:
+                  continue
+              data = candidate
+              break
+
+          if data is None:
+              raise SystemExit(
+                  'No authorized JSON edit found in agent response; '
+                  f'scanned {len(errors)} invalid JSON candidates'
+              )
 
           target = Path(data['path'])
           target.parent.mkdir(parents=True, exist_ok=True)
