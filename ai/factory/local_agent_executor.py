@@ -1,14 +1,11 @@
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+from .agent_result_validator import AgentResultValidator
+
 
 class FactoryLocalAgentExecutor:
-    """Explicit boundary for bounded local-agent execution.
-
-    The executor does not grant the model repository-wide authority. A caller
-    must provide an explicit workspace, allowed paths, and an injected agent
-    callable. The callable receives the task plus the authorization envelope.
-    """
+    """Explicit boundary for bounded local-agent execution."""
 
     def __init__(self, agent: Optional[Any] = None):
         self.agent = agent
@@ -29,49 +26,33 @@ class FactoryLocalAgentExecutor:
             normalized.append(path.as_posix())
         return tuple(normalized)
 
-    def execute(
-        self,
-        task: Dict[str, Any],
-        workspace: str = ".",
-        allowed_paths=None,
-    ):
+    def execute(self, task: Dict[str, Any], workspace: str = ".", allowed_paths=None):
         workspace_path = Path(workspace).resolve()
         allowed_paths = self._validate_allowed_paths(
-            workspace_path,
-            tuple(allowed_paths or task.get("allowed_paths", ())),
+            workspace_path, tuple(allowed_paths or task.get("allowed_paths", ()))
         )
 
         if self.agent is None:
-            result = {
-                "status": "AGENT_UNAVAILABLE",
-                "task": task,
-                "workspace": str(workspace_path),
-                "allowed_paths": list(allowed_paths),
-            }
+            result = {"status": "AGENT_UNAVAILABLE", "task": task,
+                      "workspace": str(workspace_path), "allowed_paths": list(allowed_paths)}
             self.executions.append(result)
             return result
 
-        envelope = {
-            "task": task,
-            "workspace": str(workspace_path),
-            "allowed_paths": list(allowed_paths),
-        }
+        envelope = {"task": task, "workspace": str(workspace_path),
+                    "allowed_paths": list(allowed_paths)}
+        raw_result = self.agent(envelope)
+        if isinstance(raw_result, dict) and raw_result.get("status") == "agent_completed":
+            validated = AgentResultValidator.validate(raw_result.get("response"), allowed_paths)
+            result = {"status": "agent_completed", "edit": validated}
+        else:
+            if not isinstance(raw_result, dict):
+                raise TypeError("local agent must return a dictionary")
+            result = raw_result
 
-        result = self.agent(envelope)
-        if not isinstance(result, dict):
-            raise TypeError("local agent must return a dictionary")
-
-        result = {
-            **result,
-            "task": task,
-            "workspace": envelope["workspace"],
-            "allowed_paths": list(allowed_paths),
-        }
+        result = {**result, "task": task, "workspace": envelope["workspace"],
+                  "allowed_paths": list(allowed_paths)}
         self.executions.append(result)
         return result
 
     def report(self):
-        return {
-            "executions": self.executions,
-            "count": len(self.executions),
-        }
+        return {"executions": self.executions, "count": len(self.executions)}
