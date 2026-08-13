@@ -1,0 +1,21 @@
+name: Factory Local Agent Executor Bridge
+
+on:
+  push:
+    branches:
+      - factory-local-agent-executor-bridge-20260813
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Validate bounded executor contract
+        run: python -m pytest tests/test_local_agent_executor.py -q
