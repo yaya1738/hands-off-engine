@@ -1,0 +1,3 @@
+canary write-access verification
+timestamp: 2026-08-13T09:00 IDT
+purpose: confirm browser session can commit to factory-ollama-canary-20260812
