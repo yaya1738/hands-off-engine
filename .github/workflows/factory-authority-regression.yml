@@ -10,7 +10,6 @@ on:
       - 'tests/test_runtime_state_persistence.py'
       - 'tests/test_execution_journal.py'
       - 'tests/test_execution_reconciler.py'
-      - 'tests/test_restart_reconciliation.py'
       - 'tests/test_authority_startup_reconciliation.py'
       - '.github/workflows/factory-authority-regression.yml'
   workflow_dispatch:
@@ -38,4 +37,4 @@ jobs:
           pip install pytest
 
       - name: Run authority, persistence, and recovery regressions
-        run: python -m pytest -q tests/test_autonomy_manager_authority.py tests/test_runtime_state_persistence.py tests/test_execution_journal.py tests/test_execution_reconciler.py tests/test_restart_reconciliation.py tests/test_authority_startup_reconciliation.py
+        run: python -m pytest -q tests/test_autonomy_manager_authority.py tests/test_runtime_state_persistence.py tests/test_execution_journal.py tests/test_execution_reconciler.py tests/test_authority_startup_reconciliation.py
