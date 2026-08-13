@@ -82,6 +82,36 @@ class FactoryAuthorityGateway:
             context,
         )
 
+    def execute(self, objective):
+        """Canonical external execution ingress into FactoryRuntime.
+
+        Callers that need the Factory to actually execute an objective
+        should enter through this gateway rather than invoking internal
+        runtime components directly. The runtime remains the execution
+        authority; this gateway owns the boundary.
+        """
+        if objective is None:
+            raise ValueError("objective is required")
+
+        objective = str(objective).strip()
+
+        if not objective:
+            raise ValueError("objective must not be empty")
+
+        result = self.runtime.execute(objective)
+
+        self.runtime.emit_event(
+            "authority.execution_completed",
+            {
+                "objective": objective,
+                "success": bool(result.get("success"))
+                if isinstance(result, dict)
+                else False,
+            },
+        )
+
+        return result
+
     def complete_reviewed_goal(
         self,
         review_request,
