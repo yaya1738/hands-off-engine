@@ -35,81 +35,47 @@ jobs:
         shell: bash
         run: ollama pull qwen2.5-coder:1.5b
 
-      - name: Prove local model execution
+      - name: Prove local model execution through shared agent module
         shell: bash
         run: |
           set -euo pipefail
-          result="$(ollama run qwen2.5-coder:1.5b 'Reply with exactly: FACTORY_OLLAMA_READY')"
-          printf '%s\n' "$result"
-          test "$result" = "FACTORY_OLLAMA_READY"
+          PYTHONPATH=. python - <<'PY'
+          from tools.factory_forensics.local_agent import prove_local_execution
 
-      - name: Bounded agent execution bridge
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat > /tmp/task.txt <<'TASK'
-          You are a bounded coding agent. Return ONLY one valid JSON object, with no markdown and no extra text, in exactly this schema:
-          {"path":"tools/factory_forensics/ollama_canary_result.txt","content":"OLLAMA_CODE_EDIT_READY\n"}
-          The requested change is to create that one file with exactly that content. You are not being asked to execute shell commands. Do not propose commands. Do not include any other file or field.
-          TASK
-
-          ollama run qwen2.5-coder:1.5b "$(cat /tmp/task.txt)" > /tmp/ollama_agent_output.txt
-          cat /tmp/ollama_agent_output.txt
-
-      - name: Apply model edit through bounded executor
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          import json
-          import re
-          from pathlib import Path
-
-          raw = Path('/tmp/ollama_agent_output.txt').read_text()
-          raw = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', raw)
-
-          allowed_path = 'tools/factory_forensics/ollama_canary_result.txt'
-          allowed_contents = {'OLLAMA_CODE_EDIT_READY', 'OLLAMA_CODE_EDIT_READY\n'}
-          decoder = json.JSONDecoder()
-          data = None
-          errors = []
-
-          # Models can repeat, truncate, or fence JSON. Scan every plausible
-          # object start and accept only the exact bounded schema we authorize.
-          for match in re.finditer(r'\{', raw):
-              try:
-                  candidate, _ = decoder.raw_decode(raw[match.start():])
-              except json.JSONDecodeError as exc:
-                  errors.append(str(exc))
-                  continue
-              if not isinstance(candidate, dict):
-                  continue
-              if set(candidate) != {'path', 'content'}:
-                  continue
-              if candidate.get('path') != allowed_path:
-                  continue
-              if candidate.get('content') not in allowed_contents:
-                  continue
-              data = candidate
-              break
-
-          if data is None:
-              raise SystemExit(
-                  'No authorized JSON edit found in agent response; '
-                  f'scanned {len(errors)} invalid JSON candidates'
-              )
-
-          target = Path(data['path'])
-          target.parent.mkdir(parents=True, exist_ok=True)
-          target.write_text('OLLAMA_CODE_EDIT_READY\n')
+          if not prove_local_execution("qwen2.5-coder:1.5b"):
+              raise SystemExit("Local Ollama execution proof failed")
+          print("FACTORY_OLLAMA_READY")
           PY
 
-      - name: Verify bounded result
+      - name: Bounded agent execution bridge through shared agent module
         shell: bash
         run: |
           set -euo pipefail
-          test -f tools/factory_forensics/ollama_canary_result.txt
-          test "$(cat tools/factory_forensics/ollama_canary_result.txt)" = "OLLAMA_CODE_EDIT_READY"
+          PYTHONPATH=. python - <<'PY'
+          from tools.factory_forensics.local_agent import BoundedTask, execute_bounded_edit
+
+          task = BoundedTask(
+              allowed_path="tools/factory_forensics/ollama_canary_result.txt",
+              allowed_contents=frozenset({"OLLAMA_CODE_EDIT_READY", "OLLAMA_CODE_EDIT_READY\n"}),
+              write_content="OLLAMA_CODE_EDIT_READY\n",
+          )
+          result = execute_bounded_edit("qwen2.5-coder:1.5b", task)
+          print(result)
+          PY
+
+      - name: Verify bounded result through shared validator
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONPATH=. python - <<'PY'
+          from tools.factory_forensics.validator import verify_result
+
+          if not verify_result(
+              "tools/factory_forensics/ollama_canary_result.txt",
+              "OLLAMA_CODE_EDIT_READY\n",
+          ):
+              raise SystemExit("Bounded result verification failed")
+          PY
           git diff --exit-code -- ':!tools/factory_forensics/ollama_canary_result.txt' || {
             echo 'Unexpected files modified.'
             git status --short
