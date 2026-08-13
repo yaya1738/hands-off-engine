@@ -31,6 +31,8 @@ from pathlib import Path
 from threading import Thread, Event
 from typing import Callable, Dict, List, Optional
 
+from ai.factory.autonomous_scheduler import FactoryAutonomousScheduler
+
 REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
 LOGS_DIR = Path("/var/log/hands-off")
@@ -171,14 +173,17 @@ def task_claude_orchestrator():
 
 
 def task_self_improvement():
-    """Run self-improvement kernel refresh"""
+    """Run self-improvement through Factory authority."""
     log("Running self-improvement cycle...")
     try:
-        sys.path.insert(0, str(REPO_ROOT))
-        from ai_nexus.spark_plug_autokernel import refresh_all_kernels
-        refresh_all_kernels()
-        log("Self-improvement cycle completed")
-        return True
+        scheduler = FactoryAutonomousScheduler()
+        result = scheduler.run_self_improvement()
+        success = bool(result.get("success")) if isinstance(result, dict) else bool(result)
+        if success:
+            log("Self-improvement cycle completed")
+        else:
+            log(f"Self-improvement authority returned failure: {result}", "ERROR")
+        return success
     except Exception as e:
         log(f"Self-improvement failed: {e}", "ERROR")
         return False
