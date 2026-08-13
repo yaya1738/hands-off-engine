@@ -1,4 +1,5 @@
 import json
+import uuid
 from datetime import datetime, timezone
 
 from ai.factory.runtime import (
@@ -11,14 +12,16 @@ from ai.factory.runtime import (
 from ai.factory.artifact_registry import FactoryArtifactRegistry
 from ai.factory.development_pipeline import FactoryDevelopmentPipeline
 from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntelligence
+from ai.factory.execution_journal import FactoryExecutionJournal
 
 from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
 
 class FactoryAuthorityGateway:
 
-    def __init__(self, runtime=None):
+    def __init__(self, runtime=None, execution_journal=None):
         self.runtime = runtime or FactoryRuntime()
+        self.execution_journal = execution_journal or FactoryExecutionJournal()
 
         self.tracker = self.runtime.development_tracker
         self.approval = self.runtime.improvement_approval
@@ -42,7 +45,32 @@ class FactoryAuthorityGateway:
         if not objective:
             raise ValueError("objective must not be empty")
 
-        return self.runtime.autonomous_execute(objective)
+        execution_id = str(uuid.uuid4())
+        intent = {"objective": objective, "entrypoint": "FactoryAuthorityGateway"}
+        self.execution_journal.record(execution_id, "STARTED", intent)
+
+        try:
+            result = self.runtime.autonomous_execute(objective)
+            if isinstance(result, dict) and result.get("blocked"):
+                self.execution_journal.record(
+                    execution_id,
+                    "CANCELLED",
+                    {**intent, "result": result},
+                )
+            else:
+                self.execution_journal.record(
+                    execution_id,
+                    "COMPLETED",
+                    {**intent, "result": result},
+                )
+            return result
+        except Exception as exc:
+            self.execution_journal.record(
+                execution_id,
+                "FAILED",
+                {**intent, "error": str(exc)},
+            )
+            raise
 
     def submit_goal(self, objective):
         capability_graph = FactoryCapabilityGraphIntelligence(
