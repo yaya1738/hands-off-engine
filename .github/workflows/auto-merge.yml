@@ -1,214 +1,103 @@
 name: Auto-merge PRs
 
-# Automatically merge PRs without user intervention
-# This workflow enables zero-touch repo management as per the Hands-Off Engine goals
-# 
-# Merges automatically when:
-# 1. PR is from Copilot or other trusted sources
-# 2. PR is marked ready for review (not draft)
-# 3. All required checks pass
-# 4. No merge conflicts
+# Fail-closed repository automation.
+# Auto-merge is permitted only after an explicit human approval label.
+# No manual/API trigger may bypass that requirement, and this workflow never
+# performs a direct merge.
 
 on:
-  # When a PR is opened, ready for review, or synchronized
   pull_request:
-    types: [opened, ready_for_review, synchronize]
-  # When checks complete
+    types: [opened, ready_for_review, synchronize, labeled]
   check_suite:
     types: [completed]
-  # Manual trigger
   workflow_dispatch:
     inputs:
       pr_number:
-        description: 'PR number to merge'
+        description: 'PR number to evaluate'
         required: true
         type: number
-  # Triggered by other systems (like Telegram bot)
   repository_dispatch:
     types: [merge_pr]
 
 permissions:
   contents: write
   pull-requests: write
-  issues: write
+  issues: read
 
-# Trusted bot authors that can auto-merge (case-insensitive matching used in script)
 env:
   TRUSTED_AUTHORS: "copilot,github-actions[bot],dependabot[bot]"
+  HUMAN_APPROVAL_LABEL: "human-approved"
+  FINANCE_APPROVAL_LABEL: "human-finance-approved"
 
 jobs:
   auto-merge:
     runs-on: ubuntu-latest
-    # Run when:
-    # - PR event (opened, ready, synced)
-    # - Check suite completed successfully
-    # - Manual dispatch
-    # - Repository dispatch
     if: >
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'repository_dispatch' ||
-      (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
-      (github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success')
-
+      github.event_name == 'check_suite' ||
+      (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Determine PR number
-        id: pr_number
-        run: |
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            echo "pr=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            echo "pr=${{ github.event.client_payload.pr_number }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "pr=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" == "check_suite" ]; then
-            # Get PR associated with this check suite
-            HEAD_BRANCH="${{ github.event.check_suite.head_branch }}"
-            PR=$(gh pr list --json number,headRefName --jq ".[] | select(.headRefName == \"$HEAD_BRANCH\") | .number" 2>/dev/null | head -1)
-            echo "pr=$PR" >> $GITHUB_OUTPUT
-          fi
+      - name: Determine PR
+        id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Check PR and auto-merge
-        if: steps.pr_number.outputs.pr != ''
         run: |
-          PR_NUM="${{ steps.pr_number.outputs.pr }}"
-          echo "Processing PR #$PR_NUM..."
-          
-          # Get PR details
-          PR_INFO=$(gh pr view $PR_NUM --json state,mergeable,mergeStateStatus,isDraft,author,statusCheckRollup,title,headRefName 2>/dev/null) || {
-            echo "Failed to get PR info"
-            exit 0
-          }
-          
-          STATE=$(echo "$PR_INFO" | jq -r '.state')
-          MERGEABLE=$(echo "$PR_INFO" | jq -r '.mergeable')
-          IS_DRAFT=$(echo "$PR_INFO" | jq -r '.isDraft')
-          AUTHOR=$(echo "$PR_INFO" | jq -r '.author.login')
-          TITLE=$(echo "$PR_INFO" | jq -r '.title')
-          
-          echo "PR #$PR_NUM: $TITLE"
-          echo "  State: $STATE"
-          echo "  Mergeable: $MERGEABLE"
-          echo "  Draft: $IS_DRAFT"
-          echo "  Author: $AUTHOR"
-          
-          # Check if PR is eligible for auto-merge
-          if [ "$STATE" != "OPEN" ]; then
-            echo "PR is not open, skipping"
-            exit 0
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
+            echo "number=${{ github.event.client_payload.pr_number }}" >> "$GITHUB_OUTPUT"
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
+          else
+            branch="${{ github.event.check_suite.head_branch }}"
+            number=$(gh pr list --head "$branch" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+            echo "number=$number" >> "$GITHUB_OUTPUT"
           fi
-          
-          if [ "$IS_DRAFT" == "true" ]; then
-            echo "PR is a draft, skipping"
-            exit 0
-          fi
-          
-          if [ "$MERGEABLE" != "MERGEABLE" ]; then
-            echo "PR has merge conflicts, skipping"
-            exit 0
-          fi
-          
-          # Check if all checks pass (only evaluate completed checks)
-          CHECKS_PASSED=$(echo "$PR_INFO" | jq '[.statusCheckRollup[]? | select(.status == "COMPLETED") | .conclusion] | all(. == "SUCCESS" or . == "SKIPPED" or . == "NEUTRAL")')
-          HAS_PENDING=$(echo "$PR_INFO" | jq '[.statusCheckRollup[]? | .status] | any(. == "PENDING" or . == "QUEUED" or . == "IN_PROGRESS")')
-          
-          if [ "$HAS_PENDING" == "true" ]; then
-            echo "PR has pending checks, skipping for now"
-            exit 0
-          fi
-          
-          # Ensure all completed checks passed
-          if [ "$CHECKS_PASSED" != "true" ]; then
-            echo "Some checks failed, skipping"
-            exit 0
-          fi
-          
-          # Auto-merge criteria:
-          # 1. From trusted sources (case-insensitive check)
-          # 2. Manual trigger allows any author
-          SHOULD_MERGE="false"
-          AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
-          
-          # Check if author is in trusted list (case-insensitive)
-          for trusted in $(echo "$TRUSTED_AUTHORS" | tr ',' ' '); do
-            trusted_lower=$(echo "$trusted" | tr '[:upper:]' '[:lower:]')
-            if [ "$AUTHOR_LOWER" == "$trusted_lower" ]; then
-              echo "PR is from trusted source ($AUTHOR), will auto-merge"
-              SHOULD_MERGE="true"
-              break
-            fi
+
+      - name: Fail-closed eligibility check
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          pr="${{ steps.pr.outputs.number }}"
+          info=$(gh pr view "$pr" --json state,isDraft,mergeable,author,labels,statusCheckRollup)
+
+          state=$(jq -r '.state' <<<"$info")
+          draft=$(jq -r '.isDraft' <<<"$info")
+          mergeable=$(jq -r '.mergeable' <<<"$info")
+          author=$(jq -r '.author.login' <<<"$info")
+          labels=$(jq -r '[.labels[].name] | map(ascii_downcase) | .[]' <<<"$info")
+
+          [ "$state" = "OPEN" ] || { echo "DENY: PR is not open"; exit 0; }
+          [ "$draft" = "false" ] || { echo "DENY: PR is draft"; exit 0; }
+          [ "$mergeable" = "MERGEABLE" ] || { echo "DENY: PR is not mergeable"; exit 0; }
+
+          trusted=false
+          author_lc=$(tr '[:upper:]' '[:lower:]' <<<"$author")
+          IFS=',' read -ra trusted_list <<<"$TRUSTED_AUTHORS"
+          for candidate in "${trusted_list[@]}"; do
+            [ "$author_lc" = "$(tr '[:upper:]' '[:lower:]' <<<"$candidate")" ] && trusted=true
           done
-          
-          # Manual/API triggers allow merge regardless of author
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            echo "Manual/API trigger, will attempt merge"
-            SHOULD_MERGE="true"
-          fi
-          
-          if [ "$SHOULD_MERGE" != "true" ]; then
-            echo "PR does not meet auto-merge criteria"
-            exit 0
-          fi
-          
-          # Enable auto-merge if not already enabled
-          echo "Enabling auto-merge for PR #$PR_NUM..."
-          AUTO_MERGE_OUTPUT=$(gh pr merge $PR_NUM --squash --auto 2>&1) && echo "Auto-merge enabled" || echo "Auto-merge setup returned: $AUTO_MERGE_OUTPUT"
-          
-          # If auto-merge is not available, try direct merge
-          echo "Attempting direct merge..."
-          MERGE_OUTPUT=$(gh pr merge $PR_NUM --squash --delete-branch 2>&1) && {
-            echo "✅ PR #$PR_NUM merged successfully!"
-          } || {
-            echo "Direct merge returned: $MERGE_OUTPUT"
-            echo "Auto-merge may be pending until branch protections are satisfied"
-          }
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
+          $trusted || { echo "DENY: author is not trusted"; exit 0; }
 
-  # Separate job to handle draft PRs when they become ready
-  mark-ready-and-merge:
-    runs-on: ubuntu-latest
-    if: >
-      github.event_name == 'pull_request' && 
-      github.event.action == 'ready_for_review'
+          has_human=false
+          while IFS= read -r label; do
+            [ "$label" = "$HUMAN_APPROVAL_LABEL" ] && has_human=true
+          done <<<"$labels"
+          $has_human || { echo "DENY: explicit human approval label missing"; exit 0; }
 
-    steps:
-      - name: Auto-merge ready PR from trusted source
-        run: |
-          PR_NUM="${{ github.event.pull_request.number }}"
-          AUTHOR="${{ github.event.pull_request.user.login }}"
-          AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
-          
-          echo "PR #$PR_NUM is now ready for review (author: $AUTHOR)"
-          
-          # Check if author is trusted (case-insensitive)
-          IS_TRUSTED="false"
-          for trusted in $(echo "$TRUSTED_AUTHORS" | tr ',' ' '); do
-            trusted_lower=$(echo "$trusted" | tr '[:upper:]' '[:lower:]')
-            if [ "$AUTHOR_LOWER" == "$trusted_lower" ]; then
-              IS_TRUSTED="true"
-              break
-            fi
-          done
-          
-          if [ "$IS_TRUSTED" != "true" ]; then
-            echo "Author $AUTHOR is not in trusted list, skipping"
-            exit 0
+          # Financial changes require a second, domain-specific human approval.
+          changed=$(gh pr diff "$pr" --name-only)
+          if grep -Eiq '(^|/)(polymarket|trading|finance|financial|executor)(/|_|\.|$)|POLYMARKET|LIVE_TRADING' <<<"$changed"; then
+            has_finance=false
+            while IFS= read -r label; do
+              [ "$label" = "$FINANCE_APPROVAL_LABEL" ] && has_finance=true
+            done <<<"$labels"
+            $has_finance || { echo "DENY: financial approval label missing"; exit 0; }
           fi
-          
-          echo "Author $AUTHOR is trusted, enabling auto-merge"
-          
-          # Enable auto-merge (will merge when checks pass)
-          AUTO_MERGE_OUTPUT=$(gh pr merge $PR_NUM --squash --auto 2>&1) && {
-            echo "Auto-merge enabled for PR #$PR_NUM"
-          } || {
-            echo "Auto-merge setup returned: $AUTO_MERGE_OUTPUT"
-          }
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
+
+          # Do not bypass branch protection with a direct merge.
+          echo "Eligibility passed; enabling GitHub auto-merge only."
+          gh pr merge "$pr" --squash --auto
