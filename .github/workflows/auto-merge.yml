@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           pr="${{ steps.pr.outputs.number }}"
-          info=$(gh pr view "$pr" --repo "$GITHUB_REPOSITORY" --json state,isDraft,mergeable,author,labels,statusCheckRollup)
+          info=$(gh pr view "$pr" --repo "$GITHUB_REPOSITORY" --json state,isDraft,mergeable,author,labels)
 
           state=$(jq -r '.state' <<<"$info")
           draft=$(jq -r '.isDraft' <<<"$info")
