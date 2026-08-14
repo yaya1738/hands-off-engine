@@ -36,6 +36,7 @@ from ai.factory.autonomous_scheduler import FactoryAutonomousScheduler
 REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
 LOGS_DIR = Path("/var/log/hands-off")
+LIVE_TRADING_ENABLED = False
 
 # Ensure log directory exists
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
@@ -104,7 +105,11 @@ def run_subprocess(command: List[str], timeout: int = 300) -> tuple[bool, str]:
 # Task implementations
 
 def task_trading_pipeline():
-    """Run the trading pipeline"""
+    """Keep live trading unavailable until explicitly unbanned."""
+    if not LIVE_TRADING_ENABLED:
+        log("Trading pipeline blocked: live trading capability is temporarily disabled", "WARN")
+        return False
+
     log("Running trading pipeline...")
     os.environ["HANDS_OFF_EXECUTOR_MODE"] = "shadow"
     success, output = run_subprocess(
@@ -221,7 +226,7 @@ TASKS = [
     Task("health_check", task_health_check, 15 * 60, "Health monitoring"),
     Task("claude_orchestrator", task_claude_orchestrator, 30 * 60, "Claude orchestrator", run_on_start=True),
     Task("performance_metrics", task_performance_metrics, 60 * 60, "Performance metrics"),
-    Task("trading_pipeline", task_trading_pipeline, 60 * 60, "Trading pipeline", run_on_start=True),
+    Task("trading_pipeline", task_trading_pipeline, 60 * 60, "Trading pipeline", run_on_start=False),
     Task("revenue_tracking", task_revenue_tracking, 4 * 60 * 60, "Revenue tracking"),
     Task("self_improvement", task_self_improvement, 6 * 60 * 60, "Self-improvement cycle"),
     Task("phase_progression", task_phase_progression, 24 * 60 * 60, "Phase progression"),
