@@ -7,11 +7,16 @@ def test_self_improvement_uses_factory_scheduler(monkeypatch):
     calls = []
 
     class FakeScheduler:
-        def run_self_improvement(self):
-            calls.append("factory")
-            return {"success": True}
+        def __init__(self):
+            calls.append("init")
+
+        def schedule_task(self, task):
+            calls.append(("schedule", task))
+            return {"scheduled": True}
 
     monkeypatch.setattr(daemon, "FactoryAutonomousScheduler", FakeScheduler)
 
     assert daemon.task_self_improvement() is True
-    assert calls == ["factory"]
+    assert [call[0] if isinstance(call, tuple) else call for call in calls] == [
+        "init", "schedule"
+    ]
