@@ -14,17 +14,19 @@ import subprocess
 import sys
 import time
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Event
 from typing import Callable, List, Optional
 
 from ai.factory.autonomous_scheduler import FactoryAutonomousScheduler
+from ai.finance.polymarket_rules_gate import PolymarketRulesGate
 
 REPO_ROOT = Path(__file__).parent.parent
 STATE_DIR = REPO_ROOT / "state"
 LOGS_DIR = Path("/var/log/hands-off")
 LIVE_TRADING_ENABLED = False
+POLYMARKET_RULES_GATE = PolymarketRulesGate()
 
 LOGS_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -75,14 +77,41 @@ def run_subprocess(command: List[str], timeout: int = 300) -> tuple[bool, str]:
         return False, str(e)
 
 
+def _current_polymarket_rules_snapshot():
+    """Return an injected fresh rules snapshot, or None so the gate fails closed.
+
+    A future live-enabled adapter should populate this from authoritative current
+    Polymarket API/documentation data immediately before the final green-light.
+    """
+    raw = os.environ.get("POLYMARKET_RULES_SNAPSHOT_JSON")
+    if not raw:
+        return None
+    try:
+        snapshot = json.loads(raw)
+    except (TypeError, ValueError):
+        return None
+    return snapshot if isinstance(snapshot, dict) else None
+
+
 # Task implementations
 
 def task_trading_pipeline():
-    """Keep live trading unavailable until explicitly unbanned."""
+    """Keep live trading unavailable until explicitly unbanned and rules-checked."""
     if not LIVE_TRADING_ENABLED:
         log("Trading pipeline blocked: live trading capability is temporarily disabled", "WARN")
         return False
-    log("Running trading pipeline...")
+
+    snapshot = _current_polymarket_rules_snapshot()
+    decision = POLYMARKET_RULES_GATE.check(
+        snapshot,
+        live_trading_enabled=LIVE_TRADING_ENABLED,
+        now=datetime.now(timezone.utc),
+    )
+    if not decision.allowed:
+        log(f"Trading pipeline blocked by current-rules gate: {decision.reason}", "WARN")
+        return False
+
+    log("Running trading pipeline after current-rules gate passed...")
     os.environ["HANDS_OFF_EXECUTOR_MODE"] = "shadow"
     success, output = run_subprocess(["python3", str(REPO_ROOT / "scripts" / "run_pipeline.py")], timeout=600)
     if success:
@@ -183,7 +212,7 @@ def task_performance_metrics():
     if success:
         log("Performance metrics tracked")
     else:
-        log(f"Performance tracking failed: {output[:200]}", "ERROR")
+        log(f"Performance metrics failed: {output[:200]}", "ERROR")
     return success
 
 
@@ -244,7 +273,6 @@ class AutonomousDaemon:
             task.mark_run(success)
         except Exception as e:
             log(f"Task {task.name} exception: {e}", "ERROR")
-            traceback.print_exc()
             task.mark_run(False, str(e))
 
     def run_loop(self):
@@ -298,8 +326,8 @@ def main():
     def signal_handler(signum, frame):
         daemon.stop()
 
-    signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
+    signal.signal(signal.SIGINT, signal_handler)
 
     if args.background:
         pid = os.fork()
