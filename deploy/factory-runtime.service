@@ -1,0 +1,19 @@
+[Unit]
+Description=Hands-Off Engine Factory Runtime
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/hands-off-engine
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/env python3 %h/hands-off-engine/scripts/autonomous_daemon.py
+Restart=always
+RestartSec=10
+TimeoutStopSec=30
+
+# Live financial execution remains unavailable until explicitly unbanned.
+Environment=HANDS_OFF_LIVE_TRADING_ENABLED=0
+
+[Install]
+WantedBy=default.target
