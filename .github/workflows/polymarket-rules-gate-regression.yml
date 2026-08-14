@@ -1,0 +1,27 @@
+name: Polymarket Rules Gate Regression
+
+on:
+  pull_request:
+    paths:
+      - 'ai/finance/polymarket_rules_gate.py'
+      - 'tests/test_polymarket_rules_gate.py'
+      - '.github/workflows/polymarket-rules-gate-regression.yml'
+  push:
+    paths:
+      - 'ai/finance/polymarket_rules_gate.py'
+      - 'tests/test_polymarket_rules_gate.py'
+      - '.github/workflows/polymarket-rules-gate-regression.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  rules-gate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: python -m pip install --disable-pip-version-check pytest
+      - run: python -m pytest -q tests/test_polymarket_rules_gate.py
