@@ -51,7 +51,7 @@ jobs:
             echo "number=${{ github.event.pull_request.number }}" >> "$GITHUB_OUTPUT"
           else
             branch="${{ github.event.check_suite.head_branch }}"
-            number=$(gh pr list --head "$branch" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+            number=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open --json number --jq '.[0].number' 2>/dev/null || true)
             echo "number=$number" >> "$GITHUB_OUTPUT"
           fi
 
@@ -62,7 +62,7 @@ jobs:
         run: |
           set -euo pipefail
           pr="${{ steps.pr.outputs.number }}"
-          info=$(gh pr view "$pr" --json state,isDraft,mergeable,author,labels,statusCheckRollup)
+          info=$(gh pr view "$pr" --repo "$GITHUB_REPOSITORY" --json state,isDraft,mergeable,author,labels,statusCheckRollup)
 
           state=$(jq -r '.state' <<<"$info")
           draft=$(jq -r '.isDraft' <<<"$info")
@@ -88,8 +88,14 @@ jobs:
           done <<<"$labels"
           $has_human || { echo "DENY: explicit human approval label missing"; exit 0; }
 
-          # Financial changes require a second, domain-specific human approval.
-          changed=$(gh pr diff "$pr" --name-only)
+          # Query changed filenames through the GitHub API rather than gh pr diff.
+          # This job intentionally has no repository checkout, so eligibility must
+          # not depend on a local git working tree.
+          changed=$(gh api --paginate \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/pulls/${pr}/files" \
+            --jq '.[].filename')
+
           if grep -Eiq '(^|/)(polymarket|trading|finance|financial|executor)(/|_|\.|$)|POLYMARKET|LIVE_TRADING' <<<"$changed"; then
             has_finance=false
             while IFS= read -r label; do
@@ -100,4 +106,4 @@ jobs:
 
           # Do not bypass branch protection with a direct merge.
           echo "Eligibility passed; enabling GitHub auto-merge only."
-          gh pr merge "$pr" --squash --auto
+          gh pr merge "$pr" --repo "$GITHUB_REPOSITORY" --squash --auto
