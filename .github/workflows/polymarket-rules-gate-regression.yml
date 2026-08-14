@@ -4,12 +4,16 @@ on:
   pull_request:
     paths:
       - 'ai/finance/polymarket_rules_gate.py'
+      - 'scripts/autonomous_daemon.py'
       - 'tests/test_polymarket_rules_gate.py'
+      - 'tests/test_autonomous_daemon_trading_gate.py'
       - '.github/workflows/polymarket-rules-gate-regression.yml'
   push:
     paths:
       - 'ai/finance/polymarket_rules_gate.py'
+      - 'scripts/autonomous_daemon.py'
       - 'tests/test_polymarket_rules_gate.py'
+      - 'tests/test_autonomous_daemon_trading_gate.py'
       - '.github/workflows/polymarket-rules-gate-regression.yml'
 
 permissions:
@@ -24,4 +28,4 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install --disable-pip-version-check pytest
-      - run: python -m pytest -q tests/test_polymarket_rules_gate.py
+      - run: python -m pytest -q tests/test_polymarket_rules_gate.py tests/test_autonomous_daemon_trading_gate.py
