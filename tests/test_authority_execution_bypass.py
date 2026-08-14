@@ -1,4 +1,5 @@
 from ai.factory.authority_gateway import FactoryAuthorityGateway
+from factory_runtime_autonomy_gateway import FactoryRuntimeAutonomyGateway
 
 
 class FakeRuntime:
@@ -38,7 +39,7 @@ def test_authority_execution_does_not_delegate_to_legacy_runtime_wrapper(monkeyp
             return {"activation": {"decision": {"status": "READY"}}}
 
     monkeypatch.setattr(
-        "ai.factory.authority_gateway.FactoryRuntimeAutonomyGateway",
+        "factory_runtime_autonomy_gateway.FactoryRuntimeAutonomyGateway",
         ReadyGateway,
     )
 
