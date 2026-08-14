@@ -1,0 +1,45 @@
+name: Factory Authority Regression
+
+on:
+  pull_request:
+    branches:
+      - factory-capability-boundary-live-20260812
+    paths:
+      - 'ai/factory/**'
+      - 'scripts/autonomous_daemon.py'
+      - 'tests/test_authority_execution_bypass.py'
+      - 'tests/test_autonomous_daemon_authority.py'
+      - 'tests/test_autonomous_daemon_trading_gate.py'
+      - 'tests/test_autonomy_manager_authority.py'
+      - 'tests/test_event_replay_persistence.py'
+      - 'tests/test_runtime_state_persistence.py'
+      - 'tests/test_execution_journal.py'
+      - 'tests/test_execution_reconciler.py'
+      - 'tests/test_authority_startup_reconciliation.py'
+      - '.github/workflows/factory-authority-regression.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  authority-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install test dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install pytest
+
+      - name: Run authority, daemon, trading-gate, persistence, and recovery regressions
+        run: python -m pytest -q tests/test_authority_execution_bypass.py tests/test_autonomous_daemon_authority.py tests/test_autonomous_daemon_trading_gate.py tests/test_autonomy_manager_authority.py tests/test_event_replay_persistence.py tests/test_runtime_state_persistence.py tests/test_execution_journal.py tests/test_execution_reconciler.py tests/test_authority_startup_reconciliation.py
