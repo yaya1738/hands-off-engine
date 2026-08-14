@@ -16,12 +16,15 @@ fi
 
 ssh -o BatchMode=yes -o ConnectTimeout=10 "$SSH_HOST" 'printf "connected\n"'
 
-# Pass only non-secret deployment parameters to the remote shell. No .env,
-# cloud credentials, trading credentials, or tokens are transferred.
-ssh "$SSH_HOST" "REPO_URL='$REPO_URL' REF='$REF' REMOTE_ROOT='$REMOTE_ROOT' bash -s" <<'REMOTE'
+# Pass deployment parameters as positional arguments rather than interpolating
+# them into a shell command. No .env, cloud credentials, trading credentials,
+# or tokens are transferred.
+ssh "$SSH_HOST" bash -s -- "$REPO_URL" "$REF" "$REMOTE_ROOT" <<'REMOTE'
 set -euo pipefail
 
-REMOTE_ROOT="${REMOTE_ROOT:-$HOME/hands-off-engine}"
+REPO_URL="$1"
+REF="$2"
+REMOTE_ROOT="${3:-$HOME/hands-off-engine}"
 
 if [[ "$(id -u)" -eq 0 ]]; then
   SUDO=""
@@ -50,8 +53,7 @@ systemctl --user --version >/dev/null 2>&1 || { echo "FAIL: systemd user service
 
 if [[ -d "$REMOTE_ROOT/.git" ]]; then
   git -C "$REMOTE_ROOT" fetch --prune origin
-  git -C "$REMOTE_ROOT" checkout "$REF"
-  git -C "$REMOTE_ROOT" reset --hard "origin/$REF"
+  git -C "$REMOTE_ROOT" checkout -B "$REF" "origin/$REF"
 else
   mkdir -p "$(dirname "$REMOTE_ROOT")"
   git clone --branch "$REF" --single-branch "$REPO_URL" "$REMOTE_ROOT"
