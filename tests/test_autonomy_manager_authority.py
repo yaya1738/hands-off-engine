@@ -83,7 +83,7 @@ def test_authority_gateway_routes_ready_execution_through_runtime(monkeypatch):
             }
 
     monkeypatch.setattr(
-        "ai.factory.authority_gateway.FactoryRuntimeAutonomyGateway",
+        "factory_runtime_autonomy_gateway.FactoryRuntimeAutonomyGateway",
         ReadyGateway,
     )
 
