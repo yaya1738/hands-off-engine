@@ -1,67 +1,39 @@
 #!/usr/bin/env python3
+"""Fail-closed manual financial activation entry point.
+
+This legacy command is intentionally unable to enable live trading by itself.
+A human must complete the current-rules/financial approval process through the
+authoritative Factory authority path. This prevents a convenience script from
+becoming a second trading authority.
 """
-Manual Trading Resume
 
-Manually resume live trading after auto-pause or manual pause.
-"""
+from __future__ import annotations
 
-# UNIFIED AI - All systems serve Yair Siegel
-import sys
-from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
-try:
-    from ai.unified_ai import MASTER, get_master
-except ImportError:
-    MASTER = "Yair Siegel"
-
-
-import sys
-from pathlib import Path
-import os
 import logging
 
-# Add parent directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
-
-from executor.trading_safeguards import load_mode, save_mode
+from executor.trading_safeguards import load_mode
 
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
+    format="%(asctime)s - %(levelname)s - %(message)s",
 )
 LOG = logging.getLogger(__name__)
 
 
-def main():
-    """Manually resume trading"""
+def main() -> int:
     mode = load_mode()
-
     if mode.get("live_trading_enabled", False):
-        LOG.info("Trading is already enabled")
-        return
+        LOG.info("Trading is already enabled; this legacy entry point makes no changes.")
+        return 0
 
-    # Resume trading
-    mode["live_trading_enabled"] = True
-    mode["reason"] = "manual_resume"
-    mode["auto_paused"] = False
-
-    save_mode(mode)
-
-    LOG.info("✅ Trading manually resumed")
-
-    # Send notification
-    try:
-        from notifications.telegram_notifier import send_telegram_message
-        send_telegram_message(
-            "✅ **TRADING MANUALLY RESUMED**\n\n"
-            "Live trading has been manually enabled.\n"
-            "System is now active."
-        )
-    except Exception as e:
-        LOG.error(f"Failed to send notification: {e}")
-
-    print("✓ Trading resumed")
+    LOG.error("FAIL-CLOSED: this legacy resume command cannot enable live trading.")
+    LOG.error(
+        "Live financial activation requires the authoritative Factory authority "
+        "path, a fresh current-rules check, and explicit human approval."
+    )
+    LOG.error("No trading state was modified.")
+    return 2
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
