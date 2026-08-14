@@ -15,7 +15,6 @@ from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntel
 from ai.factory.execution_journal import FactoryExecutionJournal
 from ai.factory.execution_reconciler import FactoryExecutionReconciler
 from ai.factory.restart_reconciliation import FactoryRestartReconciliation
-from factory_runtime_autonomy_gateway import FactoryRuntimeAutonomyGateway
 
 from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
@@ -57,6 +56,11 @@ class FactoryAuthorityGateway:
         self.execution_journal.record(execution_id, "STARTED", intent)
 
         try:
+            # Lazy import is intentional: the autonomy gateway's controller graph
+            # references FactoryAuthorityGateway, so importing it at module load
+            # time would create a circular-import failure during test/daemon startup.
+            from factory_runtime_autonomy_gateway import FactoryRuntimeAutonomyGateway
+
             evaluation = FactoryRuntimeAutonomyGateway().evaluate(objective)
             decision = evaluation.get("activation", {}).get("decision", {})
             ready = (
