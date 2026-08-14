@@ -5,7 +5,7 @@ set -euo pipefail
 # trading credentials, provisions cloud resources, or enables live financial execution.
 
 SSH_HOST="${1:-}"
-REMOTE_ROOT="${2:-$HOME/hands-off-engine}"
+REMOTE_ROOT="${2:-}"
 REPO_URL="${REPO_URL:-https://github.com/yaya1738/hands-off-engine.git}"
 REF="${REF:-main}"
 
@@ -18,6 +18,8 @@ ssh -o BatchMode=yes -o ConnectTimeout=10 "$SSH_HOST" 'printf "connected\n"'
 
 ssh "$SSH_HOST" "REPO_URL='$REPO_URL' REF='$REF' REMOTE_ROOT='$REMOTE_ROOT' bash -s" <<'REMOTE'
 set -euo pipefail
+
+REMOTE_ROOT="${REMOTE_ROOT:-$HOME/hands-off-engine}"
 
 sudo apt-get update -qq
 sudo apt-get install -y -qq python3 python3-venv python3-pip git curl jq tmux
