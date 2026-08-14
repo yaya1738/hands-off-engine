@@ -158,9 +158,9 @@ class TradingSafeguards:
 
         except Exception as e:
             LOG.warning(f"Balance check failed: {e}")
-            # Fail open - don't block trading if we can't check balance
-            # The CLOB API will reject the trade anyway if insufficient funds
-            return True, f"Balance check skipped (error: {str(e)[:30]})"
+            # Fail closed: an unknown wallet balance must never authorize a trade.
+            # The execution layer must have positive, verified balance evidence.
+            return False, f"Balance check failed closed: {str(e)[:80]}"
 
     def _get_usdc_balance(self, wallet: str, contract: str) -> Optional[float]:
         """Fetch USDC balance from Polygon RPC"""
@@ -355,7 +355,7 @@ def maybe_auto_resume(reason: str = "recalibration", notify: bool = True):
 
     Args:
         reason: Why trading is being resumed
-        notify: Whether to send a notification (default: True)
+        notify: Whether to send a notification
     """
     mode = load_mode()
 
@@ -372,13 +372,13 @@ def maybe_auto_resume(reason: str = "recalibration", notify: bool = True):
 
     save_mode(mode)
 
-    LOG.info(f"✅ TRADING AUTO-RESUMED: {reason}")
+    LOG.info(f"TRADING AUTO-RESUMED: {reason}")
 
     if notify:
         try:
             from notifications.telegram_notifier import send_telegram_message
             send_telegram_message(
-                f"✅ **TRADING AUTO-RESUMED**\n\n"
+                f"TRADING AUTO-RESUMED\n\n"
                 f"Reason: {reason}\n"
                 f"Time: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
                 f"Live trading is now active."
