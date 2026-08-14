@@ -1,0 +1,16 @@
+from scripts import autonomous_daemon
+
+
+def test_trading_pipeline_is_hard_blocked(monkeypatch):
+    called = False
+
+    def forbidden(*args, **kwargs):
+        nonlocal called
+        called = True
+        raise AssertionError("live trading subprocess must not be launched")
+
+    monkeypatch.setattr(autonomous_daemon, "run_subprocess", forbidden)
+    monkeypatch.setattr(autonomous_daemon, "LIVE_TRADING_ENABLED", False)
+
+    assert autonomous_daemon.task_trading_pipeline() is False
+    assert called is False
