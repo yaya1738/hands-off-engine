@@ -3,7 +3,7 @@ name: Factory Authority Regression
 on:
   pull_request:
     branches:
-      - factory-capability-boundary-live-20260812
+      - main
     paths:
       - 'ai/factory/**'
       - 'scripts/autonomous_daemon.py'
