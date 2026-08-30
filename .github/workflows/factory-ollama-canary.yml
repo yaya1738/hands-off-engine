@@ -3,7 +3,7 @@ name: Factory Ollama Local Agent Canary
 on:
   push:
     branches:
-      - factory-ollama-canary-20260812
+      - fix/canary-validator-authority-20260830
   workflow_dispatch:
 
 permissions:
@@ -41,7 +41,6 @@ jobs:
           set -euo pipefail
           PYTHONPATH=. python - <<'PY'
           from tools.factory_forensics.local_agent import prove_local_execution
-
           if not prove_local_execution("qwen2.5-coder:1.5b"):
               raise SystemExit("Local Ollama execution proof failed")
           print("FACTORY_OLLAMA_READY")
@@ -53,7 +52,6 @@ jobs:
           set -euo pipefail
           PYTHONPATH=. python - <<'PY'
           from tools.factory_forensics.local_agent import BoundedTask, execute_bounded_edit
-
           task = BoundedTask(
               allowed_path="tools/factory_forensics/ollama_canary_result.txt",
               allowed_contents=frozenset({"OLLAMA_CODE_EDIT_READY", "OLLAMA_CODE_EDIT_READY\n"}),
@@ -69,7 +67,6 @@ jobs:
           set -euo pipefail
           PYTHONPATH=. python - <<'PY'
           from tools.factory_forensics.validator import verify_result
-
           if not verify_result(
               "tools/factory_forensics/ollama_canary_result.txt",
               "OLLAMA_CODE_EDIT_READY\n",
