@@ -1,13 +1,10 @@
 name: Factory Ollama Local Agent Canary
 
 on:
-  push:
-    branches:
-      - factory-ollama-canary-20260812
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   ollama-canary:
@@ -39,55 +36,25 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          result="$(ollama run qwen2.5-coder:1.5b 'Reply with exactly: FACTORY_OLLAMA_READY')"
-          printf '%s\n' "$result"
-          test "$result" = "FACTORY_OLLAMA_READY"
+          python - <<'PY'
+          from tools.factory_forensics.local_agent import prove_local_execution
+          raise SystemExit(0 if prove_local_execution('qwen2.5-coder:1.5b') else 1)
+          PY
 
       - name: Bounded agent execution bridge
         shell: bash
         run: |
           set -euo pipefail
-          cat > /tmp/task.txt <<'TASK'
-          You are a bounded coding agent. Return ONLY one valid JSON object, with no markdown and no extra text, in exactly this schema:
-          {"path":"tools/factory_forensics/ollama_canary_result.txt","content":"OLLAMA_CODE_EDIT_READY\n"}
-          The requested change is to create that one file with exactly that content. You are not being asked to execute shell commands. Do not propose commands. Do not include any other file or field.
-          TASK
-
-          ollama run qwen2.5-coder:1.5b "$(cat /tmp/task.txt)" > /tmp/ollama_agent_output.txt
-          cat /tmp/ollama_agent_output.txt
-
-      - name: Apply model edit through bounded executor
-        shell: bash
-        run: |
-          set -euo pipefail
           python - <<'PY'
-          import json
-          import re
           from pathlib import Path
-
-          raw = Path('/tmp/ollama_agent_output.txt').read_text()
-          # Ollama's CLI may emit terminal control sequences and the model may
-          # wrap valid JSON in a markdown code fence. Those bytes are transport
-          # noise; only the bounded JSON object below is authoritative.
-          raw = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', raw)
-          start = raw.find('{')
-          end = raw.rfind('}')
-          if start < 0 or end < start:
-              raise SystemExit('Agent response contained no JSON object')
-          candidate = raw[start:end + 1]
-          data = json.loads(candidate)
-
-          allowed_path = 'tools/factory_forensics/ollama_canary_result.txt'
-          if set(data) != {'path', 'content'}:
-              raise SystemExit('Agent response schema violation')
-          if data['path'] != allowed_path:
-              raise SystemExit(f'Agent attempted unauthorized path: {data["path"]!r}')
-          if data['content'] != 'OLLAMA_CODE_EDIT_READY\n':
-              raise SystemExit('Agent content violation')
-
-          target = Path(data['path'])
-          target.parent.mkdir(parents=True, exist_ok=True)
-          target.write_text(data['content'])
+          from tools.factory_forensics.local_agent import BoundedTask, execute_bounded_edit
+          task = BoundedTask(
+              allowed_path='tools/factory_forensics/ollama_canary_result.txt',
+              allowed_contents=frozenset({'OLLAMA_CODE_EDIT_READY\n'}),
+              write_content='OLLAMA_CODE_EDIT_READY\n',
+          )
+          execute_bounded_edit('qwen2.5-coder:1.5b', task)
+          assert Path(task.allowed_path).read_text() == task.write_content
           PY
 
       - name: Verify bounded result
