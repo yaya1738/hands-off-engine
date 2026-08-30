@@ -1,0 +1,38 @@
+name: Autonomous Ingress Patch
+
+on:
+  push:
+    branches: [security/runtime-autonomous-ingress-20260830]
+
+permissions:
+  contents: write
+
+jobs:
+  patch:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Patch and test
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('ai/factory/runtime.py')
+          s = p.read_text()
+          old = '''    def autonomous_execute(self, objective):\n\n        from factory_runtime_autonomy_gateway import (\n            FactoryRuntimeAutonomyGateway\n        )\n\n        gateway = FactoryRuntimeAutonomyGateway()\n\n        evaluation = gateway.evaluate(\n            objective\n        )\n\n        decision = evaluation.get(\n            "activation",\n            {}\n        ).get(\n            "decision",\n            {}\n        )\n\n        ready = (\n            decision.get("status") == "READY"\n            or decision.get("status") == "PASS"\n            or decision.get("classification") == "factory_ready"\n        )\n\n        autonomy_report = self.report_autonomy_state(\n            objective,\n            decision,\n        )\n\n        if not ready:\n            return {\n                "status": "blocked",\n                "decision": decision,\n                "autonomy_report": autonomy_report,\n            }\n\n        result = self.execute(\n            objective\n        )\n\n        return {\n            "decision": decision,\n            "execution": result,\n        }\n'''
+          new = '''    def autonomous_execute(self, objective):\n        """Compatibility wrapper; autonomous ingress is owned by FactoryAuthorityGateway."""\n        from ai.factory.authority_gateway import FactoryAuthorityGateway\n        return FactoryAuthorityGateway(runtime=self).execute_autonomous(objective)\n'''
+          if old not in s:
+              raise SystemExit('expected autonomous_execute implementation not found; refusing to mutate')
+          p.write_text(s.replace(old, new, 1))
+          PY
+          python -m pytest -q
+      - name: Commit and push
+        run: |
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
+          git add ai/factory/runtime.py
+          git diff --cached --quiet && exit 0
+          git commit -m "security: route runtime autonomous ingress through authority gateway"
+          git push
