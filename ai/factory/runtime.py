@@ -786,51 +786,9 @@ class FactoryRuntime:
 
 
     def autonomous_execute(self, objective):
-
-        from factory_runtime_autonomy_gateway import (
-            FactoryRuntimeAutonomyGateway
-        )
-
-        gateway = FactoryRuntimeAutonomyGateway()
-
-        evaluation = gateway.evaluate(
-            objective
-        )
-
-        decision = evaluation.get(
-            "activation",
-            {}
-        ).get(
-            "decision",
-            {}
-        )
-
-        ready = (
-            decision.get("status") == "READY"
-            or decision.get("status") == "PASS"
-            or decision.get("classification") == "factory_ready"
-        )
-
-        autonomy_report = self.report_autonomy_state(
-            objective,
-            decision,
-        )
-
-        if not ready:
-            return {
-                "status": "blocked",
-                "decision": decision,
-                "autonomy_report": autonomy_report,
-            }
-
-        result = self.execute(
-            objective
-        )
-
-        return {
-            "decision": decision,
-            "execution": result,
-        }
+        """Compatibility wrapper; autonomous ingress is owned by FactoryAuthorityGateway."""
+        from ai.factory.authority_gateway import FactoryAuthorityGateway
+        return FactoryAuthorityGateway(runtime=self).execute_autonomous(objective)
 
 
 
