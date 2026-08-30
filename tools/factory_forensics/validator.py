@@ -49,7 +49,27 @@ def extract_authorized_edit(
     return None
 
 
-def apply_edit(data: dict, write_content: str) -> Path:
+def apply_edit(
+    data: dict,
+    write_content: str,
+    *,
+    allowed_path: str,
+    allowed_contents: set[str],
+) -> Path:
+    """Apply only an edit that independently satisfies the authority contract.
+
+    Keep the policy check at the write boundary so callers cannot accidentally
+    turn this helper into an arbitrary filesystem writer by skipping extraction.
+    """
+    if set(data) != {"path", "content"}:
+        raise ValueError("Unauthorized edit schema")
+    if data.get("path") != allowed_path:
+        raise ValueError(f"Unauthorized edit path: {data.get('path')!r}")
+    if data.get("content") not in allowed_contents:
+        raise ValueError("Unauthorized edit content")
+    if write_content not in allowed_contents or write_content != data["content"]:
+        raise ValueError("Write content does not match authorized content")
+
     target = Path(data["path"])
     target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(write_content)
