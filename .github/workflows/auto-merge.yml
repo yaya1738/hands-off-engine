@@ -76,10 +76,14 @@ jobs:
 
           trusted=false
           author_lc=$(tr '[:upper:]' '[:lower:]' <<<"$author")
+          owner_lc=$(tr '[:upper:]' '[:lower:]' <<<"$GITHUB_REPOSITORY_OWNER")
           IFS=',' read -ra trusted_list <<<"$TRUSTED_AUTHORS"
           for candidate in "${trusted_list[@]}"; do
             [ "$author_lc" = "$(tr '[:upper:]' '[:lower:]' <<<"$candidate")" ] && trusted=true
           done
+          # The repository owner is a trusted author, but still requires the
+          # explicit human approval label below; ownership alone never permits merge.
+          [ "$author_lc" = "$owner_lc" ] && trusted=true
           $trusted || { echo "DENY: author is not trusted"; exit 0; }
 
           has_human=false
