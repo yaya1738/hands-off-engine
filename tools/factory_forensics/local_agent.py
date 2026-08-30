@@ -45,7 +45,7 @@ def run_ollama(model: str, prompt: str, timeout: int = 120) -> str:
 
 
 def execute_bounded_edit(model: str, task: BoundedTask) -> dict:
-    """Run the model, extract the authorized edit, and apply it."""
+    """Run the model, validate the edit at the write boundary, and apply it."""
     raw_output = run_ollama(model, task.prompt())
     data = validator.extract_authorized_edit(
         raw_output,
@@ -54,7 +54,12 @@ def execute_bounded_edit(model: str, task: BoundedTask) -> dict:
     )
     if data is None:
         raise SystemExit("No authorized JSON edit found in agent response.")
-    validator.apply_edit(data, task.write_content)
+    validator.apply_edit(
+        data,
+        task.write_content,
+        allowed_path=task.allowed_path,
+        allowed_contents=set(task.allowed_contents),
+    )
     return data
 
 
