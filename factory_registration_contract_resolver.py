@@ -1,60 +1,34 @@
+"""Read-only registration contract resolver compatibility facade."""
 import json
-import subprocess
 from datetime import datetime, timezone
 
 
 def probe():
-
-    result = subprocess.run(
-        ["python", "factory_construction_contract_probe.py"],
-        capture_output=True,
-        text=True
-    )
-
-    start = result.stdout.find("{")
-
-    if start == -1:
-        return {}
-
-    return json.loads(result.stdout[start:])
+    return {"contracts": [], "authority_required": True}
 
 
 def resolve(data):
-
-    contracts = data.get("contracts", [])
-
+    contracts = data.get("contracts", []) if isinstance(data, dict) else []
     matches = []
-
     for item in contracts:
         name = item.get("class", "").lower()
         methods = item.get("methods", {})
-
-        if (
-            "artifact" in name
-            or "verification" in name
-            or "register" in str(methods).lower()
-        ):
+        if "artifact" in name or "verification" in name or "register" in str(methods).lower():
             matches.append(item)
-
-    if matches:
-        return {
-            "decision": "registration_contract_found",
-            "action": "build_thin_completion_adapter",
-            "contracts": matches
-        }
-
     return {
-        "decision": "registration_contract_missing",
-        "action": "extend_registration_capability"
+        "decision": "authority_required",
+        "action": "submit_registration_probe_through_FactoryAuthorityGateway",
+        "contracts": matches,
     }
 
 
 def run():
-
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "component": "factory_registration_contract_resolver",
-        "decision": resolve(probe())
+        "decision": resolve(probe()),
+        "disabled": True,
+        "authority": "FactoryAuthorityGateway",
     }
 
 
