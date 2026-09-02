@@ -1,62 +1,31 @@
+"""Read-only completion registration resolver compatibility facade."""
 import json
-import subprocess
 from datetime import datetime, timezone
 
-
-TARGETS = [
-    "register",
-    "artifact",
-    "verification",
-    "complete",
-]
+TARGETS = ["register", "artifact", "verification", "complete"]
 
 
 def get_introspection():
-
-    result = subprocess.run(
-        ["python", "factory_introspection_extension_adapter.py"],
-        capture_output=True,
-        text=True
-    )
-
-    start = result.stdout.find("{")
-
-    if start == -1:
-        return {}
-
-    return json.loads(result.stdout[start:])
+    return {"disabled": True, "authority_required": True}
 
 
 def resolve(data):
-
     text = json.dumps(data).lower()
-
-    matches = []
-
-    for target in TARGETS:
-        if target in text:
-            matches.append(target)
-
-    if "register" in matches and "artifact" in matches:
-        return {
-            "decision": "reuse_registration_organ",
-            "action": "wire_pipeline_completion_to_registry",
-            "matches": matches
-        }
-
+    matches = [target for target in TARGETS if target in text]
     return {
-        "decision": "completion_adapter_required",
-        "action": "extend_existing_pipeline",
-        "matches": matches
+        "decision": "authority_required",
+        "action": "submit_registration_request_through_FactoryAuthorityGateway",
+        "matches": matches,
     }
 
 
 def run():
-
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "component": "factory_completion_registration_resolver",
-        "decision": resolve(get_introspection())
+        "decision": resolve(get_introspection()),
+        "disabled": True,
+        "authority": "FactoryAuthorityGateway",
     }
 
 
