@@ -41,39 +41,44 @@ jobs:
         shell: bash
         run: ollama pull qwen2.5-coder:1.5b
 
-      - name: Prove local model execution
+      - name: Prove direct model execution is fail-closed
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from tools.factory_forensics.local_agent import prove_local_execution
-          raise SystemExit(0 if prove_local_execution('qwen2.5-coder:1.5b') else 1)
+          assert prove_local_execution('qwen2.5-coder:1.5b') is False
           PY
 
-      - name: Bounded agent execution bridge
+      - name: Prove bounded mutation is authority-gated
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
           from pathlib import Path
-          from tools.factory_forensics.local_agent import BoundedTask, execute_bounded_edit
+          from tools.factory_forensics.local_agent import BoundedTask, execute_bounded_edit, run_ollama
+
           task = BoundedTask(
               allowed_path='tools/factory_forensics/ollama_canary_result.txt',
               allowed_contents=frozenset({'OLLAMA_CODE_EDIT_READY\n'}),
               write_content='OLLAMA_CODE_EDIT_READY\n',
           )
-          execute_bounded_edit('qwen2.5-coder:1.5b', task)
-          assert Path(task.allowed_path).read_text() == task.write_content
+          for operation in (
+              lambda: run_ollama('qwen2.5-coder:1.5b', task.prompt()),
+              lambda: execute_bounded_edit('qwen2.5-coder:1.5b', task),
+          ):
+              try:
+                  operation()
+              except RuntimeError as exc:
+                  assert '[FACTORY-AUTHORITY]' in str(exc)
+              else:
+                  raise AssertionError('direct authority bypass was not rejected')
+          assert not Path(task.allowed_path).exists()
           PY
 
-      - name: Verify bounded result
+      - name: Verify canary made no repository mutation
         shell: bash
         run: |
           set -euo pipefail
-          test -f tools/factory_forensics/ollama_canary_result.txt
-          test "$(cat tools/factory_forensics/ollama_canary_result.txt)" = "OLLAMA_CODE_EDIT_READY"
-          git diff --exit-code -- ':!tools/factory_forensics/ollama_canary_result.txt' || {
-            echo 'Unexpected files modified.'
-            git status --short
-            exit 1
-          }
+          test ! -e tools/factory_forensics/ollama_canary_result.txt
+          git diff --exit-code
