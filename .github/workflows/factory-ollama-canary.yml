@@ -2,6 +2,15 @@ name: Factory Ollama Local Agent Canary
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - 'hardening/**'
+      - 'fix/**'
+  pull_request:
+    paths:
+      - 'tools/factory_forensics/**'
+      - '.github/workflows/factory-ollama-canary.yml'
 
 permissions:
   contents: read
