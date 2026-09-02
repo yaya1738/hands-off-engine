@@ -1,92 +1,56 @@
+"""Read-only script-creator capability router.
+
+Legacy analyzer execution is disabled; construction authority belongs to
+FactoryAuthorityGateway.
+"""
+
 import json
-import subprocess
 from datetime import datetime, timezone
-from pathlib import Path
 
 
 CREATION_KEYWORDS = [
-    "create",
-    "build",
-    "develop",
-    "artifact",
-    "generate",
-    "constructor",
-    "write",
+    "create", "build", "develop", "artifact", "generate", "constructor", "write",
 ]
-
 
 NEW_COMPONENT = {
     "name": "Factory Script Creator",
-    "responsibility": [
-        "generate file",
-        "run syntax check",
-        "run tests",
-        "register artifact",
-    ],
-    "scope": "narrow construction capability"
+    "responsibility": ["generate file", "run syntax check", "run tests", "register artifact"],
+    "scope": "narrow construction capability",
 }
 
 
 def run_capability_analyzer():
-    result = subprocess.run(
-        ["python", "factory_capability_analyzer.py"],
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
-
-    output = result.stdout
-
-    try:
-        start = output.find("{")
-        data = json.loads(output[start:])
-        return data
-
-    except Exception:
-        return {
-            "raw_output": output,
-            "parse_error": True,
-        }
+    return {
+        "authority_required": True,
+        "message": "[FACTORY-AUTHORITY] Legacy capability analyzer execution is disabled; use FactoryAuthorityGateway.",
+        "capabilities": {},
+    }
 
 
 def find_construction_capability(report):
-    matches = []
-
     text = json.dumps(report).lower()
-
-    for keyword in CREATION_KEYWORDS:
-        if keyword in text:
-            matches.append(keyword)
-
-    return matches
+    return [keyword for keyword in CREATION_KEYWORDS if keyword in text]
 
 
 def create_missing_creator():
-    return {
-        "decision": "create_missing_capability",
-        "capability": NEW_COMPONENT,
-        "status": "planned",
-    }
+    return {"decision": "create_missing_capability", "capability": NEW_COMPONENT, "status": "planned"}
 
 
 def run():
     report = run_capability_analyzer()
-
     matches = find_construction_capability(report)
-
-    if matches:
-        decision = {
-            "decision": "reuse_existing_construction_organ",
-            "matches": matches,
-            "source": "factory_capability_analyzer",
-        }
-    else:
-        decision = create_missing_creator()
-
+    decision = {
+        "decision": "authority_required",
+        "matches": matches,
+        "source": "FactoryAuthorityGateway",
+    }
+    if not matches:
+        decision["fallback"] = create_missing_creator()
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "component": "factory_script_creator_capability_router",
         "decision": decision,
+        "authority_required": True,
     }
 
 
