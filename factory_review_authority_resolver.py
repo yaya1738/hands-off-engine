@@ -1,67 +1,39 @@
+"""Read-only compatibility facade for review-authority discovery.
+
+The legacy implementation spawned another controller directly. Operational
+execution now belongs behind FactoryAuthorityGateway.
+"""
 import json
-import subprocess
 from datetime import datetime, timezone
 
-
-KEYWORDS = [
-    "review",
-    "approve",
-    "validate",
-    "verification",
-    "complete",
-    "accept",
-]
+KEYWORDS = ["review", "approve", "validate", "verification", "complete", "accept"]
 
 
 def probe():
-
-    result = subprocess.run(
-        ["python", "factory_introspection_extension_adapter.py"],
-        capture_output=True,
-        text=True
-    )
-
-    start = result.stdout.find("{")
-
-    if start == -1:
-        return {}
-
-    return json.loads(result.stdout[start:])
+    return {
+        "disabled": True,
+        "authority_required": True,
+        "next_step": "FactoryAuthorityGateway",
+        "error": "[FACTORY-AUTHORITY] legacy controller execution is disabled; submit through FactoryAuthorityGateway",
+    }
 
 
 def find(data):
-
     text = json.dumps(data).lower()
-
-    matches = []
-
-    for word in KEYWORDS:
-        if word in text:
-            matches.append(word)
-
-    return matches
+    return [word for word in KEYWORDS if word in text]
 
 
 def run():
-
-    matches = find(probe())
-
-    if matches:
-        decision = {
-            "decision": "existing_review_authority_candidates_found",
-            "matches": matches,
-            "action": "reuse_or_adapt"
-        }
-    else:
-        decision = {
-            "decision": "review_authority_missing",
-            "action": "extend_pipeline"
-        }
-
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "component": "factory_review_authority_resolver",
-        "decision": decision
+        "decision": {
+            "decision": "factory_authority_required",
+            "matches": find(probe()),
+            "action": "submit_review_authority_request",
+        },
+        "disabled": True,
+        "next_step": "FactoryAuthorityGateway",
     }
 
 
