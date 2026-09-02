@@ -7,6 +7,7 @@ TARGETS = [
     "factory_builder_capability_discovery.py",
     "factory_constructor_repair_assistant.py",
     "autonomous/singularity_trigger.py",
+    "autonomous/time_collapse.py",
     "scripts/realtime_coordination_service.py",
 ]
 
@@ -36,7 +37,7 @@ def test_self_repair_and_discovery_fail_closed():
     assert ns["run"]()["disabled"] is True
 
 
-def test_constructor_repair_and_singularity_are_disabled():
+def test_constructor_repair_singularity_and_time_collapse_are_disabled():
     ns = {"__file__": str(ROOT / "factory_constructor_repair_assistant.py")}
     exec(compile(_source("factory_constructor_repair_assistant.py"), "factory_constructor_repair_assistant.py", "exec"), ns)
     assert ns["main"]() is False
@@ -45,6 +46,10 @@ def test_constructor_repair_and_singularity_are_disabled():
     exec(compile(_source("autonomous/singularity_trigger.py"), "singularity_trigger.py", "exec"), ns)
     assert ns["execute_singularity"]()[0].startswith("[FACTORY-AUTHORITY]")
     assert ns["save_state"]({}) is False
+
+    ns = {"__file__": str(ROOT / "autonomous/time_collapse.py")}
+    exec(compile(_source("autonomous/time_collapse.py"), "time_collapse.py", "exec"), ns)
+    assert ns["collapse_timeline"]()["disabled"] is True
 
 
 def test_coordination_webhook_fails_closed():
