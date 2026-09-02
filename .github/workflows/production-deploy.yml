@@ -1,0 +1,69 @@
+name: Governed Production Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Exact main commit SHA to deploy'
+        required: true
+        type: string
+      activate:
+        description: 'Start/restart Factory services after deployment'
+        required: true
+        default: false
+        type: boolean
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy exact approved revision
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Validate requested revision
+        env:
+          REQUESTED_SHA: ${{ inputs.ref }}
+        run: |
+          set -euo pipefail
+          test "${REQUESTED_SHA}" != ""
+          git ls-remote "https://github.com/${GITHUB_REPOSITORY}.git" "refs/heads/main" | grep -q "${REQUESTED_SHA}"
+          echo "Deploying main revision ${REQUESTED_SHA}"
+
+      - name: Verify required deployment credentials exist
+        env:
+          DEPLOY_HOST: ${{ secrets.PRODUCTION_HOST }}
+          DEPLOY_USER: ${{ secrets.PRODUCTION_USER }}
+          DEPLOY_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          test -n "${DEPLOY_HOST}" || { echo 'Missing PRODUCTION_HOST'; exit 1; }
+          test -n "${DEPLOY_USER}" || { echo 'Missing PRODUCTION_USER'; exit 1; }
+          test -n "${DEPLOY_KEY}" || { echo 'Missing PRODUCTION_SSH_KEY'; exit 1; }
+
+      - name: Configure SSH
+        env:
+          DEPLOY_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          DEPLOY_HOST: ${{ secrets.PRODUCTION_HOST }}
+        run: |
+          set -euo pipefail
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "${DEPLOY_KEY}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H "${DEPLOY_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Deploy and verify
+        env:
+          DEPLOY_HOST: ${{ secrets.PRODUCTION_HOST }}
+          DEPLOY_USER: ${{ secrets.PRODUCTION_USER }}
+          REQUESTED_SHA: ${{ inputs.ref }}
+          ACTIVATE: ${{ inputs.activate }}
+        run: |
+          set -euo pipefail
+          ssh -i ~/.ssh/deploy_key "${DEPLOY_USER}@${DEPLOY_HOST}" \
+            "set -euo pipefail; cd /root/hands-off-engine; git fetch origin main; git checkout --detach '${REQUESTED_SHA}'; test \"\$(git rev-parse HEAD)\" = '${REQUESTED_SHA}'; if [ '${ACTIVATE}' = 'true' ]; then if systemctl list-unit-files | grep -q '^hands-off-autonomous.service'; then sudo systemctl restart hands-off-autonomous.service; fi; if systemctl list-unit-files | grep -q '^hands-off-telegram.service'; then sudo systemctl restart hands-off-telegram.service; fi; fi; if systemctl list-unit-files | grep -q '^hands-off-autonomous.service'; then sudo systemctl is-active --quiet hands-off-autonomous.service; fi; test \"\$(git rev-parse HEAD)\" = '${REQUESTED_SHA}'; echo DEPLOY_OK"
