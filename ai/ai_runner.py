@@ -29,7 +29,7 @@ ALLOWED_PATHS = [
     "/root/hands-off-out"
 ]
 
-# Dangerous patterns
+# Dangerous patterns retained for compatibility with the legacy planner.
 DANGEROUS_PATTERNS = [
     "rm -rf /",
     "rm -rf /*",
@@ -55,17 +55,14 @@ logger = logging.getLogger(__name__)
 
 
 def validate_command(cmd):
-    """Validate command for safety."""
+    """Validate a planned command for compatibility/reporting only."""
     cmd_lower = cmd.lower().strip()
 
-    # Check dangerous patterns
     for pattern in DANGEROUS_PATTERNS:
         if pattern in cmd_lower:
             return False, f"Dangerous pattern detected: {pattern}"
 
-    # Check if command writes to allowed paths only
     if any(op in cmd_lower for op in ["touch", "mkdir", "cp", "mv", ">"]):
-        # Extract potential paths (simple heuristic)
         for part in cmd.split():
             if part.startswith("/") and not any(part.startswith(allowed) for allowed in ALLOWED_PATHS):
                 return False, f"Write to disallowed path: {part}"
@@ -79,7 +76,7 @@ def read_file_safe(path):
         p = Path(path)
         if not p.exists():
             return f"[FILE NOT FOUND: {path}]"
-        if p.stat().st_size > 1_000_000:  # 1MB limit
+        if p.stat().st_size > 1_000_000:
             return f"[FILE TOO LARGE: {path}]"
         return p.read_text()
     except Exception as e:
@@ -110,7 +107,6 @@ def call_llm(system_prompt, user_prompt):
 
     data = response.json()
 
-    # Handle different API response formats
     if "choices" in data:
         content = data["choices"][0]["message"]["content"]
     elif "content" in data:
@@ -121,7 +117,6 @@ def call_llm(system_prompt, user_prompt):
     else:
         raise ValueError(f"Unexpected API response format: {data}")
 
-    # Extract JSON from markdown code blocks if present
     content = content.strip()
     if content.startswith("```json"):
         content = content[7:]
@@ -134,40 +129,20 @@ def call_llm(system_prompt, user_prompt):
 
 
 def execute_command(cmd):
-    """Execute shell command and return result."""
-    logger.info(f"Executing: {cmd}")
-    try:
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=300
-        )
-        return {
-            "command": cmd,
-            "status": "success",
-            "stdout": result.stdout,
-            "stderr": result.stderr,
-            "returncode": result.returncode
-        }
-    except subprocess.CalledProcessError as e:
-        return {
-            "command": cmd,
-            "status": "failed",
-            "stdout": e.stdout,
-            "stderr": e.stderr,
-            "returncode": e.returncode
-        }
-    except subprocess.TimeoutExpired:
-        return {
-            "command": cmd,
-            "status": "timeout",
-            "stdout": "",
-            "stderr": "Command timed out after 300 seconds",
-            "returncode": -1
-        }
+    """Legacy execution authority is permanently disabled.
+
+    Execution must enter through FactoryAuthorityGateway, where approval,
+    journaling, reconciliation, and runtime policy are enforced.
+    """
+    logger.warning("Blocked legacy AI-runner execution; use FactoryAuthorityGateway")
+    return {
+        "command": cmd,
+        "status": "blocked",
+        "stdout": "",
+        "stderr": "legacy_ai_runner_execution_disabled",
+        "returncode": -1,
+        "authority": "FactoryAuthorityGateway",
+    }
 
 
 def process_task(task_file):
@@ -178,7 +153,6 @@ def process_task(task_file):
     started_at = datetime.utcnow().isoformat()
 
     try:
-        # Load task
         task = json.loads(task_file.read_text())
         task_id = task.get("id", task_id)
         goal = task.get("goal", "")
@@ -187,13 +161,11 @@ def process_task(task_file):
 
         logger.info(f"Task {task_id}: {goal}")
 
-        # Read context files
         file_contents = []
         for file_path in context.get("files", []):
             content = read_file_safe(file_path)
             file_contents.append(f"=== {file_path} ===\n{content}\n")
 
-        # Build LLM prompt
         system_prompt = (
             "You are an infrastructure coding agent. "
             "Respond ONLY with JSON containing a high-level plan and a list of shell commands. "
@@ -211,7 +183,6 @@ NOTES: {context.get('notes', 'None')}
 
 Provide a plan and shell commands to accomplish this goal."""
 
-        # Call LLM
         logger.info(f"Calling LLM with model {MODEL}")
         llm_response = call_llm(system_prompt, user_prompt)
 
@@ -221,12 +192,10 @@ Provide a plan and shell commands to accomplish this goal."""
         logger.info(f"Plan: {plan}")
         logger.info(f"Commands: {len(commands)}")
 
-        # Validate and execute commands
         command_results = []
         overall_status = "ok"
 
         for cmd in commands:
-            # Validate
             valid, reason = validate_command(cmd)
             if not valid:
                 logger.error(f"Command validation failed: {reason}")
@@ -241,7 +210,6 @@ Provide a plan and shell commands to accomplish this goal."""
                 overall_status = "failed"
                 continue
 
-            # Execute or log
             if EXECUTE:
                 result = execute_command(cmd)
                 command_results.append(result)
@@ -259,7 +227,6 @@ Provide a plan and shell commands to accomplish this goal."""
 
         finished_at = datetime.utcnow().isoformat()
 
-        # Write result
         result = {
             "id": task_id,
             "status": overall_status,
@@ -276,7 +243,6 @@ Provide a plan and shell commands to accomplish this goal."""
 
         logger.info(f"Task {task_id} completed with status: {overall_status}")
 
-        # Move task to processed
         PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
         task_file.rename(PROCESSED_DIR / task_file.name)
 
@@ -285,7 +251,6 @@ Provide a plan and shell commands to accomplish this goal."""
 
         finished_at = datetime.utcnow().isoformat()
 
-        # Write error result
         result = {
             "id": task_id,
             "status": "failed",
@@ -298,11 +263,10 @@ Provide a plan and shell commands to accomplish this goal."""
         result_file = RESULTS_DIR / f"{task_id}.result.json"
         result_file.write_text(json.dumps(result, indent=2))
 
-        # Move task to processed anyway
         try:
             PROCESSED_DIR.mkdir(parents=True, exist_ok=True)
             task_file.rename(PROCESSED_DIR / task_file.name)
-        except:
+        except Exception:
             pass
 
 
@@ -318,7 +282,6 @@ def main():
 
     while True:
         try:
-            # Scan for task files
             TASKS_DIR.mkdir(parents=True, exist_ok=True)
             task_files = sorted(TASKS_DIR.glob("*.json"))
 
@@ -327,7 +290,7 @@ def main():
                 for task_file in task_files:
                     process_task(task_file)
 
-            time.sleep(7)  # Poll every 7 seconds
+            time.sleep(7)
 
         except KeyboardInterrupt:
             logger.info("Shutting down...")
