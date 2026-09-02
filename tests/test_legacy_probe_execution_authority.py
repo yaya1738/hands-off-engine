@@ -6,6 +6,8 @@ TARGETS = [
     "factory_self_repair_pipeline.py",
     "factory_builder_capability_discovery.py",
     "factory_constructor_repair_assistant.py",
+    "factory_authority_layer_discovery.py",
+    "factory_introspection_completion_gate.py",
     "autonomous/singularity_trigger.py",
     "autonomous/time_collapse.py",
     "scripts/realtime_coordination_service.py",
@@ -34,6 +36,16 @@ def test_self_repair_and_discovery_fail_closed():
 
     ns = {"__file__": str(ROOT / "factory_builder_capability_discovery.py")}
     exec(compile(_source("factory_builder_capability_discovery.py"), "factory_builder_capability_discovery.py", "exec"), ns)
+    assert ns["run"]()["disabled"] is True
+
+
+def test_authority_discovery_and_completion_are_disabled():
+    ns = {"__file__": str(ROOT / "factory_authority_layer_discovery.py")}
+    exec(compile(_source("factory_authority_layer_discovery.py"), "factory_authority_layer_discovery.py", "exec"), ns)
+    assert ns["discover"]()["disabled"] is True
+
+    ns = {"__file__": str(ROOT / "factory_introspection_completion_gate.py")}
+    exec(compile(_source("factory_introspection_completion_gate.py"), "factory_introspection_completion_gate.py", "exec"), ns)
     assert ns["run"]()["disabled"] is True
 
 
