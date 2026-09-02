@@ -1,14 +1,17 @@
+"""Compatibility facade for legacy capability-construction automation.
+
+The historical implementation executed a sequence of local Python tools and
+persisted a report directly. That made this helper an autonomous execution
+boundary outside FactoryAuthorityGateway. Privileged construction and state
+mutation now belong to the Factory authority layer.
+"""
+
 import json
-import subprocess
 import sys
-from pathlib import Path
 from datetime import datetime, timezone
 
 
-OUTPUT = Path("factory_capability_constructor_report.json")
-
-
-TOOLS = [
+TOOLS = (
     "factory_forensic_engine.py",
     "factory_artifact_registry.py",
     "factory_capability_analyzer.py",
@@ -16,68 +19,36 @@ TOOLS = [
     "factory_capability_decision_engine.py",
     "factory_capability_integration_planner.py",
     "factory_capability_safety_gate.py",
-]
+)
 
 
 def run_tool(tool):
-    try:
-        result = subprocess.run(
-            ["python", tool],
-            capture_output=True,
-            text=True,
-        )
-
-        return {
-            "tool": tool,
-            "success": result.returncode == 0,
-            "stdout": result.stdout[-2000:],
-            "stderr": result.stderr[-1000:],
-        }
-
-    except Exception as e:
-        return {
-            "tool": tool,
-            "success": False,
-            "error": str(e),
-        }
+    """Fail closed; legacy direct tool execution is no longer permitted."""
+    return {
+        "tool": tool,
+        "success": False,
+        "error": "[FACTORY-AUTHORITY] legacy tool execution is disabled; submit through FactoryAuthorityGateway",
+    }
 
 
 def build_capability(goal):
-
-    report = {
+    """Return a non-mutating compatibility result without executing tools."""
+    return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "goal": goal,
-        "mode": "compose_existing_capabilities",
+        "mode": "factory_authority_required",
         "tools": [],
+        "decision": {
+            "action": "submit_capability_construction_request",
+            "next_step": "FactoryAuthorityGateway",
+            "disabled": True,
+        },
     }
-
-    for tool in TOOLS:
-        if Path(tool).exists():
-            report["tools"].append(
-                run_tool(tool)
-            )
-
-    report["decision"] = {
-        "action": "analyze_existing_factory_capabilities",
-        "next_step": "integration_planning",
-    }
-
-    OUTPUT.write_text(
-        json.dumps(report, indent=2)
-    )
-
-    return report
 
 
 def main():
     goal = " ".join(sys.argv[1:]) or "unknown capability"
-
-    print(
-        json.dumps(
-            build_capability(goal),
-            indent=2,
-        )
-    )
+    print(json.dumps(build_capability(goal), indent=2))
 
 
 if __name__ == "__main__":
