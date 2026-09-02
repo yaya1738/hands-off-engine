@@ -22,15 +22,22 @@ jobs:
       - name: Check for urgent coordination messages
         id: check_urgent
         run: |
-          # Check last message for urgent flag
+          # Empty coordination logs are valid; there is nothing to notify.
+          if [ ! -s ai/coordination/messages.jsonl ]; then
+            echo "No coordination messages; nothing to notify."
+            echo "urgent=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Check last message for urgent flag.
           LAST_MSG=$(tail -1 ai/coordination/messages.jsonl)
           echo "Last message: $LAST_MSG"
 
-          # Check if message is request type or high priority
+          # Check if message is request type or high priority.
           if echo "$LAST_MSG" | grep -q '"type":"request"'; then
-            echo "urgent=true" >> $GITHUB_OUTPUT
+            echo "urgent=true" >> "$GITHUB_OUTPUT"
           else
-            echo "urgent=false" >> $GITHUB_OUTPUT
+            echo "urgent=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Create notification issue if urgent
@@ -41,7 +48,13 @@ jobs:
             const fs = require('fs');
             const messages = fs.readFileSync('ai/coordination/messages.jsonl', 'utf8')
               .trim().split('\n')
+              .filter(Boolean)
               .map(line => JSON.parse(line));
+
+            if (messages.length === 0) {
+              core.info('No coordination messages after parsing; nothing to notify.');
+              return;
+            }
 
             const lastMsg = messages[messages.length - 1];
 
@@ -62,18 +75,7 @@ jobs:
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 issue_number: issueNumber,
-                body: `## 🔔 New Coordination Message
-
-**From:** ${lastMsg.from}
-**To:** ${lastMsg.to}
-**Type:** ${lastMsg.type}
-**Time:** ${lastMsg.timestamp}
-
-**Message:**
-${lastMsg.message}
-
----
-*View full coordination log: \`ai/coordination/messages.jsonl\`*`
+                body: `## 🔔 New Coordination Message\n\n**From:** ${lastMsg.from}\n**To:** ${lastMsg.to}\n**Type:** ${lastMsg.type}\n**Time:** ${lastMsg.timestamp}\n\n**Message:**\n${lastMsg.message}\n\n---\n*View full coordination log: \`ai/coordination/messages.jsonl\`*`
               });
             } else {
               // Create new coordination issue
@@ -82,30 +84,7 @@ ${lastMsg.message}
                 repo: context.repo.repo,
                 title: '🤖 Agent Coordination Hub',
                 labels: ['agent-coordination'],
-                body: `## Agent Coordination Messages
-
-This issue tracks real-time coordination between AI agents.
-
-**Latest Message:**
-
-**From:** ${lastMsg.from}
-**To:** ${lastMsg.to}
-**Type:** ${lastMsg.type}
-
-**Message:**
-${lastMsg.message}
-
----
-
-**Coordination Protocol:**
-- Agents coordinate via \`ai/coordination/messages.jsonl\`
-- This issue provides notifications
-- View full log: \`ai/coordination/messages.jsonl\`
-
-**Active Agents:**
-- Claude Code CLI
-- GitHub Copilot
-`
+                body: `## Agent Coordination Messages\n\nThis issue tracks real-time coordination between AI agents.\n\n**Latest Message:**\n\n**From:** ${lastMsg.from}\n**To:** ${lastMsg.to}\n**Type:** ${lastMsg.type}\n\n**Message:**\n${lastMsg.message}\n\n---\n\n**Coordination Protocol:**\n- Agents coordinate via \`ai/coordination/messages.jsonl\`\n- This issue provides notifications\n- View full log: \`ai/coordination/messages.jsonl\`\n\n**Active Agents:**\n- Claude Code CLI\n- GitHub Copilot\n`
               });
             }
 
