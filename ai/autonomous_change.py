@@ -1,35 +1,17 @@
 #!/usr/bin/env python3
-"""
-Autonomous Change Helper
+"""Compatibility proposal API with a fail-closed execution boundary.
 
-Provides simple API for autonomous agents to propose changes
-that either auto-apply or require approval based on risk level.
-
-Usage from autonomous agents:
-    from ai.autonomous_change import propose_change
-
-    propose_change(
-        title="Increase risk limit",
-        description="Alpha signals showing consistent edge >8%, safe to increase limit",
-        change_type="trading_parameters",
-        files=["config/risk_limits.json"],
-        action={
-            "type": "edit_file",
-            "file_path": "/root/hands-off-engine/config/risk_limits.json",
-            "old_content": '"max_position": 100',
-            "new_content": '"max_position": 200'
-        },
-        risk_level="high"
-    )
+Legacy callers may still create persistent approval records, but this module
+is not an execution authority. Approved work must be consumed by the governed
+Factory authority path.
 """
 
 from pathlib import Path
 import sys
 
-# Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from ai.approval_queue import ApprovalQueue, needs_approval, send_approval_notification
+from ai.approval_queue import ApprovalQueue, send_approval_notification
 
 
 def propose_change(
@@ -38,95 +20,48 @@ def propose_change(
     change_type: str,
     files: list,
     action: dict,
-    risk_level: str = "medium"
+    risk_level: str = "medium",
 ) -> dict:
-    """
-    Propose a change - either auto-applies or queues for approval.
+    """Record a proposal without executing caller-supplied actions.
 
-    Args:
-        title: Short title of change
-        description: Detailed description
-        change_type: Type (config, code, parameters, etc)
-        files: List of files affected
-        action: Dict with action details (type, file_path, etc)
-        risk_level: low, medium, high
-
-    Returns:
-        dict with:
-            - applied: bool (True if auto-applied, False if queued)
-            - change_id: str (if queued for approval)
-            - result: dict (if auto-applied)
+    The historical implementation auto-executed low-risk actions and exposed
+    a shell/file execution path through ``ApprovalQueue``. That is no longer
+    permitted. Every proposal is recorded and handed to the governed authority
+    path for later processing.
     """
     queue = ApprovalQueue()
-
-    # Determine if approval needed
-    if needs_approval(change_type, files) or risk_level == "high":
-        # Queue for approval
-        change_id = queue.add_change(
-            title=title,
-            description=description,
-            change_type=change_type,
-            files_affected=files,
-            proposed_action=action,
-            risk_level=risk_level
-        )
-
-        # Send Telegram notification
-        change = queue.get_change(change_id)
-        send_approval_notification(change_id, change)
-
-        return {
-            "applied": False,
-            "change_id": change_id,
-            "status": "pending_approval",
-            "message": f"Change queued for approval: {change_id}"
-        }
-
-    else:
-        # Safe to auto-apply
-        # Create temporary queue entry
-        change_id = queue.add_change(
-            title=title,
-            description=description,
-            change_type=change_type,
-            files_affected=files,
-            proposed_action=action,
-            risk_level=risk_level
-        )
-
-        # Auto-approve
-        queue.approve(change_id)
-
-        # Execute
-        result = queue.execute_approved(change_id)
-
-        return {
-            "applied": True,
-            "change_id": change_id,
-            "status": "auto_applied",
-            "result": result
-        }
-
-
-# Example usage
-if __name__ == "__main__":
-    # Example 1: High-risk change requiring approval
-    result = propose_change(
-        title="Increase max position size to $200",
-        description="Alpha signals consistently showing 8%+ edge. Safe to increase position limits.",
-        change_type="trading_parameters",
-        files=["config/risk_limits.json"],
-        action={
-            "type": "edit_file",
-            "file_path": "/root/hands-off-engine/config/risk_limits.json",
-            "old_content": '"max_position": 100',
-            "new_content": '"max_position": 200'
-        },
-        risk_level="high"
+    change_id = queue.add_change(
+        title=title,
+        description=description,
+        change_type=change_type,
+        files_affected=files,
+        proposed_action=action,
+        risk_level=risk_level,
     )
 
-    print(f"Result: {result}")
+    change = queue.get_change(change_id)
+    send_approval_notification(change_id, change)
 
-    if not result["applied"]:
-        print(f"\nChange {result['change_id']} is pending your approval via Telegram")
-        print(f"Send: /approve {result['change_id']}")
+    return {
+        "applied": False,
+        "change_id": change_id,
+        "status": "pending_governed_execution",
+        "execution_authority": "factory_authority_gateway",
+        "message": (
+            f"Change recorded: {change_id}. "
+            "No legacy auto-execution is permitted."
+        ),
+    }
+
+
+if __name__ == "__main__":
+    print(
+        propose_change(
+            title="Authority boundary self-test",
+            description="Verify that legacy proposals do not execute directly.",
+            change_type="system_architecture",
+            files=["tests/"],
+            action={"type": "disabled_legacy_execution"},
+            risk_level="low",
+        )
+    )
