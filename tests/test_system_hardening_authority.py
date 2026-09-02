@@ -21,9 +21,11 @@ def test_system_hardening_has_no_process_mutation_primitives():
 
 
 def test_restart_fails_closed_to_factory_authority():
+    source = PATH.read_text()
     namespace = {"__file__": str(PATH)}
-    exec(compile(PATH.read_text(), str(PATH), "exec"), namespace)
+    exec(compile(source, str(PATH), "exec"), namespace)
     hardening = namespace["SystemHardening"]()
     config = namespace["CRITICAL_PROCESSES"]["backend_loop"]
     assert hardening.restart_process("backend_loop", config) is False
-    assert "FactoryAuthorityGateway" in hardening.status_report() if hasattr(hardening, "status_report") else True
+    assert "FactoryAuthorityGateway" in source
+    assert "Lifecycle authority" in namespace["status_report"]()
