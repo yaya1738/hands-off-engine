@@ -21,8 +21,20 @@ def _source(path):
 def test_legacy_execution_targets_have_no_process_or_shell_authority():
     for rel in TARGETS:
         tree = ast.parse(_source(rel))
-        imports = [n.name for n in ast.walk(tree) if isinstance(n, ast.Import)]
-        assert "subprocess" not in imports, rel
+        imported_modules = {
+            alias.name
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Import)
+            for alias in node.names
+        }
+        imported_from = {
+            node.module
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom)
+            and node.module
+        }
+        assert "subprocess" not in imported_modules, rel
+        assert "subprocess" not in imported_from, rel
         for node in ast.walk(tree):
             if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
                 assert node.func.attr not in {"system", "popen", "Popen", "check_call", "check_output"}, rel
