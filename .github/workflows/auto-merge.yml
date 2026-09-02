@@ -81,12 +81,16 @@ jobs:
           [ "$has_human" = "true" ] || { echo "DENY: explicit human approval label missing"; exit 1; }
           [ "$mergeable" = "MERGEABLE" ] || { echo "DENY: PR is not mergeable"; exit 1; }
 
-          # Use the REST pull-request mutation rather than the broken external
-          # connector GraphQL path. This changes only draft state; merge remains
-          # delegated to the existing fail-closed auto-merge policy below.
-          gh api "repos/$GITHUB_REPOSITORY/pulls/$pr" --method PATCH --field draft=false >/tmp/ready-response.json
-          jq -e '.draft == false' /tmp/ready-response.json >/dev/null
-          echo "Owner-approved mergeable draft transitioned to ready via REST."
+          # The external connector failed because its GraphQL response query
+          # selected the nonexistent Repository.fullDatabaseId field. Use the
+          # same official mutation with a minimal selection set so the workflow
+          # does not depend on that broken response projection.
+          node_id=$(gh api "repos/$GITHUB_REPOSITORY/pulls/$pr" --jq '.node_id')
+          gh api graphql \
+            -f query='mutation($id:ID!){markPullRequestReadyForReview(input:{pullRequestId:$id}){pullRequest{isDraft}}}' \
+            -F id="$node_id" \
+            --jq '.data.markPullRequestReadyForReview.pullRequest.isDraft' | grep -qx 'false'
+          echo "Owner-approved mergeable draft transitioned to ready via minimal GraphQL mutation."
 
       - name: Fail-closed eligibility check
         if: steps.pr.outputs.number != ''
