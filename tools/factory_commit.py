@@ -1,39 +1,28 @@
-import subprocess
-import sys
+"""Read-only compatibility facade for legacy repository commit helper.
+
+Repository mutation is an authority operation and must be performed through
+the FactoryAuthorityGateway rather than a local shell command.
+"""
+
+import json
 
 
 def run(cmd):
-    print("\n$", " ".join(cmd))
-    result = subprocess.run(cmd)
-    if result.returncode != 0:
-        raise SystemExit(result.returncode)
+    return {
+        "disabled": True,
+        "error": "[FACTORY-AUTHORITY] legacy git execution is disabled; submit through FactoryAuthorityGateway",
+        "command": list(cmd),
+    }
 
 
 def main():
-    if len(sys.argv) < 2:
-        print("Usage: python3 tools/factory_commit.py \"commit message\"")
-        raise SystemExit(1)
-
-    message = sys.argv[1]
-
-    print("FACTORY COMMIT CHECKPOINT")
-    print("=" * 40)
-
-    run(["git", "status", "--short"])
-
-    print("\nAdding tracked Factory changes...")
-    run(["git", "add", "-A"])
-
-    print("\nCreating commit...")
-    run([
-        "git",
-        "commit",
-        "-m",
-        message
-    ])
-
-    print("\nCOMMIT COMPLETE")
+    return {
+        "component": "factory_commit",
+        "disabled": True,
+        "decision": "factory_authority_required",
+        "next_step": "FactoryAuthorityGateway",
+    }
 
 
 if __name__ == "__main__":
-    main()
+    print(json.dumps(main(), indent=2))
