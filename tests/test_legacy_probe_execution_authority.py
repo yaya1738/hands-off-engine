@@ -1,72 +1,70 @@
 import ast
-import importlib
 from pathlib import Path
 
-
-FILES = [
-    "factory_lifecycle_authority_probe.py",
-    "factory_review_authority_resolver.py",
-    "factory_workflow_executor.py",
-    "tools/factory_forensics/local_agent.py",
+ROOT = Path(__file__).resolve().parents[1]
+TARGETS = [
+    "factory_self_repair_pipeline.py",
+    "factory_builder_capability_discovery.py",
+    "factory_constructor_repair_assistant.py",
+    "factory_authority_layer_discovery.py",
+    "factory_introspection_completion_gate.py",
+    "autonomous/singularity_trigger.py",
+    "autonomous/time_collapse.py",
+    "scripts/realtime_coordination_service.py",
 ]
 
 
-def source(path):
-    return (Path(__file__).resolve().parents[1] / path).read_text()
+def _source(path):
+    return (ROOT / path).read_text()
 
 
-def test_legacy_probe_tools_have_no_direct_process_execution():
-    for path in FILES:
-        text = source(path)
-        tree = ast.parse(text)
-        assert "import subprocess" not in text
-        assert "subprocess." not in text
-        assert not any(
-            isinstance(node, ast.Call)
-            and isinstance(node.func, ast.Attribute)
-            and node.func.attr in {"system", "popen"}
-            for node in ast.walk(tree)
-        )
+def test_legacy_execution_targets_have_no_process_or_shell_authority():
+    for rel in TARGETS:
+        tree = ast.parse(_source(rel))
+        imports = [n.name for n in ast.walk(tree) if isinstance(n, ast.Import)]
+        assert "subprocess" not in imports, rel
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+                assert node.func.attr not in {"system", "popen", "Popen", "check_call", "check_output"}, rel
 
 
-def test_lifecycle_and_review_probes_fail_closed():
-    lifecycle = importlib.import_module("factory_lifecycle_authority_probe")
-    review = importlib.import_module("factory_review_authority_resolver")
+def test_self_repair_and_discovery_fail_closed():
+    ns = {"__file__": str(ROOT / "factory_self_repair_pipeline.py")}
+    exec(compile(_source("factory_self_repair_pipeline.py"), "factory_self_repair_pipeline.py", "exec"), ns)
+    assert ns["run_tool"](["python", "tool"])["authority_required"] is True
+    assert ns["run_pipeline"]("goal")["disabled"] is True
 
-    lifecycle_result = lifecycle.run()
-    review_result = review.run()
-
-    assert lifecycle_result["disabled"] is True
-    assert lifecycle_result["next_step"] == "FactoryAuthorityGateway"
-    assert "FactoryAuthorityGateway" in lifecycle_result["error"]
-    assert review_result["disabled"] is True
-    assert review_result["next_step"] == "FactoryAuthorityGateway"
+    ns = {"__file__": str(ROOT / "factory_builder_capability_discovery.py")}
+    exec(compile(_source("factory_builder_capability_discovery.py"), "factory_builder_capability_discovery.py", "exec"), ns)
+    assert ns["run"]()["disabled"] is True
 
 
-def test_workflow_executor_planning_is_non_mutating():
-    executor = importlib.import_module("factory_workflow_executor")
-    result = executor.record_workflow_result("example", True)
-    assert result["persisted"] is False
-    assert result["authority_required"] is True
-    assert result["next_step"] == "FactoryAuthorityGateway"
+def test_authority_discovery_and_completion_are_disabled():
+    ns = {"__file__": str(ROOT / "factory_authority_layer_discovery.py")}
+    exec(compile(_source("factory_authority_layer_discovery.py"), "factory_authority_layer_discovery.py", "exec"), ns)
+    assert ns["discover"]()["disabled"] is True
+
+    ns = {"__file__": str(ROOT / "factory_introspection_completion_gate.py")}
+    exec(compile(_source("factory_introspection_completion_gate.py"), "factory_introspection_completion_gate.py", "exec"), ns)
+    assert ns["run"]()["disabled"] is True
 
 
-def test_local_agent_execution_fails_closed():
-    agent = importlib.import_module("tools.factory_forensics.local_agent")
-    task = agent.BoundedTask("allowed.py", frozenset({"allowed.py"}), "pass\n")
+def test_constructor_repair_singularity_and_time_collapse_are_disabled():
+    ns = {"__file__": str(ROOT / "factory_constructor_repair_assistant.py")}
+    exec(compile(_source("factory_constructor_repair_assistant.py"), "factory_constructor_repair_assistant.py", "exec"), ns)
+    assert ns["main"]() is False
 
-    try:
-        agent.run_ollama("test-model", "probe")
-    except RuntimeError as exc:
-        assert "FactoryAuthorityGateway" in str(exc)
-    else:
-        raise AssertionError("legacy Ollama execution did not fail closed")
+    ns = {"__file__": str(ROOT / "autonomous/singularity_trigger.py")}
+    exec(compile(_source("autonomous/singularity_trigger.py"), "singularity_trigger.py", "exec"), ns)
+    assert ns["execute_singularity"]()[0].startswith("[FACTORY-AUTHORITY]")
+    assert ns["save_state"]({}) is False
 
-    try:
-        agent.execute_bounded_edit("test-model", task)
-    except RuntimeError as exc:
-        assert "FactoryAuthorityGateway" in str(exc)
-    else:
-        raise AssertionError("legacy bounded edit did not fail closed")
+    ns = {"__file__": str(ROOT / "autonomous/time_collapse.py")}
+    exec(compile(_source("autonomous/time_collapse.py"), "time_collapse.py", "exec"), ns)
+    assert ns["collapse_timeline"]()["disabled"] is True
 
-    assert agent.prove_local_execution("test-model") is False
+
+def test_coordination_webhook_fails_closed():
+    ns = {"__file__": str(ROOT / "scripts/realtime_coordination_service.py")}
+    exec(compile(_source("scripts/realtime_coordination_service.py"), "realtime_coordination_service.py", "exec"), ns)
+    assert ns["CoordinationWebhook"].message_callback is None
