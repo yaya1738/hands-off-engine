@@ -1,0 +1,11 @@
+"""Legacy compatibility marker.
+
+The authoritative FactoryAuthorityGateway implementation lives at
+``ai.factory.authority_gateway``.  This file intentionally contains no
+execution or mutation entry points; callers must migrate to the canonical
+module rather than relying on the historical root-level implementation.
+"""
+
+from ai.factory.authority_gateway import FactoryAuthorityGateway
+
+__all__ = ["FactoryAuthorityGateway"]
