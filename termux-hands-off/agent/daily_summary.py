@@ -1,25 +1,43 @@
 #!/usr/bin/env python3
-import os, json, glob, subprocess
+"""Read-only daily summary compatibility facade."""
+import glob
+import json
+import os
+from datetime import datetime, timezone
 
 REG = os.path.expanduser("~/hands-off/state/balances.d")
-NOTIFY = os.path.expanduser("~/hands-off/agent/notify.py")
+
 
 def load():
     parts, total = [], 0.0
-    for p in sorted(glob.glob(os.path.join(REG,"*.json"))):
+    for p in sorted(glob.glob(os.path.join(REG, "*.json"))):
         try:
-            d=json.load(open(p))
-            name=d.get("name") or os.path.splitext(os.path.basename(p))[0]
-            amt=float(d.get("balance_usd",0.0))
-            parts.append((name,amt)); total+=amt
-        except: pass
+            with open(p) as f:
+                d = json.load(f)
+            name = d.get("name") or os.path.splitext(os.path.basename(p))[0]
+            amount = float(d.get("balance_usd", 0.0))
+            parts.append((name, amount))
+            total += amount
+        except Exception:
+            pass
     return parts, total
 
-if __name__=="__main__":
+
+def build_message():
     parts, total = load()
     if not parts:
-        msg = "📊 Daily Summary: (no sources yet)"
-    else:
-        lines = "\n".join([f"• {n}: ${a:,.2f}" for n,a in parts])
-        msg = f"📊 Daily Summary\nTotal: ${total:,.2f}\n\n{lines}"
-    subprocess.run(["python", NOTIFY, msg], check=False)
+        return "Daily Summary: no sources yet"
+    lines = "\n".join(f"- {name}: ${amount:,.2f}" for name, amount in parts)
+    return f"Daily Summary\nTotal: ${total:,.2f}\n\n{lines}"
+
+
+def notify(message):
+    return {
+        "success": False,
+        "authority_required": "FactoryAuthorityGateway",
+        "message": message,
+    }
+
+
+if __name__ == "__main__":
+    print(json.dumps(notify(build_message()), ensure_ascii=False, indent=2))
