@@ -16,4 +16,4 @@ def test_legacy_subprocess_hook_fails_closed():
     exec(compile(SOURCE, "scripts/autonomous_daemon.py", "exec"), namespace)
     ok, message = namespace["run_subprocess"](["rm", "-rf", "/"])
     assert ok is False
-    assert "FactoryAuthority" in message
+    assert "FACTORY-AUTHORITY" in message
