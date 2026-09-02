@@ -34,15 +34,10 @@ class ApprovalQueue:
         queue = self._load_queue()
         change_id = hashlib.md5(f"{title}{datetime.now().isoformat()}".encode()).hexdigest()[:8]
         change = {
-            "id": change_id,
-            "title": title,
-            "description": description,
-            "change_type": change_type,
-            "files_affected": files_affected,
-            "proposed_action": proposed_action,
-            "risk_level": risk_level,
-            "created_at": datetime.now().isoformat(),
-            "status": "pending",
+            "id": change_id, "title": title, "description": description,
+            "change_type": change_type, "files_affected": files_affected,
+            "proposed_action": proposed_action, "risk_level": risk_level,
+            "created_at": datetime.now().isoformat(), "status": "pending",
         }
         queue["pending"].append(change)
         self._save_queue(queue)
@@ -99,8 +94,7 @@ class ApprovalQueue:
         if change["status"] != "approved":
             return {"success": False, "error": "Change not approved"}
         return {
-            "success": False,
-            "blocked": True,
+            "success": False, "blocked": True,
             "error": "legacy_execution_authority_disabled",
             "message": "Approval recorded, but legacy execution is disabled. Route execution through FactoryAuthorityGateway.",
             "change_id": change_id,
@@ -110,14 +104,13 @@ class ApprovalQueue:
 def send_approval_notification(change_id: str, change: Dict):
     """Send a notification using runtime-only Telegram credentials."""
     import os
-    import requests
-
     bot_token = os.getenv("TG_BOT_TOKEN") or os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TG_CHAT_ID") or os.getenv("TELEGRAM_CHAT_ID")
     if not bot_token or not chat_id:
         print(f"Telegram not configured. Change {change_id} pending approval.")
         return
 
+    import requests
     risk_emoji = {"low": "🟢", "medium": "🟡", "high": "🔴"}
     emoji = risk_emoji.get(change.get("risk_level", "medium"), "🟡")
     message = f"""{emoji} **Approval Required**
@@ -157,10 +150,8 @@ if __name__ == "__main__":
     change_id = queue.add_change(
         title="Approval queue self-test",
         description="Create a pending approval for compatibility testing.",
-        change_type="system_architecture",
-        files_affected=["tests/"],
-        proposed_action={"type": "disabled_legacy_execution"},
-        risk_level="low",
+        change_type="system_architecture", files_affected=["tests/"],
+        proposed_action={"type": "disabled_legacy_execution"}, risk_level="low",
     )
     print(f"Created change: {change_id}")
     print(f"Pending changes: {len(queue.get_pending())}")
