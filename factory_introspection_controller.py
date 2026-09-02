@@ -1,105 +1,58 @@
+"""Read-only compatibility facade for legacy factory introspection control.
+
+The historical helper launched the forensic engine directly. Privileged
+orchestration is now owned by FactoryAuthorityGateway.
+"""
+
 import json
-import subprocess
 from datetime import datetime, timezone
-from pathlib import Path
 
 
-KEYWORDS = [
-    "inspect",
-    "introspect",
-    "contract",
-    "probe",
-    "reflection",
-]
-
+KEYWORDS = ["inspect", "introspect", "contract", "probe", "reflection"]
 
 MISSING_UTILITY = {
     "name": "factory_introspection_probe.py",
-    "responsibility": [
-        "discover modules",
-        "discover classes",
-        "discover functions",
-        "inspect signatures",
-        "return JSON contracts",
-    ],
+    "responsibility": ["discover modules", "discover classes", "discover functions", "inspect signatures", "return JSON contracts"],
 }
 
 
 def run_forensic_engine():
-    result = subprocess.run(
-        ["python", "factory_forensic_engine.py"],
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
-
-    output = result.stdout
-    start = output.find("{")
-
-    if start == -1:
-        return {}
-
-    try:
-        return json.loads(output[start:])
-    except Exception:
-        return {}
+    return {
+        "disabled": True,
+        "error": "[FACTORY-AUTHORITY] legacy forensic execution is disabled; submit through FactoryAuthorityGateway",
+    }
 
 
 def find_existing_capability(report):
     matches = []
-
     for tool in report.get("available_tools", []):
-        name = tool.get("tool", "").lower()
-        exports = " ".join(
-            tool.get("exports", [])
-        ).lower()
-
-        combined = name + " " + exports
-
-        found = [
-            k for k in KEYWORDS
-            if k in combined
-        ]
-
+        combined = tool.get("tool", "").lower() + " " + " ".join(tool.get("exports", [])).lower()
+        found = [k for k in KEYWORDS if k in combined]
         if found:
-            matches.append({
-                "tool": tool.get("tool"),
-                "matches": found,
-            })
-
+            matches.append({"tool": tool.get("tool"), "matches": found})
     return matches
 
 
 def connect_existing(matches):
-    return {
-        "action": "connect_existing_tool",
-        "tools": matches,
-    }
+    return {"action": "connect_existing_tool", "tools": matches}
 
 
 def create_missing():
-    return {
-        "action": "create_missing_utility",
-        "utility": MISSING_UTILITY,
-    }
+    return {"action": "create_missing_utility", "utility": MISSING_UTILITY}
 
 
 def run():
-
     report = run_forensic_engine()
-
-    existing = find_existing_capability(report)
-
-    if existing:
-        result = connect_existing(existing)
-
-    else:
-        result = create_missing()
-
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "controller": "factory_introspection_controller",
-        "decision": result,
+        "decision": {
+            "decision": "factory_authority_required",
+            "action": "submit_introspection_request",
+            "disabled": True,
+            "next_step": "FactoryAuthorityGateway",
+            "legacy_report": report,
+        },
     }
 
 
