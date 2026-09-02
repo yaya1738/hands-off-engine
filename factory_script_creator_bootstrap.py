@@ -1,6 +1,10 @@
+"""Read-only compatibility facade for legacy creator discovery.
+
+The historical helper launched grep directly. Discovery and privileged creation
+are now owned by FactoryAuthorityGateway.
+"""
+
 import json
-import subprocess
-import os
 
 
 SEARCH_TERMS = [
@@ -14,64 +18,28 @@ SEARCH_TERMS = [
 
 
 def search_factory():
-    results = []
-
-    for term in SEARCH_TERMS:
-        try:
-            r = subprocess.run(
-                [
-                    "grep",
-                    "-R",
-                    term,
-                    "ai/factory",
-                    "-n"
-                ],
-                capture_output=True,
-                text=True,
-                timeout=30,
-            )
-
-            if r.stdout:
-                results.append({
-                    "term": term,
-                    "matches": r.stdout.splitlines()[:10]
-                })
-
-        except Exception as e:
-            results.append({
-                "term": term,
-                "error": str(e)
-            })
-
-    return results
+    return {
+        "disabled": True,
+        "error": "[FACTORY-AUTHORITY] legacy discovery execution is disabled; submit through FactoryAuthorityGateway",
+        "search_terms": SEARCH_TERMS,
+    }
 
 
 def classify(results):
+    if results.get("disabled"):
+        return "factory_authority_required"
     text = json.dumps(results).lower()
-
-    if (
-        "generate" in text
-        or "create_file" in text
-        or "artifact" in text
-        or "builder" in text
-    ):
-        return "existing_script_creator_possible"
-
-    return "no_script_creator_found"
+    return "existing_script_creator_possible" if any(term in text for term in ("generate", "create_file", "artifact", "builder")) else "no_script_creator_found"
 
 
 def run():
     discovery = search_factory()
-
     return {
         "component": "factory_script_creator_bootstrap",
         "discovery": discovery,
         "decision": classify(discovery),
-        "next_action": (
-            "route_request_to_existing_creator"
-            if classify(discovery) == "existing_script_creator_possible"
-            else "manual_script_creation_required"
-        )
+        "next_action": "submit_creator_discovery_request",
+        "authority": "FactoryAuthorityGateway",
     }
 
 
