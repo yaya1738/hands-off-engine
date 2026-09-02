@@ -11,9 +11,8 @@ import json
 import os
 import signal
 import sys
-import time
 import traceback
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Event
 from typing import Callable, List, Optional
@@ -67,11 +66,7 @@ def run_subprocess(command: List[str], timeout: int = 300) -> tuple[bool, str]:
 
 def queue_objective(objective: str, capability: str, source: str = "autonomous_daemon") -> bool:
     try:
-        result = FactoryAutonomousScheduler().schedule_task({
-            "objective": objective,
-            "source": source,
-            "capability": capability,
-        })
+        result = FactoryAutonomousScheduler().schedule_task({"objective": objective, "source": source, "capability": capability})
         return bool(result.get("scheduled"))
     except Exception as e:
         log(f"Failed to persist objective: {e}", "ERROR")
@@ -79,7 +74,6 @@ def queue_objective(objective: str, capability: str, source: str = "autonomous_d
 
 
 def task_trading_pipeline():
-    """Keep live trading disabled unless the explicit gate permits it."""
     if not LIVE_TRADING_ENABLED:
         log("Trading pipeline blocked: live trading capability is disabled", "WARN")
         return False
@@ -92,27 +86,17 @@ def task_trading_pipeline():
     except (TypeError, ValueError):
         log("Trading pipeline blocked: invalid current rules snapshot", "WARN")
         return False
-    decision = POLYMARKET_RULES_GATE.check(snapshot, live_trading_enabled=True, now=datetime.utcnow())
+    decision = POLYMARKET_RULES_GATE.check(snapshot, live_trading_enabled=True, now=datetime.now(timezone.utc))
     if not decision.allowed:
         log(f"Trading pipeline blocked by rules gate: {decision.reason}", "WARN")
         return False
     return queue_objective("Run the trading pipeline only within the authorized live-trading policy.", "trading_pipeline")
 
 
-def task_health_check():
-    return queue_objective("Run the authoritative health check and persist its result.", "health_check")
-
-
-def task_phase_progression():
-    return queue_objective("Evaluate autonomous phase progression through the Factory authority.", "phase_progression")
-
-
-def task_coordination_agent():
-    return queue_objective("Run one coordination-agent cycle through the Factory authority.", "coordination")
-
-
-def task_claude_orchestrator():
-    return queue_objective("Run the Claude orchestration objective through the Factory authority.", "claude_orchestration")
+def task_health_check(): return queue_objective("Run the authoritative health check and persist its result.", "health_check")
+def task_phase_progression(): return queue_objective("Evaluate autonomous phase progression through the Factory authority.", "phase_progression")
+def task_coordination_agent(): return queue_objective("Run one coordination-agent cycle through the Factory authority.", "coordination")
+def task_claude_orchestrator(): return queue_objective("Run the Claude orchestration objective through the Factory authority.", "claude_orchestration")
 
 
 def task_factory_scheduler():
@@ -125,16 +109,9 @@ def task_factory_scheduler():
         return False
 
 
-def task_self_improvement():
-    return queue_objective("Run the Factory self-improvement cycle and apply only authorized improvements.", "self_improvement")
-
-
-def task_revenue_tracking():
-    return queue_objective("Run revenue tracking through the Factory authority.", "revenue_tracking")
-
-
-def task_performance_metrics():
-    return queue_objective("Collect performance metrics through the Factory authority.", "performance_metrics")
+def task_self_improvement(): return queue_objective("Run the Factory self-improvement cycle and apply only authorized improvements.", "self_improvement")
+def task_revenue_tracking(): return queue_objective("Run revenue tracking through the Factory authority.", "revenue_tracking")
+def task_performance_metrics(): return queue_objective("Collect performance metrics through the Factory authority.", "performance_metrics")
 
 
 TASKS = [
@@ -160,13 +137,10 @@ class AutonomousDaemon:
     def save_state(self):
         state = {"running": self.running, "last_update": datetime.now().isoformat(), "tasks": {}}
         for task in self.tasks:
-            state["tasks"][task.name] = {
-                "last_run": task.last_run.isoformat() if task.last_run else None,
-                "next_run": task.next_run.isoformat() if task.next_run else None,
-                "run_count": task.run_count,
-                "error_count": task.error_count,
-                "last_error": task.last_error,
-            }
+            state["tasks"][task.name] = {"last_run": task.last_run.isoformat() if task.last_run else None,
+                                         "next_run": task.next_run.isoformat() if task.next_run else None,
+                                         "run_count": task.run_count, "error_count": task.error_count,
+                                         "last_error": task.last_error}
         STATE_DIR.mkdir(parents=True, exist_ok=True)
         self.state_file.write_text(json.dumps(state, indent=2))
 
@@ -177,14 +151,12 @@ class AutonomousDaemon:
             for task in self.tasks:
                 saved = state.get("tasks", {}).get(task.name, {})
                 if saved.get("next_run"): task.next_run = datetime.fromisoformat(saved["next_run"])
-                task.run_count = saved.get("run_count", 0)
-                task.error_count = saved.get("error_count", 0)
+                task.run_count, task.error_count = saved.get("run_count", 0), saved.get("error_count", 0)
         except Exception as e:
             log(f"Error loading state: {e}", "WARN")
 
     def run_task(self, task: Task):
-        try:
-            task.mark_run(bool(task.func()))
+        try: task.mark_run(bool(task.func()))
         except Exception as e:
             log(f"Task {task.name} exception: {e}", "ERROR")
             task.mark_run(False, str(e))
@@ -195,8 +167,7 @@ class AutonomousDaemon:
         self.load_state()
         now = datetime.now()
         for task in self.tasks:
-            if task.next_run is None:
-                task.next_run = now if task.run_on_start else now + timedelta(seconds=task.interval)
+            if task.next_run is None: task.next_run = now if task.run_on_start else now + timedelta(seconds=task.interval)
         while not self.stop_event.is_set():
             try:
                 for task in self.tasks:
@@ -205,8 +176,7 @@ class AutonomousDaemon:
                         self.run_task(task)
                         self.save_state()
                 self.stop_event.wait(30)
-            except KeyboardInterrupt:
-                break
+            except KeyboardInterrupt: break
             except Exception as e:
                 log(f"Loop error: {e}", "ERROR")
                 traceback.print_exc()
@@ -215,8 +185,7 @@ class AutonomousDaemon:
         self.save_state()
         log("Daemon stopped")
 
-    def stop(self):
-        self.stop_event.set()
+    def stop(self): self.stop_event.set()
 
 
 def main():
@@ -224,11 +193,8 @@ def main():
     parser.add_argument("--background", action="store_true")
     args = parser.parse_args()
     daemon = AutonomousDaemon()
-
-    def signal_handler(signum, frame): daemon.stop()
-    signal.signal(signal.SIGTERM, signal_handler)
-    signal.signal(signal.SIGINT, signal_handler)
-
+    signal.signal(signal.SIGTERM, lambda signum, frame: daemon.stop())
+    signal.signal(signal.SIGINT, lambda signum, frame: daemon.stop())
     if args.background:
         pid = os.fork()
         if pid > 0:
