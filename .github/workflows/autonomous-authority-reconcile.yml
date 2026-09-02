@@ -1,0 +1,129 @@
+name: Autonomous Production Authority Reconcile
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      activate:
+        description: 'Activate the discovered production host after exact-SHA deployment'
+        required: false
+        default: false
+        type: boolean
+
+concurrency:
+  group: autonomous-production-authority
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Determine activation policy
+        id: policy
+        shell: bash
+        run: |
+          set -euo pipefail
+          activate='false'
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.activate }}" == "true" ]]; then
+            activate='true'
+          elif [[ "${{ github.event_name }}" == "schedule" && "${{ secrets.AUTONOMOUS_PRODUCTION_ACTIVATE }}" == "true" ]]; then
+            activate='true'
+          fi
+          echo "activate=$activate" >> "$GITHUB_OUTPUT"
+
+      - name: Verify required authority is present
+        id: authority
+        shell: bash
+        env:
+          DO_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
+          PROD_HOST: ${{ secrets.PRODUCTION_HOST }}
+          PROD_USER: ${{ secrets.PRODUCTION_USER }}
+          PROD_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -n "$DO_TOKEN" && -n "$PROD_USER" && -n "$PROD_KEY" ]]; then
+            echo 'mode=digitalocean-discovery' >> "$GITHUB_OUTPUT"
+            echo 'DigitalOcean discovery authority is configured.'
+          elif [[ -n "$PROD_HOST" && -n "$PROD_USER" && -n "$PROD_KEY" ]]; then
+            echo 'mode=static-host' >> "$GITHUB_OUTPUT"
+            echo 'Static production SSH authority is configured.'
+          else
+            echo 'No complete external production authority is configured; fail closed.'
+            echo 'mode=none' >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Fail closed when no external authority exists
+        if: steps.authority.outputs.mode == 'none'
+        run: |
+          echo 'AUTONOMOUS_AUTHORITY_BLOCKED: configure either DIGITALOCEAN_API_TOKEN + PRODUCTION_USER + PRODUCTION_SSH_KEY or PRODUCTION_HOST + PRODUCTION_USER + PRODUCTION_SSH_KEY in the protected production environment.'
+          exit 1
+
+      - name: Resolve production host through DigitalOcean
+        if: steps.authority.outputs.mode == 'digitalocean-discovery'
+        id: resolve
+        env:
+          DO_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          response="$(curl -fsS -H "Authorization: Bearer $DO_TOKEN" -H 'Accept: application/json' https://api.digitalocean.com/v2/droplets?per_page=200)"
+          host="$(printf '%s' "$response" | jq -r '.droplets[] | select(.name == "ho-cli-main" or (.tags // [] | index("hands-off-production"))) | .networks.v4[] | select(.type == "public") | .ip_address' | head -n1)"
+          [[ -n "$host" && "$host" != 'null' ]] || { echo 'No uniquely resolvable production Droplet found.' >&2; exit 1; }
+          echo 'host='"$host" >> "$GITHUB_OUTPUT"
+          echo "Resolved production host through DigitalOcean control-plane authority."
+
+      - name: Resolve static production host
+        if: steps.authority.outputs.mode == 'static-host'
+        id: static
+        env:
+          PROD_HOST: ${{ secrets.PRODUCTION_HOST }}
+        run: echo "host=$PROD_HOST" >> "$GITHUB_OUTPUT"
+
+      - name: Configure SSH
+        env:
+          PROD_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          install -d -m 700 ~/.ssh
+          printf '%s\n' "$PROD_KEY" > ~/.ssh/production_ed25519
+          chmod 600 ~/.ssh/production_ed25519
+          host='${{ steps.resolve.outputs.host || steps.static.outputs.host }}'
+          ssh-keyscan -T 10 -H "$host" >> ~/.ssh/known_hosts
+
+      - name: Deploy and verify exact main SHA
+        env:
+          PROD_USER: ${{ secrets.PRODUCTION_USER }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          host='${{ steps.resolve.outputs.host || steps.static.outputs.host }}'
+          sha='${{ github.sha }}'
+          ssh -i ~/.ssh/production_ed25519 -o BatchMode=yes "$PROD_USER@$host" bash -s -- "$sha" '${{ steps.policy.outputs.activate }}' <<'REMOTE'
+          set -euo pipefail
+          requested_sha="$1"
+          activate="$2"
+          cd /root/hands-off-engine
+          git fetch --prune origin main
+          expected="$(git rev-parse origin/main)"
+          [[ "$expected" == "$requested_sha" ]] || { echo "Main moved during reconciliation: expected $requested_sha, got $expected"; exit 1; }
+          git checkout --detach "$requested_sha"
+          deployed="$(git rev-parse HEAD)"
+          [[ "$deployed" == "$requested_sha" ]] || exit 1
+          if [[ "$activate" == 'true' ]]; then
+            for svc in hands-off-autonomous.service hands-off-telegram.service; do
+              if systemctl cat "$svc" >/dev/null 2>&1; then
+                systemctl restart "$svc"
+              fi
+            done
+          fi
+          if systemctl cat hands-off-autonomous.service >/dev/null 2>&1; then
+            systemctl is-active --quiet hands-off-autonomous.service
+          fi
+          printf 'DEPLOY_OK sha=%s activate=%s\n' "$deployed" "$activate"
+          REMOTE
