@@ -12,7 +12,10 @@ def test_creator_has_no_process_or_credential_mutation():
 
 
 def test_setup_fails_closed():
-    namespace = {"__name__": "telegram_bot_creator_test"}
+    namespace = {
+        "__name__": "telegram_bot_creator_test",
+        "__file__": str(Path("autonomous/telegram_bot_creator.py").resolve()),
+    }
     exec(compile(SOURCE, "autonomous/telegram_bot_creator.py", "exec"), namespace)
     creator = namespace["TelegramBotCreator"]("1", "hash", "+1")
     assert asyncio.run(creator.setup_complete_system()) is False
