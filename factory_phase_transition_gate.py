@@ -1,13 +1,14 @@
-from pathlib import Path
-import subprocess
+"""Verification-only phase transition compatibility gate.
+
+Repository inspection and mutation are operational authorities. This legacy
+helper no longer shells out to git and cannot advance phases itself.
+"""
+
 import json
 import sys
 
-
 CURRENT_MILESTONE = "factory-runtime-reporting-restored-20260717"
-
 NEXT_PHASE = "preflight_runtime_integration"
-
 ALLOWED_NEXT_PHASE_PREFIXES = [
     "factory_autonomy_preflight",
     "factory_capability_",
@@ -18,10 +19,7 @@ ALLOWED_NEXT_PHASE_PREFIXES = [
 
 
 def run(cmd):
-    return subprocess.check_output(
-        cmd,
-        text=True,
-    ).strip()
+    return "[FACTORY-AUTHORITY] legacy command execution disabled"
 
 
 def main():
@@ -29,58 +27,12 @@ def main():
         "current_milestone": CURRENT_MILESTONE,
         "next_phase": NEXT_PHASE,
         "checks": {},
+        "ready": False,
+        "action": "submit repository verification through FactoryAuthorityGateway",
+        "authority": "FactoryAuthorityGateway",
     }
-
-    latest = run(
-        ["git", "log", "-1", "--pretty=%s"]
-    )
-
-    result["checks"]["milestone_commit"] = {
-        "passed": latest == CURRENT_MILESTONE,
-        "found": latest,
-    }
-
-    untracked = run(
-        ["git", "ls-files", "--others", "--exclude-standard"]
-    ).splitlines()
-
-    unexpected = []
-
-    for item in untracked:
-        if not any(
-            item.startswith(prefix)
-            for prefix in ALLOWED_NEXT_PHASE_PREFIXES
-        ):
-            unexpected.append(item)
-
-    result["checks"]["workspace_separation"] = {
-        "passed": not unexpected,
-        "unexpected_files": unexpected,
-    }
-
-    result["ready"] = all(
-        check["passed"]
-        for check in result["checks"].values()
-    )
-
-    if result["ready"]:
-        result["action"] = (
-            "begin preflight_runtime_integration"
-        )
-    else:
-        result["action"] = (
-            "resolve boundary issues before continuing"
-        )
-
-    print(
-        json.dumps(
-            result,
-            indent=2,
-        )
-    )
-
-    if not result["ready"]:
-        sys.exit(1)
+    print(json.dumps(result, indent=2))
+    sys.exit(1)
 
 
 if __name__ == "__main__":
