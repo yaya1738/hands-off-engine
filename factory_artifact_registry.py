@@ -1,10 +1,13 @@
-from pathlib import Path
+"""Read-only artifact registry compatibility facade.
+
+Legacy classifier process execution and registry persistence are disabled.
+Operational artifact classification must be routed through FactoryAuthorityGateway.
+"""
+
 import json
-import subprocess
 
 
-REGISTRY_FILE = Path("factory_artifact_registry.json")
-
+REGISTRY_FILE = "factory_artifact_registry.json"
 
 CLASS_MAP = {
     "historical_analysis_artifact": "evidence",
@@ -15,62 +18,34 @@ CLASS_MAP = {
 
 
 def run_classifier():
-    output = subprocess.check_output(
-        ["python", "factory_workspace_artifact_classifier.py"],
-        text=True,
-    )
-
-    return json.loads(output)
+    """Compatibility boundary: do not launch the legacy classifier."""
+    return {
+        "authority_required": True,
+        "message": "[FACTORY-AUTHORITY] Legacy artifact classifier execution is disabled; use FactoryAuthorityGateway.",
+        "artifacts": [],
+    }
 
 
 def build_registry():
     classified = run_classifier()
-
-    registry = {
-        "artifacts": [],
+    return {
+        "artifacts": classified.get("artifacts", []),
         "summary": {
             "evidence": 0,
             "active_phase_asset": 0,
             "factory_tool": 0,
             "unclassified": 0,
         },
+        "authority_required": True,
+        "message": classified["message"],
     }
-
-    for item in classified["artifacts"]:
-        category = CLASS_MAP.get(
-            item["classification"],
-            "unclassified",
-        )
-
-        record = {
-            "file": item["file"],
-            "classifier_result": item["classification"],
-            "registry_category": category,
-        }
-
-        registry["artifacts"].append(record)
-        registry["summary"][category] += 1
-
-    return registry
 
 
 def main():
     registry = build_registry()
-
-    REGISTRY_FILE.write_text(
-        json.dumps(
-            registry,
-            indent=2,
-        )
-    )
-
-    print(
-        json.dumps(
-            registry,
-            indent=2,
-        )
-    )
+    print(json.dumps(registry, indent=2))
+    return 1
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
