@@ -12,7 +12,7 @@ def test_daemon_has_no_subprocess_import_or_execution():
 
 
 def test_legacy_subprocess_hook_fails_closed():
-    namespace = {"__name__": "autonomous_daemon_test"}
+    namespace = {"__name__": "autonomous_daemon_test", "__file__": str(Path("scripts/autonomous_daemon.py").resolve())}
     exec(compile(SOURCE, "scripts/autonomous_daemon.py", "exec"), namespace)
     ok, message = namespace["run_subprocess"](["rm", "-rf", "/"])
     assert ok is False
