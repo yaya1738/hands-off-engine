@@ -5,18 +5,19 @@ from datetime import datetime, timezone
 
 
 def run_tool(command):
+    """Run a fixed executable/argument vector without shell interpretation."""
     result = subprocess.run(
         command,
-        shell=True,
+        shell=False,
         capture_output=True,
-        text=True
+        text=True,
     )
 
     return {
         "command": command,
         "success": result.returncode == 0,
         "stdout": result.stdout,
-        "stderr": result.stderr
+        "stderr": result.stderr,
     }
 
 
@@ -26,7 +27,7 @@ def parse_json_output(result):
     except Exception:
         return {
             "raw_output": result["stdout"],
-            "parse_error": True
+            "parse_error": True,
         }
 
 
@@ -34,10 +35,10 @@ def run_pipeline(goal):
     stages = []
 
     tools = [
-        f'python factory_capability_composer.py "{goal}"',
-        f'python factory_capability_binding_executor.py "{goal}"',
-        f'python factory_capability_execution_bridge.py "{goal}"',
-        f'python factory_capability_validation_bridge.py "{goal}"'
+        [sys.executable, "factory_capability_composer.py", goal],
+        [sys.executable, "factory_capability_binding_executor.py", goal],
+        [sys.executable, "factory_capability_execution_bridge.py", goal],
+        [sys.executable, "factory_capability_validation_bridge.py", goal],
     ]
 
     for tool in tools:
@@ -59,7 +60,7 @@ def run_pipeline(goal):
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "goal": goal,
         "stages": stages,
-        "decision": decision
+        "decision": decision,
     }
 
 
@@ -72,5 +73,5 @@ if __name__ == "__main__":
     print(json.dumps(
         run_pipeline(goal),
         indent=2,
-        default=str
+        default=str,
     ))
