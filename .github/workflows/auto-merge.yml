@@ -2,7 +2,9 @@ name: Auto-merge PRs
 
 # Fail-closed repository automation.
 # Auto-merge is permitted only after an explicit human approval label.
-# No manual/API trigger may bypass that requirement, and this workflow never
+# Draft PRs may transition to ready only through this trusted workflow when
+# the repository owner is the author and the approval label is present.
+# No manual/API trigger may bypass those requirements, and this workflow never
 # performs a direct merge.
 
 on:
@@ -25,9 +27,10 @@ permissions:
   issues: read
 
 env:
-  TRUSTED_AUTHORS: "copilot,github-actions[bot],dependabot[bot]"
+  TRUSTED_AUTHORS: "yaya1738,github-actions[bot],dependabot[bot]"
   HUMAN_APPROVAL_LABEL: "human-approved"
   FINANCE_APPROVAL_LABEL: "human-finance-approved"
+  REPOSITORY_OWNER: "yaya1738"
 
 jobs:
   auto-merge:
@@ -36,13 +39,16 @@ jobs:
       github.event_name == 'workflow_dispatch' ||
       github.event_name == 'repository_dispatch' ||
       github.event_name == 'check_suite' ||
-      (github.event_name == 'pull_request' && github.event.pull_request.draft == false)
+      (github.event_name == 'pull_request' &&
+        (github.event.pull_request.draft == false ||
+         contains(join(github.event.pull_request.labels.*.name, ','), 'human-approved')))
     steps:
       - name: Determine PR
         id: pr
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+          set -euo pipefail
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "number=${{ inputs.pr_number }}" >> "$GITHUB_OUTPUT"
           elif [ "${{ github.event_name }}" = "repository_dispatch" ]; then
@@ -54,6 +60,31 @@ jobs:
             number=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open --json number --jq '.[0].number' 2>/dev/null || true)
             echo "number=$number" >> "$GITHUB_OUTPUT"
           fi
+
+      - name: Convert owner-approved draft to ready
+        if: steps.pr.outputs.number != '' && github.event_name == 'pull_request' && github.event.pull_request.draft == true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          pr="${{ steps.pr.outputs.number }}"
+          info=$(gh pr view "$pr" --repo "$GITHUB_REPOSITORY" --json state,isDraft,mergeable,author,labels,statusCheckRollup)
+          state=$(jq -r '.state' <<<"$info")
+          draft=$(jq -r '.isDraft' <<<"$info")
+          mergeable=$(jq -r '.mergeable' <<<"$info")
+          author=$(jq -r '.author.login' <<<"$info")
+          has_human=$(jq -r --arg label "$HUMAN_APPROVAL_LABEL" '[.labels[].name | ascii_downcase] | index(($label | ascii_downcase)) != null' <<<"$info")
+          checks_ok=$(jq -r '([.statusCheckRollup[]? | .state // .conclusion // ""] | map(ascii_downcase) | map(select(. != "" and . != "success" and . != "completed" and . != "skipped")) | length) == 0' <<<"$info")
+
+          [ "$state" = "OPEN" ] || { echo "DENY: PR is not open"; exit 1; }
+          [ "$draft" = "true" ] || { echo "DENY: PR is no longer draft"; exit 1; }
+          [ "$author" = "$REPOSITORY_OWNER" ] || { echo "DENY: author is not repository owner"; exit 1; }
+          [ "$has_human" = "true" ] || { echo "DENY: explicit human approval label missing"; exit 1; }
+          [ "$mergeable" = "MERGEABLE" ] || { echo "DENY: PR is not mergeable"; exit 1; }
+          [ "$checks_ok" = "true" ] || { echo "DENY: one or more status checks are not successful"; exit 1; }
+
+          echo "Owner-approved, mergeable, passing draft; converting to ready for review."
+          gh pr ready "$pr" --repo "$GITHUB_REPOSITORY"
 
       - name: Fail-closed eligibility check
         if: steps.pr.outputs.number != ''
