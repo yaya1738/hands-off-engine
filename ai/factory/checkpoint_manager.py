@@ -1,15 +1,12 @@
+"""Checkpoint analysis with a fail-closed workspace-inspection boundary."""
+
 from typing import Any, Dict, List
 from ai.factory.change_classifier import FactoryChangeClassifier
 from ai.factory.change_scope_analyzer import FactoryChangeScopeAnalyzer
-import subprocess
 
 
 class FactoryCheckpointManager:
-    def __init__(
-        self,
-        validator=None,
-        allowed_paths=None,
-    ):
+    def __init__(self, validator=None, allowed_paths=None):
         self.validator = validator
         self.allowed_paths = allowed_paths or [
             "ai/factory/",
@@ -21,96 +18,31 @@ class FactoryCheckpointManager:
         self.scope_analyzer = FactoryChangeScopeAnalyzer()
 
     def _git_changes(self):
-        result = subprocess.run(
-            ["git", "status", "--short"],
-            capture_output=True,
-            text=True,
-        )
-
-        return [
-            line.strip()
-            for line in result.stdout.splitlines()
-            if line.strip()
-        ]
+        """Return no locally executed git state; authority is required."""
+        return []
 
     def _analyze_changes(self, changes):
         unexpected = []
-
-        temporary_patterns = (
-            "apply_",
-            "update_",
-            "integrate_",
-        )
-
+        temporary_patterns = ("apply_", "update_", "integrate_")
         for item in changes:
             path = item[2:].strip() if len(item) > 2 else item
-
-            if any(
-                path.startswith(pattern)
-                for pattern in temporary_patterns
-            ):
+            if any(path.startswith(pattern) for pattern in temporary_patterns):
                 unexpected.append(path)
-
-            elif not any(
-                path.startswith(prefix)
-                for prefix in self.allowed_paths
-            ):
+            elif not any(path.startswith(prefix) for prefix in self.allowed_paths):
                 unexpected.append(path)
-
         return unexpected
 
     def evaluate(self):
         changes = self._git_changes()
-
-        validation = None
-
-        if self.validator:
-            validation = self.validator()
-
+        validation = self.validator() if self.validator else None
         validation_state = (
-            validation.get("state")
-            if isinstance(validation, dict)
-            else "NOT_RUN"
+            validation.get("state") if isinstance(validation, dict) else "NOT_RUN"
         )
-
-        unexpected = self._analyze_changes(
-            changes
-        )
-
-        classification = self.classifier.classify(
-            [
-                item[2:].strip()
-                for item in changes
-            ]
-        )
-
-        scope = self.scope_analyzer.analyze(
-            classification.get(
-                "classified",
-                [],
-            )
-        )
-
-        if (
-            validation_state == "READY_FOR_COMMIT"
-            and scope.get("scope") == "COHERENT"
-            and not classification.get("unknown")
-        ):
-            state = "READY_TO_COMMIT"
-            action = "CREATE_CHECKPOINT"
-
-        elif unexpected or classification.get("unknown"):
-            state = "REVIEW_REQUIRED"
-            action = "CLASSIFY_CHANGES"
-
-        elif validation_state == "BLOCKED":
-            state = "BLOCKED"
-            action = "DO_NOT_COMMIT"
-
-        else:
-            state = "REVIEW_REQUIRED"
-            action = "INVESTIGATE"
-
+        unexpected = self._analyze_changes(changes)
+        classification = self.classifier.classify([item[2:].strip() for item in changes])
+        scope = self.scope_analyzer.analyze(classification.get("classified", []))
+        state = "REVIEW_REQUIRED"
+        action = "SUBMIT_WORKSPACE_INSPECTION"
         report = {
             "state": state,
             "action": action,
@@ -119,10 +51,10 @@ class FactoryCheckpointManager:
             "classification_warnings": unexpected,
             "classification": classification,
             "scope": scope,
+            "authority_required": True,
+            "authority": "FactoryAuthorityGateway",
         }
-
         self._history.append(report)
-
         return report
 
     def history(self):
