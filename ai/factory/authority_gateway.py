@@ -56,9 +56,6 @@ class FactoryAuthorityGateway:
         self.execution_journal.record(execution_id, "STARTED", intent)
 
         try:
-            # Lazy import is intentional: the autonomy gateway's controller graph
-            # references FactoryAuthorityGateway, so importing it at module load
-            # time would create a circular-import failure during test/daemon startup.
             from factory_runtime_autonomy_gateway import FactoryRuntimeAutonomyGateway
 
             evaluation = FactoryRuntimeAutonomyGateway().evaluate(objective)
@@ -134,6 +131,23 @@ class FactoryAuthorityGateway:
             objective,
             context or "",
         )
+
+    def approve_improvement(self, request):
+        """Authoritative approval transition for externally authenticated callers.
+
+        This method only performs the approval state transition. Execution remains
+        behind the existing governed executor and must not be performed by an
+        external ingress such as Telegram.
+        """
+        return self.approval.approve(request)
+
+    def reject_improvement(self, request):
+        """Authoritative rejection transition for externally authenticated callers."""
+        return self.approval.reject(request)
+
+    def validate_approved_improvement(self, request):
+        """Validate an approved request without executing it."""
+        return self.approval.validate_approved_request(request)
 
     def complete_reviewed_goal(
         self,

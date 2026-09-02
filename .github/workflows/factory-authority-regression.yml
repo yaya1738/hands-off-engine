@@ -17,6 +17,7 @@ on:
       - 'tests/test_execution_reconciler.py'
       - 'tests/test_authority_startup_reconciliation.py'
       - '.github/workflows/factory-authority-regression.yml'
+      - '.github/workflows/auto-merge.yml'
   workflow_dispatch:
 
 permissions:
