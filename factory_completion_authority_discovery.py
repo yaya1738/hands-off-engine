@@ -1,64 +1,31 @@
+"""Read-only completion authority discovery compatibility facade."""
 import json
-import subprocess
 from datetime import datetime, timezone
 
-KEYWORDS = [
-    "approve",
-    "finalize",
-    "complete",
-    "commit",
-    "promote",
-    "publish",
-    "register",
-    "verify",
-]
+KEYWORDS = ["approve", "finalize", "complete", "commit", "promote", "publish", "register", "verify"]
 
 
 def run_probe():
-    result = subprocess.run(
-        ["python", "factory_introspection_extension_adapter.py"],
-        capture_output=True,
-        text=True
-    )
-
-    start = result.stdout.find("{")
-
-    if start == -1:
-        return {}
-
-    return json.loads(result.stdout[start:])
+    return {"disabled": True, "authority": "FactoryAuthorityGateway"}
 
 
 def search(data):
-
     text = json.dumps(data).lower()
-
-    matches = [
-        word for word in KEYWORDS
-        if word in text
-    ]
-
-    if matches:
-        return {
-            "decision": "existing_completion_capability_detected",
-            "matches": matches,
-            "action": "reuse_existing_component"
-        }
-
+    matches = [word for word in KEYWORDS if word in text]
     return {
-        "decision": "completion_capability_missing",
-        "action": "extend_existing_pipeline"
+        "decision": "authority_required",
+        "matches": matches,
+        "action": "submit_discovery_request_through_FactoryAuthorityGateway",
     }
 
 
 def run():
-
-    report = run_probe()
-
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "component": "factory_completion_authority_discovery",
-        "decision": search(report)
+        "decision": search(run_probe()),
+        "disabled": True,
+        "authority": "FactoryAuthorityGateway",
     }
 
 
