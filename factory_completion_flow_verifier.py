@@ -35,6 +35,7 @@ def run():
             "decision": "factory_authority_required",
             "action": "submit_completion_verification_request",
             "disabled": True,
+            "next_step": "FactoryAuthorityGateway",
         },
     }
 
