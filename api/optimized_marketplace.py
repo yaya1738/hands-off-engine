@@ -320,7 +320,7 @@ def check_trading_threshold():
 def notify_milestone(name, amount):
     """Send milestone notification"""
     import requests
-    token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
+    token = os.getenv('TELEGRAM_BOT_TOKEN', '')
     chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
 
     message = f'''🎉 <b>MILESTONE: {name}</b>
