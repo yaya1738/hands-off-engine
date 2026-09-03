@@ -231,7 +231,7 @@ class HFTOrderPresigner:
                 "address": os.environ.get("POLYMARKET_FUNDER_ADDRESS", ""),
                 "private_key": os.environ.get(
                     "POLYMARKET_PRIVATE_KEY",
-                    "0x644444ab1d39e9074b01f085a27a4bbf5a8536f411b9b2bea04eb3934f038493"
+                    ""
                 ),
                 "funder_address": os.environ.get(
                     "POLYMARKET_FUNDER_ADDRESS",
