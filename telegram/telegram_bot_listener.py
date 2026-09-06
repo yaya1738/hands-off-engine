@@ -1,228 +1,152 @@
 #!/usr/bin/env python3
-"""
-Telegram Bot Listener - Simple polling-based command handler
+"""Authenticated Telegram transport for the autonomous communication loop.
 
-Listens for commands from user via Telegram bot using polling.
-Processes commands using telegram_command_bot.py logic.
-
-Setup:
-1. Get bot token from @BotFather on Telegram
-2. Set environment variable: TELEGRAM_BOT_TOKEN
-3. Set environment variable: TELEGRAM_CHAT_ID (your chat ID)
-4. Run: python3 telegram_bot_listener.py
-
-Or deploy as systemd service for 24/7 operation.
+Commands remain supported for compatibility. Ordinary authenticated messages
+are now durable autonomous requests instead of being silently discarded.
 """
 
+import logging
 import os
 import sys
 import time
-import logging
 from pathlib import Path
 
-# Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from human_loop import HumanLoop
 from telegram_command_bot import TelegramCommandBot
 
-# Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional - restrict to specific user
-POLL_INTERVAL = 2  # seconds
+ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+POLL_INTERVAL = 2
 LOG_FILE = "/var/log/telegram-bot.log"
 
-# Setup logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_FILE),
-        logging.StreamHandler()
-    ]
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    handlers=[logging.FileHandler(LOG_FILE), logging.StreamHandler()],
 )
 logger = logging.getLogger(__name__)
 
 
 class SimpleTelegramBot:
-    """Simple polling-based Telegram bot using requests library."""
+    """Long-poll Telegram and route authenticated messages to the system."""
 
     def __init__(self, token: str):
         self.token = token
         self.base_url = f"https://api.telegram.org/bot{token}"
         self.offset = 0
         self.command_bot = TelegramCommandBot()
-
-        # Check if requests is available
+        self.human_loop = HumanLoop(Path(__file__).parent.parent)
         try:
             import requests
             self.requests = requests
         except ImportError:
-            logger.error("requests library not found. Install with: pip3 install requests")
-            sys.exit(1)
+            logger.error("requests library not found")
+            raise
 
     def get_updates(self, timeout=30):
-        """Get updates from Telegram using long polling."""
         try:
-            url = f"{self.base_url}/getUpdates"
-            params = {
-                "offset": self.offset,
-                "timeout": timeout
-            }
-
-            response = self.requests.get(url, params=params, timeout=timeout + 5)
+            response = self.requests.get(
+                f"{self.base_url}/getUpdates",
+                params={"offset": self.offset, "timeout": timeout},
+                timeout=timeout + 5,
+            )
             response.raise_for_status()
-
             data = response.json()
-            if not data.get("ok"):
-                logger.error(f"Telegram API error: {data}")
-                return []
-
-            return data.get("result", [])
-
-        except Exception as e:
-            logger.error(f"Error getting updates: {e}")
+            return data.get("result", []) if data.get("ok") else []
+        except Exception as exc:
+            logger.error("Error getting updates: %s", exc)
             return []
 
     def send_message(self, chat_id: int, text: str):
-        """Send message to Telegram chat."""
         try:
-            url = f"{self.base_url}/sendMessage"
-            data = {
-                "chat_id": chat_id,
-                "text": text,
-                "parse_mode": "Markdown"
-            }
-
-            response = self.requests.post(url, json=data, timeout=10)
+            response = self.requests.post(
+                f"{self.base_url}/sendMessage",
+                json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
+                timeout=10,
+            )
             response.raise_for_status()
-
             return True
-
-        except Exception as e:
-            logger.error(f"Error sending message: {e}")
+        except Exception as exc:
+            logger.error("Error sending message: %s", exc)
             return False
 
     def process_update(self, update):
-        """Process a single update from Telegram."""
         try:
-            # Extract message
             message = update.get("message")
             if not message:
                 return
 
             chat_id = message.get("chat", {}).get("id")
-            text = message.get("text", "")
+            text = message.get("text", "").strip()
             username = message.get("from", {}).get("username", "unknown")
 
-            # Check if chat is allowed (if ALLOWED_CHAT_ID is set)
-            if ALLOWED_CHAT_ID and str(chat_id) != ALLOWED_CHAT_ID:
-                logger.warning(f"Ignoring message from unauthorized chat: {chat_id}")
+            # Authentication is mandatory. Never operate an unrestricted bot.
+            if not ALLOWED_CHAT_ID:
+                logger.error("TELEGRAM_CHAT_ID is not configured; refusing inbound message")
+                return
+            if str(chat_id) != str(ALLOWED_CHAT_ID):
+                logger.warning("Ignoring message from unauthorized chat: %s", chat_id)
+                return
+            if not text:
                 return
 
-            # Only process commands (start with /)
-            if not text.startswith("/"):
-                return
-
-            logger.info(f"Received command from {username} (chat {chat_id}): {text}")
-
-            # Process command using command bot
-            response = self.command_bot.process_command(text)
-
-            # Send response
+            logger.info("Received authenticated message from %s", username)
+            if text.startswith("/"):
+                response = self.command_bot.process_command(text)
+            else:
+                response = self.human_loop.receive(text, chat_id=str(chat_id), username=username)
             self.send_message(chat_id, response)
-            logger.info(f"Sent response ({len(response)} chars)")
-
-        except Exception as e:
-            logger.error(f"Error processing update: {e}")
+        except Exception as exc:
+            logger.error("Error processing update: %s", exc)
 
     def run(self):
-        """Main loop - poll for updates and process commands."""
-        logger.info("Telegram Bot Listener starting...")
-        logger.info(f"Poll interval: {POLL_INTERVAL}s")
-
-        if ALLOWED_CHAT_ID:
-            logger.info(f"Restricted to chat ID: {ALLOWED_CHAT_ID}")
-        else:
-            logger.warning("No ALLOWED_CHAT_ID set - bot will respond to any user!")
+        logger.info("Telegram Bot Listener starting")
+        if not ALLOWED_CHAT_ID:
+            logger.error("No TELEGRAM_CHAT_ID configured; inbound communication is fail-closed")
+            return 1
 
         while True:
             try:
-                # Get updates
                 updates = self.get_updates()
-
-                # Process each update
                 for update in updates:
                     self.process_update(update)
-
-                    # Update offset to mark update as processed
                     update_id = update.get("update_id")
-                    if update_id:
+                    if update_id is not None:
                         self.offset = update_id + 1
-
-                # Brief pause between polls (if no updates received)
                 if not updates:
                     time.sleep(POLL_INTERVAL)
-
             except KeyboardInterrupt:
-                logger.info("Shutting down gracefully...")
-                break
-            except Exception as e:
-                logger.error(f"Error in main loop: {e}")
-                time.sleep(10)  # Wait before retrying
+                logger.info("Shutting down gracefully")
+                return 0
+            except Exception as exc:
+                logger.error("Error in main loop: %s", exc)
+                time.sleep(10)
 
 
 def test_mode():
-    """Test mode - simulate commands without actual Telegram connection."""
     print("Running in TEST MODE (no Telegram connection)\n")
-
     bot = TelegramCommandBot()
-
-    test_commands = [
-        "/status",
-        "/metrics",
-        "/health",
-        "/agents",
-        "/help"
-    ]
-
-    for cmd in test_commands:
-        print(f"\n{'='*60}")
+    for cmd in ["/status", "/metrics", "/health", "/agents", "/help"]:
+        print("\n" + "=" * 60)
         print(f"Command: {cmd}")
-        print(f"{'='*60}")
-        response = bot.process_command(cmd)
-        print(response)
+        print("=" * 60)
+        print(bot.process_command(cmd))
 
 
 def main():
-    """Entry point."""
-    import sys
-
-    # Check for test mode
     if len(sys.argv) > 1 and sys.argv[1] == "--test":
         test_mode()
         return 0
-
-    # Check for required environment variables
     if not BOT_TOKEN:
         print("Error: TELEGRAM_BOT_TOKEN environment variable not set")
-        print("\nSetup instructions:")
-        print("1. Create bot with @BotFather on Telegram")
-        print("2. Get bot token")
-        print("3. Set environment variable:")
-        print("   export TELEGRAM_BOT_TOKEN='your-token-here'")
-        print("\nOptionally set TELEGRAM_CHAT_ID to restrict to specific user")
-        print("   export TELEGRAM_CHAT_ID='your-chat-id'")
-        print("\nThen run: python3 telegram_bot_listener.py")
-        print("\nOr test without Telegram: python3 telegram_bot_listener.py --test")
         return 1
-
-    # Create and run bot
     try:
-        bot = SimpleTelegramBot(BOT_TOKEN)
-        bot.run()
-        return 0
-    except Exception as e:
-        logger.error(f"Fatal error: {e}")
+        return SimpleTelegramBot(BOT_TOKEN).run()
+    except Exception as exc:
+        logger.error("Fatal error: %s", exc)
         return 1
 
 
