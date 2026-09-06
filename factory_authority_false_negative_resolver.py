@@ -1,6 +1,7 @@
 import json
-import subprocess
 from datetime import datetime, timezone
+
+from factory_capability_analyzer import analyze, load_report
 
 
 TARGETS = {
@@ -26,27 +27,16 @@ TARGETS = {
 
 
 def run_capability_analyzer():
+    """Analyze the existing capability report in-process.
 
-    result = subprocess.run(
-        ["python", "factory_capability_analyzer.py"],
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
-
-    start = result.stdout.find("{")
-
-    if start == -1:
-        return {}
-
-    try:
-        return json.loads(result.stdout[start:])
-    except Exception:
-        return {}
+    The analyzer's CLI entrypoint also writes a derived output file and spawns
+    no privileged work. This resolver only needs the returned analysis, so it
+    calls the reusable library functions directly instead of starting Python.
+    """
+    return analyze(load_report())
 
 
 def resolve():
-
     report = run_capability_analyzer()
 
     capabilities = report.get(
@@ -57,11 +47,9 @@ def resolve():
     results = {}
 
     for target, keywords in TARGETS.items():
-
         matches = []
 
         for capability, data in capabilities.items():
-
             files = " ".join(
                 data.get("files", [])
             ).lower()
@@ -98,7 +86,6 @@ def resolve():
                 "status": "not_found",
                 "action": "candidate_for_creation",
             }
-
 
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
