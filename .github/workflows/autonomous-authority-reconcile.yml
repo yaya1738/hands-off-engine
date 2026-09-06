@@ -72,10 +72,15 @@ jobs:
         run: |
           set -euo pipefail
           response="$(curl -fsS -H "Authorization: Bearer $DO_TOKEN" -H 'Accept: application/json' https://api.digitalocean.com/v2/droplets?per_page=200)"
-          host="$(printf '%s' "$response" | jq -r '.droplets[] | select(.name == "ho-cli-main" or (.tags // [] | index("hands-off-production"))) | .networks.v4[] | select(.type == "public") | .ip_address' | head -n1)"
-          [[ -n "$host" && "$host" != 'null' ]] || { echo 'No uniquely resolvable production Droplet found.' >&2; exit 1; }
+          mapfile -t hosts < <(printf '%s' "$response" | jq -r '.droplets[] | select(.name == "ho-cli-main" or (.tags // [] | index("hands-off-production"))) | .networks.v4[] | select(.type == "public") | .ip_address' | sort -u)
+          if (( ${#hosts[@]} != 1 )); then
+            echo "Expected exactly one production Droplet public IP, found ${#hosts[@]}." >&2
+            exit 1
+          fi
+          host="${hosts[0]}"
+          [[ -n "$host" && "$host" != 'null' ]] || { echo 'Invalid production Droplet address.' >&2; exit 1; }
           echo 'host='"$host" >> "$GITHUB_OUTPUT"
-          echo "Resolved production host through DigitalOcean control-plane authority."
+          echo 'Resolved exactly one production host through DigitalOcean control-plane authority.'
 
       - name: Resolve static production host
         if: steps.authority.outputs.mode == 'static-host'
@@ -116,14 +121,18 @@ jobs:
           deployed="$(git rev-parse HEAD)"
           [[ "$deployed" == "$requested_sha" ]] || exit 1
           if [[ "$activate" == 'true' ]]; then
-            for svc in hands-off-autonomous.service hands-off-telegram.service; do
-              if systemctl cat "$svc" >/dev/null 2>&1; then
-                systemctl restart "$svc"
-              fi
+            required_services=(hands-off-autonomous.service hands-off-telegram.service)
+            for svc in "${required_services[@]}"; do
+              systemctl cat "$svc" >/dev/null 2>&1 || { echo "Required production service missing: $svc" >&2; exit 1; }
             done
-          fi
-          if systemctl cat hands-off-autonomous.service >/dev/null 2>&1; then
-            systemctl is-active --quiet hands-off-autonomous.service
+            for svc in "${required_services[@]}"; do
+              systemctl restart "$svc"
+            done
+            for svc in "${required_services[@]}"; do
+              systemctl is-active --quiet "$svc" || { echo "Required production service is not active after restart: $svc" >&2; exit 1; }
+            done
+          else
+            echo 'Activation disabled; services were not restarted.'
           fi
           printf 'DEPLOY_OK sha=%s activate=%s\n' "$deployed" "$activate"
           REMOTE
