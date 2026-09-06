@@ -37,6 +37,15 @@ jobs:
           test "${MAIN_SHA}" = "${REQUESTED_SHA}"
           echo "Deploying main revision ${REQUESTED_SHA}"
 
+      - name: Checkout requested revision for safety gates
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 1
+
+      - name: Fail closed on direct live order mutation
+        run: python tools/factory_forensics/live_mutation_guard.py .
+
       - name: Verify required deployment credentials exist
         env:
           DEPLOY_HOST: ${{ secrets.PRODUCTION_HOST }}
