@@ -75,7 +75,6 @@ class ConversationStore:
                 and message.requires_response and message.message_id not in answered]
 
     def pending_responses(self) -> list[ConversationMessage]:
-        """Backward-compatible alias for pending outbound human requests."""
         return self.pending_human_requests()
 
 
@@ -86,8 +85,7 @@ class ConversationProtocol:
         self.store = ConversationStore(root)
 
     def receive(self, text: str, *, correlation_id: str | None = None,
-                metadata: dict[str, Any] | None = None,
-                kind: str = "request") -> ConversationMessage:
+                metadata: dict[str, Any] | None = None, kind: str = "request") -> ConversationMessage:
         if kind not in {"request", "response"}:
             raise ValueError("inbound communication must be request or response")
         return self.store.append(ConversationMessage.create(
@@ -97,10 +95,10 @@ class ConversationProtocol:
     def emit(self, text: str, *, kind: str = "progress", priority: str = "normal",
              correlation_id: str | None = None, requires_response: bool = False,
              metadata: dict[str, Any] | None = None, deliver: bool = False) -> ConversationMessage:
-        safe_text = self._redact(text)
         message = self.store.append(ConversationMessage.create(
-            direction="outbound", kind=kind, priority=priority, text=safe_text,
-            correlation_id=correlation_id, requires_response=requires_response, metadata=metadata))
+            direction="outbound", kind=kind, priority=priority,
+            text=self._redact(text), correlation_id=correlation_id,
+            requires_response=requires_response, metadata=metadata))
         if deliver:
             self.deliver(message)
         return message
@@ -122,5 +120,7 @@ class ConversationProtocol:
 
     def render(self, message: ConversationMessage) -> str:
         prefix = {"progress": "ℹ️", "decision": "🧭", "blocker": "🛑", "request": "📥", "response": "↩️", "ack": "✅"}[message.kind]
-        suffix = "\nReply is requested." if message.requires_response else ""
+        suffix = ""
+        if message.requires_response:
+            suffix = f"\nReply with: response:{message.message_id} <your answer>"
         return f"{prefix} {self._redact(message.text)}{suffix}"
