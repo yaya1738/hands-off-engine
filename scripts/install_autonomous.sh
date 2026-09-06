@@ -17,7 +17,6 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 INSTALL_DIR="/opt/hands-off-engine"
 LOG_DIR="/var/log/hands-off"
 
-# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -29,7 +28,6 @@ echo -e "${GREEN}     AUTONOMOUS INFRASTRUCTURE INSTALLER${NC}"
 echo -e "${BLUE}════════════════════════════════════════════════════════════════${NC}"
 echo ""
 
-# Check if root
 if [ "$EUID" -ne 0 ]; then
     echo -e "${RED}Please run as root (sudo)${NC}"
     exit 1
@@ -47,10 +45,11 @@ cp -r "$PROJECT_DIR"/* "$INSTALL_DIR/"
 chmod +x "$INSTALL_DIR/scripts/"*.sh 2>/dev/null || true
 echo -e "${GREEN}✓ Files copied${NC}"
 
-echo -e "${BLUE}Step 3: Installing systemd service...${NC}"
+echo -e "${BLUE}Step 3: Installing systemd services...${NC}"
 cp "$INSTALL_DIR/scripts/systemd/hands-off-autonomous.service" /etc/systemd/system/
+cp "$INSTALL_DIR/scripts/systemd/hands-off-autonomy-supervisor.service" /etc/systemd/system/
 systemctl daemon-reload
-echo -e "${GREEN}✓ Systemd service installed${NC}"
+echo -e "${GREEN}✓ Systemd services installed${NC}"
 
 echo -e "${BLUE}Step 4: Creating environment file...${NC}"
 if [ ! -f /etc/hands-off-engine.env ]; then
@@ -78,18 +77,22 @@ else
     echo -e "${GREEN}✓ Environment file already exists${NC}"
 fi
 
+echo -e "${BLUE}Step 5: Enabling liveness supervision...${NC}"
+systemctl enable hands-off-autonomous.service
+systemctl enable hands-off-autonomy-supervisor.service
+echo -e "${GREEN}✓ Autonomous services enabled for boot${NC}"
+
 echo ""
 echo -e "${GREEN}════════════════════════════════════════════════════════════════${NC}"
 echo -e "${GREEN}     INSTALLATION COMPLETE${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════════════════════${NC}"
 echo ""
 echo -e "Next steps:"
-echo -e "  1. Edit /etc/hands-off-engine.env and add your API keys"
-echo -e "  2. Enable the service: ${BLUE}systemctl enable hands-off-autonomous${NC}"
-echo -e "  3. Start the service:  ${BLUE}systemctl start hands-off-autonomous${NC}"
-echo -e "  4. Check status:       ${BLUE}systemctl status hands-off-autonomous${NC}"
-echo -e "  5. View logs:          ${BLUE}journalctl -u hands-off-autonomous -f${NC}"
+echo -e "  1. Edit /etc/hands-off-engine.env and add required credentials"
+echo -e "  2. Start the services: ${BLUE}systemctl start hands-off-autonomous hands-off-autonomy-supervisor${NC}"
+echo -e "  3. Check status:       ${BLUE}systemctl status hands-off-autonomous hands-off-autonomy-supervisor${NC}"
+echo -e "  4. View liveness log:  ${BLUE}journalctl -u hands-off-autonomy-supervisor -f${NC}"
 echo ""
-echo -e "${YELLOW}The system will manage ALL infrastructure autonomously.${NC}"
-echo -e "${YELLOW}User intervention is NOT required for normal operations.${NC}"
+echo -e "${YELLOW}The liveness supervisor continuously discovers the next governed objective,${NC}"
+echo -e "${YELLOW}prevents indefinite inactivity, and never bypasses execution authority.${NC}"
 echo ""
