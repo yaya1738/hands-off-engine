@@ -43,7 +43,7 @@ class FactoryAuthorityGateway:
         )
 
     def execute_autonomous(self, objective):
-        """Authoritative autonomous ingress; never delegates to the legacy runtime autonomous wrapper."""
+        """Authoritative autonomous ingress with evidence-based execution state."""
         if objective is None:
             raise ValueError("objective is required")
 
@@ -58,39 +58,34 @@ class FactoryAuthorityGateway:
         try:
             from factory_runtime_autonomy_gateway import FactoryRuntimeAutonomyGateway
 
-            evaluation = FactoryRuntimeAutonomyGateway().evaluate(objective)
-            decision = evaluation.get("activation", {}).get("decision", {})
-            ready = (
-                decision.get("status") in {"READY", "PASS"}
-                or decision.get("classification") == "factory_ready"
-            )
+            # This gateway is the authoritative lifecycle execution path. The
+            # controller may activate the existing factory or report that
+            # construction/blocking is required. Do not call a nonexistent
+            # FactoryRuntime.execute() method or duplicate lifecycle execution.
+            execution = FactoryRuntimeAutonomyGateway().evaluate(objective)
+            activation = execution.get("activation", {}) if isinstance(execution, dict) else {}
+            decision = activation.get("decision", {}) if isinstance(activation, dict) else {}
+            status = str(activation.get("status", "")).upper()
 
-            autonomy_report = self.runtime.report_autonomy_state(
-                objective,
-                decision,
-            )
-
-            if not ready:
-                result = {
-                    "status": "blocked",
-                    "decision": decision,
-                    "autonomy_report": autonomy_report,
-                }
-                self.execution_journal.record(
-                    execution_id,
-                    "CANCELLED",
-                    {**intent, "result": result},
-                )
-                return result
-
-            execution = self.runtime.execute(objective)
+            autonomy_report = self.runtime.report_autonomy_state(objective, decision)
             result = {
+                "status": "activated" if status == "ACTIVATED" else "blocked",
                 "decision": decision,
                 "execution": execution,
+                "autonomy_report": autonomy_report,
+                "evidence": {
+                    "controller_execution_observed": True,
+                    "activation_observed": status == "ACTIVATED",
+                    "verification_observed": bool(
+                        isinstance(activation.get("decision"), dict)
+                        and activation.get("decision", {}).get("status") == "PASS"
+                    ),
+                },
             }
+
             self.execution_journal.record(
                 execution_id,
-                "COMPLETED",
+                "COMPLETED" if status == "ACTIVATED" else "CANCELLED",
                 {**intent, "result": result},
             )
             return result
@@ -133,12 +128,7 @@ class FactoryAuthorityGateway:
         )
 
     def approve_improvement(self, request):
-        """Authoritative approval transition for externally authenticated callers.
-
-        This method only performs the approval state transition. Execution remains
-        behind the existing governed executor and must not be performed by an
-        external ingress such as Telegram.
-        """
+        """Authoritative approval transition for externally authenticated callers."""
         return self.approval.approve(request)
 
     def reject_improvement(self, request):
