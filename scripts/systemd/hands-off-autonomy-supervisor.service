@@ -1,0 +1,31 @@
+[Unit]
+Description=Hands-Off Engine Autonomous Objective Liveness Supervisor
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network-online.target hands-off-autonomous.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/root/hands-off-engine
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/root/hands-off-engine"
+EnvironmentFile=-/etc/hands-off-engine.env
+ExecStart=/usr/bin/python3 /root/hands-off-engine/tools/autonomy_liveness_supervisor.py
+Restart=always
+RestartSec=15
+StartLimitIntervalSec=300
+StartLimitBurst=10
+
+StandardOutput=append:/var/log/hands-off/autonomy-supervisor.log
+StandardError=append:/var/log/hands-off/autonomy-supervisor-error.log
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/root/hands-off-engine/state
+ReadWritePaths=/var/log/hands-off
+
+[Install]
+WantedBy=multi-user.target
