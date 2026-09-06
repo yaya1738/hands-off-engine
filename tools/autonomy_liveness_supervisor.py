@@ -33,6 +33,32 @@ def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _successful_objectives(repo_root: Path) -> set[str]:
+    """Return objectives whose prior autonomous execution completed successfully."""
+    path = repo_root / "state" / "autonomous_tasks_completed.jsonl"
+    if not path.exists():
+        return set()
+
+    completed: set[str] = set()
+    for line in path.read_text(encoding="utf-8").splitlines():
+        try:
+            record = json.loads(line)
+            task = record.get("task", {})
+            metadata = task.get("metadata", {}) if isinstance(task, dict) else {}
+            result = json.loads(record.get("result", "{}"))
+            if (
+                isinstance(metadata, dict)
+                and metadata.get("objective")
+                and isinstance(result, dict)
+                and result.get("status") == "executed"
+                and result.get("success") is True
+            ):
+                completed.add(str(metadata["objective"]).strip().casefold())
+        except (TypeError, ValueError, json.JSONDecodeError):
+            continue
+    return completed
+
+
 def run_cycle(repo_root: Path) -> dict:
     runtime = FactoryRuntime()
     discovery = runtime.autonomy.discovery_gate(
@@ -45,6 +71,7 @@ def run_cycle(repo_root: Path) -> dict:
     if isinstance(graph, dict):
         gaps.extend(graph.get("gaps", []))
 
+    retired = _successful_objectives(repo_root)
     selection = FactoryAutonomousObjectiveLoop(runtime).select_next(
         {
             "strategic_objective": (
@@ -55,6 +82,7 @@ def run_cycle(repo_root: Path) -> dict:
             ),
             "gaps": gaps,
             "discovery": discovery,
+            "excluded_objectives": retired,
         }
     )
 
@@ -95,9 +123,6 @@ def run_cycle(repo_root: Path) -> dict:
             )
             queued = True
 
-        # The liveness supervisor is itself the persistent continuation mechanism.
-        # Do not wait for a consumer ChatGPT/Claude session to claim the task.
-        # All execution still enters through the authoritative gateway.
         gateway = FactoryAuthorityGateway(runtime=runtime)
         execution = gateway.execute_autonomous(selected["objective"])
         execution_observed = isinstance(execution, dict) and bool(
@@ -126,8 +151,9 @@ def run_cycle(repo_root: Path) -> dict:
 
     return {
         "timestamp": utc_now(),
-        "status": "observed" if execution_observed else "degraded",
+        "status": "observed" if execution_observed else "degraded" if selected else "idle",
         "selection": selection,
+        "retired_successful_objective_count": len(retired),
         "task_queued": queued,
         "task_id": task_id,
         "execution_observed": execution_observed,
@@ -136,6 +162,8 @@ def run_cycle(repo_root: Path) -> dict:
         "claim_basis": (
             "observed execution and runtime completion result"
             if execution_observed and verification_observed
+            else "no executable objective selected"
+            if not selected
             else "no observed autonomous execution"
         ),
         "execution": execution,
