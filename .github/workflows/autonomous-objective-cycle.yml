@@ -1,0 +1,32 @@
+name: Autonomous Objective Cycle
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run objective discovery
+        run: python tools/autonomous_objective_cycle.py
+
+      - name: Upload machine-readable objective result
+        uses: actions/upload-artifact@v4
+        with:
+          name: autonomous-objective-cycle
+          path: autonomous-objective-cycle.json
+          if-no-files-found: error
