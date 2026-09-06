@@ -8,11 +8,11 @@ Wants=network-online.target
 Type=simple
 User=root
 Group=root
-WorkingDirectory=/opt/hands-off-engine
+WorkingDirectory=/root/hands-off-engine
 Environment="PATH=/usr/local/bin:/usr/bin:/bin"
-Environment="PYTHONPATH=/opt/hands-off-engine"
+Environment="PYTHONPATH=/root/hands-off-engine"
 EnvironmentFile=-/etc/hands-off-engine.env
-ExecStart=/usr/bin/python3 /opt/hands-off-engine/tools/autonomy_liveness_supervisor.py
+ExecStart=/usr/bin/python3 /root/hands-off-engine/tools/autonomy_liveness_supervisor.py
 Restart=always
 RestartSec=15
 StartLimitIntervalSec=300
@@ -24,7 +24,7 @@ StandardError=append:/var/log/hands-off/autonomy-supervisor-error.log
 NoNewPrivileges=true
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=/opt/hands-off-engine/state
+ReadWritePaths=/root/hands-off-engine/state
 ReadWritePaths=/var/log/hands-off
 
 [Install]
