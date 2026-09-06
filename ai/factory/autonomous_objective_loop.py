@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-from typing import Any, Dict, Iterable, List
+from typing import Any, Dict, Iterable, List, Set
 
 
 class FactoryAutonomousObjectiveLoop:
@@ -72,11 +72,20 @@ class FactoryAutonomousObjectiveLoop:
 
         return candidates
 
-    def prioritize(self, candidates: Iterable[Dict[str, Any]]) -> Dict[str, Any] | None:
+    def prioritize(
+        self,
+        candidates: Iterable[Dict[str, Any]],
+        excluded_objectives: Iterable[str] | None = None,
+    ) -> Dict[str, Any] | None:
+        excluded: Set[str] = {
+            self._text(objective).casefold()
+            for objective in (excluded_objectives or [])
+            if self._text(objective)
+        }
         normalized: Dict[str, Dict[str, Any]] = {}
         for candidate in candidates:
             objective = self._text(candidate.get("objective"))
-            if not objective:
+            if not objective or objective.casefold() in excluded:
                 continue
             key = objective.casefold()
             current = normalized.get(key)
@@ -87,7 +96,6 @@ class FactoryAutonomousObjectiveLoop:
         if not normalized:
             return None
 
-        # Stable tie-breaking keeps autonomous runs reproducible.
         ranked = sorted(
             normalized.values(),
             key=lambda item: (-int(item.get("score", 0)), item["objective"].casefold()),
@@ -100,12 +108,17 @@ class FactoryAutonomousObjectiveLoop:
         return selected
 
     def select_next(self, context: Dict[str, Any] | None = None) -> Dict[str, Any]:
+        context = context or {}
         candidates = self.discover_candidates(context)
-        selected = self.prioritize(candidates)
+        selected = self.prioritize(
+            candidates,
+            context.get("excluded_objectives", []),
+        )
         result = {
             "status": "selected" if selected else "no_candidate",
             "candidate_count": len(candidates),
             "candidates": candidates,
+            "excluded_objectives": list(context.get("excluded_objectives", [])),
             "selected": selected,
         }
         self._history.append(result)
