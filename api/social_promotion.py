@@ -289,7 +289,7 @@ def post_to_reddit(title, body, subreddit='test'):
 def post_to_telegram_groups(content):
     """Post to Telegram groups (use existing bot)"""
 
-    token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
+    token = os.getenv('TELEGRAM_BOT_TOKEN', '')
     chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
