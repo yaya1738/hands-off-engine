@@ -1,7 +1,8 @@
-import json
 import importlib
-import subprocess
+import json
 from datetime import datetime, timezone
+
+from factory_forensic_engine import discover
 
 
 TARGET_TOOL_KEYWORDS = [
@@ -14,45 +15,21 @@ TARGET_TOOL_KEYWORDS = [
 
 
 def discover_tools():
-    result = subprocess.run(
-        ["python", "factory_forensic_engine.py"],
-        capture_output=True,
-        text=True,
-        timeout=120,
-    )
-
-    output = result.stdout
-    start = output.find("{")
-
-    if start == -1:
-        return []
-
-    try:
-        report = json.loads(output[start:])
-    except Exception:
-        return []
-
+    report = discover()
     matches = []
 
     for tool in report.get("available_tools", []):
         name = tool.get("tool", "").lower()
-        exports = " ".join(
-            tool.get("exports", [])
-        ).lower()
-
+        exports = " ".join(tool.get("exports", [])).lower()
         combined = name + " " + exports
 
-        if any(
-            keyword in combined
-            for keyword in TARGET_TOOL_KEYWORDS
-        ):
+        if any(keyword in combined for keyword in TARGET_TOOL_KEYWORDS):
             matches.append(tool)
 
     return matches
 
 
 def inspect_tool(tool):
-
     module_name = tool.get("tool")
 
     if not module_name:
@@ -64,10 +41,7 @@ def inspect_tool(tool):
     python_module = module_name.replace(".py", "")
 
     try:
-        module = importlib.import_module(
-            python_module
-        )
-
+        module = importlib.import_module(python_module)
     except Exception as e:
         return {
             "tool": module_name,
@@ -76,30 +50,15 @@ def inspect_tool(tool):
             "error": str(e),
         }
 
-
-    exports = []
-
-    for name in dir(module):
-        if not name.startswith("_"):
-            exports.append(name)
-
-
+    exports = [name for name in dir(module) if not name.startswith("_")]
     useful_functions = [
         name
         for name in exports
         if any(
             keyword in name.lower()
-            for keyword in [
-                "inspect",
-                "locate",
-                "find",
-                "contract",
-                "class",
-                "init",
-            ]
+            for keyword in ["inspect", "locate", "find", "contract", "class", "init"]
         )
     ]
-
 
     return {
         "tool": module_name,
@@ -110,28 +69,19 @@ def inspect_tool(tool):
 
 
 def run():
-
     tools = discover_tools()
-
-    inspected = [
-        inspect_tool(tool)
-        for tool in tools
-    ]
-
+    inspected = [inspect_tool(tool) for tool in tools]
     usable = [
         item
         for item in inspected
-        if item.get("usable")
-        and item.get("useful_functions")
+        if item.get("usable") and item.get("useful_functions")
     ]
-
 
     if usable:
         decision = {
             "decision": "reuse_existing_introspection_capability",
             "tools": usable,
         }
-
     else:
         decision = {
             "decision": "create_missing_probe_utility",
@@ -146,7 +96,6 @@ def run():
                 ],
             },
         }
-
 
     return {
         "timestamp": datetime.now(timezone.utc).isoformat(),
