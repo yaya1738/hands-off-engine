@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import json
 import signal
+import sys
 import time
 from pathlib import Path
 from datetime import datetime, timezone
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(REPO_ROOT))
+
 from ai.factory.autonomous_objective_loop import FactoryAutonomousObjectiveLoop
 from ai.factory.runtime import FactoryRuntime
-
-import sys
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.autonomous_task_queue import AutonomousTaskQueue
 
 
@@ -105,7 +106,7 @@ def persist(repo_root: Path, state: dict) -> None:
 
 
 def main() -> int:
-    repo_root = Path(__file__).resolve().parents[1]
+    repo_root = REPO_ROOT
     signal.signal(signal.SIGALRM, _timeout_handler)
 
     while True:
