@@ -54,6 +54,30 @@ def test_run_cycle_executes_selected_objective_without_consumer(monkeypatch, tmp
     assert len((tmp_path / "state" / "autonomous_tasks_completed.jsonl").read_text()) > 0
 
 
+def test_successful_objective_is_retired_from_future_selection(tmp_path: Path):
+    completed = tmp_path / "state" / "autonomous_tasks_completed.jsonl"
+    completed.parent.mkdir(parents=True)
+    completed.write_text(
+        '{"task":{"metadata":{"objective":"already completed"}},'
+        '"result":"{\"status\":\"executed\",\"success\":true}"}\n',
+        encoding="utf-8",
+    )
+
+    assert supervisor._successful_objectives(tmp_path) == {"already completed"}
+
+
+def test_failed_objective_is_not_retired(tmp_path: Path):
+    completed = tmp_path / "state" / "autonomous_tasks_completed.jsonl"
+    completed.parent.mkdir(parents=True)
+    completed.write_text(
+        '{"task":{"metadata":{"objective":"retry me"}},'
+        '"result":"{\"status\":\"executed\",\"success\":false}"}\n',
+        encoding="utf-8",
+    )
+
+    assert supervisor._successful_objectives(tmp_path) == set()
+
+
 def test_persist_writes_liveness_state(tmp_path: Path):
     supervisor.persist(tmp_path, {"status": "observed", "timestamp": "now"})
     assert (tmp_path / "state" / "autonomy_liveness.json").exists()
