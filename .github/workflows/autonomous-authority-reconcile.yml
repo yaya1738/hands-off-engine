@@ -121,15 +121,20 @@ jobs:
           deployed="$(git rev-parse HEAD)"
           [[ "$deployed" == "$requested_sha" ]] || exit 1
           if [[ "$activate" == 'true' ]]; then
-            required_services=(hands-off-autonomous.service hands-off-telegram.service)
+            supervisor_unit='scripts/systemd/hands-off-autonomy-supervisor.service'
+            test -f "$supervisor_unit" || { echo "Autonomous supervisor unit missing from deployed revision." >&2; exit 1; }
+            sudo install -m 0644 "$supervisor_unit" /etc/systemd/system/hands-off-autonomy-supervisor.service
+            sudo systemctl daemon-reload
+            required_services=(hands-off-autonomous.service hands-off-telegram.service hands-off-autonomy-supervisor.service)
             for svc in "${required_services[@]}"; do
               systemctl cat "$svc" >/dev/null 2>&1 || { echo "Required production service missing: $svc" >&2; exit 1; }
             done
             for svc in "${required_services[@]}"; do
-              systemctl restart "$svc"
+              sudo systemctl enable "$svc"
+              sudo systemctl restart "$svc"
             done
             for svc in "${required_services[@]}"; do
-              systemctl is-active --quiet "$svc" || { echo "Required production service is not active after restart: $svc" >&2; exit 1; }
+              sudo systemctl is-active --quiet "$svc" || { echo "Required production service is not active after restart: $svc" >&2; exit 1; }
             done
           else
             echo 'Activation disabled; services were not restarted.'
