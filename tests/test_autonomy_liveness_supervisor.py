@@ -37,7 +37,11 @@ def test_run_cycle_queues_selected_objective_once(monkeypatch, tmp_path: Path):
     first = supervisor.run_cycle(tmp_path)
     second = supervisor.run_cycle(tmp_path)
 
-    assert first["status"] == "active"
+    assert first["status"] == "observed"
+    assert first["reality"]["discovery_completed"] is True
+    assert first["reality"]["objective_selected"] is True
+    assert first["reality"]["execution_observed"] is False
+    assert first["reality"]["live_system_active"] is False
     assert first["task_queued"] is True
     assert first["task_id"]
     assert second["task_queued"] is False
@@ -45,5 +49,5 @@ def test_run_cycle_queues_selected_objective_once(monkeypatch, tmp_path: Path):
 
 
 def test_persist_writes_liveness_state(tmp_path: Path):
-    supervisor.persist(tmp_path, {"status": "active", "timestamp": "now"})
+    supervisor.persist(tmp_path, {"status": "observed", "timestamp": "now"})
     assert (tmp_path / "state" / "autonomy_liveness.json").exists()
