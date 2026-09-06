@@ -1,15 +1,11 @@
 #!/usr/bin/env python3
 
 import json
-import subprocess
 import sys
 
-data = json.loads(
-    subprocess.check_output(
-        [sys.executable, "-m", "autonomous.integrations.supervisor"],
-        text=True
-    )
-)
+from autonomous.integrations.supervisor import IntegrationSupervisor
+
+data = IntegrationSupervisor().run_once()
 
 if "--json" in sys.argv:
     print(json.dumps(data, indent=2))
