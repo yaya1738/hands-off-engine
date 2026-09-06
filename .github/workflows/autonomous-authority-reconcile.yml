@@ -31,7 +31,7 @@ jobs:
           activate='false'
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.activate }}" == "true" ]]; then
             activate='true'
-          elif [[ "${{ github.event_name }}" == "schedule" && "${{ secrets.AUTONOMOUS_PRODUCTION_ACTIVATE }}" == "true" ]]; then
+          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
             activate='true'
           fi
           echo "activate=$activate" >> "$GITHUB_OUTPUT"
@@ -117,9 +117,14 @@ jobs:
           git fetch --prune origin main
           expected="$(git rev-parse origin/main)"
           [[ "$expected" == "$requested_sha" ]] || { echo "Main moved during reconciliation: expected $requested_sha, got $expected"; exit 1; }
-          git checkout --detach "$requested_sha"
-          deployed="$(git rev-parse HEAD)"
-          [[ "$deployed" == "$requested_sha" ]] || exit 1
+
+          deployed="$(git rev-parse HEAD 2>/dev/null || true)"
+          if [[ "$deployed" != "$requested_sha" ]]; then
+            git checkout --detach "$requested_sha"
+            deployed="$(git rev-parse HEAD)"
+            [[ "$deployed" == "$requested_sha" ]] || exit 1
+          fi
+
           if [[ "$activate" == 'true' ]]; then
             supervisor_unit='scripts/systemd/hands-off-autonomy-supervisor.service'
             test -f "$supervisor_unit" || { echo "Autonomous supervisor unit missing from deployed revision." >&2; exit 1; }
@@ -128,13 +133,15 @@ jobs:
             required_services=(hands-off-autonomous.service hands-off-telegram.service hands-off-autonomy-supervisor.service)
             for svc in "${required_services[@]}"; do
               systemctl cat "$svc" >/dev/null 2>&1 || { echo "Required production service missing: $svc" >&2; exit 1; }
-            done
-            for svc in "${required_services[@]}"; do
               sudo systemctl enable "$svc"
-              sudo systemctl restart "$svc"
             done
             for svc in "${required_services[@]}"; do
-              sudo systemctl is-active --quiet "$svc" || { echo "Required production service is not active after restart: $svc" >&2; exit 1; }
+              if ! systemctl is-active --quiet "$svc"; then
+                sudo systemctl restart "$svc"
+              fi
+            done
+            for svc in "${required_services[@]}"; do
+              sudo systemctl is-active --quiet "$svc" || { echo "Required production service is not active after reconcile: $svc" >&2; exit 1; }
             done
           else
             echo 'Activation disabled; services were not restarted.'
