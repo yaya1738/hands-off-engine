@@ -92,6 +92,7 @@ def run_cycle(repo_root: Path) -> dict:
     execution = None
     execution_observed = False
     verification_observed = False
+    execution_succeeded = False
 
     if isinstance(selected, dict) and selected.get("objective"):
         objective_id = selected.get("strategic_objective_id", "")
@@ -131,10 +132,14 @@ def run_cycle(repo_root: Path) -> dict:
         runtime_execution = (
             execution.get("execution", {}) if isinstance(execution, dict) else {}
         )
-        verification_observed = execution_observed and bool(
-            isinstance(runtime_execution, dict)
-            and runtime_execution.get("success") is not None
-        )
+        # A returned runtime result is verification evidence of the attempted
+        # execution. It is not, by itself, proof of an external-world side effect.
+        verification_observed = execution_observed and isinstance(
+            runtime_execution, dict
+        ) and "success" in runtime_execution
+        execution_succeeded = verification_observed and runtime_execution.get(
+            "success"
+        ) is True
 
         if task_id and execution_observed:
             queue.complete_task(
@@ -158,10 +163,15 @@ def run_cycle(repo_root: Path) -> dict:
         "task_id": task_id,
         "execution_observed": execution_observed,
         "verification_observed": verification_observed,
-        "live_system_active": execution_observed and verification_observed,
+        "execution_succeeded": execution_succeeded,
+        # This flag deliberately requires an explicit successful runtime result;
+        # execution alone must never be represented as successful live activity.
+        "live_system_active": execution_succeeded,
         "claim_basis": (
-            "observed execution and runtime completion result"
-            if execution_observed and verification_observed
+            "observed autonomous execution with explicit successful runtime result; external side effects not independently proven"
+            if execution_succeeded
+            else "observed autonomous execution with unsuccessful or non-success runtime result"
+            if execution_observed
             else "no executable objective selected"
             if not selected
             else "no observed autonomous execution"

@@ -38,6 +38,14 @@ class FakeGateway:
         }
 
 
+class FailedGateway:
+    def execute_autonomous(self, objective):
+        return {
+            "decision": {"status": "READY"},
+            "execution": {"success": False, "steps_completed": []},
+        }
+
+
 def test_run_cycle_executes_selected_objective_without_consumer(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
     monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", FakeLoop)
@@ -49,9 +57,23 @@ def test_run_cycle_executes_selected_objective_without_consumer(monkeypatch, tmp
     assert result["task_queued"] is True
     assert result["execution_observed"] is True
     assert result["verification_observed"] is True
+    assert result["execution_succeeded"] is True
     assert result["live_system_active"] is True
     assert result["task_id"]
     assert len((tmp_path / "state" / "autonomous_tasks_completed.jsonl").read_text()) > 0
+
+
+def test_failed_runtime_execution_is_not_reported_as_live_activity(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
+    monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", FakeLoop)
+    monkeypatch.setattr(supervisor, "FactoryAuthorityGateway", lambda runtime=None: FailedGateway())
+
+    result = supervisor.run_cycle(tmp_path)
+
+    assert result["execution_observed"] is True
+    assert result["verification_observed"] is True
+    assert result["execution_succeeded"] is False
+    assert result["live_system_active"] is False
 
 
 def test_successful_objective_is_retired_from_future_selection(tmp_path: Path):
