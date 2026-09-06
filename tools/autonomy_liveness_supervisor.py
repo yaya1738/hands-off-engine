@@ -90,9 +90,20 @@ def run_cycle(repo_root: Path) -> dict:
             )
             queued = True
 
+    # This cycle proves only that discovery and durable queueing occurred.
+    # It must not label the live system "active" until execution evidence exists.
     return {
         "timestamp": utc_now(),
-        "status": "active",
+        "status": "observed",
+        "reality": {
+            "discovery_completed": True,
+            "objective_selected": bool(isinstance(selected, dict) and selected.get("objective")),
+            "task_queued": queued,
+            "execution_observed": False,
+            "verification_observed": False,
+            "live_system_active": False,
+            "claim_basis": "objective discovery and queue state only",
+        },
         "selection": selection,
         "task_queued": queued,
         "task_id": task_id,
