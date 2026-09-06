@@ -3,6 +3,14 @@ from unittest.mock import patch
 from ai.factory.authority_gateway import FactoryAuthorityGateway
 
 
+class Journal:
+    def __init__(self):
+        self.records = []
+
+    def record(self, *args):
+        self.records.append(args)
+
+
 def test_authority_gateway_does_not_call_missing_runtime_execute():
     class Runtime:
         def report_autonomy_state(self, objective, decision):
@@ -13,6 +21,7 @@ def test_authority_gateway_does_not_call_missing_runtime_execute():
 
     gateway = FactoryAuthorityGateway.__new__(FactoryAuthorityGateway)
     gateway.runtime = Runtime()
+    gateway.execution_journal = Journal()
 
     evaluation = {
         "activation": {
@@ -29,3 +38,5 @@ def test_authority_gateway_does_not_call_missing_runtime_execute():
 
     assert result["status"] == "activated"
     assert result["execution"]["activation"]["status"] == "ACTIVATED"
+    assert result["evidence"]["activation_observed"] is True
+    assert result["evidence"]["verification_observed"] is True
