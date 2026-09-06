@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "objectives": [
+    {
+      "id": "adaptive-human-independence",
+      "priority": 1,
+      "status": "persistent",
+      "objective": "Continuously increase autonomous capability so routine operation requires progressively less human intervention, while continuously improve the system's ability to communicate dynamically, selectively, clearly, and powerfully with Yair when human input has genuine value.",
+      "success_criteria": [
+        "Reduce routine human interventions without weakening safety or authority boundaries.",
+        "Resolve more classes of problems autonomously through detection, reasoning, bounded implementation, testing, verification, and recovery.",
+        "Learn reusable bounded policies from repeated human decisions rather than treating one-off approvals as permanent authority.",
+        "Escalate fewer but higher-value communications, with concise context, confidence, alternatives, consequences, and the exact decision required.",
+        "Correlate human responses to originating decisions/tasks and resume autonomous work automatically within existing authority controls.",
+        "Preserve fail-closed behavior whenever required authority, credentials, safety evidence, or policy is absent."
+      ],
+      "operating_loop": [
+        "observe",
+        "assess",
+        "prioritize",
+        "act_within_authority",
+        "verify",
+        "learn",
+        "communicate_when_valuable",
+        "incorporate_response",
+        "resume"
+      ]
+    }
+  ]
+}
