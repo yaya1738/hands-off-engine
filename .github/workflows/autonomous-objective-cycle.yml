@@ -6,8 +6,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Shares the durable-state write lock with hosted production and authority
+# workflows so autonomous state commits cannot race.
 concurrency:
-  group: autonomous-objective-cycle
+  group: autonomous-production-authority
   cancel-in-progress: false
 
 permissions:
@@ -50,7 +52,7 @@ jobs:
       - name: Ingest authenticated GitHub autonomous requests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python tools/github_issue_autonomous_ingress.py
+        run: python -m tools.github_issue_autonomous_ingress
 
       - name: Run governed autonomous objective cycle
         run: python tools/autonomy_liveness_supervisor.py --once
