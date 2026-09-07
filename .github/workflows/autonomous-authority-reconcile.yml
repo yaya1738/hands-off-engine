@@ -25,6 +25,12 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Checkout exact main revision
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
       - name: Determine activation policy
         id: policy
         shell: bash
@@ -65,12 +71,8 @@ jobs:
         run: |
           set -euo pipefail
           requested_sha='${{ github.sha }}'
-          git init --quiet hosted-reconcile
-          cd hosted-reconcile
-          git remote add origin "https://github.com/${GITHUB_REPOSITORY}.git"
-          git fetch --quiet --depth=1 origin "$requested_sha"
-          git checkout --quiet --detach "$requested_sha"
           test "$(git rev-parse HEAD)" = "$requested_sha"
+          test "$(git status --porcelain)" = ""
 
           if [ -f requirements.txt ]; then
             python -m pip install --disable-pip-version-check -r requirements.txt
