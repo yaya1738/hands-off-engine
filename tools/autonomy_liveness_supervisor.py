@@ -72,6 +72,8 @@ def run_cycle(repo_root: Path) -> dict:
     if isinstance(graph, dict):
         gaps.extend(graph.get("gaps", []))
 
+    queue = AutonomousTaskQueue(repo_root)
+    pending_task = queue.get_next_task()
     retired = _successful_objectives(repo_root)
     selection = FactoryAutonomousObjectiveLoop(runtime).select_next(
         {
@@ -95,9 +97,21 @@ def run_cycle(repo_root: Path) -> dict:
     verification_observed = False
     execution_succeeded = False
 
-    if isinstance(selected, dict) and selected.get("objective"):
+    # Authenticated external requests are durable work, not merely messages.
+    # They take precedence over generated objectives so Telegram/web ingress can
+    # drive the same governed execution loop without a ChatGPT session.
+    if pending_task:
+        objective = pending_task.get("description") or pending_task.get("title")
+        selected = {
+            "objective": objective,
+            "strategic_objective_id": pending_task.get("metadata", {}).get("objective_id", "external-request"),
+            "score": 100,
+            "source": pending_task.get("source", "external"),
+            "task_id": pending_task.get("id"),
+        }
+        task_id = pending_task.get("id")
+    elif isinstance(selected, dict) and selected.get("objective"):
         objective_id = selected.get("strategic_objective_id", "")
-        queue = AutonomousTaskQueue(repo_root)
         pending = queue.get_all_tasks()
         duplicate = any(
             isinstance(task, dict)
@@ -107,13 +121,7 @@ def run_cycle(repo_root: Path) -> dict:
         if not duplicate:
             task_id = queue.add_task(
                 title=f"Autonomous objective: {selected['objective']}",
-                description=(
-                    "Pursue the selected autonomous objective through the authoritative "
-                    "FactoryAuthorityGateway. Assess first, make only bounded authorized "
-                    "changes, test, verify, recover from failures, and communicate only "
-                    "material decisions or blockers. Do not bypass approval, credentials, "
-                    "execution, or live-mutation gates."
-                ),
+                description=selected["objective"],
                 priority="high" if selected.get("score", 0) >= 95 else "normal",
                 source="autonomous_objective_liveness",
                 metadata={
@@ -125,22 +133,13 @@ def run_cycle(repo_root: Path) -> dict:
             )
             queued = True
 
+    if isinstance(selected, dict) and selected.get("objective"):
         gateway = FactoryAuthorityGateway(runtime=runtime)
         execution = gateway.execute_autonomous(selected["objective"])
-        execution_observed = isinstance(execution, dict) and bool(
-            execution.get("execution")
-        )
-        runtime_execution = (
-            execution.get("execution", {}) if isinstance(execution, dict) else {}
-        )
-        # A returned runtime result is verification evidence of the attempted
-        # execution. It is not, by itself, proof of an external-world side effect.
-        verification_observed = execution_observed and isinstance(
-            runtime_execution, dict
-        ) and "success" in runtime_execution
-        execution_succeeded = verification_observed and runtime_execution.get(
-            "success"
-        ) is True
+        execution_observed = isinstance(execution, dict) and bool(execution.get("execution"))
+        runtime_execution = execution.get("execution", {}) if isinstance(execution, dict) else {}
+        verification_observed = execution_observed and isinstance(runtime_execution, dict) and "success" in runtime_execution
+        execution_succeeded = verification_observed and runtime_execution.get("success") is True
 
         if task_id and execution_observed:
             queue.complete_task(
@@ -162,6 +161,7 @@ def run_cycle(repo_root: Path) -> dict:
         "retired_successful_objective_count": len(retired),
         "task_queued": queued,
         "task_id": task_id,
+        "external_task_processed": bool(pending_task),
         "execution_observed": execution_observed,
         "verification_observed": verification_observed,
         "execution_succeeded": execution_succeeded,

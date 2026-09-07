@@ -126,3 +126,36 @@ def test_run_once_executes_and_persists_single_cycle(monkeypatch, tmp_path: Path
     assert result["execution_succeeded"] is True
     persisted = (tmp_path / "state" / "autonomy_liveness.json").read_text(encoding="utf-8")
     assert '"execution_succeeded": true' in persisted
+
+
+def test_pending_external_task_preempts_generated_objective(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
+    monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", FakeLoop)
+
+    seen = []
+
+    class RecordingGateway:
+        def execute_autonomous(self, objective):
+            seen.append(objective)
+            return {"execution": {"success": True, "steps_completed": ["external"]}}
+
+    monkeypatch.setattr(
+        supervisor,
+        "FactoryAuthorityGateway",
+        lambda runtime=None: RecordingGateway(),
+    )
+
+    queue = supervisor.AutonomousTaskQueue(tmp_path)
+    task_id = queue.add_task(
+        title="External request",
+        description="finish work requested through authenticated Telegram",
+        priority="critical",
+        source="telegram_user",
+    )
+
+    result = supervisor.run_cycle(tmp_path)
+
+    assert result["external_task_processed"] is True
+    assert result["task_id"] == task_id
+    assert seen == ["finish work requested through authenticated Telegram"]
+    assert queue.get_all_tasks() == []

@@ -127,8 +127,11 @@ jobs:
 
           if [[ "$activate" == 'true' ]]; then
             supervisor_unit='scripts/systemd/hands-off-autonomy-supervisor.service'
+            telegram_unit='scripts/systemd/hands-off-telegram.service'
             test -f "$supervisor_unit" || { echo "Autonomous supervisor unit missing from deployed revision." >&2; exit 1; }
+            test -f "$telegram_unit" || { echo "Telegram ingress unit missing from deployed revision." >&2; exit 1; }
             sudo install -m 0644 "$supervisor_unit" /etc/systemd/system/hands-off-autonomy-supervisor.service
+            sudo install -m 0644 "$telegram_unit" /etc/systemd/system/hands-off-telegram.service
             sudo systemctl daemon-reload
             required_services=(hands-off-autonomous.service hands-off-telegram.service hands-off-autonomy-supervisor.service)
             for svc in "${required_services[@]}"; do

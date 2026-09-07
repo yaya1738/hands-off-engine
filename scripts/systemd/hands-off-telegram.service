@@ -1,0 +1,16 @@
+[Unit]
+Description=Hands-Off Engine authenticated Telegram autonomy ingress
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+EnvironmentFile=-/root/hands-off-engine/.env.handsoff_telegram
+ExecStart=/usr/bin/python3 /root/hands-off-engine/telegram/telegram_bot_listener.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
