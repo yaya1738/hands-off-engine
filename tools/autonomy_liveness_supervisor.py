@@ -142,17 +142,20 @@ def run_cycle(repo_root: Path) -> dict:
         execution_succeeded = verification_observed and runtime_execution.get("success") is True
 
         if task_id and execution_observed:
-            queue.complete_task(
-                task_id,
-                result=json.dumps(
-                    {
-                        "status": "executed",
-                        "success": runtime_execution.get("success"),
-                        "steps_completed": runtime_execution.get("steps_completed", []),
-                    },
-                    sort_keys=True,
-                ),
-            )
+            completion = {
+                "status": "executed",
+                "success": runtime_execution.get("success"),
+                "steps_completed": runtime_execution.get("steps_completed", []),
+            }
+            queue.complete_task(task_id, result=json.dumps(completion, sort_keys=True))
+            if pending_task:
+                # External requests receive completion feedback on their original
+                # control surface. Notification failure never falsifies execution.
+                try:
+                    from telegram.autonomy_notifier import notify_task_result
+                    notify_task_result(pending_task, execution)
+                except Exception:
+                    pass
 
     return {
         "timestamp": utc_now(),
