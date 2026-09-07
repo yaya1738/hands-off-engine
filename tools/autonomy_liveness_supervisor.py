@@ -159,13 +159,16 @@ def run_cycle(repo_root: Path) -> dict:
         task_id = pending_task.get("id")
     elif isinstance(selected, dict) and selected.get("objective"):
         objective_id = selected.get("strategic_objective_id", "")
+        # Successful objectives are retired across cycles: continuity must advance.
+        if selected.get("objective", "").strip().casefold() in retired:
+            selected = None
         pending = queue.get_all_tasks()
         duplicate = any(
             isinstance(task, dict)
             and task.get("metadata", {}).get("objective") == selected.get("objective")
             for task in pending
         )
-        if not duplicate:
+        if selected is not None and not duplicate:
             task_id = queue.add_task(
                 title=f"Autonomous objective: {selected['objective']}",
                 description=selected["objective"],
