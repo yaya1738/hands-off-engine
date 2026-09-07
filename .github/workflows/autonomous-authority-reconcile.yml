@@ -9,6 +9,8 @@ on:
     - cron: '17 * * * *'
   workflow_dispatch:
 
+# The hosted production service also writes durable state to main. Sharing one
+# lock prevents two authorities from racing on main or publishing stale state.
 concurrency:
   group: autonomous-production-authority
   cancel-in-progress: false
@@ -16,24 +18,30 @@ concurrency:
 permissions:
   contents: write
 
+env:
+  PYTHONUNBUFFERED: '1'
+
 jobs:
   reconcile:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout exact main revision
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 1
 
-      - name: Assert repository-native authority
+      - name: Resolve current main under authority lock
         shell: bash
         run: |
           set -euo pipefail
-          requested_sha='${{ github.sha }}'
-          test "$(git rev-parse HEAD)" = "$requested_sha"
+          git fetch --prune origin main
+          current_sha="$(git rev-parse origin/main)"
+          git checkout --detach "$current_sha"
+          test "$(git rev-parse HEAD)" = "$current_sha"
           test "$(git status --porcelain)" = ""
+          echo "authority_revision=$current_sha"
           echo "authority_mode=repository_hosted"
           echo "external_remote_credentials_required=false"
           echo "financial_live_execution_enabled=false"
