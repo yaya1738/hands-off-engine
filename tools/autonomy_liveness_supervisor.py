@@ -125,15 +125,38 @@ def run_cycle(repo_root: Path) -> dict:
     queue = AutonomousTaskQueue(repo_root)
     pending_task = queue.get_next_task()
     retired = _successful_objectives(repo_root)
-    selection = FactoryAutonomousObjectiveLoop(runtime).select_next(
-        {
-            "strategic_objective": mission["mission"],
-            "gaps": gaps,
-            "discovery": discovery,
-            "excluded_objectives": retired,
-            "cycle_count": mission["cycle_count"],
+
+    discovery_missing = discovery.get("missing", []) if isinstance(discovery, dict) else []
+    discovery_findings = discovery.get("findings", []) if isinstance(discovery, dict) else []
+    actionable_work = bool(gaps or discovery_missing or discovery_findings or previous_error)
+
+    if pending_task:
+        selection = {"status": "external_task", "selected": None, "candidate_count": 0, "candidates": []}
+    elif not actionable_work:
+        # A healthy autonomous system must be able to converge. Once the
+        # governed discovery layer reports no actionable gaps/findings and no
+        # external task is pending, do not manufacture another continuity
+        # objective merely to create activity. Keep the heartbeat active and
+        # persist an explicit convergence result so future regressions can
+        # reopen autonomous work naturally.
+        selection = {
+            "status": "converged",
+            "candidate_count": 0,
+            "candidates": [],
+            "excluded_objectives": list(retired),
+            "selected": None,
+            "reason": "governed discovery reports no actionable autonomous work",
         }
-    )
+    else:
+        selection = FactoryAutonomousObjectiveLoop(runtime).select_next(
+            {
+                "strategic_objective": mission["mission"],
+                "gaps": gaps,
+                "discovery": discovery,
+                "excluded_objectives": retired,
+                "cycle_count": mission["cycle_count"],
+            }
+        )
 
     selected = selection.get("selected")
     queued = False
@@ -142,6 +165,7 @@ def run_cycle(repo_root: Path) -> dict:
     execution_observed = False
     verification_observed = False
     execution_succeeded = False
+    converged = selection.get("status") == "converged" and not pending_task
 
     if pending_task:
         objective = pending_task.get("description") or pending_task.get("title")
@@ -207,16 +231,17 @@ def run_cycle(repo_root: Path) -> dict:
                 except Exception:
                     pass
 
-    mission["last_status"] = "succeeded" if execution_succeeded else "blocked_or_failed"
-    mission["last_error"] = None if execution_succeeded else (
+    mission["last_status"] = "converged" if converged else "succeeded" if execution_succeeded else "blocked_or_failed"
+    mission["last_error"] = None if (execution_succeeded or converged) else (
         execution.get("reason") if isinstance(execution, dict) else "no executable objective"
     )
     mission["last_objective"] = selected.get("objective") if isinstance(selected, dict) else None
+    mission["converged"] = converged
     _persist_mission(repo_root, mission)
 
     return {
         "timestamp": utc_now(),
-        "status": "observed" if execution_observed else "degraded" if selected else "idle",
+        "status": "converged" if converged else "observed" if execution_observed else "degraded" if selected else "idle",
         "mission": mission,
         "selection": selection,
         "retired_successful_objective_count": len(retired),
@@ -226,9 +251,12 @@ def run_cycle(repo_root: Path) -> dict:
         "execution_observed": execution_observed,
         "verification_observed": verification_observed,
         "execution_succeeded": execution_succeeded,
-        "live_system_active": execution_succeeded,
+        "converged": converged,
+        "live_system_active": execution_succeeded or converged,
         "claim_basis": (
-            "observed autonomous execution with explicit successful runtime result; external side effects not independently proven"
+            "governed discovery observed no actionable work; autonomous heartbeat remains active"
+            if converged
+            else "observed autonomous execution with explicit successful runtime result; external side effects not independently proven"
             if execution_succeeded
             else "observed autonomous execution with unsuccessful or non-success runtime result"
             if execution_observed
@@ -287,11 +315,11 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.once:
         state = run_once(repo_root)
-        return 0 if state.get("execution_succeeded") is True else 1
+        return 0 if state.get("execution_succeeded") is True or state.get("converged") is True else 1
 
     while True:
         state = run_once(repo_root)
-        if state.get("execution_succeeded") is not True:
+        if state.get("execution_succeeded") is not True and state.get("converged") is not True:
             # Continuous service remains alive for recovery, but each failed
             # cycle is explicitly persisted and observable to the caller.
             time.sleep(INTERVAL_SECONDS)
