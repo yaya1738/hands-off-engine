@@ -1,6 +1,8 @@
 name: Autonomous Production Authority Reconcile
 
 on:
+  push:
+    branches: [main]
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
@@ -31,7 +33,7 @@ jobs:
           activate='false'
           if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.activate }}" == "true" ]]; then
             activate='true'
-          elif [[ "${{ github.event_name }}" == "schedule" ]]; then
+          elif [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ]]; then
             activate='true'
           fi
           echo "activate=$activate" >> "$GITHUB_OUTPUT"
