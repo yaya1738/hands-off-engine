@@ -17,4 +17,4 @@ The governed runtime completed state loading, policy check, permission check, ri
 
 The hosted workflow also explicitly asserts the four execution-success conditions and persists the autonomous queue/completion/liveness state across ephemeral GitHub-hosted runners.
 
-This proves the hosted autonomous service can ingest and complete authenticated autonomous work without the consumer ChatGPT UI or an external production host. It does not claim external-world side effects beyond the observed governed runtime result, and it does not weaken fail-closed authority or live-mutation safety.
+This proves the hosted autonomous service can ingest and complete authenticated autonomous work without the consumer ChatGPT UI or an external production host. It does not claim external production side effects beyond the observed governed runtime result, and it does not weaken fail-closed authority or live-mutation safety.
