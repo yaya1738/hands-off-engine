@@ -1,3 +1,4 @@
+from ai.factory.live_order_authority import submit_legacy_order
 #!/usr/bin/env python3
 """
 MONEY PRINTER
@@ -188,7 +189,7 @@ class MoneyPrinter:
                         side=BUY
                     )
                     signed = self.client.create_order(order)
-                    result = self.client.post_order(signed)
+                    result = self.client.submit_legacy_order(signed)
                     results.append(result)
                 except Exception as e:
                     pass
@@ -212,7 +213,7 @@ class MoneyPrinter:
                     side=BUY
                 )
                 signed = self.client.create_order(order)
-                result = self.client.post_order(signed)
+                result = self.client.submit_legacy_order(signed)
                 return result
             except Exception as e:
                 return None

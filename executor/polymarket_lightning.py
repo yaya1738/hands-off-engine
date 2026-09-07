@@ -1,3 +1,4 @@
+from ai.factory.live_order_authority import submit_legacy_order
 #!/usr/bin/env python3
 """
 Polymarket Lightning Rod - Cloudflare-Aware Connection Manager
@@ -265,7 +266,7 @@ class PolymarketLightning:
                 "size": size,
                 "side": order_side
             })
-            return client.post_order(order)
+            return client.submit_legacy_order(order)
 
         return self.throttled_request(do_place, endpoint="place_order")
 

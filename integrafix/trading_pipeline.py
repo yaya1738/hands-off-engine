@@ -1,3 +1,4 @@
+from ai.factory.live_order_authority import submit_legacy_order
 #!/usr/bin/env python3
 """
 INTEGRAFIX: Trading Pipeline - MONEY PRINTER
@@ -490,7 +491,7 @@ class TradingPipeline:
             )
 
             signed_order = client.create_order(order_args)
-            result = client.post_order(signed_order)
+            result = client.submit_legacy_order(signed_order)
 
             order_id = result.get("orderID") or result.get("id") if result else None
 
