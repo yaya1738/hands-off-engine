@@ -74,18 +74,26 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
+          converged=$(python - <<'PY'
           import json
           from pathlib import Path
           p = Path('state/autonomy_liveness.json')
           if not p.exists():
               raise SystemExit('AUTONOMOUS_OBJECTIVE_UNAVAILABLE')
           state = json.loads(p.read_text(encoding='utf-8'))
-          if state.get('converged') is True:
-              print('AUTONOMOUS_FACTORY_CONVERGED')
-              print('No autonomous coding objective remains; preserving the verified steady state.')
-              Path('/tmp/factory_objective_converged').write_text('true', encoding='utf-8')
-              raise SystemExit(0)
+          print('true' if state.get('converged') is True else 'false')
+          PY
+          )
+          echo "converged=$converged" >> "$GITHUB_OUTPUT"
+          if [ "$converged" = "true" ]; then
+            echo 'AUTONOMOUS_FACTORY_CONVERGED'
+            echo 'No autonomous coding objective remains; preserving the verified steady state.'
+            exit 0
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state = json.loads(Path('state/autonomy_liveness.json').read_text(encoding='utf-8'))
           if state.get('execution_succeeded') is not True or state.get('live_system_active') is not True:
               raise SystemExit('AUTONOMOUS_SYSTEM_NOT_VERIFIED')
           selected = state.get('selection', {}).get('selected', {})
@@ -95,7 +103,6 @@ jobs:
           print(objective)
           Path('/tmp/factory_objective.txt').write_text(objective, encoding='utf-8')
           PY
-          echo "converged=false" >> "$GITHUB_OUTPUT"
 
       - name: Run bounded autonomous coding agent
         if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
