@@ -85,6 +85,14 @@ state/opportunities/
 state/*
 !state/.gitkeep
 
+# Persisted autonomous service state is intentionally versioned so ephemeral
+# GitHub-hosted runners share durable queue/completion/attempt state.
+!state/autonomous_task_queue.json
+!state/autonomous_tasks_completed.jsonl
+!state/autonomous_task_attempts.jsonl
+!state/autonomous_tasks.jsonl
+!state/autonomy_liveness.json
+
 # Local investigation artifacts
 action_*.txt
 *_debug.txt
@@ -119,22 +127,6 @@ fix_brain_*
 add_stage25.py
 auto_copy_report.sh
 generate_integration_plan.sh
-data/
-deliverables/
-draft
-*.txt
-
-# Independent nested repositories
-hands-off-engine/
-
-# Hands-Off operator workflow artifacts
-autonomous_architecture_decider.sh
-autonomous_bridge_next_step.sh
-autonomous_intake_discovery.sh
-build_credential_supervisor_v2.sh
-finish_credential_heartbeat.sh
-hard_limits_only.sh
-integrate_credential_heartbeat.py
 run_income_worker.sh
 send_me_credential_state.sh
 start_work
