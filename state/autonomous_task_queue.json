@@ -1,0 +1,20 @@
+{
+  "updated_at": "2026-09-07T10:43:12.731283+00:00",
+  "tasks": [
+    {
+      "id": "75c53ce9-34bf-4238-bc4e-70eef2b8df77",
+      "title": "[autonomous] hosted service completion probe",
+      "description": "hosted service completion probe\n\nRequest details:\nAutonomous production-service completion probe.\n\nTrigger execution after hosted workflow installation; do not require human resubmission.\n\nVerification trigger: execute this authenticated request through the hosted GitHub Actions service, through the governed FactoryAuthorityGateway, and persist durable evidence. Close this issue only after the governed cycle records a successful execution. Consumer ChatGPT UI and external production host are not dependencies. Preserve all fail-closed safety gates.",
+      "priority": "high",
+      "source": "github_issue",
+      "created_at": "2026-09-07T10:43:10.659074+00:00",
+      "metadata": {
+        "external_id": "github_issue:226",
+        "issue_number": 226,
+        "issue_url": "https://github.com/yaya1738/hands-off-engine/issues/226",
+        "requester": "yaya1738",
+        "authority": "FactoryAuthorityGateway"
+      }
+    }
+  ]
+}
