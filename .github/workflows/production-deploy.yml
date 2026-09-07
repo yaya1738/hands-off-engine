@@ -88,11 +88,19 @@ jobs:
           import json
           from pathlib import Path
           state = json.loads(Path('state/autonomy_liveness.json').read_text(encoding='utf-8'))
-          assert state.get('execution_observed') is True, state
-          assert state.get('verification_observed') is True, state
-          assert state.get('execution_succeeded') is True, state
-          assert state.get('live_system_active') is True, state
-          print('DEPLOY_OK authority=hosted sha=${{ steps.revision.outputs.sha }}')
+          converged = state.get('converged') is True
+          if converged:
+              assert state.get('execution_observed') is False, state
+              assert state.get('execution_succeeded') is False, state
+              assert state.get('verification_observed') is True, state
+              assert state.get('live_system_active') is True, state
+              print('DEPLOY_OK authority=hosted converged=true sha=${{ steps.revision.outputs.sha }}')
+          else:
+              assert state.get('execution_observed') is True, state
+              assert state.get('verification_observed') is True, state
+              assert state.get('execution_succeeded') is True, state
+              assert state.get('live_system_active') is True, state
+              print('DEPLOY_OK authority=hosted converged=false sha=${{ steps.revision.outputs.sha }}')
           PY
 
       - name: Configure SSH for remote authority
