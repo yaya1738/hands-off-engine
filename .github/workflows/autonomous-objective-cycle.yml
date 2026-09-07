@@ -42,12 +42,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run objective discovery
-        run: python tools/autonomous_objective_cycle.py
+      - name: Run governed autonomous objective cycle
+        run: python tools/autonomy_liveness_supervisor.py --once
 
-      - name: Upload machine-readable objective result
+      - name: Upload machine-readable autonomy evidence
         uses: actions/upload-artifact@v4
         with:
           name: autonomous-objective-cycle
-          path: autonomous-objective-cycle.json
+          path: state/autonomy_liveness.json
           if-no-files-found: error
