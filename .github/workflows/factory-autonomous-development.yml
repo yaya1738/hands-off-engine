@@ -1,0 +1,207 @@
+name: Factory Autonomous Development
+
+# The hosted Factory continuously turns its verified autonomous objectives into
+# bounded coding-agent PRs. It never writes directly to main. Each change must
+# pass the repository's normal validation before the trusted auto-merge lane can
+# integrate it. Financial/live-trading, credentials, durable state, and authority
+# workflows remain outside this autonomous coding lane.
+
+on:
+  schedule:
+    - cron: '17,47 * * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths-ignore:
+      - 'state/**'
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: read
+
+concurrency:
+  group: autonomous-development-authority
+  cancel-in-progress: false
+
+env:
+  PROTECTED_PATHS: >-
+    state/
+    credentials/
+    .github/workflows/autonomous-production-service.yml
+    .github/workflows/autonomous-authority-reconcile.yml
+    .github/workflows/autonomous-objective-cycle.yml
+    .github/workflows/production-deploy.yml
+    .github/workflows/factory-autonomous-development.yml
+    polymarket/
+    trading/
+    finance/
+
+jobs:
+  develop:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Resolve exact current main under development lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch origin main --prune
+          current_sha=$(git rev-parse origin/main)
+          git checkout --detach "$current_sha"
+          test "$(git rev-parse HEAD)" = "$current_sha"
+          test "$(git status --porcelain)" = ""
+          echo "BASE_SHA=$current_sha" >> "$GITHUB_ENV"
+
+      - name: Skip when another autonomous development PR is open
+        id: existing
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          count=$(gh pr list --repo "$GITHUB_REPOSITORY" --state open --search 'head:autonomous-factory/' --json number --jq 'length')
+          if [ "$count" -gt 0 ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "An autonomous Factory development PR is already open; preserving one-change-at-a-time progression."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install runtime dependencies
+        if: steps.existing.outputs.skip != 'true'
+        run: python -m pip install --disable-pip-version-check -r requirements.txt
+
+      - name: Read autonomous objective
+        if: steps.existing.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('state/autonomy_liveness.json')
+          if not p.exists():
+              raise SystemExit('AUTONOMOUS_OBJECTIVE_UNAVAILABLE')
+          state = json.loads(p.read_text(encoding='utf-8'))
+          if state.get('execution_succeeded') is not True or state.get('live_system_active') is not True:
+              raise SystemExit('AUTONOMOUS_SYSTEM_NOT_VERIFIED')
+          selected = state.get('selection', {}).get('selected', {})
+          objective = selected.get('objective')
+          if not objective:
+              raise SystemExit('AUTONOMOUS_OBJECTIVE_UNAVAILABLE')
+          print(objective)
+          Path('/tmp/factory_objective.txt').write_text(objective, encoding='utf-8')
+          PY
+
+      - name: Run bounded autonomous coding agent
+        if: steps.existing.outputs.skip != 'true'
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          permission-profile: ":workspace"
+          prompt: |
+            You are the repository's bounded autonomous Factory development agent.
+
+            Read /tmp/factory_objective.txt for the currently verified objective and
+            inspect the actual repository before changing anything. Make ONE concrete,
+            reviewable improvement that advances that objective toward the permanent
+            mission: discover capability gaps, repair/construct missing capability,
+            validate it, integrate it into the governed runtime, and repeat with less
+            human intervention.
+
+            Rules:
+            - Never weaken or bypass safety, authority, audit, cost, risk, verification,
+              credential, or financial-live-execution controls.
+            - Never modify state/**, credential material, financial/trading code, or the
+              production-authority/deployment workflow files.
+            - Do not access or print secrets.
+            - Prefer the smallest coherent change; do not create speculative modules.
+            - You may change implementation and tests needed for the improvement.
+            - Run focused tests for the change and fix failures you introduce.
+            - Do not commit, push, create PRs, or use destructive git commands; the
+              workflow owns persistence and review submission.
+            - If the repository already satisfies the objective, make no change.
+
+            The workflow will independently enforce changed-file boundaries, compile
+            checks, tests, and PR creation. A no-op is preferable to an unjustified
+            mutation.
+
+      - name: Enforce bounded change surface
+        if: steps.existing.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t changed < <(git diff --name-only "$BASE_SHA" --)
+          if [ "${#changed[@]}" -eq 0 ]; then
+            echo 'FACTORY_AUTONOMOUS_DEVELOPMENT=NOOP'
+            exit 0
+          fi
+          if [ "${#changed[@]}" -gt 8 ]; then
+            echo "DENY: autonomous agent changed ${#changed[@]} files; maximum is 8."
+            printf '%s\n' "${changed[@]}"
+            exit 1
+          fi
+          for path in "${changed[@]}"; do
+            case "$path" in
+              state/*|credentials/*|polymarket/*|trading/*|finance/*|.github/workflows/autonomous-production-service.yml|.github/workflows/autonomous-authority-reconcile.yml|.github/workflows/autonomous-objective-cycle.yml|.github/workflows/production-deploy.yml|.github/workflows/factory-autonomous-development.yml)
+                echo "DENY: protected autonomous-development path changed: $path"
+                exit 1
+                ;;
+              *) ;;
+            esac
+          done
+          printf '%s\n' "${changed[@]}" | tee /tmp/factory_changed_files.txt
+
+      - name: Validate autonomous change
+        if: steps.existing.outputs.skip != 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/factory_changed_files.txt ]; then
+            echo 'No autonomous code change to validate.'
+            exit 0
+          fi
+          python -m compileall -q ai tools scripts
+          python -m pytest -q
+
+      - name: Create autonomous development PR
+        if: steps.existing.outputs.skip != 'true' && hashFiles('/tmp/factory_changed_files.txt') != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ ! -s /tmp/factory_changed_files.txt ]; then
+            exit 0
+          fi
+          cycle=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          try:
+              print(json.loads(Path('state/autonomy_liveness.json').read_text())['mission']['cycle_count'])
+          except Exception:
+              print('unknown')
+          PY
+          )
+          branch="autonomous-factory/cycle-${cycle}-${GITHUB_RUN_ID}"
+          git switch -c "$branch"
+          git config user.name 'factory-autonomous-agent'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- $(cat /tmp/factory_changed_files.txt)
+          git commit -m "Factory autonomous improvement: cycle ${cycle}"
+          git push --set-upstream origin "$branch"
+          objective=$(cat /tmp/factory_objective.txt)
+          gh pr create \
+            --repo "$GITHUB_REPOSITORY" \
+            --base main \
+            --head "$branch" \
+            --title "Factory autonomous improvement: cycle ${cycle}" \
+            --body "## Autonomous Factory development\n\nObjective:\n${objective}\n\nThis PR was generated by the repository-hosted autonomous development lane. The change was bounded to the autonomous coding surface and passed compile/tests before submission. It must remain subject to the repository's normal required checks and protected authority rules."
