@@ -67,7 +67,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add state/autonomy_liveness.json state/autonomous_task_queue.json state/autonomous_tasks_completed.jsonl state/autonomous_task_attempts.jsonl state/autonomous_tasks.jsonl 2>/dev/null || true
+          git add -f state/autonomy_liveness.json state/autonomous_task_queue.json state/autonomous_tasks_completed.jsonl state/autonomous_task_attempts.jsonl state/autonomous_tasks.jsonl
           if ! git diff --cached --quiet; then
             git commit -m "chore: persist autonomous service state"
             git push origin HEAD:main
