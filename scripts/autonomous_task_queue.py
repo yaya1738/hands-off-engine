@@ -21,6 +21,7 @@ class AutonomousTaskQueue:
         self.repo_root = repo_root
         self.queue_file = repo_root / "state" / "autonomous_task_queue.json"
         self.completed_log = repo_root / "state" / "autonomous_tasks_completed.jsonl"
+        self.attempt_log = repo_root / "state" / "autonomous_task_attempts.jsonl"
 
     def load_queue(self) -> List[Dict]:
         if not self.queue_file.exists():
@@ -60,6 +61,20 @@ class AutonomousTaskQueue:
 
     def get_all_tasks(self) -> List[Dict]:
         return self.load_queue()
+
+    def record_attempt(self, task_id: str, result: str):
+        """Persist an execution attempt without removing retryable work."""
+        task = next((t for t in self.load_queue() if t.get("id") == task_id), None)
+        if not task:
+            return
+        self.attempt_log.parent.mkdir(parents=True, exist_ok=True)
+        record = {
+            "task": task,
+            "attempted_at": datetime.now(timezone.utc).isoformat(),
+            "result": result,
+        }
+        with open(self.attempt_log, "a", encoding="utf-8") as f:
+            f.write(json.dumps(record, sort_keys=True) + "\n")
 
     def complete_task(self, task_id: str, result: str = "completed"):
         tasks = self.load_queue()
