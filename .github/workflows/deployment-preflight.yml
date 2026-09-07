@@ -3,6 +3,8 @@ name: Deployment Preflight
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'state/**'
   pull_request:
     branches: [main]
   schedule:
