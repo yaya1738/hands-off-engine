@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 SKIP_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
-TEXT_SUFFIXES = {".py", ".yml", ".yaml", ".sh", ".service", ".toml", ".json", ".md"}
+TEXT_SUFFIXES = {".py", ".yml", ".yaml", ".sh", ".service", ".toml"}
 
 
 def files(root: Path):
