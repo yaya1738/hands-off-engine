@@ -76,6 +76,7 @@ class FactoryAutonomousObjectiveLoop:
         self,
         candidates: Iterable[Dict[str, Any]],
         excluded_objectives: Iterable[str] | None = None,
+        cycle_count: int = 0,
     ) -> Dict[str, Any] | None:
         excluded: Set[str] = {
             self._text(objective).casefold()
@@ -109,7 +110,7 @@ class FactoryAutonomousObjectiveLoop:
                 "",
             )
             if strategic and strategic.casefold() in excluded:
-                cycle = max(1, int(context_cycle := 0))
+                cycle = max(1, int(cycle_count or 0))
                 continuity = (
                     f"Perform bounded autonomous continuity checkpoint {cycle}: "
                     "inspect the governed runtime for the highest-value actionable "
@@ -145,6 +146,7 @@ class FactoryAutonomousObjectiveLoop:
         selected = self.prioritize(
             candidates,
             context.get("excluded_objectives", []),
+            int(context.get("cycle_count", 0) or 0),
         )
         result = {
             "status": "selected" if selected else "no_candidate",
