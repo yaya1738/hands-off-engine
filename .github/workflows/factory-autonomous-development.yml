@@ -62,9 +62,7 @@ jobs:
 
       - name: Install repository test dependencies
         if: steps.existing.outputs.skip != 'true'
-        run: |
-          set -euo pipefail
-          python -m pip install --disable-pip-version-check pytest
+        run: python -m pip install --disable-pip-version-check pytest
 
       - name: Run repository deployment preflight
         if: steps.existing.outputs.skip != 'true'
