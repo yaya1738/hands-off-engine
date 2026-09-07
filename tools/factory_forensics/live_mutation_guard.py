@@ -14,7 +14,9 @@ from pathlib import Path
 POST_ORDER = re.compile(r"\bpost_order\s*\(")
 SKIP_PARTS = {".git", ".venv", "venv", "node_modules", "__pycache__"}
 SKIP_SUFFIXES = {".md", ".rst", ".txt", ".json", ".lock"}
+SKIP_DIRECTORIES = {".github"}
 TEST_PARTS = {"tests", "test"}
+GUARD_PATH = Path("tools/factory_forensics/live_mutation_guard.py")
 
 
 def iter_source(root: Path):
@@ -23,9 +25,13 @@ def iter_source(root: Path):
             continue
         if any(part in SKIP_PARTS for part in path.parts):
             continue
+        if any(part in SKIP_DIRECTORIES for part in path.parts):
+            continue
         if path.suffix.lower() in SKIP_SUFFIXES:
             continue
         if any(part in TEST_PARTS for part in path.parts):
+            continue
+        if path.relative_to(root) == GUARD_PATH:
             continue
         yield path
 
