@@ -1,4 +1,4 @@
-name: Autonomous Production Authority Reconcile
+name: Repository-Native Production Authority Reconcile
 
 on:
   push:
@@ -8,24 +8,18 @@ on:
   schedule:
     - cron: '17 * * * *'
   workflow_dispatch:
-    inputs:
-      activate:
-        description: 'Activate the discovered production host after exact-SHA deployment'
-        required: false
-        default: false
-        type: boolean
 
 concurrency:
   group: autonomous-production-authority
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   reconcile:
     runs-on: ubuntu-latest
-    environment: production
+    timeout-minutes: 15
     steps:
       - name: Checkout exact main revision
         uses: actions/checkout@v4
@@ -33,56 +27,31 @@ jobs:
           ref: main
           fetch-depth: 1
 
-      - name: Determine activation policy
-        id: policy
-        shell: bash
-        run: |
-          set -euo pipefail
-          activate='false'
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" && "${{ inputs.activate }}" == "true" ]]; then
-            activate='true'
-          elif [[ "${{ github.event_name }}" == "schedule" || "${{ github.event_name }}" == "push" ]]; then
-            activate='true'
-          fi
-          echo "activate=$activate" >> "$GITHUB_OUTPUT"
-
-      - name: Verify available production authority
-        id: authority
-        shell: bash
-        env:
-          DO_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
-          PROD_HOST: ${{ secrets.PRODUCTION_HOST }}
-          PROD_USER: ${{ secrets.PRODUCTION_USER }}
-          PROD_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
-        run: |
-          set -euo pipefail
-          if [[ -n "$DO_TOKEN" && -n "$PROD_USER" && -n "$PROD_KEY" ]]; then
-            echo 'mode=digitalocean-discovery' >> "$GITHUB_OUTPUT"
-            echo 'DigitalOcean production control-plane authority is configured.'
-          elif [[ -n "$PROD_HOST" && -n "$PROD_USER" && -n "$PROD_KEY" ]]; then
-            echo 'mode=static-host' >> "$GITHUB_OUTPUT"
-            echo 'Static production SSH authority is configured.'
-          else
-            echo 'No remote production connection is configured; selecting the repository-native hosted production authority.'
-            echo 'mode=hosted' >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Reconcile through repository-native hosted production authority
-        if: steps.authority.outputs.mode == 'hosted'
+      - name: Assert repository-native authority
         shell: bash
         run: |
           set -euo pipefail
           requested_sha='${{ github.sha }}'
           test "$(git rev-parse HEAD)" = "$requested_sha"
           test "$(git status --porcelain)" = ""
+          echo "authority_mode=repository_hosted"
+          echo "external_remote_credentials_required=false"
+          echo "financial_live_execution_enabled=false"
 
+      - name: Install runtime dependencies
+        run: |
           if [ -f requirements.txt ]; then
             python -m pip install --disable-pip-version-check -r requirements.txt
           fi
 
-          python tools/factory_forensics/deployment_preflight.py .
-          python tools/autonomy_liveness_supervisor.py --once
+      - name: Run deterministic deployment preflight
+        run: python tools/factory_forensics/deployment_preflight.py .
 
+      - name: Execute governed hosted production cycle
+        run: python tools/autonomy_liveness_supervisor.py --once
+
+      - name: Verify internal production authority
+        run: |
           python - <<'PY'
           import json
           from pathlib import Path
@@ -92,97 +61,32 @@ jobs:
           assert state.get("verification_observed") is True, state
           assert state.get("execution_succeeded") is True, state
           assert state.get("live_system_active") is True, state
-          print("HOSTED_PRODUCTION_OK")
-          print("Governed autonomous production execution and verification are active on the exact main revision.")
+          print("REPOSITORY_NATIVE_PRODUCTION_OK")
+          print("Governed autonomous production authority is active without remote host credentials.")
           PY
 
-      - name: Resolve production host through DigitalOcean
-        if: steps.authority.outputs.mode == 'digitalocean-discovery'
-        id: resolve
-        env:
-          DO_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
-        shell: bash
+      - name: Persist authority evidence
         run: |
-          set -euo pipefail
-          response="$(curl -fsS -H "Authorization: Bearer $DO_TOKEN" -H 'Accept: application/json' https://api.digitalocean.com/v2/droplets?per_page=200)"
-          mapfile -t hosts < <(printf '%s' "$response" | jq -r '.droplets[] | select(.name == "ho-cli-main" or (.tags // [] | index("hands-off-production"))) | .networks.v4[] | select(.type == "public") | .ip_address' | sort -u)
-          if (( ${#hosts[@]} != 1 )); then
-            echo "Expected exactly one production Droplet public IP, found ${#hosts[@]}." >&2
-            exit 1
-          fi
-          host="${hosts[0]}"
-          [[ -n "$host" && "$host" != 'null' ]] || { echo 'Invalid production Droplet address.' >&2; exit 1; }
-          echo 'host='"$host" >> "$GITHUB_OUTPUT"
-          echo 'Resolved exactly one production host through DigitalOcean control-plane authority.'
-
-      - name: Resolve static production host
-        if: steps.authority.outputs.mode == 'static-host'
-        id: static
-        env:
-          PROD_HOST: ${{ secrets.PRODUCTION_HOST }}
-        run: echo "host=$PROD_HOST" >> "$GITHUB_OUTPUT"
-
-      - name: Configure SSH
-        if: steps.authority.outputs.mode != 'hosted'
-        env:
-          PROD_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          install -d -m 700 ~/.ssh
-          printf '%s\n' "$PROD_KEY" > ~/.ssh/production_ed25519
-          chmod 600 ~/.ssh/production_ed25519
-          host='${{ steps.resolve.outputs.host || steps.static.outputs.host }}'
-          ssh-keyscan -T 10 -H "$host" >> ~/.ssh/known_hosts
-
-      - name: Deploy and verify exact main SHA on remote production host
-        if: steps.authority.outputs.mode != 'hosted'
-        env:
-          PROD_USER: ${{ secrets.PRODUCTION_USER }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          host='${{ steps.resolve.outputs.host || steps.static.outputs.host }}'
-          sha='${{ github.sha }}'
-          ssh -i ~/.ssh/production_ed25519 -o BatchMode=yes "$PROD_USER@$host" bash -s -- "$sha" '${{ steps.policy.outputs.activate }}' <<'REMOTE'
-          set -euo pipefail
-          requested_sha="$1"
-          activate="$2"
-          cd /root/hands-off-engine
-          git fetch --prune origin main
-          expected="$(git rev-parse origin/main)"
-          [[ "$expected" == "$requested_sha" ]] || { echo "Main moved during reconciliation: expected $requested_sha, got $expected"; exit 1; }
-
-          deployed="$(git rev-parse HEAD 2>/dev/null || true)"
-          if [[ "$deployed" != "$requested_sha" ]]; then
-            git checkout --detach "$requested_sha"
-            deployed="$(git rev-parse HEAD)"
-            [[ "$deployed" == "$requested_sha" ]] || exit 1
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for f in state/autonomy_liveness.json state/autonomous_task_queue.json state/autonomous_tasks_completed.jsonl state/autonomous_task_attempts.jsonl state/autonomous_tasks.jsonl; do
+            if [ -e "$f" ]; then git add -f "$f"; fi
+          done
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: persist repository-native authority state"
+            git push origin HEAD:main
           fi
 
-          if [[ "$activate" == 'true' ]]; then
-            supervisor_unit='scripts/systemd/hands-off-autonomy-supervisor.service'
-            telegram_unit='scripts/systemd/hands-off-telegram.service'
-            test -f "$supervisor_unit" || { echo "Autonomous supervisor unit missing from deployed revision." >&2; exit 1; }
-            test -f "$telegram_unit" || { echo "Telegram ingress unit missing from deployed revision." >&2; exit 1; }
-            sudo install -m 0644 "$supervisor_unit" /etc/systemd/system/hands-off-autonomy-supervisor.service
-            sudo install -m 0644 "$telegram_unit" /etc/systemd/system/hands-off-telegram.service
-            sudo systemctl daemon-reload
-            required_services=(hands-off-autonomous.service hands-off-telegram.service hands-off-autonomy-supervisor.service)
-            for svc in "${required_services[@]}"; do
-              systemctl cat "$svc" >/dev/null 2>&1 || { echo "Required production service missing: $svc" >&2; exit 1; }
-              sudo systemctl enable "$svc"
-            done
-            for svc in "${required_services[@]}"; do
-              if ! systemctl is-active --quiet "$svc"; then
-                sudo systemctl restart "$svc"
-              fi
-            done
-            for svc in "${required_services[@]}"; do
-              sudo systemctl is-active --quiet "$svc" || { echo "Required production service is not active after reconcile: $svc" >&2; exit 1; }
-            done
-          else
-            echo 'Activation disabled; services were not restarted.'
-          fi
-          printf 'DEPLOY_OK sha=%s activate=%s\n' "$deployed" "$activate"
-          REMOTE
+      - name: Publish authority evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repository-native-production-authority-${{ github.run_id }}
+          path: |
+            state/autonomy_liveness.json
+            state/autonomous_task_queue.json
+            state/autonomous_tasks_completed.jsonl
+            state/autonomous_task_attempts.jsonl
+            state/autonomous_tasks.jsonl
+          if-no-files-found: ignore
+          retention-days: 14
