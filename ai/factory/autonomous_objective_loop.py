@@ -97,8 +97,9 @@ class FactoryAutonomousObjectiveLoop:
 
         # If all discovered work is already retired, generate a bounded,
         # cycle-specific continuity objective instead of replaying the broad
-        # strategic objective. This keeps the autonomous loop advancing while
-        # preserving the existing execution authority boundary.
+        # strategic objective. Advance past any continuity checkpoint that is
+        # already retired so a restart or persisted state cannot select the
+        # same checkpoint again.
         if not normalized:
             strategic = next(
                 (
@@ -111,13 +112,17 @@ class FactoryAutonomousObjectiveLoop:
             )
             if strategic and strategic.casefold() in excluded:
                 cycle = max(1, int(cycle_count or 0))
-                continuity = (
-                    f"Perform bounded autonomous continuity checkpoint {cycle}: "
-                    "inspect the governed runtime for the highest-value actionable "
-                    "capability gap, validate the finding through existing safety "
-                    "and authority gates, and record the next bounded improvement "
-                    "without weakening any safety, audit, cost, risk, or verification boundary."
-                )
+                while True:
+                    continuity = (
+                        f"Perform bounded autonomous continuity checkpoint {cycle}: "
+                        "inspect the governed runtime for the highest-value actionable "
+                        "capability gap, validate the finding through existing safety "
+                        "and authority gates, and record the next bounded improvement "
+                        "without weakening any safety, audit, cost, risk, or verification boundary."
+                    )
+                    if continuity.casefold() not in excluded:
+                        break
+                    cycle += 1
                 normalized[continuity.casefold()] = {
                     "objective": continuity,
                     "source": "autonomous_continuity",

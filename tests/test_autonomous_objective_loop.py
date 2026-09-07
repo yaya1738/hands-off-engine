@@ -73,3 +73,27 @@ def test_continuity_checkpoint_changes_with_cycle_count():
     assert first != second
     assert "checkpoint 1" in first
     assert "checkpoint 2" in second
+
+
+def test_retired_continuity_checkpoint_advances_to_next_cycle():
+    loop = FactoryAutonomousObjectiveLoop()
+    strategic = "keep improving autonomous capability"
+    retired = (
+        "Perform bounded autonomous continuity checkpoint 1: inspect the governed runtime for the highest-value actionable "
+        "capability gap, validate the finding through existing safety and authority gates, and record the next bounded "
+        "improvement without weakening any safety, audit, cost, risk, or verification boundary."
+    )
+    result = loop.select_next(
+        {
+            "strategic_objective": strategic,
+            "excluded_objectives": [strategic, retired],
+            "cycle_count": 1,
+        }
+    )
+
+    selected = result["selected"]
+    assert result["status"] == "selected"
+    assert selected["source"] == "autonomous_continuity"
+    assert "checkpoint 2" in selected["objective"]
+    assert selected["objective"] != retired
+    assert selected["execution_permitted"] is False
