@@ -34,7 +34,12 @@ jobs:
           fetch-depth: 1
 
       - name: Install runtime dependencies
-        run: python -m pip install --disable-pip-version-check -r requirements.txt
+        run: |
+          if [ -f requirements.txt ]; then
+            python -m pip install --disable-pip-version-check -r requirements.txt
+          else
+            echo "No requirements.txt present; repository runtime uses only the standard library for this hosted cycle."
+          fi
 
       - name: Ingest authenticated autonomous GitHub requests
         env:
