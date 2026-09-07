@@ -1,3 +1,4 @@
+from ai.factory.live_order_authority import submit_legacy_order
 #!/usr/bin/env python3
 """
 ESPN Executor - Concrete Implementation of Yair's ESPN Teaching
@@ -388,7 +389,7 @@ class ESPNExecutor:
             )
 
             signed_order = client.create_order(order_args)
-            result = client.post_order(signed_order)
+            result = client.submit_legacy_order(signed_order)
 
             execution = {
                 "executed": True,

@@ -1,3 +1,4 @@
+from ai.factory.live_order_authority import submit_legacy_order
 #!/usr/bin/env python3
 """
 INTEGRAFIX: ABCFC Live Nexus
@@ -726,7 +727,7 @@ class ABCFCLiveNexus:
             )
 
             signed_order = self.client.create_order(order_args)
-            result = self.client.post_order(signed_order)
+            result = self.client.submit_legacy_order(signed_order)
 
             order_id = result.get("orderID") or result.get("id") if result else None
 

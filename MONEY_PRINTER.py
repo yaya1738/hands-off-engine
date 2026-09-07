@@ -1,3 +1,4 @@
+from ai.factory.live_order_authority import submit_legacy_order
 #!/usr/bin/env python3
 """
 MONEY PRINTER
@@ -66,7 +67,7 @@ class MoneyPrinter:
             for i, token in enumerate(opp["t"]):
                 order = OrderArgs(token_id=token, price=opp["p"][i] if i < len(opp["p"]) else opp["p"][0],
                                  size=opp["sz"], side=opp["s"][i] if i < len(opp["s"]) else opp["s"][0])
-                if client.post_order(client.create_order(order)):
+                if client.submit_legacy_order(client.create_order(order)):
                     self.orders += 1
                     self.printed += opp["pr"] * opp["sz"]
         except: pass

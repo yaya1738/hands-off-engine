@@ -1,3 +1,4 @@
+from ai.factory.live_order_authority import submit_legacy_order
 #!/usr/bin/env python3
 """
 INTEGRAFIX: Autonomous ABCFC Executor
@@ -584,7 +585,7 @@ class AutonomousABCFCExecutor:
             )
 
             signed_order = client.create_order(order_args)
-            result = client.post_order(signed_order)
+            result = client.submit_legacy_order(signed_order)
 
             if result and (result.get("orderID") or result.get("success")):
                 return "executed"

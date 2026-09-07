@@ -59,3 +59,22 @@ class LiveOrderAuthority:
         if not decision["authorized"]:
             return {"executed": False, **decision}
         raise RuntimeError("live submission backend is intentionally not enabled")
+
+
+def submit_legacy_order(order: Any, *, source: str = "legacy") -> dict[str, Any]:
+    """Route legacy signed-order objects through the same fail-closed boundary.
+
+    The migration helper intentionally does not submit, inspect credentials, or
+    create an exchange client. It accepts the legacy object only so existing
+    executor call sites can be migrated mechanically without preserving a live
+    mutation capability outside this authority module.
+    """
+    return LiveOrderAuthority().submit(
+        {
+            "token_id": "",
+            "price": 0.0,
+            "size": 0.0,
+            "side": "",
+            "source": source,
+        }
+    )
