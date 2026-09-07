@@ -1,0 +1,1 @@
+This checkpoint intentionally lives outside runtime code; see tests/test_machine_execution_claims.py for the executable contract.
