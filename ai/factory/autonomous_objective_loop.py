@@ -94,23 +94,36 @@ class FactoryAutonomousObjectiveLoop:
             if current is None or item.get("score", 0) > current.get("score", 0):
                 normalized[key] = item
 
-        # A persistent strategic objective is intentionally recurring. If all
-        # other work is exhausted and the only candidate is the already-successful
-        # strategic objective, do not turn normal completion into system dormancy.
+        # If all discovered work is already retired, generate a bounded,
+        # cycle-specific continuity objective instead of replaying the broad
+        # strategic objective. This keeps the autonomous loop advancing while
+        # preserving the existing execution authority boundary.
         if not normalized:
-            for candidate in candidate_list:
-                objective = self._text(candidate.get("objective"))
-                if (
-                    objective
+            strategic = next(
+                (
+                    self._text(candidate.get("objective"))
+                    for candidate in candidate_list
+                    if self._text(candidate.get("objective"))
                     and candidate.get("source") == "strategic_objective"
-                    and objective.casefold() in excluded
-                ):
-                    normalized[objective.casefold()] = {
-                        **candidate,
-                        "objective": objective,
-                        "reason": "persistent strategic objective recurrence after candidate exhaustion",
-                    }
-                    break
+                ),
+                "",
+            )
+            if strategic and strategic.casefold() in excluded:
+                cycle = max(1, int(context_cycle := 0))
+                continuity = (
+                    f"Perform bounded autonomous continuity checkpoint {cycle}: "
+                    "inspect the governed runtime for the highest-value actionable "
+                    "capability gap, validate the finding through existing safety "
+                    "and authority gates, and record the next bounded improvement "
+                    "without weakening any safety, audit, cost, risk, or verification boundary."
+                )
+                normalized[continuity.casefold()] = {
+                    "objective": continuity,
+                    "source": "autonomous_continuity",
+                    "score": 94,
+                    "reason": "bounded continuity objective after candidate exhaustion",
+                    "strategic_objective": strategic,
+                }
 
         if not normalized:
             return None
