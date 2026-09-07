@@ -1,23 +1,20 @@
 #!/usr/bin/env python3
-"""
-AI Nexus Runner - provider-agnostic task dispatcher.
+"""AI Nexus Runner - provider-agnostic durable task dispatcher.
 
-This runner processes durable task JSON files without requiring the regular
-ChatGPT consumer UI (or any particular provider) to be available. Providers
-are loaded lazily only when a task explicitly selects one.
-
-Usage:
-    python runner.py [--once] [--tasks-dir DIR] [--output-dir DIR]
+The runner does not require the regular ChatGPT consumer UI or any provider
+at startup. Providers are loaded lazily only when a task explicitly selects
+one, preserving backend-model optionality without making it an operational
+control-plane dependency.
 """
 
+import argparse
 import importlib
 import json
 import logging
-import argparse
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
 
 
 PROVIDER_IMPORTS = {
@@ -35,14 +32,13 @@ class AIRunner:
         self.output_dir = Path(output_dir)
         self.processed_tasks = set()
         self.providers: Dict[str, Any] = {}
-
         self.tasks_dir.mkdir(parents=True, exist_ok=True)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         logging.basicConfig(format="%(asctime)s [%(levelname)s] %(message)s", level=logging.INFO)
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def _provider(self, provider_name: str) -> Optional[Any]:
-        """Load only the provider explicitly requested by the task."""
+        """Load only the provider explicitly requested by a task."""
         if provider_name in self.providers:
             return self.providers[provider_name]
         spec = PROVIDER_IMPORTS.get(provider_name)
@@ -75,11 +71,7 @@ class AIRunner:
         provider_name = task["provider"]
         provider = self._provider(provider_name)
         if provider is None:
-            return {
-                "success": False,
-                "error": f"Provider {provider_name!r} unavailable",
-                "provider": provider_name,
-            }
+            return {"success": False, "error": f"Provider {provider_name!r} unavailable", "provider": provider_name}
         try:
             result = provider.run_task(task)
             result["task_file"] = task_file.name
@@ -87,21 +79,14 @@ class AIRunner:
             return result
         except Exception as exc:
             self.logger.error("Task execution failed: %s", exc)
-            return {
-                "success": False,
-                "error": str(exc),
-                "provider": provider_name,
-                "task_file": task_file.name,
-                "timestamp": datetime.utcnow().isoformat(),
-            }
+            return {"success": False, "error": str(exc), "provider": provider_name,
+                    "task_file": task_file.name, "timestamp": datetime.utcnow().isoformat()}
 
     def save_result(self, task_file: Path, result: Dict[str, Any]):
-        output_file = self.output_dir / f"{task_file.stem}_result.json"
-        with open(output_file, "w", encoding="utf-8") as f:
+        with open(self.output_dir / f"{task_file.stem}_result.json", "w", encoding="utf-8") as f:
             json.dump(result, f, indent=2, ensure_ascii=False)
 
     def process_tasks(self, once: bool = False):
-        self.logger.info("Monitoring tasks directory: %s", self.tasks_dir)
         while True:
             for task_file in self.tasks_dir.glob("*.json"):
                 if task_file in self.processed_tasks:
@@ -110,8 +95,7 @@ class AIRunner:
                 if task is None:
                     self.processed_tasks.add(task_file)
                     continue
-                result = self.execute_task(task_file, task)
-                self.save_result(task_file, result)
+                self.save_result(task_file, self.execute_task(task_file, task))
                 self.processed_tasks.add(task_file)
             if once:
                 return
