@@ -1,10 +1,7 @@
-"""Unified, fail-closed decision gate for any future live trading.
+"""Unified, fail-closed decision gate for consequential trading.
 
-The gate does not place orders. It composes hard limits, wallet/performance
-safeguards, explicit trading costs, and probability consensus into an auditable
-pre-trade decision. Every financially consequential decision must pass two
-independent evaluations: a primary calculation and a recomputed consistency
-check. Missing evidence is a rejection, never an approval.
+The gate never places orders. It composes hard limits, trading safeguards,
+fully loaded costs, and probability/brain evidence into an auditable decision.
 """
 from __future__ import annotations
 
@@ -18,6 +15,8 @@ from llm.consensus_engine import build_consensus
 
 ROOT = Path(__file__).resolve().parent.parent
 HARD_LIMITS = ROOT / "config" / "hard_limits.json"
+
+CONFIDENCE_SCORES = {"low": 0.40, "medium": 0.65, "high": 0.85}
 
 
 @dataclass(frozen=True)
@@ -57,14 +56,7 @@ def evaluate_trade(
     expected_payout_multiple: float = 1.0,
     safeguards: TradingSafeguards | None = None,
 ) -> TradingDecision:
-    """Evaluate a trade without executing it.
-
-    ``analyses`` must contain probability estimates. The expected value is
-    computed from the consensus probability and payout multiple, then reduced
-    by every supplied cost. A trade is rejected on any missing/invalid input,
-    disagreement, insufficient confidence, safeguard failure, or failed
-    recomputation.
-    """
+    """Evaluate a trade without execution; every missing safety input rejects."""
     checks: list[str] = []
     limits = _limits()
 
@@ -91,8 +83,12 @@ def evaluate_trade(
         return _reject("no valid probability analysis", checks, probability=probability, price=market_price)
     if first["disagreement_detected"]:
         return _reject("analysis disagreement requires deferral", checks, probability=probability, price=market_price)
-    if probability < limits["MIN_CONFIDENCE_THRESHOLD"]:
-        return _reject("probability below minimum confidence threshold", checks, probability=probability, price=market_price)
+
+    confidence = str(first.get("confidence", "low")).lower()
+    confidence_score = CONFIDENCE_SCORES.get(confidence, 0.0)
+    checks.append("brain-confidence-rule")
+    if confidence_score < limits["MIN_CONFIDENCE_THRESHOLD"]:
+        return _reject("brain confidence below minimum threshold", checks, probability=probability, price=market_price)
 
     edge = probability - market_price
     expected_gross = trade_size_usd * max(0.0, probability * expected_payout_multiple - 1.0)
@@ -111,8 +107,6 @@ def evaluate_trade(
     if not safe:
         return _reject("; ".join(messages), checks, probability=probability, price=market_price, edge=edge, ev=expected_value, cost=total_cost)
 
-    # Double-check the final economic decision independently from the first
-    # calculation. Never let a stale/partial cost calculation authorize spend.
     recomputed_gross = trade_size_usd * max(0.0, probability * expected_payout_multiple - 1.0)
     recomputed_ev = recomputed_gross - total_cost
     checks.append("economic-recomputation")
@@ -121,27 +115,8 @@ def evaluate_trade(
     if recomputed_ev <= 0:
         return _reject("non-positive net expected value after all costs", checks, probability=probability, price=market_price, edge=edge, ev=recomputed_ev, cost=total_cost)
 
-    return TradingDecision(
-        approved=True,
-        reason="all hard limits, safeguards, probability and cost checks passed",
-        probability=probability,
-        market_price=market_price,
-        edge=edge,
-        expected_value=recomputed_ev,
-        total_cost=total_cost,
-        max_position_usd=limits["MAX_ABSOLUTE_POSITION_USD"],
-        checks=tuple(checks),
-    )
+    return TradingDecision(True, "all hard limits, safeguards, brain confidence, probability and cost checks passed", probability, market_price, edge, recomputed_ev, total_cost, limits["MAX_ABSOLUTE_POSITION_USD"], tuple(checks))
 
 
-def _reject(
-    reason: str,
-    checks: list[str],
-    *,
-    probability: float = 0.0,
-    price: float = 0.0,
-    edge: float = 0.0,
-    ev: float = 0.0,
-    cost: float = 0.0,
-) -> TradingDecision:
+def _reject(reason: str, checks: list[str], *, probability: float = 0.0, price: float = 0.0, edge: float = 0.0, ev: float = 0.0, cost: float = 0.0) -> TradingDecision:
     return TradingDecision(False, reason, probability, price, edge, ev, cost, 0.0, tuple(checks))
