@@ -12,9 +12,19 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 import urllib.parse
 import urllib.request
 from pathlib import Path
+
+
+# When executed as ``python tools/github_issue_autonomous_ingress.py``, Python
+# puts ``tools/`` on sys.path rather than the repository root. Resolve the
+# root explicitly so the durable queue import works identically in Actions,
+# local execution, and module-based tests.
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.autonomous_task_queue import AutonomousTaskQueue
 
@@ -124,7 +134,7 @@ def main() -> int:
     token = os.environ.get("GITHUB_TOKEN")
     if not repo or not token:
         raise SystemExit("GITHUB_REPOSITORY and GITHUB_TOKEN are required")
-    count = ingest(repo, token, Path(__file__).resolve().parents[1])
+    count = ingest(repo, token, REPO_ROOT)
     print(json.dumps({"ingested": count}, sort_keys=True))
     return 0
 
