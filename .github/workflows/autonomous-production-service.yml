@@ -49,6 +49,20 @@ jobs:
       - name: Execute autonomous service cycle
         run: python tools/autonomy_liveness_supervisor.py --once
 
+      - name: Assert governed execution success
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          state = json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          assert state.get("execution_observed") is True, state
+          assert state.get("verification_observed") is True, state
+          assert state.get("execution_succeeded") is True, state
+          assert state.get("live_system_active") is True, state
+          print("Governed autonomous execution success verified.")
+          PY
+
       - name: Persist service evidence
         run: |
           git config user.name "github-actions[bot]"
