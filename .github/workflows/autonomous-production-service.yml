@@ -17,8 +17,10 @@ permissions:
 env:
   PYTHONUNBUFFERED: "1"
 
+# This lock is shared with Repository-Native Production Authority Reconcile.
+# Both workflows write durable state to main, so they must never race.
 concurrency:
-  group: autonomous-hosted-production-service
+  group: autonomous-production-authority
   cancel-in-progress: false
 
 jobs:
@@ -27,11 +29,22 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - name: Checkout exact main revision
+      - name: Checkout current main revision
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 1
+
+      - name: Resolve current main under authority lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --prune origin main
+          current_sha="$(git rev-parse origin/main)"
+          git checkout --detach "$current_sha"
+          test "$(git rev-parse HEAD)" = "$current_sha"
+          test "$(git status --porcelain)" = ""
+          echo "authority_revision=$current_sha"
 
       - name: Install runtime dependencies
         run: |
@@ -69,6 +82,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for f in \
             state/autonomy_liveness.json \
+            state/autonomy_mission.json \
             state/autonomous_task_queue.json \
             state/autonomous_tasks_completed.jsonl \
             state/autonomous_task_attempts.jsonl \
@@ -87,6 +101,7 @@ jobs:
           name: autonomous-production-evidence-${{ github.run_id }}
           path: |
             state/autonomy_liveness.json
+            state/autonomy_mission.json
             state/autonomous_task_queue.json
             state/autonomous_tasks_completed.jsonl
             state/autonomous_task_attempts.jsonl
