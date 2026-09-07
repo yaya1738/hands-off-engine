@@ -20,6 +20,14 @@ from scripts.autonomous_task_queue import AutonomousTaskQueue
 INTERVAL_SECONDS = 10 * 60
 CYCLE_TIMEOUT_SECONDS = 5 * 60
 STATE_PATH = Path("state/autonomy_liveness.json")
+MISSION_PATH = Path("state/autonomy_mission.json")
+MISSION_OBJECTIVE = (
+    "Continuously improve this autonomous system itself: discover its highest-value "
+    "capability gaps, repair or construct the missing capabilities, validate the "
+    "result, integrate successful improvements into the governed runtime, and then "
+    "repeat indefinitely with progressively less human intervention. Preserve all "
+    "existing safety, authority, audit, cost, risk, and verification boundaries."
+)
 
 
 class CycleTimeout(Exception):
@@ -32,6 +40,40 @@ def _timeout_handler(signum, frame):
 
 def utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
+
+
+def _load_mission(repo_root: Path) -> dict:
+    """Load durable mission state so the improvement loop survives restarts."""
+    path = repo_root / MISSION_PATH
+    if not path.exists():
+        return {
+            "mission": MISSION_OBJECTIVE,
+            "cycle_count": 0,
+            "last_status": "never_run",
+            "last_error": None,
+            "updated_at": utc_now(),
+        }
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(data, dict):
+            raise ValueError("mission state must be an object")
+        data["mission"] = MISSION_OBJECTIVE
+        data.setdefault("cycle_count", 0)
+        return data
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        return {
+            "mission": MISSION_OBJECTIVE,
+            "cycle_count": 0,
+            "last_status": "mission_state_recovered",
+            "last_error": None,
+            "updated_at": utc_now(),
+        }
+
+
+def _persist_mission(repo_root: Path, mission: dict) -> None:
+    path = repo_root / MISSION_PATH
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(mission, indent=2, sort_keys=True), encoding="utf-8")
 
 
 def _successful_objectives(repo_root: Path) -> set[str]:
@@ -61,10 +103,14 @@ def _successful_objectives(repo_root: Path) -> set[str]:
 
 
 def run_cycle(repo_root: Path) -> dict:
+    mission = _load_mission(repo_root)
+    mission["cycle_count"] = int(mission.get("cycle_count", 0)) + 1
+    mission["updated_at"] = utc_now()
+
     runtime = FactoryRuntime()
     discovery = runtime.autonomy.discovery_gate(
-        "discover the highest-value next autonomous objective",
-        "anti-dormancy liveness supervisor",
+        mission["mission"],
+        "persistent autonomous self-improvement supervisor",
     )
 
     gaps = []
@@ -72,17 +118,18 @@ def run_cycle(repo_root: Path) -> dict:
     if isinstance(graph, dict):
         gaps.extend(graph.get("gaps", []))
 
+    # A prior failed cycle becomes actionable input to the next cycle. The system
+    # therefore does not merely retry blindly; it feeds failure back into planning.
+    previous_error = mission.get("last_error")
+    if previous_error:
+        gaps.insert(0, {"capability": "previous_cycle_repair", "component": previous_error})
+
     queue = AutonomousTaskQueue(repo_root)
     pending_task = queue.get_next_task()
     retired = _successful_objectives(repo_root)
     selection = FactoryAutonomousObjectiveLoop(runtime).select_next(
         {
-            "strategic_objective": (
-                "Continuously increase autonomous capability so routine operation "
-                "requires progressively less human intervention, while continuously "
-                "improve the system's ability to communicate dynamically, selectively, "
-                "clearly, and powerfully with Yair when human input has genuine value."
-            ),
+            "strategic_objective": mission["mission"],
             "gaps": gaps,
             "discovery": discovery,
             "excluded_objectives": retired,
@@ -129,6 +176,7 @@ def run_cycle(repo_root: Path) -> dict:
                     "objective_id": objective_id,
                     "score": selected.get("score"),
                     "authority": "FactoryAuthorityGateway",
+                    "persistent_mission": True,
                 },
             )
             queued = True
@@ -161,9 +209,17 @@ def run_cycle(repo_root: Path) -> dict:
                 except Exception:
                     pass
 
+    mission["last_status"] = "succeeded" if execution_succeeded else "blocked_or_failed"
+    mission["last_error"] = None if execution_succeeded else (
+        execution.get("reason") if isinstance(execution, dict) else "no executable objective"
+    )
+    mission["last_objective"] = selected.get("objective") if isinstance(selected, dict) else None
+    _persist_mission(repo_root, mission)
+
     return {
         "timestamp": utc_now(),
         "status": "observed" if execution_observed else "degraded" if selected else "idle",
+        "mission": mission,
         "selection": selection,
         "retired_successful_objective_count": len(retired),
         "task_queued": queued,
