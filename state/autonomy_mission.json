@@ -1,0 +1,7 @@
+{
+  "cycle_count": 0,
+  "last_error": null,
+  "last_status": "initialized",
+  "mission": "Continuously improve this autonomous system itself: discover its highest-value capability gaps, repair or construct the missing capabilities, validate the result, integrate successful improvements into the governed runtime, and then repeat indefinitely with progressively less human intervention. Preserve all existing safety, authority, audit, cost, risk, and verification boundaries.",
+  "updated_at": null
+}
