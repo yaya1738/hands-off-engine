@@ -49,10 +49,32 @@ jobs:
           print("\n".join(changed))
 
       - name: Verify no direct live-order mutation remains
+        shell: bash
         run: |
+          set -euo pipefail
           python tools/factory_forensics/live_mutation_guard.py .
           python -m compileall -q ai autonomous executor integrafix MONEY_PRINTER.py
-          python -m pytest -q tests/test_live_order_authority.py
+          python - <<'PY'
+          from ai.factory.live_order_authority import LiveOrderAuthority, OrderIntent
+
+          denied = LiveOrderAuthority().submit(
+              OrderIntent(token_id="token", price=0.5, size=1, side="BUY", source="smoke")
+          )
+          assert denied["executed"] is False
+          assert denied["reason"] == "live_order_authority_disabled"
+
+          invalid = LiveOrderAuthority().authorize(
+              OrderIntent(token_id="", price=0.5, size=1, side="BUY")
+          )
+          assert invalid["reason"] == "missing_token_id"
+
+          still_closed = LiveOrderAuthority(enabled=True).submit(
+              OrderIntent(token_id="token", price=0.5, size=1, side="BUY")
+          )
+          assert still_closed["executed"] is False
+          assert still_closed["reason"] == "activation_contract_not_implemented"
+          print("LIVE_ORDER_AUTHORITY_SMOKE_OK")
+          PY
 
       - name: Commit migration and remove one-shot workflow
         run: |
