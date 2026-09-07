@@ -33,9 +33,8 @@ def test_empty_discovery_is_non_executing_no_candidate():
     loop = FactoryAutonomousObjectiveLoop()
     result = loop.select_next({})
 
-    assert result == {
-        "status": "no_candidate",
-        "candidate_count": 0,
-        "candidates": [],
-        "selected": None,
-    }
+    assert result["status"] == "no_candidate"
+    assert result["candidate_count"] == 0
+    assert result["candidates"] == []
+    assert result["excluded_objectives"] == []
+    assert result["selected"] is None
