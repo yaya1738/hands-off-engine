@@ -14,7 +14,10 @@ def test_legacy_claude_processor_is_not_a_model_consumer():
     source = (REPO_ROOT / "scripts" / "claude_task_processor.sh").read_text(encoding="utf-8").casefold()
     assert "exec /usr/bin/python3" in source
     assert "autonomy_liveness_supervisor.py" in source
-    assert "claude" not in source.split("#", 1)[-1]
+    assert "claude" in source  # filename/compatibility documentation is allowed
+    assert "claude --" not in source
+    assert "chatgpt" in source
+    assert "consumer session" in source
 
 
 def test_external_control_surface_exists():
