@@ -13,6 +13,7 @@ from pathlib import Path
 
 SKIP_DIRS = {".git", ".venv", "venv", "node_modules", "__pycache__", ".pytest_cache"}
 TEXT_SUFFIXES = {".py", ".yml", ".yaml", ".sh", ".service", ".toml"}
+GUARD_PATH = Path("tools/factory_forensics/live_mutation_guard.py")
 
 
 def files(root: Path):
@@ -20,6 +21,8 @@ def files(root: Path):
         if not path.is_file() or path.suffix.lower() not in TEXT_SUFFIXES:
             continue
         if any(part in SKIP_DIRS for part in path.parts):
+            continue
+        if path.relative_to(root) == GUARD_PATH:
             continue
         yield path
 
@@ -44,7 +47,8 @@ def main() -> int:
 
     # Repository-side direct mutation must remain absent. The approved authority
     # currently contains no exchange mutation implementation, so every match is
-    # a blocker rather than something to whitelist.
+    # a blocker rather than something to whitelist. The guard implementation is
+    # itself scanner code and must not be reported as a production mutation path.
     pattern = re.compile(r"\bpost_order\s*\(")
     for path in files(root):
         if path == authority:
