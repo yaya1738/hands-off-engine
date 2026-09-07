@@ -99,27 +99,16 @@ echo "Step 5: Setting up Telegram bot service..."
 
 SYSTEMD_SERVICE="/etc/systemd/system/hands-off-telegram.service"
 
-sudo tee "$SYSTEMD_SERVICE" > /dev/null << EOF
-[Unit]
-Description=Hands-Off Engine Telegram Bot
-After=network.target
-
-[Service]
-Type=simple
-User=root
-WorkingDirectory=$REPO_ROOT
-ExecStart=/usr/bin/python3 $REPO_ROOT/scripts/telegram_command_bot.py
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
+if [ -f "$REPO_ROOT/scripts/systemd/hands-off-telegram.service" ]; then
+    sudo install -m 0644 "$REPO_ROOT/scripts/systemd/hands-off-telegram.service" "$SYSTEMD_SERVICE"
+else
+    error "Canonical Telegram ingress service unit missing"
+    exit 1
+fi
 
 sudo systemctl daemon-reload
-sudo systemctl enable hands-off-telegram
-sudo systemctl start hands-off-telegram || warning "Telegram bot service failed to start"
-success "Telegram bot service configured"
+sudo systemctl enable --now hands-off-telegram.service
+success "Authenticated Telegram autonomy ingress configured"
 
 # Step 6: Run initial health check
 echo ""
@@ -202,7 +191,7 @@ import requests
 import os
 
 token = os.getenv('TELEGRAM_BOT_TOKEN', '')
-chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+chat_id = os.getenv('TELEGRAM_CHAT_ID', '')
 
 message = '''🚀 <b>AUTONOMOUS MODE ACTIVATED</b>
 
@@ -220,8 +209,9 @@ All systems configured and running:
 System is now fully autonomous.
 '''
 
-url = f'https://api.telegram.org/bot{token}/sendMessage'
-requests.post(url, json={'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}, timeout=10)
+if token and chat_id:
+    url = f'https://api.telegram.org/bot{token}/sendMessage'
+    requests.post(url, json={'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}, timeout=10)
 " 2>/dev/null || warning "Failed to send Telegram notification"
 
 exit 0
