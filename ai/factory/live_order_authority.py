@@ -21,7 +21,7 @@ class OrderIntent:
 
 
 class LiveOrderAuthority:
-    """Fail-closed order authority; no exchange client is created here yet."""
+    """Fail-closed order authority; no exchange client is created here."""
 
     def __init__(self, *, enabled: bool = False):
         self.enabled = bool(enabled)
@@ -62,12 +62,12 @@ class LiveOrderAuthority:
 
 
 def submit_legacy_order(order: Any, *, source: str = "legacy") -> dict[str, Any]:
-    """Route legacy signed-order objects through the same fail-closed boundary.
+    """Route a legacy signed-order object through the same fail-closed boundary.
 
-    The migration helper intentionally does not submit, inspect credentials, or
-    create an exchange client. It accepts the legacy object only so existing
-    executor call sites can be migrated mechanically without preserving a live
-    mutation capability outside this authority module.
+    The legacy object is intentionally not trusted or forwarded to an exchange.
+    The compatibility path supplies an invalid normalized intent so the authority
+    deterministically returns a blocked result without inspecting credentials,
+    creating an exchange client, or mutating an exchange.
     """
     return LiveOrderAuthority().submit(
         {
@@ -78,3 +78,28 @@ def submit_legacy_order(order: Any, *, source: str = "legacy") -> dict[str, Any]
             "source": source,
         }
     )
+
+
+def install_legacy_client_adapter() -> None:
+    """Install the legacy method name as a fail-closed compatibility shim.
+
+    Some already-migrated legacy modules call ``client.submit_legacy_order``.
+    Until those call sites can be mechanically changed to the function ingress,
+    this shim prevents an AttributeError from becoming a hidden execution path.
+    It never submits an order and never grants live authority.
+    """
+    try:
+        from py_clob_client.client import ClobClient
+    except ImportError:
+        return
+
+    if hasattr(ClobClient, "submit_legacy_order"):
+        return
+
+    def _submit_legacy_order(self: Any, order: Any) -> dict[str, Any]:
+        return submit_legacy_order(order, source="legacy-client-adapter")
+
+    setattr(ClobClient, "submit_legacy_order", _submit_legacy_order)
+
+
+install_legacy_client_adapter()
