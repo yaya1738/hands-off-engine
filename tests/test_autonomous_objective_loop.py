@@ -38,3 +38,19 @@ def test_empty_discovery_is_non_executing_no_candidate():
     assert result["candidates"] == []
     assert result["excluded_objectives"] == []
     assert result["selected"] is None
+
+
+def test_persistent_strategic_objective_recurs_after_exhaustion():
+    loop = FactoryAutonomousObjectiveLoop()
+    objective = "keep improving autonomous capability"
+    result = loop.select_next(
+        {
+            "strategic_objective": objective,
+            "excluded_objectives": [objective],
+        }
+    )
+
+    assert result["status"] == "selected"
+    assert result["selected"]["objective"] == objective
+    assert result["selected"]["source"] == "strategic_objective"
+    assert "recurrence" in result["selected"]["reason"]
