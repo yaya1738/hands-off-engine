@@ -1,4 +1,4 @@
-from ai.factory.live_order_authority import LiveOrderAuthority, OrderIntent
+from ai.factory.live_order_authority import LiveOrderAuthority, OrderIntent, submit_legacy_order
 
 
 def test_authority_denies_by_default():
@@ -31,3 +31,10 @@ def test_enabled_still_fails_closed_without_activation_contract():
     )
     assert decision["executed"] is False
     assert decision["reason"] == "activation_contract_not_implemented"
+
+
+def test_legacy_denial_is_falsey_and_never_looks_executed():
+    result = submit_legacy_order(object(), source="regression-test")
+    assert not result
+    assert result["executed"] is False
+    assert result["reason"] == "missing_token_id"
