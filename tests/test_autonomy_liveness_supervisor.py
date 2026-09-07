@@ -64,7 +64,7 @@ def test_run_cycle_executes_selected_objective_without_consumer(monkeypatch, tmp
     assert len((tmp_path / "state" / "autonomous_tasks_completed.jsonl").read_text()) > 0
 
 
-def test_failed_runtime_execution_is_not_reported_as_live_activity(monkeypatch, tmp_path: Path):
+def test_failed_runtime_execution_is_not_reported_as_live_activity_and_is_retryable(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
     monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", FakeLoop)
     monkeypatch.setattr(supervisor, "FactoryAuthorityGateway", lambda runtime=None: FailedGateway())
@@ -75,6 +75,11 @@ def test_failed_runtime_execution_is_not_reported_as_live_activity(monkeypatch, 
     assert result["verification_observed"] is True
     assert result["execution_succeeded"] is False
     assert result["live_system_active"] is False
+    assert result["task_id"]
+    queue = supervisor.AutonomousTaskQueue(tmp_path)
+    assert queue.get_next_task()["id"] == result["task_id"]
+    assert (tmp_path / "state" / "autonomous_task_attempts.jsonl").exists()
+    assert not (tmp_path / "state" / "autonomous_tasks_completed.jsonl").exists()
 
 
 def test_successful_objective_is_retired_from_future_selection(tmp_path: Path):
