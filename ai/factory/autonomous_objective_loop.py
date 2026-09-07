@@ -82,8 +82,9 @@ class FactoryAutonomousObjectiveLoop:
             for objective in (excluded_objectives or [])
             if self._text(objective)
         }
+        candidate_list = list(candidates)
         normalized: Dict[str, Dict[str, Any]] = {}
-        for candidate in candidates:
+        for candidate in candidate_list:
             objective = self._text(candidate.get("objective"))
             if not objective or objective.casefold() in excluded:
                 continue
@@ -92,6 +93,24 @@ class FactoryAutonomousObjectiveLoop:
             item = {**candidate, "objective": objective}
             if current is None or item.get("score", 0) > current.get("score", 0):
                 normalized[key] = item
+
+        # A persistent strategic objective is intentionally recurring. If all
+        # other work is exhausted and the only candidate is the already-successful
+        # strategic objective, do not turn normal completion into system dormancy.
+        if not normalized:
+            for candidate in candidate_list:
+                objective = self._text(candidate.get("objective"))
+                if (
+                    objective
+                    and candidate.get("source") == "strategic_objective"
+                    and objective.casefold() in excluded
+                ):
+                    normalized[objective.casefold()] = {
+                        **candidate,
+                        "objective": objective,
+                        "reason": "persistent strategic objective recurrence after candidate exhaustion",
+                    }
+                    break
 
         if not normalized:
             return None
