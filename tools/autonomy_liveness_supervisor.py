@@ -231,12 +231,14 @@ def run_cycle(repo_root: Path) -> dict:
                 except Exception:
                     pass
 
+    was_converged = bool(mission.get("converged"))
     mission["last_status"] = "converged" if converged else "succeeded" if execution_succeeded else "blocked_or_failed"
     mission["last_error"] = None if (execution_succeeded or converged) else (
         execution.get("reason") if isinstance(execution, dict) else "no executable objective"
     )
     mission["last_objective"] = selected.get("objective") if isinstance(selected, dict) else None
     mission["converged"] = converged
+    mission["convergence_transition"] = converged and not was_converged
     _persist_mission(repo_root, mission)
 
     return {
