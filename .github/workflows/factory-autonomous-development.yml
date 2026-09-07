@@ -84,7 +84,9 @@ jobs:
           if state.get('converged') is True:
               print('AUTONOMOUS_FACTORY_CONVERGED')
               print('No autonomous coding objective remains; preserving the verified steady state.')
+              print('converged=true')
               raise SystemExit(0)
+          print('converged=false')
           if state.get('execution_succeeded') is not True or state.get('live_system_active') is not True:
               raise SystemExit('AUTONOMOUS_SYSTEM_NOT_VERIFIED')
           selected = state.get('selection', {}).get('selected', {})
@@ -96,7 +98,7 @@ jobs:
           PY
 
       - name: Run bounded autonomous coding agent
-        if: steps.existing.outputs.skip != 'true' && steps.objective.outcome == 'success'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -115,7 +117,7 @@ jobs:
             make no change.
 
       - name: Enforce bounded change surface
-        if: steps.existing.outputs.skip != 'true' && steps.objective.outcome == 'success'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -138,7 +140,7 @@ jobs:
           printf '%s\n' "${changed[@]}" | tee /tmp/factory_changed_files.txt
 
       - name: Validate autonomous change
-        if: steps.existing.outputs.skip != 'true' && steps.objective.outcome == 'success'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -147,7 +149,7 @@ jobs:
           python -m pytest -q
 
       - name: Revalidate base and objective before PR
-        if: steps.existing.outputs.skip != 'true' && steps.objective.outcome == 'success'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -165,7 +167,7 @@ jobs:
           PY
 
       - name: Create autonomous development PR and enable auto-merge
-        if: steps.existing.outputs.skip != 'true' && steps.objective.outcome == 'success'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
