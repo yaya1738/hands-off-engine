@@ -162,27 +162,29 @@ def run_cycle(repo_root: Path) -> dict:
         # Successful objectives are retired across cycles: continuity must advance.
         if selected.get("objective", "").strip().casefold() in retired:
             selected = None
-        pending = queue.get_all_tasks()
-        duplicate = any(
-            isinstance(task, dict)
-            and task.get("metadata", {}).get("objective") == selected.get("objective")
-            for task in pending
-        )
-        if selected is not None and not duplicate:
-            task_id = queue.add_task(
-                title=f"Autonomous objective: {selected['objective']}",
-                description=selected["objective"],
-                priority="high" if selected.get("score", 0) >= 95 else "normal",
-                source="autonomous_objective_liveness",
-                metadata={
-                    "objective": selected.get("objective"),
-                    "objective_id": objective_id,
-                    "score": selected.get("score"),
-                    "authority": "FactoryAuthorityGateway",
-                    "persistent_mission": True,
-                },
+
+        if selected is not None:
+            pending = queue.get_all_tasks()
+            duplicate = any(
+                isinstance(task, dict)
+                and task.get("metadata", {}).get("objective") == selected.get("objective")
+                for task in pending
             )
-            queued = True
+            if not duplicate:
+                task_id = queue.add_task(
+                    title=f"Autonomous objective: {selected['objective']}",
+                    description=selected["objective"],
+                    priority="high" if selected.get("score", 0) >= 95 else "normal",
+                    source="autonomous_objective_liveness",
+                    metadata={
+                        "objective": selected.get("objective"),
+                        "objective_id": objective_id,
+                        "score": selected.get("score"),
+                        "authority": "FactoryAuthorityGateway",
+                        "persistent_mission": True,
+                    },
+                )
+                queued = True
 
     if isinstance(selected, dict) and selected.get("objective"):
         gateway = FactoryAuthorityGateway(runtime=runtime)
