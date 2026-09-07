@@ -103,3 +103,21 @@ def test_failed_objective_is_not_retired(tmp_path: Path):
 def test_persist_writes_liveness_state(tmp_path: Path):
     supervisor.persist(tmp_path, {"status": "observed", "timestamp": "now"})
     assert (tmp_path / "state" / "autonomy_liveness.json").exists()
+
+
+def test_run_once_executes_and_persists_single_cycle(monkeypatch, tmp_path: Path):
+    observed = {}
+
+    def fake_cycle(repo_root):
+        observed["repo_root"] = repo_root
+        return {"timestamp": "now", "status": "observed", "execution_succeeded": True}
+
+    monkeypatch.setattr(supervisor, "run_cycle", fake_cycle)
+    monkeypatch.setattr(supervisor.signal, "alarm", lambda *_: None)
+
+    result = supervisor.run_once(tmp_path)
+
+    assert observed["repo_root"] == tmp_path
+    assert result["execution_succeeded"] is True
+    persisted = (tmp_path / "state" / "autonomy_liveness.json").read_text(encoding="utf-8")
+    assert '"execution_succeeded": true' in persisted

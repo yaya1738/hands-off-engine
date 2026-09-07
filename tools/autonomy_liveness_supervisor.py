@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import json
 import signal
 import sys
@@ -186,27 +187,47 @@ def persist(repo_root: Path, state: dict) -> None:
     path.write_text(json.dumps(state, indent=2, sort_keys=True), encoding="utf-8")
 
 
-def main() -> int:
+def run_once(repo_root: Path) -> dict:
+    """Execute exactly one autonomous cycle and persist its evidence."""
+    started = time.monotonic()
+    try:
+        signal.alarm(CYCLE_TIMEOUT_SECONDS)
+        state = run_cycle(repo_root)
+        signal.alarm(0)
+    except CycleTimeout as exc:
+        signal.alarm(0)
+        state = {"timestamp": utc_now(), "status": "degraded", "error": str(exc)}
+    except Exception as exc:
+        signal.alarm(0)
+        state = {"timestamp": utc_now(), "status": "degraded", "error": str(exc)}
+
+    state["cycle_duration_seconds"] = round(time.monotonic() - started, 3)
+    persist(repo_root, state)
+    print(json.dumps(state, sort_keys=True), flush=True)
+    return state
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run the autonomous liveness supervisor continuously or once."
+    )
+    parser.add_argument(
+        "--once",
+        action="store_true",
+        help="execute one governed autonomous cycle and exit",
+    )
+    args = parser.parse_args(argv)
+
     repo_root = REPO_ROOT
     signal.signal(signal.SIGALRM, _timeout_handler)
 
-    while True:
-        started = time.monotonic()
-        try:
-            signal.alarm(CYCLE_TIMEOUT_SECONDS)
-            state = run_cycle(repo_root)
-            signal.alarm(0)
-        except CycleTimeout as exc:
-            signal.alarm(0)
-            state = {"timestamp": utc_now(), "status": "degraded", "error": str(exc)}
-        except Exception as exc:
-            signal.alarm(0)
-            state = {"timestamp": utc_now(), "status": "degraded", "error": str(exc)}
+    if args.once:
+        run_once(repo_root)
+        return 0
 
-        state["cycle_duration_seconds"] = round(time.monotonic() - started, 3)
-        persist(repo_root, state)
-        print(json.dumps(state, sort_keys=True), flush=True)
-        time.sleep(max(1, INTERVAL_SECONDS - int(state["cycle_duration_seconds"])))
+    while True:
+        run_once(repo_root)
+        time.sleep(INTERVAL_SECONDS)
 
 
 if __name__ == "__main__":
