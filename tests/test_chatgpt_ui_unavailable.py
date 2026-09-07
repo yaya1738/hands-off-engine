@@ -1,8 +1,6 @@
 from pathlib import Path
 
-
 def test_autonomous_control_plane_has_no_regular_chatgpt_ui_dependency(monkeypatch):
-    """The autonomous supervisor remains importable if ChatGPT is unavailable."""
     import sys
     repo = Path(__file__).resolve().parents[1]
     sys.path.insert(0, str(repo))
