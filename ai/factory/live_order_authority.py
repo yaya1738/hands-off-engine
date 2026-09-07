@@ -20,6 +20,13 @@ class OrderIntent:
     source: str = "unknown"
 
 
+class _DeniedOrderResult(dict):
+    """Mapping-compatible denial result that cannot be mistaken for success."""
+
+    def __bool__(self) -> bool:
+        return False
+
+
 class LiveOrderAuthority:
     """Fail-closed order authority; no exchange client is created here."""
 
@@ -45,8 +52,6 @@ class LiveOrderAuthority:
                 "intent": asdict(intent),
             }
 
-        # Deliberately fail closed until the full activation/risk/capital/
-        # provenance contract is wired into this single authority boundary.
         return {
             "authorized": False,
             "reason": "activation_contract_not_implemented",
@@ -62,14 +67,8 @@ class LiveOrderAuthority:
 
 
 def submit_legacy_order(order: Any, *, source: str = "legacy") -> dict[str, Any]:
-    """Route a legacy signed-order object through the same fail-closed boundary.
-
-    The legacy object is intentionally not trusted or forwarded to an exchange.
-    The compatibility path supplies an invalid normalized intent so the authority
-    deterministically returns a blocked result without inspecting credentials,
-    creating an exchange client, or mutating an exchange.
-    """
-    return LiveOrderAuthority().submit(
+    """Route a legacy signed-order object through the same fail-closed boundary."""
+    decision = LiveOrderAuthority().submit(
         {
             "token_id": "",
             "price": 0.0,
@@ -78,6 +77,7 @@ def submit_legacy_order(order: Any, *, source: str = "legacy") -> dict[str, Any]
             "source": source,
         }
     )
+    return _DeniedOrderResult(decision)
 
 
 def install_legacy_client_adapter() -> None:
