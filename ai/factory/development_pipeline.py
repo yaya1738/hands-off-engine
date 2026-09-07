@@ -37,13 +37,23 @@ class FactoryDevelopmentPipeline:
             artifact["artifact_id"],
             {"execution": execution, "change": change, "validation": validation},
         )
+
+        execution_status = execution.get("status") if isinstance(execution, dict) else None
+        if execution_status in {"AGENT_UNAVAILABLE", "HANDOFF_REQUIRED"}:
+            status = "agent_unavailable"
+        elif execution_status in {"agent_completed", "completed", "success", "verified"}:
+            status = "ready_for_review"
+        else:
+            status = "execution_failed"
+
         result = {
             "task": development_task,
             "artifact": artifact,
             "execution": execution,
             "change": change,
             "validation": validation,
-            "status": "ready_for_review",
+            "status": status,
+            "execution_succeeded": status == "ready_for_review",
         }
         self._history.append(result)
         return result
