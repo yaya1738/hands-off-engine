@@ -41,8 +41,25 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      # Acquire the shared concurrency lock before resolving the revision.
+      # A queued run must operate on the newest main, not its stale trigger SHA,
+      # because this job persists durable state back to main.
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Resolve current main revision under the write lock
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --prune origin main
+          current_sha="$(git rev-parse origin/main)"
+          git checkout --detach "$current_sha"
+          test "$(git rev-parse HEAD)" = "$current_sha"
+          test "$(git status --porcelain)" = ''
+          echo "Operating on current main SHA: $current_sha"
 
       - name: Set up Python
         uses: actions/setup-python@v5
