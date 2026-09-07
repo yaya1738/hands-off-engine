@@ -7,6 +7,8 @@ on:
       - main
       - 'hardening/**'
       - 'fix/**'
+    paths-ignore:
+      - 'state/**'
   pull_request:
     paths:
       - 'tools/factory_forensics/**'
