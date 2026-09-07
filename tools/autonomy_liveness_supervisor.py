@@ -247,7 +247,12 @@ def persist(repo_root: Path, state: dict) -> None:
 
 
 def run_once(repo_root: Path) -> dict:
-    """Execute exactly one autonomous cycle and persist its evidence."""
+    """Execute exactly one autonomous cycle and persist its evidence.
+
+    The process result is part of the verification contract: a degraded cycle
+    must produce a non-zero exit status so callers cannot accidentally treat a
+    failed autonomous cycle as a successful production heartbeat.
+    """
     started = time.monotonic()
     try:
         signal.alarm(CYCLE_TIMEOUT_SECONDS)
@@ -281,11 +286,16 @@ def main(argv: list[str] | None = None) -> int:
     signal.signal(signal.SIGALRM, _timeout_handler)
 
     if args.once:
-        run_once(repo_root)
-        return 0
+        state = run_once(repo_root)
+        return 0 if state.get("execution_succeeded") is True else 1
 
     while True:
-        run_once(repo_root)
+        state = run_once(repo_root)
+        if state.get("execution_succeeded") is not True:
+            # Continuous service remains alive for recovery, but each failed
+            # cycle is explicitly persisted and observable to the caller.
+            time.sleep(INTERVAL_SECONDS)
+            continue
         time.sleep(INTERVAL_SECONDS)
 
 

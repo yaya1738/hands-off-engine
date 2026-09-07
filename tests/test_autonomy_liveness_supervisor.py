@@ -180,6 +180,36 @@ def test_run_once_executes_and_persists_single_cycle(monkeypatch, tmp_path: Path
     assert '"execution_succeeded": true' in persisted
 
 
+def test_run_once_persists_failed_cycle_before_returning(monkeypatch, tmp_path: Path):
+    def fake_cycle(repo_root):
+        return {"timestamp": "now", "status": "observed", "execution_succeeded": False}
+
+    monkeypatch.setattr(supervisor, "run_cycle", fake_cycle)
+    monkeypatch.setattr(supervisor.signal, "alarm", lambda *_: None)
+
+    result = supervisor.run_once(tmp_path)
+
+    assert result["execution_succeeded"] is False
+    persisted = json.loads(
+        (tmp_path / "state" / "autonomy_liveness.json").read_text(encoding="utf-8")
+    )
+    assert persisted["execution_succeeded"] is False
+
+
+def test_main_once_fails_closed_when_cycle_does_not_succeed(monkeypatch):
+    monkeypatch.setattr(supervisor, "run_once", lambda repo_root: {"execution_succeeded": False})
+    monkeypatch.setattr(supervisor.signal, "signal", lambda *args: None)
+
+    assert supervisor.main(["--once"]) == 1
+
+
+def test_main_once_returns_success_for_verified_cycle(monkeypatch):
+    monkeypatch.setattr(supervisor, "run_once", lambda repo_root: {"execution_succeeded": True})
+    monkeypatch.setattr(supervisor.signal, "signal", lambda *args: None)
+
+    assert supervisor.main(["--once"]) == 0
+
+
 def test_pending_external_task_preempts_generated_objective(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
     monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", FakeLoop)
