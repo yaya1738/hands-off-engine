@@ -62,22 +62,48 @@ jobs:
       - name: Execute autonomous service cycle
         run: python tools/autonomy_liveness_supervisor.py --once
 
-      - name: Assert governed execution success
+      - name: Assert governed execution or verified convergence
         run: |
           python - <<'PY'
           import json
           from pathlib import Path
 
           state = json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
-          assert state.get("execution_observed") is True, state
-          assert state.get("verification_observed") is True, state
-          assert state.get("execution_succeeded") is True, state
-          assert state.get("live_system_active") is True, state
-          print("Governed autonomous execution success verified.")
+          converged = state.get("converged") is True
+          if converged:
+              assert state.get("live_system_active") is True, state
+              assert state.get("execution_succeeded") is False, state
+              print("Governed autonomous convergence verified; heartbeat remains active.")
+          else:
+              assert state.get("execution_observed") is True, state
+              assert state.get("verification_observed") is True, state
+              assert state.get("execution_succeeded") is True, state
+              assert state.get("live_system_active") is True, state
+              print("Governed autonomous execution success verified.")
           PY
 
       - name: Persist service evidence
         run: |
+          set -euo pipefail
+          converged=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          print("true" if state.get("converged") is True else "false")
+          PY
+          )
+          transition=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          mission=state.get("mission", {})
+          print("true" if mission.get("convergence_transition") is True else "false")
+          PY
+          )
+          if [ "$converged" = "true" ] && [ "$transition" != "true" ]; then
+            echo "Verified converged steady state; no durable heartbeat commit required."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           for f in \

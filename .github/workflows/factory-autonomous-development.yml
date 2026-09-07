@@ -69,17 +69,31 @@ jobs:
         run: python tools/factory_forensics/deployment_preflight.py .
 
       - name: Read autonomous objective
+        id: objective
         if: steps.existing.outputs.skip != 'true'
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
+          converged=$(python - <<'PY'
           import json
           from pathlib import Path
           p = Path('state/autonomy_liveness.json')
           if not p.exists():
               raise SystemExit('AUTONOMOUS_OBJECTIVE_UNAVAILABLE')
           state = json.loads(p.read_text(encoding='utf-8'))
+          print('true' if state.get('converged') is True else 'false')
+          PY
+          )
+          echo "converged=$converged" >> "$GITHUB_OUTPUT"
+          if [ "$converged" = "true" ]; then
+            echo 'AUTONOMOUS_FACTORY_CONVERGED'
+            echo 'No autonomous coding objective remains; preserving the verified steady state.'
+            exit 0
+          fi
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state = json.loads(Path('state/autonomy_liveness.json').read_text(encoding='utf-8'))
           if state.get('execution_succeeded') is not True or state.get('live_system_active') is not True:
               raise SystemExit('AUTONOMOUS_SYSTEM_NOT_VERIFIED')
           selected = state.get('selection', {}).get('selected', {})
@@ -91,7 +105,7 @@ jobs:
           PY
 
       - name: Run bounded autonomous coding agent
-        if: steps.existing.outputs.skip != 'true'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         uses: openai/codex-action@v1
         with:
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
@@ -110,7 +124,7 @@ jobs:
             make no change.
 
       - name: Enforce bounded change surface
-        if: steps.existing.outputs.skip != 'true'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -133,7 +147,7 @@ jobs:
           printf '%s\n' "${changed[@]}" | tee /tmp/factory_changed_files.txt
 
       - name: Validate autonomous change
-        if: steps.existing.outputs.skip != 'true'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -142,7 +156,7 @@ jobs:
           python -m pytest -q
 
       - name: Revalidate base and objective before PR
-        if: steps.existing.outputs.skip != 'true'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         shell: bash
         run: |
           set -euo pipefail
@@ -153,12 +167,14 @@ jobs:
           import json
           from pathlib import Path
           state=json.loads(Path('state/autonomy_liveness.json').read_text(encoding='utf-8'))
+          if state.get('converged') is True:
+              raise SystemExit('AUTONOMOUS_OBJECTIVE_CONVERGED')
           if state.get('execution_succeeded') is not True or state.get('live_system_active') is not True:
               raise SystemExit('AUTONOMOUS_SYSTEM_NOT_VERIFIED')
           PY
 
       - name: Create autonomous development PR and enable auto-merge
-        if: steps.existing.outputs.skip != 'true'
+        if: steps.existing.outputs.skip != 'true' && steps.objective.outputs.converged != 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
