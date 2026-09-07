@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 from tools import autonomy_liveness_supervisor as supervisor
@@ -80,8 +81,10 @@ def test_successful_objective_is_retired_from_future_selection(tmp_path: Path):
     completed = tmp_path / "state" / "autonomous_tasks_completed.jsonl"
     completed.parent.mkdir(parents=True)
     completed.write_text(
-        '{"task":{"metadata":{"objective":"already completed"}},'
-        '"result":"{\"status\":\"executed\",\"success\":true}"}\n',
+        json.dumps({
+            "task": {"metadata": {"objective": "already completed"}},
+            "result": json.dumps({"status": "executed", "success": True}),
+        }) + "\n",
         encoding="utf-8",
     )
 
@@ -92,8 +95,10 @@ def test_failed_objective_is_not_retired(tmp_path: Path):
     completed = tmp_path / "state" / "autonomous_tasks_completed.jsonl"
     completed.parent.mkdir(parents=True)
     completed.write_text(
-        '{"task":{"metadata":{"objective":"retry me"}},'
-        '"result":"{\"status\":\"executed\",\"success\":false}"}\n',
+        json.dumps({
+            "task": {"metadata": {"objective": "retry me"}},
+            "result": json.dumps({"status": "executed", "success": False}),
+        }) + "\n",
         encoding="utf-8",
     )
 
