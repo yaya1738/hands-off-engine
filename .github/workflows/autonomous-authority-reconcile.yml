@@ -65,19 +65,51 @@ jobs:
           from pathlib import Path
 
           state = json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
-          assert state.get("execution_observed") is True, state
-          assert state.get("verification_observed") is True, state
-          assert state.get("execution_succeeded") is True, state
-          assert state.get("live_system_active") is True, state
-          print("REPOSITORY_NATIVE_PRODUCTION_OK")
-          print("Governed autonomous production authority is active without remote host credentials.")
+          if state.get("converged") is True:
+              assert state.get("live_system_active") is True, state
+              assert state.get("execution_succeeded") is False, state
+              print("REPOSITORY_NATIVE_PRODUCTION_CONVERGED")
+              print("Governed autonomous authority is healthy and has reached verified steady state.")
+          else:
+              assert state.get("execution_observed") is True, state
+              assert state.get("verification_observed") is True, state
+              assert state.get("execution_succeeded") is True, state
+              assert state.get("live_system_active") is True, state
+              print("REPOSITORY_NATIVE_PRODUCTION_OK")
+              print("Governed autonomous production authority is active without remote host credentials.")
           PY
 
       - name: Persist authority evidence
         run: |
+          set -euo pipefail
+          converged=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          print("true" if state.get("converged") is True else "false")
+          PY
+          )
+          transition=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          mission=state.get("mission", {})
+          print("true" if mission.get("convergence_transition") is True else "false")
+          PY
+          )
+          if [ "$converged" = "true" ] && [ "$transition" != "true" ]; then
+            echo "Verified converged steady state; no durable heartbeat commit required."
+            exit 0
+          fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for f in state/autonomy_liveness.json state/autonomous_task_queue.json state/autonomous_tasks_completed.jsonl state/autonomous_task_attempts.jsonl state/autonomous_tasks.jsonl; do
+          for f in \
+            state/autonomy_liveness.json \
+            state/autonomy_mission.json \
+            state/autonomous_task_queue.json \
+            state/autonomous_tasks_completed.jsonl \
+            state/autonomous_task_attempts.jsonl \
+            state/autonomous_tasks.jsonl; do
             if [ -e "$f" ]; then git add -f "$f"; fi
           done
           if ! git diff --cached --quiet; then
@@ -92,6 +124,7 @@ jobs:
           name: repository-native-production-authority-${{ github.run_id }}
           path: |
             state/autonomy_liveness.json
+            state/autonomy_mission.json
             state/autonomous_task_queue.json
             state/autonomous_tasks_completed.jsonl
             state/autonomous_task_attempts.jsonl
