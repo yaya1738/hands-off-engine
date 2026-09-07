@@ -40,17 +40,36 @@ def test_empty_discovery_is_non_executing_no_candidate():
     assert result["selected"] is None
 
 
-def test_persistent_strategic_objective_recurs_after_exhaustion():
+def test_exhausted_strategic_objective_becomes_bounded_continuity_checkpoint():
     loop = FactoryAutonomousObjectiveLoop()
     objective = "keep improving autonomous capability"
     result = loop.select_next(
         {
             "strategic_objective": objective,
             "excluded_objectives": [objective],
+            "cycle_count": 7,
         }
     )
 
+    selected = result["selected"]
     assert result["status"] == "selected"
-    assert result["selected"]["objective"] == objective
-    assert result["selected"]["source"] == "strategic_objective"
-    assert "recurrence" in result["selected"]["reason"]
+    assert selected["source"] == "autonomous_continuity"
+    assert selected["reason"] == "bounded continuity objective after candidate exhaustion"
+    assert "checkpoint 7" in selected["objective"]
+    assert selected["strategic_objective"] == objective
+    assert selected["execution_permitted"] is False
+
+
+def test_continuity_checkpoint_changes_with_cycle_count():
+    loop = FactoryAutonomousObjectiveLoop()
+    objective = "keep improving autonomous capability"
+    first = loop.select_next(
+        {"strategic_objective": objective, "excluded_objectives": [objective], "cycle_count": 1}
+    )["selected"]["objective"]
+    second = loop.select_next(
+        {"strategic_objective": objective, "excluded_objectives": [objective], "cycle_count": 2}
+    )["selected"]["objective"]
+
+    assert first != second
+    assert "checkpoint 1" in first
+    assert "checkpoint 2" in second

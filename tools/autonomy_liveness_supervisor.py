@@ -118,8 +118,6 @@ def run_cycle(repo_root: Path) -> dict:
     if isinstance(graph, dict):
         gaps.extend(graph.get("gaps", []))
 
-    # A prior failed cycle becomes actionable input to the next cycle. The system
-    # therefore does not merely retry blindly; it feeds failure back into planning.
     previous_error = mission.get("last_error")
     if previous_error:
         gaps.insert(0, {"capability": "previous_cycle_repair", "component": previous_error})
@@ -133,6 +131,7 @@ def run_cycle(repo_root: Path) -> dict:
             "gaps": gaps,
             "discovery": discovery,
             "excluded_objectives": retired,
+            "cycle_count": mission["cycle_count"],
         }
     )
 
@@ -144,9 +143,6 @@ def run_cycle(repo_root: Path) -> dict:
     verification_observed = False
     execution_succeeded = False
 
-    # Authenticated external requests are durable work, not merely messages.
-    # They take precedence over generated objectives so Telegram/web ingress can
-    # drive the same governed execution loop without a ChatGPT session.
     if pending_task:
         objective = pending_task.get("description") or pending_task.get("title")
         selected = {
@@ -159,7 +155,6 @@ def run_cycle(repo_root: Path) -> dict:
         task_id = pending_task.get("id")
     elif isinstance(selected, dict) and selected.get("objective"):
         objective_id = selected.get("strategic_objective_id", "")
-        # Successful objectives are retired across cycles: continuity must advance.
         if selected.get("objective", "").strip().casefold() in retired:
             selected = None
 
@@ -204,8 +199,6 @@ def run_cycle(repo_root: Path) -> dict:
             if execution_succeeded:
                 queue.complete_task(task_id, result=result_json)
             else:
-                # Failed execution is an attempt, not completion. Keep the durable
-                # task pending so the next scheduled supervisor cycle can retry it.
                 queue.record_attempt(task_id, result=result_json)
             if pending_task:
                 try:
