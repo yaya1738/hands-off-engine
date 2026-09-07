@@ -26,6 +26,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: production
     steps:
+      - name: Checkout repository metadata
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
       - name: Validate requested revision
         env:
           REQUESTED_SHA: ${{ inputs.ref }}
@@ -36,6 +41,15 @@ jobs:
           MAIN_SHA="$(git ls-remote "https://github.com/${GITHUB_REPOSITORY}.git" "refs/heads/main" | awk '{print $1}')"
           test "${MAIN_SHA}" = "${REQUESTED_SHA}"
           echo "Deploying main revision ${REQUESTED_SHA}"
+
+      - name: Checkout requested revision for safety gates
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 1
+
+      - name: Fail closed on direct live order mutation
+        run: python tools/factory_forensics/live_mutation_guard.py .
 
       - name: Verify required deployment credentials exist
         env:
