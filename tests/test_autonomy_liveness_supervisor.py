@@ -96,6 +96,53 @@ def test_successful_objective_is_retired_from_future_selection(tmp_path: Path):
     assert supervisor._successful_objectives(tmp_path) == {"already completed"}
 
 
+def test_retired_selected_objective_does_not_crash_duplicate_scan(monkeypatch, tmp_path: Path):
+    completed = tmp_path / "state" / "autonomous_tasks_completed.jsonl"
+    completed.parent.mkdir(parents=True)
+    completed.write_text(
+        json.dumps({
+            "task": {"metadata": {"objective": "already completed"}},
+            "result": json.dumps({"status": "executed", "success": True}),
+        }) + "\n",
+        encoding="utf-8",
+    )
+
+    class RetiredLoop:
+        def __init__(self, runtime):
+            self.runtime = runtime
+
+        def select_next(self, context):
+            assert "already completed" in context["excluded_objectives"]
+            return {
+                "status": "selected",
+                "selected": {
+                    "objective": "already completed",
+                    "strategic_objective_id": "retired-objective",
+                    "score": 100,
+                },
+            }
+
+    class ExplodingGateway:
+        def __init__(self, runtime=None):
+            pass
+
+        def execute_autonomous(self, objective):
+            raise AssertionError("retired objective must not reach execution")
+
+    monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
+    monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", RetiredLoop)
+    monkeypatch.setattr(supervisor, "FactoryAuthorityGateway", ExplodingGateway)
+
+    result = supervisor.run_cycle(tmp_path)
+
+    assert result["status"] == "idle"
+    assert result["execution_observed"] is False
+    assert result["execution_succeeded"] is False
+    assert result["task_queued"] is False
+    assert result["task_id"] is None
+    assert result["mission"]["last_objective"] is None
+
+
 def test_failed_objective_is_not_retired(tmp_path: Path):
     completed = tmp_path / "state" / "autonomous_tasks_completed.jsonl"
     completed.parent.mkdir(parents=True)
