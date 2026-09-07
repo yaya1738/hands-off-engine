@@ -16,17 +16,14 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-
 PROVIDER_IMPORTS = {
     "chatgpt": ("ai_nexus.provider_chatgpt", "ChatGPTProvider"),
     "claude": ("ai_nexus.provider_claude", "ClaudeProvider"),
     "copilot": ("ai_nexus.provider_copilot", "CopilotProvider"),
 }
 
-
 class AIRunner:
     """Process durable tasks while keeping model providers optional."""
-
     def __init__(self, tasks_dir: str = "./tasks", output_dir: str = "./output"):
         self.tasks_dir = Path(tasks_dir)
         self.output_dir = Path(output_dir)
@@ -38,18 +35,15 @@ class AIRunner:
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def _provider(self, provider_name: str) -> Optional[Any]:
-        """Load only the provider explicitly requested by a task."""
         if provider_name in self.providers:
             return self.providers[provider_name]
         spec = PROVIDER_IMPORTS.get(provider_name)
         if spec is None:
             return None
-        module_name, class_name = spec
         try:
-            module = importlib.import_module(module_name)
-            provider = getattr(module, class_name)()
+            module = importlib.import_module(spec[0])
+            provider = getattr(module, spec[1])()
             self.providers[provider_name] = provider
-            self.logger.info("Registered optional provider %s", provider_name)
             return provider
         except Exception as exc:
             self.logger.warning("Provider %s unavailable: %s", provider_name, exc)
@@ -60,11 +54,9 @@ class AIRunner:
             with open(task_file, "r", encoding="utf-8") as f:
                 task = json.load(f)
             if "provider" not in task or "prompt" not in task:
-                self.logger.error("Task %s missing provider or prompt", task_file.name)
                 return None
             return task
-        except (json.JSONDecodeError, OSError) as exc:
-            self.logger.error("Failed to load %s: %s", task_file.name, exc)
+        except (json.JSONDecodeError, OSError):
             return None
 
     def execute_task(self, task_file: Path, task: Dict[str, Any]) -> Dict[str, Any]:
@@ -78,7 +70,6 @@ class AIRunner:
             result["timestamp"] = datetime.utcnow().isoformat()
             return result
         except Exception as exc:
-            self.logger.error("Task execution failed: %s", exc)
             return {"success": False, "error": str(exc), "provider": provider_name,
                     "task_file": task_file.name, "timestamp": datetime.utcnow().isoformat()}
 
@@ -101,7 +92,6 @@ class AIRunner:
                 return
             time.sleep(5)
 
-
 def main():
     parser = argparse.ArgumentParser(description="AI Nexus Task Runner")
     parser.add_argument("--once", action="store_true")
@@ -109,7 +99,6 @@ def main():
     parser.add_argument("--output-dir", default="./output")
     args = parser.parse_args()
     AIRunner(args.tasks_dir, args.output_dir).process_tasks(once=args.once)
-
 
 if __name__ == "__main__":
     main()
