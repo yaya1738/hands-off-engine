@@ -22,6 +22,8 @@ def test_human_loop_persists_and_queues_request(tmp_path: Path, monkeypatch):
 
     assert "12345678" in response
     assert captured["task"]["source"] == "telegram_user"
+    assert captured["task"]["metadata"]["chat_id"] == "42"
+    assert captured["task"]["metadata"]["communication_message_id"]
     messages = ConversationStore(tmp_path).read()
     assert len(messages) == 2
     assert messages[0].direction == "inbound"
