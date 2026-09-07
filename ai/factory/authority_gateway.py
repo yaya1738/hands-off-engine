@@ -15,6 +15,7 @@ from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntel
 from ai.factory.execution_journal import FactoryExecutionJournal
 from ai.factory.execution_reconciler import FactoryExecutionReconciler
 from ai.factory.restart_reconciliation import FactoryRestartReconciliation
+from ai.decision.action_kernel import ActionDecision, decide
 
 from factory_completion_wiring_adapter import FactoryCompletionWiringAdapter
 
@@ -40,6 +41,25 @@ class FactoryAuthorityGateway:
             registry=self.registry,
             approval=self.approval,
             queue=self.queue,
+        )
+
+    def decide_action(self, *, action, confidence, risk_score, costs, evidence,
+                      max_risk=1.0, min_confidence=0.4, risk_check=None):
+        """Single cognitive-to-authority checkpoint for consequential actions.
+
+        This calculates and verifies readiness but never performs the action.
+        Execution must consume the returned approved decision through its
+        separately governed executor.
+        """
+        return decide(
+            action=action,
+            confidence=confidence,
+            risk_score=risk_score,
+            costs=costs,
+            evidence=evidence,
+            max_risk=max_risk,
+            min_confidence=min_confidence,
+            risk_check=risk_check,
         )
 
     def execute_autonomous(self, objective):
@@ -149,19 +169,9 @@ class FactoryAuthorityGateway:
         """Validate an approved request without executing it."""
         return self.approval.validate_approved_request(request)
 
-    def complete_reviewed_goal(
-        self,
-        review_request,
-        improvement,
-        result,
-        artifact
-    ):
+    def complete_reviewed_goal(self, review_request, improvement, result, artifact):
         return self.completion.complete_reviewed_task(
-            review_request,
-            0,
-            improvement,
-            result,
-            artifact
+            review_request, 0, improvement, result, artifact
         )
 
     def report(self):
@@ -170,11 +180,9 @@ class FactoryAuthorityGateway:
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "shared_state": True,
             "startup_reconciliation": self.startup_reconciliation,
+            "decision_kernel": "ai.decision.action_kernel",
         }
 
 
 if __name__ == "__main__":
-    print(json.dumps(
-        FactoryAuthorityGateway().report(),
-        indent=2
-    ))
+    print(json.dumps(FactoryAuthorityGateway().report(), indent=2))
