@@ -1,7 +1,6 @@
 import importlib.util
 from pathlib import Path
 
-
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -16,6 +15,5 @@ def test_runner_constructs_without_loading_any_provider(tmp_path):
     module = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(module)
-
     runner = module.AIRunner(str(tmp_path / "tasks"), str(tmp_path / "output"))
     assert runner.providers == {}
