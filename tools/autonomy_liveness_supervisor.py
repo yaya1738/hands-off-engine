@@ -147,10 +147,14 @@ def run_cycle(repo_root: Path) -> dict:
                 "success": runtime_execution.get("success"),
                 "steps_completed": runtime_execution.get("steps_completed", []),
             }
-            queue.complete_task(task_id, result=json.dumps(completion, sort_keys=True))
+            result_json = json.dumps(completion, sort_keys=True)
+            if execution_succeeded:
+                queue.complete_task(task_id, result=result_json)
+            else:
+                # Failed execution is an attempt, not completion. Keep the durable
+                # task pending so the next scheduled supervisor cycle can retry it.
+                queue.record_attempt(task_id, result=result_json)
             if pending_task:
-                # External requests receive completion feedback on their original
-                # control surface. Notification failure never falsifies execution.
                 try:
                     from telegram.autonomy_notifier import notify_task_result
                     notify_task_result(pending_task, execution)
@@ -168,8 +172,6 @@ def run_cycle(repo_root: Path) -> dict:
         "execution_observed": execution_observed,
         "verification_observed": verification_observed,
         "execution_succeeded": execution_succeeded,
-        # This flag deliberately requires an explicit successful runtime result;
-        # execution alone must never be represented as successful live activity.
         "live_system_active": execution_succeeded,
         "claim_basis": (
             "observed autonomous execution with explicit successful runtime result; external side effects not independently proven"
