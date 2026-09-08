@@ -25,6 +25,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: read
   issues: read
 
 env:
@@ -132,6 +133,18 @@ jobs:
             echo "DENY: explicit human approval label missing and PR is not an authorized autonomous Factory PR"
             exit 0
           fi
+
+          # Auto-merge must never rely on an unprotected main branch. Require at
+          # least one completed passing check and reject any failed, cancelled,
+          # timed-out, or still-pending check before enabling merge.
+          checks=$(gh pr checks "$pr" --repo "$GITHUB_REPOSITORY" --json name,bucket)
+          check_count=$(jq 'length' <<<"$checks")
+          passed_count=$(jq '[.[] | select(.bucket == "pass")] | length' <<<"$checks")
+          blocking_count=$(jq '[.[] | select(.bucket != "pass" and .bucket != "skipping")] | length' <<<"$checks")
+          [ "$check_count" -gt 0 ] || { echo "DENY: no CI checks are registered for this PR"; exit 0; }
+          [ "$blocking_count" -eq 0 ] || { echo "DENY: CI checks are not fully passing"; exit 0; }
+          [ "$passed_count" -gt 0 ] || { echo "DENY: no passing CI check exists"; exit 0; }
+          echo "Validation gate passed: $passed_count passing check(s), $check_count total check(s)."
 
           # Financial changes always require the domain-specific human approval,
           # including autonomous Factory PRs.
