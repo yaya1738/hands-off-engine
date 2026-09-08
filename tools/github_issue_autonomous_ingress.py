@@ -65,8 +65,8 @@ def _mutate(path: str, token: str, payload: dict) -> object:
         return json.load(response)
 
 
-def _already_recorded(repo_root: Path, issue_number: int) -> bool:
-    queue = AutonomousTaskQueue(repo_root)
+def _already_recorded(repo_root: Path, issue_number: int, queue: AutonomousTaskQueue | None = None) -> bool:
+    queue = queue or AutonomousTaskQueue(repo_root)
     marker = f"github_issue:{issue_number}"
     for task in queue.get_all_tasks():
         if task.get("metadata", {}).get("external_id") == marker:
@@ -101,7 +101,7 @@ def ingest(repo: str, token: str, repo_root: Path) -> int:
         if not title.casefold().startswith(PREFIX.casefold()):
             continue
         number = int(issue["number"])
-        if _already_recorded(repo_root, number):
+        if _already_recorded(repo_root, number, queue):
             continue
         objective = title[len(PREFIX):].strip()
         body = str(issue.get("body") or "").strip()
