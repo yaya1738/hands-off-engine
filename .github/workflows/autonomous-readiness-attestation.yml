@@ -1,0 +1,70 @@
+name: Autonomous Readiness Attestation
+
+# Machine-derived readiness for the bounded autonomous Factory lane. This
+# attestation never grants authority; it records that independent repository
+# checks have all passed before autonomous auto-merge may be enabled.
+
+on:
+  pull_request:
+    types: [opened, ready_for_review, synchronize]
+  check_suite:
+    types: [completed]
+
+permissions:
+  contents: read
+  pull-requests: read
+  checks: read
+
+jobs:
+  attest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine PR
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            number="${{ github.event.pull_request.number }}"
+          else
+            branch="${{ github.event.check_suite.head_branch }}"
+            number=$(gh pr list --repo "$GITHUB_REPOSITORY" --head "$branch" --state open --json number --jq '.[0].number' 2>/dev/null || true)
+          fi
+          echo "number=$number" >> "$GITHUB_OUTPUT"
+          [ -n "$number" ] || { echo 'No open PR found for this event; nothing to attest.'; exit 0; }
+
+      - name: Verify autonomous Factory identity
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          info=$(gh pr view "${{ steps.pr.outputs.number }}" --repo "$GITHUB_REPOSITORY" --json author,headRefName,state,isDraft)
+          author=$(jq -r '.author.login' <<<"$info")
+          head=$(jq -r '.headRefName' <<<"$info")
+          state=$(jq -r '.state' <<<"$info")
+          draft=$(jq -r '.isDraft' <<<"$info")
+          [ "$state" = "OPEN" ] || { echo 'DENY: PR is not open'; exit 1; }
+          [ "$draft" = "false" ] || { echo 'DENY: PR is draft'; exit 1; }
+          [ "$author" = "github-actions[bot]" ] || { echo 'DENY: PR author is not github-actions[bot]'; exit 1; }
+          [[ "$head" == "autonomous-factory/"* ]] || { echo 'DENY: PR is outside autonomous Factory namespace'; exit 1; }
+
+      - name: Checkout verification code
+        if: steps.pr.outputs.number != ''
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Evaluate independent readiness quorum
+        if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          checks=$(gh pr checks "${{ steps.pr.outputs.number }}" --repo "$GITHUB_REPOSITORY" --json name,bucket)
+          python tools/factory_forensics/autonomous_readiness.py --checks-json "$checks"
