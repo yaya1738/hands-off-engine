@@ -95,16 +95,14 @@ def test_authority_gateway_routes_ready_execution_through_runtime(monkeypatch):
 
     result = gateway.execute_autonomous("preserve autonomous readiness")
 
-    assert result == {
-        "decision": {
-            "status": "READY",
-            "classification": "factory_ready",
-        },
-        "execution": {
-            "success": True,
-            "objective": "preserve autonomous readiness",
-        },
+    assert result["status"] == "verified"
+    assert result["verified"] is True
+    assert result["execution"] == {
+        "success": True,
+        "objective": "preserve autonomous readiness",
     }
+    assert result["decision"]["status"] in {"READY", "APPROVED"}
+    assert result["convergence"]["status"] == "verified"
     assert runtime.legacy_called is False
     assert runtime.executed is True
     assert [status for _, status, _ in journal.records] == ["STARTED", "COMPLETED"]
