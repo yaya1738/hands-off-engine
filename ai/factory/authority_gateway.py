@@ -43,6 +43,11 @@ class FactoryAuthorityGateway:
 
     def decide_action(self, *, action, confidence, risk_score, costs, evidence,
                       max_risk=1.0, min_confidence=0.4, risk_check=None):
+        # Keep the authority decision boundary self-contained even when a
+        # controlled test or recovery path reconstructs this gateway without
+        # calling __init__.
+        if not hasattr(self, "convergence"):
+            self.convergence = ConvergenceController()
         return self.convergence.evaluate(
             action=action, confidence=confidence, risk_score=risk_score,
             costs=costs, evidence=evidence, max_risk=max_risk,
