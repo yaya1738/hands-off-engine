@@ -1,6 +1,7 @@
 """Contract tests proving routine operation does not require the ChatGPT consumer UI."""
 
 import json
+import re
 from pathlib import Path
 
 from telegram.human_loop import HumanLoop
@@ -49,7 +50,7 @@ def test_external_request_reaches_autonomous_execution_without_consumer_ui(monke
         username="authenticated-user",
     )
 
-    assert "12345678" in response
+    assert re.search(r"task [a-f0-9]{8}", response)
     queued = supervisor.AutonomousTaskQueue(tmp_path).get_next_task()
     assert queued is not None
     assert queued["source"] == "telegram_user"
