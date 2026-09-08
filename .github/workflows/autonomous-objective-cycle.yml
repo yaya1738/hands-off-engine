@@ -78,9 +78,35 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          converged=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          print("true" if state.get("converged") is True else "false")
+          PY
+          )
+          transition=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          print("true" if state.get("mission", {}).get("convergence_transition") is True else "false")
+          PY
+          )
+          if [ "$converged" = "true" ] && [ "$transition" != "true" ]; then
+            echo 'Verified converged steady state; no durable heartbeat commit required.'
+            exit 0
+          fi
           git config user.name "hands-off-autonomy[bot]"
           git config user.email "hands-off-autonomy[bot]@users.noreply.github.com"
-          git add state/autonomy_liveness.json state/autonomous_task_queue.json state/autonomous_tasks_completed.jsonl state/autonomous_task_attempts.jsonl
+          for f in \
+            state/autonomy_liveness.json \
+            state/autonomy_mission.json \
+            state/autonomous_task_queue.json \
+            state/autonomous_tasks_completed.jsonl \
+            state/autonomous_task_attempts.jsonl \
+            state/autonomous_tasks.jsonl; do
+            if [ -e "$f" ]; then git add -f "$f"; fi
+          done
           if git diff --cached --quiet; then
             echo 'No autonomous state changes to persist.'
           else
