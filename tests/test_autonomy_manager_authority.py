@@ -71,20 +71,19 @@ def test_execute_routes_through_authority_gateway_without_legacy_bypass():
 
 
 def test_authority_gateway_routes_ready_execution_through_runtime(monkeypatch):
-    class ReadyGateway:
+    class ReadyInference:
         def evaluate(self, objective):
             return {
-                "activation": {
-                    "decision": {
-                        "status": "READY",
-                        "classification": "factory_ready",
-                    }
-                }
+                "objective": objective,
+                "decision": {
+                    "status": "CAPABILITIES_AVAILABLE",
+                    "action": "activate_existing_factory",
+                },
             }
 
     monkeypatch.setattr(
-        "factory_runtime_autonomy_gateway.FactoryRuntimeAutonomyGateway",
-        ReadyGateway,
+        "ai.factory.authority_gateway.FactoryCapabilityRequirementInference",
+        ReadyInference,
     )
 
     runtime = FakeRuntime()
@@ -95,16 +94,14 @@ def test_authority_gateway_routes_ready_execution_through_runtime(monkeypatch):
 
     result = gateway.execute_autonomous("preserve autonomous readiness")
 
-    assert result == {
-        "decision": {
-            "status": "READY",
-            "classification": "factory_ready",
-        },
-        "execution": {
-            "success": True,
-            "objective": "preserve autonomous readiness",
-        },
+    assert result["status"] == "verified"
+    assert result["verified"] is True
+    assert result["execution"] == {
+        "success": True,
+        "objective": "preserve autonomous readiness",
     }
+    assert result["decision"]["approved"] is True
+    assert result["convergence"]["status"] == "verified"
     assert runtime.legacy_called is False
     assert runtime.executed is True
     assert [status for _, status, _ in journal.records] == ["STARTED", "COMPLETED"]
