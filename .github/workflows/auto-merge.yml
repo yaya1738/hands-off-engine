@@ -136,15 +136,17 @@ jobs:
 
           # Auto-merge must never rely on an unprotected main branch. Require at
           # least one completed passing check and reject any failed, cancelled,
-          # timed-out, or still-pending check before enabling merge.
+          # timed-out, or still-pending check before enabling merge. Exclude this
+          # workflow's own check so it cannot block itself while still running.
           checks=$(gh pr checks "$pr" --repo "$GITHUB_REPOSITORY" --json name,bucket)
-          check_count=$(jq 'length' <<<"$checks")
-          passed_count=$(jq '[.[] | select(.bucket == "pass")] | length' <<<"$checks")
-          blocking_count=$(jq '[.[] | select(.bucket != "pass" and .bucket != "skipping")] | length' <<<"$checks")
-          [ "$check_count" -gt 0 ] || { echo "DENY: no CI checks are registered for this PR"; exit 0; }
-          [ "$blocking_count" -eq 0 ] || { echo "DENY: CI checks are not fully passing"; exit 0; }
-          [ "$passed_count" -gt 0 ] || { echo "DENY: no passing CI check exists"; exit 0; }
-          echo "Validation gate passed: $passed_count passing check(s), $check_count total check(s)."
+          checks_for_validation=$(jq '[.[] | select(.name != "auto-merge")]' <<<"$checks")
+          check_count=$(jq 'length' <<<"$checks_for_validation")
+          passed_count=$(jq '[.[] | select(.bucket == "pass")] | length' <<<"$checks_for_validation")
+          blocking_count=$(jq '[.[] | select(.bucket != "pass" and .bucket != "skipping")] | length' <<<"$checks_for_validation")
+          [ "$check_count" -gt 0 ] || { echo "DENY: no external CI checks are registered for this PR"; exit 0; }
+          [ "$blocking_count" -eq 0 ] || { echo "DENY: external CI checks are not fully passing"; exit 0; }
+          [ "$passed_count" -gt 0 ] || { echo "DENY: no passing external CI check exists"; exit 0; }
+          echo "Validation gate passed: $passed_count passing external check(s), $check_count external check(s)."
 
           # Financial changes always require the domain-specific human approval,
           # including autonomous Factory PRs.
