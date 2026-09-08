@@ -17,6 +17,7 @@ permissions:
 
 jobs:
   attest:
+    name: Autonomous Readiness Attestation
     runs-on: ubuntu-latest
     steps:
       - name: Determine PR
