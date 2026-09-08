@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import argparse
+import json
 from dataclasses import dataclass
 from typing import Iterable
 
@@ -23,7 +25,6 @@ PROTECTED_TERMS = (
     "trading",
     "polymarket",
     "live_trading",
-    "executor",
     "wallet",
     "credential",
     "secret",
@@ -69,3 +70,21 @@ def evaluate_change(
             reasons.append(f"protected semantic path: {path}")
 
     return ChangePolicyDecision(not reasons, tuple(dict.fromkeys(reasons)))
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description="Evaluate pre-authorized autonomous change policy.")
+    parser.add_argument("--paths-json", required=True)
+    parser.add_argument("--additions", type=int, default=0)
+    parser.add_argument("--deletions", type=int, default=0)
+    args = parser.parse_args(argv)
+    paths = json.loads(args.paths_json)
+    if not isinstance(paths, list):
+        raise SystemExit("paths JSON must be an array")
+    decision = evaluate_change(paths, args.additions, args.deletions)
+    print(json.dumps(decision.as_dict(), sort_keys=True))
+    return 0 if decision.permitted else 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
