@@ -65,11 +65,16 @@ jobs:
           DEPLOY_HOST: ${{ secrets.PRODUCTION_HOST }}
           DEPLOY_USER: ${{ secrets.PRODUCTION_USER }}
           DEPLOY_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.PRODUCTION_KNOWN_HOSTS }}
         run: |
           set -euo pipefail
-          if [[ -n "$DEPLOY_HOST" && -n "$DEPLOY_USER" && -n "$DEPLOY_KEY" ]]; then
+          if [[ -n "$DEPLOY_HOST" || -n "$DEPLOY_USER" || -n "$DEPLOY_KEY" || -n "$DEPLOY_KNOWN_HOSTS" ]]; then
+            if [[ -z "$DEPLOY_HOST" || -z "$DEPLOY_USER" || -z "$DEPLOY_KEY" || -z "$DEPLOY_KNOWN_HOSTS" ]]; then
+              echo 'Remote production authority is partially configured; refusing unsafe fallback.' >&2
+              exit 1
+            fi
             echo 'mode=remote' >> "$GITHUB_OUTPUT"
-            echo 'Remote production authority is configured; using exact-SHA remote deployment.'
+            echo 'Remote production authority is fully configured with a pinned host key.'
           else
             echo 'mode=hosted' >> "$GITHUB_OUTPUT"
             echo 'Remote credentials are absent; using repository-native hosted production authority.'
@@ -107,14 +112,16 @@ jobs:
         if: steps.authority.outputs.mode == 'remote'
         env:
           DEPLOY_KEY: ${{ secrets.PRODUCTION_SSH_KEY }}
-          DEPLOY_HOST: ${{ secrets.PRODUCTION_HOST }}
+          DEPLOY_KNOWN_HOSTS: ${{ secrets.PRODUCTION_KNOWN_HOSTS }}
         shell: bash
         run: |
           set -euo pipefail
           install -m 700 -d ~/.ssh
           printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          ssh-keyscan -T 10 -H "$DEPLOY_HOST" >> ~/.ssh/known_hosts
+          printf '%s\n' "$DEPLOY_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+          test -s ~/.ssh/known_hosts
 
       - name: Deploy and verify exact SHA on remote authority
         if: steps.authority.outputs.mode == 'remote'
@@ -126,7 +133,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          ssh -i ~/.ssh/deploy_key -o BatchMode=yes "$DEPLOY_USER@$DEPLOY_HOST" bash -s -- "$REQUESTED_SHA" "$ACTIVATE" <<'REMOTE'
+          ssh -i ~/.ssh/deploy_key -o BatchMode=yes -o StrictHostKeyChecking=yes -o UserKnownHostsFile="$HOME/.ssh/known_hosts" "$DEPLOY_USER@$DEPLOY_HOST" bash -s -- "$REQUESTED_SHA" "$ACTIVATE" <<'REMOTE'
           set -euo pipefail
           requested_sha="$1"
           activate="$2"
