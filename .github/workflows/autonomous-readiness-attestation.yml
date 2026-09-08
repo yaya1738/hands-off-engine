@@ -35,8 +35,26 @@ jobs:
           echo "number=$number" >> "$GITHUB_OUTPUT"
           [ -n "$number" ] || { echo 'No open PR found for this event; nothing to attest.'; exit 0; }
 
-      - name: Verify autonomous Factory identity
+      - name: Determine autonomous lane applicability
+        id: lane
         if: steps.pr.outputs.number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          info=$(gh pr view "${{ steps.pr.outputs.number }}" --repo "$GITHUB_REPOSITORY" --json author,headRefName)
+          author=$(jq -r '.author.login' <<<"$info")
+          head=$(jq -r '.headRefName' <<<"$info")
+          if [ "$author" = "github-actions[bot]" ] && [[ "$head" == "autonomous-factory/"* ]]; then
+            echo 'autonomous=true' >> "$GITHUB_OUTPUT"
+          else
+            echo 'autonomous=false' >> "$GITHUB_OUTPUT"
+            echo 'Not an autonomous Factory PR; attestation is not applicable.'
+          fi
+
+      - name: Verify autonomous Factory identity
+        if: steps.pr.outputs.number != '' && steps.lane.outputs.autonomous == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
@@ -53,14 +71,14 @@ jobs:
           [[ "$head" == "autonomous-factory/"* ]] || { echo 'DENY: PR is outside autonomous Factory namespace'; exit 1; }
 
       - name: Checkout verification code
-        if: steps.pr.outputs.number != ''
+        if: steps.pr.outputs.number != '' && steps.lane.outputs.autonomous == 'true'
         uses: actions/checkout@v5
         with:
           ref: main
           fetch-depth: 1
 
       - name: Evaluate independent readiness quorum
-        if: steps.pr.outputs.number != ''
+        if: steps.pr.outputs.number != '' && steps.lane.outputs.autonomous == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         shell: bash
