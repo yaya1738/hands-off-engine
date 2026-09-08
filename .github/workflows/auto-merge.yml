@@ -4,9 +4,10 @@ name: Auto-merge PRs
 # Ordinary PRs still require the explicit human approval label. The bounded
 # repository-hosted Factory development lane is separately eligible for
 # auto-merge when it is authored by github-actions[bot], uses the dedicated
-# autonomous-factory/* branch namespace, passes all required checks, and is not
-# a financial/live-trading change. Financial changes always retain the separate
-# human-finance-approved gate. No workflow performs a direct merge.
+# autonomous-factory/* branch namespace, passes readiness evidence, and stays
+# inside the pre-authorized low-risk change surface. Financial changes always
+# retain the separate human-finance-approved gate. No workflow performs a
+# direct merge.
 
 on:
   pull_request:
@@ -34,6 +35,7 @@ env:
   FINANCE_APPROVAL_LABEL: "human-finance-approved"
   REPOSITORY_OWNER: "yaya1738"
   AUTONOMOUS_BRANCH_PREFIX: "autonomous-factory/"
+  AUTONOMOUS_READINESS_CHECK: "Autonomous Readiness Attestation"
 
 jobs:
   auto-merge:
@@ -91,6 +93,13 @@ jobs:
             --jq '.data.markPullRequestReadyForReview.pullRequest.isDraft' | grep -qx 'false'
           echo "Owner-approved mergeable draft transitioned to ready via minimal GraphQL mutation."
 
+      - name: Checkout policy evaluator
+        if: steps.pr.outputs.number != ''
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 1
+
       - name: Fail-closed eligibility check
         if: steps.pr.outputs.number != ''
         env:
@@ -98,13 +107,15 @@ jobs:
         run: |
           set -euo pipefail
           pr="${{ steps.pr.outputs.number }}"
-          info=$(gh pr view "$pr" --repo "$GITHUB_REPOSITORY" --json state,isDraft,mergeable,author,headRefName,labels)
+          info=$(gh pr view "$pr" --repo "$GITHUB_REPOSITORY" --json state,isDraft,mergeable,author,headRefName,labels,additions,deletions)
 
           state=$(jq -r '.state' <<<"$info")
           draft=$(jq -r '.isDraft' <<<"$info")
           mergeable=$(jq -r '.mergeable' <<<"$info")
           author=$(jq -r '.author.login' <<<"$info")
           head=$(jq -r '.headRefName' <<<"$info")
+          additions=$(jq -r '.additions' <<<"$info")
+          deletions=$(jq -r '.deletions' <<<"$info")
           labels=$(jq -r '[.labels[].name] | map(ascii_downcase) | .[]' <<<"$info")
 
           [ "$state" = "OPEN" ] || { echo "DENY: PR is not open"; exit 0; }
@@ -148,6 +159,17 @@ jobs:
           [ "$passed_count" -gt 0 ] || { echo "DENY: no passing external CI check exists"; exit 0; }
           echo "Validation gate passed: $passed_count passing external check(s), $check_count external check(s)."
 
+          if $autonomous; then
+            changed=$(gh pr diff "$pr" --repo "$GITHUB_REPOSITORY" --name-only)
+            changed_json=$(jq -Rn --arg value "$changed" '$value | split("\n") | map(select(length > 0))')
+            policy=$(python tools/factory_forensics/autonomous_change_policy.py --paths-json "$changed_json" --additions "$additions" --deletions "$deletions")
+            permitted=$(jq -r '.permitted' <<<"$policy")
+            [ "$permitted" = "true" ] || { echo "DENY: pre-authorized autonomous change policy rejected this PR: $(jq -c '.reasons' <<<"$policy")"; exit 0; }
+
+            readiness=$(gh pr checks "$pr" --repo "$GITHUB_REPOSITORY" --json name,bucket | jq -r --arg name "$AUTONOMOUS_READINESS_CHECK" '[.[] | select(.name == $name) | .bucket] | .[0] // "missing"')
+            [ "$readiness" = "pass" ] || { echo "DENY: autonomous readiness attestation is not passing (status=$readiness)"; exit 0; }
+          fi
+
           # Financial changes always require the domain-specific human approval,
           # including autonomous Factory PRs.
           changed=$(gh pr diff "$pr" --repo "$GITHUB_REPOSITORY" --name-only)
@@ -159,5 +181,5 @@ jobs:
             $has_finance || { echo "DENY: financial approval label missing"; exit 0; }
           fi
 
-          echo "Eligibility passed; enabling GitHub auto-merge only. autonomous_lane=$autonomous human_lane=$has_human"
+          echo "Eligibility passed; enabling GitHub auto-merge only. autonomous_lane=$autonomous human_lane=$has_human readiness=$([ "$autonomous" = true ] && echo verified || echo not_required)"
           gh pr merge "$pr" --repo "$GITHUB_REPOSITORY" --squash --auto
