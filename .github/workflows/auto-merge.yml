@@ -25,6 +25,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  checks: read
   issues: read
 
 env:
@@ -33,6 +34,7 @@ env:
   FINANCE_APPROVAL_LABEL: "human-finance-approved"
   REPOSITORY_OWNER: "yaya1738"
   AUTONOMOUS_BRANCH_PREFIX: "autonomous-factory/"
+  AUTONOMOUS_READINESS_CHECK: "Autonomous Readiness Attestation"
 
 jobs:
   auto-merge:
@@ -133,6 +135,15 @@ jobs:
             exit 0
           fi
 
+          # Autonomous Factory merges require an independently generated,
+          # machine-verifiable readiness attestation in addition to the normal
+          # trusted-author, namespace, and safety gates. The attestation is
+          # evidence only and never grants authority or financial approval.
+          if $autonomous; then
+            readiness=$(gh pr checks "$pr" --repo "$GITHUB_REPOSITORY" --json name,bucket | jq -r --arg name "$AUTONOMOUS_READINESS_CHECK" '[.[] | select(.name == $name) | .bucket] | .[0] // "missing"')
+            [ "$readiness" = "pass" ] || { echo "DENY: autonomous readiness attestation is not passing (status=$readiness)"; exit 0; }
+          fi
+
           # Financial changes always require the domain-specific human approval,
           # including autonomous Factory PRs.
           changed=$(gh pr diff "$pr" --repo "$GITHUB_REPOSITORY" --name-only)
@@ -144,5 +155,5 @@ jobs:
             $has_finance || { echo "DENY: financial approval label missing"; exit 0; }
           fi
 
-          echo "Eligibility passed; enabling GitHub auto-merge only. autonomous_lane=$autonomous human_lane=$has_human"
+          echo "Eligibility passed; enabling GitHub auto-merge only. autonomous_lane=$autonomous human_lane=$has_human readiness=$([ "$autonomous" = true ] && echo verified || echo not_required)"
           gh pr merge "$pr" --repo "$GITHUB_REPOSITORY" --squash --auto
