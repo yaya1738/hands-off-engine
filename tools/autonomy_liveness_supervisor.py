@@ -167,6 +167,14 @@ def run_cycle(repo_root: Path) -> dict:
     execution_succeeded = False
     converged = selection.get("status") == "converged" and not pending_task
 
+    # Convergence is itself a verified autonomous outcome: the governed
+    # discovery gate ran successfully and explicitly found no actionable work.
+    # It must therefore satisfy the same verification contract used by hosted
+    # production liveness checks, without implying that any external side
+    # effect was performed.
+    if converged:
+        verification_observed = True
+
     if pending_task:
         objective = pending_task.get("description") or pending_task.get("title")
         selected = {

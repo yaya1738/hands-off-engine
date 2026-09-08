@@ -84,6 +84,7 @@ def test_run_cycle_converges_without_creating_or_executing_work(tmp_path, monkey
     assert state["status"] == "converged"
     assert state["converged"] is True
     assert state["execution_observed"] is False
+    assert state["verification_observed"] is True
     assert state["execution_succeeded"] is False
     assert state["live_system_active"] is True
     assert state["selection"]["status"] == "converged"
