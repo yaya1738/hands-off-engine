@@ -1,0 +1,30 @@
+name: Autonomous Deep Audit
+
+on:
+  schedule:
+    - cron: "23 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomous-deep-audit
+  cancel-in-progress: true
+
+jobs:
+  deep-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install test dependencies
+        run: |
+          python -m pip install --disable-pip-version-check pytest
+          if [ -f requirements.txt ]; then python -m pip install --disable-pip-version-check -r requirements.txt; fi
+      - name: Compile all operational Python
+        run: python -m compileall -q ai tools
+      - name: Run full test suite
+        run: pytest -q
+      - name: Re-measure DASS after tests
+        run: python tools/factory_forensics/dass_measurement.py
