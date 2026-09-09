@@ -29,6 +29,48 @@ def test_missing_integration_boundary_outranks_generic_gap():
     assert "improvement_executor" in result["selected"]["objective"]
 
 
+def test_pre_dass_gap_outranks_broad_strategic_objective():
+    loop = FactoryAutonomousObjectiveLoop()
+    strategic = "maximize verified progress toward DASS"
+    result = loop.select_next(
+        {
+            "phase": "pre_dass",
+            "strategic_objective": strategic,
+            "gaps": ["close the remaining DASS production gap"],
+        }
+    )
+
+    selected = result["selected"]
+    assert selected["source"] == "capability_gap"
+    assert selected["objective"] == "close the remaining DASS production gap"
+    assert selected["priority_score"] > next(
+        c["priority_score"] for c in result["candidates"] if c["source"] == "strategic_objective"
+    )
+
+
+def test_post_dass_value_metadata_can_outrank_broad_strategic_objective():
+    loop = FactoryAutonomousObjectiveLoop()
+    result = loop.select_next(
+        {
+            "phase": "post_dass",
+            "strategic_objective": "maximize useful post-DASS operation indefinitely",
+            "gaps": [
+                {
+                    "objective": "high-value resilient capability",
+                    "expected_value": 1.0,
+                    "confidence": 1.0,
+                    "reversibility": 1.0,
+                    "cost": 0.0,
+                    "risk": 0.0,
+                }
+            ],
+        }
+    )
+
+    assert result["selected"]["objective"] == "high-value resilient capability"
+    assert result["selected"]["priority_score"] > 100
+
+
 def test_empty_discovery_is_non_executing_no_candidate():
     loop = FactoryAutonomousObjectiveLoop()
     result = loop.select_next({})
