@@ -18,10 +18,9 @@ EnvironmentFile=-/etc/hands-off-engine.env
 # without credentials; live infrastructure mutation remains governed by the DASS
 # authority path and fail-closed controls.
 
-# Run the authoritative DASS phase supervisor, not the legacy autonomous runtime.
-# The supervisor performs one governed cycle and exits; systemd restarts it so the
-# same authoritative loop continues indefinitely while failures remain observable.
-ExecStart=/usr/bin/python3 /root/hands-off-engine/tools/autonomous_phase_supervisor.py
+# Run the integrated DASS supervisor: phase selection, governed execution,
+# continuous improvement, learning, and productive-capacity feedback are one loop.
+ExecStart=/usr/bin/python3 /root/hands-off-engine/tools/autonomous_integrated_supervisor.py
 
 Restart=always
 RestartSec=10
