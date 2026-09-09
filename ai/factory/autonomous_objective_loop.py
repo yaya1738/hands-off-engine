@@ -24,6 +24,13 @@ class FactoryAutonomousObjectiveLoop:
             return str(value.get("objective") or value.get("name") or "").strip()
         return str(value or "").strip()
 
+    @staticmethod
+    def _bounded_number(value: Any, default: float = 0.5) -> float:
+        try:
+            return max(0.0, min(1.0, float(value)))
+        except (TypeError, ValueError):
+            return default
+
     def discover_candidates(self, context: Dict[str, Any] | None = None) -> List[Dict[str, Any]]:
         context = context or {}
         candidates: List[Dict[str, Any]] = []
@@ -42,12 +49,17 @@ class FactoryAutonomousObjectiveLoop:
         for gap in context.get("gaps", []):
             objective = self._text(gap)
             if objective:
-                candidates.append({
+                item = {
                     "objective": objective,
                     "source": "capability_gap",
                     "score": 90,
                     "reason": "observed capability gap",
-                })
+                }
+                if isinstance(gap, dict):
+                    for key in ("expected_value", "confidence", "reversibility", "cost", "risk"):
+                        if key in gap:
+                            item[key] = gap[key]
+                candidates.append(item)
 
         discovery = context.get("discovery", {})
         if isinstance(discovery, dict) and discovery.get("missing"):
@@ -63,20 +75,58 @@ class FactoryAutonomousObjectiveLoop:
         for finding in context.get("findings", []):
             objective = self._text(finding)
             if objective:
-                candidates.append({
+                item = {
                     "objective": objective,
                     "source": "runtime_finding",
                     "score": 80,
                     "reason": "runtime finding requires follow-up",
-                })
+                }
+                if isinstance(finding, dict):
+                    for key in ("expected_value", "confidence", "reversibility", "cost", "risk"):
+                        if key in finding:
+                            item[key] = finding[key]
+                candidates.append(item)
 
         return candidates
+
+    def _phase_score(self, candidate: Dict[str, Any], phase: str | None, has_actionable: bool) -> float:
+        """Score work according to the current operating phase."""
+        source = candidate.get("source")
+        base = float(candidate.get("score", 0) or 0)
+
+        if phase == "pre_dass":
+            source_bonus = {
+                "integration_health": 20,
+                "capability_gap": 15,
+                "runtime_finding": 10,
+                "autonomous_continuity": 5,
+                "strategic_objective": -30 if has_actionable else 0,
+            }.get(source, 0)
+            return base + source_bonus
+
+        if phase == "post_dass":
+            source_bonus = {
+                "integration_health": 15,
+                "capability_gap": 10,
+                "runtime_finding": 5,
+                "autonomous_continuity": 0,
+                "strategic_objective": -35 if has_actionable else 0,
+            }.get(source, 0)
+            value = self._bounded_number(candidate.get("expected_value"))
+            confidence = self._bounded_number(candidate.get("confidence"))
+            reversibility = self._bounded_number(candidate.get("reversibility"))
+            cost = self._bounded_number(candidate.get("cost"), 0.5)
+            risk = self._bounded_number(candidate.get("risk"), 0.0)
+            return base + source_bonus + 15 * value + 8 * confidence + 5 * reversibility - 8 * cost - 12 * risk
+
+        return base
 
     def prioritize(
         self,
         candidates: Iterable[Dict[str, Any]],
         excluded_objectives: Iterable[str] | None = None,
         cycle_count: int = 0,
+        phase: str | None = None,
     ) -> Dict[str, Any] | None:
         excluded: Set[str] = {
             self._text(objective).casefold()
@@ -84,22 +134,23 @@ class FactoryAutonomousObjectiveLoop:
             if self._text(objective)
         }
         candidate_list = list(candidates)
+        has_actionable = any(
+            candidate.get("source") in {"capability_gap", "integration_health", "runtime_finding"}
+            for candidate in candidate_list
+            if isinstance(candidate, dict)
+        )
         normalized: Dict[str, Dict[str, Any]] = {}
         for candidate in candidate_list:
             objective = self._text(candidate.get("objective"))
             if not objective or objective.casefold() in excluded:
                 continue
             key = objective.casefold()
-            current = normalized.get(key)
             item = {**candidate, "objective": objective}
-            if current is None or item.get("score", 0) > current.get("score", 0):
+            item["priority_score"] = self._phase_score(item, phase, has_actionable)
+            current = normalized.get(key)
+            if current is None or item["priority_score"] > current.get("priority_score", float("-inf")):
                 normalized[key] = item
 
-        # If all discovered work is already retired, generate a bounded,
-        # cycle-specific continuity objective instead of replaying the broad
-        # strategic objective. Advance past any continuity checkpoint that is
-        # already retired so a restart or persisted state cannot select the
-        # same checkpoint again.
         if not normalized:
             strategic = next(
                 (
@@ -127,6 +178,9 @@ class FactoryAutonomousObjectiveLoop:
                     "objective": continuity,
                     "source": "autonomous_continuity",
                     "score": 94,
+                    "priority_score": self._phase_score(
+                        {"source": "autonomous_continuity", "score": 94}, phase, has_actionable
+                    ),
                     "reason": "bounded continuity objective after candidate exhaustion",
                     "strategic_objective": strategic,
                 }
@@ -136,7 +190,7 @@ class FactoryAutonomousObjectiveLoop:
 
         ranked = sorted(
             normalized.values(),
-            key=lambda item: (-int(item.get("score", 0)), item["objective"].casefold()),
+            key=lambda item: (-float(item.get("priority_score", item.get("score", 0))), item["objective"].casefold()),
         )
         selected = dict(ranked[0])
         selected["strategic_objective_id"] = self.STRATEGIC_OBJECTIVE_ID
@@ -152,12 +206,14 @@ class FactoryAutonomousObjectiveLoop:
             candidates,
             context.get("excluded_objectives", []),
             int(context.get("cycle_count", 0) or 0),
+            context.get("phase"),
         )
         result = {
             "status": "selected" if selected else "no_candidate",
             "candidate_count": len(candidates),
             "candidates": candidates,
             "excluded_objectives": list(context.get("excluded_objectives", [])),
+            "phase": context.get("phase"),
             "selected": selected,
         }
         self._history.append(result)
