@@ -1,5 +1,5 @@
 [Unit]
-Description=Hands-Off Engine Autonomous Infrastructure Manager
+Description=Hands-Off Engine Governed DASS Autonomous Service
 Documentation=https://github.com/yaya1738/hands-off-engine
 After=network-online.target
 Wants=network-online.target
@@ -15,9 +15,13 @@ EnvironmentFile=-/etc/hands-off-engine.env
 
 # Cloud provider credentials are supplied through the protected environment file.
 # EnvironmentFile is intentionally optional so repository-native verification can run
-# without credentials; live infrastructure mutation remains governed elsewhere.
+# without credentials; live infrastructure mutation remains governed by the DASS
+# authority path and fail-closed controls.
 
-ExecStart=/usr/bin/python3 -m autonomous.unified_system --budget 500
+# Run the authoritative DASS phase supervisor, not the legacy autonomous runtime.
+# The supervisor performs one governed cycle and exits; systemd restarts it so the
+# same authoritative loop continues indefinitely while failures remain observable.
+ExecStart=/usr/bin/python3 /root/hands-off-engine/tools/autonomous_phase_supervisor.py
 
 Restart=always
 RestartSec=10
