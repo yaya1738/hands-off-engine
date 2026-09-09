@@ -1,0 +1,29 @@
+name: Autonomous Scheduled Release Audit
+
+on:
+  schedule:
+    - cron: '47 4 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-release-audit
+  cancel-in-progress: true
+
+jobs:
+  release-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify deployment workflows remain governed
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f .github/workflows/production-deploy.yml
+          test -f .github/workflows/deployment-preflight.yml
+          grep -q 'workflow_dispatch' .github/workflows/production-deploy.yml
+          grep -q 'live_mutation_guard.py' .github/workflows/production-deploy.yml
+      - name: Verify current revision
+        run: git rev-parse HEAD
+      - name: Verify operational Python
+        run: python -m compileall -q ai tools
