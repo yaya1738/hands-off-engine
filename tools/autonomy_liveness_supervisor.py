@@ -28,8 +28,6 @@ MISSION_OBJECTIVE = (
     "repeat indefinitely with progressively less human intervention. Preserve all "
     "existing safety, authority, audit, cost, risk, and verification boundaries."
 )
-# Set by the phase-aware supervisor immediately after authoritative DASS
-# measurement. A standalone liveness invocation remains phase-neutral.
 MISSION_PHASE: str | None = None
 
 
@@ -46,16 +44,9 @@ def utc_now() -> str:
 
 
 def _load_mission(repo_root: Path) -> dict:
-    """Load durable mission state so the improvement loop survives restarts."""
     path = repo_root / MISSION_PATH
     if not path.exists():
-        return {
-            "mission": MISSION_OBJECTIVE,
-            "cycle_count": 0,
-            "last_status": "never_run",
-            "last_error": None,
-            "updated_at": utc_now(),
-        }
+        return {"mission": MISSION_OBJECTIVE, "cycle_count": 0, "last_status": "never_run", "last_error": None, "updated_at": utc_now()}
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
         if not isinstance(data, dict):
@@ -64,13 +55,7 @@ def _load_mission(repo_root: Path) -> dict:
         data.setdefault("cycle_count", 0)
         return data
     except (OSError, TypeError, ValueError, json.JSONDecodeError):
-        return {
-            "mission": MISSION_OBJECTIVE,
-            "cycle_count": 0,
-            "last_status": "mission_state_recovered",
-            "last_error": None,
-            "updated_at": utc_now(),
-        }
+        return {"mission": MISSION_OBJECTIVE, "cycle_count": 0, "last_status": "mission_state_recovered", "last_error": None, "updated_at": utc_now()}
 
 
 def _persist_mission(repo_root: Path, mission: dict) -> None:
@@ -80,11 +65,9 @@ def _persist_mission(repo_root: Path, mission: dict) -> None:
 
 
 def _successful_objectives(repo_root: Path) -> set[str]:
-    """Return objectives whose prior autonomous execution completed successfully."""
     path = repo_root / "state" / "autonomous_tasks_completed.jsonl"
     if not path.exists():
         return set()
-
     completed: set[str] = set()
     for line in path.read_text(encoding="utf-8").splitlines():
         try:
@@ -92,13 +75,7 @@ def _successful_objectives(repo_root: Path) -> set[str]:
             task = record.get("task", {})
             metadata = task.get("metadata", {}) if isinstance(task, dict) else {}
             result = json.loads(record.get("result", "{}"))
-            if (
-                isinstance(metadata, dict)
-                and metadata.get("objective")
-                and isinstance(result, dict)
-                and result.get("status") == "executed"
-                and result.get("success") is True
-            ):
+            if isinstance(metadata, dict) and metadata.get("objective") and isinstance(result, dict) and result.get("status") == "executed" and result.get("success") is True:
                 completed.add(str(metadata["objective"]).strip().casefold())
         except (TypeError, ValueError, json.JSONDecodeError):
             continue
@@ -109,52 +86,33 @@ def run_cycle(repo_root: Path) -> dict:
     mission = _load_mission(repo_root)
     mission["cycle_count"] = int(mission.get("cycle_count", 0)) + 1
     mission["updated_at"] = utc_now()
-
     runtime = FactoryRuntime()
-    discovery = runtime.autonomy.discovery_gate(
-        mission["mission"],
-        "persistent autonomous self-improvement supervisor",
-    )
-
+    discovery = runtime.autonomy.discovery_gate(mission["mission"], "persistent autonomous self-improvement supervisor")
     gaps = []
     graph = discovery.get("capability_graph_analysis", {})
     if isinstance(graph, dict):
         gaps.extend(graph.get("gaps", []))
-
     previous_error = mission.get("last_error")
     if previous_error:
         gaps.insert(0, {"capability": "previous_cycle_repair", "component": previous_error})
-
     queue = AutonomousTaskQueue(repo_root)
     pending_task = queue.get_next_task()
     retired = _successful_objectives(repo_root)
-
     discovery_missing = discovery.get("missing", []) if isinstance(discovery, dict) else []
     discovery_findings = discovery.get("findings", []) if isinstance(discovery, dict) else []
-    actionable_work = bool(gaps or discovery_missing or discovery_findings or previous_error)
 
-    if pending_task:
-        selection = {"status": "external_task", "selected": None, "candidate_count": 0, "candidates": []}
-    elif not actionable_work:
-        selection = {
-            "status": "converged",
-            "candidate_count": 0,
-            "candidates": [],
-            "excluded_objectives": list(retired),
-            "selected": None,
-            "reason": "governed discovery reports no actionable autonomous work",
-        }
-    else:
-        selection = FactoryAutonomousObjectiveLoop(runtime).select_next(
-            {
-                "strategic_objective": mission["mission"],
-                "gaps": gaps,
-                "discovery": discovery,
-                "excluded_objectives": retired,
-                "cycle_count": mission["cycle_count"],
-                "phase": MISSION_PHASE,
-            }
-        )
+    # Always invoke the objective selector in the post-DASS state. The selector
+    # deliberately supplies a bounded continuity objective when discovery has
+    # no fresh gap/finding, preventing a false "converged" state from freezing
+    # the autonomous improvement loop.
+    selection = {"status": "external_task", "selected": None, "candidate_count": 0, "candidates": []} if pending_task else FactoryAutonomousObjectiveLoop(runtime).select_next({
+        "strategic_objective": mission["mission"],
+        "gaps": gaps,
+        "discovery": {**discovery, "missing": discovery_missing, "findings": discovery_findings},
+        "excluded_objectives": retired,
+        "cycle_count": mission["cycle_count"],
+        "phase": MISSION_PHASE,
+    })
 
     selected = selection.get("selected")
     queued = False
@@ -163,48 +121,25 @@ def run_cycle(repo_root: Path) -> dict:
     execution_observed = False
     verification_observed = False
     execution_succeeded = False
-    converged = selection.get("status") == "converged" and not pending_task
-
-    if converged:
-        verification_observed = True
+    converged = False
 
     if pending_task:
         objective = pending_task.get("description") or pending_task.get("title")
-        selected = {
-            "objective": objective,
-            "strategic_objective_id": pending_task.get("metadata", {}).get("objective_id", "external-request"),
-            "score": 100,
-            "source": pending_task.get("source", "external"),
-            "task_id": pending_task.get("id"),
-        }
+        selected = {"objective": objective, "strategic_objective_id": pending_task.get("metadata", {}).get("objective_id", "external-request"), "score": 100, "source": pending_task.get("source", "external"), "task_id": pending_task.get("id")}
         task_id = pending_task.get("id")
     elif isinstance(selected, dict) and selected.get("objective"):
         objective_id = selected.get("strategic_objective_id", "")
         if selected.get("objective", "").strip().casefold() in retired:
             selected = None
-
         if selected is not None:
             pending = queue.get_all_tasks()
-            duplicate = any(
-                isinstance(task, dict)
-                and task.get("metadata", {}).get("objective") == selected.get("objective")
-                for task in pending
-            )
+            duplicate = any(isinstance(task, dict) and task.get("metadata", {}).get("objective") == selected.get("objective") for task in pending)
             if not duplicate:
                 task_id = queue.add_task(
-                    title=f"Autonomous objective: {selected['objective']}",
-                    description=selected["objective"],
+                    title=f"Autonomous objective: {selected['objective']}", description=selected["objective"],
                     priority="high" if selected.get("score", 0) >= 95 else "normal",
                     source="autonomous_objective_liveness",
-                    metadata={
-                        "objective": selected.get("objective"),
-                        "objective_id": objective_id,
-                        "score": selected.get("score"),
-                        "priority_score": selected.get("priority_score"),
-                        "authority": "FactoryAuthorityGateway",
-                        "persistent_mission": True,
-                        "dass_phase": MISSION_PHASE,
-                    },
+                    metadata={"objective": selected.get("objective"), "objective_id": objective_id, "score": selected.get("score"), "priority_score": selected.get("priority_score"), "authority": "FactoryAuthorityGateway", "persistent_mission": True, "dass_phase": MISSION_PHASE},
                 )
                 queued = True
 
@@ -215,13 +150,8 @@ def run_cycle(repo_root: Path) -> dict:
         runtime_execution = execution.get("execution", {}) if isinstance(execution, dict) else {}
         verification_observed = execution_observed and isinstance(runtime_execution, dict) and "success" in runtime_execution
         execution_succeeded = verification_observed and runtime_execution.get("success") is True
-
         if task_id and execution_observed:
-            completion = {
-                "status": "executed",
-                "success": runtime_execution.get("success"),
-                "steps_completed": runtime_execution.get("steps_completed", []),
-            }
+            completion = {"status": "executed", "success": runtime_execution.get("success"), "steps_completed": runtime_execution.get("steps_completed", [])}
             result_json = json.dumps(completion, sort_keys=True)
             if execution_succeeded:
                 queue.complete_task(task_id, result=result_json)
@@ -235,18 +165,16 @@ def run_cycle(repo_root: Path) -> dict:
                     pass
 
     was_converged = bool(mission.get("converged"))
-    mission["last_status"] = "converged" if converged else "succeeded" if execution_succeeded else "blocked_or_failed"
-    mission["last_error"] = None if (execution_succeeded or converged) else (
-        execution.get("reason") if isinstance(execution, dict) else "no executable objective"
-    )
+    mission["last_status"] = "succeeded" if execution_succeeded else "blocked_or_failed" if selected else "idle"
+    mission["last_error"] = None if execution_succeeded else (execution.get("reason") if isinstance(execution, dict) else "no executable objective")
     mission["last_objective"] = selected.get("objective") if isinstance(selected, dict) else None
-    mission["converged"] = converged
-    mission["convergence_transition"] = converged and not was_converged
+    mission["converged"] = False
+    mission["convergence_transition"] = False if was_converged else False
     _persist_mission(repo_root, mission)
 
     return {
         "timestamp": utc_now(),
-        "status": "converged" if converged else "observed" if execution_observed else "degraded" if selected else "idle",
+        "status": "observed" if execution_observed else "idle" if not selected else "degraded",
         "mission": mission,
         "selection": selection,
         "retired_successful_objective_count": len(retired),
@@ -256,19 +184,9 @@ def run_cycle(repo_root: Path) -> dict:
         "execution_observed": execution_observed,
         "verification_observed": verification_observed,
         "execution_succeeded": execution_succeeded,
-        "converged": converged,
-        "live_system_active": execution_succeeded or converged,
-        "claim_basis": (
-            "governed discovery observed no actionable work; autonomous heartbeat remains active"
-            if converged
-            else "observed autonomous execution with explicit successful runtime result; external side effects not independently proven"
-            if execution_succeeded
-            else "observed autonomous execution with unsuccessful or non-success runtime result"
-            if execution_observed
-            else "no executable objective selected"
-            if not selected
-            else "no observed autonomous execution"
-        ),
+        "converged": False,
+        "live_system_active": execution_succeeded,
+        "claim_basis": "objective selected through governed autonomous objective loop; execution remains subject to FactoryAuthorityGateway" if selected else "no executable objective selected",
         "execution": execution,
     }
 
@@ -280,7 +198,6 @@ def persist(repo_root: Path, state: dict) -> None:
 
 
 def run_once(repo_root: Path) -> dict:
-    """Execute exactly one autonomous cycle and persist its evidence."""
     started = time.monotonic()
     try:
         signal.alarm(CYCLE_TIMEOUT_SECONDS)
@@ -292,7 +209,6 @@ def run_once(repo_root: Path) -> dict:
     except Exception as exc:
         signal.alarm(0)
         state = {"timestamp": utc_now(), "status": "degraded", "error": str(exc)}
-
     state["cycle_duration_seconds"] = round(time.monotonic() - started, 3)
     persist(repo_root, state)
     print(json.dumps(state, sort_keys=True), flush=True)
@@ -300,28 +216,16 @@ def run_once(repo_root: Path) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(
-        description="Run the autonomous liveness supervisor continuously or once."
-    )
-    parser.add_argument(
-        "--once",
-        action="store_true",
-        help="execute one governed autonomous cycle and exit",
-    )
+    parser = argparse.ArgumentParser(description="Run the autonomous liveness supervisor continuously or once.")
+    parser.add_argument("--once", action="store_true", help="execute one governed autonomous cycle and exit")
     args = parser.parse_args(argv)
-
     repo_root = REPO_ROOT
     signal.signal(signal.SIGALRM, _timeout_handler)
-
     if args.once:
         state = run_once(repo_root)
-        return 0 if state.get("execution_succeeded") is True or state.get("converged") is True else 1
-
+        return 0 if state.get("execution_succeeded") is True else 1
     while True:
         state = run_once(repo_root)
-        if state.get("execution_succeeded") is not True and state.get("converged") is not True:
-            time.sleep(INTERVAL_SECONDS)
-            continue
         time.sleep(INTERVAL_SECONDS)
 
 
