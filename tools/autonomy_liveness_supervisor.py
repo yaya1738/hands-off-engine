@@ -28,6 +28,9 @@ MISSION_OBJECTIVE = (
     "repeat indefinitely with progressively less human intervention. Preserve all "
     "existing safety, authority, audit, cost, risk, and verification boundaries."
 )
+# Set by the phase-aware supervisor immediately after authoritative DASS
+# measurement. A standalone liveness invocation remains phase-neutral.
+MISSION_PHASE: str | None = None
 
 
 class CycleTimeout(Exception):
@@ -133,12 +136,6 @@ def run_cycle(repo_root: Path) -> dict:
     if pending_task:
         selection = {"status": "external_task", "selected": None, "candidate_count": 0, "candidates": []}
     elif not actionable_work:
-        # A healthy autonomous system must be able to converge. Once the
-        # governed discovery layer reports no actionable gaps/findings and no
-        # external task is pending, do not manufacture another continuity
-        # objective merely to create activity. Keep the heartbeat active and
-        # persist an explicit convergence result so future regressions can
-        # reopen autonomous work naturally.
         selection = {
             "status": "converged",
             "candidate_count": 0,
@@ -155,6 +152,7 @@ def run_cycle(repo_root: Path) -> dict:
                 "discovery": discovery,
                 "excluded_objectives": retired,
                 "cycle_count": mission["cycle_count"],
+                "phase": MISSION_PHASE,
             }
         )
 
@@ -167,11 +165,6 @@ def run_cycle(repo_root: Path) -> dict:
     execution_succeeded = False
     converged = selection.get("status") == "converged" and not pending_task
 
-    # Convergence is itself a verified autonomous outcome: the governed
-    # discovery gate ran successfully and explicitly found no actionable work.
-    # It must therefore satisfy the same verification contract used by hosted
-    # production liveness checks, without implying that any external side
-    # effect was performed.
     if converged:
         verification_observed = True
 
@@ -207,8 +200,10 @@ def run_cycle(repo_root: Path) -> dict:
                         "objective": selected.get("objective"),
                         "objective_id": objective_id,
                         "score": selected.get("score"),
+                        "priority_score": selected.get("priority_score"),
                         "authority": "FactoryAuthorityGateway",
                         "persistent_mission": True,
+                        "dass_phase": MISSION_PHASE,
                     },
                 )
                 queued = True
@@ -285,12 +280,7 @@ def persist(repo_root: Path, state: dict) -> None:
 
 
 def run_once(repo_root: Path) -> dict:
-    """Execute exactly one autonomous cycle and persist its evidence.
-
-    The process result is part of the verification contract: a degraded cycle
-    must produce a non-zero exit status so callers cannot accidentally treat a
-    failed autonomous cycle as a successful production heartbeat.
-    """
+    """Execute exactly one autonomous cycle and persist its evidence."""
     started = time.monotonic()
     try:
         signal.alarm(CYCLE_TIMEOUT_SECONDS)
@@ -330,8 +320,6 @@ def main(argv: list[str] | None = None) -> int:
     while True:
         state = run_once(repo_root)
         if state.get("execution_succeeded") is not True and state.get("converged") is not True:
-            # Continuous service remains alive for recovery, but each failed
-            # cycle is explicitly persisted and observable to the caller.
             time.sleep(INTERVAL_SECONDS)
             continue
         time.sleep(INTERVAL_SECONDS)
