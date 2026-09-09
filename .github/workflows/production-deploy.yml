@@ -4,27 +4,21 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: 'Exact main commit SHA to deploy; defaults to current main'
+        description: Exact current-main commit SHA to deploy
         required: false
-        default: ''
         type: string
       activate:
-        description: 'Activate production execution where a remote host is configured'
+        description: Activate the production services after exact-SHA verification
         required: false
         default: true
         type: boolean
 
-# Serialize deployment with the autonomous production authority so a manual
-# deployment cannot overlap a durable-state-producing autonomous cycle.
-concurrency:
-  group: autonomous-production-authority
-  cancel-in-progress: false
-
 permissions:
   contents: read
 
-env:
-  PYTHONUNBUFFERED: '1'
+concurrency:
+  group: autonomous-production-authority
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -143,8 +137,10 @@ jobs:
           git checkout --detach "$requested_sha"
           test "$(git rev-parse HEAD)" = "$requested_sha"
           if [[ "$activate" == 'true' ]]; then
-            test -f scripts/systemd/hands-off-autonomy-supervisor.service
-            sudo install -m 0644 scripts/systemd/hands-off-autonomy-supervisor.service /etc/systemd/system/hands-off-autonomy-supervisor.service
+            for unit in hands-off-autonomous.service hands-off-autonomy-supervisor.service; do
+              test -f "scripts/systemd/$unit"
+              sudo install -m 0644 "scripts/systemd/$unit" "/etc/systemd/system/$unit"
+            done
             sudo systemctl daemon-reload
             required_services=(hands-off-autonomous.service hands-off-telegram.service hands-off-autonomy-supervisor.service)
             for svc in "${required_services[@]}"; do
