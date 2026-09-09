@@ -109,7 +109,24 @@ jobs:
             echo 'No autonomous state changes to persist.'
           else
             git commit -m "chore: persist phase-aware autonomous cycle state [skip ci]"
-            git push origin HEAD:main
+            # The runner starts from main, but main may advance while the
+            # autonomous cycle is executing (for example, a merged PR). Rebase
+            # the state-only commit onto the newest main before pushing so an
+            # otherwise successful cycle cannot lose continuity to a stale ref.
+            # Retry because another writer can advance main between fetch and push.
+            for attempt in 1 2 3; do
+              git fetch --prune origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                echo "Persisted autonomous state on current main (attempt $attempt)."
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo 'Failed to persist autonomous state after 3 synchronized push attempts.' >&2
+                exit 1
+              fi
+              sleep $((attempt * 2))
+            done
           fi
 
       - name: Upload machine-readable autonomy evidence
