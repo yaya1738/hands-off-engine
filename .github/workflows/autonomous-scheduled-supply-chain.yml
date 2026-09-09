@@ -1,0 +1,28 @@
+name: Autonomous Scheduled Supply Chain Audit
+
+on:
+  schedule:
+    - cron: '13 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-supply-chain
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inspect tracked executable surface
+        shell: bash
+        run: |
+          set -euo pipefail
+          git ls-files '*.py' '*.sh' '*.yml' '*.yaml' '*.service' | sort > /tmp/operational-files
+          test -s /tmp/operational-files
+          echo "tracked operational files: $(wc -l < /tmp/operational-files)"
+      - name: Compile all operational Python
+        run: python -m compileall -q ai tools
+      - name: Verify DASS purity
+        run: python tools/factory_forensics/dass_measurement.py
