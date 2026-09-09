@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
-"""Fail-closed DASS purity/coverage measurement.
+"""Fail-closed measurement of the declared DASS production surface.
 
-The denominator is the active DASS runtime surface declared in dass_scope.json.
-Legacy, income-oriented, backups, tests and documentation are not silently
-counted as DASS. A new production file must be deliberately placed under an
-active root; otherwise the measurement fails rather than inflating the score.
+Every tracked path is classified as DASS, explicitly quarantined, or
+explicitly non-runtime support. Executable/operational paths cannot remain
+unclassified. Python imports are checked with the AST rather than substring
+matching. This makes a 100% result an independently measured property.
 """
 from __future__ import annotations
 
+import ast
 import json
 import subprocess
 from pathlib import Path
@@ -25,41 +26,63 @@ def matches(path: str, root: str) -> bool:
     return path.startswith(root) if root.endswith("/") else path == root
 
 
+def classify(path: str, scope: dict) -> str:
+    if any(matches(path, r) for r in scope["active_roots"]):
+        return "dass"
+    if any(matches(path, r) for r in scope["non_dass_quarantined_roots"]):
+        return "quarantined"
+    if (path.startswith(("tests/", ".github/", "docs/"))
+        or path.endswith((".md", ".txt", ".rst"))
+        or path.startswith(("examples/", "samples/"))):
+        return "support"
+    return "unclassified"
+
+
+def python_imports(path: str) -> list[str]:
+    try:
+        tree = ast.parse((ROOT / path).read_text(encoding="utf-8", errors="ignore"), filename=path)
+    except SyntaxError:
+        return [f"{path}: syntax-error"]
+    found: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            found.extend(a.name for a in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            found.append(node.module)
+    return found
+
+
 def main() -> int:
     scope = json.loads(SCOPE.read_text(encoding="utf-8"))
     files = tracked_files()
-    active = [p for p in files if any(matches(p, r) for r in scope["active_roots"])]
-
-    # Active files are mapped by construction to an explicit active root.
-    unmapped = [p for p in active if not any(matches(p, r) for r in scope["active_roots"])]
-
-    quarantined = [
-        p for p in files if any(matches(p, r) for r in scope["non_dass_quarantined_roots"])
-    ]
-
-    # No quarantined income/legacy module may be imported by active Python code.
+    classes = {p: classify(p, scope) for p in files}
+    dass = [p for p, c in classes.items() if c == "dass"]
+    quarantined = [p for p, c in classes.items() if c == "quarantined"]
+    unclassified = [p for p, c in classes.items() if c == "unclassified"]
+    prefixes = [r.rstrip("/").replace("/", ".") for r in scope["non_dass_quarantined_roots"]]
     import_hits: list[str] = []
-    for p in active:
+    for p in dass:
         if not p.endswith(".py"):
             continue
-        text = (ROOT / p).read_text(encoding="utf-8", errors="ignore")
-        for q in scope["non_dass_quarantined_roots"]:
-            token = q.rstrip("/").split("/")[-1]
-            if token.endswith("_"):
-                token = token[:-1]
-            if token and f"import {token}" in text:
-                import_hits.append(f"{p}: import {token}")
+        for module in python_imports(p):
+            if any(module == prefix or module.startswith(prefix + ".") for prefix in prefixes):
+                import_hits.append(f"{p}: {module}")
 
-    mapped = len(active) - len(unmapped)
-    coverage = 100.0 if not active else (100.0 * mapped / len(active))
-    pure = not unmapped and not import_hits
-
+    operational_unclassified = [
+        p for p in unclassified
+        if p.endswith((".py", ".sh", ".service", ".yml", ".yaml"))
+    ]
+    measured = len(dass)
+    coverage = 100.0 if not operational_unclassified else 100.0 * measured / (measured + len(operational_unclassified))
+    pure = not operational_unclassified and not import_hits
     report = {
         "mission": scope["mission"],
-        "active_files": len(active),
-        "mapped_active_files": mapped,
-        "unmapped_active_files": unmapped,
+        "tracked_files": len(files),
+        "dass_runtime_files": measured,
         "quarantined_non_dass_files": len(quarantined),
+        "support_files": sum(c == "support" for c in classes.values()),
+        "unclassified_files": unclassified,
+        "operational_unclassified_files": operational_unclassified,
         "quarantined_import_hits": import_hits,
         "dass_coverage_percent": round(coverage, 2),
         "dass_pure": pure,
