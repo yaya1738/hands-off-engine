@@ -14,6 +14,7 @@ from ai.factory.capability_graph_intelligence import FactoryCapabilityGraphIntel
 from ai.factory.execution_journal import FactoryExecutionJournal
 from ai.factory.execution_reconciler import FactoryExecutionReconciler
 from ai.factory.restart_reconciliation import FactoryRestartReconciliation
+from ai.factory.capital_intelligence import CapitalIntelligence
 from ai.decision.action_kernel import ActionDecision
 from ai.decision.convergence import ConvergenceController
 from factory_capability_requirement_inference import FactoryCapabilityRequirementInference
@@ -29,6 +30,7 @@ class FactoryAuthorityGateway:
         )
         self.startup_reconciliation = self.restart_reconciliation.on_startup()
         self.convergence = ConvergenceController()
+        self.capital_intelligence = CapitalIntelligence()
         self.tracker = self.runtime.development_tracker
         self.approval = self.runtime.improvement_approval
         self.queue = self.runtime.improvement_queue
@@ -164,9 +166,10 @@ class FactoryAuthorityGateway:
             "component": "FactoryAuthorityGateway",
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "shared_state": True,
-            "startup_reconciliation": self.startup_reconciliation,
             "decision_kernel": "ai.decision.action_kernel",
             "convergence_controller": "ai.decision.convergence.ConvergenceController",
+            "capital_intelligence": self.capital_intelligence.report(),
+            "startup_reconciliation": self.startup_reconciliation,
         }
 
 
