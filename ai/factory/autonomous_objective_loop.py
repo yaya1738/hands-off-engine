@@ -86,6 +86,17 @@ class FactoryAutonomousObjectiveLoop:
             return base + source_bonus + 15 * value + 8 * confidence + 5 * reversibility - 8 * cost - 12 * risk
         return base
 
+    def _continuity_candidate(self, excluded: Set[str], cycle_count: int, phase: str | None, strategic: str) -> Dict[str, Any] | None:
+        cycle = max(1, int(cycle_count or 0))
+        while cycle <= cycle + len(excluded) + 1:
+            continuity = f"Perform bounded autonomous continuity checkpoint {cycle}: inspect the governed runtime for the highest-value actionable capability gap, validate the finding through existing safety and authority gates, and record the next bounded improvement without weakening any safety, audit, cost, risk, or verification boundary."
+            if continuity.casefold() not in excluded:
+                item = {"objective": continuity, "source": "autonomous_continuity", "score": 94, "reason": "bounded continuity objective after candidate exhaustion", "strategic_objective": strategic}
+                item["priority_score"] = self._phase_score(item, phase, False)
+                return item
+            cycle += 1
+        return None
+
     def prioritize(self, candidates: Iterable[Dict[str, Any]], excluded_objectives: Iterable[str] | None = None, cycle_count: int = 0, phase: str | None = None) -> Dict[str, Any] | None:
         excluded: Set[str] = {self._text(objective).casefold() for objective in (excluded_objectives or []) if self._text(objective)}
         candidate_list = list(candidates)
@@ -101,16 +112,20 @@ class FactoryAutonomousObjectiveLoop:
             current = normalized.get(key)
             if current is None or item["priority_score"] > current.get("priority_score", float("-inf")):
                 normalized[key] = item
+
+        # A persistent mission must never become permanently converged merely
+        # because its strategic objective and prior continuity checkpoints are
+        # already retired. When discovery is exhausted, create a fresh,
+        # bounded continuity objective regardless of whether the strategic
+        # objective itself survived candidate filtering.
         if not normalized:
             strategic = next((self._text(candidate.get("objective")) for candidate in candidate_list if self._text(candidate.get("objective")) and candidate.get("source") == "strategic_objective"), "")
-            if strategic and strategic.casefold() in excluded:
-                cycle = max(1, int(cycle_count or 0))
-                while True:
-                    continuity = f"Perform bounded autonomous continuity checkpoint {cycle}: inspect the governed runtime for the highest-value actionable capability gap, validate the finding through existing safety and authority gates, and record the next bounded improvement without weakening any safety, audit, cost, risk, or verification boundary."
-                    if continuity.casefold() not in excluded:
-                        break
-                    cycle += 1
-                normalized[continuity.casefold()] = {"objective": continuity, "source": "autonomous_continuity", "score": 94, "priority_score": self._phase_score({"source": "autonomous_continuity", "score": 94}, phase, has_actionable), "reason": "bounded continuity objective after candidate exhaustion", "strategic_objective": strategic}
+            if not strategic:
+                strategic = "Continuously improve the governed autonomous system while preserving every safety, authority, audit, cost, risk, and verification boundary."
+            continuity = self._continuity_candidate(excluded, cycle_count, phase, strategic)
+            if continuity:
+                normalized[continuity["objective"].casefold()] = continuity
+
         if not normalized:
             return None
         ranked = sorted(normalized.values(), key=lambda item: (-float(item.get("priority_score", item.get("score", 0))), item["objective"].casefold()))
