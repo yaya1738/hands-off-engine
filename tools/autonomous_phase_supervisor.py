@@ -35,8 +35,6 @@ def _load_previous_phase(path: Path) -> dict:
         data = json.loads(path.read_text(encoding="utf-8"))
         return data if isinstance(data, dict) else {}
     except (OSError, TypeError, ValueError, json.JSONDecodeError):
-        # Phase history is evidence only; corrupted history must never block a
-        # fresh authoritative measurement from selecting the current phase.
         return {}
 
 
@@ -82,6 +80,10 @@ def main() -> int:
     supervisor.MISSION_OBJECTIVE = (
         POST_DASS_OBJECTIVE if phase == "post_dass" else PRE_DASS_OBJECTIVE
     )
+    # Pass the authoritative phase into selection. This keeps the phase
+    # decision derived from measurement rather than inferred from the mission
+    # text, while preserving the existing governed execution path.
+    supervisor.MISSION_PHASE = phase
     state = supervisor.run_once(ROOT)
     state["dass_phase"] = phase_state
     supervisor.persist(ROOT, state)
