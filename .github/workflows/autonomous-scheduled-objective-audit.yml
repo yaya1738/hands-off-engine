@@ -1,0 +1,23 @@
+name: Autonomous Scheduled Objective Audit
+
+on:
+  schedule:
+    - cron: '27 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-objective-audit
+  cancel-in-progress: true
+
+jobs:
+  objective:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run the governed objective cycle
+        run: python tools/autonomy_liveness_supervisor.py --once
+      - name: Verify DASS remains complete
+        run: python tools/factory_forensics/dass_measurement.py
+      - name: Compile operational runtime
+        run: python -m compileall -q ai/factory tools
