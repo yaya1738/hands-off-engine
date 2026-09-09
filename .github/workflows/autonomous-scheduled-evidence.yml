@@ -1,0 +1,33 @@
+name: Autonomous Scheduled Evidence Integrity
+
+on:
+  schedule:
+    - cron: '5,35 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-evidence
+  cancel-in-progress: true
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify Git object and working-tree integrity
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fsck --no-progress --full
+          test -z "$(git status --porcelain)"
+      - name: Verify required evidence surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -d state
+          test -d tools/factory_forensics
+          test -f DASS_SCOPE.md
+          test -f tools/factory_forensics/dass_measurement.py
+      - name: Measure DASS evidence state
+        run: python tools/factory_forensics/dass_measurement.py
