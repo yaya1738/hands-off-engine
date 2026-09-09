@@ -1,0 +1,48 @@
+name: Autonomous GitHub Governance Audit
+
+on:
+  schedule:
+    - cron: '4,34 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+  pull-requests: read
+  issues: read
+
+concurrency:
+  group: autonomous-github-governance
+  cancel-in-progress: true
+
+jobs:
+  governance:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Audit recent Actions failures
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          failures="$(gh api --paginate '/repos/${GITHUB_REPOSITORY}/actions/runs?per_page=100&branch=main' --jq '.workflow_runs[] | select(.status == "completed" and .conclusion == "failure") | [.name,.run_number,.id] | @tsv' | head -20 || true)"
+          if [ -n "$failures" ]; then
+            echo "Recent main-branch workflow failures detected:"
+            echo "$failures"
+          else
+            echo "No recent main-branch workflow failures in the inspected page."
+          fi
+      - name: Audit open pull requests
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          count="$(gh api '/repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100' --jq 'length')"
+          echo "Open pull requests: $count"
+          gh api '/repos/${GITHUB_REPOSITORY}/pulls?state=open&per_page=100' --jq '.[] | [.number,.title,.draft,.mergeable_state] | @tsv' | head -50 || true
+      - name: Audit open blocking issues
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh api '/repos/${GITHUB_REPOSITORY}/issues?state=open&per_page=100' --jq '.[] | select(.pull_request == null) | [.number,.title] | @tsv' | head -100 || true
