@@ -6,6 +6,7 @@
     "ai/factory/",
     "tools/autonomy_liveness_supervisor.py",
     "tools/autonomous_phase_supervisor.py",
+    "tools/autonomous_integrated_supervisor.py",
     "tools/factory_forensics/",
     ".github/workflows/autonomous-production-service.yml",
     ".github/workflows/autonomous-authority-reconcile.yml",
