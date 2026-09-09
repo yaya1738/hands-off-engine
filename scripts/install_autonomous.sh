@@ -14,8 +14,10 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-INSTALL_DIR="/opt/hands-off-engine"
-LOG_DIR="/var/log/hands-off"
+# Keep the installer aligned with the governed production service path.
+# Override only for an explicitly different installation target.
+INSTALL_DIR="${INSTALL_DIR:-/root/hands-off-engine}"
+LOG_DIR="${LOG_DIR:-/var/log/hands-off}"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -33,17 +35,23 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-echo -e "${BLUE}Step 1: Creating directories...${NC}"
-mkdir -p "$INSTALL_DIR"
-mkdir -p "$LOG_DIR"
-chmod 755 "$INSTALL_DIR"
-chmod 755 "$LOG_DIR"
-echo -e "${GREEN}✓ Directories created${NC}"
+if [ "$PROJECT_DIR" != "$INSTALL_DIR" ]; then
+    echo -e "${BLUE}Step 1: Creating directories...${NC}"
+    mkdir -p "$INSTALL_DIR"
+    mkdir -p "$LOG_DIR"
+    chmod 755 "$INSTALL_DIR"
+    chmod 755 "$LOG_DIR"
+    echo -e "${GREEN}✓ Directories created${NC}"
 
-echo -e "${BLUE}Step 2: Copying files...${NC}"
-cp -r "$PROJECT_DIR"/* "$INSTALL_DIR/"
-chmod +x "$INSTALL_DIR/scripts/"*.sh 2>/dev/null || true
-echo -e "${GREEN}✓ Files copied${NC}"
+    echo -e "${BLUE}Step 2: Copying files...${NC}"
+    cp -a "$PROJECT_DIR/." "$INSTALL_DIR/"
+    chmod +x "$INSTALL_DIR/scripts/"*.sh 2>/dev/null || true
+    echo -e "${GREEN}✓ Files copied${NC}"
+else
+    echo -e "${BLUE}Step 1-2: Installation directory is the source checkout; skipping self-copy.${NC}"
+    mkdir -p "$LOG_DIR"
+    chmod 755 "$LOG_DIR"
+fi
 
 echo -e "${BLUE}Step 3: Installing systemd services...${NC}"
 cp "$INSTALL_DIR/scripts/systemd/hands-off-autonomous.service" /etc/systemd/system/
@@ -72,7 +80,7 @@ if [ ! -f /etc/hands-off-engine.env ]; then
 INFRA_BUDGET=500
 EOF
     echo -e "${YELLOW}⚠ Created /etc/hands-off-engine.env${NC}"
-    echo -e "${YELLOW}  Please edit this file and add your API keys!${NC}"
+    echo -e "${YELLOW}  Please edit this file and add required protected credentials.${NC}"
 else
     echo -e "${GREEN}✓ Environment file already exists${NC}"
 fi
@@ -88,7 +96,7 @@ echo -e "${GREEN}     INSTALLATION COMPLETE${NC}"
 echo -e "${GREEN}════════════════════════════════════════════════════════════════${NC}"
 echo ""
 echo -e "Next steps:"
-echo -e "  1. Edit /etc/hands-off-engine.env and add required credentials"
+echo -e "  1. Ensure /etc/hands-off-engine.env contains any required protected credentials"
 echo -e "  2. Start the services: ${BLUE}systemctl start hands-off-autonomous hands-off-autonomy-supervisor${NC}"
 echo -e "  3. Check status:       ${BLUE}systemctl status hands-off-autonomous hands-off-autonomy-supervisor${NC}"
 echo -e "  4. View liveness log:  ${BLUE}journalctl -u hands-off-autonomy-supervisor -f${NC}"
