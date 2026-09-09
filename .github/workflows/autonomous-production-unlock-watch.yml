@@ -1,0 +1,51 @@
+name: Autonomous Production Unlock Watch
+
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-production-unlock-watch
+  cancel-in-progress: true
+
+permissions:
+  actions: write
+  contents: read
+
+jobs:
+  unlock:
+    name: Re-attempt governed production activation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout current main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Verify repository-side gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --prune origin main
+          main_sha="$(git rev-parse origin/main)"
+          test "$main_sha" = "$(git rev-parse HEAD)"
+          test "$(git status --porcelain)" = ''
+          python tools/factory_forensics/live_mutation_guard.py .
+          python tools/factory_forensics/deployment_preflight.py .
+
+      - name: Invoke existing governed deployment gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          main_sha="$(git rev-parse HEAD)"
+          gh workflow run production-deploy.yml \
+            --repo "$GITHUB_REPOSITORY" \
+            --ref main \
+            -f ref="$main_sha" \
+            -f activate=true
+          echo "Governed production gate invoked for main=$main_sha."
+          echo "If external production authority is still unavailable, production-deploy.yml must fail closed or remain on its repository-native safe path; this watcher never supplies or bypasses credentials."
