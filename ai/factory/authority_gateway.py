@@ -16,6 +16,7 @@ from ai.factory.execution_reconciler import FactoryExecutionReconciler
 from ai.factory.restart_reconciliation import FactoryRestartReconciliation
 from ai.factory.capital_intelligence import CapitalIntelligence
 from ai.factory.economic_sustainability import EconomicSnapshot, EconomicSustainability
+from ai.factory.productive_capacity_optimizer import CapacityOpportunity, ProductiveCapacityOptimizer
 from ai.decision.action_kernel import ActionDecision
 from ai.decision.convergence import ConvergenceController
 from factory_capability_requirement_inference import FactoryCapabilityRequirementInference
@@ -33,6 +34,9 @@ class FactoryAuthorityGateway:
         self.convergence = ConvergenceController()
         self.capital_intelligence = CapitalIntelligence()
         self.economic_sustainability = EconomicSustainability()
+        self.productive_capacity = ProductiveCapacityOptimizer(
+            capital_floor_fraction=self.capital_intelligence.preservation_floor
+        )
         self.tracker = self.runtime.development_tracker
         self.approval = self.runtime.improvement_approval
         self.queue = self.runtime.improvement_queue
@@ -67,6 +71,24 @@ class FactoryAuthorityGateway:
             reserved_capital=float(reserved_capital),
         )
         return self.economic_sustainability.compute_policy(snapshot)
+
+    def optimize_productive_capacity(self, *, available_capital, opportunities):
+        """Choose between money, compute, hardware, software and revenue actions.
+
+        Hardware and compute are treated as productive capacity purchased with
+        capital, while software/revenue opportunities can replenish that capital.
+        This returns policy only; execution remains behind authorized adapters.
+        """
+        protected = float(available_capital) * self.productive_capacity.capital_floor_fraction
+        normalized = [
+            item if isinstance(item, CapacityOpportunity) else CapacityOpportunity(**item)
+            for item in opportunities
+        ]
+        return self.productive_capacity.decide(
+            available_capital=float(available_capital),
+            protected_capital=protected,
+            opportunities=normalized,
+        )
 
     @staticmethod
     def _verify_runtime_result(result, decision: ActionDecision) -> bool:
@@ -185,6 +207,7 @@ class FactoryAuthorityGateway:
             "convergence_controller": "ai.decision.convergence.ConvergenceController",
             "capital_intelligence": self.capital_intelligence.report(),
             "economic_sustainability": self.economic_sustainability.report(),
+            "productive_capacity_optimizer": self.productive_capacity.report(),
             "startup_reconciliation": self.startup_reconciliation,
         }
 
