@@ -6,8 +6,6 @@ on:
   pull_request:
   workflow_dispatch:
 
-# Shares the durable-state write lock with hosted production and authority
-# workflows so autonomous state commits cannot race.
 concurrency:
   group: autonomous-production-authority
   cancel-in-progress: false
@@ -24,15 +22,12 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Install test dependency
         run: python -m pip install --disable-pip-version-check pytest
-
       - name: Run objective, liveness, ingress, UI-independence, and phase tests
         run: python -m pytest tests/test_autonomous_objective_loop.py tests/test_autonomy_liveness_supervisor.py tests/test_consumer_ui_independence.py tests/test_chatgpt_ui_outage_contract.py tests/test_github_issue_autonomous_ingress.py tests/test_dass_phase.py -q
 
@@ -41,12 +36,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Check out repository
+      - name: Check out current main
         uses: actions/checkout@v4
         with:
           ref: main
           fetch-depth: 0
-
       - name: Resolve current main revision under the write lock
         shell: bash
         run: |
@@ -56,21 +50,16 @@ jobs:
           git checkout --detach "$current_sha"
           test "$(git rev-parse HEAD)" = "$current_sha"
           test "$(git status --porcelain)" = ''
-          echo "Operating on current main SHA: $current_sha"
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
       - name: Ingest authenticated GitHub autonomous requests
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m tools.github_issue_autonomous_ingress
-
-      - name: Run phase-aware governed autonomous objective cycle
-        run: python tools/autonomous_phase_supervisor.py
-
+      - name: Run integrated governed autonomous objective cycle
+        run: python tools/autonomous_integrated_supervisor.py
       - name: Persist autonomous state for the next cycle
         shell: bash
         run: |
@@ -95,25 +84,13 @@ jobs:
           fi
           git config user.name "hands-off-autonomy[bot]"
           git config user.email "hands-off-autonomy[bot]@users.noreply.github.com"
-          for f in \
-            state/autonomy_liveness.json \
-            state/autonomy_mission.json \
-            state/dass_phase.json \
-            state/autonomous_task_queue.json \
-            state/autonomous_tasks_completed.jsonl \
-            state/autonomous_task_attempts.jsonl \
-            state/autonomous_tasks.jsonl; do
+          for f in state/autonomy_liveness.json state/autonomy_mission.json state/dass_phase.json state/autonomous_task_queue.json state/autonomous_tasks_completed.jsonl state/autonomous_task_attempts.jsonl state/autonomous_tasks.jsonl; do
             if [ -e "$f" ]; then git add -f "$f"; fi
           done
           if git diff --cached --quiet; then
             echo 'No autonomous state changes to persist.'
           else
-            git commit -m "chore: persist phase-aware autonomous cycle state [skip ci]"
-            # The runner starts from main, but main may advance while the
-            # autonomous cycle is executing (for example, a merged PR). Rebase
-            # the state-only commit onto the newest main before pushing so an
-            # otherwise successful cycle cannot lose continuity to a stale ref.
-            # Retry because another writer can advance main between fetch and push.
+            git commit -m "chore: persist integrated autonomous cycle state [skip ci]"
             for attempt in 1 2 3; do
               git fetch --prune origin main
               git rebase origin/main
@@ -128,7 +105,6 @@ jobs:
               sleep $((attempt * 2))
             done
           fi
-
       - name: Upload machine-readable autonomy evidence
         uses: actions/upload-artifact@v4
         with:
