@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "mission": "DASS",
+  "definition": "DASS measures only the system surface that directly participates in the governed autonomous objective: autonomous decisioning, authorized action, continuous service/liveness, safety/authority enforcement, verification, recovery, and evidence.",
+  "active_roots": [
+    "ai/factory/",
+    "tools/autonomy_liveness_supervisor.py",
+    "tools/factory_forensics/",
+    ".github/workflows/autonomous-production-service.yml",
+    ".github/workflows/autonomous-authority-reconcile.yml",
+    ".github/workflows/autonomous-readiness-attestation.yml",
+    ".github/workflows/auto-merge.yml",
+    ".github/workflows/production-deploy.yml"
+  ],
+  "non_dass_quarantined_roots": [
+    "autonomous/income_",
+    "integrafix/income_",
+    "ai/INCOME_",
+    "deliverables/INCOME_",
+    "deliverables/income_pipeline/",
+    "backups/"
+  ],
+  "non_dass_rule": "Anything outside active_roots is not allowed to count as DASS runtime surface unless explicitly promoted by this manifest. Quarantined legacy/income material is retained for history but is not an autonomous production dependency.",
+  "score": {
+    "formula": "100 * mapped_active_files / active_files",
+    "target_percent": 100,
+    "zero_unmapped_active_files_required": true,
+    "zero_quarantined_imports_required": true
+  }
+}
