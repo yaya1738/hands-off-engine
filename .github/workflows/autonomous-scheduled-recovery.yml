@@ -1,0 +1,37 @@
+name: Autonomous Scheduled Recovery Audit
+
+on:
+  schedule:
+    - cron: '9,39 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-recovery
+  cancel-in-progress: true
+
+jobs:
+  recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run recovery readiness check
+        run: python tools/autonomy_liveness_supervisor.py --once
+      - name: Reject stale or contradictory liveness state
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          candidates = [Path('state/autonomy_liveness.json'), Path('state/autonomy_liveness_state.json')]
+          p = next((x for x in candidates if x.exists()), None)
+          if p is None:
+              raise SystemExit('liveness state missing')
+          d = json.loads(p.read_text())
+          if not isinstance(d, dict) or d.get('last_error') not in (None, ''):
+              raise SystemExit(f"liveness error: {d.get('last_error')!r}")
+          if d.get('live_system_active') is not True:
+              raise SystemExit('live system is not active')
+          print('recovery state healthy')
+          PY
