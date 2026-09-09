@@ -1,0 +1,33 @@
+name: Autonomous Scheduled Preflight
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-preflight
+  cancel-in-progress: true
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify repository policy surfaces
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f DASS_SCOPE.md
+          test -f tools/factory_forensics/dass_scope.json
+          test -f tools/factory_forensics/dass_measurement.py
+          test -f tools/autonomy_liveness_supervisor.py
+          test -f .github/workflows/autonomous-production-service.yml
+      - name: Verify no obvious credential material is tracked
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! git ls-files | grep -E '(^|/)(\.env|.*\.(pem|key|p12|pfx))$' || { echo 'tracked credential-like file detected'; exit 1; }
+      - name: Verify DASS precondition
+        run: python tools/factory_forensics/dass_measurement.py

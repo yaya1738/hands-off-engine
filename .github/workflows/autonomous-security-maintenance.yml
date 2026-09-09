@@ -1,0 +1,42 @@
+name: Autonomous Security Maintenance
+
+on:
+  schedule:
+    - cron: '11 3 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomous-security-maintenance
+  cancel-in-progress: true
+
+jobs:
+  security:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile operational Python
+        run: python -m compileall -q ai tools
+      - name: Install dependency audit tooling
+        run: python -m pip install --disable-pip-version-check pip-audit
+      - name: Audit Python dependencies when requirements are present
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -f requirements.txt ]; then
+            python -m pip_audit -r requirements.txt
+          else
+            echo 'No requirements.txt; dependency audit has no declared Python dependency set to inspect.'
+          fi
+      - name: Detect tracked private-key material
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-files | grep -E '\.(pem|key|p12|pfx)$' | grep -vE '(^|/)(tests?|fixtures?)/' ; then
+            echo 'Potential tracked private-key material detected.'
+            exit 1
+          fi
+          echo 'No tracked private-key file extensions detected.'

@@ -1,0 +1,43 @@
+name: Autonomous Evidence Integrity
+
+on:
+  schedule:
+    - cron: '9,39 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomous-evidence-integrity
+  cancel-in-progress: true
+
+jobs:
+  evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verify DASS measurement is executable
+        run: python tools/factory_forensics/dass_measurement.py
+      - name: Verify required autonomous surfaces exist
+        shell: bash
+        run: |
+          set -euo pipefail
+          required=(
+            tools/autonomy_liveness_supervisor.py
+            tools/factory_forensics/dass_measurement.py
+            .github/workflows/autonomous-production-service.yml
+            .github/workflows/autonomous-authority-reconcile.yml
+            .github/workflows/autonomous-readiness-attestation.yml
+          )
+          for path in "${required[@]}"; do
+            test -f "$path" || { echo "Missing required DASS evidence surface: $path"; exit 1; }
+          done
+      - name: Verify no accidental generated state is tracked
+        shell: bash
+        run: |
+          set -euo pipefail
+          bad="$(git ls-files | grep -E '(^|/)(__pycache__/|\.pytest_cache/|\.coverage$|coverage\.xml$)' || true)"
+          test -z "$bad" || { echo "$bad"; exit 1; }
+          echo 'Repository evidence surface is free of common generated test state.'

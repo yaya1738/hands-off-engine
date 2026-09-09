@@ -1,0 +1,42 @@
+name: Autonomous Recovery Readiness
+
+on:
+  schedule:
+    - cron: '14 */2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomous-recovery-readiness
+  cancel-in-progress: true
+
+jobs:
+  recovery:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate recovery-critical Python syntax
+        run: python -m compileall -q ai/factory tools
+      - name: Exercise liveness supervisor in one-shot mode
+        run: python tools/autonomy_liveness_supervisor.py --once
+      - name: Verify fail-closed production guard remains present
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f tools/factory_forensics/live_mutation_guard.py
+          grep -q 'fail' tools/factory_forensics/live_mutation_guard.py
+          test -f .github/workflows/production-deploy.yml
+          grep -q 'live_mutation_guard.py' .github/workflows/production-deploy.yml
+      - name: Verify recovery service definitions are not silently removed
+        shell: bash
+        run: |
+          set -euo pipefail
+          found=0
+          for p in $(git ls-files '*.service'); do
+            found=1
+            test -s "$p" || { echo "Empty service definition: $p"; exit 1; }
+          done
+          echo "Service-definition audit complete (service_files=$found)."

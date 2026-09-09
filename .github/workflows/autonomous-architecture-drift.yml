@@ -1,0 +1,56 @@
+name: Autonomous Architecture Drift Audit
+
+on:
+  schedule:
+    - cron: '41 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomous-architecture-drift
+  cancel-in-progress: true
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Inventory operational surfaces and workflow schedules
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          workflows = sorted(Path('.github/workflows').glob('*.y*ml'))
+          operational = [p for p in Path('.').rglob('*') if p.is_file() and (p.suffix in {'.py','.sh','.service'} or 'systemd' in p.parts)]
+          print(f'workflow_files={len(workflows)}')
+          print(f'operational_files={len(operational)}')
+          schedules = []
+          for p in workflows:
+              text = p.read_text(errors='replace')
+              for cron in re.findall(r"cron:\s*['\"]([^'\"]+)['\"]", text):
+                  schedules.append((cron, p.as_posix()))
+          print(f'scheduled_entries={len(schedules)}')
+          for cron, path in schedules:
+              print(f'SCHEDULE {cron} {path}')
+          missing = [str(p) for p in [
+              Path('ai/factory'), Path('tools/factory_forensics'),
+              Path('tools/autonomy_liveness_supervisor.py')
+          ] if not p.exists()]
+          if missing:
+              raise SystemExit('Missing required architecture surface(s): ' + ', '.join(missing))
+          PY
+      - name: Detect workflow YAML duplication by identical content
+        shell: bash
+        run: |
+          set -euo pipefail
+          dup="$(sha256sum .github/workflows/*.y*ml | sort | awk '{seen[$1]++; files[$1]=files[$1] " " $2} END {for (s in seen) if (seen[s] > 1) print files[s]}' || true)"
+          if [ -n "$dup" ]; then
+            echo "Identical workflow files detected:"; echo "$dup"
+          else
+            echo 'No identical workflow files detected.'
+          fi
