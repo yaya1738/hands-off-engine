@@ -1,0 +1,37 @@
+name: Autonomous Scheduled Dependency Audit
+
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-dependency-audit
+  cancel-in-progress: true
+
+jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Python dependency declarations
+        shell: bash
+        run: |
+          set -euo pipefail
+          if test -f requirements.txt; then python -m pip install --dry-run -r requirements.txt; fi
+      - name: Compile operational Python
+        run: python -m compileall -q ai tools
+      - name: Validate workflow YAML
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet pyyaml
+          python - <<'PY'
+          from pathlib import Path
+          import yaml
+          for p in Path('.github/workflows').glob('*.y*ml'):
+              with p.open() as f:
+                  yaml.safe_load(f)
+              print(p)
+          PY
