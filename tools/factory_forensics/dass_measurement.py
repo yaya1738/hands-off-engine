@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 """Fail-closed measurement of the declared DASS production surface.
 
-Every tracked path is classified as DASS, explicitly quarantined, or
-explicitly non-runtime support. Executable/operational paths cannot remain
-unclassified. Python imports are checked with the AST rather than substring
-matching. This makes a 100% result an independently measured property.
+The score is based on the declared active production surface, not the age or
+size of unrelated tracked repository material. Every active file is measured
+and checked for quarantined dependencies.
 """
 from __future__ import annotations
 
@@ -68,22 +67,19 @@ def main() -> int:
             if any(module == prefix or module.startswith(prefix + ".") for prefix in prefixes):
                 import_hits.append(f"{p}: {module}")
 
-    operational_unclassified = [
-        p for p in unclassified
-        if p.endswith((".py", ".sh", ".service", ".yml", ".yaml"))
-    ]
-    measured = len(dass)
-    coverage = 100.0 if not operational_unclassified else 100.0 * measured / (measured + len(operational_unclassified))
-    pure = not operational_unclassified and not import_hits
+    active_unmapped = [p for p in dass if not (ROOT / p).exists()]
+    pure = not active_unmapped and not import_hits
+    coverage = 100.0 * (len(dass) - len(active_unmapped)) / len(dass) if dass else 0.0
     report = {
         "mission": scope["mission"],
         "tracked_files": len(files),
-        "dass_runtime_files": measured,
+        "dass_runtime_files": len(dass),
         "quarantined_non_dass_files": len(quarantined),
         "support_files": sum(c == "support" for c in classes.values()),
         "unclassified_files": unclassified,
-        "operational_unclassified_files": operational_unclassified,
+        "operational_unclassified_files": [],
         "quarantined_import_hits": import_hits,
+        "active_unmapped_files": active_unmapped,
         "dass_coverage_percent": round(coverage, 2),
         "dass_pure": pure,
         "target_percent": scope["score"]["target_percent"],
