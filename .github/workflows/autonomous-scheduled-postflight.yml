@@ -1,0 +1,43 @@
+name: Autonomous Scheduled Postflight
+
+on:
+  schedule:
+    - cron: '12,42 * * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: autonomous-scheduled-postflight
+  cancel-in-progress: true
+
+jobs:
+  postflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run liveness supervisor
+        run: python tools/autonomy_liveness_supervisor.py --once
+      - name: Verify persisted liveness contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          candidates = [Path('state/autonomy_liveness.json'), Path('state/autonomy_liveness_state.json')]
+          p = next((x for x in candidates if x.exists()), None)
+          if p is None:
+              raise SystemExit('no liveness state file found')
+          data = json.loads(p.read_text())
+          if data.get('live_system_active') is not True:
+              raise SystemExit(f"live_system_active={data.get('live_system_active')!r}")
+          if data.get('converged') is True and data.get('execution_succeeded') is not False:
+              raise SystemExit('converged state has unexpected execution success')
+          if data.get('converged') is not True:
+              for key in ('execution_observed','verification_observed','execution_succeeded'):
+                  if data.get(key) is not True:
+                      raise SystemExit(f'non-converged state missing {key}=true')
+          print(json.dumps(data, sort_keys=True))
+          PY
+      - name: Re-measure DASS after runtime verification
+        run: python tools/factory_forensics/dass_measurement.py
