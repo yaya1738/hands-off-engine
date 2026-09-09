@@ -1,0 +1,44 @@
+name: Autonomous Runtime Health
+
+on:
+  schedule:
+    - cron: "7,22,37,52 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: autonomous-runtime-health
+  cancel-in-progress: true
+
+jobs:
+  runtime-health:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install runtime dependencies
+        run: |
+          if [ -f requirements.txt ]; then python -m pip install --disable-pip-version-check -r requirements.txt; fi
+      - name: Run targeted runtime health checks
+        run: |
+          python -m compileall -q ai/factory tools
+          python tools/autonomy_liveness_supervisor.py --once
+      - name: Assert liveness contract
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path('state/autonomy_liveness.json')
+          assert p.exists(), 'liveness state missing'
+          state = json.loads(p.read_text(encoding='utf-8'))
+          assert state.get('live_system_active') is True, state
+          if state.get('converged') is True:
+              assert state.get('execution_succeeded') is False, state
+              print('healthy converged state')
+          else:
+              assert state.get('execution_observed') is True, state
+              assert state.get('verification_observed') is True, state
+              assert state.get('execution_succeeded') is True, state
+              print('healthy executed state')
