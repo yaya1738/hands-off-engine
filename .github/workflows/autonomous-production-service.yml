@@ -17,8 +17,6 @@ permissions:
 env:
   PYTHONUNBUFFERED: "1"
 
-# A stale hosted runner must never block the next governed service cycle.
-# A newer cycle cancels the stale cycle before taking the same authority lock.
 concurrency:
   group: autonomous-production-authority
   cancel-in-progress: true
@@ -59,8 +57,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m tools.github_issue_autonomous_ingress
 
-      - name: Execute phase-aware autonomous service cycle
-        run: python tools/autonomous_phase_supervisor.py
+      - name: Execute integrated autonomous service cycle
+        run: python tools/autonomous_integrated_supervisor.py
 
       - name: Assert governed execution or verified convergence
         run: |
@@ -83,7 +81,9 @@ jobs:
               assert state.get("verification_observed") is True, state
               assert state.get("execution_succeeded") is True, state
               assert state.get("live_system_active") is True, state
-              print(f"Governed autonomous execution success verified in {selected}.")
+              execution = state.get("execution") or {}
+              assert "continuous_improvement" in execution, state
+              print(f"Integrated governed execution and continuous-improvement cycle verified in {selected}.")
           PY
 
       - name: Persist service evidence
@@ -121,16 +121,16 @@ jobs:
             if [ -e "$f" ]; then git add -f "$f"; fi
           done
           if ! git diff --cached --quiet; then
-            git commit -m "chore: persist phase-aware autonomous service state"
+            git commit -m "chore: persist integrated autonomous service state"
             for attempt in 1 2 3; do
               git fetch --prune origin main
               git rebase origin/main
               if git push origin HEAD:main; then
-                echo "Persisted phase-aware autonomous state on current main (attempt $attempt)."
+                echo "Persisted integrated autonomous state on current main (attempt $attempt)."
                 break
               fi
               if [ "$attempt" -eq 3 ]; then
-                echo 'Failed to persist phase-aware autonomous state after 3 synchronized push attempts.' >&2
+                echo 'Failed to persist integrated autonomous state after 3 synchronized push attempts.' >&2
                 exit 1
               fi
               sleep $((attempt * 2))
