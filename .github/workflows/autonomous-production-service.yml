@@ -59,8 +59,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: python -m tools.github_issue_autonomous_ingress
 
-      - name: Execute autonomous service cycle
-        run: python tools/autonomy_liveness_supervisor.py --once
+      - name: Execute phase-aware autonomous service cycle
+        run: python tools/autonomous_phase_supervisor.py
 
       - name: Assert governed execution or verified convergence
         run: |
@@ -69,17 +69,21 @@ jobs:
           from pathlib import Path
 
           state = json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
+          phase = json.loads(Path("state/dass_phase.json").read_text(encoding="utf-8"))
+          selected = phase.get("phase")
+          assert selected in {"pre_dass", "post_dass"}, phase
+
           converged = state.get("converged") is True
           if converged:
               assert state.get("live_system_active") is True, state
               assert state.get("execution_succeeded") is False, state
-              print("Governed autonomous convergence verified; heartbeat remains active.")
+              print(f"Governed autonomous convergence verified; heartbeat remains active in {selected}.")
           else:
               assert state.get("execution_observed") is True, state
               assert state.get("verification_observed") is True, state
               assert state.get("execution_succeeded") is True, state
               assert state.get("live_system_active") is True, state
-              print("Governed autonomous execution success verified.")
+              print(f"Governed autonomous execution success verified in {selected}.")
           PY
 
       - name: Persist service evidence
@@ -109,6 +113,7 @@ jobs:
           for f in \
             state/autonomy_liveness.json \
             state/autonomy_mission.json \
+            state/dass_phase.json \
             state/autonomous_task_queue.json \
             state/autonomous_tasks_completed.jsonl \
             state/autonomous_task_attempts.jsonl \
@@ -116,8 +121,20 @@ jobs:
             if [ -e "$f" ]; then git add -f "$f"; fi
           done
           if ! git diff --cached --quiet; then
-            git commit -m "chore: persist autonomous service state"
-            git push origin HEAD:main
+            git commit -m "chore: persist phase-aware autonomous service state"
+            for attempt in 1 2 3; do
+              git fetch --prune origin main
+              git rebase origin/main
+              if git push origin HEAD:main; then
+                echo "Persisted phase-aware autonomous state on current main (attempt $attempt)."
+                break
+              fi
+              if [ "$attempt" -eq 3 ]; then
+                echo 'Failed to persist phase-aware autonomous state after 3 synchronized push attempts.' >&2
+                exit 1
+              fi
+              sleep $((attempt * 2))
+            done
           fi
 
       - name: Publish execution evidence
@@ -128,6 +145,7 @@ jobs:
           path: |
             state/autonomy_liveness.json
             state/autonomy_mission.json
+            state/dass_phase.json
             state/autonomous_task_queue.json
             state/autonomous_tasks_completed.jsonl
             state/autonomous_task_attempts.jsonl
