@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run the governed autonomous loop with a DASS-derived operating objective."""
+"""Run the governed autonomous loop with a fail-closed DASS-derived objective."""
 from __future__ import annotations
 
 import json
@@ -28,6 +28,18 @@ POST_DASS_OBJECTIVE = (
 )
 
 
+def _load_previous_phase(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return data if isinstance(data, dict) else {}
+    except (OSError, TypeError, ValueError, json.JSONDecodeError):
+        # Phase history is evidence only; corrupted history must never block a
+        # fresh authoritative measurement from selecting the current phase.
+        return {}
+
+
 def persist_phase(phase: str, report: dict, previous: dict | None = None) -> dict:
     previous = previous or {}
     state = {
@@ -43,12 +55,29 @@ def persist_phase(phase: str, report: dict, previous: dict | None = None) -> dic
     return state
 
 
+def _phase_error_state(exc: Exception) -> dict:
+    return {
+        "timestamp": supervisor.utc_now(),
+        "status": "degraded",
+        "execution_succeeded": False,
+        "converged": False,
+        "live_system_active": False,
+        "phase_selection_failed": True,
+        "error": f"DASS phase measurement/selection failed: {exc}",
+    }
+
+
 def main() -> int:
-    report = measure()
-    phase = select_phase(report)
     phase_path = ROOT / "state" / "dass_phase.json"
-    previous = json.loads(phase_path.read_text(encoding="utf-8")) if phase_path.exists() else {}
-    phase_state = persist_phase(phase, report, previous)
+    try:
+        report = measure()
+        phase = select_phase(report)
+        phase_state = persist_phase(phase, report, _load_previous_phase(phase_path))
+    except Exception as exc:
+        state = _phase_error_state(exc)
+        supervisor.persist(ROOT, state)
+        print(json.dumps(state, sort_keys=True))
+        return 1
 
     supervisor.MISSION_OBJECTIVE = (
         POST_DASS_OBJECTIVE if phase == "post_dass" else PRE_DASS_OBJECTIVE
