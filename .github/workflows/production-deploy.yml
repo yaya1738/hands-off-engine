@@ -147,6 +147,10 @@ jobs:
               systemctl cat "$svc" >/dev/null 2>&1 || { echo "Required production service missing: $svc" >&2; exit 1; }
               sudo systemctl enable "$svc"
             done
+            test "$(systemctl show -p WorkingDirectory --value hands-off-autonomous.service)" = "/root/hands-off-engine"
+            test "$(systemctl show -p WorkingDirectory --value hands-off-autonomy-supervisor.service)" = "/root/hands-off-engine"
+            systemctl cat hands-off-autonomous.service | grep -F -- '/root/hands-off-engine' >/dev/null
+            systemctl cat hands-off-autonomy-supervisor.service | grep -F -- '/root/hands-off-engine' >/dev/null
             for svc in "${required_services[@]}"; do
               if ! systemctl is-active --quiet "$svc"; then sudo systemctl restart "$svc"; fi
             done
