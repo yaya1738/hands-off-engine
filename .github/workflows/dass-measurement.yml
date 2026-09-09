@@ -1,0 +1,20 @@
+name: DASS 100% Measurement
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  measure:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Measure DASS purity
+        run: python tools/factory_forensics/dass_measurement.py
