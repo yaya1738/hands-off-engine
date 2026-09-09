@@ -15,6 +15,7 @@ from ai.factory.execution_journal import FactoryExecutionJournal
 from ai.factory.execution_reconciler import FactoryExecutionReconciler
 from ai.factory.restart_reconciliation import FactoryRestartReconciliation
 from ai.factory.capital_intelligence import CapitalIntelligence
+from ai.factory.economic_sustainability import EconomicSnapshot, EconomicSustainability
 from ai.decision.action_kernel import ActionDecision
 from ai.decision.convergence import ConvergenceController
 from factory_capability_requirement_inference import FactoryCapabilityRequirementInference
@@ -31,6 +32,7 @@ class FactoryAuthorityGateway:
         self.startup_reconciliation = self.restart_reconciliation.on_startup()
         self.convergence = ConvergenceController()
         self.capital_intelligence = CapitalIntelligence()
+        self.economic_sustainability = EconomicSustainability()
         self.tracker = self.runtime.development_tracker
         self.approval = self.runtime.improvement_approval
         self.queue = self.runtime.improvement_queue
@@ -52,6 +54,19 @@ class FactoryAuthorityGateway:
             costs=costs, evidence=evidence, max_risk=max_risk,
             min_confidence=min_confidence, risk_check=risk_check,
         )
+
+    def evaluate_economics(self, *, available_capital, operating_burn,
+                           realized_inflow=0.0, expected_inflow=0.0,
+                           reserved_capital=0.0):
+        """Evaluate economic sustainability without performing financial actions."""
+        snapshot = EconomicSnapshot(
+            available_capital=float(available_capital),
+            operating_burn=float(operating_burn),
+            realized_inflow=float(realized_inflow),
+            expected_inflow=float(expected_inflow),
+            reserved_capital=float(reserved_capital),
+        )
+        return self.economic_sustainability.compute_policy(snapshot)
 
     @staticmethod
     def _verify_runtime_result(result, decision: ActionDecision) -> bool:
@@ -169,6 +184,7 @@ class FactoryAuthorityGateway:
             "decision_kernel": "ai.decision.action_kernel",
             "convergence_controller": "ai.decision.convergence.ConvergenceController",
             "capital_intelligence": self.capital_intelligence.report(),
+            "economic_sustainability": self.economic_sustainability.report(),
             "startup_reconciliation": self.startup_reconciliation,
         }
 
