@@ -1,18 +1,17 @@
-"""Compatibility CLI for the unified autonomous runtime.
+"""Compatibility CLI for the integrated autonomous runtime.
 
-The implementation lives in :mod:`autonomous.orchestrator`; this module
-preserves the production service entrypoint ``python -m autonomous.unified_system``.
+The production entrypoint now runs the existing infrastructure loop together
+with the Factory learning/improvement loop.
 """
-
 from __future__ import annotations
 
 import argparse
 
-from .orchestrator import start_live_system
+from .integrated_runtime import start_live_system
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Start the unified autonomous system")
+    parser = argparse.ArgumentParser(description="Start the integrated autonomous system")
     parser.add_argument("--budget", type=float, default=500.0)
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args()
