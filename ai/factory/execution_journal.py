@@ -5,6 +5,9 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 
+TERMINAL_STATES = {"COMPLETED", "FAILED", "CANCELLED"}
+
+
 class FactoryExecutionJournal:
     """Durable intent lifecycle used to reconcile interrupted work after restart."""
 
@@ -40,7 +43,36 @@ class FactoryExecutionJournal:
             if os.path.exists(temporary):
                 os.unlink(temporary)
 
-    def record(self, execution_id: str, state: str, intent: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def find_by_idempotency_key(self, idempotency_key: str) -> Optional[Dict[str, Any]]:
+        """Return the latest lifecycle entry carrying a caller-supplied idempotency key."""
+        key = str(idempotency_key).strip()
+        if not key:
+            return None
+        for entry in reversed(self._entries):
+            intent = entry.get("intent")
+            if isinstance(intent, dict) and intent.get("idempotency_key") == key:
+                return entry
+        return None
+
+    def record(
+        self,
+        execution_id: str,
+        state: str,
+        intent: Optional[Dict[str, Any]] = None,
+    ) -> Dict[str, Any]:
+        """Append a lifecycle event, rejecting illegal duplicate terminal events."""
+        if not execution_id or state not in {"STARTED", *TERMINAL_STATES}:
+            raise ValueError("invalid execution lifecycle event")
+        previous = self.latest(execution_id)
+        if previous is not None:
+            previous_state = previous.get("state")
+            allowed = (
+                previous_state == "STARTED" and state in TERMINAL_STATES
+            )
+            if previous_state in TERMINAL_STATES or not allowed:
+                raise ValueError(
+                    f"illegal execution lifecycle transition: {previous_state} -> {state}"
+                )
         entry = {
             "execution_id": execution_id,
             "state": state,
@@ -58,11 +90,10 @@ class FactoryExecutionJournal:
         return None
 
     def interrupted(self) -> List[Dict[str, Any]]:
-        terminal = {"COMPLETED", "FAILED", "CANCELLED"}
         latest = {}
         for entry in self._entries:
             latest[entry.get("execution_id")] = entry
-        return [entry for entry in latest.values() if entry.get("state") not in terminal]
+        return [entry for entry in latest.values() if entry.get("state") not in TERMINAL_STATES]
 
     def history(self) -> List[Dict[str, Any]]:
         return list(self._entries)

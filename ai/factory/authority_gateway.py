@@ -43,9 +43,6 @@ class FactoryAuthorityGateway:
 
     def decide_action(self, *, action, confidence, risk_score, costs, evidence,
                       max_risk=1.0, min_confidence=0.4, risk_check=None):
-        # Keep the authority decision boundary self-contained even when a
-        # controlled test or recovery path reconstructs this gateway without
-        # calling __init__.
         if not hasattr(self, "convergence"):
             self.convergence = ConvergenceController()
         return self.convergence.evaluate(
@@ -58,16 +55,39 @@ class FactoryAuthorityGateway:
     def _verify_runtime_result(result, decision: ActionDecision) -> bool:
         return isinstance(result, dict) and result.get("success") is True
 
-    def execute_autonomous(self, objective):
-        """Route autonomous work through the canonical convergence lifecycle."""
+    def execute_autonomous(self, objective, idempotency_key=None):
+        """Route autonomous work through the canonical convergence lifecycle.
+
+        A caller-supplied idempotency key makes retries safe: an in-flight key is
+        rejected and a terminal key replays the recorded outcome without running
+        the objective a second time. Omitting the key preserves existing behavior.
+        """
         if objective is None:
             raise ValueError("objective is required")
         objective = str(objective).strip()
         if not objective:
             raise ValueError("objective must not be empty")
+        if idempotency_key is not None:
+            idempotency_key = str(idempotency_key).strip()
+            if not idempotency_key:
+                raise ValueError("idempotency_key must not be empty")
+            existing = self.execution_journal.find_by_idempotency_key(idempotency_key)
+            if existing is not None:
+                existing_intent = existing.get("intent") or {}
+                if existing_intent.get("objective") != objective:
+                    raise ValueError("idempotency_key is already bound to another objective")
+                state = existing.get("state")
+                if state == "STARTED":
+                    return {"status": "in_progress", "execution_id": existing.get("execution_id"),
+                            "idempotent": True}
+                result = existing_intent.get("result")
+                return {"status": "idempotent_replay", "execution_id": existing.get("execution_id"),
+                        "state": state, "result": result, "idempotent": True}
 
         execution_id = str(uuid.uuid4())
         intent = {"objective": objective, "entrypoint": "FactoryAuthorityGateway"}
+        if idempotency_key is not None:
+            intent["idempotency_key"] = idempotency_key
         self.execution_journal.record(execution_id, "STARTED", intent)
         try:
             capability_evaluation = FactoryCapabilityRequirementInference().evaluate(objective)
