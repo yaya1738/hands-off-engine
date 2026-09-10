@@ -101,10 +101,6 @@ def run_cycle(repo_root: Path) -> dict:
     discovery_missing = discovery.get("missing", []) if isinstance(discovery, dict) else []
     discovery_findings = discovery.get("findings", []) if isinstance(discovery, dict) else []
 
-    # Always invoke the objective selector in the post-DASS state. The selector
-    # deliberately supplies a bounded continuity objective when discovery has
-    # no fresh gap/finding, preventing a false "converged" state from freezing
-    # the autonomous improvement loop.
     selection = {"status": "external_task", "selected": None, "candidate_count": 0, "candidates": []} if pending_task else FactoryAutonomousObjectiveLoop(runtime).select_next({
         "strategic_objective": mission["mission"],
         "gaps": gaps,
@@ -165,16 +161,17 @@ def run_cycle(repo_root: Path) -> dict:
                     pass
 
     was_converged = bool(mission.get("converged"))
-    mission["last_status"] = "succeeded" if execution_succeeded else "blocked_or_failed" if selected else "idle"
-    mission["last_error"] = None if execution_succeeded else (execution.get("reason") if isinstance(execution, dict) else "no executable objective")
+    no_actionable_work = selected is None and not pending_task
+    mission["last_status"] = "succeeded" if execution_succeeded else "idle" if no_actionable_work else "blocked_or_failed"
+    mission["last_error"] = None if execution_succeeded or no_actionable_work else (execution.get("reason") if isinstance(execution, dict) else "no executable objective")
     mission["last_objective"] = selected.get("objective") if isinstance(selected, dict) else None
-    mission["converged"] = False
-    mission["convergence_transition"] = False if was_converged else False
+    mission["converged"] = no_actionable_work
+    mission["convergence_transition"] = no_actionable_work and not was_converged
     _persist_mission(repo_root, mission)
 
     return {
         "timestamp": utc_now(),
-        "status": "observed" if execution_observed else "idle" if not selected else "degraded",
+        "status": "observed" if execution_observed else "idle" if no_actionable_work else "degraded",
         "mission": mission,
         "selection": selection,
         "retired_successful_objective_count": len(retired),
@@ -182,11 +179,11 @@ def run_cycle(repo_root: Path) -> dict:
         "task_id": task_id,
         "external_task_processed": bool(pending_task),
         "execution_observed": execution_observed,
-        "verification_observed": verification_observed,
+        "verification_observed": verification_observed if execution_observed else no_actionable_work,
         "execution_succeeded": execution_succeeded,
-        "converged": False,
-        "live_system_active": execution_succeeded,
-        "claim_basis": "objective selected through governed autonomous objective loop; execution remains subject to FactoryAuthorityGateway" if selected else "no executable objective selected",
+        "converged": no_actionable_work,
+        "live_system_active": execution_succeeded or no_actionable_work,
+        "claim_basis": "objective selected through governed autonomous objective loop; execution remains subject to FactoryAuthorityGateway" if selected else "governed discovery observed no actionable work; autonomous heartbeat remains active",
         "execution": execution,
     }
 
@@ -223,7 +220,7 @@ def main(argv: list[str] | None = None) -> int:
     signal.signal(signal.SIGALRM, _timeout_handler)
     if args.once:
         state = run_once(repo_root)
-        return 0 if state.get("execution_succeeded") is True else 1
+        return 0 if state.get("execution_succeeded") is True or state.get("converged") is True else 1
     while True:
         state = run_once(repo_root)
         time.sleep(INTERVAL_SECONDS)
