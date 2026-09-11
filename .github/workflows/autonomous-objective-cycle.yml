@@ -1,22 +1,15 @@
-name: Autonomous Objective Cycle
+name: Autonomous Objective Tests
 
 on:
-  schedule:
-    - cron: "*/5 * * * *"
   pull_request:
   workflow_dispatch:
 
-concurrency:
-  group: autonomous-production-authority
-  cancel-in-progress: false
-
 permissions:
-  contents: write
-  issues: write
+  contents: read
+  issues: read
 
 jobs:
   validate:
-    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -28,88 +21,5 @@ jobs:
           python-version: "3.12"
       - name: Install test dependency
         run: python -m pip install --disable-pip-version-check pytest
-      - name: Run objective, liveness, ingress, UI-independence, and phase tests
+      - name: Run objective, liveness, ingress, UI-independence, and DASS tests
         run: python -m pytest tests/test_autonomous_objective_loop.py tests/test_autonomy_liveness_supervisor.py tests/test_consumer_ui_independence.py tests/test_chatgpt_ui_outage_contract.py tests/test_github_issue_autonomous_ingress.py tests/test_dass_phase.py -q
-
-  discover:
-    if: github.event_name != 'pull_request'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Check out current main
-        uses: actions/checkout@v4
-        with:
-          ref: main
-          fetch-depth: 0
-      - name: Resolve current main revision under the write lock
-        shell: bash
-        run: |
-          set -euo pipefail
-          git fetch --prune origin main
-          current_sha="$(git rev-parse origin/main)"
-          git checkout --detach "$current_sha"
-          test "$(git rev-parse HEAD)" = "$current_sha"
-          test "$(git status --porcelain)" = ''
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Ingest authenticated GitHub autonomous requests
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: python -m tools.github_issue_autonomous_ingress
-      - name: Run integrated governed autonomous objective cycle
-        run: python tools/autonomous_integrated_supervisor.py
-      - name: Persist autonomous state for the next cycle
-        shell: bash
-        run: |
-          set -euo pipefail
-          converged=$(python - <<'PY'
-          import json
-          from pathlib import Path
-          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
-          print("true" if state.get("converged") is True else "false")
-          PY
-          )
-          transition=$(python - <<'PY'
-          import json
-          from pathlib import Path
-          state=json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
-          print("true" if state.get("mission", {}).get("convergence_transition") is True else "false")
-          PY
-          )
-          if [ "$converged" = "true" ] && [ "$transition" != "true" ]; then
-            echo 'Verified converged steady state; no durable heartbeat commit required.'
-            exit 0
-          fi
-          git config user.name "hands-off-autonomy[bot]"
-          git config user.email "hands-off-autonomy[bot]@users.noreply.github.com"
-          for f in state/autonomy_liveness.json state/autonomy_mission.json state/dass_phase.json state/autonomous_task_queue.json state/autonomous_tasks_completed.jsonl state/autonomous_task_attempts.jsonl state/autonomous_tasks.jsonl; do
-            if [ -e "$f" ]; then git add -f "$f"; fi
-          done
-          if git diff --cached --quiet; then
-            echo 'No autonomous state changes to persist.'
-          else
-            git commit -m "chore: persist integrated autonomous cycle state [skip ci]"
-            for attempt in 1 2 3; do
-              git fetch --prune origin main
-              git rebase origin/main
-              if git push origin HEAD:main; then
-                echo "Persisted autonomous state on current main (attempt $attempt)."
-                break
-              fi
-              if [ "$attempt" -eq 3 ]; then
-                echo 'Failed to persist autonomous state after 3 synchronized push attempts.' >&2
-                exit 1
-              fi
-              sleep $((attempt * 2))
-            done
-          fi
-      - name: Upload machine-readable autonomy evidence
-        uses: actions/upload-artifact@v4
-        with:
-          name: autonomous-objective-cycle
-          path: |
-            state/autonomy_liveness.json
-            state/dass_phase.json
-          if-no-files-found: error
