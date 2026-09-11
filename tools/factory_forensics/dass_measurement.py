@@ -2,9 +2,9 @@
 """Fail-closed measurement of the declared DASS production surface.
 
 DASS is a bounded autonomous runtime, not the entire historical repository.
-Every declared active file is measured, and every operational-looking path
-outside the declared surface is treated as an explicit measurement gap rather
-than silently ignored. Quarantined dependencies also fail the measurement.
+Every declared active file is measured, operational-looking paths outside the
+surface are explicit gaps, and critical runtime components are anchored by the
+scope manifest so deletion cannot make coverage appear healthier.
 """
 from __future__ import annotations
 
@@ -63,9 +63,6 @@ def main() -> int:
     quarantined = [p for p, c in classes.items() if c == "quarantined"]
     unclassified = [p for p, c in classes.items() if c == "unclassified"]
 
-    # Executable/operational files outside the declared DASS surface are
-    # measurement gaps. They must be explicitly promoted, quarantined, or
-    # otherwise classified; they cannot disappear from the denominator.
     operational_unclassified = [
         p for p in unclassified
         if p.endswith((".py", ".sh", ".service", ".yml", ".yaml"))
@@ -80,15 +77,29 @@ def main() -> int:
             if any(module == prefix or module.startswith(prefix + ".") for prefix in prefixes):
                 import_hits.append(f"{p}: {module}")
 
-    active_unmapped = [p for p in dass if not (ROOT / p).exists()]
+    # Required paths are structural anchors. Unlike active_roots, they remain
+    # measurable even when an entire runtime directory or file has disappeared.
+    required_paths = scope.get("required_active_paths", [])
+    active_unmapped = [
+        p for p in required_paths if not (ROOT / p).is_file()
+    ]
+
+    # Also retain the legacy invariant that every measured active file resolves
+    # to a real working-tree path.
+    active_unmapped.extend(
+        p for p in dass if not (ROOT / p).exists() and p not in active_unmapped
+    )
+    active_unmapped = sorted(set(active_unmapped))
+
     pure = not operational_unclassified and not active_unmapped and not import_hits
     measured = len(dass)
-    denominator = measured + len(operational_unclassified)
-    coverage = 100.0 if denominator == 0 or not operational_unclassified else 100.0 * measured / denominator
+    denominator = measured + len(operational_unclassified) + len(active_unmapped)
+    coverage = 100.0 if denominator == 0 else 100.0 * measured / denominator
     report = {
         "mission": scope["mission"],
         "tracked_files": len(files),
         "dass_runtime_files": measured,
+        "required_active_paths": required_paths,
         "quarantined_non_dass_files": len(quarantined),
         "support_files": sum(c == "support" for c in classes.values()),
         "unclassified_files": unclassified,
