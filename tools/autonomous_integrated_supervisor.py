@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 
 from tools import autonomy_liveness_supervisor as liveness
@@ -45,6 +46,31 @@ def _persist_phase(report: dict, phase: str) -> dict:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(state, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     return state
+
+
+def _fresh_live_attestation(state: dict) -> bool:
+    """Verify the exact liveness contract independently of phase selection."""
+    if state.get("live_system_active") is not True:
+        return False
+    if state.get("operating_state") not in {"live_executing", "live_steady_state"}:
+        return False
+    attestation = state.get("live_attestation")
+    if not isinstance(attestation, dict) or attestation.get("active") is not True:
+        return False
+    if attestation.get("mechanism") != "governed_autonomous_supervisor_cycle":
+        return False
+    try:
+        observed = datetime.fromisoformat(str(attestation["observed_at"]).replace("Z", "+00:00"))
+        expiry_value = attestation["expires_at"]
+        expires = (
+            datetime.fromtimestamp(float(expiry_value), tz=timezone.utc)
+            if isinstance(expiry_value, (int, float))
+            else datetime.fromisoformat(str(expiry_value).replace("Z", "+00:00"))
+        )
+        now = datetime.now(timezone.utc)
+        return observed <= now <= expires
+    except (KeyError, TypeError, ValueError, OverflowError):
+        return False
 
 
 _ORIGINAL_EXECUTE = FactoryAuthorityGateway.execute_autonomous
@@ -119,12 +145,7 @@ def main() -> int:
         return 1
 
     cycle_state["dass_phase"] = phase_state
-    liveness_verified = bool(
-        cycle_state.get("live_system_active") is True
-        and isinstance(cycle_state.get("live_attestation"), dict)
-        and cycle_state["live_attestation"].get("active") is True
-        and cycle_state.get("operating_state") in {"live_executing", "live_steady_state"}
-    )
+    liveness_verified = _fresh_live_attestation(cycle_state)
     dass_live = final_phase == "post_dass" and liveness_verified
     cycle_state["dass_live_contract"] = {
         "runtime": "github-hosted-autonomous-production-service",
