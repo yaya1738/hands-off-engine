@@ -26,6 +26,12 @@ def _parse_timestamp(value: object) -> datetime:
     return datetime.fromisoformat(str(value).replace("Z", "+00:00"))
 
 
+def _parse_expiry(value: object) -> float:
+    if isinstance(value, (int, float)):
+        return float(value)
+    return _parse_timestamp(value).timestamp()
+
+
 def _live_runtime_observed() -> bool:
     """Require a recent healthy supervisor cycle; stale or failed state is never enough."""
     if not LIVENESS.exists():
@@ -49,9 +55,9 @@ def _live_runtime_observed() -> bool:
         if attestation.get("mechanism") != "governed_autonomous_supervisor_cycle":
             return False
         observed = _parse_timestamp(attestation["observed_at"])
-        expires = _parse_timestamp(attestation["expires_at"])
-        now = datetime.now(timezone.utc)
-        return observed.tzinfo is not None and observed <= now <= expires
+        expires = _parse_expiry(attestation["expires_at"])
+        now = datetime.now(timezone.utc).timestamp()
+        return observed.tzinfo is not None and observed.timestamp() <= now <= expires
     except (OSError, TypeError, ValueError, KeyError, json.JSONDecodeError):
         return False
 
@@ -64,9 +70,6 @@ def select_phase(report: dict) -> str:
         and not report.get("quarantined_import_hits")
         and not report.get("active_unmapped_files")
     )
-    # DASS is a desired live autonomous-system state, not merely a property of
-    # source code. Physical/cloud infrastructure is not required, but a current
-    # governed runtime cycle must be observable and healthy.
     return "post_dass" if structural and _live_runtime_observed() else "pre_dass"
 
 
