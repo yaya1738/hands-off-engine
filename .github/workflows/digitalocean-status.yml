@@ -1,0 +1,39 @@
+name: DigitalOcean Live Status
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: digitalocean-live-status
+  cancel-in-progress: true
+
+jobs:
+  status:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Collect read-only DigitalOcean telemetry
+        env:
+          DIGITALOCEAN_API_TOKEN: ${{ secrets.DIGITALOCEAN_API_TOKEN }}
+        run: |
+          set -euo pipefail
+          mkdir -p .runtime-status
+          python tools/factory_forensics/digitalocean_status.py | tee .runtime-status/digitalocean-status.json
+
+      - name: Upload current DigitalOcean status
+        uses: actions/upload-artifact@v4
+        with:
+          name: digitalocean-live-status
+          path: .runtime-status/digitalocean-status.json
+          retention-days: 7
