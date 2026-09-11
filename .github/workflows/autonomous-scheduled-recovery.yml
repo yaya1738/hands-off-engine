@@ -35,17 +35,16 @@ jobs:
           try:
               d = json.loads(p.read_text(encoding='utf-8'))
               a = d.get('live_attestation') or {}
-              expires = float(a.get('expires_at', 0))
-              now = datetime.now(timezone.utc).timestamp()
+              expires = datetime.fromisoformat(a['expires_at']).astimezone(timezone.utc)
               healthy = (
                   d.get('live_system_active') is True
                   and d.get('operating_state') in {'live_executing', 'live_steady_state'}
                   and a.get('active') is True
                   and a.get('mechanism') == 'governed_autonomous_supervisor_cycle'
-                  and now <= expires
+                  and datetime.now(timezone.utc) <= expires
               )
               print(f"NEEDS_CYCLE={'false' if healthy else 'true'}")
-          except (OSError, TypeError, ValueError, json.JSONDecodeError):
+          except (KeyError, OSError, TypeError, ValueError, json.JSONDecodeError):
               print('NEEDS_CYCLE=true')
           PY
           cat /tmp/dass_watchdog.env >> "$GITHUB_OUTPUT"
