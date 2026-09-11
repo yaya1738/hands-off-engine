@@ -55,6 +55,14 @@ def python_imports(path: str) -> list[str]:
     return found
 
 
+def missing_required_paths(scope: dict) -> list[str]:
+    """Return critical runtime components absent from the working tree."""
+    return sorted(
+        p for p in scope.get("required_active_paths", [])
+        if not (ROOT / p).is_file()
+    )
+
+
 def main() -> int:
     scope = json.loads(SCOPE.read_text(encoding="utf-8"))
     files = tracked_files()
@@ -79,13 +87,7 @@ def main() -> int:
 
     # Required paths are structural anchors. Unlike active_roots, they remain
     # measurable even when an entire runtime directory or file has disappeared.
-    required_paths = scope.get("required_active_paths", [])
-    active_unmapped = [
-        p for p in required_paths if not (ROOT / p).is_file()
-    ]
-
-    # Also retain the legacy invariant that every measured active file resolves
-    # to a real working-tree path.
+    active_unmapped = missing_required_paths(scope)
     active_unmapped.extend(
         p for p in dass if not (ROOT / p).exists() and p not in active_unmapped
     )
@@ -99,7 +101,7 @@ def main() -> int:
         "mission": scope["mission"],
         "tracked_files": len(files),
         "dass_runtime_files": measured,
-        "required_active_paths": required_paths,
+        "required_active_paths": scope.get("required_active_paths", []),
         "quarantined_non_dass_files": len(quarantined),
         "support_files": sum(c == "support" for c in classes.values()),
         "unclassified_files": unclassified,
