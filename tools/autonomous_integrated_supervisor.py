@@ -37,6 +37,9 @@ def _persist_phase(report: dict, phase: str) -> dict:
         "previous_phase": previous.get("phase"),
         "transition": previous.get("phase") != phase,
         "dass_achieved": phase == "post_dass",
+        "dass_is_live_state": phase == "post_dass",
+        "external_host_required": False,
+        "live_runtime_observed": phase == "post_dass",
         "measurement": report,
     }
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -68,15 +71,15 @@ FactoryAuthorityGateway.execute_autonomous = _execute_and_learn
 
 def main() -> int:
     try:
-        report = measure()
-        phase = select_phase(report)
-        phase_state = _persist_phase(report, phase)
+        initial_report = measure()
+        initial_phase = select_phase(initial_report)
     except Exception as exc:
         state = {
             "status": "degraded",
             "execution_succeeded": False,
             "converged": False,
             "live_system_active": False,
+            "operating_state": "offline",
             "phase_selection_failed": True,
             "error": f"DASS phase measurement/selection failed: {exc}",
         }
@@ -84,27 +87,59 @@ def main() -> int:
         print(json.dumps(state, sort_keys=True))
         return 1
 
-    liveness.MISSION_OBJECTIVE = POST_DASS_OBJECTIVE if phase == "post_dass" else PRE_DASS_OBJECTIVE
-    liveness.MISSION_PHASE = phase
-    state = liveness.run_once(ROOT)
-    state["dass_phase"] = phase_state
-    # DASS is GitHub-native: a separate physical/cloud host is not part of
-    # achievement or liveness. External deployment remains a downstream target.
-    state["dass_live_contract"] = {
+    liveness.MISSION_OBJECTIVE = POST_DASS_OBJECTIVE if initial_phase == "post_dass" else PRE_DASS_OBJECTIVE
+    liveness.MISSION_PHASE = initial_phase
+    cycle_state = liveness.run_once(ROOT)
+
+    # Re-measure after the actual governed cycle. This is essential: DASS is a
+    # live state, so the cycle itself must establish the attestation before the
+    # same run can claim DASS. A stale pre-cycle state can never do that.
+    try:
+        final_report = measure()
+        final_phase = select_phase(final_report)
+        phase_state = _persist_phase(final_report, final_phase)
+    except Exception as exc:
+        cycle_state["dass_phase"] = {
+            "phase": "pre_dass",
+            "dass_achieved": False,
+            "dass_is_live_state": False,
+            "external_host_required": False,
+            "live_runtime_observed": False,
+            "error": f"post-cycle DASS verification failed: {exc}",
+        }
+        cycle_state["dass_live_contract"] = {
+            "runtime": "github-hosted-autonomous-production-service",
+            "dass_achieved": False,
+            "external_host_required": False,
+            "external_deployment_separate": True,
+            "liveness_verified": False,
+        }
+        liveness.persist(ROOT, cycle_state)
+        print(json.dumps(cycle_state, sort_keys=True))
+        return 1
+
+    cycle_state["dass_phase"] = phase_state
+    liveness_verified = bool(
+        cycle_state.get("live_system_active") is True
+        and isinstance(cycle_state.get("live_attestation"), dict)
+        and cycle_state["live_attestation"].get("active") is True
+        and cycle_state.get("operating_state") in {"live_executing", "live_steady_state"}
+    )
+    dass_live = final_phase == "post_dass" and liveness_verified
+    cycle_state["dass_live_contract"] = {
         "runtime": "github-hosted-autonomous-production-service",
-        "dass_achieved": phase == "post_dass",
+        "dass_achieved": dass_live,
         "external_host_required": False,
         "external_deployment_separate": True,
-        "liveness_verified": bool(
-            state.get("live_system_active") is True
-            and (
-                state.get("converged") is True
-                or state.get("execution_succeeded") is True
-            )
-        ),
+        "liveness_verified": liveness_verified,
+        "verification_basis": "post-cycle structural measurement plus fresh runtime liveness attestation",
     }
-    liveness.persist(ROOT, state)
-    return 0 if state.get("execution_succeeded") is True or state.get("converged") is True else 1
+    cycle_state["dass_phase"]["dass_achieved"] = dass_live
+    cycle_state["dass_phase"]["dass_is_live_state"] = dass_live
+    cycle_state["dass_phase"]["live_runtime_observed"] = liveness_verified
+    liveness.persist(ROOT, cycle_state)
+    print(json.dumps(cycle_state, sort_keys=True))
+    return 0 if dass_live else 1
 
 
 if __name__ == "__main__":
