@@ -68,14 +68,18 @@ jobs:
 
           state = json.loads(Path("state/autonomy_liveness.json").read_text(encoding="utf-8"))
           phase = json.loads(Path("state/dass_phase.json").read_text(encoding="utf-8"))
+          contract = state.get("dass_live_contract") or {}
           selected = phase.get("phase")
           assert selected in {"pre_dass", "post_dass"}, phase
+          assert contract.get("runtime") == "github-hosted-autonomous-production-service", state
+          assert contract.get("external_host_required") is False, state
+          assert contract.get("liveness_verified") is True, state
 
           converged = state.get("converged") is True
           if converged:
               assert state.get("live_system_active") is True, state
               assert state.get("execution_succeeded") is False, state
-              print(f"Governed autonomous convergence verified; heartbeat remains active in {selected}.")
+              print(f"Governed autonomous convergence verified; GitHub DASS heartbeat remains active in {selected}.")
           else:
               assert state.get("execution_observed") is True, state
               assert state.get("verification_observed") is True, state
@@ -83,7 +87,7 @@ jobs:
               assert state.get("live_system_active") is True, state
               execution = state.get("execution") or {}
               assert "continuous_improvement" in execution, state
-              print(f"Integrated governed execution and continuous-improvement cycle verified in {selected}.")
+              print(f"Integrated governed DASS execution and continuous-improvement cycle verified in {selected}.")
           PY
 
       - name: Persist service evidence
