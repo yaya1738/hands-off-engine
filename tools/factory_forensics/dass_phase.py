@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Select DASS phase from both structural achievement and live runtime state."""
+"""Select DASS phase from structural achievement and verified live runtime state."""
 from __future__ import annotations
 
 import json
@@ -23,20 +23,24 @@ def measure() -> dict:
 
 
 def _live_runtime_observed() -> bool:
-    """Require a recent explicit execution attestation; source/state alone is insufficient."""
+    """Require a recent successful supervisor cycle; stale state is never enough."""
     if not LIVENESS.exists():
         return False
     try:
         state = json.loads(LIVENESS.read_text(encoding="utf-8"))
         if state.get("live_system_active") is not True:
             return False
+        if state.get("operating_state") not in {"live_executing", "live_steady_state"}:
+            return False
         attestation = state.get("live_attestation", {})
         if not isinstance(attestation, dict) or attestation.get("active") is not True:
+            return False
+        if attestation.get("mechanism") != "governed_autonomous_supervisor_cycle":
             return False
         observed = datetime.fromisoformat(str(attestation["observed_at"]).replace("Z", "+00:00"))
         expires = float(attestation["expires_at"])
         now = datetime.now(timezone.utc).timestamp()
-        return observed.tzinfo is not None and now <= expires
+        return observed.tzinfo is not None and observed.timestamp() <= now <= expires
     except (OSError, TypeError, ValueError, KeyError, json.JSONDecodeError):
         return False
 
@@ -50,8 +54,8 @@ def select_phase(report: dict) -> str:
         and not report.get("active_unmapped_files")
     )
     # DASS is a desired live autonomous-system state, not merely a property of
-    # source code. Physical/cloud infrastructure is not required, but an actual
-    # governed runtime cycle must have been observed recently.
+    # source code. Physical/cloud infrastructure is not required, but a current
+    # governed runtime cycle must be observable and healthy.
     return "post_dass" if structural and _live_runtime_observed() else "pre_dass"
 
 
