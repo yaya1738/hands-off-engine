@@ -8,6 +8,12 @@ The DASS runtime surface is the governed loop that can observe state, make auton
 
 **DASS is a desired live autonomous-system state, not merely a collection of code.** It is intentionally deployable and operable using the repository/GitHub execution assets alone. A separate physical/cloud host is not a prerequisite for DASS. The GitHub-hosted autonomous production-service workflow is the primary live-system benchmark for this mission. External infrastructure such as DigitalOcean is a downstream deployment target, not a DASS prerequisite.
 
+## Structural anchors
+
+The scope manifest declares `required_active_paths` for the critical runtime components, including the Factory runtime and authority gateway, the autonomous objective loop, the canonical liveness/integrated supervisors, DASS measurement/phase logic, the scope manifest itself, and the canonical autonomous production-service workflow.
+
+These anchors are intentionally measured separately from the broad `active_roots`. Deleting an entire runtime component cannot make the measured denominator shrink and falsely preserve a 100% score. A missing required path is an `active_unmapped_files` failure and therefore prevents DASS achievement.
+
 ## What was found outside DASS
 
 The repository contains historical income-generation material, including `AUTONOMOUS_INCOME.md`, `ai/INCOME_RESEARCH_2025-11-30.md`, `deliverables/INCOME_ACTION_PLAN.md`, `autonomous/income_worker.py`, `autonomous/income_accelerator.py`, `autonomous/zero_capital_income.py`, and `integrafix/income_engine.py`. Search results also show older income-pipeline and backup state material. These are not DASS runtime capabilities.
