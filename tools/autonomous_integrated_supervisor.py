@@ -88,6 +88,21 @@ def main() -> int:
     liveness.MISSION_PHASE = phase
     state = liveness.run_once(ROOT)
     state["dass_phase"] = phase_state
+    # DASS is GitHub-native: a separate physical/cloud host is not part of
+    # achievement or liveness. External deployment remains a downstream target.
+    state["dass_live_contract"] = {
+        "runtime": "github-hosted-autonomous-production-service",
+        "dass_achieved": phase == "post_dass",
+        "external_host_required": False,
+        "external_deployment_separate": True,
+        "liveness_verified": bool(
+            state.get("live_system_active") is True
+            and (
+                state.get("converged") is True
+                or state.get("execution_succeeded") is True
+            )
+        ),
+    }
     liveness.persist(ROOT, state)
     return 0 if state.get("execution_succeeded") is True or state.get("converged") is True else 1
 
