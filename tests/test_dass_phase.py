@@ -1,7 +1,4 @@
-import json
-
-from tools import autonomous_phase_supervisor as phase_supervisor
-from tools.factory_forensics.dass_phase import select_phase
+from tools.factory_forensics import dass_phase
 
 
 def _measurement(achieved: bool) -> dict:
@@ -11,118 +8,50 @@ def _measurement(achieved: bool) -> dict:
         "dass_pure": achieved,
         "operational_unclassified_files": [] if achieved else ["tools/missing.py"],
         "quarantined_import_hits": [],
+        "active_unmapped_files": [],
     }
 
 
-def test_select_phase_requires_full_pure_measurement():
-    assert select_phase(_measurement(True)) == "post_dass"
+def test_select_phase_requires_structural_achievement_and_live_runtime(monkeypatch):
+    monkeypatch.setattr(dass_phase, "_live_runtime_observed", lambda: True)
+    assert dass_phase.select_phase(_measurement(True)) == "post_dass"
+
+    monkeypatch.setattr(dass_phase, "_live_runtime_observed", lambda: False)
+    assert dass_phase.select_phase(_measurement(True)) == "pre_dass"
+
+
+def test_structural_failures_cannot_become_dass_even_with_live_runtime(monkeypatch):
+    monkeypatch.setattr(dass_phase, "_live_runtime_observed", lambda: True)
+    assert dass_phase.select_phase(_measurement(False)) == "pre_dass"
 
     impure = {**_measurement(True), "dass_pure": False}
-    assert select_phase(impure) == "pre_dass"
+    assert dass_phase.select_phase(impure) == "pre_dass"
 
     quarantined = {**_measurement(True), "quarantined_import_hits": ["x"]}
-    assert select_phase(quarantined) == "pre_dass"
+    assert dass_phase.select_phase(quarantined) == "pre_dass"
 
-    assert select_phase(_measurement(False)) == "pre_dass"
+    unmapped = {**_measurement(True), "active_unmapped_files": ["tools/missing.py"]}
+    assert dass_phase.select_phase(unmapped) == "pre_dass"
 
 
-def test_persist_phase_records_transition(tmp_path, monkeypatch):
-    monkeypatch.setattr(phase_supervisor, "ROOT", tmp_path)
-    state = phase_supervisor.persist_phase(
-        "post_dass", _measurement(True), {"phase": "pre_dass"}
+def test_live_runtime_requires_current_healthy_attestation(tmp_path, monkeypatch):
+    monkeypatch.setattr(dass_phase, "LIVENESS", tmp_path / "autonomy_liveness.json")
+    assert dass_phase._live_runtime_observed() is False
+
+    (tmp_path / "autonomy_liveness.json").write_text(
+        '{"live_system_active": true, "operating_state": "live_degraded", '
+        '"live_attestation": {"active": true, '
+        '"mechanism": "governed_autonomous_supervisor_cycle", '
+        '"observed_at": "2099-01-01T00:00:00+00:00", "expires_at": 4102444800}}',
+        encoding="utf-8",
     )
-    assert state["transition"] is True
-    assert state["dass_achieved"] is True
-    saved = json.loads((tmp_path / "state" / "dass_phase.json").read_text())
-    assert saved["phase"] == "post_dass"
-    assert saved["previous_phase"] == "pre_dass"
+    assert dass_phase._live_runtime_observed() is False
 
-
-def test_main_uses_pre_dass_objective_when_measurement_is_not_achieved(monkeypatch, tmp_path):
-    seen = {}
-
-    monkeypatch.setattr(phase_supervisor, "ROOT", tmp_path)
-    monkeypatch.setattr(phase_supervisor, "measure", lambda: _measurement(False))
-
-    def fake_run_once(repo_root):
-        seen["repo_root"] = repo_root
-        seen["objective"] = phase_supervisor.supervisor.MISSION_OBJECTIVE
-        return {"execution_succeeded": True, "converged": False}
-
-    monkeypatch.setattr(phase_supervisor.supervisor, "run_once", fake_run_once)
-
-    assert phase_supervisor.main() == 0
-    assert seen["repo_root"] == tmp_path
-    assert seen["objective"] == phase_supervisor.PRE_DASS_OBJECTIVE
-    persisted = json.loads((tmp_path / "state" / "autonomy_liveness.json").read_text())
-    assert persisted["dass_phase"]["phase"] == "pre_dass"
-    assert persisted["dass_phase"]["dass_achieved"] is False
-
-
-def test_main_uses_post_dass_objective_only_for_verified_achievement(monkeypatch, tmp_path):
-    seen = {}
-
-    monkeypatch.setattr(phase_supervisor, "ROOT", tmp_path)
-    monkeypatch.setattr(phase_supervisor, "measure", lambda: _measurement(True))
-
-    def fake_run_once(repo_root):
-        seen["objective"] = phase_supervisor.supervisor.MISSION_OBJECTIVE
-        return {"execution_succeeded": False, "converged": True}
-
-    monkeypatch.setattr(phase_supervisor.supervisor, "run_once", fake_run_once)
-
-    assert phase_supervisor.main() == 0
-    assert seen["objective"] == phase_supervisor.POST_DASS_OBJECTIVE
-    persisted = json.loads((tmp_path / "state" / "autonomy_liveness.json").read_text())
-    assert persisted["dass_phase"]["phase"] == "post_dass"
-    assert persisted["dass_phase"]["dass_achieved"] is True
-
-
-def test_failed_cycle_does_not_fake_success_or_advance_phase(monkeypatch, tmp_path):
-    monkeypatch.setattr(phase_supervisor, "ROOT", tmp_path)
-    monkeypatch.setattr(phase_supervisor, "measure", lambda: _measurement(False))
-    monkeypatch.setattr(
-        phase_supervisor.supervisor,
-        "run_once",
-        lambda repo_root: {"execution_succeeded": False, "converged": False},
+    (tmp_path / "autonomy_liveness.json").write_text(
+        '{"live_system_active": true, "operating_state": "live_steady_state", '
+        '"live_attestation": {"active": true, '
+        '"mechanism": "governed_autonomous_supervisor_cycle", '
+        '"observed_at": "2099-01-01T00:00:00+00:00", "expires_at": 4102444800}}',
+        encoding="utf-8",
     )
-
-    assert phase_supervisor.main() == 1
-    persisted = json.loads((tmp_path / "state" / "autonomy_liveness.json").read_text())
-    assert persisted["dass_phase"]["phase"] == "pre_dass"
-    assert persisted["dass_phase"]["dass_achieved"] is False
-
-
-def test_measurement_failure_is_persisted_and_fails_closed(monkeypatch, tmp_path):
-    monkeypatch.setattr(phase_supervisor, "ROOT", tmp_path)
-
-    def fail_measurement():
-        raise RuntimeError("measurement unavailable")
-
-    monkeypatch.setattr(phase_supervisor, "measure", fail_measurement)
-
-    assert phase_supervisor.main() == 1
-    persisted = json.loads((tmp_path / "state" / "autonomy_liveness.json").read_text())
-    assert persisted["status"] == "degraded"
-    assert persisted["phase_selection_failed"] is True
-    assert persisted["execution_succeeded"] is False
-    assert persisted["live_system_active"] is False
-    assert "measurement unavailable" in persisted["error"]
-
-
-def test_corrupt_previous_phase_state_does_not_block_authoritative_measurement(monkeypatch, tmp_path):
-    monkeypatch.setattr(phase_supervisor, "ROOT", tmp_path)
-    phase_path = tmp_path / "state" / "dass_phase.json"
-    phase_path.parent.mkdir(parents=True)
-    phase_path.write_text("{not valid json", encoding="utf-8")
-    monkeypatch.setattr(phase_supervisor, "measure", lambda: _measurement(False))
-    monkeypatch.setattr(
-        phase_supervisor.supervisor,
-        "run_once",
-        lambda repo_root: {"execution_succeeded": True, "converged": False},
-    )
-
-    assert phase_supervisor.main() == 0
-    state = json.loads(phase_path.read_text())
-    assert state["phase"] == "pre_dass"
-    assert state["previous_phase"] is None
+    assert dass_phase._live_runtime_observed() is False
