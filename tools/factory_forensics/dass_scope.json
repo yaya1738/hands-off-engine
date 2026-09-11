@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "mission": "DASS",
   "definition": "DASS is the desired live autonomous-system state. Its measured production surface is the system directly participating in the governed autonomous objective: autonomous decisioning, authorized action, continuous service/liveness, safety/authority enforcement, verification, recovery, and evidence.",
   "active_roots": [
@@ -12,6 +12,17 @@
     ".github/workflows/autonomous-readiness-attestation.yml",
     ".github/workflows/auto-merge.yml",
     ".github/workflows/production-deploy.yml"
+  ],
+  "required_active_paths": [
+    "ai/factory/runtime.py",
+    "ai/factory/authority_gateway.py",
+    "ai/factory/autonomous_objective_loop.py",
+    "tools/autonomy_liveness_supervisor.py",
+    "tools/autonomous_integrated_supervisor.py",
+    "tools/factory_forensics/dass_measurement.py",
+    "tools/factory_forensics/dass_phase.py",
+    "tools/factory_forensics/dass_scope.json",
+    ".github/workflows/autonomous-production-service.yml"
   ],
   "non_dass_quarantined_roots": [
     "autonomous/income_",
