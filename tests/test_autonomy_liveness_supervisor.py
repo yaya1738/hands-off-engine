@@ -47,7 +47,7 @@ class FailedGateway:
         }
 
 
-def test_run_cycle_executes_selected_objective_without_consumer(monkeypatch, tmp_path: Path):
+def test_run_cycle_executes_selected_objective_and_attests_live(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
     monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", FakeLoop)
     monkeypatch.setattr(supervisor, "FactoryAuthorityGateway", lambda runtime=None: FakeGateway())
@@ -60,11 +60,13 @@ def test_run_cycle_executes_selected_objective_without_consumer(monkeypatch, tmp
     assert result["verification_observed"] is True
     assert result["execution_succeeded"] is True
     assert result["live_system_active"] is True
+    assert result["operating_state"] == "live_executing"
+    assert result["live_attestation"]["active"] is True
     assert result["task_id"]
     assert len((tmp_path / "state" / "autonomous_tasks_completed.jsonl").read_text()) > 0
 
 
-def test_failed_runtime_execution_is_not_reported_as_live_activity_and_is_retryable(monkeypatch, tmp_path: Path):
+def test_failed_runtime_execution_is_live_degraded_but_not_dass_live(monkeypatch, tmp_path: Path):
     monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
     monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", FakeLoop)
     monkeypatch.setattr(supervisor, "FactoryAuthorityGateway", lambda runtime=None: FailedGateway())
@@ -74,12 +76,34 @@ def test_failed_runtime_execution_is_not_reported_as_live_activity_and_is_retrya
     assert result["execution_observed"] is True
     assert result["verification_observed"] is True
     assert result["execution_succeeded"] is False
-    assert result["live_system_active"] is False
+    assert result["live_system_active"] is True
+    assert result["operating_state"] == "live_executing"
     assert result["task_id"]
     queue = supervisor.AutonomousTaskQueue(tmp_path)
     assert queue.get_next_task()["id"] == result["task_id"]
     assert (tmp_path / "state" / "autonomous_task_attempts.jsonl").exists()
     assert not (tmp_path / "state" / "autonomous_tasks_completed.jsonl").exists()
+
+
+def test_converged_cycle_is_live_steady_state_not_dormant(monkeypatch, tmp_path: Path):
+    monkeypatch.setattr(supervisor, "FactoryRuntime", FakeRuntime)
+
+    class IdleLoop:
+        def __init__(self, runtime):
+            self.runtime = runtime
+
+        def select_next(self, context):
+            return {"status": "converged", "selected": None}
+
+    monkeypatch.setattr(supervisor, "FactoryAutonomousObjectiveLoop", IdleLoop)
+
+    result = supervisor.run_cycle(tmp_path)
+
+    assert result["converged"] is True
+    assert result["live_system_active"] is True
+    assert result["operating_state"] == "live_steady_state"
+    assert result["execution_observed"] is False
+    assert result["live_attestation"]["active"] is True
 
 
 def test_successful_objective_is_retired_from_future_selection(tmp_path: Path):
@@ -138,6 +162,8 @@ def test_retired_selected_objective_does_not_crash_duplicate_scan(monkeypatch, t
     assert result["status"] == "idle"
     assert result["execution_observed"] is False
     assert result["execution_succeeded"] is False
+    assert result["live_system_active"] is True
+    assert result["operating_state"] == "live_steady_state"
     assert result["task_queued"] is False
     assert result["task_id"] is None
     assert result["mission"]["last_objective"] is None
