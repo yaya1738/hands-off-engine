@@ -1,3 +1,6 @@
+import json
+from datetime import datetime, timedelta, timezone
+
 from tools.factory_forensics import dass_phase
 
 
@@ -34,24 +37,50 @@ def test_structural_failures_cannot_become_dass_even_with_live_runtime(monkeypat
     assert dass_phase.select_phase(unmapped) == "pre_dass"
 
 
+def _write_liveness(path, *, operating_state: str, observed: datetime, expires: datetime) -> None:
+    path.write_text(
+        json.dumps(
+            {
+                "live_system_active": True,
+                "operating_state": operating_state,
+                "live_attestation": {
+                    "active": True,
+                    "mechanism": "governed_autonomous_supervisor_cycle",
+                    "observed_at": observed.isoformat(),
+                    "expires_at": expires.timestamp(),
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+
+
 def test_live_runtime_requires_current_healthy_attestation(tmp_path, monkeypatch):
-    monkeypatch.setattr(dass_phase, "LIVENESS", tmp_path / "autonomy_liveness.json")
+    path = tmp_path / "autonomy_liveness.json"
+    monkeypatch.setattr(dass_phase, "LIVENESS", path)
     assert dass_phase._live_runtime_observed() is False
 
-    (tmp_path / "autonomy_liveness.json").write_text(
-        '{"live_system_active": true, "operating_state": "live_degraded", '
-        '"live_attestation": {"active": true, '
-        '"mechanism": "governed_autonomous_supervisor_cycle", '
-        '"observed_at": "2099-01-01T00:00:00+00:00", "expires_at": 4102444800}}',
-        encoding="utf-8",
+    now = datetime.now(timezone.utc)
+    _write_liveness(
+        path,
+        operating_state="live_degraded",
+        observed=now - timedelta(seconds=10),
+        expires=now + timedelta(minutes=5),
     )
     assert dass_phase._live_runtime_observed() is False
 
-    (tmp_path / "autonomy_liveness.json").write_text(
-        '{"live_system_active": true, "operating_state": "live_steady_state", '
-        '"live_attestation": {"active": true, '
-        '"mechanism": "governed_autonomous_supervisor_cycle", '
-        '"observed_at": "2099-01-01T00:00:00+00:00", "expires_at": 4102444800}}',
-        encoding="utf-8",
+    _write_liveness(
+        path,
+        operating_state="live_steady_state",
+        observed=now - timedelta(seconds=10),
+        expires=now + timedelta(minutes=5),
+    )
+    assert dass_phase._live_runtime_observed() is True
+
+    _write_liveness(
+        path,
+        operating_state="live_steady_state",
+        observed=now - timedelta(minutes=30),
+        expires=now - timedelta(minutes=15),
     )
     assert dass_phase._live_runtime_observed() is False
