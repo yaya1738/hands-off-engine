@@ -1,37 +1,58 @@
-name: Autonomous Scheduled Recovery Audit
+name: Autonomous DASS Runtime Watchdog
 
 on:
   schedule:
     - cron: '9,39 * * * *'
   workflow_dispatch:
 
+permissions:
+  actions: write
+  contents: read
+
 concurrency:
-  group: autonomous-scheduled-recovery
+  group: autonomous-dass-watchdog
   cancel-in-progress: true
 
 jobs:
-  recovery:
+  watchdog:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - name: Run recovery readiness check
-        run: python tools/autonomy_liveness_supervisor.py --once
-      - name: Reject stale or contradictory liveness state
+      - name: Check whether the canonical DASS runtime needs a fresh cycle
+        id: check
         shell: bash
         run: |
           set -euo pipefail
-          python - <<'PY'
+          python - <<'PY' > /tmp/dass_watchdog.env
           import json
+          from datetime import datetime, timezone
           from pathlib import Path
-          candidates = [Path('state/autonomy_liveness.json'), Path('state/autonomy_liveness_state.json')]
-          p = next((x for x in candidates if x.exists()), None)
-          if p is None:
-              raise SystemExit('liveness state missing')
-          d = json.loads(p.read_text())
-          if not isinstance(d, dict) or d.get('last_error') not in (None, ''):
-              raise SystemExit(f"liveness error: {d.get('last_error')!r}")
-          if d.get('live_system_active') is not True:
-              raise SystemExit('live system is not active')
-          print('recovery state healthy')
+          p = Path('state/autonomy_liveness.json')
+          if not p.exists():
+              print('NEEDS_CYCLE=true')
+              raise SystemExit(0)
+          try:
+              d = json.loads(p.read_text(encoding='utf-8'))
+              a = d.get('live_attestation') or {}
+              expires = float(a.get('expires_at', 0))
+              now = datetime.now(timezone.utc).timestamp()
+              healthy = (
+                  d.get('live_system_active') is True
+                  and d.get('operating_state') in {'live_executing', 'live_steady_state'}
+                  and a.get('active') is True
+                  and a.get('mechanism') == 'governed_autonomous_supervisor_cycle'
+                  and now <= expires
+              )
+              print(f"NEEDS_CYCLE={'false' if healthy else 'true'}")
+          except (OSError, TypeError, ValueError, json.JSONDecodeError):
+              print('NEEDS_CYCLE=true')
           PY
+          cat /tmp/dass_watchdog.env >> "$GITHUB_OUTPUT"
+      - name: Re-attempt the canonical DASS runtime
+        if: steps.check.outputs.NEEDS_CYCLE == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run autonomous-production-service.yml --repo "$GITHUB_REPOSITORY" --ref main
+      - name: Confirm watchdog never declares DASS itself
+        run: echo 'Watchdog only requests the canonical DASS runtime; it cannot establish DASS liveness itself.'
