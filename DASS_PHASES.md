@@ -15,7 +15,7 @@ The transition is state-driven, not operator-driven.
 
 The authoritative DASS measurement remains the gate. DASS achievement means the declared production surface is fully mapped, pure, and at the configured 100% target, with no operational-looking unclassified paths and no quarantined imports.
 
-DASS liveness is then demonstrated by the governed GitHub-hosted autonomous production-service workflow actually executing the integrated supervisor and verifying its liveness/authority contract. A missing external DigitalOcean host does not invalidate DASS; it is an external deployment concern.
+DASS liveness is demonstrated by the governed GitHub-hosted autonomous production-service workflow actually executing the integrated supervisor and verifying its liveness/authority contract. A missing external DigitalOcean host does not invalidate DASS; it is an external deployment concern.
 
 No post-DASS action may be treated as proof of DASS achievement. Post-DASS activation consumes the persisted achievement state produced by the authoritative measurement/transition mechanism.
 
