@@ -38,11 +38,16 @@ def test_structural_failures_cannot_become_dass_even_with_live_runtime(monkeypat
 
 
 def _write_liveness(path, *, operating_state: str, observed: datetime, expires: datetime) -> None:
+    converged = operating_state == "live_steady_state"
+    execution_observed = operating_state == "live_executing"
     path.write_text(
         json.dumps(
             {
                 "live_system_active": True,
                 "operating_state": operating_state,
+                "converged": converged,
+                "execution_observed": execution_observed,
+                "execution_succeeded": execution_observed,
                 "live_attestation": {
                     "active": True,
                     "mechanism": "governed_autonomous_supervisor_cycle",
