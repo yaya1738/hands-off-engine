@@ -12,6 +12,8 @@ concurrency:
   group: autonomous-recovery-readiness
   cancel-in-progress: true
 
+# Readiness checks must never create or refresh DASS liveness. The canonical
+# integrated production service owns runtime execution and attestation.
 jobs:
   recovery:
     runs-on: ubuntu-latest
@@ -20,8 +22,6 @@ jobs:
       - uses: actions/checkout@v4
       - name: Validate recovery-critical Python syntax
         run: python -m compileall -q ai/factory tools
-      - name: Exercise liveness supervisor in one-shot mode
-        run: python tools/autonomy_liveness_supervisor.py --once
       - name: Verify fail-closed production guard remains present
         shell: bash
         run: |
