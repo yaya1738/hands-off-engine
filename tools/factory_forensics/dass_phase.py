@@ -23,14 +23,21 @@ def measure() -> dict:
 
 
 def _live_runtime_observed() -> bool:
-    """Require a recent successful supervisor cycle; stale state is never enough."""
+    """Require a recent healthy supervisor cycle; stale or failed state is never enough."""
     if not LIVENESS.exists():
         return False
     try:
         state = json.loads(LIVENESS.read_text(encoding="utf-8"))
         if state.get("live_system_active") is not True:
             return False
-        if state.get("operating_state") not in {"live_executing", "live_steady_state"}:
+        operating_state = state.get("operating_state")
+        if operating_state == "live_executing":
+            if state.get("execution_observed") is not True or state.get("execution_succeeded") is not True:
+                return False
+        elif operating_state == "live_steady_state":
+            if state.get("converged") is not True or state.get("execution_succeeded") is not False:
+                return False
+        else:
             return False
         attestation = state.get("live_attestation", {})
         if not isinstance(attestation, dict) or attestation.get("active") is not True:
