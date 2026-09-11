@@ -85,21 +85,32 @@ jobs:
           python tools/autonomy_liveness_supervisor.py --once
           python - <<'PY'
           import json
+          from datetime import datetime, timezone
           from pathlib import Path
           state = json.loads(Path('state/autonomy_liveness.json').read_text(encoding='utf-8'))
+          att = state.get('live_attestation') or {}
+          assert state.get('live_system_active') is True, state
+          assert state.get('operating_state') in {'live_executing', 'live_steady_state'}, state
+          assert att.get('active') is True, state
+          assert att.get('mechanism') == 'governed_autonomous_supervisor_cycle', state
+          observed = datetime.fromisoformat(str(att['observed_at']).replace('Z', '+00:00'))
+          expires_value = att['expires_at']
+          expires = datetime.fromtimestamp(float(expires_value), tz=timezone.utc) if isinstance(expires_value, (int, float)) else datetime.fromisoformat(str(expires_value).replace('Z', '+00:00'))
+          now = datetime.now(timezone.utc)
+          assert observed <= now <= expires, state
           converged = state.get('converged') is True
           if converged:
               assert state.get('execution_observed') is False, state
               assert state.get('execution_succeeded') is False, state
               assert state.get('verification_observed') is True, state
-              assert state.get('live_system_active') is True, state
-              print('DEPLOY_OK authority=hosted converged=true sha=${{ steps.revision.outputs.sha }}')
+              assert state.get('operating_state') == 'live_steady_state', state
+              print('DEPLOY_OK authority=hosted converged=true fresh_attestation=true sha=${{ steps.revision.outputs.sha }}')
           else:
               assert state.get('execution_observed') is True, state
               assert state.get('verification_observed') is True, state
               assert state.get('execution_succeeded') is True, state
-              assert state.get('live_system_active') is True, state
-              print('DEPLOY_OK authority=hosted converged=false sha=${{ steps.revision.outputs.sha }}')
+              assert state.get('operating_state') == 'live_executing', state
+              print('DEPLOY_OK authority=hosted converged=false fresh_attestation=true sha=${{ steps.revision.outputs.sha }}')
           PY
 
       - name: Configure SSH for remote authority
