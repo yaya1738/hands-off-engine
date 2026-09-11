@@ -1,5 +1,7 @@
 # DASS Phase Operating Contract
 
+DASS is the repository-native autonomous production system. Its achievement and live operation are judged against the governed runtime that can run from the repository/GitHub execution assets; a separate cloud/physical host is not a prerequisite for DASS.
+
 ## Purpose
 
 DASS is operated as a two-phase autonomous workspace with an explicit achievement transition:
@@ -11,7 +13,9 @@ The transition is state-driven, not operator-driven.
 
 ## Phase boundary
 
-The authoritative DASS measurement remains the gate. DASS achievement means the declared production surface is fully mapped, pure, and at the configured 100% target. The measurement is fail-closed: operationally relevant unclassified paths or quarantined imports prevent achievement.
+The authoritative DASS measurement remains the gate. DASS achievement means the declared production surface is fully mapped, pure, and at the configured 100% target, with no operational-looking unclassified paths and no quarantined imports.
+
+DASS liveness is then demonstrated by the governed GitHub-hosted autonomous production-service workflow actually executing the integrated supervisor and verifying its liveness/authority contract. A missing external DigitalOcean host does not invalidate DASS; it is an external deployment concern.
 
 No post-DASS action may be treated as proof of DASS achievement. Post-DASS activation consumes the persisted achievement state produced by the authoritative measurement/transition mechanism.
 
@@ -60,3 +64,4 @@ Human involvement is an exception path. The autonomous system should diagnose, p
 - Production actions remain governed by the existing authority controls.
 - Failed verification does not advance phase state.
 - Post-DASS evolution must not weaken the transition contract.
+- External infrastructure availability is not silently promoted into a DASS prerequisite.
