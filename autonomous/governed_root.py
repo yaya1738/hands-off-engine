@@ -13,7 +13,10 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-from governed_authority import authorize
+try:
+    from .governed_authority import authorize
+except ImportError:
+    from governed_authority import authorize
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE = ROOT / "state"
