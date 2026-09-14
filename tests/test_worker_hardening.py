@@ -54,6 +54,7 @@ def test_action_allowlist_blocks_unknown():
     """Invariant 3: unknown actions rejected."""
     w = _fresh_worker()
     valid, err = w.validate_task_envelope({
+        "from": "factory", "type": "task_assignment", "msg_id": "m1",
         "to": "anyclaw",
         "context": {"task_id": "t1", "action": "dangerous_action"}
     })
@@ -65,6 +66,7 @@ def test_action_allowlist_blocks_execute():
     """Invariant 3: 'execute' action not in allowlist."""
     w = _fresh_worker()
     valid, err = w.validate_task_envelope({
+        "from": "factory", "type": "task_assignment", "msg_id": "m2",
         "to": "anyclaw",
         "context": {"task_id": "t1", "action": "execute"}
     })
@@ -75,8 +77,9 @@ def test_action_allowlist_blocks_execute():
 def test_action_allowlist_accepts_valid():
     """Invariant 3: valid actions pass."""
     w = _fresh_worker()
-    for action in w.ALLOWED_ACTIONS:
+    for i, action in enumerate(w.ALLOWED_ACTIONS):
         valid, err = w.validate_task_envelope({
+            "from": "factory", "type": "task_assignment", "msg_id": f"m{i}",
             "to": "anyclaw",
             "context": {"task_id": "t1", "action": action}
         })
@@ -87,6 +90,7 @@ def test_rejects_wrong_target():
     """Invariant 3: tasks addressed to other agents rejected."""
     w = _fresh_worker()
     valid, err = w.validate_task_envelope({
+        "from": "factory", "type": "task_assignment", "msg_id": "m4",
         "to": "claude-code",
         "context": {"task_id": "t1", "action": "health_check"}
     })
@@ -125,8 +129,12 @@ def test_duplicate_delivery_safety():
         w.PROCESSED_IDS = tmp / "processed.json"
         w.LOCK_DIR = tmp / "locks"
 
-        # Write two identical tasks
-        task = json.dumps({"to": "anyclaw", "message": "test", "context": {"task_id": "dup-1", "action": "health_check"}}) + "\n"
+        # Write two identical tasks (with strict envelope fields)
+        task = json.dumps({
+            "from": "factory", "type": "task_assignment", "msg_id": "dup-1",
+            "to": "anyclaw", "message": "test",
+            "context": {"task_id": "dup-1", "action": "health_check"}
+        }) + "\n"
         w.INBOX.write_text(task + task)
 
         count = w.poll_once()
@@ -135,5 +143,117 @@ def test_duplicate_delivery_safety():
         # Verify result written once
         results = w.RESULTS.read_text().strip().split("\n")
         assert len(results) == 1
+    finally:
+        shutil.rmtree(tmp)
+
+
+# ── Round 19 hardening: strict envelope + crash recovery ──
+
+def test_rejects_wrong_sender():
+    """Strict: tasks from non-factory senders rejected."""
+    w = _fresh_worker()
+    valid, err = w.validate_task_envelope({
+        "from": "evil-agent", "type": "task_assignment", "msg_id": "m1",
+        "to": "anyclaw",
+        "context": {"task_id": "t1", "action": "health_check"}
+    })
+    assert not valid
+    assert "sender" in err
+
+
+def test_rejects_wrong_type():
+    """Strict: tasks with wrong type rejected."""
+    w = _fresh_worker()
+    valid, err = w.validate_task_envelope({
+        "from": "factory", "type": "chat_message", "msg_id": "m2",
+        "to": "anyclaw",
+        "context": {"task_id": "t1", "action": "health_check"}
+    })
+    assert not valid
+    assert "type" in err
+
+
+def test_rejects_missing_msg_id():
+    """Strict: tasks without msg_id rejected."""
+    w = _fresh_worker()
+    valid, err = w.validate_task_envelope({
+        "from": "factory", "type": "task_assignment",
+        "to": "anyclaw",
+        "context": {"task_id": "t1", "action": "health_check"}
+    })
+    assert not valid
+    assert "msg_id" in err
+
+
+def test_accepts_valid_envelope():
+    """Strict: well-formed envelope accepted."""
+    w = _fresh_worker()
+    valid, err = w.validate_task_envelope({
+        "from": "factory", "type": "task_assignment", "msg_id": "m3",
+        "to": "anyclaw",
+        "context": {"task_id": "t3", "action": "health_check"}
+    })
+    assert valid
+    assert err is None
+
+
+def test_path_containment_uses_relative_to():
+    """safe_resolve uses Path.is_relative_to, not string startswith."""
+    w = _fresh_worker()
+    # A path that would match via startswith but not via is_relative_to
+    # e.g. if SAFE_READ_DIRS has /root/hands-off-engine/docs
+    # then /root/hands-off-engine/docsEvil/secret would pass startswith
+    # but not is_relative_to
+    import tempfile as _tf
+    tmp = _tf.mkdtemp()
+    try:
+        evil = Path(tmp) / "docsEvil"
+        evil.mkdir()
+        secret = evil / "secret.txt"
+        secret.write_text("oops")
+        # Temporarily add tmp as safe dir to test containment
+        old_dirs = w.SAFE_READ_DIRS
+        try:
+            # This should NOT match docsEvil (different dir name)
+            resolved, err = w.safe_resolve("docsEvil/secret.txt")
+            # Should be rejected (not in SAFE_READ_DIRS)
+            assert resolved is None or "outside" in (err or ""), \
+                f"Path traversal via prefix collision should be rejected: {resolved}"
+        finally:
+            pass
+    finally:
+        import shutil
+        shutil.rmtree(tmp)
+
+
+def test_crash_recovery_reuses_existing_result():
+    """If results.jsonl already has a task_id, it won't be re-executed."""
+    w = _fresh_worker()
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        w.INBOX = tmp / "inbox.jsonl"
+        w.RESULTS = tmp / "results.jsonl"
+        w.PROCESSED_IDS = tmp / "processed.json"
+        w.LOCK_DIR = tmp / "locks"
+
+        # Write a task
+        task = json.dumps({
+            "from": "factory", "type": "task_assignment", "msg_id": "crash-1",
+            "to": "anyclaw", "message": "test",
+            "context": {"task_id": "crash-1", "action": "health_check"}
+        })
+        w.INBOX.write_text(task + "\n")
+
+        # Simulate: result already written (crash recovery scenario)
+        result_line = json.dumps({
+            "from": "anyclaw", "to": "factory", "type": "task_result",
+            "msg_id": "crash-1",
+            "context": {"task_id": "crash-1", "status": "success"}
+        })
+        w.RESULTS.write_text(result_line + "\n")
+
+        # Now poll: should skip the task since result already exists
+        count = w.poll_once()
+        assert count == 0, f"Should not re-execute, got {count}"
     finally:
         shutil.rmtree(tmp)

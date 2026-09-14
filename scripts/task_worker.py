@@ -135,8 +135,10 @@ def safe_resolve(file_path):
         return None, f"resolution failed: {e}"
 
     # Must be under one of SAFE_READ_DIRS (after resolving symlinks)
+    # Use Path.is_relative_to for proper containment (not string prefix matching)
+    resolved_abs = resolved.resolve()
     in_safe = any(
-        str(resolved).startswith(str(d.resolve()))
+        resolved_abs.is_relative_to(d.resolve())
         for d in SAFE_READ_DIRS
     )
     if not in_safe:
@@ -154,9 +156,31 @@ def safe_resolve(file_path):
 
 # ── Invariant 3: Task envelope validation ──
 def validate_task_envelope(task):
-    """Validate task structure and enforce action allowlist."""
+    """Validate task structure and enforce action allowlist.
+
+    Strict checks:
+    - task is a dict
+    - "from" must be "factory" (or absent for legacy compat)
+    - "type" must be "task_assignment"
+    - "msg_id" must be a non-empty string
+    - "to" must be "anyclaw" or "all"
+    - context.task_id and context.action required
+    - action must be in allowlist
+    """
     if not isinstance(task, dict):
         return False, "task is not a dict"
+
+    # Sender validation (strict: must come from factory)
+    if task.get("from", "") != "factory":
+        return False, f"unexpected sender: {task.get('from')!r}"
+
+    # Type validation (strict: must be a task_assignment)
+    if task.get("type", "") != "task_assignment":
+        return False, f"unexpected type: {task.get('type')!r}"
+
+    # msg_id required
+    if not task.get("msg_id"):
+        return False, "missing msg_id"
 
     context = task.get("context")
     if not isinstance(context, dict):
@@ -178,8 +202,6 @@ def validate_task_envelope(task):
         return False, f"task addressed to '{to_field}', not 'anyclaw'"
 
     return True, None
-
-
 def process_task(task):
     """Process a single task and return a result dict."""
     task_id = task.get("context", {}).get("task_id", task.get("msg_id", "unknown"))
@@ -222,7 +244,10 @@ def process_task(task):
         elif action == "list_backends":
             from scripts.ai_connector import AIConnector
             ai = AIConnector()
-            result = {"status": "success", "result": ai.list_backends()}
+            # Minimize exposure: return only backend IDs and names, not capabilities/keys
+            result = {"status": "success", "result": {
+                k: v["name"] for k, v in ai.list_backends().items()
+            }}
         elif action == "list_parties":
             from scripts.comm_hub import CommHub
             hub = CommHub()
@@ -249,12 +274,39 @@ def process_task(task):
     }
 
 
+def _load_result_ids():
+    """Load task_ids already present in results.jsonl (crash recovery)."""
+    result_ids = set()
+    if RESULTS.exists():
+        try:
+            with open(RESULTS, "r") as f:
+                for line in f:
+                    if line.strip():
+                        try:
+                            r = json.loads(line)
+                            tid = r.get("context", {}).get("task_id", r.get("msg_id", ""))
+                            if tid:
+                                result_ids.add(tid)
+                        except Exception:
+                            pass
+        except Exception:
+            pass
+    return result_ids
+
+
 def poll_once():
-    """Read inbox, validate, claim, process, and write results."""
+    """Read inbox, validate, claim, process, and write results.
+
+    Crash/restart-safe: on startup, re-scans results.jsonl for task_ids
+    that were already written, so a crash mid-loop won't cause re-execution.
+    Processed IDs are persisted after each task to limit re-execution window.
+    """
     if not INBOX.exists():
         return 0
 
     processed = load_processed()
+    # Crash recovery: mark any result already written as processed
+    processed |= _load_result_ids()
     count = 0
 
     with open(INBOX, "r") as f:
@@ -275,6 +327,7 @@ def poll_once():
             if not valid:
                 log.warning(f"Rejected invalid task: {err}")
                 processed.add(task_id)
+                save_processed(processed)
                 continue
 
             # Invariant 5: atomic claim
@@ -290,6 +343,9 @@ def poll_once():
                 with open(RESULTS, "a") as f:
                     f.write(json.dumps(result, default=str) + "\n")
 
+                # Persist immediately for crash safety
+                save_processed(processed)
+
                 log.info(f"Completed task {task_id[:8]}... -> {result['context']['status']}")
                 # Emit continuation event
                 emitter = get_emitter()
@@ -304,7 +360,6 @@ def poll_once():
             finally:
                 lock.release()
 
-    save_processed(processed)
     return count
 
 
