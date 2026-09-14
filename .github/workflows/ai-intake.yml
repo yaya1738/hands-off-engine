@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   handle-intake:
+    if: github.event.issue.number == 1 && startsWith(github.event.comment.body, '/')
     runs-on: ubuntu-latest
 
     env:
