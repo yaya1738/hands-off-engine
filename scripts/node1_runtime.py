@@ -53,7 +53,7 @@ log = logging.getLogger("Node1")
 # Node identity
 NODE_ID = "node-1"
 NODE_NAME = "Yair Phone (Xiaomi Redmi)"
-NODE_DEVICE = "Xiaomi Redmi 23117G68G / Android 15 / proot"
+NODE_DEVICE = "Xiaomi Redmi 23117RA68G / Android 15 / proot"
 NODE_PARTY = "anyclaw"  # maps to the anyclaw party on the coordination bus
 
 
