@@ -1,0 +1,149 @@
+{
+  "timestamp": "2026-09-14T15:05:10.438748+00:00",
+  "services": [
+    {
+      "name": "AI Monitoring Bot Setup",
+      "description": "Set up an AI-powered monitoring system for Telegram/Slack/Discord. Alerts on conditions you define.",
+      "price_range": {
+        "min": 100,
+        "max": 500,
+        "unit": "one-time"
+      },
+      "delivery_time": "2-3 days",
+      "tech_stack": [
+        "Python",
+        "Telegram API",
+        "Cron",
+        "AI analysis"
+      ],
+      "what_client_gets": [
+        "Custom bot that monitors channels",
+        "AI-powered alert summarization",
+        "Setup on their server/device",
+        "Documentation and usage guide"
+      ],
+      "difficulty": "easy",
+      "platforms": [
+        "fiverr",
+        "upwork",
+        "direct"
+      ]
+    },
+    {
+      "name": "Multi-AI Coordination System",
+      "description": "Deploy a coordination system that lets ChatGPT, Claude, Grok, and other AIs work together on tasks.",
+      "price_range": {
+        "min": 500,
+        "max": 2000,
+        "unit": "one-time"
+      },
+      "delivery_time": "1-2 weeks",
+      "tech_stack": [
+        "Python",
+        "JSONL bus",
+        "Multi-agent",
+        "Telegram"
+      ],
+      "what_client_gets": [
+        "Multi-AI coordination on their tasks",
+        "Task routing and result aggregation",
+        "Health monitoring and alerting",
+        "Dashboard for visibility"
+      ],
+      "difficulty": "medium",
+      "platforms": [
+        "upwork",
+        "direct",
+        "github_sponsors"
+      ]
+    },
+    {
+      "name": "Polymarket Signal Bot",
+      "description": "Custom market intelligence alerts for prediction markets. AI-analyzed signals delivered to Telegram.",
+      "price_range": {
+        "min": 200,
+        "max": 800,
+        "unit": "one-time + 50/mo"
+      },
+      "delivery_time": "3-5 days",
+      "tech_stack": [
+        "Python",
+        "Polymarket API",
+        "Telegram",
+        "AI analysis"
+      ],
+      "what_client_gets": [
+        "Custom signal filters",
+        "Telegram alerts with analysis",
+        "Market trend summaries",
+        "Configurable alert thresholds"
+      ],
+      "difficulty": "easy",
+      "platforms": [
+        "fiverr",
+        "direct"
+      ]
+    },
+    {
+      "name": "Automated Code Review Bot",
+      "description": "AI-powered PR review for GitHub repos. Comments on code quality, security, and best practices.",
+      "price_range": {
+        "min": 150,
+        "max": 600,
+        "unit": "one-time"
+      },
+      "delivery_time": "2-4 days",
+      "tech_stack": [
+        "Python",
+        "GitHub API",
+        "AI analysis",
+        "Webhooks"
+      ],
+      "what_client_gets": [
+        "GitHub bot that reviews PRs",
+        "Security vulnerability detection",
+        "Code quality scoring",
+        "Automated suggestions"
+      ],
+      "difficulty": "easy",
+      "platforms": [
+        "fiverr",
+        "upwork"
+      ]
+    },
+    {
+      "name": "Phone-as-Node Setup Service",
+      "description": "Turn an Android phone into a lightweight cloud compute node with monitoring and task processing.",
+      "price_range": {
+        "min": 75,
+        "max": 300,
+        "unit": "one-time"
+      },
+      "delivery_time": "1-2 days",
+      "tech_stack": [
+        "Termux",
+        "proot",
+        "Python",
+        "SSH"
+      ],
+      "what_client_gets": [
+        "Phone configured as compute node",
+        "Remote access and task processing",
+        "Monitoring dashboard",
+        "Boot auto-start"
+      ],
+      "difficulty": "easy",
+      "platforms": [
+        "fiverr",
+        "direct"
+      ]
+    }
+  ],
+  "market_data": {
+    "ai_fiverr_avg": 150,
+    "bot_dev_avg": 300,
+    "coordination_avg": 500,
+    "target_monthly": 1000,
+    "time_to_first_client": "1-2 weeks"
+  }
+}
