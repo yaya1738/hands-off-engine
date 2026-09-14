@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""Self-Improvement Engine — reads learning state and generates actionable improvements.
+"""Self-Improvement Engine — generate and durably dispatch bounded improvements.
 
-This is the "constantly improving" part of the system. It:
-1. Reads the learning loop state (patterns, suggestions)
-2. Reads the health monitor log
-3. Reads bus activity patterns
-4. Generates concrete improvement tasks
-5. Posts them to the bus for Factory/AnyClaw to execute
+The loop is intentionally fail-closed:
+observe -> deterministic candidate -> durable dedup -> max one dispatch -> AnyClaw
+result/continuation -> Factory intake -> next bounded decision.
+
+Only existing read-only task actions are dispatched. This module never executes
+arbitrary commands or modifies source code directly.
 """
+import hashlib
 import json
-import uuid
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -17,6 +17,17 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE = ROOT / "state"
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
 IMPROVEMENT_STATE = STATE / "improvement_state.json"
+DISPATCH_STATE = STATE / "improvement_dispatch_state.json"
+
+# These actions already exist in the AnyClaw worker and are deliberately read-only.
+ACTION_BY_CATEGORY = {
+    "reliability": ("read_file_fact", "state/health_log.jsonl"),
+    "quality": ("read_file_fact", "state/learning_state.json"),
+    "maintenance": ("read_file_fact", "ai/coordination/messages.jsonl"),
+    "usability": ("read_file_fact", ".termux/boot/hands-off-engine.sh"),
+    "security": ("read_file_fact", "scripts/comm_hub.py"),
+    "expansion": ("system_status", ""),
+}
 
 
 def load_json(path):
@@ -50,80 +61,66 @@ def get_learning_state():
     return load_json(STATE / "learning_state.json")
 
 
+def candidate_id(category, title, description):
+    raw = "\n".join((category, title, description))
+    return "imp-" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:20]
+
+
+def _candidate(category, title, description, priority):
+    return {
+        "id": candidate_id(category, title, description),
+        "category": category,
+        "title": title,
+        "description": description,
+        "priority": priority,
+        "actionable": True,
+    }
+
+
 def generate_improvements():
-    """Generate improvement tasks based on current state."""
+    """Generate deterministic improvement candidates from current state."""
     improvements = []
     learning = get_learning_state()
     health = get_health_trend()
     patterns = learning.get("patterns", {})
-    
-    # 1. If health has issues, add monitoring improvement
+
     if health["issues"] > 0:
-        improvements.append({
-            "id": str(uuid.uuid4()),
-            "category": "reliability",
-            "title": "Investigate health failures",
-            "description": f"{health['issues']} health issues in last {health['checks']} checks. Review health_log.jsonl for patterns.",
-            "priority": "high",
-            "actionable": True,
-        })
-    
-    # 2. If success rate is low, add validation improvement
+        improvements.append(_candidate(
+            "reliability", "Investigate health failures",
+            f"{health['issues']} health issues in last {health['checks']} checks. Review health_log.jsonl for patterns.",
+            "high"))
+
     rate = patterns.get("success_rate", 1.0)
     if rate < 0.8 and patterns.get("total_tasks", 0) > 0:
-        improvements.append({
-            "id": str(uuid.uuid4()),
-            "category": "quality",
-            "title": "Improve task validation",
-            "description": f"Success rate {rate:.0%}. Add input validation, retry logic, and error categorization.",
-            "priority": "high",
-            "actionable": True,
-        })
-    
-    # 3. Bus is growing — suggest cleanup
+        improvements.append(_candidate(
+            "quality", "Improve task validation",
+            f"Success rate {rate:.0%}. Add input validation, retry logic, and error categorization.",
+            "high"))
+
     if BUS.exists():
         lines = len(BUS.read_text().splitlines())
         if lines > 200:
-            improvements.append({
-                "id": str(uuid.uuid4()),
-                "category": "maintenance",
-                "title": "Clean up bus messages",
-                "description": f"Bus has {lines} lines. Archive old continuation events, keep task_assignments and results.",
-                "priority": "medium",
-                "actionable": True,
-            })
-    
-    # 4. Add operator convenience improvements
-    improvements.append({
-        "id": str(uuid.uuid4()),
-        "category": "usability",
-        "title": "Add Termux boot launcher",
-        "description": "Create Termux:Boot script to auto-start Node 1 + Telegram bridge + Control Room on device boot.",
-        "priority": "medium",
-        "actionable": True,
-    })
-    
-    # 5. Security hardening (from audit)
-    improvements.append({
-        "id": str(uuid.uuid4()),
-        "category": "security",
-        "title": "Validate sender_id against registered parties",
-        "description": "CommHub.receive() should reject unknown sender_ids to prevent bus poisoning.",
-        "priority": "medium",
-        "actionable": True,
-    })
-    
-    # 6. Learning improvement
+            improvements.append(_candidate(
+                "maintenance", "Clean up bus messages",
+                f"Bus has {lines} lines. Archive old continuation events, keep task_assignments and results.",
+                "medium"))
+
+    improvements.append(_candidate(
+        "usability", "Add Termux boot launcher",
+        "Create Termux:Boot script to auto-start Node 1 + Telegram bridge + Control Room on device boot.",
+        "medium"))
+
+    improvements.append(_candidate(
+        "security", "Validate sender_id against registered parties",
+        "CommHub.receive() should reject unknown sender_ids to prevent bus poisoning.",
+        "medium"))
+
     if patterns.get("total_tasks", 0) > 10 and rate > 0.9:
-        improvements.append({
-            "id": str(uuid.uuid4()),
-            "category": "expansion",
-            "title": "Expand autonomous task scope",
-            "description": f"System is stable ({rate:.0%} over {patterns['total_tasks']} tasks). Consider enabling autonomous web research, file analysis, or monitoring tasks.",
-            "priority": "low",
-            "actionable": True,
-        })
-    
+        improvements.append(_candidate(
+            "expansion", "Expand autonomous task scope",
+            f"System is stable ({rate:.0%} over {patterns['total_tasks']} tasks). Consider enabling autonomous web research, file analysis, or monitoring tasks.",
+            "low"))
+
     return improvements
 
 
@@ -138,14 +135,86 @@ def save_improvements(improvements):
     return state
 
 
+def _load_dispatch_state():
+    state = load_json(DISPATCH_STATE)
+    return {
+        "dispatched": state.get("dispatched", {}),
+        "history": state.get("history", []),
+    }
+
+
+def _append_bus(message):
+    BUS.parent.mkdir(parents=True, exist_ok=True)
+    with BUS.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(message, sort_keys=True) + "\n")
+
+
+def dispatch_one(improvements):
+    """Dispatch at most one new bounded candidate and persist the decision first."""
+    state = _load_dispatch_state()
+    now = datetime.now(timezone.utc).isoformat()
+
+    for imp in improvements:
+        cid = imp["id"]
+        if cid in state["dispatched"]:
+            continue
+        action, target = ACTION_BY_CATEGORY.get(imp["category"], (None, None))
+        if action is None:
+            continue
+
+        msg_id = "imp-task-" + hashlib.sha256(cid.encode("utf-8")).hexdigest()[:20]
+        task_id = "task-" + cid
+        message = {
+            "msg_id": msg_id,
+            "timestamp": now,
+            "from": "factory",
+            "to": "anyclaw",
+            "type": "task_assignment",
+            "task_id": task_id,
+            "action": action,
+            "params": {"path": target} if target else {},
+            "payload": {
+                "candidate_id": cid,
+                "category": imp["category"],
+                "title": imp["title"],
+                "description": imp["description"],
+            },
+            "reply_to": "self_improvement",
+        }
+
+        # Record the durable decision before the bus write. If the process dies
+        # after this point, the candidate remains closed rather than duplicating work.
+        state["dispatched"][cid] = {
+            "msg_id": msg_id,
+            "task_id": task_id,
+            "action": action,
+            "dispatched_at": now,
+        }
+        state["history"].append(state["dispatched"][cid] | {"candidate_id": cid})
+        DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
+        DISPATCH_STATE.write_text(json.dumps(state, indent=2) + "\n")
+        _append_bus(message)
+        return message
+
+    DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
+    DISPATCH_STATE.write_text(json.dumps(state, indent=2) + "\n")
+    return None
+
+
 def run():
     improvements = generate_improvements()
     state = save_improvements(improvements)
-    
+    dispatched = dispatch_one(improvements)
+    state["dispatched"] = dispatched
+
     print(f"Self-improvement: {len(improvements)} improvements generated")
+    if dispatched:
+        print(f"  dispatched: {dispatched['task_id']} -> {dispatched['action']}")
+    else:
+        print("  dispatched: none (all candidates already handled or unsupported)")
     for imp in improvements:
         print(f"  [{imp['priority']}] {imp['category']}: {imp['title']}")
-    
+
     return state
 
 
