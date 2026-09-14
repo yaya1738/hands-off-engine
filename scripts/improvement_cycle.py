@@ -48,6 +48,12 @@ def main():
     # 4. State integrity
     integrity = run_subprocess("state_integrity.py")
     
+    # 5. Improvement applier (apply safe improvements)
+    applier = run_subprocess("improvement_applier.py status")
+    
+    # 6. Feedback analysis (measure improvement impact)
+    feedback = run_subprocess("improvement_feedback.py analyze")
+    
     # Load results
     cycle_result = {
         "timestamp": now,
@@ -55,6 +61,8 @@ def main():
         "learning": learning["success"],
         "improvement": improvement["success"],
         "integrity": integrity["success"],
+        "applier": applier["success"],
+        "feedback": feedback["success"],
     }
     
     # Save cycle history

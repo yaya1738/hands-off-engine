@@ -18,6 +18,7 @@ STATE = ROOT / "state"
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
 IMPROVEMENT_STATE = STATE / "improvement_state.json"
 DISPATCH_STATE = STATE / "improvement_dispatch_state.json"
+FEEDBACK_FILE = STATE / "improvement_feedback.json"
 
 # These actions already exist in the AnyClaw worker and are deliberately read-only.
 ACTION_BY_CATEGORY = {
@@ -66,6 +67,18 @@ def candidate_id(category, title, description):
     return "imp-" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:20]
 
 
+# Category → safe action mapping for the improvement applier
+ACTION_MAP = {
+    "reliability": "log_analysis",
+    "quality": "generate_report",
+    "maintenance": "clean_bus",
+    "usability": "fix_config",
+    "security": "log_analysis",
+    "expansion": "generate_report",
+    "documentation": "update_documentation",
+}
+
+
 def _candidate(category, title, description, priority):
     return {
         "id": candidate_id(category, title, description),
@@ -74,21 +87,41 @@ def _candidate(category, title, description, priority):
         "description": description,
         "priority": priority,
         "actionable": True,
+        "action": ACTION_MAP.get(category, "update_documentation"),
     }
 
 
+def get_feedback_recommendations():
+    """Load feedback recommendations to inform candidate generation."""
+    if FEEDBACK_FILE.exists():
+        try:
+            data = json.loads(FEEDBACK_FILE.read_text())
+            return data.get("summary", {}).get("category_summary", {})
+        except Exception:
+            pass
+    return {}
+
+
 def generate_improvements():
-    """Generate deterministic improvement candidates from current state."""
+    """Generate deterministic improvement candidates from current state.
+
+    Uses feedback data to prefer categories that historically helped
+    and deprioritize categories that didn't.
+    """
     improvements = []
     learning = get_learning_state()
     health = get_health_trend()
     patterns = learning.get("patterns", {})
+    feedback_cats = get_feedback_recommendations()
 
     if health["issues"] > 0:
+        priority = "high"
+        if feedback_cats.get("reliability", {}).get("recommendation") == "prefer":
+            priority = "critical"
         improvements.append(_candidate(
             "reliability", "Investigate health failures",
             f"{health['issues']} health issues in last {health['checks']} checks. Review health_log.jsonl for patterns.",
-            "high"))
+            priority))
 
     rate = patterns.get("success_rate", 1.0)
     if rate < 0.8 and patterns.get("total_tasks", 0) > 0:
@@ -120,6 +153,22 @@ def generate_improvements():
             "expansion", "Expand autonomous task scope",
             f"System is stable ({rate:.0%} over {patterns['total_tasks']} tasks). Consider enabling autonomous web research, file analysis, or monitoring tasks.",
             "low"))
+
+    # Feedback-driven: add improvement applier cycle if not yet running
+    applier_state = STATE / "improvement_applier_state.json"
+    if not applier_state.exists() or json.loads(applier_state.read_text() if applier_state.exists() else "{}").get("applied_ids", []) == []:
+        improvements.append(_candidate(
+            "maintenance", "Initialize improvement applier",
+            "Run the improvement applier to start the observe→act→measure loop.",
+            "high"))
+
+    # Feedback-driven: prefer categories that historically helped
+    for cat, info in feedback_cats.items():
+        if info.get("recommendation") == "prefer" and info.get("count", 0) >= 2:
+            improvements.append(_candidate(
+                cat, f"Continue {cat} improvements (historically effective)",
+                f"Average score {info['avg_score']:.2f} over {info['count']} improvements. This category consistently helps.",
+                "medium"))
 
     return improvements
 

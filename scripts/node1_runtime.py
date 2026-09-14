@@ -186,6 +186,18 @@ class Node1Runtime:
         except ImportError:
             req_intake = None
             log.warning("factory_request_intake not available")
+        try:
+            from scripts.improvement_applier import ImprovementApplier
+            applier = ImprovementApplier(repo_root=REPO_ROOT)
+        except ImportError:
+            applier = None
+            log.warning("improvement_applier not available")
+        
+        try:
+            from scripts.self_improvement import generate_improvements, save_improvements
+        except ImportError:
+            generate_improvements = None
+            log.warning("self_improvement not available")
 
         try:
             from scripts.continuation import ContinuationEmitter
@@ -243,6 +255,32 @@ class Node1Runtime:
                             )
                     except Exception as e:
                         log.error(f"Request intake error: {e}")
+
+                # 3c. Improvement applier (every 5 minutes, tick % 30)
+                if applier and tick % 30 == 0:
+                    try:
+                        # Generate improvement candidates
+                        if generate_improvements:
+                            candidates = generate_improvements()
+                            save_improvements(candidates)
+                            # Apply safe ones
+                            results = applier.apply_batch(candidates)
+                            applied = sum(1 for r in results if r.get("applied"))
+                            if applied:
+                                log.info(f"Improvement applier: {applied} improvements applied")
+                                self.state.data["improvements_applied"] = (
+                                    self.state.data.get("improvements_applied", 0) + applied
+                                )
+                    except Exception as e:
+                        log.error(f"Improvement applier error: {e}")
+
+                # 3d. Feedback analysis (every 10 minutes, tick % 60)
+                if tick % 60 == 0:
+                    try:
+                        from scripts.improvement_feedback import analyze_feedback
+                        analyze_feedback()
+                    except Exception as e:
+                        log.error(f"Feedback analysis error: {e}")
 
                 # 4. Heartbeat (every 60s)
                 if time.time() - self.last_heartbeat >= 60:
