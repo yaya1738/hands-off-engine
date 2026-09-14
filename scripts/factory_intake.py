@@ -1,26 +1,18 @@
 #!/usr/bin/env python3
-"""
-Factory-side continuation intake.
+"""Factory-side continuation intake.
 
-Consumes `continuation_event` entries from the canonical coordination bus
-(ai/coordination/messages.jsonl), validates/correlates event_id/msg_id and
-task_id, durably deduplicates across restart, filters to wake-worthy events
-only, and produces exactly one bounded next `task_assignment` addressed to
-anyclaw through the same canonical bus.
-
-Design constraints (per Factory round 12):
-- No second bus, no credentials, no live execution, no direct main push
-- Durable consumption/decision state so restart cannot fan out duplicates
-- Deterministic correlation: event identity derived from event data, not UUID
+Consumes continuation_event entries from the canonical coordination bus,
+filters to wake-worthy events, durably deduplicates them, and emits at most
+one bounded follow-up task_assignment for each actionable event.
 """
 
-import json
-import sys
 import hashlib
+import json
 import logging
-from pathlib import Path
+import sys
 from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from pathlib import Path
+from typing import List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -32,65 +24,47 @@ MESSAGES_FILE = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
 INTAKE_STATE = REPO_ROOT / "state" / "factory_intake_state.json"
 DECISION_DIR = REPO_ROOT / "state" / "intake_decisions"
 
-# Wake-worthy event types (only these trigger a next-task decision)
 WAKE_EVENT_TYPES = frozenset({
-    "task_completed",
-    "blocked",
-    "authorization_required",
-    "security_boundary",
-    "test_failure",
+    "task_completed", "blocked", "authorization_required",
+    "security_boundary", "test_failure",
 })
-
-# The only action produced by this intake is a bounded task_assignment to anyclaw
 TARGET_PARTY = "anyclaw"
-
-# Canonical envelope requirement: acceptable in-message event_type fields
 EVENT_TYPE_FIELD_CANDIDATES = ("event_type", "type")
 
 
-def _load_state() -> dict:
-    if INTAKE_STATE.exists():
+def _load_state(path: Optional[Path] = None) -> dict:
+    state_path = Path(path) if path else INTAKE_STATE
+    if state_path.exists():
         try:
-            return json.loads(INTAKE_STATE.read_text())
+            return json.loads(state_path.read_text())
         except Exception:
             pass
     return {"consumed_ids": [], "decisions": []}
 
 
-def _save_state(state: dict):
-    INTAKE_STATE.write_text(json.dumps(state, indent=2) + "\n")
+def _save_state(state: dict, path: Optional[Path] = None):
+    state_path = Path(path) if path else INTAKE_STATE
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps(state, indent=2) + "\n")
 
 
 def _get_event_type(event: dict) -> str:
-    """Extract the effective event type from a bus message.
-
-    Bus messages have event_type inside context (from continuation emitter):
-    {"type": "continuation_event", "context": {"event_type": "task_completed", ...}}
-    Also checks top-level fields for flat events.
-    """
-    # Check context first (standard bus envelope from continuation emitter)
     context = event.get("context") or {}
     for field in EVENT_TYPE_FIELD_CANDIDATES:
-        val = context.get(field)
-        if val:
-            return val
-    # Fall back to top-level fields
+        if context.get(field):
+            return context[field]
     for field in EVENT_TYPE_FIELD_CANDIDATES:
-        val = event.get(field)
-        if val:
-            return val
-    # Fall back to message-level type
+        if event.get(field):
+            return event[field]
     return event.get("type", "")
 
 
 def _get_task_correlation(event: dict) -> Optional[str]:
-    """Extract task_id correlation from the bus message (context or top-level)."""
     context = event.get("context") or {}
     return context.get("task_id") or event.get("task_id")
 
 
 def _event_fingerprint(event: dict) -> str:
-    """Deterministic identity from event data (event_id preferred, else msg_id + task correlation)."""
     event_id = event.get("event_id") or event.get("msg_id")
     task_id = _get_task_correlation(event)
     event_type = _get_event_type(event)
@@ -98,13 +72,13 @@ def _event_fingerprint(event: dict) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
-def read_continuation_events() -> List[dict]:
-    """Read all continuation_event entries from the canonical bus."""
-    if not MESSAGES_FILE.exists():
+def read_continuation_events(messages_file: Optional[Path] = None) -> List[dict]:
+    path = Path(messages_file) if messages_file else MESSAGES_FILE
+    if not path.exists():
         return []
     events = []
     try:
-        with open(MESSAGES_FILE, "r") as f:
+        with path.open("r") as f:
             for line in f:
                 if not line.strip():
                     continue
@@ -120,74 +94,48 @@ def read_continuation_events() -> List[dict]:
 
 
 class FactoryIntake:
-    """Factory-side continuation consumer: dedup → filter → decide → emit exactly one task."""
+    """Factory-side continuation consumer with repo-root-local durable state."""
 
     def __init__(self, repo_root: Optional[Path] = None):
         self.repo_root = Path(repo_root) if repo_root else REPO_ROOT
         self.state_dir = self.repo_root / "state"
+        self.messages_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
+        self.intake_state = self.state_dir / "factory_intake_state.json"
+        self.decisions_dir = self.state_dir / "intake_decisions"
         self.state_dir.mkdir(parents=True, exist_ok=True)
-        self.decisions_dir = DECISION_DIR
         self.decisions_dir.mkdir(parents=True, exist_ok=True)
-        self.state = _load_state()
+        self.state = _load_state(self.intake_state)
         self.consumed_ids = set(self.state.get("consumed_ids", []))
         self.decisions = list(self.state.get("decisions", []))
-
-    # ── durable consumption state ──
 
     def _persist(self):
         state = {
             "consumed_ids": sorted(self.consumed_ids)[-5000:],
             "decisions": self.decisions[-5000:],
         }
-        INTAKE_STATE.write_text(json.dumps(state, indent=2) + "\n")
-
-    # ── intake pipeline ──
+        _save_state(state, self.intake_state)
 
     def intake_once(self) -> List[dict]:
-        """Process all un-consumed continuation events. Returns decision records."""
-        events = read_continuation_events()
         decisions = []
-        for event in events:
+        for event in read_continuation_events(self.messages_file):
             decision = self.process_event(event)
             if decision:
                 decisions.append(decision)
         return decisions
 
-    def process_event(self, event: dict) -> Optional[dict]:
-        """Process one bus message. Returns a decision record or None if not actionable.
-
-        Pipeline: validate envelope → dedup by fingerprint → wake-only filter
-        → correlate task_id → emit exactly one task_assignment.
-        """
-        # 1. Envelope validation
+    def process_event(self, event: dict):
         fp = _event_fingerprint(event)
-        if not fp:
-            log.warning("Rejected event: no usable identity")
-            return None
-
-        # 2. Durable dedup across restart
-        if fp in self.consumed_ids:
-            log.info(f"Dedup: event fingerprint {fp[:12]}... already consumed")
+        if not fp or fp in self.consumed_ids:
             return None
         self.consumed_ids.add(fp)
 
-        # 3. Wake-only filter
         event_type = _get_event_type(event)
         if event_type not in WAKE_EVENT_TYPES:
-            log.info(f"Ignoring non-wake event type: {event_type}")
             self._persist()
             return None
 
-        # 4. Correlation
-        task_id = _get_task_correlation(event)
-        if not task_id:
-            task_id = "uncorrelated"
-
-        # 5. Follow-up gate: only emit when there is real correlated work.
-        # Uncorrelated task_completed events (e.g. heartbeats) are recorded
-        # as consumed but do NOT fan out into noise on the bus.
+        task_id = _get_task_correlation(event) or "uncorrelated"
         if not self._should_follow_up(event, task_id):
-            log.info(f"Recorded {event_type} (task={task_id}) but no follow-up needed")
             decision = {
                 "fingerprint": fp,
                 "event_id": event.get("event_id") or event.get("msg_id"),
@@ -200,9 +148,7 @@ class FactoryIntake:
             self._persist()
             return decision
 
-        # 6. Exactly one bounded next task_assignment
         assignment = self._emit_next_task(event, task_id)
-
         decision = {
             "fingerprint": fp,
             "event_id": event.get("event_id") or event.get("msg_id"),
@@ -213,70 +159,55 @@ class FactoryIntake:
         }
         self.decisions.append(decision)
         self._persist()
-        log.info(f"Decided: {event_type} (task={task_id}) -> emitted {assignment['msg_id']}")
         return decision
 
-    # ── exactly-one bounded next task ──
-
     def _should_follow_up(self, event: dict, task_id: str) -> bool:
-        """Decide whether this wake event warrants a new task_assignment.
-
-        Only emit when there is a real, correlated next action:
-        - task_id must be present and not "uncorrelated"
-        - security_boundary / authorization_required / test_failure / blocked
-          always warrant follow-up when correlated
-        - task_completed only warrants follow-up if a result implies next work
-        """
         if not task_id or task_id == "uncorrelated":
             return False
         event_type = _get_event_type(event)
         if event_type in {"security_boundary", "authorization_required", "test_failure", "blocked"}:
             return True
         if event_type == "task_completed":
-            # Only follow up on correlated, real task completions (not heartbeats)
-            context = event.get("context") or {}
-            status = context.get("status", "")
+            status = (event.get("context") or {}).get("status", "")
             return status in {"success", "error", "failed"}
         return False
 
     def _emit_next_task(self, event: dict, task_id: str) -> dict:
-        """Emit exactly one bounded task_assignment to anyclaw on the canonical bus."""
-        next_task_id = f"intake-{datetime.now(timezone.utc).strftime('%Y%m%d%H%M%S')}"
-        msg_id = f"factory-intake-{_event_fingerprint(event)[:12]}"
-
+        now = datetime.now(timezone.utc)
+        source_id = event.get("event_id") or event.get("msg_id") or _event_fingerprint(event)[:12]
+        # Include source fingerprint so IDs remain unique even for same-second events.
+        suffix = _event_fingerprint(event)[:12]
+        next_task_id = f"intake-{now.strftime('%Y%m%d%H%M%S')}-{suffix}"
+        msg_id = f"factory-intake-{suffix}"
         assignment = {
             "from": "factory",
             "to": TARGET_PARTY,
             "type": "task_assignment",
             "message": f"Factory continuation intake: follow-up on {task_id[:12]}... ({_get_event_type(event)})",
             "msg_id": msg_id,
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": now.isoformat(),
             "context": {
                 "task_id": next_task_id,
                 "action": "system_status",
                 "params": {},
                 "reply_to": "281",
-                "source_event": event.get("event_id") or event.get("msg_id"),
+                "source_event": source_id,
                 "source_event_type": _get_event_type(event),
             },
         }
         try:
-            out_path = self.repo_root / "ai" / "coordination" / "messages.jsonl"
-            with open(out_path, "a") as f:
+            self.messages_file.parent.mkdir(parents=True, exist_ok=True)
+            with self.messages_file.open("a") as f:
                 f.write(json.dumps(assignment) + "\n")
-        except Exception as e:
-            log.error(f"Failed to write assignment: {e}")
+        except Exception as exc:
+            log.error("Failed to write assignment: %s", exc)
         return assignment
 
     def pending_wake_events(self) -> List[dict]:
-        """Return wake-worthy events not yet consumed (for Factory-side visibility)."""
-        events = read_continuation_events()
         pending = []
-        for event in events:
+        for event in read_continuation_events(self.messages_file):
             fp = _event_fingerprint(event)
-            if fp in self.consumed_ids:
-                continue
-            if _get_event_type(event) in WAKE_EVENT_TYPES:
+            if fp not in self.consumed_ids and _get_event_type(event) in WAKE_EVENT_TYPES:
                 pending.append(event)
         return pending
 
@@ -285,28 +216,17 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description="Factory-side continuation intake")
     sub = parser.add_subparsers(dest="cmd")
-    sub.add_parser("process", help="Process all pending continuation events")
-    sub.add_parser("pending", help="List pending wake-worthy events")
-    sub.add_parser("status", help="Show intake state summary")
-
+    sub.add_parser("process")
+    sub.add_parser("pending")
+    sub.add_parser("status")
     args = parser.parse_args()
     intake = FactoryIntake()
-
     if args.cmd == "process":
         decisions = intake.intake_once()
         print(f"Processed {len(decisions)} events -> {len(decisions)} decisions")
-        for d in decisions:
-            print(f"  {d['event_type']} (task={d['task_id'][:16]}...) -> {d['assigned_msg_id']}")
     elif args.cmd == "pending":
-        pending = intake.pending_wake_events()
-        print(f"{len(pending)} pending wake events")
-        for e in pending:
-            print(f"  [{_get_event_type(e)}] {e.get('message', '')[:80]}")
+        print(f"{len(intake.pending_wake_events())} pending wake events")
     elif args.cmd == "status":
-        print(json.dumps({
-            "consumed": len(intake.consumed_ids),
-            "decisions": len(intake.decisions),
-            "pending_wake": len(intake.pending_wake_events()),
-        }, indent=2))
+        print(json.dumps({"consumed": len(intake.consumed_ids), "decisions": len(intake.decisions), "pending_wake": len(intake.pending_wake_events())}, indent=2))
     else:
         parser.print_help()
