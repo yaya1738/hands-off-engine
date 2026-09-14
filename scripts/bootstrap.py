@@ -48,7 +48,22 @@ def start_listener():
         log_msg(f"Listener failed: {e}", "ERROR")
         return None
 
-def monitor(main_proc, listener_proc):
+def start_monitor():
+    MONITOR = REPO_ROOT / "scripts" / "proactive_monitor.py"
+    if not MONITOR.exists():
+        log_msg("Proactive monitor unavailable", "WARNING")
+        return None
+    log_msg("Starting proactive monitor")
+    try:
+        proc = subprocess.Popen([sys.executable, str(MONITOR), "--interval", "60"], cwd=REPO_ROOT)
+        log_msg("Proactive monitor started")
+        return proc
+    except Exception as e:
+        log_msg(f"Monitor failed: {e}", "ERROR")
+        return None
+
+
+def monitor(main_proc, listener_proc, monitor_proc=None):
     main_restarts = 0
     while True:
         try:
@@ -66,13 +81,19 @@ def monitor(main_proc, listener_proc):
             if listener_proc and listener_proc.poll() is not None:
                 log_msg("Listener died, restarting", "WARNING")
                 listener_proc = start_listener()
-            write_status({"status": "running", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False, "main_restarts": main_restarts, "listener_active": listener_proc is not None and listener_proc.poll() is None})
+monitor_proc = start_monitor()
+                    if monitor_proc and monitor_proc.poll() is not None:
+                log_msg("Monitor died, restarting", "WARNING")
+                monitor_proc = start_monitor()
+            write_status({"status": "running", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False, "main_restarts": main_restarts, "listener_active": listener_proc is not None and listener_proc.poll() is None, "monitor_active": monitor_proc is not None and monitor_proc.poll() is None})
             time.sleep(10)
         except KeyboardInterrupt:
             log_msg("Shutdown")
             main_proc.terminate()
             if listener_proc:
                 listener_proc.terminate()
+            if monitor_proc:
+                monitor_proc.terminate()
             break
         except Exception as e:
             log_msg(f"Monitor error: {e}", "ERROR")
@@ -90,4 +111,4 @@ if not ENTRY_POINT.exists():
 write_status({"status": "starting", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False})
 main_proc = start_system()
 listener_proc = start_listener()
-monitor(main_proc, listener_proc)
+monitor(main_proc, listener_proc, monitor_proc)
