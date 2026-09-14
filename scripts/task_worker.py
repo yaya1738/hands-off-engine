@@ -22,6 +22,15 @@ logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [T
 log = logging.getLogger("TaskWorker")
 
 REPO_ROOT = Path.home() / "hands-off-engine"
+# Allowed directories for read operations (prevents path traversal)
+SAFE_READ_DIRS = [
+    REPO_ROOT / "docs",
+    REPO_ROOT / "ai",
+    REPO_ROOT / "state",
+    REPO_ROOT / "scripts",
+    REPO_ROOT / "tests",
+]
+
 INBOX = REPO_ROOT / "ai" / "tasks" / "inbox.jsonl"
 RESULTS = REPO_ROOT / "ai" / "tasks" / "results.jsonl"
 PROCESSED_IDS = REPO_ROOT / "state" / "processed_task_ids.json"
@@ -65,29 +74,34 @@ def process_task(task):
             result = {"status": "success", "result": ai.list_backends()}
         elif action == "read_file_fact":
             file_path = params.get("file_path", "")
-            full_path = REPO_ROOT / file_path
-            result_data = {"file_path": file_path, "file_exists": full_path.exists()}
-            if full_path.exists():
-                result_data["file_size_bytes"] = full_path.stat().st_size
-                try:
-                    content = full_path.read_text()[:5000]
-                    result_data["content_preview"] = content[:200]
-                    # Try to extract a fact from the file
-                    fact_q = params.get("fact", "")
-                    import re
-                    # Simple JSON key search
-                    if "runtime identity" in fact_q.lower() or "name" in fact_q.lower():
-                        try:
-                            data = json.loads(content)
-                            ri = data.get("runtime_identity", data.get("response", {}).get("runtime_identity", {}))
-                            result_data["fact_answer"] = ri.get("name", "unknown")
-                        except Exception:
-                            result_data["fact_answer"] = "Could not parse JSON"
-                    else:
-                        result_data["fact_answer"] = content[:100]
-                except Exception:
-                    result_data["fact_answer"] = "Could not read file"
-            result = {"status": "success", "result": result_data}
+            full_path = (REPO_ROOT / file_path).resolve()
+            # Path traversal guard: must be under one of SAFE_READ_DIRS
+            in_safe_dir = any(
+                str(full_path).startswith(str(d.resolve()))
+                for d in SAFE_READ_DIRS
+            )
+            if not in_safe_dir:
+                result = {"status": "error", "error": f"Path traversal blocked: {file_path} is outside safe directories"}
+            else:
+                result_data = {"file_path": file_path, "file_exists": full_path.exists()}
+                if full_path.exists():
+                    result_data["file_size_bytes"] = full_path.stat().st_size
+                    try:
+                        content = full_path.read_text()[:5000]
+                        result_data["content_preview"] = content[:200]
+                        fact_q = params.get("fact", "")
+                        if "runtime identity" in fact_q.lower() or "name" in fact_q.lower():
+                            try:
+                                data = json.loads(content)
+                                ri = data.get("runtime_identity", data.get("response", {}).get("runtime_identity", {}))
+                                result_data["fact_answer"] = ri.get("name", "unknown")
+                            except Exception:
+                                result_data["fact_answer"] = "Could not parse JSON"
+                        else:
+                            result_data["fact_answer"] = content[:100]
+                    except Exception:
+                        result_data["fact_answer"] = "Could not read file"
+                result = {"status": "success", "result": result_data}
         elif action == "list_parties":
             from scripts.comm_hub import CommHub
             hub = CommHub()
