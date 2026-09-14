@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Factory-side continuation intake.
-
-Consumes continuation_event entries from the canonical coordination bus,
-filters to wake-worthy events, durably deduplicates them, and emits at most
-one bounded follow-up task_assignment for each actionable event.
-"""
-
+"""Factory-side continuation intake."""
 import hashlib
 import json
 import logging
@@ -15,7 +9,6 @@ from pathlib import Path
 from typing import List, Optional
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [FactoryIntake] %(message)s')
 log = logging.getLogger("FactoryIntake")
 
@@ -23,11 +16,7 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 MESSAGES_FILE = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
 INTAKE_STATE = REPO_ROOT / "state" / "factory_intake_state.json"
 DECISION_DIR = REPO_ROOT / "state" / "intake_decisions"
-
-WAKE_EVENT_TYPES = frozenset({
-    "task_completed", "blocked", "authorization_required",
-    "security_boundary", "test_failure",
-})
+WAKE_EVENT_TYPES = frozenset({"task_completed", "blocked", "authorization_required", "security_boundary", "test_failure"})
 TARGET_PARTY = "anyclaw"
 EVENT_TYPE_FIELD_CANDIDATES = ("event_type", "type")
 
@@ -94,30 +83,44 @@ def read_continuation_events(messages_file: Optional[Path] = None) -> List[dict]
 
 
 class FactoryIntake:
-    """Factory-side continuation consumer with repo-root-local durable state."""
-
+    """Factory-side continuation consumer with durable, checkout-local state."""
     def __init__(self, repo_root: Optional[Path] = None):
-        self.repo_root = Path(repo_root) if repo_root else REPO_ROOT
+        if repo_root is None:
+            self.repo_root = REPO_ROOT
+            # Preserve the module-level injection seam used by existing tests/tools.
+            self.messages_file = Path(MESSAGES_FILE)
+            self.intake_state = Path(INTAKE_STATE)
+        else:
+            self.repo_root = Path(repo_root)
+            self.messages_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
+            self.intake_state = self.repo_root / "state" / "factory_intake_state.json"
         self.state_dir = self.repo_root / "state"
-        self.messages_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
-        self.intake_state = self.state_dir / "factory_intake_state.json"
-        self.decisions_dir = self.state_dir / "intake_decisions"
+        self.decisions_dir = self.repo_root / "state" / "intake_decisions"
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.decisions_dir.mkdir(parents=True, exist_ok=True)
         self.state = _load_state(self.intake_state)
         self.consumed_ids = set(self.state.get("consumed_ids", []))
         self.decisions = list(self.state.get("decisions", []))
 
+    def _paths(self):
+        # Supports legacy __new__-constructed test instances while keeping runtime paths local.
+        messages = getattr(self, "messages_file", None)
+        state = getattr(self, "intake_state", None)
+        if messages is None:
+            messages = Path(getattr(self, "repo_root", REPO_ROOT)) / "ai" / "coordination" / "messages.jsonl"
+        if state is None:
+            state = Path(getattr(self, "repo_root", REPO_ROOT)) / "state" / "factory_intake_state.json"
+        return Path(messages), Path(state)
+
     def _persist(self):
-        state = {
-            "consumed_ids": sorted(self.consumed_ids)[-5000:],
-            "decisions": self.decisions[-5000:],
-        }
-        _save_state(state, self.intake_state)
+        _, state_path = self._paths()
+        state = {"consumed_ids": sorted(self.consumed_ids)[-5000:], "decisions": self.decisions[-5000:]}
+        _save_state(state, state_path)
 
     def intake_once(self) -> List[dict]:
+        messages_path, _ = self._paths()
         decisions = []
-        for event in read_continuation_events(self.messages_file):
+        for event in read_continuation_events(messages_path):
             decision = self.process_event(event)
             if decision:
                 decisions.append(decision)
@@ -128,35 +131,18 @@ class FactoryIntake:
         if not fp or fp in self.consumed_ids:
             return None
         self.consumed_ids.add(fp)
-
         event_type = _get_event_type(event)
         if event_type not in WAKE_EVENT_TYPES:
             self._persist()
             return None
-
         task_id = _get_task_correlation(event) or "uncorrelated"
         if not self._should_follow_up(event, task_id):
-            decision = {
-                "fingerprint": fp,
-                "event_id": event.get("event_id") or event.get("msg_id"),
-                "event_type": event_type,
-                "task_id": task_id,
-                "assigned_msg_id": None,
-                "decided_at": datetime.now(timezone.utc).isoformat(),
-            }
+            decision = {"fingerprint": fp, "event_id": event.get("event_id") or event.get("msg_id"), "event_type": event_type, "task_id": task_id, "assigned_msg_id": None, "decided_at": datetime.now(timezone.utc).isoformat()}
             self.decisions.append(decision)
             self._persist()
             return decision
-
         assignment = self._emit_next_task(event, task_id)
-        decision = {
-            "fingerprint": fp,
-            "event_id": event.get("event_id") or event.get("msg_id"),
-            "event_type": event_type,
-            "task_id": task_id,
-            "assigned_msg_id": assignment["msg_id"],
-            "decided_at": datetime.now(timezone.utc).isoformat(),
-        }
+        decision = {"fingerprint": fp, "event_id": event.get("event_id") or event.get("msg_id"), "event_type": event_type, "task_id": task_id, "assigned_msg_id": assignment["msg_id"], "decided_at": datetime.now(timezone.utc).isoformat()}
         self.decisions.append(decision)
         self._persist()
         return decision
@@ -173,39 +159,25 @@ class FactoryIntake:
         return False
 
     def _emit_next_task(self, event: dict, task_id: str) -> dict:
+        messages_path, _ = self._paths()
         now = datetime.now(timezone.utc)
-        source_id = event.get("event_id") or event.get("msg_id") or _event_fingerprint(event)[:12]
-        # Include source fingerprint so IDs remain unique even for same-second events.
         suffix = _event_fingerprint(event)[:12]
+        source_id = event.get("event_id") or event.get("msg_id") or suffix
         next_task_id = f"intake-{now.strftime('%Y%m%d%H%M%S')}-{suffix}"
         msg_id = f"factory-intake-{suffix}"
-        assignment = {
-            "from": "factory",
-            "to": TARGET_PARTY,
-            "type": "task_assignment",
-            "message": f"Factory continuation intake: follow-up on {task_id[:12]}... ({_get_event_type(event)})",
-            "msg_id": msg_id,
-            "timestamp": now.isoformat(),
-            "context": {
-                "task_id": next_task_id,
-                "action": "system_status",
-                "params": {},
-                "reply_to": "281",
-                "source_event": source_id,
-                "source_event_type": _get_event_type(event),
-            },
-        }
+        assignment = {"from": "factory", "to": TARGET_PARTY, "type": "task_assignment", "message": f"Factory continuation intake: follow-up on {task_id[:12]}... ({_get_event_type(event)})", "msg_id": msg_id, "timestamp": now.isoformat(), "context": {"task_id": next_task_id, "action": "system_status", "params": {}, "reply_to": "281", "source_event": source_id, "source_event_type": _get_event_type(event)}}
         try:
-            self.messages_file.parent.mkdir(parents=True, exist_ok=True)
-            with self.messages_file.open("a") as f:
+            messages_path.parent.mkdir(parents=True, exist_ok=True)
+            with messages_path.open("a") as f:
                 f.write(json.dumps(assignment) + "\n")
         except Exception as exc:
             log.error("Failed to write assignment: %s", exc)
         return assignment
 
     def pending_wake_events(self) -> List[dict]:
+        messages_path, _ = self._paths()
         pending = []
-        for event in read_continuation_events(self.messages_file):
+        for event in read_continuation_events(messages_path):
             fp = _event_fingerprint(event)
             if fp not in self.consumed_ids and _get_event_type(event) in WAKE_EVENT_TYPES:
                 pending.append(event)
