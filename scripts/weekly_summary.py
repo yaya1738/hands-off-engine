@@ -8,10 +8,19 @@ and sends via Telegram (or email, or logs to file).
 Run manually or via cron (weekly).
 """
 
+# UNIFIED AI - All systems serve Yair Siegel
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from ai.unified_ai import MASTER, get_master
+except ImportError:
+    MASTER = "Yair Siegel"
+
+
 import json
 import sys
 from datetime import datetime, timedelta
-from pathlib import Path
 from typing import Dict, List
 
 REPO_ROOT = Path(__file__).parent.parent

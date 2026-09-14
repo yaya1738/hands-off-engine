@@ -14,12 +14,29 @@ Runs continuously (via cron) and invokes Claude Code when:
 Part of CLM/Nexus/System serving Yair Siegel's domain.
 """
 
+# UNIFIED AI - All systems serve Yair Siegel
+import sys
+from pathlib import Path
+sys.path.insert(0, str(Path(__file__).parent.parent))
+try:
+    from ai.unified_ai import MASTER, get_master
+except ImportError:
+    MASTER = "Yair Siegel"
+
+
 import json
 import subprocess
 import sys
 from datetime import datetime, timezone, timedelta
-from pathlib import Path
 from typing import Dict, List, Optional
+
+# Import audit system conditionally
+try:
+    from audit import AuditLogger, FinancialLedger
+    from ai_nexus import ClaudeProvider
+    AUDIT_AVAILABLE = True
+except ImportError:
+    AUDIT_AVAILABLE = False
 
 
 class ClaudeOrchestrator:
@@ -31,6 +48,15 @@ class ClaudeOrchestrator:
         self.orchestrator_state = self.state_dir / 'claude_orchestrator.json'
         self.metrics_file = self.state_dir / 'performance_metrics.jsonl'
         self.execution_plan = repo_root / 'executor' / 'execution_plan.json'
+        
+        # Initialize audit logging if available
+        if AUDIT_AVAILABLE:
+            self.audit_logger = AuditLogger()
+            self.ledger = FinancialLedger()
+            self.claude_provider = ClaudeProvider(self.audit_logger, self.ledger)
+        else:
+            self.audit_logger = None
+            self.claude_provider = None
 
     def load_orchestrator_state(self) -> Dict:
         """Load orchestrator state (last Claude invocation, etc.)"""
@@ -219,6 +245,20 @@ class ClaudeOrchestrator:
 
             print(f"✓ Task added to queue (ID: {task_id[:8]}...)")
             print("Next Claude Code session will execute this task autonomously")
+            
+            # Log to audit system
+            if self.audit_logger:
+                self.audit_logger.log_event(
+                    component="ai.claude",
+                    action="task_queued",
+                    metadata={
+                        "task_id": task_id,
+                        "reason": reason,
+                        "priority": priority,
+                        "source": "orchestrator"
+                    },
+                    outcome="success"
+                )
 
             return True
 
@@ -295,9 +335,33 @@ Refer to .claude/USER_PROFILE.md and .claude/AUTONOMOUS_OPERATION.md for full co
 
             if success:
                 print("\n✓ Autonomous task added to queue successfully")
+                
+                # Log orchestrator invocation to audit
+                if self.audit_logger:
+                    self.audit_logger.log_event(
+                        component="ai.claude",
+                        action="orchestrator_invocation",
+                        metadata={
+                            "reason": reason,
+                            "total_invocations": state['total_autonomous_invocations']
+                        },
+                        outcome="success"
+                    )
+                
                 return 0
             else:
                 print("\n✗ Failed to add autonomous task")
+                
+                # Log failure to audit
+                if self.audit_logger:
+                    self.audit_logger.log_event(
+                        component="ai.claude",
+                        action="orchestrator_invocation",
+                        metadata={"reason": reason},
+                        outcome="failed",
+                        error="Failed to add task to queue"
+                    )
+                
                 return 1
         else:
             print(f"○ No invocation needed: {reason}")

@@ -1,0 +1,15 @@
+{
+  "cpu_usage_mean": 0.0,
+  "cpu_usage_std": 0.0,
+  "cpu_load_mean": 0.0,
+  "cpu_load_std": 0.0,
+  "memory_usage_mean": 0.0,
+  "memory_usage_std": 0.0,
+  "disk_usage_mean": {},
+  "network_latency_mean": 0.0,
+  "network_latency_std": 0.0,
+  "cpu_temp_mean": 0.0,
+  "cpu_temp_std": 0.0,
+  "samples_collected": 0,
+  "last_updated": ""
+}

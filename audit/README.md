@@ -32,14 +32,23 @@ audit.log_order(
 ## Viewing Logs
 
 ```bash
-# View recent logs
-python3 audit/audit_viewer.py --tail 20
+# List all agent sessions
+python3 audit/audit_viewer.py --list-sessions
+
+# Show summary for all sessions
+python3 audit/audit_viewer.py --all-sessions
+
+# Show summary for specific session
+python3 audit/audit_viewer.py --session <session-id> --summary
+
+# View recent events
+python3 audit/audit_viewer.py --limit 20
 
 # Filter by component
-python3 audit/audit_viewer.py --component edge_engine
+python3 audit/audit_viewer.py --component trading.polymarket
 
-# Show statistics
-python3 audit/audit_viewer.py --stats
+# View events with metadata
+python3 audit/audit_viewer.py --metadata --limit 10
 ```
 
 ## Documentation

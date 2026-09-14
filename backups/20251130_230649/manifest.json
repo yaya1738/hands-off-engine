@@ -1,0 +1,14 @@
+{
+  "timestamp": "20251130_230649",
+  "files": [
+    ".env",
+    ".env.polymarket",
+    "state/unified_system_state.json",
+    "state/brain_state.json",
+    "state/script_registry.json",
+    "state/self_preservation.json",
+    "state/threat_analysis.json",
+    "state/system_topology.json"
+  ],
+  "created_at": "2025-11-30T23:06:49.573035+00:00"
+}

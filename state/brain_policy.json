@@ -1,0 +1,9 @@
+{
+  "generated_at": "2025-11-18T20:00:00Z",
+  "policy_version": "1.0",
+  "actions": [
+    {"type": "summary"},
+    {"type": "health-check"},
+    {"type": "polymarket-analysis"}
+  ]
+}

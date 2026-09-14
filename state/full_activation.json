@@ -1,0 +1,94 @@
+{
+  "master": "Yair Siegel",
+  "last_activation": "2025-11-30T23:26:53.857601+00:00",
+  "modules_active": 11,
+  "nodes_coordinated": 4,
+  "results": {
+    "protection": {
+      "self_preservation": {
+        "success": true,
+        "active": true
+      },
+      "system_immunity": {
+        "success": true,
+        "active": true
+      },
+      "harm_prevention": {
+        "success": true,
+        "active": true
+      },
+      "claude_optimizer": {
+        "success": true,
+        "active": true
+      }
+    },
+    "intelligence": {
+      "web_agent": {
+        "success": true,
+        "output": "polymarket_active: OK\ncoingecko_prices: OK\nbtc_dominance: OK\nfear_greed: OK\ncrypto_news: OK\n"
+      },
+      "dense_ai": {
+        "success": true,
+        "output": "[DenseAI] Initialized for Yair Siegel\n[DenseAI] AI Providers: ['openai']\nDense Market Analysis: BTC\n"
+      },
+      "system_topology": {
+        "success": true,
+        "output": "State recorded at 2025-11-30T23:26:24.458124+00:00\n  Components active: 14\n  Balance: $0.00\n"
+      },
+      "threat_analysis": {
+        "success": true,
+        "output": "\n============================================================\nTHREAT ANALYSIS - Finding What Can Kil"
+      }
+    },
+    "preparation": {
+      "pipeline": {
+        "success": false,
+        "output": "[UNIFIED AI] trading-pipeline online - serving Yair Siegel\n"
+      },
+      "claude_optimizer": {
+        "success": true,
+        "output": "Optimizing Claude instructions...\nClaude instructions updated with system context\n"
+      },
+      "singularity_trigger": {
+        "success": true,
+        "output": "\ud83d\udca5 SINGULARITY TRIGGER - Monitoring for breakthrough...\n\ud83d\udca5 \n\ud83d\udca5 Current balance: $8.99\n\ud83d\udca5 Full threshold:"
+      },
+      "backup": {
+        "success": true,
+        "output": "Backed up 8 files to /root/hands-off-engine/backups/20251130_232642\n"
+      }
+    },
+    "nodes": {
+      "nodes": [
+        {
+          "name": "pm-helper",
+          "ip": "138.68.103.156"
+        },
+        {
+          "name": "ho-compute-2",
+          "ip": "142.93.63.109"
+        },
+        {
+          "name": "ho-compute-2",
+          "ip": "159.203.184.188"
+        },
+        {
+          "name": "ho-scale-1764543864",
+          "ip": "162.243.175.211"
+        }
+      ]
+    },
+    "income": {
+      "outreach": {
+        "ready": true,
+        "count": 11
+      },
+      "landing_pages": {
+        "main": true,
+        "consulting": true
+      },
+      "github_funding": true
+    }
+  },
+  "last_updated": "2025-11-30T23:26:53.857635+00:00"
+}

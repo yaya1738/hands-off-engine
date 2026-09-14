@@ -1,0 +1,55 @@
+{
+  "created": "2025-12-01T10:27:35.505949",
+  "protection_level": "CRITICAL",
+  "absolute_rule": "NO droplet destruction without explicit user approval",
+  "protected_droplets": [
+    {
+      "id": "524521199",
+      "name": "pm-helper",
+      "role": "MASTER - runs all coordination",
+      "protection": "CRITICAL - NEVER destroy",
+      "cost": "$48/mo"
+    },
+    {
+      "id": "533588771",
+      "name": "ho-compute-2",
+      "role": "Compute node",
+      "protection": "PROTECTED - requires approval",
+      "cost": "$112/mo"
+    },
+    {
+      "id": "533588783",
+      "name": "ho-compute-2",
+      "role": "Compute node",
+      "protection": "PROTECTED - requires approval",
+      "cost": "$112/mo"
+    },
+    {
+      "id": "533589133",
+      "name": "ho-scale-1764543864",
+      "role": "Scale node",
+      "protection": "PROTECTED - requires approval",
+      "cost": "$112/mo"
+    }
+  ],
+  "destruction_rules": {
+    "CRITICAL": "NEVER - system dies without this",
+    "PROTECTED": "Only with explicit user command",
+    "STANDARD": "Auto-scale can manage",
+    "TEMPORARY": "Can be destroyed after task complete"
+  },
+  "auto_destroy_blocked": true,
+  "hardware_brain_can_destroy": false,
+  "scaling_engine_can_destroy": false,
+  "allowed_operations": [
+    "create new droplets",
+    "resize existing droplets",
+    "reboot droplets"
+  ],
+  "blocked_operations": [
+    "destroy any droplet",
+    "delete droplet",
+    "doctl compute droplet delete"
+  ],
+  "last_updated": "2025-12-01T10:27:35.506011"
+}

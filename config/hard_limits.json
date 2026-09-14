@@ -1,0 +1,22 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-26T14:00:00Z",
+  "description": "ABSOLUTE HARD CAPS - Never exceeded by auto-tuning",
+  "updated_by": "human",
+  "limits": {
+    "MAX_ABSOLUTE_POSITION_USD": 50,
+    "MAX_ABSOLUTE_DAILY_LOSS_USD": 200,
+    "MAX_ABSOLUTE_OPEN_RISK_USD": 500,
+    "MAX_ABSOLUTE_CONFIDENCE_THRESHOLD": 0.35,
+    "MAX_ABSOLUTE_TRADES_PER_HOUR": 10,
+    "MIN_CONFIDENCE_THRESHOLD": 0.40
+  },
+  "notes": {
+    "MAX_ABSOLUTE_POSITION_USD": "No single trade can exceed this, regardless of phase",
+    "MAX_ABSOLUTE_DAILY_LOSS_USD": "System auto-pauses if this is hit, no exceptions",
+    "MAX_ABSOLUTE_OPEN_RISK_USD": "Total exposure across all open positions",
+    "MAX_ABSOLUTE_CONFIDENCE_THRESHOLD": "Never trade below 35% confidence",
+    "MIN_CONFIDENCE_THRESHOLD": "Recalibration cannot lower confidence below 40%"
+  },
+  "enforcement": "These limits are enforced by executor and cannot be overridden by recalibration engine"
+}

@@ -1,8 +1,8 @@
 {
   "balances": {
-    "cash_usd": 1200,
+    "cash_usd": 10000,
     "crypto_usd": 0.0,
-    "polymarket_usd": 300
+    "polymarket_usd": 5000
   },
   "history": [
     {

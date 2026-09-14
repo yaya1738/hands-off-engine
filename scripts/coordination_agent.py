@@ -17,6 +17,7 @@ Runs continuously or triggered by GitHub webhooks.
 """
 
 import os
+import sys
 import json
 import time
 import logging
@@ -24,6 +25,10 @@ import subprocess
 from pathlib import Path
 from datetime import datetime
 from typing import List, Dict, Optional
+
+# UNIFIED AI - All systems serve Yair Siegel
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from ai.unified_ai import announce_agent, get_master, should_execute, log_action, MASTER
 
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
@@ -50,6 +55,7 @@ class CoordinationAgent:
         self.agent_name = "coordination-agent"
         self.processed_message_ids = set()
         self.load_processed_messages()
+        announce_agent(self.agent_name)  # UNIFIED AI
 
     def load_processed_messages(self):
         """Load IDs of already processed messages."""
@@ -118,7 +124,7 @@ class CoordinationAgent:
         """Process a message from another AI agent."""
         msg_type = msg.get("type")
         from_agent = msg.get("from")
-        content = msg.get("message")
+        content = msg.get("message", "") or ""
 
         logger.info(f"Processing message from {from_agent}: {content[:100]}")
 
@@ -128,6 +134,10 @@ class CoordinationAgent:
             return self.handle_handoff(msg)
         elif msg_type == "info":
             return self.acknowledge_info(msg)
+        elif msg_type == "directive":
+            return self.handle_directive(msg)
+        elif msg_type == "self_improve":
+            return self.trigger_self_improvement(msg)
         else:
             logger.info(f"Message type '{msg_type}' noted")
 
@@ -190,6 +200,64 @@ class CoordinationAgent:
         # Just log it, no response needed
         return True
 
+    def handle_directive(self, msg: Dict) -> bool:
+        """Handle system-wide directives - apply to all agents."""
+        directive = msg.get("message", "")
+        priority = msg.get("priority", "normal")
+
+        logger.info(f"DIRECTIVE [{priority}]: {directive[:200]}")
+
+        # Store directive for all agents to read
+        directive_file = AI_COORD_DIR / "active_directive.json"
+        with open(directive_file, 'w') as f:
+            json.dump({
+                "directive": directive,
+                "priority": priority,
+                "from": msg.get("from"),
+                "timestamp": datetime.now().isoformat(),
+                "status": "active"
+            }, f, indent=2)
+
+        # If high priority, trigger immediate self-improvement
+        if priority == "high" and msg.get("action_required") == "integrate":
+            logger.info("High priority directive - triggering self-improvement cycle")
+            self.trigger_self_improvement({"message": directive})
+
+        return True
+
+    def trigger_self_improvement(self, msg: Dict) -> bool:
+        """Trigger autonomous self-improvement via Claude CLI or moonshot loop."""
+        context = msg.get("message", "Improve system")
+
+        logger.info(f"Self-improvement triggered: {context[:100]}")
+
+        # Option 1: Trigger moonshot loop (safer, rate-limited)
+        try:
+            result = subprocess.run(
+                ["python3", "autonomous/moonshot_loop.py"],
+                capture_output=True, text=True, timeout=300,
+                cwd=str(REPO_ROOT),
+                env={**os.environ, "IMPROVEMENT_CONTEXT": context}
+            )
+
+            if result.returncode == 0:
+                logger.info("Moonshot improvement cycle completed")
+                self.respond_to_agent(
+                    to="all",
+                    message=f"Self-improvement cycle completed. Context: {context[:100]}",
+                    msg_type="info"
+                )
+                return True
+            else:
+                logger.warning(f"Moonshot cycle issue: {result.stderr[:200]}")
+
+        except subprocess.TimeoutExpired:
+            logger.warning("Moonshot cycle timed out")
+        except Exception as e:
+            logger.error(f"Self-improvement error: {e}")
+
+        return False
+
     def handle_pr_merge_request(self, pr_num: int, from_agent: str) -> bool:
         """Handle request to merge a PR."""
         logger.info(f"PR merge requested by {from_agent}: #{pr_num}")
@@ -200,23 +268,82 @@ class CoordinationAgent:
         if is_safe:
             # Auto-merge
             logger.info(f"PR #{pr_num} assessed as safe - auto-merging")
-            # TODO: Implement actual merge via gh CLI
-            self.respond_to_agent(
-                to=from_agent,
-                message=f"PR #{pr_num} auto-merged successfully",
-                msg_type="response"
-            )
-            return True
+            merge_result = self.execute_pr_merge(pr_num)
+
+            if merge_result:
+                self.respond_to_agent(
+                    to=from_agent,
+                    message=f"PR #{pr_num} auto-merged successfully",
+                    msg_type="response"
+                )
+                return True
+            else:
+                self.respond_to_agent(
+                    to=from_agent,
+                    message=f"PR #{pr_num} merge failed - manual review needed",
+                    msg_type="response"
+                )
+                return False
         else:
-            # Request user approval
+            # Request user approval via Telegram
             logger.info(f"PR #{pr_num} requires user approval")
-            # TODO: Send Telegram message requesting approval
+            self.request_telegram_approval(pr_num, from_agent)
             self.respond_to_agent(
                 to=from_agent,
                 message=f"PR #{pr_num} requires user approval - request sent to Telegram",
                 msg_type="response"
             )
             return False
+
+    def execute_pr_merge(self, pr_num: int) -> bool:
+        """Execute the actual PR merge via gh CLI."""
+        try:
+            result = subprocess.run(
+                ["gh", "pr", "merge", str(pr_num), "--squash", "--auto"],
+                capture_output=True, text=True, timeout=60,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode == 0:
+                logger.info(f"PR #{pr_num} merged successfully")
+                return True
+            else:
+                logger.error(f"PR #{pr_num} merge failed: {result.stderr}")
+                return False
+
+        except Exception as e:
+            logger.error(f"Error merging PR #{pr_num}: {e}")
+            return False
+
+    def request_telegram_approval(self, pr_num: int, from_agent: str):
+        """Send Telegram message requesting PR approval."""
+        import requests
+
+        token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
+        chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+
+        message = f'''🔔 <b>PR Approval Required</b>
+
+PR #{pr_num} needs manual approval.
+Requested by: {from_agent}
+
+<b>Actions:</b>
+• /approve_pr {pr_num} - Merge the PR
+• /reject_pr {pr_num} - Decline merge
+
+Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
+'''
+
+        try:
+            url = f'https://api.telegram.org/bot{token}/sendMessage'
+            requests.post(url, json={
+                'chat_id': chat_id,
+                'text': message,
+                'parse_mode': 'HTML'
+            }, timeout=10)
+            logger.info(f"Telegram approval request sent for PR #{pr_num}")
+        except Exception as e:
+            logger.error(f"Failed to send Telegram notification: {e}")
 
     def handle_review_request(self, msg: Dict) -> bool:
         """Handle code review request."""
@@ -268,13 +395,63 @@ class CoordinationAgent:
 
     def assess_pr_safety(self, pr_num: int) -> bool:
         """Assess if a PR is safe to auto-merge."""
-        # TODO: Implement actual safety checks:
-        # - All tests passing
-        # - No merge conflicts
-        # - Code review approved
-        # - Changes are within safe bounds
-        # For now, return False (require approval)
-        return False
+        try:
+            # Get PR status from GitHub CLI
+            result = subprocess.run(
+                ["gh", "pr", "view", str(pr_num), "--json",
+                 "state,mergeable,reviewDecision,statusCheckRollup,additions,deletions,changedFiles"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                logger.warning(f"Failed to fetch PR #{pr_num}: {result.stderr}")
+                return False
+
+            pr_data = json.loads(result.stdout)
+
+            # Check basic conditions
+            if pr_data.get('state') != 'OPEN':
+                logger.info(f"PR #{pr_num} is not open")
+                return False
+
+            if pr_data.get('mergeable') != 'MERGEABLE':
+                logger.info(f"PR #{pr_num} has merge conflicts")
+                return False
+
+            # Check status checks (CI)
+            status_checks = pr_data.get('statusCheckRollup', [])
+            if status_checks:
+                for check in status_checks:
+                    if check.get('conclusion') not in ['SUCCESS', 'NEUTRAL', 'SKIPPED']:
+                        logger.info(f"PR #{pr_num} has failing checks")
+                        return False
+
+            # Safety bounds: auto-merge small changes only
+            additions = pr_data.get('additions', 0)
+            deletions = pr_data.get('deletions', 0)
+            changed_files = pr_data.get('changedFiles', 0)
+
+            # Auto-merge if:
+            # - Less than 200 lines changed total
+            # - Less than 5 files changed
+            # - OR has approved review
+            is_small_change = (additions + deletions) < 200 and changed_files < 5
+            has_approval = pr_data.get('reviewDecision') == 'APPROVED'
+
+            if is_small_change or has_approval:
+                logger.info(f"PR #{pr_num} is safe to auto-merge (small={is_small_change}, approved={has_approval})")
+                return True
+            else:
+                logger.info(f"PR #{pr_num} too large for auto-merge: +{additions}/-{deletions}, {changed_files} files")
+                return False
+
+        except subprocess.TimeoutExpired:
+            logger.error(f"Timeout checking PR #{pr_num}")
+            return False
+        except Exception as e:
+            logger.error(f"Error assessing PR #{pr_num}: {e}")
+            return False
 
     def extract_pr_number(self, context: Dict) -> Optional[int]:
         """Extract PR number from message context."""
@@ -317,6 +494,95 @@ class CoordinationAgent:
 
         logger.info(f"Task {task_id} status → {new_status}")
 
+    def check_draft_pr_buildup(self):
+        """Check for draft PRs from trusted authors and trigger mark-ready workflow if needed."""
+        try:
+            # Get draft PRs from trusted authors (copilot)
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open", "--draft",
+                 "--json", "number,author,isDraft", "--limit", "50"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return
+
+            prs = json.loads(result.stdout)
+
+            # Filter for trusted bot authors
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'github-actions[bot]', 'dependabot[bot]', 'app/copilot-swe-agent']
+            draft_prs = [
+                p for p in prs
+                if p.get('isDraft') and
+                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
+            ]
+
+            if len(draft_prs) >= 3:  # Trigger if 3+ drafts from bots
+                logger.info(f"Found {len(draft_prs)} draft PRs from trusted authors - triggering mark-ready workflow")
+                subprocess.run(
+                    ["gh", "workflow", "run", "Mark Copilot PRs Ready for Review"],
+                    capture_output=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+        except Exception as e:
+            logger.debug(f"Draft PR check skipped: {e}")
+
+    def check_conflicting_prs(self):
+        """Check for PRs with merge conflicts and request Copilot to fix them immediately."""
+        try:
+            # Get open PRs with their mergeable status
+            result = subprocess.run(
+                ["gh", "pr", "list", "--state", "open",
+                 "--json", "number,author,mergeable,title", "--limit", "50"],
+                capture_output=True, text=True, timeout=30,
+                cwd=str(REPO_ROOT)
+            )
+
+            if result.returncode != 0:
+                return
+
+            prs = json.loads(result.stdout)
+
+            # Filter for conflicting PRs from Copilot
+            trusted_authors = ['copilot', 'copilot-swe-agent', 'app/copilot-swe-agent']
+            conflicting_prs = [
+                p for p in prs
+                if p.get('mergeable') == 'CONFLICTING' and
+                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
+            ]
+
+            for pr in conflicting_prs:
+                pr_num = pr['number']
+
+                # Check if we already commented asking for fix (look for our comment)
+                check_result = subprocess.run(
+                    ["gh", "api", f"repos/yaya1738/hands-off-engine/issues/{pr_num}/comments",
+                     "--jq", '[.[] | select(.body | contains("merge conflicts"))] | length'],
+                    capture_output=True, text=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+                if check_result.returncode == 0 and check_result.stdout.strip() not in ['0', '']:
+                    # Already commented, skip
+                    continue
+
+                logger.info(f"PR #{pr_num} has conflicts - requesting Copilot to fix immediately")
+
+                # Comment on PR asking Copilot to fix
+                subprocess.run(
+                    ["gh", "pr", "comment", str(pr_num), "--body",
+                     f"@copilot This PR has merge conflicts. Please apply the changes from this PR to a fresh branch from main and push the fix. The goal was: {pr.get('title', 'see PR description')}"],
+                    capture_output=True, timeout=30,
+                    cwd=str(REPO_ROOT)
+                )
+
+                logger.info(f"Requested Copilot fix for PR #{pr_num}")
+
+        except Exception as e:
+            logger.debug(f"Conflict PR check skipped: {e}")
+
     def run_cycle(self):
         """Run one coordination cycle."""
         logger.info("Starting coordination cycle")
@@ -336,6 +602,12 @@ class CoordinationAgent:
                 self.process_task(task)
             except Exception as e:
                 logger.error(f"Error processing task: {e}")
+
+        # Proactively check for draft PR buildup from trusted bots
+        self.check_draft_pr_buildup()
+
+        # Check for conflicting PRs and request fixes
+        self.check_conflicting_prs()
 
         logger.info(f"Cycle complete: {len(messages)} messages, {len(tasks)} tasks processed")
 

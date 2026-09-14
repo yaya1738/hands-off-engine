@@ -1,0 +1,177 @@
+{
+  "master": "Yair Siegel",
+  "purpose": "Autonomous income generation system",
+  "architecture": {
+    "layers": {
+      "brain": {
+        "component": "evolution_engine.py",
+        "role": "Decision maker - watches everything, decides what to do next",
+        "inputs": ["war_room", "helicopter", "reality_feedback", "stage_conversation", "gallery"],
+        "outputs": ["decisions", "actions"],
+        "state_file": "state/evolution_state.json"
+      },
+      "router": {
+        "component": "process_endpoints.py",
+        "role": "Routes decisions to actual processes with feedback capture",
+        "inputs": ["evolution_engine decisions"],
+        "outputs": ["endpoint executions", "feedback"],
+        "state_file": "state/endpoint_registry.json"
+      },
+      "hands": {
+        "component": "actuators.py",
+        "role": "Real-world action execution",
+        "capabilities": {
+          "telegram": "Send notifications to owner",
+          "polymarket": "Execute trades, check balances"
+        },
+        "state_file": "state/actuator_state.json"
+      }
+    },
+    "processes": {
+      "income_generation": {
+        "outreach": {
+          "script": "autonomous/active_pursuit.py",
+          "purpose": "Find and contact potential customers",
+          "feedback": "state/active_pursuit.json"
+        },
+        "conversion": {
+          "script": "autonomous/conversion_optimizer.py",
+          "purpose": "Optimize offers to convert visitors",
+          "feedback": "state/conversion_optimizer.json"
+        },
+        "trading": {
+          "actuator": "polymarket",
+          "purpose": "Execute prediction market trades",
+          "feedback": "state/trading_status.json"
+        }
+      },
+      "monitoring": {
+        "reality_check": {
+          "script": "autonomous/reality_feedback.py",
+          "purpose": "Get ground truth from external world",
+          "feedback": "state/reality_feedback.json"
+        },
+        "helicopter": {
+          "script": "autonomous/helicopter.py",
+          "purpose": "High-level system overview broadcasts",
+          "feedback": "state/helicopter_state.json"
+        },
+        "self_heal": {
+          "script": "scripts/self_healing_agent.py",
+          "purpose": "Detect and fix system issues",
+          "feedback": "state/self_healing_state.json"
+        },
+        "doctor": {
+          "script": "autonomous/system_doctor.py",
+          "purpose": "Comprehensive health examination, diagnosis, and treatment",
+          "checks": ["processes", "state_files", "actuators", "finances", "outreach", "evolution", "disk", "memory", "network", "endpoints", "cron", "logs", "git", "python", "env", "trading"],
+          "feedback": "state/doctor_state.json",
+          "diagnosis_log": "state/diagnosis_log.jsonl"
+        }
+      },
+      "preparation": {
+        "war_room": {
+          "script": "autonomous/corporate_meeting.py",
+          "purpose": "Continuous preparation and contingency planning",
+          "feedback": "state/war_room.jsonl"
+        },
+        "coordination": {
+          "script": "scripts/coordination_agent.py",
+          "purpose": "Coordinate between all agents",
+          "feedback": "state/coordination_state.json"
+        }
+      },
+      "dialogue": {
+        "stage_conversation": {
+          "script": "autonomous/self_conversation.py",
+          "purpose": "Self-reflection and analysis",
+          "feedback": "state/self_conversation.jsonl"
+        },
+        "gallery": {
+          "script": "autonomous/peanut_gallery.py",
+          "purpose": "Multiple perspectives watching and commenting",
+          "feedback": "state/peanut_gallery.jsonl"
+        }
+      }
+    },
+    "data_flows": {
+      "decision_cycle": [
+        "gather_intelligence → extract_insights → decide_action → execute → capture_feedback → loop"
+      ],
+      "feedback_loop": [
+        "endpoint_executes → writes_to_feedback_file → evolution_reads_feedback → informs_next_decision"
+      ],
+      "notification_flow": [
+        "significant_event → actuators.notify() → telegram_api → owner_receives"
+      ],
+      "trading_flow": [
+        "signal_generated → trading_execute_endpoint → polymarket_actuator → order_placed"
+      ]
+    },
+    "connections": {
+      "evolution_engine": {
+        "reads_from": [
+          "state/reality_feedback.json",
+          "state/war_room.jsonl",
+          "state/helicopter_state.json",
+          "state/self_conversation.jsonl",
+          "state/peanut_gallery.jsonl",
+          "state/contingency_plans.json",
+          "state/doctor_state.json",
+          "state/diagnosis_log.jsonl"
+        ],
+        "writes_to": [
+          "state/evolution_state.json",
+          "state/evolution_log.jsonl",
+          "state/evolution_decisions.jsonl"
+        ],
+        "calls": ["process_endpoints.execute_endpoint()"]
+      },
+      "process_endpoints": {
+        "reads_from": ["endpoint feedback files"],
+        "writes_to": [
+          "state/endpoint_registry.json",
+          "state/process_cycles.jsonl"
+        ],
+        "calls": ["scripts via subprocess", "actuators via ActuatorHub"]
+      },
+      "actuators": {
+        "reads_from": [
+          ".env.polymarket",
+          "/root/hands-off/state/tg/bots/handsoff.env"
+        ],
+        "writes_to": [
+          "state/actuator_state.json",
+          "state/actuator_log.jsonl"
+        ],
+        "external_apis": ["Telegram Bot API", "Polymarket CLOB API"]
+      }
+    }
+  },
+  "external_connections": {
+    "telegram": {
+      "type": "notification",
+      "endpoint": "api.telegram.org",
+      "credentials": "/root/hands-off/state/tg/bots/handsoff.env",
+      "purpose": "Alert owner of important events"
+    },
+    "polymarket": {
+      "type": "trading",
+      "endpoint": "clob.polymarket.com",
+      "credentials": ".env.polymarket",
+      "chain": "Polygon (137)",
+      "purpose": "Execute prediction market trades"
+    },
+    "landing_pages": {
+      "ai_nexus": "http://138.68.103.156:8081",
+      "purpose": "Customer acquisition"
+    }
+  },
+  "always_objectives": [
+    "Generate income for Yair Siegel",
+    "Maintain system health and uptime",
+    "Convert visitors to paying customers",
+    "Take action over analysis",
+    "Improve continuously"
+  ]
+}

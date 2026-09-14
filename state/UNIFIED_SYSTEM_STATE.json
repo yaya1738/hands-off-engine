@@ -1,0 +1,130 @@
+{
+  "version": "1.0",
+  "last_updated": "2025-11-28T09:24:17.058199+00:00",
+  "system_name": "Hands-Off Engine",
+  "owner": {
+    "name": "Yair Siegel",
+    "aliases": [
+      "Joseph Siegel",
+      "Froggy"
+    ],
+    "role": "System Owner / Human Operator",
+    "contact": {
+      "primary": "Telegram (@pm_alerts_autobot)",
+      "time_commitment": "~15 min/week"
+    }
+  },
+  "core_directive": {
+    "mission": "Extension of user's self, autonomous realization of user's wishes",
+    "principles": [
+      "User is primary objective",
+      "Reduce user's workload",
+      "Improve user's quality of life",
+      "Operate without prompts",
+      "Self-improve continuously"
+    ],
+    "decision_framework": {
+      "reduce_workload": "DO IT",
+      "improve_life": "DO IT",
+      "requires_approval": "Only if real money or major changes",
+      "uncertain": "Implement safely (DRYRUN), monitor, iterate"
+    }
+  },
+  "financial_targets": {
+    "profit_goal_usd": 15000,
+    "bootstrap_capital_needed_usdc": 100,
+    "allocated_capital": {
+      "cash_usd": 10000,
+      "polymarket_usd": 5000,
+      "total": 15000
+    },
+    "current_wallet": {
+      "address": "0x5258512505e13Bbb21c2f1738A32AEF2A5a6393e",
+      "network": "Polygon",
+      "status": "awaiting_funding"
+    }
+  },
+  "operational_state": {
+    "trading_mode": {
+      "enabled": true,
+      "phase": "baby_mode",
+      "executor_mode": "live_when_funded"
+    },
+    "risk_profile": {
+      "max_position_usd": 50,
+      "max_daily_loss_usd": 200,
+      "max_trades_per_hour": 10,
+      "confidence_threshold": 0.25,
+      "scale_factor": 1,
+      "_source": "synced from state/risk_profile.json - do not edit here"
+    },
+    "automation": {
+      "pipeline_schedule": "0 */2 * * *",
+      "healthcheck_schedule": "30 * * * *",
+      "claude_tasks_schedule": "30 */6 * * *",
+      "recalibration_schedule": "0 8 * * *"
+    }
+  },
+  "ai_agents": {
+    "claude_cli": {
+      "role": "primary_repo_implementer",
+      "status": "active",
+      "invocation": "cron + manual",
+      "task_queue": "state/autonomous_task_queue.json"
+    },
+    "ai_nexus": {
+      "role": "multi_model_orchestration",
+      "status": "active",
+      "invocation": "sparkplug_runner.sh"
+    },
+    "chatgpt": {
+      "role": "research_and_design",
+      "status": "available",
+      "handoff": "SYSTEM_HANDOFF_v0.5"
+    },
+    "github_copilot": {
+      "role": "github_native_helper",
+      "status": "available",
+      "invocation": "issues/PRs"
+    }
+  },
+  "autonomous_capabilities": {
+    "self_healing": {
+      "git_locks": true,
+      "cron_reinstall": true,
+      "data_refresh": true,
+      "pipeline_trigger": true,
+      "state_recovery": true
+    },
+    "auto_scaling": {
+      "phase_progression": true,
+      "risk_adjustment": true,
+      "bankroll_dynamic": true
+    },
+    "circuit_breakers": {
+      "daily_loss_limit": true,
+      "rate_limit": true,
+      "auto_pause": true,
+      "auto_resume": true
+    }
+  },
+  "success_metrics": {
+    "system": {
+      "uptime_target": "99%",
+      "signal_quality": "improving",
+      "user_intervention": "decreasing"
+    },
+    "user": {
+      "time_saved": "increasing",
+      "life_quality": "improving",
+      "financial_outcomes": "positive_when_live"
+    }
+  },
+  "harmony_status": {
+    "claude_cli_integration": "COMPLETE",
+    "autonomy_remediation": "COMPLETE",
+    "user_interface_unified": "TELEGRAM_ONLY",
+    "system_sphere_alignment": "IN_PROGRESS",
+    "last_orchestration": "2025-11-28T09:24:17.058175+00:00"
+  }
+}

@@ -1,0 +1,56 @@
+name: 🤖 Copilot Agent Task
+description: Assign a task directly to GitHub Copilot agent
+labels: ["copilot-task"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This issue will be automatically assigned to the Copilot coding agent.
+        Be specific and provide clear acceptance criteria.
+        
+  - type: textarea
+    id: task-description
+    attributes:
+      label: Task Description
+      description: What should Copilot build or fix?
+      placeholder: "Add a new endpoint to fetch alpha signals..."
+    validations:
+      required: true
+      
+  - type: textarea
+    id: acceptance-criteria
+    attributes:
+      label: Acceptance Criteria
+      description: How will we know the task is complete?
+      placeholder: |
+        - [ ] Tests pass
+        - [ ] Documentation updated
+        - [ ] No linting errors
+    validations:
+      required: true
+      
+  - type: dropdown
+    id: complexity
+    attributes:
+      label: Estimated Complexity
+      options:
+        - Low (< 1 hour)
+        - Medium (1-4 hours)
+        - High (4+ hours)
+    validations:
+      required: true
+      
+  - type: textarea
+    id: relevant-files
+    attributes:
+      label: Relevant Files
+      description: Which files should Copilot focus on?
+      placeholder: |
+        - alpha/sync_polymarket_model.py
+        - tests/test_alpha_pipeline.py
+        
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional Context
+      description: Any other information for the agent

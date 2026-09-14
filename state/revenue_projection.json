@@ -1,0 +1,111 @@
+{
+  "generated_at": "2025-11-27T19:06:41.475546Z",
+  "operator": "yair_siegel",
+  "phase": "full_force_launch",
+  "streams": [
+    {
+      "stream": "polymarket_trading",
+      "current_capital": 241.36,
+      "monthly_expected": 122.61,
+      "month_1_end_capital": 363.97,
+      "month_2_expected": 184.9,
+      "month_3_expected": 278.82,
+      "3_month_total": 586.33,
+      "scaling_factor": "compounds with wins",
+      "status": "ACTIVE"
+    },
+    {
+      "stream": "signal_subscriptions",
+      "product": "crypto_prediction_signals",
+      "edge_offered": "12.7% avg documented edge",
+      "tiers": {
+        "basic": {
+          "price": 29,
+          "signals": 5,
+          "target_subs": 50
+        },
+        "pro": {
+          "price": 99,
+          "signals": 15,
+          "target_subs": 20
+        },
+        "premium": {
+          "price": 299,
+          "signals": 15,
+          "extras": "live_alerts",
+          "target_subs": 5
+        }
+      },
+      "monthly_potential": 4925,
+      "startup_cost": 0,
+      "status": "READY_TO_LAUNCH"
+    },
+    {
+      "stream": "system_licensing",
+      "products": [
+        {
+          "name": "Polymarket Trading Bot",
+          "price": 499,
+          "type": "one_time"
+        },
+        {
+          "name": "Signal Generation System",
+          "price": 999,
+          "type": "one_time"
+        },
+        {
+          "name": "Full Stack License",
+          "price": 2499,
+          "type": "one_time"
+        },
+        {
+          "name": "Managed Service",
+          "price": 199,
+          "type": "monthly"
+        }
+      ],
+      "target_customers": "crypto_traders, funds, individuals",
+      "monthly_potential": 5000,
+      "status": "AVAILABLE"
+    },
+    {
+      "stream": "consulting",
+      "hourly_rate": 200,
+      "target_hours_month": 20,
+      "monthly_potential": 4000,
+      "areas": [
+        "prediction_market_strategy",
+        "ai_trading_systems",
+        "risk_management",
+        "autonomous_systems"
+      ],
+      "status": "AVAILABLE"
+    },
+    {
+      "stream": "alpha_research",
+      "products": [
+        {
+          "name": "Weekly Market Report",
+          "price": 49,
+          "subs": 100
+        },
+        {
+          "name": "Deep Dive Analysis",
+          "price": 199,
+          "sales": 10
+        },
+        {
+          "name": "Custom Research",
+          "price": 999,
+          "projects": 2
+        }
+      ],
+      "monthly_potential": 8880,
+      "status": "CAN_LAUNCH"
+    }
+  ],
+  "total_monthly_potential": 22805,
+  "current_burn": 3280,
+  "net_monthly_potential": 19525,
+  "time_to_profitability": "immediate_with_execution"
+}

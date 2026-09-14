@@ -1,0 +1,30 @@
+{
+  "threats": [
+    {
+      "id": "credentials_1",
+      "category": "CREDENTIALS",
+      "severity": "HIGH",
+      "title": "Missing Trading Credentials",
+      "description": "No POLYMARKET* keys found in .env",
+      "impact": "Cannot access Trading services",
+      "mitigation": "Add Trading API credentials to .env",
+      "detected_at": "2025-11-30T23:05:44.170851+00:00",
+      "status": "active",
+      "auto_mitigate": false
+    },
+    {
+      "id": "data_2",
+      "category": "DATA",
+      "severity": "MEDIUM",
+      "title": "No Backups Exist",
+      "description": "No backup directory or empty",
+      "impact": "Cannot recover from data loss",
+      "mitigation": "Implement regular backups",
+      "detected_at": "2025-11-30T23:05:44.207271+00:00",
+      "status": "active",
+      "auto_mitigate": false
+    }
+  ],
+  "last_scan": "2025-11-30T23:05:59.484584+00:00",
+  "mitigations_applied": 0
+}

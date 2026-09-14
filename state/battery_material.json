@@ -1,0 +1,39 @@
+{
+  "materials": {
+    "usdc": {
+      "amount": 8.993226,
+      "unit": "USDC",
+      "available": true
+    },
+    "api_calls": {
+      "providers": {
+        "anthropic": true,
+        "openai": true,
+        "groq": false
+      },
+      "capacity": 2000,
+      "unit": "calls/day",
+      "available": true
+    },
+    "credentials": {
+      "credentials": {
+        "telegram": false,
+        "polymarket": true,
+        "github": false
+      },
+      "working": 1,
+      "total": 3,
+      "available": true
+    },
+    "compute": {
+      "memory_gb": 6.5,
+      "memory_total_gb": 7.8,
+      "disk_gb": 143.4,
+      "disk_total_gb": 154.9,
+      "cpu_load": 0.54,
+      "available": true
+    }
+  },
+  "total_power": 439.93226,
+  "measured_at": "2025-12-01T03:08:28.443704+00:00"
+}

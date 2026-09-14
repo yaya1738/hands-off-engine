@@ -82,4 +82,8 @@ echo "[$(date)] ✓ All health checks passed"
 echo "  Execution plan age: ${AGE_MINS} minutes"
 echo "  Status: Healthy"
 
+# NOTE: Orchestrator removed from healthcheck - caused cascade failure 2025-11-28
+# See docs/claude/CASCADE_FAILURE_2025-11-28.md
+# Orchestrator should run on its own schedule, not from health checks
+
 exit 0

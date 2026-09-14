@@ -1,17 +1,5 @@
 # Hands-Off Engine
 
-## Status & Roadmap
-
-See `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
-for the current status and next steps.
-
-### For any AI / agent working on this repo
-
-Before doing anything substantial, the AI/agent MUST:
-
-1. Read `termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md`
-2. Follow the roadmap and constraints described there.
-
 This repository is the canonical codebase for my "Hands-Off" personal finance, trading,
 and automation engine. It is designed to be driven primarily by AI coding agents
 (LLMs) with minimal manual involvement.
@@ -23,3 +11,41 @@ High-level goals:
 
 This repo is intentionally minimal at first; existing scripts will be migrated into a
 clean structure step by step.
+
+## Current Status
+
+### Batch 18: Unified Brain Summary ✅
+
+**Latest:** A top-level "brain summary" module that consolidates all key system state into a single unified view.
+
+**Quick Start:**
+```bash
+# Generate unified brain summary
+python3 reports/ho_brain_report.py
+
+# View results
+cat state/hands_off_brain.txt
+cat state/hands_off_brain.json | jq .
+```
+
+**Key Features:**
+- Consolidates health, pipeline, history, and AI loop state
+- Dual output: JSON (machine-readable) + text (human-readable)
+- Graceful handling of missing/malformed input files
+- Clear status signals: `ok` / `warn` / `error`
+- DRYRUN-only, read-mostly, production-safe
+
+**Documentation:**
+- `reports/README.md` - Quick reference for brain report module
+- `docs/BATCH_18_STATUS_REPORT.md` - Complete technical documentation
+- `tests/integration/test_brain_report.py` - Test suite (12 tests, all passing)
+
+### Previous Batches
+
+The engine includes foundations from earlier batches including:
+- Polymarket DRYRUN pipeline (alpha/decider/executor)
+- Health monitoring and history analytics
+- AI task generator and runner
+- Autonomous AI loop orchestration
+
+See `docs/` for detailed batch reports.

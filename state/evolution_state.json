@@ -1,0 +1,15 @@
+{
+  "generation": 1,
+  "created": "2025-12-01T10:26:35.837681",
+  "last_evolution": "2025-12-01T10:26:35.837711",
+  "pending_proposals": [],
+  "active_mutations": [],
+  "fitness_score": 52.99,
+  "survival_traits": [
+    "DRYRUN safety gates",
+    "Position monitoring",
+    "Self-preservation",
+    "Human model awareness"
+  ],
+  "next_evolution_trigger": "capital_threshold_50"
+}

@@ -1,0 +1,39 @@
+{
+  "timestamp": "2025-11-30T17:21:33.640647+00:00",
+  "collapse_session": true,
+  "financial": {
+    "balance_usd": 8.99,
+    "positions_usd": 98.05,
+    "total_usd": 107.04,
+    "trading_enabled": false,
+    "threshold_to_trade": 50.0
+  },
+  "automation": {
+    "cron_jobs": 12,
+    "monitors_active": 5,
+    "moonshot_enabled": true,
+    "self_improving": true
+  },
+  "income": {
+    "channels": 2,
+    "landing_pages_live": 2,
+    "payment_address_visible": true,
+    "github_sponsors_ready": true
+  },
+  "readiness": {
+    "signals_prepared": 3,
+    "trade_value_ready": 150.0,
+    "immediate_execution": true
+  },
+  "timeline": {
+    "dec_10_resolution": "9 days",
+    "dec_31_resolution": "31 days",
+    "projected_capital_return": "$0-$99"
+  },
+  "escape_velocity": {
+    "current_score": 31,
+    "target_score": 80,
+    "gap": 49,
+    "progress_percent": 38.75
+  }
+}

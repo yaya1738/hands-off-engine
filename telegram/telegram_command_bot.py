@@ -56,6 +56,16 @@ class TelegramCommandBot:
             '/task': self.cmd_task,
             '/agents': self.cmd_agents,
             '/help': self.cmd_help,
+            # New unified commands
+            '/balance': self.cmd_balance,
+            '/positions': self.cmd_positions,
+            '/cluster': self.cmd_cluster,
+            '/identity': self.cmd_identity,
+            '/logs': self.cmd_logs,
+            '/dashboard': self.cmd_dashboard,
+            '/escape': self.cmd_escape_velocity,
+            '/setpat': self.cmd_setpat,
+            '/fixssh': self.cmd_fixssh,
         }
 
     def process_command(self, command_text: str) -> str:
@@ -408,19 +418,435 @@ Pending Tasks: {len(pending_tasks)}"""
 /status - Full system status
 /metrics - Performance metrics (24h)
 /health - Run health check
+/balance - Trading balance & positions
+/positions - Detailed position list
+/cluster - Server cluster status
+/logs - Recent system logs
+/escape - Escape velocity score
 
 **Interact:**
 /task <description> - Request system to do something
 /pending - View pending approvals
 /approve <id> - Approve pending change
 /reject <id> - Reject pending change
+/setpat <token> - Set GitHub PAT for compute nodes
 
 **Info:**
+/dashboard - Unified web dashboard URL
 /agents - AI coordination status
+/identity - Verify your identity
 /help - This message
+
+Web Dashboard: http://138.68.103.156:8002
 
 You can control the entire system via Telegram.
 No need to launch Claude Code CLI for routine operations."""
+
+    def cmd_balance(self, args) -> str:
+        """Get trading balance and position summary."""
+        try:
+            # Read dollar access file for balance info
+            dollar_file = REPO_ROOT / "finance" / "dollar_access.json"
+            if dollar_file.exists():
+                with open(dollar_file) as f:
+                    data = json.load(f)
+                cash = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("current_balance_usdc", 0)
+                positions = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("positions_value_usdc", 0)
+            else:
+                cash = 0
+                positions = 0
+
+            # Try to get live position data
+            try:
+                result = subprocess.run(
+                    ["python3", str(SCRIPTS_DIR / "position_monitor.py")],
+                    capture_output=True,
+                    text=True,
+                    timeout=30,
+                    cwd=str(REPO_ROOT),
+                    env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+                )
+                if "positions" in result.stdout.lower():
+                    live_info = result.stdout.strip().split('\n')[-1]
+                else:
+                    live_info = ""
+            except:
+                live_info = ""
+
+            total = cash + positions
+            gap = max(0, 50 - cash)
+
+            return f"""💰 Trading Balance
+
+Cash: ${cash:.2f}
+Positions: ${positions:.2f}
+Total: ${total:.2f}
+
+Trading threshold: $50
+Gap to trading: ${gap:.2f}
+
+{live_info}
+
+Use /positions for details"""
+
+        except Exception as e:
+            return f"❌ Error getting balance: {str(e)}"
+
+    def cmd_positions(self, args) -> str:
+        """Get detailed position list."""
+        try:
+            result = subprocess.run(
+                ["python3", str(SCRIPTS_DIR / "position_monitor.py")],
+                capture_output=True,
+                text=True,
+                timeout=30,
+                cwd=str(REPO_ROOT),
+                env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+            )
+
+            output = result.stdout.strip()
+            if output:
+                # Truncate if too long
+                if len(output) > 3500:
+                    output = output[:3500] + "\n... (truncated)"
+                return f"📊 Positions\n\n{output}"
+            else:
+                return "❌ No position data available"
+
+        except Exception as e:
+            return f"❌ Error getting positions: {str(e)}"
+
+    def cmd_cluster(self, args) -> str:
+        """Get server cluster status."""
+        try:
+            result = subprocess.run(
+                ["doctl", "compute", "droplet", "list", "--format", "Name,Status,PublicIPv4,Memory"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+
+            if result.returncode == 0:
+                output = result.stdout.strip()
+                lines = output.split('\n')
+                active = sum(1 for l in lines if 'active' in l.lower())
+
+                return f"""🖥 Cluster Status
+
+{output}
+
+Active: {active} servers
+"""
+            else:
+                return f"❌ Error getting cluster status: {result.stderr}"
+
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
+
+    def cmd_identity(self, args) -> str:
+        """Run identity verification."""
+        try:
+            result = subprocess.run(
+                ["python3", str(REPO_ROOT / "security" / "absolute_identity.py")],
+                capture_output=True,
+                text=True,
+                timeout=15,
+                cwd=str(REPO_ROOT)
+            )
+
+            output = result.stdout.strip()
+            if "GRANTED" in output:
+                return f"✅ Identity Verified\n\n{output}"
+            else:
+                return f"❌ Identity Check\n\n{output}"
+
+        except Exception as e:
+            return f"❌ Error running identity check: {str(e)}"
+
+    def cmd_logs(self, args) -> str:
+        """Get recent system logs."""
+        try:
+            log_dir = Path("/var/log/hands-off")
+            if not log_dir.exists():
+                return "❌ No logs directory"
+
+            # Get recent entries from multiple logs
+            logs_output = []
+
+            # Healthcheck log
+            hc_log = log_dir / "healthcheck.log"
+            if hc_log.exists():
+                with open(hc_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("📋 Healthcheck:")
+                        logs_output.append(lines[-1].strip())
+
+            # Pipeline log
+            pipe_log = log_dir / "pipeline.log"
+            if pipe_log.exists():
+                with open(pipe_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("\n📋 Pipeline:")
+                        logs_output.append(lines[-1].strip())
+
+            # Position monitor log
+            pos_log = log_dir / "position_monitor.log"
+            if pos_log.exists():
+                with open(pos_log) as f:
+                    lines = f.readlines()
+                    if lines:
+                        logs_output.append("\n📋 Positions:")
+                        logs_output.append(lines[-1].strip())
+
+            if logs_output:
+                return "📜 Recent Logs\n\n" + "\n".join(logs_output)
+            else:
+                return "❌ No recent log entries"
+
+        except Exception as e:
+            return f"❌ Error reading logs: {str(e)}"
+
+    def cmd_dashboard(self, args) -> str:
+        """Get link to unified web dashboard."""
+        try:
+            import requests as req
+            # Check if dashboard is running
+            r = req.get("http://localhost:8002/api/status", timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                ev = data.get("escape_velocity", {}).get("score", 0)
+                nodes = data.get("cluster", {}).get("healthy_nodes", 0)
+                agents = len(data.get("coordination", {}).get("active_agents", []))
+
+                return f"""🖥 Unified Dashboard
+
+Access: http://138.68.103.156:8002
+
+Real-time system visualization:
+• Finance & Trading
+• Cluster Health ({nodes} nodes)
+• AI Coordination ({agents} agents)
+• Escape Velocity: {ev}/100
+• Identity & Security
+
+Updates every 30 seconds.
+Full API at /api/status"""
+            else:
+                return "❌ Dashboard service not responding"
+
+        except Exception as e:
+            return f"""🖥 Unified Dashboard
+
+Access: http://138.68.103.156:8002
+
+(Status check failed: {str(e)})
+
+Try opening the URL in your browser."""
+
+    def cmd_escape_velocity(self, args) -> str:
+        """Get escape velocity score and factors."""
+        try:
+            import requests as req
+            r = req.get("http://localhost:8002/api/escape-velocity", timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                score = data.get("score", 0)
+                factors = data.get("factors", {})
+
+                # Determine status
+                if score >= 80:
+                    status = "🚀 ESCAPE VELOCITY ACHIEVED"
+                elif score >= 60:
+                    status = "🟢 Strong momentum"
+                elif score >= 40:
+                    status = "🟡 Building momentum"
+                else:
+                    status = "🔴 Need acceleration"
+
+                return f"""🚀 Escape Velocity: {score}/100
+
+{status}
+
+Factors:
+• Capital: ${factors.get('capital', 0):.2f}
+• Nodes: {factors.get('nodes', 0)}
+• Signals: {factors.get('signals', 0)}
+
+Target: 100 = Self-sustaining system
+
+Dashboard: http://138.68.103.156:8002"""
+            else:
+                return "❌ Could not get escape velocity"
+
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
+
+    def cmd_setpat(self, args) -> str:
+        """Set GitHub Personal Access Token for compute nodes."""
+        if not args:
+            return """🔐 GitHub PAT Configuration
+
+Usage: /setpat <your_github_pat>
+
+This will:
+1. Store PAT in .env file
+2. Configure git on all compute nodes
+3. Enable CLI migration to larger nodes
+
+Generate PAT at: https://github.com/settings/tokens
+Required scope: repo (Full control of private repos)
+
+⚠️ Send the PAT directly - it will be stored securely."""
+
+        pat = args[0]
+
+        # Validate PAT format (github classic or fine-grained)
+        if not (pat.startswith('ghp_') or pat.startswith('github_pat_')):
+            return "❌ Invalid PAT format. Should start with 'ghp_' or 'github_pat_'"
+
+        try:
+            # Store in .env file
+            env_file = REPO_ROOT / ".env"
+            env_content = ""
+            if env_file.exists():
+                env_content = env_file.read_text()
+
+            # Update or add GITHUB_PAT
+            if "GITHUB_PAT=" in env_content:
+                lines = env_content.split('\n')
+                lines = [l if not l.startswith('GITHUB_PAT=') else f'GITHUB_PAT={pat}' for l in lines]
+                env_content = '\n'.join(lines)
+            else:
+                env_content += f'\nGITHUB_PAT={pat}\n'
+
+            env_file.write_text(env_content)
+
+            # Configure git on compute nodes
+            compute_nodes = ["134.122.124.240", "198.211.96.196", "67.205.153.121"]
+            configured = []
+
+            for node_ip in compute_nodes:
+                try:
+                    # Configure git to use PAT
+                    result = subprocess.run([
+                        'ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=10',
+                        f'root@{node_ip}',
+                        f'''cd /root/hands-off-engine && git remote set-url origin https://{pat}@github.com/yaya1738/hands-off-engine.git && git fetch --quiet && echo "OK"'''
+                    ], capture_output=True, text=True, timeout=30)
+
+                    if "OK" in result.stdout:
+                        configured.append(node_ip)
+                except Exception:
+                    pass
+
+            return f"""✅ GitHub PAT configured!
+
+Stored in .env: ✓
+Compute nodes configured: {len(configured)}/3
+Nodes: {', '.join(configured) if configured else 'none'}
+
+You can now run Claude CLI on any compute node:
+ssh root@67.205.153.121
+cd /root/hands-off-engine
+claude
+
+(This node has 8 vCPU, 16GB RAM vs current 4 vCPU)"""
+
+        except Exception as e:
+            return f"❌ Error configuring PAT: {str(e)}"
+
+    def cmd_fixssh(self, args) -> str:
+        """Fix SSH access on all droplets by adding ho-cli-main key."""
+        try:
+            # Get list of droplets
+            result = subprocess.run(
+                ["doctl", "compute", "droplet", "list", "--format", "ID,Name,PublicIPv4", "--no-header"],
+                capture_output=True,
+                text=True,
+                timeout=30
+            )
+
+            if result.returncode != 0:
+                return f"❌ Error getting droplets: {result.stderr}"
+
+            droplets = []
+            for line in result.stdout.strip().split('\n'):
+                parts = line.split()
+                if len(parts) >= 3:
+                    droplets.append({'id': parts[0], 'name': parts[1], 'ip': parts[2]})
+
+            if not droplets:
+                return "❌ No droplets found"
+
+            # SSH key to add
+            HO_CLI_KEY = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIN9leXKzmPHKpTLjwsynPjVSbtyyhk0HFynKlA6X1z6x root@ho-cli-main"
+
+            fixed = []
+            failed = []
+            skipped = []
+
+            for d in droplets:
+                name = d['name']
+                ip = d['ip']
+
+                # Skip self
+                if name == 'pm-helper':
+                    skipped.append(name)
+                    continue
+
+                try:
+                    # Check if key already exists, if not add it
+                    cmd = f'''
+                    grep -q "root@ho-cli-main" /root/.ssh/authorized_keys 2>/dev/null && echo "EXISTS" || {{
+                        mkdir -p /root/.ssh
+                        chmod 700 /root/.ssh
+                        echo "{HO_CLI_KEY}" >> /root/.ssh/authorized_keys
+                        chmod 600 /root/.ssh/authorized_keys
+                        echo "ADDED"
+                    }}
+                    '''
+
+                    ssh_result = subprocess.run(
+                        ['ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=10', '-o', 'BatchMode=yes',
+                         f'root@{ip}', cmd],
+                        capture_output=True,
+                        text=True,
+                        timeout=30
+                    )
+
+                    if "ADDED" in ssh_result.stdout:
+                        fixed.append(f"{name} ({ip})")
+                    elif "EXISTS" in ssh_result.stdout:
+                        skipped.append(f"{name} (already has key)")
+                    else:
+                        failed.append(f"{name}: {ssh_result.stderr[:50]}")
+
+                except Exception as e:
+                    failed.append(f"{name}: {str(e)[:50]}")
+
+            msg = f"""🔧 SSH Fix Results
+
+✅ Fixed: {len(fixed)}
+"""
+            if fixed:
+                msg += "\n".join(f"  • {f}" for f in fixed) + "\n"
+
+            msg += f"\n⏭ Skipped: {len(skipped)}\n"
+            if skipped:
+                msg += "\n".join(f"  • {s}" for s in skipped[:5]) + "\n"
+
+            if failed:
+                msg += f"\n❌ Failed: {len(failed)}\n"
+                msg += "\n".join(f"  • {f}" for f in failed[:5]) + "\n"
+
+            msg += "\nho-cli-main can now SSH to fixed droplets."
+
+            return msg
+
+        except Exception as e:
+            return f"❌ Error: {str(e)}"
 
 
 def send_telegram_message(message: str):

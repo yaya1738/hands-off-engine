@@ -4,6 +4,47 @@ Executable scripts for running and testing the Hands-Off Engine pipeline.
 
 ## Main Scripts
 
+### `system_audit.py` - System Health Check ⭐
+
+Run a comprehensive audit of the entire Hands-Off Engine system:
+
+```bash
+# Basic audit (generates report in reports/)
+python3 scripts/system_audit.py
+
+# Verbose mode (see all checks in real-time)
+python3 scripts/system_audit.py --verbose
+
+# Custom output file
+python3 scripts/system_audit.py -o my_audit.md
+```
+
+**Checks:**
+- ✅ Core components (alpha, decider, executor, fetchers, audit, AI)
+- ✅ Configuration and state files
+- ✅ Safety settings (DRYRUN enforcement, credentials)
+- ✅ Audit trails and logging
+- ✅ Documentation completeness
+- ✅ Test infrastructure
+- ✅ Dependencies
+- ✅ AI coordination status
+- ✅ Financial ledger
+
+**Output:**
+- Console summary with pass/warn/error counts
+- Markdown report with detailed findings
+- Recommendations for improvements
+
+**Use Cases:**
+- Pre-deployment health check
+- Regular system validation
+- Compliance verification
+- Debugging system issues
+
+See [README_SYSTEM_AUDIT.md](README_SYSTEM_AUDIT.md) for complete documentation.
+
+---
+
 ### `run_pipeline.py` - Full Pipeline Runner ⭐
 
 Run the complete end-to-end pipeline (Sync → Decider → Executor):

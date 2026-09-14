@@ -1,0 +1,767 @@
+[
+  {
+    "decision_id": "hw_dec_48afe53b0dbf",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:38:38.848264",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_c086047356c1",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:39:39.307258",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_da489f9b94c3",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:40:37.111127",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_b04ae99c290b",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:41:37.506806",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_e059789b5e87",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:42:38.580851",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_fd3508672d86",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:43:39.727352",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_aae89d764dcf",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:44:09.650822",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_ac1c414bb169",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:45:10.821806",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_e5b7bf3e8a58",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:46:11.889514",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_24fd01808775",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:47:14.540242",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_b8aed3105390",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:48:15.220165",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_9cdea3ddd7a0",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:49:15.832025",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_a166db2d6b11",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:49:36.879999",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_8538504b78e6",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:50:36.916976",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_be943e203e52",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:51:36.958746",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_400c65c5205d",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:52:36.996905",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_ee9a860e1241",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:53:37.034845",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_d3a663ab159d",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T04:54:24.511050",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_83326dc1c06f",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:54:24.533922",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_f253ead8c42f",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:54:43.383643",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_409fe9f5d293",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:55:44.329739",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_612f95061d67",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:56:45.290563",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_9db9166398db",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:57:45.778891",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_1c14442d4de4",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:58:47.023793",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_cc215e313438",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T04:59:47.787087",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_f0b53684276e",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T05:00:46.751312",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_f4cd31fd04d9",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T05:03:26.651642",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_747d606f15a7",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T05:06:08.229260",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_28e2a7a1787e",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T05:31:30.367479",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_d9d677613484",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T05:31:30.369973",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_398eb1d0b1ce",
+    "decision_type": "upgrade_recommendation",
+    "action": "recommend_memory_upgrade",
+    "timestamp": "2025-11-28T05:31:30.376635",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_b0ca44c92355",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T06:31:35.248310",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_10dbb5b89706",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T06:32:35.953218",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_88b6ce5ce159",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:31:34.547831",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_1f38208f2a1f",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:32:35.543326",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_094898723fdb",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:33:37.339992",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_679d26c3bedd",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:34:39.286285",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_79ea03834748",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:35:41.331327",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_23d9b17254c6",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:36:42.201243",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_ee9b56574fe5",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:37:43.364430",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_03f22515345b",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:38:45.168582",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_9dcbf9234c49",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:39:45.933476",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_ca763a6e1ba4",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:40:46.819892",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_c1a135bd51f2",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:41:48.606127",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_66988200ccc2",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:42:50.163004",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_8fc5a7433d3b",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:43:51.007839",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_836f5bf59aa6",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:44:52.675682",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_edaf0b54ec41",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:45:54.260534",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_c6044e9fb38b",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:46:55.890286",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_7cda7110ff9a",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:47:56.968646",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_98afe9fe028f",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:48:57.989979",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_bd47067cb283",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:49:59.430256",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_f1a649d32c8d",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:51:00.823333",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_338a19e82c00",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:52:01.876153",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_9d1d8d973e8a",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:53:03.691590",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_75d0818c7abd",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:54:05.142637",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_a2e38c8d3054",
+    "decision_type": "alert_response",
+    "action": "respond_to_memory_alert",
+    "timestamp": "2025-11-28T07:54:05.154834",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_8c4a6703d14f",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:55:06.457705",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_c71f942e2dc7",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:56:08.303091",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_ffaefbee0677",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:57:09.634311",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_c82f752df6e0",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:58:11.622120",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_8c1d03cf7698",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T07:59:14.872357",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_de6e49cc189c",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:00:15.924905",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_e6543805c7c8",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:01:18.375086",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_b42cff12beda",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:02:19.875637",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_14fb3f7f3ca5",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:03:21.225960",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_7eaef7189684",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:04:23.302639",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_d7c3dba119b4",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:05:24.670062",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_8facc87a91b9",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:06:26.478217",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_4730f822fa7a",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:07:28.516211",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_ecad37260e28",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:08:29.710852",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_aae72b2dcb08",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:09:31.681031",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_9b96abfd6a05",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:10:33.524980",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_d6123e5a0114",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:11:34.498432",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_d195802ab2bc",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:12:37.789147",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_6799dcc340aa",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:13:38.943007",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_8ed391d0f9de",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:14:39.566113",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_bc2d7930edb9",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:15:41.508340",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_8ed1503b67f2",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:16:43.449071",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_862a42ff7dc6",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:17:45.374626",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_108b337e93cd",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:18:46.454297",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_dd1a203b7f25",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:19:48.185911",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_b3bc7fdca1b7",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:20:49.661740",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_4000971069b3",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:21:51.633395",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  },
+  {
+    "decision_id": "hw_dec_b6e333866592",
+    "decision_type": "alert_response",
+    "action": "respond_to_cpu_alert",
+    "timestamp": "2025-11-28T08:22:52.279884",
+    "success": true,
+    "impact": "Auto-executed",
+    "lessons_learned": []
+  }
+]

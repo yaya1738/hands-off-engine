@@ -1,0 +1,54 @@
+{
+  "campaign_start": "2025-11-27T13:14:37.549147Z",
+  "targets": [
+    {
+      "type": "discord_server",
+      "name": "Polymarket Traders",
+      "focus": "general",
+      "priority": "high"
+    },
+    {
+      "type": "discord_server",
+      "name": "Prediction Market Alpha",
+      "focus": "general",
+      "priority": "high"
+    },
+    {
+      "type": "twitter_user",
+      "handle": "@polymarket_traders",
+      "focus": "general",
+      "priority": "medium"
+    },
+    {
+      "type": "reddit_community",
+      "name": "r/polymarket",
+      "focus": "general",
+      "priority": "high"
+    },
+    {
+      "type": "reddit_community",
+      "name": "r/predictit",
+      "focus": "politics",
+      "priority": "high"
+    },
+    {
+      "type": "reddit_community",
+      "name": "r/sportsbook",
+      "focus": "sports",
+      "priority": "medium"
+    }
+  ],
+  "metrics": {
+    "messages_sent": 0,
+    "responses_received": 0,
+    "conversions": 0,
+    "revenue_generated": 0
+  },
+  "next_actions": [
+    "Join Polymarket Discord",
+    "Join prediction market trading servers",
+    "Follow active traders on Twitter",
+    "Post in r/polymarket r/predictit",
+    "Reach out to 5 Discord server owners"
+  ]
+}

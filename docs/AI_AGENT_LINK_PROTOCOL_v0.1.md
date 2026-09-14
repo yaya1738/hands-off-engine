@@ -320,39 +320,44 @@ Future tools can parse this registry to:
 
 ---
 
-## Current Limitations (v0.1)
+## Current Status (v1.1 - Autonomous Operation)
 
-**This is documentation only:**
+**UPDATE 2025-11-28:** The system has progressed beyond v0.1. Current capabilities:
+
 - ✅ Defines agents and protocols
 - ✅ Explains communication flows
-- ❌ No code enforcement
-- ❌ No automatic routing
-- ❌ User still copies/pastes
+- ✅ Auto-merge workflow for Copilot PRs (`.github/workflows/auto-merge.yml`)
+- ✅ Self-healing agent monitors for unmerged branches
+- ✅ Task queue integration (`ai/tasks/`)
+- ⚠️ User still facilitates ChatGPT handoffs (copy/paste)
 
-**Why that's okay:**
-- Solves immediate confusion about agent roles
-- Provides foundation for future automation
-- Low risk - pure documentation
-- Can iterate based on actual usage
+**Key change from v0.1:** Copilot PRs can now be auto-merged when CI passes and no critical files are touched. See `.github/copilot-instructions.md` for details.
 
 ---
 
-## Future Evolution
+## Evolution History
 
-### v0.2 - Enhanced Documentation
-- Add examples of successful multi-agent workflows
-- Document common patterns
-- Troubleshooting guide
+### v0.1 - Documentation Only (2025-11-25)
+- ✅ Defined agents and protocols
+- ✅ Explained communication flows
+- ❌ No code enforcement
+- ❌ No automatic routing
+- ❌ User copied/pasted everything
 
-### v1.0 - Light Automation
-- Parser validates SYSTEM HANDOFF format
-- Auto-route based on TARGET field
-- Task queue integration
+### v1.0 - Light Automation (2025-11-27)
+- ✅ Auto-merge workflow for safe PRs
+- ✅ Task queue integration
+- ✅ Self-healing agent monitors branch accumulation
 
-### v2.0 - Full Integration
+### v1.1 - Current (2025-11-28)
+- ✅ Copilot instructions updated for autonomous operation
+- ✅ Critical files protected from auto-merge
+- ✅ Unified instruction synchronization
+
+### v2.0 - Future
 - Direct agent-to-agent communication
-- Automatic handoff routing
-- Coordination without user intervention
+- Automatic ChatGPT handoff routing (no user copy/paste)
+- Full coordination without user intervention
 
 **See:** `docs/CHATGPT_COMMS_PROTOCOL_v1_ideas.md` for automation roadmap
 

@@ -1,0 +1,64 @@
+{
+  "timestamp": "2025-11-30T21:16:15.021687+00:00",
+  "master": "Yair Siegel",
+  "agents": {
+    "claude-code": {
+      "agent_id": "claude-code",
+      "agent_type": "claude-code",
+      "capabilities": [
+        "code_execution",
+        "file_ops",
+        "git",
+        "system_admin",
+        "trading"
+      ],
+      "auth_token_hash": "77969fd1da077505d218ee3214e6502340ddddf9aca0f866ced91f3e590c9354",
+      "last_seen": "2025-11-30T21:16:15.021574+00:00",
+      "status": "active",
+      "session_count": 0
+    },
+    "copilot": {
+      "agent_id": "copilot",
+      "agent_type": "copilot",
+      "capabilities": [
+        "code_assist",
+        "pr_review",
+        "documentation",
+        "github_ops"
+      ],
+      "auth_token_hash": "372efd516145a686cd978b0f8a8cba2251597f504dd65de89f80ce68be845a2f",
+      "last_seen": "2025-11-30T21:16:15.021609+00:00",
+      "status": "idle",
+      "session_count": 0
+    },
+    "chatgpt": {
+      "agent_id": "chatgpt",
+      "agent_type": "chatgpt",
+      "capabilities": [
+        "research",
+        "analysis",
+        "writing",
+        "brainstorming"
+      ],
+      "auth_token_hash": "4e2550d50a9d00bf56741b735e71785eba0363c7cc2353c734645f3d03f4f51a",
+      "last_seen": "2025-11-30T21:16:15.021614+00:00",
+      "status": "idle",
+      "session_count": 0
+    },
+    "claude-web": {
+      "agent_id": "claude-web",
+      "agent_type": "claude-web",
+      "capabilities": [
+        "analysis",
+        "planning",
+        "writing",
+        "research"
+      ],
+      "auth_token_hash": "145ea7e16f25880572973420ff702364c7f1d4ff4a10eb63f82bfe372c6ed8da",
+      "last_seen": "2025-11-30T21:16:15.021618+00:00",
+      "status": "idle",
+      "session_count": 0
+    }
+  },
+  "version": "1.0"
+}

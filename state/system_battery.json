@@ -1,0 +1,31 @@
+{
+  "resources": {
+    "usdc": 8.993226,
+    "api_credits": 1999,
+    "action_tokens": 199,
+    "trust": 50
+  },
+  "limits": {
+    "usdc_max": 10000.0,
+    "api_credits_max": 10000,
+    "api_credits_daily": 1000,
+    "action_tokens_max": 500,
+    "action_tokens_daily": 100,
+    "trust_max": 100
+  },
+  "last_refill": "2025-12-01T02:59:28.080426+00:00",
+  "total_drained": {
+    "usdc": 0.0,
+    "api_credits": 1,
+    "action_tokens": 1
+  },
+  "total_charged": {
+    "usdc": 0.0,
+    "api_credits": 0,
+    "action_tokens": 0
+  },
+  "blocked_actions": 0,
+  "successful_actions": 1,
+  "created": "2025-12-01T02:59:27.935726+00:00",
+  "updated": "2025-12-01T02:59:51.650396+00:00"
+}

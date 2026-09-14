@@ -1,0 +1,44 @@
+[Unit]
+Description=Hands-Off Master Controller - Unified Autonomous System
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+Environment=PYTHONPATH=/root/hands-off-engine
+Environment=DO_API_TOKEN=
+
+# Load environment from .env file
+EnvironmentFile=-/root/hands-off-engine/.env
+
+# Main command
+ExecStart=/usr/bin/python3 /root/hands-off-engine/autonomous/master_controller.py run
+
+# Restart policy - ALWAYS restart
+Restart=always
+RestartSec=10
+StartLimitIntervalSec=0
+
+# Logging
+StandardOutput=append:/var/log/hands-off/master_controller.log
+StandardError=append:/var/log/hands-off/master_controller.log
+
+# Resource limits
+LimitNOFILE=65535
+LimitNPROC=65535
+
+# Security - but not too restrictive
+NoNewPrivileges=no
+ProtectSystem=no
+ProtectHome=no
+
+# Graceful shutdown
+TimeoutStopSec=60
+KillMode=mixed
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=multi-user.target

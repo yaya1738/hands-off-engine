@@ -1,0 +1,54 @@
+{
+  "status": "success",
+  "task_type": "sparkplug_autokernel_refresh",
+  "task_id": "sparkplug_live_test",
+  "run_at": "2025-11-27T20:13:56.444703Z",
+  "kernels": [
+    {
+      "kernel_id": "risk_model_v2",
+      "result": {
+        "status": "success",
+        "kernel_id": "risk_model_v2",
+        "mode": "cpu",
+        "history": {
+          "sources": [
+            "events.jsonl"
+          ],
+          "items_seen": 430,
+          "items_used": 50,
+          "time_range": {
+            "start": "2025-11-27T19:42:45.259863+00:00",
+            "end": "2025-11-27T19:53:39.245101+00:00"
+          }
+        },
+        "updates": {
+          "applied": [
+            {
+              "type": "cpu_suggestion",
+              "conversation_id": "autokernel_risk_model_v2_20251127_201339",
+              "thread": "/root/hands-off-engine/ai/intercom/autokernel_risk_model_v2_20251127_201339/thread.jsonl",
+              "summary": "CPU session completed. Review thread for potential kernel updates.",
+              "auto_applied": false,
+              "reason": "v0.4 does not auto-apply updates. Manual review required.",
+              "timestamp": "2025-11-27T20:13:56.444051Z"
+            }
+          ],
+          "skipped": [],
+          "backup_file": null,
+          "kernel_file": "/root/hands-off-engine/ai/memory/kernels/risk_model_v2.json"
+        },
+        "cpu": {
+          "intercom_thread": "/root/hands-off-engine/ai/intercom/autokernel_risk_model_v2_20251127_201339/thread.jsonl",
+          "conversation_id": "autokernel_risk_model_v2_20251127_201339"
+        }
+      }
+    }
+  ],
+  "summary": {
+    "total_kernels": 1,
+    "success": 1,
+    "no_history": 0,
+    "kernel_not_found": 0,
+    "errors": 0
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "node_id": "runsc",
+  "session_id": "unified_20251128_040149",
+  "stats": {
+    "checks": 2,
+    "hw_decisions": 0,
+    "infra_decisions": 0,
+    "auto_upgrades": 0,
+    "servers_provisioned": 0,
+    "approvals_requested": 0,
+    "trading_protections": 2,
+    "start_time": "2025-11-28T04:01:49.580161"
+  },
+  "last_check": "2025-11-28T04:02:52.649352",
+  "last_health": {
+    "status": "pristine",
+    "score": 100.0,
+    "trading_risk": "none"
+  }
+}

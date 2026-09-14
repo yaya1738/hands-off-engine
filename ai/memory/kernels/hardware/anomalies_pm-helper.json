@@ -1,0 +1,30 @@
+[
+  {
+    "pattern_id": "anomaly_1_20251128063331",
+    "component": "memory",
+    "description": "Memory usage anomaly: 6.5% (z-score: -8.50)",
+    "signature": {
+      "metric": "usage_percent",
+      "value": 6.451612903225806,
+      "z_score": -8.495780681004765
+    },
+    "first_seen": "2025-11-28T06:33:31.392060",
+    "occurrences": 57,
+    "led_to_failure": false,
+    "remediation": null
+  },
+  {
+    "pattern_id": "anomaly_2_20251128063332",
+    "component": "cpu",
+    "description": "CPU usage anomaly: 66.3% (z-score: 3.79)",
+    "signature": {
+      "metric": "usage_percent",
+      "value": 66.34,
+      "z_score": 3.78641577648796
+    },
+    "first_seen": "2025-11-28T06:33:32.421207",
+    "occurrences": 34,
+    "led_to_failure": false,
+    "remediation": null
+  }
+]

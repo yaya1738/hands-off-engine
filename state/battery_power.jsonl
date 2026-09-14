@@ -1,0 +1,2 @@
+{"timestamp": "2025-12-01T03:03:04.496354+00:00", "event": "consume", "amount": 50.0, "energy_after": 8943.054573133333, "status": "ALIVE", "details": "trade_execute"}
+{"timestamp": "2025-12-01T03:03:04.576584+00:00", "event": "consume", "amount": 10.0, "energy_after": 8933.05324315, "status": "ALIVE", "details": "ai_inference"}

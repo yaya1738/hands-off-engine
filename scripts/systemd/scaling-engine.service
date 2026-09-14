@@ -1,0 +1,27 @@
+[Unit]
+Description=Hands-Off Scaling Engine - Exponential Growth
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target
+Wants=master-controller.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+Environment=PYTHONPATH=/root/hands-off-engine
+EnvironmentFile=-/root/hands-off-engine/.env
+
+ExecStart=/usr/bin/python3 /root/hands-off-engine/autonomous/scaling_engine.py run
+
+Restart=always
+RestartSec=30
+StartLimitIntervalSec=0
+
+StandardOutput=append:/var/log/hands-off/scaling_engine.log
+StandardError=append:/var/log/hands-off/scaling_engine.log
+
+TimeoutStopSec=30
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

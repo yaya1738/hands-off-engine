@@ -1,0 +1,20 @@
+{
+  "change_id": "b2a0cf365ae52505",
+  "change_type": "config_change",
+  "description": "config_change on ls -la",
+  "target": "ls -la",
+  "timestamp": "2025-11-30T23:22:15.213418+00:00",
+  "intention": "Claude action: execute_command",
+  "pre_state": {
+    "captured_at": "2025-11-30T23:22:15.213281+00:00",
+    "target": "ls -la",
+    "type": "config_change"
+  },
+  "post_state": null,
+  "outcome": "pending",
+  "harm_detected": false,
+  "harm_description": "",
+  "rollback_available": false,
+  "rollback_path": "",
+  "validated": true
+}

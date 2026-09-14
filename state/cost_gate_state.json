@@ -1,0 +1,12 @@
+{
+  "decisions_today": 10,
+  "approvals_today": 9,
+  "rejections_today": 1,
+  "total_approved_cost": 0.009000000000000001,
+  "total_rejected_cost": 5.339136,
+  "dynamic_threshold": 2.0,
+  "balance_cache": 3.49,
+  "last_balance_check": "2025-12-02T02:11:01.944470+00:00",
+  "auto_adjust_enabled": true,
+  "last_updated": "2025-12-02T02:11:02.166131+00:00"
+}

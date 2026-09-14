@@ -1,0 +1,25 @@
+{
+  "last_cycle": "2025-12-01T10:26:35.838036",
+  "active_agents": [
+    {
+      "name": "position_monitor",
+      "role": "Watch $98 position until Dec 10"
+    },
+    {
+      "name": "self_healer",
+      "role": "Recovery on component failure"
+    },
+    {
+      "name": "capital_watcher",
+      "role": "Trigger singularity at $50"
+    }
+  ],
+  "pending_tasks": [
+    {
+      "task": "monitor_resolution",
+      "due": "2025-12-10",
+      "status": "active"
+    }
+  ],
+  "created": "2025-12-01T10:26:35.838046"
+}

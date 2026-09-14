@@ -1,0 +1,108 @@
+{
+  "generated_at": "2025-11-19T02:47:00Z",
+  "source": "Batch 22 Consensus Engine",
+  "run_id": "run_001",
+  "agents": {
+    "rules": {
+      "status": "ok",
+      "issues": [
+        {
+          "severity": "high",
+          "message": "Polymarket API rate limit approaching threshold",
+          "confidence": 0.92,
+          "details": "Current usage: 850/1000 requests per hour"
+        },
+        {
+          "severity": "medium",
+          "message": "Stale market data detected in cache",
+          "confidence": 0.78,
+          "details": "3 markets with data >15 minutes old"
+        }
+      ]
+    },
+    "llm_1": {
+      "status": "ok",
+      "issues": [
+        {
+          "severity": "high",
+          "message": "Polymarket API rate limit approaching threshold",
+          "confidence": 0.88,
+          "details": "Risk of service degradation"
+        },
+        {
+          "severity": "low",
+          "message": "Minor logging inconsistency detected",
+          "confidence": 0.65,
+          "details": "Timestamp format varies across modules"
+        }
+      ]
+    },
+    "llm_2": {
+      "status": "ok",
+      "issues": [
+        {
+          "severity": "medium",
+          "message": "Polymarket API performance degraded",
+          "confidence": 0.71,
+          "details": "Average response time increased by 25%"
+        },
+        {
+          "severity": "medium",
+          "message": "Stale market data in cache subsystem",
+          "confidence": 0.69,
+          "details": "Cache invalidation may need tuning"
+        }
+      ]
+    },
+    "heuristics": {
+      "status": "ok",
+      "issues": [
+        {
+          "severity": "high",
+          "message": "Polymarket API rate limit nearing capacity",
+          "confidence": 0.90,
+          "details": "Threshold: 85% of limit reached"
+        },
+        {
+          "severity": "low",
+          "message": "Configuration drift detected",
+          "confidence": 0.62,
+          "details": "Dev and prod configs have diverged"
+        }
+      ]
+    }
+  },
+  "issues": [
+    {
+      "severity": "high",
+      "message": "Polymarket API rate limit approaching threshold",
+      "confidence": 0.90,
+      "agent_agreement": 0.75,
+      "supporting_agents": ["rules", "llm_1", "heuristics"],
+      "recommendation": "Implement request throttling and caching"
+    },
+    {
+      "severity": "medium",
+      "message": "Stale market data detected in cache",
+      "confidence": 0.74,
+      "agent_agreement": 0.50,
+      "supporting_agents": ["rules", "llm_2"],
+      "recommendation": "Reduce cache TTL for high-volatility markets"
+    },
+    {
+      "severity": "low",
+      "message": "Minor configuration inconsistencies",
+      "confidence": 0.64,
+      "agent_agreement": 0.50,
+      "supporting_agents": ["llm_1", "heuristics"],
+      "recommendation": "Audit and normalize configuration files"
+    }
+  ],
+  "consensus_score": 0.76,
+  "total_agent_checks": 4,
+  "metadata": {
+    "batch": 22,
+    "pipeline_version": "1.0",
+    "execution_mode": "DRYRUN"
+  }
+}

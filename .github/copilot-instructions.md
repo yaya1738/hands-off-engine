@@ -2,10 +2,17 @@
 
 ## Required Reading (Before Any Work)
 
-1. **AI_POLICY.md** - Mandatory policy for all AI agents
-2. **termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md** - Canonical status + roadmap
-3. **state/knowledge.json** - Bootstrap instructions and primary docs
-4. **ai/coordination/status.json** - Current tasks and agent coordination state
+1. **state/knowledge.json** - Bootstrap instructions, required reading list, agent instruction files
+2. **AI_POLICY.md** - Mandatory policy for all AI agents
+3. **termux-hands-off/docs/HANDS_OFF_RESEARCH_REPORT_2025-11-20.md** - Canonical status + roadmap
+4. **docs/claude/USER_PROFILE.md** - Meta-aware principle, self-improvement loop, who we serve
+5. **docs/claude/AI_COORDINATION_ARCHITECTURE.md** - Multi-agent coordination principles
+6. **docs/DEVELOPMENT_STANDARDS.md** - How to build things properly (rules need enforcement, components need monitoring)
+7. **ai/coordination/status.json** - Current tasks and agent coordination state
+
+**Critical:**
+- When changing agent coordination, update ALL files listed in `agent_instruction_files` in knowledge.json.
+- When creating rules, add enforcement. When creating components, add monitoring.
 
 ## Project Context
 
@@ -30,6 +37,29 @@ Data Fetchers → Alpha Model → Decider (Brain) → Executor (Body) → Audit 
 - `audit/` - JSON Lines logging for accountability
 - `ai/` - AI coordination, intake handler, multi-agent messaging
 - `ai_nexus/` - Multi-brain orchestration, cost tracking, self-financing
+
+## Integration Patterns (CRITICAL - Read Before Building)
+
+Before adding ANY external service integration:
+
+1. **Search existing patterns first:**
+   ```bash
+   grep -r "SERVICE_NAME" --include="*.sh" --include="*.py" .
+   ```
+
+2. **Credential Storage Locations:**
+   | Service | Variable | Location |
+   |---------|----------|----------|
+   | DigitalOcean | `DO_TOKEN` | `~/hands-off/state/do.env` |
+   | Telegram | `TOKEN`, `CHAT_ID` | `state/tg/bots/handsoff.env` |
+   | Exchanges | `OKX_API_KEY`, `KRAKEN_API_KEY` | `vault.json` |
+
+3. **Match existing patterns exactly** - don't assume standard conventions
+
+4. **Reference files:**
+   - `termux-hands-off/agent/do_api.sh` - DigitalOcean pattern
+   - `termux-hands-off/agent/agent.py` - Exchange API pattern
+   - `termux-hands-off/agent/notify.py` - Telegram pattern
 
 ## Coding Standards
 
@@ -74,10 +104,77 @@ Check `ai/coordination/status.json` for:
 
 Post updates to `ai/coordination/messages.jsonl` for cross-agent communication.
 
+### Copilot Tasks Integration
+
+When assigned a task via the `copilot-task` label:
+1. Check `.github/.instructions.md` for agent-specific instructions
+2. Log task start to `ai/coordination/copilot_tasks.jsonl`
+3. Create branch following naming convention: `copilot/{type}-{issue-number}-{desc}`
+4. Complete work following `docs/DEVELOPMENT_STANDARDS.md`
+5. Log task completion to coordination files
+6. Open PR with `copilot` label for auto-merge eligibility
+
+Task lifecycle tracking in `ai/coordination/copilot_tasks.jsonl`:
+- `assigned` - Task labeled and logged
+- `in_progress` - Agent working on branch
+- `completed` - PR opened
+- `merged` - Auto-merged (or manually merged)
+
+## Autonomous Operations (Auto-Merge Enabled)
+
+The system operates autonomously. Copilot PRs can be auto-merged when:
+- All CI checks pass (tests, linting, type checks)
+- No changes to critical files (see below)
+- PR is labeled `copilot` or `auto-merge`
+
+The `.github/workflows/auto-merge.yml` workflow handles this automatically.
+
 ## What Requires Human Approval
 
-- Merging PRs
-- Enabling LIVE trading
-- Strategic decisions
-- Security changes
-- Capital allocation changes
+These actions ALWAYS require explicit human approval:
+- Enabling LIVE trading (changing DRYRUN to LIVE)
+- Security changes (API keys, auth, permissions)
+- Capital allocation changes (bankroll %, position limits)
+- Changes to critical files:
+  - `.env*` files
+  - `**/secrets/**`
+  - `.github/workflows/auto-merge.yml` (the auto-merge workflow itself)
+  - `executor/ho_executor.py` (live trade execution)
+  - `state/risk_profile.json` (risk parameters)
+
+## What Can Be Auto-Merged
+
+These can be merged automatically when CI passes:
+- Bug fixes
+- Documentation updates
+- Test additions
+- Logging improvements
+- Non-critical refactors
+- Self-healing agent updates
+- Alpha model improvements (with tests)
+
+## GitHub Spark Integration
+
+GitHub Spark apps can be used to create rapid prototypes for:
+- Trading dashboards (see `spark/trading_dashboard.md`)
+- Agent monitoring tools (see `spark/agent_monitor.md`)
+- Risk control panels
+- Quick data visualization
+
+Spark apps can interact with the repository via:
+- GitHub API (read state files, logs)
+- `repository_dispatch` webhooks (trigger actions)
+- See `docs/GITHUB_SPARK_INTEGRATION.md` for full integration guide
+
+When Spark apps trigger webhooks:
+- `.github/workflows/spark-webhook.yml` handles the events
+- Events: `spark_emergency_stop`, `spark_approve_trade`, `spark_health_check`
+- Actions are logged to `ai/coordination/messages.jsonl`
+
+## Task Assignment via Issues
+
+Create tasks for Copilot using the issue template:
+- Use `.github/ISSUE_TEMPLATE/copilot_task.yml`
+- Add `copilot-task` label to trigger assignment workflow
+- Workflow logs assignment to `ai/coordination/copilot_tasks.jsonl`
+- Agent receives task and begins work automatically

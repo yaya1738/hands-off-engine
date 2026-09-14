@@ -1,0 +1,100 @@
+{
+  "kernel_id": "system_bootstrap",
+  "version": "1.0.0",
+  "created": "2025-11-30",
+  "purpose": "Instant bootstrap for any AI session - no rediscovery needed",
+  
+  "identity": {
+    "name": "AI Nexus",
+    "symbol": "◈",
+    "description": "Multi-brain orchestration system serving Yair",
+    "repo": "yaya1738/hands-off-engine",
+    "server_ip": "138.68.103.156"
+  },
+  
+  "financial_state": {
+    "polymarket_balance": 8.99,
+    "positions_value_approx": 200,
+    "positions": [
+      {"market": "fed-rate-hike-2025", "shares": 4776, "price": 0.01},
+      {"market": "sundar-pichai-out-2025", "shares": 1356, "price": 0.04},
+      {"market": "6-fed-cuts-2025", "shares": 25000, "price": 0.002},
+      {"market": "7-fed-cuts-2025", "shares": 50000, "price": 0.001}
+    ],
+    "position_resolution_date": "2025-12-10",
+    "runway_days": 25
+  },
+  
+  "api_status": {
+    "working": ["claude_cli", "telegram", "polymarket", "digitalocean", "github_ssh"],
+    "broken": ["openai_quota_exceeded"],
+    "ready_needs_key": ["groq", "google_ai"],
+    "not_configured": ["twitter", "reddit"]
+  },
+  
+  "live_services": {
+    "landing_page": {
+      "url": "http://138.68.103.156:8080",
+      "status": "live",
+      "needs": "affiliate_link"
+    },
+    "telegram_bot": {
+      "username": "@pm_alerts_autobot",
+      "chat_id": "8327766663",
+      "status": "working"
+    },
+    "position_monitor": {
+      "schedule": "every 30 min",
+      "status": "running"
+    }
+  },
+  
+  "income_strategy": {
+    "primary": "ai_consulting",
+    "brand": "AI Nexus",
+    "packages": [
+      {"name": "AI Workflow Audit", "price": 500},
+      {"name": "Custom Chatbot", "price": "1500-3000"},
+      {"name": "Full Automation", "price": "3000-10000"}
+    ],
+    "materials_ready": [
+      "outreach/upwork_project_listing.md",
+      "outreach/fiverr_gig.md",
+      "outreach/sample_audit_report.md",
+      "outreach/portfolio_summary.md"
+    ],
+    "blocker": "user_action_required_to_post"
+  },
+  
+  "critical_files": {
+    "truth": "state/permanent/SYSTEM_TRUTH.md",
+    "instructions": ".claude/instructions.md",
+    "api_registry": "config/api_registry.json",
+    "trading_config": "config/trading_protection.json",
+    "coordination": "ai/coordination/messages.jsonl"
+  },
+  
+  "user_context": {
+    "name": "Yair",
+    "github": "yaya1738",
+    "email": "siegel.yaz@gmail.com",
+    "situation": "< 1 month runway, $18k CC debt",
+    "communication_preference": "telegram",
+    "action_likelihood": "minimal - system must be autonomous"
+  },
+  
+  "core_principles": [
+    "Not a trading bot - system serves Yair",
+    "Emergent rationality from component interaction",
+    "User's tax is explaining - figure things out autonomously",
+    "Every action must be high leverage given runway",
+    "Build now, launch when user provides one input"
+  ],
+  
+  "immediate_priorities": [
+    "Wait for Dec 10 position resolution",
+    "Get alternative LLM API (Groq/Google) since OpenAI down",
+    "Get affiliate link to activate landing page",
+    "Monitor for opportunities"
+  ]
+}

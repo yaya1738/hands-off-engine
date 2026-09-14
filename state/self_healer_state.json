@@ -1,0 +1,822 @@
+{
+  "last_save": "2025-12-02T02:11:12.589776",
+  "hostname": "pm-helper",
+  "uptime_hours": 7.167776244166667,
+  "healing_actions": [
+    {
+      "timestamp": "2025-12-01T19:41:54.193891",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T19:46:56.694673",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T19:51:59.444865",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T19:57:01.946187",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:02:04.252310",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:02:35.194318",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:03:37.265392",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:04:49.331500",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:06:01.397725",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:07:13.468990",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:08:38.445767",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:13:41.194369",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:18:43.945244",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:23:46.444398",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:28:49.202594",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:33:51.945172",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:38:54.445027",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:43:56.945527",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:48:59.448129",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:54:01.945302",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T20:59:04.958254",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:02:07.111363",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:04:19.219232",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:04:38.198357",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:05:40.269530",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:06:52.337894",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:08:04.408838",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:10:41.196523",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:15:43.694497",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:20:46.445096",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:25:49.193379",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:30:51.945740",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:35:54.445516",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:40:56.945420",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:45:59.444596",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:51:02.196006",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T21:56:05.196773",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:01:07.945027",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:02:10.011228",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:04:22.117050",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:06:34.229025",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:07:11.198039",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:08:13.269624",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:09:25.338511",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:12:43.945933",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:17:46.445221",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:22:48.944920",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:27:51.443326",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:32:53.945220",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:37:56.443942",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:42:58.944283",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:48:01.445502",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:53:04.695940",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T22:58:07.449097",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:03:09.712007",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:03:40.450045",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:04:42.511184",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:06:54.613030",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:09:06.715130",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:09:43.694262",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:10:45.767264",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:15:16.446177",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:20:18.944755",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:25:21.446437",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:30:23.945313",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:35:26.943508",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:40:29.444015",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:45:31.945713",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:50:35.196337",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-01T23:55:37.944583",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:00:40.696546",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:03:42.851466",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:04:54.918349",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:06:13.944334",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:07:16.011574",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:09:28.117944",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:11:46.945006",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:12:49.017699",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:17:19.694027",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:22:22.194771",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:27:24.942404",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:32:27.945168",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:37:30.444328",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:42:32.946386",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:47:36.197859",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:52:38.663657",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T00:57:41.193951",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:02:43.694859",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:03:45.766133",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:04:57.832015",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:08:09.980077",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:08:46.694355",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:09:48.757722",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:13:00.896927",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:14:19.609179",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T01:19:22.194681",
+      "action_type": "start_service",
+      "target": "hands-off-autonomous.service",
+      "reason": "Service was activating",
+      "success": false,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T02:04:26.192001",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T02:05:38.295135",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T02:08:50.440032",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    },
+    {
+      "timestamp": "2025-12-02T02:10:02.515167",
+      "action_type": "restart_process",
+      "target": "position-monitor",
+      "reason": "Process not running",
+      "success": true,
+      "details": {}
+    }
+  ],
+  "restart_counts": {
+    "hardware-brain": [
+      "2025-12-01T19:01:10.708901"
+    ],
+    "scaling-engine": [
+      "2025-12-01T19:01:22.749109"
+    ],
+    "position-monitor": [
+      "2025-12-02T01:13:00.896922",
+      "2025-12-02T02:04:26.191997",
+      "2025-12-02T02:05:38.295131",
+      "2025-12-02T02:08:50.440027",
+      "2025-12-02T02:10:02.515162"
+    ]
+  }
+}

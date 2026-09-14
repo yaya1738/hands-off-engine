@@ -1,0 +1,27 @@
+[Unit]
+Description=Hands-Off Self Healer - Process Recovery
+Documentation=https://github.com/yaya1738/hands-off-engine
+After=network.target
+Wants=master-controller.service
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/root/hands-off-engine
+Environment=PYTHONPATH=/root/hands-off-engine
+EnvironmentFile=-/root/hands-off-engine/.env
+
+ExecStart=/usr/bin/python3 /root/hands-off-engine/autonomous/self_healer.py run
+
+Restart=always
+RestartSec=30
+StartLimitIntervalSec=0
+
+StandardOutput=append:/var/log/hands-off/self_healer.log
+StandardError=append:/var/log/hands-off/self_healer.log
+
+TimeoutStopSec=30
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

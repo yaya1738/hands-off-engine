@@ -1,0 +1,11 @@
+{
+  "live_trading_enabled": false,
+  "reason": "dryrun_default_per_roadmap",
+  "last_changed": "2025-12-01T12:00:00+00:00",
+  "auto_paused": false,
+  "pause_count_today": 0,
+  "last_resume": null,
+  "balance_warning": "Wallet has $7.99 - trades require $50 minimum",
+  "last_balance_check": "2025-12-01T12:00:00+00:00",
+  "note": "Per HANDS_OFF_RESEARCH_REPORT: Executor is DRYRUN-only by default. Enable via Tier 1.4 safety hardening."
+}

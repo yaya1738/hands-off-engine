@@ -1,0 +1,19 @@
+[Unit]
+Description=Hands-Off Engine Pipeline Timer (Hourly)
+Documentation=https://github.com/yaya1738/hands-off-engine
+Requires=hands-off-pipeline.service
+
+[Timer]
+# Run every hour at minute 0
+OnCalendar=hourly
+# Run on boot if missed
+OnBootSec=5min
+# Randomize start time by up to 2 minutes to avoid congestion
+RandomizedDelaySec=120
+# If missed, run immediately
+Persistent=true
+# Precise timing
+AccuracySec=1min
+
+[Install]
+WantedBy=timers.target

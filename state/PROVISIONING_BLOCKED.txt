@@ -1,0 +1,19 @@
+PROVISIONING BLOCKED - CAPITAL PRESERVATION MODE
+
+Date: 2025-11-30
+Balance: $8.99
+Trading: DISABLED
+Runway: 0 days
+
+DO NOT provision new droplets until:
+1. Balance >= $500 AND
+2. Trading is enabled AND
+3. Monthly income covers infra costs
+
+Current monthly infra cost: $48/mo (just pm-helper)
+Previous cost before purge: $384/mo
+
+SAVINGS FROM THIS ACTION: $336/month
+
+This file must exist to prevent any provisioning.
+Delete this file only when above conditions are met.

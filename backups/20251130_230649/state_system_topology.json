@@ -1,0 +1,450 @@
+{
+  "master": "Yair Siegel",
+  "components": {
+    "infra_droplets": {
+      "id": "infra_droplets",
+      "name": "DigitalOcean Droplets",
+      "type": "infra",
+      "description": "Cloud compute nodes running the system",
+      "location": "digitalocean",
+      "status": "active",
+      "purpose": "Provide compute capacity for all operations",
+      "value_to_master": "Foundation of all system capabilities",
+      "criticality": "critical",
+      "depends_on": [
+        "provider_do"
+      ],
+      "provides_to": [
+        "services_all"
+      ],
+      "communicates_via": "ssh, api",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "continuous",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "finance_cost_gate": {
+      "id": "finance_cost_gate",
+      "name": "Autonomous Cost Gate",
+      "type": "process",
+      "description": "Checks cost/ROI before any action",
+      "location": "local",
+      "status": "active",
+      "purpose": "Prevent wasteful spending, ensure positive ROI",
+      "value_to_master": "Protects capital, optimizes spending",
+      "criticality": "critical",
+      "depends_on": [
+        "finance_provider_intel",
+        "finance_terms"
+      ],
+      "provides_to": [
+        "unified_ai",
+        "scaling_engine"
+      ],
+      "communicates_via": "python import",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "finance_provider_intel": {
+      "id": "finance_provider_intel",
+      "name": "Provider Intelligence",
+      "type": "data",
+      "description": "Atomic cost decomposition for all actions",
+      "location": "local",
+      "status": "active",
+      "purpose": "Break actions into atomic costs for precise calculations",
+      "value_to_master": "Know exactly what every action costs",
+      "criticality": "high",
+      "depends_on": [
+        "finance_terms"
+      ],
+      "provides_to": [
+        "finance_cost_gate"
+      ],
+      "communicates_via": "python import",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "finance_terms": {
+      "id": "finance_terms",
+      "name": "Partner Terms",
+      "type": "data",
+      "description": "All provider contracts, timing, billing rules",
+      "location": "local",
+      "status": "active",
+      "purpose": "Central truth for all provider billing rules",
+      "value_to_master": "Never be surprised by charges",
+      "criticality": "high",
+      "depends_on": [],
+      "provides_to": [
+        "finance_provider_intel",
+        "finance_cost_gate"
+      ],
+      "communicates_via": "json file",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "static",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "infra_proactive": {
+      "id": "infra_proactive",
+      "name": "Proactive Infrastructure",
+      "type": "process",
+      "description": "Predicts and prepares capacity before needed",
+      "location": "local",
+      "status": "active",
+      "purpose": "Ensure infrastructure is ready BEFORE it's needed",
+      "value_to_master": "Never hit capacity limits, always room to grow",
+      "criticality": "high",
+      "depends_on": [
+        "infra_droplets",
+        "finance_cost_gate"
+      ],
+      "provides_to": [
+        "scaling_engine"
+      ],
+      "communicates_via": "python import",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "hourly",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "infra_protection": {
+      "id": "infra_protection",
+      "name": "Infrastructure Protection",
+      "type": "process",
+      "description": "Prevents destruction of valuable infrastructure",
+      "location": "local",
+      "status": "active",
+      "purpose": "Preserve infrastructure - build UP not tear DOWN",
+      "value_to_master": "Never lose valuable resources",
+      "criticality": "critical",
+      "depends_on": [
+        "infra_droplets"
+      ],
+      "provides_to": [
+        "scaling_engine"
+      ],
+      "communicates_via": "python import",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "unified_ai": {
+      "id": "unified_ai",
+      "name": "Unified AI Brain",
+      "type": "process",
+      "description": "Central decision-making with cost awareness",
+      "location": "local",
+      "status": "active",
+      "purpose": "Make all decisions serving Yair Siegel",
+      "value_to_master": "Autonomous agent serving your interests",
+      "criticality": "critical",
+      "depends_on": [
+        "finance_cost_gate"
+      ],
+      "provides_to": [
+        "executor",
+        "trading"
+      ],
+      "communicates_via": "python import",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "continuous",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "dense_ai": {
+      "id": "dense_ai",
+      "name": "Dense AI Analysis",
+      "type": "service",
+      "description": "Multi-provider AI with free-first fallback",
+      "location": "local",
+      "status": "active",
+      "purpose": "Maximum AI capability at minimum cost",
+      "value_to_master": "Smart analysis without burning money",
+      "criticality": "high",
+      "depends_on": [
+        "provider_groq",
+        "provider_google",
+        "provider_openai"
+      ],
+      "provides_to": [
+        "unified_ai",
+        "trading"
+      ],
+      "communicates_via": "api",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "trading_decider": {
+      "id": "trading_decider",
+      "name": "Trading Decider",
+      "type": "process",
+      "description": "Converts signals to planned actions",
+      "location": "local",
+      "status": "active",
+      "purpose": "Smart position sizing and trade planning",
+      "value_to_master": "Intelligent trading decisions",
+      "criticality": "high",
+      "depends_on": [
+        "unified_ai",
+        "trading_signals"
+      ],
+      "provides_to": [
+        "trading_executor"
+      ],
+      "communicates_via": "python objects",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "trading_executor": {
+      "id": "trading_executor",
+      "name": "Trading Executor",
+      "type": "process",
+      "description": "Executes trades with safety checks",
+      "location": "local",
+      "status": "active",
+      "purpose": "Safe execution of trading decisions",
+      "value_to_master": "Execute trades without catastrophic errors",
+      "criticality": "critical",
+      "depends_on": [
+        "trading_decider",
+        "provider_polymarket",
+        "finance_cost_gate"
+      ],
+      "provides_to": [],
+      "communicates_via": "api",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "provider_do": {
+      "id": "provider_do",
+      "name": "DigitalOcean Provider",
+      "type": "provider",
+      "description": "Cloud infrastructure provider",
+      "location": "cloud",
+      "status": "active",
+      "purpose": "Provide compute resources",
+      "value_to_master": "Foundation infrastructure",
+      "criticality": "critical",
+      "depends_on": [],
+      "provides_to": [
+        "infra_droplets"
+      ],
+      "communicates_via": "api",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "continuous",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "provider_groq": {
+      "id": "provider_groq",
+      "name": "Groq AI Provider",
+      "type": "provider",
+      "description": "FREE AI inference",
+      "location": "cloud",
+      "status": "active",
+      "purpose": "Free AI - use FIRST",
+      "value_to_master": "AI without cost",
+      "criticality": "high",
+      "depends_on": [],
+      "provides_to": [
+        "dense_ai"
+      ],
+      "communicates_via": "api",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "provider_google": {
+      "id": "provider_google",
+      "name": "Google AI Provider",
+      "type": "provider",
+      "description": "FREE AI inference (Gemini)",
+      "location": "cloud",
+      "status": "active",
+      "purpose": "Free AI - use SECOND after Groq",
+      "value_to_master": "Backup free AI",
+      "criticality": "high",
+      "depends_on": [],
+      "provides_to": [
+        "dense_ai"
+      ],
+      "communicates_via": "api",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    },
+    "provider_polymarket": {
+      "id": "provider_polymarket",
+      "name": "Polymarket Provider",
+      "type": "provider",
+      "description": "Prediction market platform",
+      "location": "cloud",
+      "status": "active",
+      "purpose": "Trading venue for predictions",
+      "value_to_master": "Income generation through trading",
+      "criticality": "high",
+      "depends_on": [],
+      "provides_to": [
+        "trading_executor"
+      ],
+      "communicates_via": "api",
+      "created": "",
+      "state_history": [],
+      "learned_patterns": [],
+      "last_active": "",
+      "current_state": "nominal",
+      "schedule": "on-demand",
+      "next_action": "",
+      "predicted_state": "",
+      "predicted_needs": []
+    }
+  },
+  "flows": [
+    {
+      "name": "Cost-Aware Decision Flow",
+      "description": "Every action checks cost before execution",
+      "path": [
+        "action_request",
+        "finance_cost_gate",
+        "unified_ai",
+        "execution"
+      ],
+      "purpose": "Ensure no action wastes money"
+    },
+    {
+      "name": "Trading Flow",
+      "description": "Signal to execution pipeline",
+      "path": [
+        "market_data",
+        "trading_decider",
+        "unified_ai",
+        "trading_executor",
+        "provider_polymarket"
+      ],
+      "purpose": "Convert signals to profitable trades"
+    },
+    {
+      "name": "Infrastructure Flow",
+      "description": "Proactive capacity management",
+      "path": [
+        "infra_proactive",
+        "finance_cost_gate",
+        "scaling_engine",
+        "provider_do"
+      ],
+      "purpose": "Always have infrastructure ready"
+    },
+    {
+      "name": "AI Provider Cascade",
+      "description": "Free first, paid last",
+      "path": [
+        "dense_ai",
+        "provider_groq",
+        "provider_google",
+        "provider_openai"
+      ],
+      "purpose": "Maximum AI capability at minimum cost"
+    }
+  ],
+  "temporal_schedule": {
+    "continuous": [
+      "infra_droplets",
+      "unified_ai",
+      "provider_do"
+    ],
+    "hourly": [
+      "infra_proactive"
+    ],
+    "on_demand": [
+      "finance_cost_gate",
+      "dense_ai",
+      "trading_decider",
+      "trading_executor"
+    ],
+    "daily": [
+      "cost_report",
+      "system_health_check"
+    ]
+  },
+  "last_updated": "2025-11-30T22:54:29.012779+00:00"
+}

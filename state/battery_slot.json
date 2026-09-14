@@ -1,0 +1,9 @@
+{
+  "installed": true,
+  "battery_type": "SystemBattery",
+  "total_drawn": 10,
+  "total_charged": 5.0,
+  "draw_count": 1,
+  "charge_count": 1,
+  "updated": "2025-12-01T03:28:13.232830+00:00"
+}

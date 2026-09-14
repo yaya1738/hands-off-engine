@@ -1,0 +1,1 @@
+{"timestamp": "2025-12-01T02:57:19.179394+00:00", "event": "mode_change", "total_energy": 35.7, "power_mode": "survival", "details": {"old_mode": "normal", "new_mode": "survival", "reason": "Critical cells: ['financial', 'operational']"}}

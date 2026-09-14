@@ -68,7 +68,7 @@ def main():
     watch = load_watchlist()
     # Pull events (Gamma API)
     # Docs: https://gamma-api.polymarket.com/events  (see Polymarket docs)
-    # We’ll fetch a page; you can expand/paginate later if you want broader coverage.
+    # Fetches first page of events. Pagination available if needed for broader coverage.
     url = "https://gamma-api.polymarket.com/events"
     try:
         events = get_json(url)

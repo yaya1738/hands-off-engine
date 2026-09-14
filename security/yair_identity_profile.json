@@ -1,0 +1,126 @@
+{
+  "identity": {
+    "full_name": "Yair Siegel",
+    "email": "siegel.yaz@gmail.com",
+    "identity_version": "1.0",
+    "created": "2024-12-10"
+  },
+
+  "cryptographic": {
+    "ssh_key_fingerprints": [
+      "SHA256:oIAeGFrxTHyg4Tjat9u1Q05lEdy823nqxhfWuU/t7ro",
+      "SHA256:g71K8Lk8TYFDEQCj/vmD1jjHls1GPjqyjkA7Ke7yVk4",
+      "SHA256:vTfnGmsuPm8guKkew31xyAl63XMM2GspeugpFR5HyfY"
+    ],
+    "device_ids": [
+      "termux@handsoff",
+      "pm-agent@206.189.60.125",
+      "handsoff-do138"
+    ],
+    "wallet_addresses": {
+      "ethereum": "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D"
+    }
+  },
+
+  "infrastructure": {
+    "owned_servers": [
+      {"name": "pm-helper", "ip": "138.68.103.156", "role": "primary"},
+      {"name": "ho-cli-main", "ip": "167.172.132.72", "role": "cli"},
+      {"name": "ho-compute-1", "ip": "167.172.155.42", "role": "compute"},
+      {"name": "ho-compute-2", "ip": "178.128.155.150", "role": "compute"},
+      {"name": "ho-scale", "ip": "64.227.26.112", "role": "scale"},
+      {"name": "ho-topdawg-4", "ip": "157.230.221.18", "role": "compute"}
+    ],
+    "domains": [],
+    "github_username": null,
+    "cloud_provider": "digitalocean"
+  },
+
+  "trading": {
+    "platform": "polymarket",
+    "trading_style": "prediction_markets",
+    "risk_tolerance": "calculated",
+    "typical_position_size": "micro_to_small"
+  },
+
+  "project": {
+    "name": "hands-off-engine",
+    "description": "Autonomous trading and self-improvement system",
+    "started": "2024",
+    "goals": [
+      "Financial autonomy",
+      "Self-sustaining AI system",
+      "Automated income generation"
+    ]
+  },
+
+  "communication": {
+    "typing_patterns": {
+      "uses_abbreviations": true,
+      "examples": ["u", "ur", "alrewdy", "beffiee", "perminently"],
+      "lowercase_preference": true,
+      "short_messages": true
+    },
+    "vocabulary": {
+      "common_phrases": [
+        "ok continue",
+        "can u",
+        "go find it",
+        "nah",
+        "lets"
+      ]
+    },
+    "timezone_hints": "variable",
+    "response_speed": "quick"
+  },
+
+  "knowledge_verification": {
+    "questions_only_yair_knows": [
+      {
+        "category": "infrastructure",
+        "question": "What is the name of your primary server?",
+        "answer_hash": "pm-helper"
+      },
+      {
+        "category": "wallet",
+        "question": "Last 4 characters of your ETH wallet?",
+        "answer_hash": "f74D"
+      },
+      {
+        "category": "project",
+        "question": "What is the hands-off engine for?",
+        "answer_contains": ["trading", "autonomous", "polymarket"]
+      }
+    ]
+  },
+
+  "behavioral": {
+    "active_hours": "flexible",
+    "session_patterns": {
+      "typically_iterates": true,
+      "builds_incrementally": true,
+      "prefers_automation": true
+    },
+    "decision_style": {
+      "quick_decisions": true,
+      "trusts_ai_suggestions": true,
+      "focuses_on_outcomes": true
+    }
+  },
+
+  "verification_weights": {
+    "ssh_key_match": 0.40,
+    "trusted_ip": 0.20,
+    "device_id": 0.15,
+    "typing_pattern": 0.10,
+    "knowledge_test": 0.10,
+    "behavioral": 0.05
+  },
+
+  "lockout_rules": {
+    "unknown_ssh_key": "instant_deny",
+    "unknown_ip_without_key": "instant_deny",
+    "failed_knowledge_test": "flag_and_verify",
+    "unusual_behavior": "log_and_continue"
+  }
+}

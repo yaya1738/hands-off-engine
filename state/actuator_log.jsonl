@@ -1,0 +1,6 @@
+{"timestamp": "2025-12-01T02:03:21.303649+00:00", "actuator": "telegram", "action": "notify", "success": true, "details": "\ud83e\uddbe Actuator test: System hands are working!"}
+{"timestamp": "2025-12-01T02:20:29.909806+00:00", "actuator": "telegram", "action": "notify", "success": true, "details": "\ud83e\uddec Evolution cycle 65: Send Telegram notification to Yair"}
+{"timestamp": "2025-12-01T02:59:28.091055+00:00", "actuator": "telegram", "action": "notify", "success": true, "details": "System notification"}
+{"timestamp": "2025-12-01T03:00:58.396930+00:00", "actuator": "telegram", "action": "notify", "success": true, "details": "System notification"}
+{"timestamp": "2025-12-01T09:42:17.823148+00:00", "actuator": "polymarket", "action": "trade_BUY", "success": true, "details": "$1.0 on 94103708777398511919"}
+{"timestamp": "2025-12-01T09:49:54.028338+00:00", "actuator": "polymarket", "action": "trade_BUY", "success": false, "details": "$5.0 on test_token_123 [BLOCKED by trading_mode]"}
