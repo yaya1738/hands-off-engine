@@ -183,7 +183,24 @@ class FactoryIntake:
         if not task_id:
             task_id = "uncorrelated"
 
-        # 5. Exactly one bounded next task_assignment
+        # 5. Follow-up gate: only emit when there is real correlated work.
+        # Uncorrelated task_completed events (e.g. heartbeats) are recorded
+        # as consumed but do NOT fan out into noise on the bus.
+        if not self._should_follow_up(event, task_id):
+            log.info(f"Recorded {event_type} (task={task_id}) but no follow-up needed")
+            decision = {
+                "fingerprint": fp,
+                "event_id": event.get("event_id") or event.get("msg_id"),
+                "event_type": event_type,
+                "task_id": task_id,
+                "assigned_msg_id": None,
+                "decided_at": datetime.now(timezone.utc).isoformat(),
+            }
+            self.decisions.append(decision)
+            self._persist()
+            return decision
+
+        # 6. Exactly one bounded next task_assignment
         assignment = self._emit_next_task(event, task_id)
 
         decision = {
@@ -200,6 +217,27 @@ class FactoryIntake:
         return decision
 
     # ── exactly-one bounded next task ──
+
+    def _should_follow_up(self, event: dict, task_id: str) -> bool:
+        """Decide whether this wake event warrants a new task_assignment.
+
+        Only emit when there is a real, correlated next action:
+        - task_id must be present and not "uncorrelated"
+        - security_boundary / authorization_required / test_failure / blocked
+          always warrant follow-up when correlated
+        - task_completed only warrants follow-up if a result implies next work
+        """
+        if not task_id or task_id == "uncorrelated":
+            return False
+        event_type = _get_event_type(event)
+        if event_type in {"security_boundary", "authorization_required", "test_failure", "blocked"}:
+            return True
+        if event_type == "task_completed":
+            # Only follow up on correlated, real task completions (not heartbeats)
+            context = event.get("context") or {}
+            status = context.get("status", "")
+            return status in {"success", "error", "failed"}
+        return False
 
     def _emit_next_task(self, event: dict, task_id: str) -> dict:
         """Emit exactly one bounded task_assignment to anyclaw on the canonical bus."""
