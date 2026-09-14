@@ -35,6 +35,10 @@ A saved source tree, a static measurement, a historical success, or a `converged
 
 The live state is represented explicitly as `live_system_active=true`, `operating_state=live_steady_state` or `live_executing`, and an unexpired `live_attestation`. If the runtime stops executing and the attestation expires, the system must no longer represent itself as DASS live until execution resumes.
 
+## Hosted runner benchmark
+
+The canonical GitHub-hosted production-service workflow is pinned to an explicit Ubuntu runner image (`ubuntu-24.04`). This removes the moving `ubuntu-latest` runner alias from the DASS execution path; a successful post-pin workflow run is required before hosted runtime liveness can be credited.
+
 ## External deployment
 
 External physical/cloud deployment is independent of DASS achievement. A missing DigitalOcean host can block external deployment, but it cannot turn a live GitHub DASS system back into PRE-DASS. Conversely, merely having a physical host does not establish DASS; the governed autonomous runtime must actually be operating there or through the GitHub-hosted runtime benchmark.
