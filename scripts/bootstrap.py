@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+"""Bootstrap all autonomous daemons: governed root, listener, monitor, router, telegram."""
 import sys, os, json, subprocess, time
 from pathlib import Path
 from datetime import datetime, timezone
@@ -11,6 +12,10 @@ LOG_FILE = STATE_DIR / "bootstrap.log"
 STATUS_FILE = STATE_DIR / "autonomy_status.json"
 ENTRY_POINT = REPO_ROOT / "autonomous" / "governed_root.py"
 LISTENER = REPO_ROOT / "scripts" / "system_listener_inline.py"
+EVENT_ROUTER = REPO_ROOT / "scripts" / "event_router.py"
+MONITOR = REPO_ROOT / "scripts" / "proactive_monitor.py"
+TG_BRIDGE = REPO_ROOT / "scripts" / "telegram_bridge.py"
+
 
 def log_msg(msg, level="INFO"):
     ts = datetime.now(timezone.utc).isoformat()
@@ -22,6 +27,7 @@ def log_msg(msg, level="INFO"):
     except Exception:
         pass
 
+
 def write_status(status):
     status["timestamp"] = datetime.now(timezone.utc).isoformat()
     try:
@@ -30,106 +36,89 @@ def write_status(status):
     except Exception:
         pass
 
-def start_system():
-    log_msg(f"Starting governed root: {ENTRY_POINT}")
-    os.chdir(REPO_ROOT)
-    return subprocess.Popen([sys.executable, str(ENTRY_POINT)], cwd=REPO_ROOT)
 
-def start_listener():
-    if not LISTENER.exists():
-        log_msg("Listener unavailable; continuing without it", "WARNING")
+def start_daemon(name, script, args=None):
+    if not script.exists():
+        log_msg(f"{name} unavailable ({script.name} not found)", "WARNING")
         return None
-    log_msg("Starting system listener")
+    cmd = [sys.executable, str(script)]
+    if args:
+        cmd.extend(args)
     try:
-        proc = subprocess.Popen([sys.executable, str(LISTENER)], cwd=REPO_ROOT)
-        log_msg("Listener started")
+        proc = subprocess.Popen(cmd, cwd=REPO_ROOT)
+        log_msg(f"Started {name} (pid={proc.pid})")
         return proc
     except Exception as e:
-        log_msg(f"Listener failed: {e}", "ERROR")
-        return None
-
-def start_telegram_bridge():
-    BRIDGE = REPO_ROOT / "scripts" / "telegram_bridge.py"
-    if not BRIDGE.exists():
-        log_msg("Telegram bridge unavailable", "WARNING")
-        return None
-    log_msg("Starting Telegram bridge")
-    try:
-        proc = subprocess.Popen([sys.executable, str(BRIDGE)], cwd=REPO_ROOT)
-        log_msg("Telegram bridge started")
-        return proc
-    except Exception as e:
-        log_msg(f"Telegram bridge failed: {e}", "ERROR")
+        log_msg(f"Failed to start {name}: {e}", "ERROR")
         return None
 
 
-def start_monitor():
-    MONITOR = REPO_ROOT / "scripts" / "proactive_monitor.py"
-    if not MONITOR.exists():
-        log_msg("Proactive monitor unavailable", "WARNING")
-        return None
-    log_msg("Starting proactive monitor")
-    try:
-        proc = subprocess.Popen([sys.executable, str(MONITOR), "--interval", "60"], cwd=REPO_ROOT)
-        log_msg("Proactive monitor started")
-        return proc
-    except Exception as e:
-        log_msg(f"Monitor failed: {e}", "ERROR")
-        return None
+def monitor_loop(daemons):
+    """Monitor all daemons, restart on crash."""
+    restart_counts = {name: 0 for name in daemons}
 
-
-def monitor(main_proc, listener_proc, monitor_proc=None, tg_bridge=None):
-    main_restarts = 0
     while True:
         try:
-            if main_proc.poll() is not None:
-                log_msg(f"Governed root died, code {main_proc.returncode}", "WARNING")
-                main_restarts += 1
-                if main_restarts < 10:
-                    wait = min(2 ** main_restarts, 300)
-                    log_msg(f"Restart governed root in {wait}s (attempt {main_restarts})")
-                    time.sleep(wait)
-                    main_proc = start_system()
-                else:
-                    log_msg("Max governed-root restarts reached", "ERROR")
-                    break
-            if listener_proc and listener_proc.poll() is not None:
-                log_msg("Listener died, restarting", "WARNING")
-                listener_proc = start_listener()
-monitor_proc = start_monitor()
-tg_bridge = start_telegram_bridge()
-                    if tg_bridge and tg_bridge.poll() is not None:
-                log_msg("Telegram bridge died, restarting", "WARNING")
-                tg_bridge = start_telegram_bridge()
-            if monitor_proc and monitor_proc.poll() is not None:
-                log_msg("Monitor died, restarting", "WARNING")
-                monitor_proc = start_monitor()
-            write_status({"status": "running", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False, "main_restarts": main_restarts, "listener_active": listener_proc is not None and listener_proc.poll() is None, "monitor_active": monitor_proc is not None and monitor_proc.poll() is None})
+            for name, proc in list(daemons.items()):
+                if proc is not None and proc.poll() is not None:
+                    log_msg(f"{name} died (code={proc.returncode}), restarting", "WARNING")
+                    restart_counts[name] += 1
+                    if restart_counts[name] >= 10:
+                        log_msg(f"Max restarts for {name}, giving up", "ERROR")
+                        continue
+                    # Restart
+                    if name == "governed_root":
+                        daemons[name] = start_daemon(name, ENTRY_POINT)
+                    elif name == "listener":
+                        daemons[name] = start_daemon(name, LISTENER)
+                    elif name == "event_router":
+                        daemons[name] = start_daemon(name, EVENT_ROUTER, ["loop", "--interval", "10"])
+                    elif name == "monitor":
+                        daemons[name] = start_daemon(name, MONITOR, ["--interval", "60"])
+                    elif name == "telegram_bridge":
+                        daemons[name] = start_daemon(name, TG_BRIDGE)
+
+            active = {k: v is not None and v.poll() is None for k, v in daemons.items()}
+            write_status({
+                "status": "running",
+                "authority": "fail_closed",
+                "execution_enabled": False,
+                "daemons": active,
+            })
             time.sleep(10)
+
         except KeyboardInterrupt:
-            log_msg("Shutdown")
-            main_proc.terminate()
-            if listener_proc:
-                listener_proc.terminate()
-            if monitor_proc:
-                monitor_proc.terminate()
-            if tg_bridge:
-                tg_bridge.terminate()
+            log_msg("Shutdown initiated")
+            for name, proc in daemons.items():
+                if proc and proc.poll() is None:
+                    log_msg(f"Terminating {name}")
+                    proc.terminate()
             break
+
         except Exception as e:
             log_msg(f"Monitor error: {e}", "ERROR")
             time.sleep(5)
 
+
+# ── Main ──
+
 log_msg("=" * 70)
-log_msg("FAIL-CLOSED AUTONOMOUS BOOTSTRAP")
-log_msg("=" * 70)
+log_msg("FAIL-CLOSED AUTONOMOUS BOOTSTRAP (with event router)")
 
 if not ENTRY_POINT.exists():
-    log_msg("Governed root missing; refusing to start legacy entrypoints", "ERROR")
-    write_status({"status": "blocked", "authority": "fail_closed", "execution_enabled": False})
+    log_msg("Governed root missing; refusing to start", "ERROR")
+    write_status({"status": "blocked", "authority": "fail_closed"})
     sys.exit(1)
 
-write_status({"status": "starting", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False})
-main_proc = start_system()
-listener_proc = start_listener()
-monitor(main_proc, listener_proc, monitor_proc, tg_bridge)
+daemons = {
+    "governed_root": start_daemon("governed_root", ENTRY_POINT),
+    "listener": start_daemon("listener", LISTENER),
+    "event_router": start_daemon("event_router", EVENT_ROUTER, ["loop", "--interval", "10"]),
+    "monitor": start_daemon("monitor", MONITOR, ["--interval", "60"]),
+    "telegram_bridge": start_daemon("telegram_bridge", TG_BRIDGE),
+}
+
+active_count = sum(1 for p in daemons.values() if p and p.poll() is None)
+log_msg(f"Started {active_count}/{len(daemons)} daemons")
+
+monitor_loop(daemons)
