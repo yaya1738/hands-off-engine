@@ -12,6 +12,7 @@ STATUS_FILE = STATE_DIR / "autonomy_status.json"
 ENTRY_POINT = REPO_ROOT / "autonomous" / "governed_root.py"
 LISTENER = REPO_ROOT / "scripts" / "system_listener_inline.py"
 
+
 def log_msg(msg, level="INFO"):
     ts = datetime.now(timezone.utc).isoformat()
     line = f"[{ts}] [{level}] {msg}"
@@ -22,6 +23,7 @@ def log_msg(msg, level="INFO"):
     except Exception:
         pass
 
+
 def write_status(status):
     status["timestamp"] = datetime.now(timezone.utc).isoformat()
     try:
@@ -30,10 +32,12 @@ def write_status(status):
     except Exception:
         pass
 
+
 def start_system():
     log_msg(f"Starting governed root: {ENTRY_POINT}")
     os.chdir(REPO_ROOT)
     return subprocess.Popen([sys.executable, str(ENTRY_POINT)], cwd=REPO_ROOT)
+
 
 def start_listener():
     if not LISTENER.exists():
@@ -48,15 +52,16 @@ def start_listener():
         log_msg(f"Listener failed: {e}", "ERROR")
         return None
 
+
 def start_monitor():
-    MONITOR = REPO_ROOT / "scripts" / "proactive_monitor.py"
-    if not MONITOR.exists():
+    monitor = REPO_ROOT / "scripts" / "proactive_monitor.py"
+    if not monitor.exists():
         log_msg("Proactive monitor unavailable", "WARNING")
         return None
     log_msg("Starting proactive monitor")
     try:
-        proc = subprocess.Popen([sys.executable, str(MONITOR), "--interval", "60"], cwd=REPO_ROOT)
-        log_msg("Proactive monitor started")
+        proc = subprocess.Popen([sys.executable, str(monitor), "--interval", "60"], cwd=REPO_ROOT)
+        log_msg("Monitor started")
         return proc
     except Exception as e:
         log_msg(f"Monitor failed: {e}", "ERROR")
@@ -81,8 +86,7 @@ def monitor(main_proc, listener_proc, monitor_proc=None):
             if listener_proc and listener_proc.poll() is not None:
                 log_msg("Listener died, restarting", "WARNING")
                 listener_proc = start_listener()
-monitor_proc = start_monitor()
-                    if monitor_proc and monitor_proc.poll() is not None:
+            if monitor_proc and monitor_proc.poll() is not None:
                 log_msg("Monitor died, restarting", "WARNING")
                 monitor_proc = start_monitor()
             write_status({"status": "running", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False, "main_restarts": main_restarts, "listener_active": listener_proc is not None and listener_proc.poll() is None, "monitor_active": monitor_proc is not None and monitor_proc.poll() is None})
@@ -99,6 +103,7 @@ monitor_proc = start_monitor()
             log_msg(f"Monitor error: {e}", "ERROR")
             time.sleep(5)
 
+
 log_msg("=" * 70)
 log_msg("FAIL-CLOSED AUTONOMOUS BOOTSTRAP")
 log_msg("=" * 70)
@@ -111,4 +116,5 @@ if not ENTRY_POINT.exists():
 write_status({"status": "starting", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False})
 main_proc = start_system()
 listener_proc = start_listener()
+monitor_proc = start_monitor()
 monitor(main_proc, listener_proc, monitor_proc)
