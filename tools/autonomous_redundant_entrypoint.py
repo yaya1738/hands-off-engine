@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 """Redundant governed Factory entrypoint.
 
-Provides a second execution route without creating a second authority. The
+Provides multiple execution routes without creating a second authority. The
 primary route is the integrated DASS supervisor; the fallback route is the
-canonical liveness supervisor. Both execute through FactoryAuthorityGateway and
-publish the same durable state. This file is intentionally portable so the
-same entrypoint can be used by GitHub-hosted execution, a local Termux node, or
-another authorized runner.
+canonical liveness supervisor. Both execute through FactoryAuthorityGateway.
+The selected backend is published to both the liveness state and the durable
+Factory control-state channel, so downstream transports can observe the same
+bounded result without depending on one publication path.
 """
 from __future__ import annotations
 
 import json
-import os
 from datetime import datetime, timezone
 from pathlib import Path
 
 from tools import autonomy_liveness_supervisor as liveness
 from tools import autonomous_integrated_supervisor as integrated
+from tools import factory_control_channel as control
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -33,6 +33,18 @@ def _record_backend(state: dict, backend: str, primary_error: str | None = None)
         "observed_at": datetime.now(timezone.utc).isoformat(),
     }
     liveness.persist(ROOT, state)
+    control.publish_state(
+        ROOT,
+        node_id=state.get("node_id"),
+        status=state.get("status"),
+        operating_state=state.get("operating_state"),
+        objective=state.get("objective"),
+        last_action=state.get("last_action"),
+        last_result=state.get("last_result"),
+        pending_commands=state.get("pending_commands", 0),
+        problem=state.get("problem"),
+        next_action=state.get("next_action"),
+    )
     return state
 
 
@@ -42,8 +54,6 @@ def run() -> tuple[dict, int]:
         code = integrated.main()
         state_path = ROOT / liveness.STATE_PATH
         state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
-        # A zero return means the integrated route established its complete
-        # contract. Do not run a second execution cycle unnecessarily.
         if code == 0 and state.get("live_system_active") is True:
             return _record_backend(state, "integrated"), 0
         primary_error = f"integrated supervisor returned {code}"
@@ -72,6 +82,13 @@ def run() -> tuple[dict, int]:
             },
         }
         liveness.persist(ROOT, state)
+        control.publish_state(
+            ROOT,
+            status="degraded",
+            operating_state="offline",
+            problem="all governed execution backends failed",
+            next_action="retry governed recovery",
+        )
         print(json.dumps(state, sort_keys=True), flush=True)
         return state, 1
 
