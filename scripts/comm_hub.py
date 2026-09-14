@@ -288,8 +288,13 @@ class CommHub:
     # ── inbound: party → system ──
 
     def receive(self, sender_id, msg_type, payload, channel="webhook"):
-        """Process an inbound message from a party."""
-        sender = self.parties.get(sender_id, {"id": sender_id, "name": sender_id, "role": "unknown", "trust_level": 0})
+        """Process an inbound message from a party.
+
+        Rejects unregistered sender_ids to prevent bus poisoning.
+        """
+        if sender_id not in self.parties:
+            return {"routed_to": "rejected", "error": f"Unknown sender: {sender_id}"}
+        sender = self.parties[sender_id]
 
         msg = {
             "id": str(uuid.uuid4()),
