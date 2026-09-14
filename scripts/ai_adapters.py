@@ -114,12 +114,100 @@ class ChatGPTAdapter(AIAdapter):
         return {"id": cmd.get("id"), "status": "completed", "result": {"system": "ChatGPT", "message": f"ChatGPT received {action}"}}
 
 class OpenClawAdapter(AIAdapter):
+    """OpenClaw adapter reconciled with canonical CommHub/messages.jsonl bus.
+
+    Reads task_assignments from messages.jsonl via CommHub party routing.
+    Writes results back to messages.jsonl. No separate queue.
+    """
+
+    def __init__(self, system_name="openclaw", repo_root=None):
+        super().__init__(system_name, repo_root)
+        self.coord_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
+        self.inbound_file = self.state_dir / "inbound" / "openclaw.jsonl"
+
+    def get_pending_commands(self):
+        """Read task_assignments addressed to openclaw from the canonical bus."""
+        commands = []
+        # First check event router's inbound queue (from router)
+        if self.inbound_file.exists():
+            try:
+                with open(self.inbound_file, "r") as f:
+                    for line in f:
+                        if line.strip():
+                            try:
+                                data = json.loads(line)
+                                if data.get("routed"):
+                                    commands.append({
+                                        "id": data.get("event_id", ""),
+                                        "action": "task_assignment",
+                                        "payload": data,
+                                        "source": "event_router",
+                                    })
+                            except json.JSONDecodeError:
+                                pass
+            except Exception:
+                pass
+
+        # Also scan messages.jsonl for task_assignments to openclaw
+        if self.coord_file.exists():
+            try:
+                with open(self.coord_file, "r") as f:
+                    for line in f:
+                        if line.strip():
+                            try:
+                                msg = json.loads(line)
+                                if (msg.get("type") == "task_assignment" and
+                                    msg.get("to") in ("openclaw", "all")):
+                                    commands.append({
+                                        "id": msg.get("msg_id", ""),
+                                        "action": msg.get("context", {}).get("action", "unknown"),
+                                        "payload": msg,
+                                        "source": "coordination_bus",
+                                    })
+                            except json.JSONDecodeError:
+                                pass
+            except Exception:
+                pass
+
+        return commands
+
     def process_command(self, cmd):
         action = cmd.get("action")
         payload = cmd.get("payload", {})
         if action == "execute":
             return {"id": cmd.get("id"), "status": "completed", "result": {"system": "OpenClaw", "message": "OpenClaw executed", "execution_time_ms": 150, "success": True, "confidence": 0.88}}
         return {"id": cmd.get("id"), "status": "completed", "result": {"system": "OpenClaw", "message": f"OpenClaw received {action}"}}
+
+    def write_result(self, result):
+        """Write result back to canonical messages.jsonl via CommHub."""
+        try:
+            from scripts.comm_hub import CommHub
+            hub = CommHub(repo_root=self.repo_root)
+            hub.send("factory", "task_result", {
+                "source": "openclaw",
+                "id": result.get("id"),
+                "status": result.get("status"),
+                "result": result.get("result"),
+            })
+        except Exception as e:
+            # Fallback: write to coordination bus directly
+            try:
+                msg = {
+                    "from": "openclaw",
+                    "to": "factory",
+                    "type": "task_result",
+                    "msg_id": result.get("id", "unknown"),
+                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "context": {
+                        "task_id": result.get("id", "unknown"),
+                        "status": result.get("status"),
+                        "result": result.get("result"),
+                    },
+                }
+                with open(self.coord_file, "a") as f:
+                    f.write(json.dumps(msg) + "\n")
+            except Exception:
+                self.log(f"Failed to write result: {e}", "ERROR")
 
 def main():
     repo_root = Path.home() / "hands-off-engine"

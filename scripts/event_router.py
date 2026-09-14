@@ -84,6 +84,18 @@ PARTY_CAPABILITIES = {
         "transport": "telegram",
         "wake_capable": False,
     },
+    "openclaw": {
+        "can_handle": {"task_assignment", "health_check", "system_status", "read_file_fact"},
+        "produces": {"task_result", "continuation_event"},
+        "transport": "file",
+        "wake_capable": False,
+    },
+    "grok": {
+        "can_handle": {"query", "task_assignment"},
+        "produces": {"query_result", "task_result"},
+        "transport": "file",
+        "wake_capable": False,
+    },
     "system_internal": {
         "can_handle": {"*"},
         "produces": {"system_status", "health_check"},
@@ -188,6 +200,7 @@ class EventRouter:
         sender = msg.get("from", "")
         context = msg.get("context", {})
         event_type = context.get("event_type", msg_type)
+        handler_party = context.get("target_party", msg.get("to", ""))
 
         # Task results from AnyClaw → route to Factory for next task
         if sender == "anyclaw" and msg_type in ("task_result", "continuation_event"):
@@ -206,6 +219,14 @@ class EventRouter:
         # System events → route to system_internal
         if msg_type in ("system_status", "health_check"):
             return "system_internal"
+
+        # Task results from openclaw or grok → route to factory
+        if sender in ("openclaw", "grok") and msg_type in ("task_result", "query_result"):
+            return "factory"
+
+        # Task assignments from factory or anyclaw to openclaw/grok
+        if msg_type == "task_assignment" and handler_party in ("openclaw", "grok"):
+            return handler_party
 
         # Continuation events from AnyClaw → route to Factory
         if sender == "anyclaw" and event_type in WAKE_EVENT_TYPES:
