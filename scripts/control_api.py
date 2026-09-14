@@ -101,13 +101,20 @@ class SystemControl:
         if not found:
             return {"status": "not_found", "error": f"No pending approval for {command_id}"}
 
+        # Grab queued_at from approval entry before removing it
+        queued_at = None
+        for p in q.get("pending", []):
+            if p.get("id") == command_id:
+                queued_at = p.get("queued_at")
+                break
+
         entry = {"id": command_id, "approved_at": datetime.now(timezone.utc).isoformat()}
         q["approved"].append(entry)
         q["pending"] = [p for p in q["pending"] if p.get("id") != command_id]
         self._save_approval_queue(q)
 
-        # Also stamp approval_status on the original queued command
-        self._stamp_command_approval(command_id, "approved")
+        # Also stamp approval_status and queued_at on the original queued command
+        self._stamp_command_approval(command_id, "approved", queued_at=queued_at)
         return {"status": "approved", "id": command_id}
 
     def reject(self, command_id):
@@ -129,8 +136,12 @@ class SystemControl:
         self._stamp_command_approval(command_id, "rejected")
         return {"status": "rejected", "id": command_id}
 
-    def _stamp_command_approval(self, command_id, approval_status):
-        """Stamp approval_status onto the original command in the queue."""
+    def _stamp_command_approval(self, command_id, approval_status, queued_at=None):
+        """Stamp approval_status onto the original command in the queue.
+
+        On approval, resets queue status to 'pending' and carries queued_at
+        forward so the executor can verify approval freshness.
+        """
         if not self.queue_file.exists():
             return
         new_lines = []
@@ -141,6 +152,10 @@ class SystemControl:
                         d = json.loads(line)
                         if d.get("id") == command_id:
                             d["approval_status"] = approval_status
+                            if approval_status == "approved":
+                                d["status"] = "pending"
+                                if queued_at:
+                                    d["queued_at"] = queued_at
                         new_lines.append(json.dumps(d) + "\n")
                     except Exception:
                         new_lines.append(line)

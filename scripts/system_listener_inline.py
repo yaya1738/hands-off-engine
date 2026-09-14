@@ -5,6 +5,10 @@ from datetime import datetime, timezone
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from autonomous.governed_authority import authorize
 try:
+    from scripts.executor import Executor
+except ImportError:
+    Executor = None
+try:
     from scripts.comm_hub import CommHub
 except ImportError:
     CommHub = None
@@ -64,7 +68,16 @@ def process_command(cmd):
             return {"action": "execute", "dryrun": True, "message": f"DRYRUN processed: {cmd.get('payload',{}).get('action','?')}", "timestamp": datetime.now(timezone.utc).isoformat()}
 
         if decision.decision == "approved":
-            return {"action": "execute", "error": "Approved but executor safety gate not yet enabled", "command_status": "awaiting_executor", "timestamp": datetime.now(timezone.utc).isoformat()}
+            if Executor is not None:
+                try:
+                    executor = Executor()
+                    exec_result = executor.execute_command(cmd)
+                    status = exec_result.status
+                    return {"action": "execute", "execution_result": exec_result.to_dict(), "command_status": status, "timestamp": datetime.now(timezone.utc).isoformat()}
+                except Exception as e:
+                    log.error(f"Executor failed: {e}")
+                    return {"action": "execute", "error": str(e), "command_status": "error", "timestamp": datetime.now(timezone.utc).isoformat()}
+            return {"action": "execute", "error": "Approved but executor module unavailable", "command_status": "awaiting_executor", "timestamp": datetime.now(timezone.utc).isoformat()}
 
     handlers = {
         "query": lambda c: {"query": c.get("payload", {}).get("query"), "response": "Query executed", "timestamp": datetime.now(timezone.utc).isoformat()},

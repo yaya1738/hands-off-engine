@@ -48,6 +48,21 @@ def start_listener():
         log_msg(f"Listener failed: {e}", "ERROR")
         return None
 
+def start_telegram_bridge():
+    BRIDGE = REPO_ROOT / "scripts" / "telegram_bridge.py"
+    if not BRIDGE.exists():
+        log_msg("Telegram bridge unavailable", "WARNING")
+        return None
+    log_msg("Starting Telegram bridge")
+    try:
+        proc = subprocess.Popen([sys.executable, str(BRIDGE)], cwd=REPO_ROOT)
+        log_msg("Telegram bridge started")
+        return proc
+    except Exception as e:
+        log_msg(f"Telegram bridge failed: {e}", "ERROR")
+        return None
+
+
 def start_monitor():
     MONITOR = REPO_ROOT / "scripts" / "proactive_monitor.py"
     if not MONITOR.exists():
@@ -63,7 +78,7 @@ def start_monitor():
         return None
 
 
-def monitor(main_proc, listener_proc, monitor_proc=None):
+def monitor(main_proc, listener_proc, monitor_proc=None, tg_bridge=None):
     main_restarts = 0
     while True:
         try:
@@ -82,7 +97,11 @@ def monitor(main_proc, listener_proc, monitor_proc=None):
                 log_msg("Listener died, restarting", "WARNING")
                 listener_proc = start_listener()
 monitor_proc = start_monitor()
-                    if monitor_proc and monitor_proc.poll() is not None:
+tg_bridge = start_telegram_bridge()
+                    if tg_bridge and tg_bridge.poll() is not None:
+                log_msg("Telegram bridge died, restarting", "WARNING")
+                tg_bridge = start_telegram_bridge()
+            if monitor_proc and monitor_proc.poll() is not None:
                 log_msg("Monitor died, restarting", "WARNING")
                 monitor_proc = start_monitor()
             write_status({"status": "running", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False, "main_restarts": main_restarts, "listener_active": listener_proc is not None and listener_proc.poll() is None, "monitor_active": monitor_proc is not None and monitor_proc.poll() is None})
@@ -94,6 +113,8 @@ monitor_proc = start_monitor()
                 listener_proc.terminate()
             if monitor_proc:
                 monitor_proc.terminate()
+            if tg_bridge:
+                tg_bridge.terminate()
             break
         except Exception as e:
             log_msg(f"Monitor error: {e}", "ERROR")
@@ -111,4 +132,4 @@ if not ENTRY_POINT.exists():
 write_status({"status": "starting", "entry_point": str(ENTRY_POINT), "authority": "fail_closed", "execution_enabled": False})
 main_proc = start_system()
 listener_proc = start_listener()
-monitor(main_proc, listener_proc, monitor_proc)
+monitor(main_proc, listener_proc, monitor_proc, tg_bridge)
