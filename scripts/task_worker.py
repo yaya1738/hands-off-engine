@@ -2,11 +2,14 @@
 """
 Task Worker — hardened bidirectional protocol between Factory and AnyClaw.
 
+Canonical transport is ai/coordination/messages.jsonl. The legacy
+ai/tasks inbox is intentionally not used as a second coordination bus.
+
 Security invariants enforced:
 1. Repo root derived from actual checkout, not hardcoded path
 2. read_file_fact rejects absolute paths, .. traversal, symlink escapes
 3. Task envelope validated against action allowlist
-4. No git push — result publication does not bypass Factory authority
+4. No git push — result publication stays local
 5. Atomic claim/lock prevents duplicate task re-execution
 6. No secrets exposed, no live/protected execution enabled
 """
@@ -30,22 +33,19 @@ except ImportError:
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [TaskWorker] %(message)s')
 log = logging.getLogger("TaskWorker")
 
-# ── Invariant 1: Derive repo root from actual checkout ──
 REPO_ROOT = Path(__file__).resolve().parent.parent
-INBOX = REPO_ROOT / "ai" / "tasks" / "inbox.jsonl"
-RESULTS = REPO_ROOT / "ai" / "tasks" / "results.jsonl"
+COORDINATION_BUS = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
+RESULTS = REPO_ROOT / "state" / "task_results.jsonl"
 LOCK_DIR = REPO_ROOT / "state" / "task_locks"
+PROCESSED_IDS = REPO_ROOT / "state" / "processed_task_ids.json"
 
-# Continuation event emitter
 _emitter = None
 def get_emitter():
     global _emitter
     if _emitter is None and ContinuationEmitter is not None:
         _emitter = ContinuationEmitter()
     return _emitter
-PROCESSED_IDS = REPO_ROOT / "state" / "processed_task_ids.json"
 
-# ── Invariant 3: Action allowlist — only these actions are accepted ──
 ALLOWED_ACTIONS = frozenset({
     "health_check",
     "system_status",
@@ -54,7 +54,6 @@ ALLOWED_ACTIONS = frozenset({
     "list_parties",
 })
 
-# ── Invariant 2: Safe read directories (no symlink escapes, no ..) ──
 SAFE_READ_DIRS = frozenset({
     REPO_ROOT / "docs",
     REPO_ROOT / "ai",
@@ -75,13 +74,14 @@ def load_processed():
 
 
 def save_processed(ids):
-    PROCESSED_IDS.write_text(json.dumps(sorted(ids)))
+    PROCESSED_IDS.parent.mkdir(parents=True, exist_ok=True)
+    tmp = PROCESSED_IDS.with_suffix(".tmp")
+    tmp.write_text(json.dumps(sorted(ids)))
+    tmp.replace(PROCESSED_IDS)
 
 
-# ── Invariant 5: Atomic claim/lock per task_id ──
 class TaskLock:
     """File-based lock to prevent duplicate task re-execution."""
-
     def __init__(self, task_id):
         self.lock_dir = LOCK_DIR
         self.lock_dir.mkdir(parents=True, exist_ok=True)
@@ -114,103 +114,61 @@ class TaskLock:
             pass
 
 
-# ── Invariant 2: Path safety ──
 def safe_resolve(file_path):
     """Resolve a file path safely — reject absolute, .., and symlink escapes."""
     if not file_path or not isinstance(file_path, str):
         return None, "empty path"
-
-    # Reject absolute paths
     if os.path.isabs(file_path):
         return None, f"absolute path rejected: {file_path}"
-
-    # Reject .. traversal
     if ".." in file_path.split("/") or ".." in file_path.split(os.sep):
         return None, f".. traversal rejected: {file_path}"
-
-    # Resolve and check it stays within a safe dir
     try:
         resolved = (REPO_ROOT / file_path).resolve()
     except Exception as e:
         return None, f"resolution failed: {e}"
-
-    # Must be under one of SAFE_READ_DIRS (after resolving symlinks)
-    # Use Path.is_relative_to for proper containment (not string prefix matching)
     resolved_abs = resolved.resolve()
-    in_safe = any(
-        resolved_abs.is_relative_to(d.resolve())
-        for d in SAFE_READ_DIRS
-    )
+    in_safe = any(resolved_abs.is_relative_to(d.resolve()) for d in SAFE_READ_DIRS)
     if not in_safe:
         return None, f"path outside safe directories: {file_path} -> {resolved}"
-
-    # Reject if the path itself is a symlink (escape check)
     try:
         if resolved.is_symlink():
             return None, f"symlink rejected: {file_path}"
     except Exception:
         pass
-
     return resolved, None
 
 
-# ── Invariant 3: Task envelope validation ──
 def validate_task_envelope(task):
-    """Validate task structure and enforce action allowlist.
-
-    Strict checks:
-    - task is a dict
-    - "from" must be "factory" (or absent for legacy compat)
-    - "type" must be "task_assignment"
-    - "msg_id" must be a non-empty string
-    - "to" must be "anyclaw" or "all"
-    - context.task_id and context.action required
-    - action must be in allowlist
-    """
+    """Validate strict Factory→AnyClaw task envelope."""
     if not isinstance(task, dict):
         return False, "task is not a dict"
-
-    # Sender validation (strict: must come from factory)
     if task.get("from", "") != "factory":
         return False, f"unexpected sender: {task.get('from')!r}"
-
-    # Type validation (strict: must be a task_assignment)
     if task.get("type", "") != "task_assignment":
         return False, f"unexpected type: {task.get('type')!r}"
-
-    # msg_id required
     if not task.get("msg_id"):
         return False, "missing msg_id"
-
     context = task.get("context")
     if not isinstance(context, dict):
         return False, "missing or invalid context"
-
-    task_id = context.get("task_id", task.get("msg_id", ""))
-    if not task_id:
+    if not context.get("task_id"):
         return False, "missing task_id"
-
     action = context.get("action", "")
     if not action:
         return False, "missing action"
-
     if action not in ALLOWED_ACTIONS:
         return False, f"action '{action}' not in allowlist"
-
     to_field = task.get("to", "")
     if to_field and to_field not in ("anyclaw", "all"):
         return False, f"task addressed to '{to_field}', not 'anyclaw'"
-
     return True, None
+
+
 def process_task(task):
-    """Process a single task and return a result dict."""
-    task_id = task.get("context", {}).get("task_id", task.get("msg_id", "unknown"))
-    action = task.get("context", {}).get("action", "unknown")
-    params = task.get("context", {}).get("params", {})
-    message = task.get("message", "")
-
+    task_id = task["context"]["task_id"]
+    action = task["context"]["action"]
+    params = task["context"].get("params", {})
     log.info(f"Processing task {task_id[:8]}... action={action}")
-
     try:
         if action == "health_check":
             result = {"status": "success", "result": {"health": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}}
@@ -244,13 +202,10 @@ def process_task(task):
         elif action == "list_backends":
             from scripts.ai_connector import AIConnector
             ai = AIConnector()
-            # Minimize exposure: return only backend IDs and names, not capabilities/keys
-            result = {"status": "success", "result": {
-                k: v["name"] for k, v in ai.list_backends().items()
-            }}
+            result = {"status": "success", "result": {k: v["name"] for k, v in ai.list_backends().items()}}
         elif action == "list_parties":
             from scripts.comm_hub import CommHub
-            hub = CommHub()
+            hub = CommHub(repo_root=REPO_ROOT)
             result = {"status": "success", "result": [p["id"] for p in hub.list_parties()]}
         else:
             result = {"status": "error", "error": f"Action '{action}' not implemented"}
@@ -258,9 +213,7 @@ def process_task(task):
         result = {"status": "error", "error": str(e)}
 
     return {
-        "from": "anyclaw",
-        "to": "factory",
-        "type": "task_result",
+        "from": "anyclaw", "to": "factory", "type": "task_result",
         "message": f"Result for {action}: {result.get('status', 'unknown')}",
         "msg_id": task_id,
         "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -275,7 +228,6 @@ def process_task(task):
 
 
 def _load_result_ids():
-    """Load task_ids already present in results.jsonl (crash recovery)."""
     result_ids = set()
     if RESULTS.exists():
         try:
@@ -294,94 +246,77 @@ def _load_result_ids():
     return result_ids
 
 
-def poll_once():
-    """Read inbox, validate, claim, process, and write results.
-
-    Crash/restart-safe: on startup, re-scans results.jsonl for task_ids
-    that were already written, so a crash mid-loop won't cause re-execution.
-    Processed IDs are persisted after each task to limit re-execution window.
-    """
-    if not INBOX.exists():
-        return 0
-
-    processed = load_processed()
-    # Crash recovery: mark any result already written as processed
-    processed |= _load_result_ids()
-    count = 0
-
-    with open(INBOX, "r") as f:
+def _iter_canonical_assignments():
+    if not COORDINATION_BUS.exists():
+        return
+    with open(COORDINATION_BUS, "r") as f:
         for line in f:
             if not line.strip():
                 continue
             try:
-                task = json.loads(line)
+                message = json.loads(line)
             except Exception:
                 continue
-
-            task_id = task.get("context", {}).get("task_id", task.get("msg_id", ""))
-            if task_id in processed:
+            if message.get("type") != "task_assignment":
                 continue
-
-            # Invariant 3: validate envelope + allowlist
-            valid, err = validate_task_envelope(task)
-            if not valid:
-                log.warning(f"Rejected invalid task: {err}")
-                processed.add(task_id)
-                save_processed(processed)
+            if message.get("from") != "factory":
                 continue
-
-            # Invariant 5: atomic claim
-            lock = TaskLock(task_id)
-            if not lock.try_acquire():
-                log.info(f"Task {task_id[:8]}... already claimed, skipping")
+            if message.get("to") not in ("anyclaw", "all"):
                 continue
+            yield message
 
-            try:
-                result = process_task(task)
-                processed.add(task_id)
 
-                with open(RESULTS, "a") as f:
-                    f.write(json.dumps(result, default=str) + "\n")
-
-                # Persist immediately for crash safety
-                save_processed(processed)
-
-                log.info(f"Completed task {task_id[:8]}... -> {result['context']['status']}")
-                # Emit continuation event
-                emitter = get_emitter()
-                if emitter:
-                    emitter.emit_task_completed(
-                        task_id=task_id,
-                        status=result['context']['status'],
-                        result_summary=str(result['context'].get('result', result['context'].get('error', '')))[:200],
-                        correlation_id=task.get('context', {}).get('reply_to'),
-                    )
-                count += 1
-            finally:
-                lock.release()
-
+def poll_once():
+    """Consume canonical Factory assignments once; legacy ai/tasks is not read."""
+    processed = load_processed()
+    processed |= _load_result_ids()
+    count = 0
+    for task in _iter_canonical_assignments():
+        task_id = task.get("context", {}).get("task_id", "")
+        if not task_id or task_id in processed:
+            continue
+        valid, err = validate_task_envelope(task)
+        if not valid:
+            log.warning(f"Rejected invalid task: {err}")
+            processed.add(task_id or task.get("msg_id", ""))
+            save_processed(processed)
+            continue
+        lock = TaskLock(task_id)
+        if not lock.try_acquire():
+            log.info(f"Task {task_id[:8]}... already claimed, skipping")
+            continue
+        try:
+            result = process_task(task)
+            processed.add(task_id)
+            RESULTS.parent.mkdir(parents=True, exist_ok=True)
+            with open(RESULTS, "a") as f:
+                f.write(json.dumps(result, default=str) + "\n")
+            save_processed(processed)
+            emitter = get_emitter()
+            if emitter:
+                emitter.emit_task_completed(
+                    task_id=task_id,
+                    status=result['context']['status'],
+                    result_summary=str(result['context'].get('result', result['context'].get('error', '')))[:200],
+                    correlation_id=task.get('context', {}).get('reply_to'),
+                )
+            count += 1
+        finally:
+            lock.release()
     return count
-
-
-# ── Invariant 4: NO git push — result publication stays local ──
-# Factory polls results.jsonl via git pull. We never push directly.
 
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Task Worker (hardened)")
+    parser = argparse.ArgumentParser(description="Task Worker (canonical coordination bus)")
     sub = parser.add_subparsers(dest="cmd")
-
-    poll_p = sub.add_parser("poll", help="Poll inbox once")
-    loop_p = sub.add_parser("loop", help="Poll continuously")
+    sub.add_parser("poll", help="Poll canonical coordination bus once")
+    loop_p = sub.add_parser("loop", help="Poll canonical coordination bus continuously")
     loop_p.add_argument("--interval", type=int, default=30)
-    sub.add_parser("validate", help="Validate inbox entries without processing")
-
+    sub.add_parser("validate", help="Validate canonical assignments without processing")
     args = parser.parse_args()
-
     if args.cmd == "poll":
-        count = poll_once()
-        print(f"Processed {count} tasks")
+        print(f"Processed {poll_once()} tasks")
     elif args.cmd == "loop":
         while True:
             try:
@@ -392,17 +327,8 @@ if __name__ == "__main__":
                 log.error(f"Error: {e}")
             time.sleep(args.interval)
     elif args.cmd == "validate":
-        if not INBOX.exists():
-            print("Inbox empty")
-        else:
-            with open(INBOX, "r") as f:
-                for i, line in enumerate(f):
-                    if not line.strip():
-                        continue
-                    task = json.loads(line)
-                    valid, err = validate_task_envelope(task)
-                    tid = task.get("context", {}).get("task_id", "?")
-                    status = "✓" if valid else f"✗ {err}"
-                    print(f"  {tid}: {status}")
+        for task in _iter_canonical_assignments() or ():
+            valid, err = validate_task_envelope(task)
+            print(f"  {task.get('context', {}).get('task_id', '?')}: {'✓' if valid else '✗ ' + err}")
     else:
         parser.print_help()
