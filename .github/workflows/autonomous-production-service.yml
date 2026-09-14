@@ -24,7 +24,7 @@ concurrency:
 jobs:
   autonomous-service:
     if: github.event_name != 'issues' || (github.event.issue.pull_request == null && startsWith(github.event.issue.title, '[autonomous]'))
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
       - name: Checkout current main revision
