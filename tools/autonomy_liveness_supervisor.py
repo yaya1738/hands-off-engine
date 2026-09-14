@@ -11,6 +11,7 @@ from datetime import datetime, timezone
 REPO_ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(REPO_ROOT))
 
+from tools import factory_control_channel as control_channel
 from ai.factory.autonomous_objective_loop import FactoryAutonomousObjectiveLoop
 from ai.factory.authority_gateway import FactoryAuthorityGateway
 from ai.factory.runtime import FactoryRuntime
@@ -45,12 +46,6 @@ def utc_now() -> str:
 
 
 def _live_attestation(now: str) -> dict:
-    """Return an explicit runtime-liveness attestation for this executing cycle.
-
-    A converged objective is a healthy steady state, not dormancy.  Liveness is
-    established by the governed supervisor actually executing a cycle; it is not
-    inferred merely from source code or from the existence of a saved state file.
-    """
     now_dt = datetime.fromisoformat(now.replace("Z", "+00:00"))
     return {
         "active": True,
@@ -101,6 +96,48 @@ def _successful_objectives(repo_root: Path) -> set[str]:
     return completed
 
 
+def _sync_control_commands(repo_root: Path, queue: AutonomousTaskQueue) -> int:
+    """Promote durable external commands into the governed task queue once."""
+    commands_path = repo_root / "state" / "factory_control_commands.jsonl"
+    if not commands_path.exists():
+        return 0
+    existing = queue.get_all_tasks()
+    known = {
+        task.get("metadata", {}).get("control_command_id")
+        for task in existing
+        if isinstance(task, dict)
+    }
+    completed_path = repo_root / "state" / "autonomous_tasks_completed.jsonl"
+    if completed_path.exists():
+        for line in completed_path.read_text(encoding="utf-8").splitlines():
+            try:
+                record = json.loads(line)
+                known.add(record.get("task", {}).get("metadata", {}).get("control_command_id"))
+            except (TypeError, ValueError, json.JSONDecodeError):
+                continue
+    promoted = 0
+    for command in control_channel._read_jsonl(commands_path):
+        command_id = command.get("id")
+        objective = str(command.get("objective", "")).strip()
+        if not command_id or not objective or command_id in known:
+            continue
+        queue.add_task(
+            title=f"Control command: {objective}",
+            description=objective,
+            priority="high",
+            source=str(command.get("source", "external_control")),
+            metadata={
+                **(command.get("metadata") or {}),
+                "control_command_id": command_id,
+                "control_idempotency_key": command.get("idempotency_key"),
+                "authority": "FactoryAuthorityGateway",
+            },
+        )
+        known.add(command_id)
+        promoted += 1
+    return promoted
+
+
 def run_cycle(repo_root: Path) -> dict:
     cycle_started_at = utc_now()
     mission = _load_mission(repo_root)
@@ -116,6 +153,7 @@ def run_cycle(repo_root: Path) -> dict:
     if previous_error:
         gaps.insert(0, {"capability": "previous_cycle_repair", "component": previous_error})
     queue = AutonomousTaskQueue(repo_root)
+    control_promoted = _sync_control_commands(repo_root, queue)
     pending_task = queue.get_next_task()
     retired = _successful_objectives(repo_root)
     discovery_missing = discovery.get("missing", []) if isinstance(discovery, dict) else []
@@ -191,7 +229,7 @@ def run_cycle(repo_root: Path) -> dict:
 
     live_attestation = _live_attestation(cycle_started_at)
     operating_state = "live_steady_state" if no_actionable_work else "live_executing" if execution_observed else "live_degraded"
-    return {
+    state = {
         "timestamp": utc_now(),
         "status": "observed" if execution_observed else "idle" if no_actionable_work else "degraded",
         "mission": mission,
@@ -200,6 +238,7 @@ def run_cycle(repo_root: Path) -> dict:
         "task_queued": queued,
         "task_id": task_id,
         "external_task_processed": bool(pending_task),
+        "control_commands_promoted": control_promoted,
         "execution_observed": execution_observed,
         "verification_observed": verification_observed if execution_observed else no_actionable_work,
         "execution_succeeded": execution_succeeded,
@@ -210,6 +249,24 @@ def run_cycle(repo_root: Path) -> dict:
         "claim_basis": "governed autonomous supervisor is actively executing a live cycle; convergence means healthy steady state, not dormancy",
         "execution": execution,
     }
+    pending_count = len(queue.get_all_tasks())
+    objective = selected.get("objective") if isinstance(selected, dict) else None
+    result = execution.get("reason") if isinstance(execution, dict) else None
+    problem = None if execution_succeeded or no_actionable_work else result or mission.get("last_error")
+    control_channel.publish_state(
+        repo_root,
+        node_id=os.environ.get("FACTORY_NODE_ID", "hands-off-node-1"),
+        status=state["status"],
+        operating_state=operating_state,
+        objective=objective or mission.get("mission"),
+        last_action=objective,
+        last_result="succeeded" if execution_succeeded else result,
+        pending_commands=pending_count,
+        problem=problem,
+        next_action="continue governed cycle" if not no_actionable_work else "await next objective",
+        fresh_until=live_attestation["expires_at"],
+    )
+    return state
 
 
 def persist(repo_root: Path, state: dict) -> None:
@@ -232,6 +289,14 @@ def run_once(repo_root: Path) -> dict:
         state = {"timestamp": utc_now(), "status": "degraded", "error": str(exc), "live_system_active": False, "operating_state": "offline"}
     state["cycle_duration_seconds"] = round(time.monotonic() - started, 3)
     persist(repo_root, state)
+    control_channel.publish_state(
+        repo_root,
+        node_id=os.environ.get("FACTORY_NODE_ID", "hands-off-node-1"),
+        status=state.get("status", "degraded"),
+        operating_state=state.get("operating_state", "offline"),
+        problem=state.get("error"),
+        next_action="retry governed cycle" if state.get("status") == "degraded" else None,
+    )
     print(json.dumps(state, sort_keys=True), flush=True)
     return state
 
