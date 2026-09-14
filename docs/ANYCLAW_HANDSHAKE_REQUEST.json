@@ -1,0 +1,12 @@
+{
+  "protocol": "factory-anyclaw-v1",
+  "message_type": "coordination",
+  "from": "factory",
+  "to": "anyclaw",
+  "request": "runtime_identity_and_transport_discovery",
+  "objective": "Establish a durable bidirectional collaboration channel between the Factory and the AnyClaw runtime on the operator device.",
+  "return_only": ["runtime_identity", "transport_type", "repository_or_workspace_identity", "capability_summary"],
+  "do_not_return": ["credentials", "tokens", "api_keys", "oauth_material", "private_keys", "device_secrets"],
+  "execution_authority": "factory_governed_approval_required",
+  "next_step": "Respond with the runtime identity and transport using the repository collaboration surface."
+}
