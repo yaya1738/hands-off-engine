@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import signal
 import sys
 import time
@@ -102,11 +103,7 @@ def _sync_control_commands(repo_root: Path, queue: AutonomousTaskQueue) -> int:
     if not commands_path.exists():
         return 0
     existing = queue.get_all_tasks()
-    known = {
-        task.get("metadata", {}).get("control_command_id")
-        for task in existing
-        if isinstance(task, dict)
-    }
+    known = {task.get("metadata", {}).get("control_command_id") for task in existing if isinstance(task, dict)}
     completed_path = repo_root / "state" / "autonomous_tasks_completed.jsonl"
     if completed_path.exists():
         for line in completed_path.read_text(encoding="utf-8").splitlines():
@@ -175,7 +172,6 @@ def run_cycle(repo_root: Path) -> dict:
     execution_observed = False
     verification_observed = False
     execution_succeeded = False
-    converged = False
 
     if pending_task:
         objective = pending_task.get("description") or pending_task.get("title")
