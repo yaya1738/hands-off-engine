@@ -32,7 +32,7 @@ import logging
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
-from uuid import uuid4
+import hashlib
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -101,9 +101,14 @@ class ContinuationEmitter:
             correlation_id: Links related events (e.g., task_id from original task)
             is_wake: Override auto-detection of wake vs heartbeat
         """
-        event_id = str(uuid4())
+        # Deterministic event identity: derived from event type + correlation
+        # (not a random UUID before dedup) so identical events dedupe naturally.
+        correlation_key = correlation_id or (context or {}).get("task_id", "") or ""
+        identity_raw = f"{event_type}|{correlation_key}|{message}"
+        event_id = hashlib.sha256(identity_raw.encode("utf-8")).hexdigest()
+        event_id = event_id[:32]  # bounded length
 
-        # Dedup check
+        # Dedup check (deterministic: same event content -> same event_id)
         if event_id in self.emitted_ids:
             log.info(f"Dedup: event {event_id[:8]}... already emitted")
             return None
@@ -213,44 +218,14 @@ class ContinuationEmitter:
         return events[-limit:]
 
     def post_to_github_issue(self, event, issue_number=281):
-        """Post a continuation event as a GitHub issue comment."""
-        try:
-            import subprocess
-            token_file = Path.home() / "gh_token.txt"
-            if not token_file.exists():
-                token_file = Path("/tmp/gh_token.txt")
-            if not token_file.exists():
-                log.warning("No GitHub token available")
-                return False
+        """GitHub issue posting is DISABLED — coordination stays credential-free.
 
-            token = token_file.read_text().strip()
-            body = json.dumps({
-                "body": f"**[continuation-event]** `{event['event_type']}` "
-                        f"(wake={event['is_wake']})\n\n"
-                        f"{event['message']}\n\n"
-                        f"commit: `{event['commit']}` | "
-                        f"correlation: `{event.get('correlation_id', 'none')}` | "
-                        f"time: {event['timestamp'][:19]}"
-            })
-
-            result = subprocess.run(
-                ["curl", "-s", "-X", "POST",
-                 "-H", f"Authorization: token {token}",
-                 "-H", "Content-Type: application/json",
-                 "-d", body,
-                 f"https://api.github.com/repos/yaya1738/hands-off-engine/issues/{issue_number}/comments"],
-                capture_output=True, text=True, timeout=15
-            )
-            resp = json.loads(result.stdout)
-            if "id" in resp:
-                log.info(f"Posted event to GitHub issue #{issue_number}")
-                return True
-            else:
-                log.warning(f"GitHub post failed: {resp.get('message', 'unknown')}")
-                return False
-        except Exception as e:
-            log.error(f"GitHub post error: {e}")
-            return False
+        Factory round 12: remove/disable the direct GitHub-token posting path.
+        Continuation events reach Factory via the canonical coordination bus
+        (ai/coordination/messages.jsonl) and state/continuation_events.jsonl.
+        """
+        log.info("GitHub-token posting disabled (credential-free coordination)")
+        return False
 
     def _write_event(self, event):
         try:
@@ -292,7 +267,6 @@ if __name__ == "__main__":
     emit_p.add_argument("type", help="Event type")
     emit_p.add_argument("message", help="Event message")
     emit_p.add_argument("--correlation", help="Correlation ID")
-    emit_p.add_argument("--github", action="store_true", help="Also post to GitHub issue")
 
     sub.add_parser("events", help="Show recent events")
 
@@ -301,8 +275,6 @@ if __name__ == "__main__":
 
     if args.cmd == "emit":
         event = emitter.emit(args.type, args.message, correlation_id=args.correlation)
-        if event and args.github:
-            emitter.post_to_github_issue(event)
         print(json.dumps(event, indent=2) if event else "Deduped")
     elif args.cmd == "events":
         for e in emitter.get_recent_events(20):

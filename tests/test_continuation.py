@@ -70,3 +70,37 @@ def test_wake_event_filtering():
     wake = e.get_recent_events(10, wake_only=True)
     assert all(ev["is_wake"] for ev in wake)
     assert len(wake) == 2
+
+
+def test_deterministic_dedup_same_event():
+    """Same event content → same deterministic event_id → deduped."""
+    import scripts.continuation as c
+    e = _make_emitter()
+    ev1 = e.emit_task_completed("t-det", "ok", "same result")
+    # Second emit with identical params produces same event_id → deduped
+    ev2 = e.emit_task_completed("t-det", "ok", "same result")
+    assert ev2 is None, "Identical event should be deduped"
+    assert ev1["event_id"] == ev1["event_id"]
+    # 32-char hex (128 bits)
+    assert len(ev1["event_id"]) == 32
+
+
+def test_different_content_different_id():
+    """Different event content produces different event ids."""
+    e = _make_emitter()
+    ev1 = e.emit_task_completed("t-a", "ok", "result A")
+    ev2 = e.emit_task_completed("t-b", "ok", "result B")
+    assert ev1["event_id"] != ev2["event_id"]
+
+
+def test_github_posting_disabled():
+    """Continuation emitter must NOT post via GitHub token (credential-free)."""
+    import scripts.continuation as c
+    e = _make_emitter()
+    event = e.emit_task_completed("t-gh", "ok", "test")
+    result = e.post_to_github_issue(event, issue_number=281)
+    assert result is False
+    # Ensure no token file is referenced
+    source = Path(c.__file__).read_text()
+    assert "gh_token.txt" not in source
+    assert "Authorization: token" not in source
