@@ -4,6 +4,10 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from autonomous.governed_authority import authorize
+try:
+    from scripts.comm_hub import CommHub
+except ImportError:
+    CommHub = None
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [SystemListener] %(message)s')
 log = logging.getLogger("SystemListener")
@@ -74,6 +78,17 @@ def process_command(cmd):
     return handler(cmd)
 
 
+def proactive_notify():
+    """Push proactive alerts about system state that needs attention."""
+    if CommHub is None:
+        return
+    try:
+        hub = CommHub()
+        hub.check_and_notify()
+    except Exception as e:
+        log.error(f"Proactive notify failed: {e}")
+
+
 if __name__ == "__main__":
     while True:
         try:
@@ -122,6 +137,7 @@ if __name__ == "__main__":
                     except Exception as e:
                         log.error(f"Failed {cmd_id}: {e}")
 
+            proactive_notify()
             time.sleep(5)
         except Exception as e:
             log.error(f"Error: {e}")
