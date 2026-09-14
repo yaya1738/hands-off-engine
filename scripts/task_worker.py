@@ -227,6 +227,34 @@ def process_task(task):
     }
 
 
+def _publish_result_to_bus(result):
+    """Publish one task_result to the canonical bus, idempotently by task_id."""
+    task_id = (result.get("context") or {}).get("task_id") or result.get("msg_id")
+    if not task_id:
+        raise ValueError("task_result missing task_id")
+    COORDINATION_BUS.parent.mkdir(parents=True, exist_ok=True)
+    existing_ids = set()
+    if COORDINATION_BUS.exists():
+        with COORDINATION_BUS.open("r") as handle:
+            for line in handle:
+                if not line.strip():
+                    continue
+                try:
+                    message = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                context = message.get("context") or {}
+                if message.get("type") == "task_result":
+                    existing = context.get("task_id") or message.get("msg_id")
+                    if existing:
+                        existing_ids.add(existing)
+    if task_id in existing_ids:
+        return False
+    with COORDINATION_BUS.open("a") as handle:
+        handle.write(json.dumps(result, default=str) + "\n")
+    return True
+
+
 def _load_result_ids():
     result_ids = set()
     if RESULTS.exists():
@@ -291,6 +319,7 @@ def poll_once():
             RESULTS.parent.mkdir(parents=True, exist_ok=True)
             with open(RESULTS, "a") as f:
                 f.write(json.dumps(result, default=str) + "\n")
+            _publish_result_to_bus(result)
             save_processed(processed)
             emitter = get_emitter()
             if emitter:
