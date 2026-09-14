@@ -181,6 +181,13 @@ class Node1Runtime:
             log.warning("factory_intake not available")
 
         try:
+            from scripts.factory_request_intake import RequestIntake
+            req_intake = RequestIntake(repo_root=REPO_ROOT)
+        except ImportError:
+            req_intake = None
+            log.warning("factory_request_intake not available")
+
+        try:
             from scripts.continuation import ContinuationEmitter
             emitter = ContinuationEmitter()
         except ImportError:
@@ -224,6 +231,18 @@ class Node1Runtime:
                             )
                     except Exception as e:
                         log.error(f"Factory intake error: {e}")
+
+                # 3b. Request intake (admission gate for AnyClaw->Factory task_requests)
+                if req_intake and tick % 3 == 0:
+                    try:
+                        req_decisions = req_intake.admit_once()
+                        if req_decisions:
+                            log.info(f"Request intake: {len(req_decisions)} admitted/rejected")
+                            self.state.data["request_intake_count"] = (
+                                self.state.data.get("request_intake_count", 0) + len(req_decisions)
+                            )
+                    except Exception as e:
+                        log.error(f"Request intake error: {e}")
 
                 # 4. Heartbeat (every 60s)
                 if time.time() - self.last_heartbeat >= 60:
