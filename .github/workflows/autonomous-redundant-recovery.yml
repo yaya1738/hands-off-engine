@@ -1,0 +1,62 @@
+name: Autonomous Redundant Recovery
+
+on:
+  schedule:
+    - cron: "3,33 * * * *"
+  workflow_dispatch:
+  issues:
+    types: [opened, edited, reopened]
+
+permissions:
+  contents: read
+  issues: read
+
+concurrency:
+  group: autonomous-production-authority
+  cancel-in-progress: false
+
+jobs:
+  redundant-authority:
+    if: github.event_name != 'issues' || startsWith(github.event.issue.title, '[autonomous]') || startsWith(github.event.issue.title, '[factory-control]')
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    steps:
+      - name: Checkout exact main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run redundant governed entrypoint
+        env:
+          FACTORY_NODE_ID: github-redundant-node
+        run: python tools/autonomous_redundant_entrypoint.py
+
+      - name: Verify bounded live state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          state = json.loads(Path('state/autonomy_liveness.json').read_text())
+          if state.get('live_system_active') is not True:
+              raise SystemExit('redundant route did not establish fresh live state')
+          if state.get('execution_backend') not in {'integrated', 'liveness_fallback'}:
+              raise SystemExit('unknown execution backend')
+          print(json.dumps({
+              'backend': state['execution_backend'],
+              'operating_state': state.get('operating_state'),
+              'execution_succeeded': state.get('execution_succeeded'),
+          }, sort_keys=True))
+
+      - name: Upload bounded evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: redundant-autonomous-cycle-evidence
+          path: |
+            state/autonomy_liveness.json
+            state/autonomy_mission.json
+            state/dass_phase.json
+          if-no-files-found: ignore
