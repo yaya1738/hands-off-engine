@@ -19,10 +19,12 @@ CYCLE_LOG = STATE / "improvement_cycles.json"
 
 
 def run_subprocess(script):
-    """Run a script and return its output."""
+    """Run a script and return its output. Supports 'script.py arg1 arg2' format."""
+    parts = script.split()
     try:
+        cmd = [sys.executable, str(ROOT / "scripts" / parts[0])] + parts[1:]
         r = subprocess.run(
-            [sys.executable, str(ROOT / "scripts" / script)],
+            cmd,
             capture_output=True, text=True, cwd=str(ROOT), timeout=30
         )
         return {"success": r.returncode == 0, "output": (r.stdout + r.stderr).strip()}
