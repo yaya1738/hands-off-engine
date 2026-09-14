@@ -9,7 +9,7 @@ on:
 
 permissions:
   contents: read
-  issues: read
+  issues: write
 
 concurrency:
   group: autonomous-production-authority
@@ -29,6 +29,12 @@ jobs:
 
       - name: Install dependencies
         run: python -m pip install -r requirements.txt
+
+      - name: Ingest authenticated GitHub control requests
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: python tools/github_issue_autonomous_ingress.py
 
       - name: Run redundant governed entrypoint
         env:
