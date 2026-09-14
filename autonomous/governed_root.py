@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Fail-closed long-running root for the autonomous lifecycle.
 
-The root is the durable authority-observation boundary.  It classifies queued
+The root is the durable authority-observation boundary. It classifies queued
 commands through governed_authority and records the latest decision without
 ever granting executor authority.
 """
@@ -98,29 +98,36 @@ def record_decisions():
     return decisions
 
 
-signal.signal(signal.SIGTERM, handle_stop)
-signal.signal(signal.SIGINT, handle_stop)
-signal.signal(signal.SIGHUP, signal.SIG_IGN)
-STATE.mkdir(parents=True, exist_ok=True)
+def run_forever():
+    global stop
+    stop = False
+    signal.signal(signal.SIGTERM, handle_stop)
+    signal.signal(signal.SIGINT, handle_stop)
+    signal.signal(signal.SIGHUP, signal.SIG_IGN)
+    STATE.mkdir(parents=True, exist_ok=True)
 
-while not stop:
-    decisions = record_decisions()
-    pending_commands_count, pending_approvals = queue_counts()
+    while not stop:
+        decisions = record_decisions()
+        pending_commands_count, pending_approvals = queue_counts()
+        STATUS.write_text(json.dumps({
+            "status": "running",
+            "authority": "governed_authority",
+            "execution_enabled": False,
+            "pending_commands": pending_commands_count,
+            "pending_approvals": pending_approvals,
+            "governed_decisions": len(decisions),
+            "hostname": socket.gethostname(),
+            "pid": os.getpid(),
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }, indent=2) + "\n")
+        time.sleep(10)
+
     STATUS.write_text(json.dumps({
-        "status": "running",
+        "status": "stopped",
         "authority": "governed_authority",
         "execution_enabled": False,
-        "pending_commands": pending_commands_count,
-        "pending_approvals": pending_approvals,
-        "governed_decisions": len(decisions),
-        "hostname": socket.gethostname(),
-        "pid": os.getpid(),
-        "timestamp": datetime.now(timezone.utc).isoformat(),
     }, indent=2) + "\n")
-    time.sleep(10)
 
-STATUS.write_text(json.dumps({
-    "status": "stopped",
-    "authority": "governed_authority",
-    "execution_enabled": False,
-}, indent=2) + "\n")
+
+if __name__ == "__main__":
+    run_forever()
