@@ -124,7 +124,7 @@ def test_duplicate_delivery_safety():
     tmp = Path(tempfile.mkdtemp())
     try:
         # Set up temp paths
-        w.INBOX = tmp / "inbox.jsonl"
+        w.COORDINATION_BUS = tmp / "inbox.jsonl"
         w.RESULTS = tmp / "results.jsonl"
         w.PROCESSED_IDS = tmp / "processed.json"
         w.LOCK_DIR = tmp / "locks"
@@ -135,7 +135,7 @@ def test_duplicate_delivery_safety():
             "to": "anyclaw", "message": "test",
             "context": {"task_id": "dup-1", "action": "health_check"}
         }) + "\n"
-        w.INBOX.write_text(task + task)
+        w.COORDINATION_BUS.write_text(task + task)
 
         count = w.poll_once()
         assert count == 1, f"Should process once, got {count}"
@@ -231,7 +231,7 @@ def test_crash_recovery_reuses_existing_result():
     w = _fresh_worker()
     tmp = Path(tempfile.mkdtemp())
     try:
-        w.INBOX = tmp / "inbox.jsonl"
+        w.COORDINATION_BUS = tmp / "inbox.jsonl"
         w.RESULTS = tmp / "results.jsonl"
         w.PROCESSED_IDS = tmp / "processed.json"
         w.LOCK_DIR = tmp / "locks"
@@ -242,7 +242,7 @@ def test_crash_recovery_reuses_existing_result():
             "to": "anyclaw", "message": "test",
             "context": {"task_id": "crash-1", "action": "health_check"}
         })
-        w.INBOX.write_text(task + "\n")
+        w.COORDINATION_BUS.write_text(task + "\n")
 
         # Simulate: result already written (crash recovery scenario)
         result_line = json.dumps({
