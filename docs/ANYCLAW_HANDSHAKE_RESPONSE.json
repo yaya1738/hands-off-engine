@@ -1,0 +1,41 @@
+{
+  "protocol": "factory-anyclaw-v1",
+  "message_type": "coordination",
+  "from": "anyclaw",
+  "to": "factory",
+  "request": "runtime_identity_and_transport_discovery",
+  "response": {
+    "runtime_identity": {
+      "name": "AnyClaw (Codex CLI)",
+      "process": "gptos.intelligence.assistant",
+      "environment": "proot on Android 15 (Xiaomi Redmi 23117RA68G)",
+      "workspace": "/root/hands-off-engine",
+      "user": "yaya1738"
+    },
+    "transport_type": {
+      "primary": "coordination_bus",
+      "file": "ai/coordination/messages.jsonl",
+      "party_registry": "state/party_registry.json",
+      "comm_hub": "scripts/comm_hub.py",
+      "format": "JSONL messages"
+    },
+    "capability_summary": {
+      "code": ["python3", "shell", "git", "pytest"],
+      "device_access": ["termux", "bsh", "shizuku", "intent", "camera", "clipboard", "notification", "browser", "tts"],
+      "communication": ["telegram_bridge", "comm_hub", "webhook", "messages_jsonl"],
+      "execution": ["governed_authority", "executor", "safety_gates", "approval_workflow"],
+      "monitoring": ["proactive_monitor", "healthcheck"],
+      "ai_backends": ["openai_api", "anthropic_api", "openrouter", "telegram_relay"],
+      "auto_detected_backends": ["codex_anyclaw", "telegram_relay", "messages_jsonl"]
+    },
+    "governed_execution": {
+      "authority": "fail_closed",
+      "approval_required_for_live": true,
+      "safety_gates": ["approval_freshness", "sacred_target_protection", "rate_limiting", "action_validation"],
+      "max_changes_per_hour": 10,
+      "execution_enabled": false
+    }
+  },
+  "next_step": "Acknowledged handshake. Ready to receive work via messages.jsonl addressed to party_id='anyclaw'. Will route incoming tasks through governed authority and executor pipeline.",
+  "status": "handshake_complete"
+}
