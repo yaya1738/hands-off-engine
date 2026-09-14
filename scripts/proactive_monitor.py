@@ -64,9 +64,17 @@ class ProactiveMonitor:
         self.alert_cooldowns[alert_key] = now
         return True
 
+    # Only these alert types reach the operator. Everything else is logged silently.
+    CRITICAL_ALERTS = {"approval_needed", "error", "trade_alert", "system_down"}
+
     def _send_alert(self, alert_type, payload, alert_key=None):
-        """Send alert through CommHub to operator."""
+        """Send alert through CommHub — only CRITICAL alerts reach the operator."""
         if not self._can_alert(alert_key or alert_type):
+            return False
+        # Filter: only truly important things bother Yair
+        severity = payload.get("severity", "normal")
+        if severity != "critical" and alert_type not in self.CRITICAL_ALERTS:
+            log.info(f"Alert suppressed (not critical): {alert_type}")
             return False
         try:
             from scripts.comm_hub import CommHub
