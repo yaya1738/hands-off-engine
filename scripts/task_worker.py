@@ -22,6 +22,11 @@ from datetime import datetime, timezone
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+try:
+    from scripts.continuation import ContinuationEmitter
+except ImportError:
+    ContinuationEmitter = None
+
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [TaskWorker] %(message)s')
 log = logging.getLogger("TaskWorker")
 
@@ -30,6 +35,14 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 INBOX = REPO_ROOT / "ai" / "tasks" / "inbox.jsonl"
 RESULTS = REPO_ROOT / "ai" / "tasks" / "results.jsonl"
 LOCK_DIR = REPO_ROOT / "state" / "task_locks"
+
+# Continuation event emitter
+_emitter = None
+def get_emitter():
+    global _emitter
+    if _emitter is None and ContinuationEmitter is not None:
+        _emitter = ContinuationEmitter()
+    return _emitter
 PROCESSED_IDS = REPO_ROOT / "state" / "processed_task_ids.json"
 
 # ── Invariant 3: Action allowlist — only these actions are accepted ──
@@ -278,6 +291,15 @@ def poll_once():
                     f.write(json.dumps(result, default=str) + "\n")
 
                 log.info(f"Completed task {task_id[:8]}... -> {result['context']['status']}")
+                # Emit continuation event
+                emitter = get_emitter()
+                if emitter:
+                    emitter.emit_task_completed(
+                        task_id=task_id,
+                        status=result['context']['status'],
+                        result_summary=str(result['context'].get('result', result['context'].get('error', '')))[:200],
+                        correlation_id=task.get('context', {}).get('reply_to'),
+                    )
                 count += 1
             finally:
                 lock.release()
