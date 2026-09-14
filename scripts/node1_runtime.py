@@ -7,6 +7,7 @@ It runs all core services as a single supervised process:
 - Task worker: polls inbox, processes tasks, emits continuation events
 - Event router: reads messages.jsonl, routes events between parties
 - Factory intake: consumes continuation events, produces next tasks
+- Lifecycle projector: materializes durable task state from the canonical bus
 
 Design:
 - Durable: state persists across restarts (crash-safe)
@@ -49,11 +50,10 @@ logging.basicConfig(
 )
 log = logging.getLogger("Node1")
 
-# Node identity
 NODE_ID = "node-1"
 NODE_NAME = "Yair Phone (Xiaomi Redmi)"
 NODE_DEVICE = "Xiaomi Redmi 23117RA68G / Android 15 / proot"
-NODE_PARTY = "anyclaw"  # maps to the anyclaw party on the coordination bus
+NODE_PARTY = "anyclaw"
 
 
 class NodeLock:
@@ -159,7 +159,6 @@ class Node1Runtime:
         signal.signal(signal.SIGTERM, self._signal)
         signal.signal(signal.SIGINT, self._signal)
 
-        # Lazy imports to avoid circular deps
         try:
             from scripts.task_worker import poll_once
         except ImportError:
@@ -186,13 +185,14 @@ class Node1Runtime:
         except ImportError:
             req_intake = None
             log.warning("factory_request_intake not available")
+
         try:
             from scripts.improvement_applier import ImprovementApplier
             applier = ImprovementApplier(repo_root=REPO_ROOT)
         except ImportError:
             applier = None
             log.warning("improvement_applier not available")
-        
+
         try:
             from scripts.self_improvement import generate_improvements, save_improvements
         except ImportError:
@@ -206,11 +206,16 @@ class Node1Runtime:
             emitter = None
             log.warning("continuation emitter not available")
 
-        # Main loop: 10s tick
+        try:
+            from scripts.lifecycle_projection import LifecycleProjector
+            projector = LifecycleProjector(repo_root=REPO_ROOT)
+        except ImportError:
+            projector = None
+            log.warning("lifecycle_projection not available")
+
         tick = 0
         while self.running:
             try:
-                # 1. Poll task worker (process inbox)
                 if poll_once:
                     try:
                         count = poll_once()
@@ -220,7 +225,6 @@ class Node1Runtime:
                     except Exception as e:
                         log.error(f"Task worker error: {e}")
 
-                # 2. Event router (read messages, route)
                 if router:
                     try:
                         count = router.process_once()
@@ -232,8 +236,17 @@ class Node1Runtime:
                     except Exception as e:
                         log.error(f"Event router error: {e}")
 
-                # 3. Factory intake (consume continuation events, emit next task)
-                if intake and tick % 3 == 0:  # every 30s to avoid rapid looping
+                # Rebuild the machine-readable lifecycle view from the canonical bus.
+                # This is observation-only: it does not create a second transport.
+                if projector and tick % 3 == 0:
+                    try:
+                        projection = projector.project()
+                        self.state.data["lifecycle_tasks"] = projection["tasks"]
+                        self.state.data["lifecycle_last_changed"] = projection["changed"]
+                    except Exception as e:
+                        log.error(f"Lifecycle projection error: {e}")
+
+                if intake and tick % 3 == 0:
                     try:
                         decisions = intake.intake_once()
                         if decisions:
@@ -244,7 +257,6 @@ class Node1Runtime:
                     except Exception as e:
                         log.error(f"Factory intake error: {e}")
 
-                # 3b. Request intake (admission gate for AnyClaw->Factory task_requests)
                 if req_intake and tick % 3 == 0:
                     try:
                         req_decisions = req_intake.admit_once()
@@ -256,14 +268,11 @@ class Node1Runtime:
                     except Exception as e:
                         log.error(f"Request intake error: {e}")
 
-                # 3c. Improvement applier (every 5 minutes, tick % 30)
                 if applier and tick % 30 == 0:
                     try:
-                        # Generate improvement candidates
                         if generate_improvements:
                             candidates = generate_improvements()
                             save_improvements(candidates)
-                            # Apply safe ones
                             results = applier.apply_batch(candidates)
                             applied = sum(1 for r in results if r.get("applied"))
                             if applied:
@@ -274,7 +283,6 @@ class Node1Runtime:
                     except Exception as e:
                         log.error(f"Improvement applier error: {e}")
 
-                # 3d. Feedback analysis (every 10 minutes, tick % 60)
                 if tick % 60 == 0:
                     try:
                         from scripts.improvement_feedback import analyze_feedback
@@ -282,12 +290,10 @@ class Node1Runtime:
                     except Exception as e:
                         log.error(f"Feedback analysis error: {e}")
 
-                # 4. Heartbeat (every 60s)
                 if time.time() - self.last_heartbeat >= 60:
                     self.state.record_heartbeat()
                     self.last_heartbeat = time.time()
 
-                # 5. Emit heartbeat event (every 5 min, non-wake)
                 if emitter and tick % 30 == 0:
                     try:
                         emitter.emit_heartbeat(
@@ -340,10 +346,6 @@ if __name__ == "__main__":
             pid = int(NODE_PID.read_text().strip())
             try:
                 os.kill(pid, signal.SIGTERM)
-                print(f"Sent SIGTERM to Node 1 (pid={pid})")
             except ProcessLookupError:
-                print(f"Node 1 not running (stale pid={pid})")
-        else:
-            print("Node 1 is not running")
-    else:
-        parser.print_help()
+                NODE_PID.unlink(missing_ok=True)
+                NODE_LOCK.unlink(missing_ok=True)
