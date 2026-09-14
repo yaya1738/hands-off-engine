@@ -19,11 +19,11 @@ def process_command(cmd):
         "status": lambda c: {"action": "status", "timestamp": datetime.now(timezone.utc).isoformat()},
         "pause": lambda c: {"action": "pause", "message": "System paused", "timestamp": datetime.now(timezone.utc).isoformat()},
         "resume": lambda c: {"action": "resume", "message": "System resumed", "timestamp": datetime.now(timezone.utc).isoformat()},
-        "execute": lambda c: {"action": "execute", "message": "Action queued", "timestamp": datetime.now(timezone.utc).isoformat()},
+        "execute": lambda c: {"action": "execute", "error": "No governed execution authority is bound", "command_status": "failed", "timestamp": datetime.now(timezone.utc).isoformat()},
         "adjust": lambda c: {"action": "adjust", "message": "Parameter adjusted", "timestamp": datetime.now(timezone.utc).isoformat()}
     }
     
-    handler = handlers.get(action, lambda c: {"error": f"Unknown action: {action}", "timestamp": datetime.now(timezone.utc).isoformat()})
+    handler = handlers.get(action, lambda c: {"error": f"Unknown action: {action}", "command_status": "failed", "timestamp": datetime.now(timezone.utc).isoformat()})
     return handler(cmd)
 
 while True:
@@ -49,9 +49,10 @@ while True:
                 cmd_id = cmd.get("id", "unknown")
                 try:
                     result = process_command(cmd)
+                    command_status = result.pop("command_status", "completed")
                     
                     with open(RESULTS_FILE, "a") as f:
-                        f.write(json.dumps({"id": cmd_id, "status": "completed", "result": result, "timestamp": datetime.now(timezone.utc).isoformat()}) + "\n")
+                        f.write(json.dumps({"id": cmd_id, "status": command_status, "result": result, "timestamp": datetime.now(timezone.utc).isoformat()}) + "\n")
                     
                     new_lines = []
                     for line in lines:
@@ -59,7 +60,7 @@ while True:
                             try:
                                 d = json.loads(line)
                                 if d.get("id") == cmd_id:
-                                    d["status"] = "completed"
+                                    d["status"] = command_status
                                     d["result"] = result
                                 new_lines.append(json.dumps(d) + "\n")
                             except:
@@ -68,7 +69,7 @@ while True:
                     with open(QUEUE_FILE, "w") as f:
                         f.writelines(new_lines)
                     
-                    log.info(f"Completed: {cmd_id}")
+                    log.info(f"Finished: {cmd_id} ({command_status})")
                 except Exception as e:
                     log.error(f"Failed {cmd_id}: {e}")
         
