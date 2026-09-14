@@ -63,6 +63,31 @@ def process_task(task):
             from scripts.ai_connector import AIConnector
             ai = AIConnector()
             result = {"status": "success", "result": ai.list_backends()}
+        elif action == "read_file_fact":
+            file_path = params.get("file_path", "")
+            full_path = REPO_ROOT / file_path
+            result_data = {"file_path": file_path, "file_exists": full_path.exists()}
+            if full_path.exists():
+                result_data["file_size_bytes"] = full_path.stat().st_size
+                try:
+                    content = full_path.read_text()[:5000]
+                    result_data["content_preview"] = content[:200]
+                    # Try to extract a fact from the file
+                    fact_q = params.get("fact", "")
+                    import re
+                    # Simple JSON key search
+                    if "runtime identity" in fact_q.lower() or "name" in fact_q.lower():
+                        try:
+                            data = json.loads(content)
+                            ri = data.get("runtime_identity", data.get("response", {}).get("runtime_identity", {}))
+                            result_data["fact_answer"] = ri.get("name", "unknown")
+                        except Exception:
+                            result_data["fact_answer"] = "Could not parse JSON"
+                    else:
+                        result_data["fact_answer"] = content[:100]
+                except Exception:
+                    result_data["fact_answer"] = "Could not read file"
+            result = {"status": "success", "result": result_data}
         elif action == "list_parties":
             from scripts.comm_hub import CommHub
             hub = CommHub()
