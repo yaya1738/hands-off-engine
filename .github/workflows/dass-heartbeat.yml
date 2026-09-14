@@ -1,0 +1,29 @@
+name: DASS Autonomous Heartbeat
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/15 * * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  heartbeat:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Run bounded fail-closed heartbeat
+        run: python3 -m autonomous.dass_heartbeat
+      - name: Verify fail-closed result
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          status = json.loads(Path("state/dass_heartbeat_status.json").read_text())
+          assert status["status"] == "completed"
+          assert status["fail_closed"] is True
+          assert status["execution_enabled"] is False
+          PY
