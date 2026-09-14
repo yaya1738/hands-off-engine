@@ -70,7 +70,7 @@ def candidate_id(category, title, description):
 # Category → safe action mapping for the improvement applier
 ACTION_MAP = {
     "reliability": "log_analysis",
-    "quality": "generate_report",
+    "quality": "add_test",
     "maintenance": "clean_bus",
     "usability": "fix_config",
     "security": "log_analysis",
@@ -122,6 +122,19 @@ def generate_improvements():
             "reliability", "Investigate health failures",
             f"{health['issues']} health issues in last {health['checks']} checks. Review health_log.jsonl for patterns.",
             priority))
+
+    # Test coverage: add tests for untested modules
+    scripts_dir = ROOT / "scripts"
+    tests_dir = ROOT / "tests"
+    if scripts_dir.exists() and tests_dir.exists():
+        existing_tests = {f.stem.replace("test_", "") for f in tests_dir.glob("test_*.py")}
+        untested = [f.stem for f in scripts_dir.glob("*.py")
+                    if f.stem not in existing_tests and not f.stem.startswith("_")]
+        if untested:
+            improvements.append(_candidate(
+                "quality", f"Add tests for {len(untested)} untested modules",
+                f"{len(untested)} modules lack test coverage (e.g., {untested[0]}). Generate basic test stubs.",
+                "medium"))
 
     rate = patterns.get("success_rate", 1.0)
     if rate < 0.8 and patterns.get("total_tasks", 0) > 0:

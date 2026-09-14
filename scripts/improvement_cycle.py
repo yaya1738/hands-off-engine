@@ -54,6 +54,9 @@ def main():
     # 6. Feedback analysis (measure improvement impact)
     feedback = run_subprocess("improvement_feedback.py analyze")
     
+    # 7. Approval check (notify operator of pending risky improvements)
+    approval = run_subprocess("improvement_approval.py check")
+    
     # Load results
     cycle_result = {
         "timestamp": now,
@@ -63,6 +66,7 @@ def main():
         "integrity": integrity["success"],
         "applier": applier["success"],
         "feedback": feedback["success"],
+        "approval": approval["success"],
     }
     
     # Save cycle history

@@ -157,6 +157,25 @@ def test_fix_config():
         _teardown(applier)
 
 
+def test_add_test():
+    """add_test creates a test stub for untested modules."""
+    applier = _make_applier()
+    try:
+        # Create a fake untested module
+        scripts_dir = applier._tmp / "scripts"
+        scripts_dir.mkdir()
+        (scripts_dir / "fake_module.py").write_text("# fake module")
+        imp = {"id": "test-addtest-1", "category": "quality", "title": "Add tests",
+               "description": "Generate test stubs", "action": "add_test"}
+        result = applier.apply_improvement(imp)
+        assert result["applied"] is True
+        test_file = applier._tmp / "tests" / "test_fake_module.py"
+        assert test_file.exists()
+        assert "fake_module" in test_file.read_text()
+    finally:
+        _teardown(applier)
+
+
 def test_risky_action_queued():
     """Risky actions are queued for approval, not executed."""
     applier = _make_applier()

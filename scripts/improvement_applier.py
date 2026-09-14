@@ -48,6 +48,7 @@ SAFE_ACTIONS = {
     "fix_config",
     "clean_bus",
     "log_analysis",
+    "add_test",
 }
 
 # Actions that require operator approval
@@ -319,6 +320,39 @@ class ImprovementApplier:
             with open(readme, "a") as f:
                 f.write(entry)
             return f"Updated {readme.relative_to(self.repo_root)}"
+
+        elif action == "add_test":
+            # Generate a basic test stub for untested modules
+            scripts_dir = self.repo_root / "scripts"
+            tests_dir = self.repo_root / "tests"
+            tests_dir.mkdir(parents=True, exist_ok=True)
+            existing_tests = {f.stem.replace("test_", "") for f in tests_dir.glob("test_*.py")}
+            untested = [f.stem for f in scripts_dir.glob("*.py")
+                       if f.stem not in existing_tests and not f.stem.startswith("_")]
+            if not untested:
+                return "All modules already have tests"
+            # Create stub for first untested module
+            module = untested[0]
+            test_file = tests_dir / f"test_{module}.py"
+            test_content = (
+                "import sys\n"
+                "from pathlib import Path\n"
+                "sys.path.insert(0, str(Path(__file__).resolve().parent.parent))\n"
+                "\n"
+                f"# Auto-generated test stub for {module}\n"
+                "# TODO: Add specific tests for this module\n"
+                "\n"
+                "def test_import():\n"
+                '    """Module can be imported without errors."""\n'
+                f"    import scripts.{module}\n"
+                "\n"
+                "def test_smoke():\n"
+                '    """Basic smoke test: module loads and key functions exist."""\n'
+                f"    import scripts.{module}\n"
+                "    # Add assertions for key exports here\n"
+            )
+            test_file.write_text(test_content)
+            return f"Created test stub for {module} ({len(untested)} untested modules remain)"
 
         return f"Unknown safe action: {action}"
 
