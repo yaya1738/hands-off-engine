@@ -2,8 +2,7 @@ name: Autonomous Hosted Production Service
 
 on:
   push:
-    paths-ignore:
-      - "state/**"
+    branches: [main]
   schedule:
     - cron: "*/5 * * * *"
   workflow_dispatch:
