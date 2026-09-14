@@ -1,18 +1,22 @@
 #!/usr/bin/env python3
 """
-Task Worker — picks up tasks from inbox, processes them, writes results.
+Task Worker — hardened bidirectional protocol between Factory and AnyClaw.
 
-This is the concrete bidirectional protocol between Factory and AnyClaw:
-  Factory appends to ai/tasks/inbox.jsonl  (commit to main)
-  AnyClaw polls inbox, processes, appends to ai/tasks/results.jsonl (commit to main)
-  Factory polls results.jsonl for its task_id
+Security invariants enforced:
+1. Repo root derived from actual checkout, not hardcoded path
+2. read_file_fact rejects absolute paths, .. traversal, symlink escapes
+3. Task envelope validated against action allowlist
+4. No git push — result publication does not bypass Factory authority
+5. Atomic claim/lock prevents duplicate task re-execution
+6. No secrets exposed, no live/protected execution enabled
 """
 
 import json
 import sys
+import os
 import time
+import fcntl
 import logging
-import subprocess
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -21,19 +25,31 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [TaskWorker] %(message)s')
 log = logging.getLogger("TaskWorker")
 
-REPO_ROOT = Path.home() / "hands-off-engine"
-# Allowed directories for read operations (prevents path traversal)
-SAFE_READ_DIRS = [
+# ── Invariant 1: Derive repo root from actual checkout ──
+REPO_ROOT = Path(__file__).resolve().parent.parent
+INBOX = REPO_ROOT / "ai" / "tasks" / "inbox.jsonl"
+RESULTS = REPO_ROOT / "ai" / "tasks" / "results.jsonl"
+LOCK_DIR = REPO_ROOT / "state" / "task_locks"
+PROCESSED_IDS = REPO_ROOT / "state" / "processed_task_ids.json"
+
+# ── Invariant 3: Action allowlist — only these actions are accepted ──
+ALLOWED_ACTIONS = frozenset({
+    "health_check",
+    "system_status",
+    "read_file_fact",
+    "list_backends",
+    "list_parties",
+})
+
+# ── Invariant 2: Safe read directories (no symlink escapes, no ..) ──
+SAFE_READ_DIRS = frozenset({
     REPO_ROOT / "docs",
     REPO_ROOT / "ai",
     REPO_ROOT / "state",
     REPO_ROOT / "scripts",
     REPO_ROOT / "tests",
-]
-
-INBOX = REPO_ROOT / "ai" / "tasks" / "inbox.jsonl"
-RESULTS = REPO_ROOT / "ai" / "tasks" / "results.jsonl"
-PROCESSED_IDS = REPO_ROOT / "state" / "processed_task_ids.json"
+    REPO_ROOT / "config",
+})
 
 
 def load_processed():
@@ -46,7 +62,109 @@ def load_processed():
 
 
 def save_processed(ids):
-    PROCESSED_IDS.write_text(json.dumps(list(ids)))
+    PROCESSED_IDS.write_text(json.dumps(sorted(ids)))
+
+
+# ── Invariant 5: Atomic claim/lock per task_id ──
+class TaskLock:
+    """File-based lock to prevent duplicate task re-execution."""
+
+    def __init__(self, task_id):
+        self.lock_dir = LOCK_DIR
+        self.lock_dir.mkdir(parents=True, exist_ok=True)
+        self.lock_path = self.lock_dir / f"{task_id}.lock"
+        self.fd = None
+
+    def try_acquire(self):
+        try:
+            self.fd = open(self.lock_path, "w")
+            fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+            self.fd.write(str(os.getpid()))
+            self.fd.flush()
+            return True
+        except (IOError, OSError):
+            if self.fd:
+                self.fd.close()
+                self.fd = None
+            return False
+
+    def release(self):
+        if self.fd:
+            try:
+                fcntl.flock(self.fd, fcntl.LOCK_UN)
+                self.fd.close()
+            except Exception:
+                pass
+        try:
+            self.lock_path.unlink(missing_ok=True)
+        except Exception:
+            pass
+
+
+# ── Invariant 2: Path safety ──
+def safe_resolve(file_path):
+    """Resolve a file path safely — reject absolute, .., and symlink escapes."""
+    if not file_path or not isinstance(file_path, str):
+        return None, "empty path"
+
+    # Reject absolute paths
+    if os.path.isabs(file_path):
+        return None, f"absolute path rejected: {file_path}"
+
+    # Reject .. traversal
+    if ".." in file_path.split("/") or ".." in file_path.split(os.sep):
+        return None, f".. traversal rejected: {file_path}"
+
+    # Resolve and check it stays within a safe dir
+    try:
+        resolved = (REPO_ROOT / file_path).resolve()
+    except Exception as e:
+        return None, f"resolution failed: {e}"
+
+    # Must be under one of SAFE_READ_DIRS (after resolving symlinks)
+    in_safe = any(
+        str(resolved).startswith(str(d.resolve()))
+        for d in SAFE_READ_DIRS
+    )
+    if not in_safe:
+        return None, f"path outside safe directories: {file_path} -> {resolved}"
+
+    # Reject if the path itself is a symlink (escape check)
+    try:
+        if resolved.is_symlink():
+            return None, f"symlink rejected: {file_path}"
+    except Exception:
+        pass
+
+    return resolved, None
+
+
+# ── Invariant 3: Task envelope validation ──
+def validate_task_envelope(task):
+    """Validate task structure and enforce action allowlist."""
+    if not isinstance(task, dict):
+        return False, "task is not a dict"
+
+    context = task.get("context")
+    if not isinstance(context, dict):
+        return False, "missing or invalid context"
+
+    task_id = context.get("task_id", task.get("msg_id", ""))
+    if not task_id:
+        return False, "missing task_id"
+
+    action = context.get("action", "")
+    if not action:
+        return False, "missing action"
+
+    if action not in ALLOWED_ACTIONS:
+        return False, f"action '{action}' not in allowlist"
+
+    to_field = task.get("to", "")
+    if to_field and to_field not in ("anyclaw", "all"):
+        return False, f"task addressed to '{to_field}', not 'anyclaw'"
+
+    return True, None
 
 
 def process_task(task):
@@ -59,35 +177,21 @@ def process_task(task):
     log.info(f"Processing task {task_id[:8]}... action={action}")
 
     try:
-        if action == "health_check" or "health" in message.lower():
+        if action == "health_check":
             result = {"status": "success", "result": {"health": "ok", "timestamp": datetime.now(timezone.utc).isoformat()}}
-        elif action == "system_status" or "status" in message.lower():
+        elif action == "system_status":
             result = {"status": "success", "result": {"system": "running", "authority": "fail_closed"}}
-        elif action == "execute":
-            from scripts.system_listener_inline import process_command
-            cmd = {"id": task_id, "action": "execute", "mode": params.get("mode", "DRYRUN"), "payload": {"action": params.get("action", "unknown"), "params": params}}
-            r = process_command(cmd)
-            result = {"status": "success", "result": r}
-        elif action == "list_backends":
-            from scripts.ai_connector import AIConnector
-            ai = AIConnector()
-            result = {"status": "success", "result": ai.list_backends()}
         elif action == "read_file_fact":
             file_path = params.get("file_path", "")
-            full_path = (REPO_ROOT / file_path).resolve()
-            # Path traversal guard: must be under one of SAFE_READ_DIRS
-            in_safe_dir = any(
-                str(full_path).startswith(str(d.resolve()))
-                for d in SAFE_READ_DIRS
-            )
-            if not in_safe_dir:
-                result = {"status": "error", "error": f"Path traversal blocked: {file_path} is outside safe directories"}
+            resolved, err = safe_resolve(file_path)
+            if err:
+                result = {"status": "error", "error": f"Path rejected: {err}"}
             else:
-                result_data = {"file_path": file_path, "file_exists": full_path.exists()}
-                if full_path.exists():
-                    result_data["file_size_bytes"] = full_path.stat().st_size
+                result_data = {"file_path": file_path, "file_exists": resolved.exists()}
+                if resolved.exists():
+                    result_data["file_size_bytes"] = resolved.stat().st_size
                     try:
-                        content = full_path.read_text()[:5000]
+                        content = resolved.read_text()[:5000]
                         result_data["content_preview"] = content[:200]
                         fact_q = params.get("fact", "")
                         if "runtime identity" in fact_q.lower() or "name" in fact_q.lower():
@@ -102,12 +206,16 @@ def process_task(task):
                     except Exception:
                         result_data["fact_answer"] = "Could not read file"
                 result = {"status": "success", "result": result_data}
+        elif action == "list_backends":
+            from scripts.ai_connector import AIConnector
+            ai = AIConnector()
+            result = {"status": "success", "result": ai.list_backends()}
         elif action == "list_parties":
             from scripts.comm_hub import CommHub
             hub = CommHub()
             result = {"status": "success", "result": [p["id"] for p in hub.list_parties()]}
         else:
-            result = {"status": "success", "result": {"message": f"Received task: {message[:200]}", "action": action, "params": params}}
+            result = {"status": "error", "error": f"Action '{action}' not implemented"}
     except Exception as e:
         result = {"status": "error", "error": str(e)}
 
@@ -129,7 +237,7 @@ def process_task(task):
 
 
 def poll_once():
-    """Read inbox, process new tasks, write results."""
+    """Read inbox, validate, claim, process, and write results."""
     if not INBOX.exists():
         return 0
 
@@ -149,57 +257,75 @@ def poll_once():
             if task_id in processed:
                 continue
 
-            # Check if addressed to us
-            to_field = task.get("to", "")
-            if to_field and to_field not in ("anyclaw", "all"):
+            # Invariant 3: validate envelope + allowlist
+            valid, err = validate_task_envelope(task)
+            if not valid:
+                log.warning(f"Rejected invalid task: {err}")
+                processed.add(task_id)
                 continue
 
-            result = process_task(task)
-            processed.add(task_id)
+            # Invariant 5: atomic claim
+            lock = TaskLock(task_id)
+            if not lock.try_acquire():
+                log.info(f"Task {task_id[:8]}... already claimed, skipping")
+                continue
 
-            with open(RESULTS, "a") as f:
-                f.write(json.dumps(result, default=str) + "\n")
+            try:
+                result = process_task(task)
+                processed.add(task_id)
 
-            log.info(f"Completed task {task_id[:8]}... -> {result['context']['status']}")
-            count += 1
+                with open(RESULTS, "a") as f:
+                    f.write(json.dumps(result, default=str) + "\n")
+
+                log.info(f"Completed task {task_id[:8]}... -> {result['context']['status']}")
+                count += 1
+            finally:
+                lock.release()
 
     save_processed(processed)
     return count
 
 
-def commit_changes():
-    """Auto-commit results so Factory can see them."""
-    try:
-        subprocess.run(["git", "add", "ai/tasks/results.jsonl"], cwd=REPO_ROOT, capture_output=True, timeout=5)
-        subprocess.run(["git", "commit", "-m", "coord: anyclaw task results update"],
-                       cwd=REPO_ROOT, capture_output=True, timeout=10)
-        subprocess.run(["git", "push", "origin", "main"], cwd=REPO_ROOT, capture_output=True, timeout=15)
-    except Exception:
-        pass
+# ── Invariant 4: NO git push — result publication stays local ──
+# Factory polls results.jsonl via git pull. We never push directly.
 
 
 if __name__ == "__main__":
     import argparse
-    parser = argparse.ArgumentParser(description="Task Worker")
-    parser.add_argument("--once", action="store_true", help="Poll once and exit")
-    parser.add_argument("--loop", action="store_true", help="Poll continuously")
-    parser.add_argument("--interval", type=int, default=30, help="Poll interval seconds")
+    parser = argparse.ArgumentParser(description="Task Worker (hardened)")
+    sub = parser.add_subparsers(dest="cmd")
+
+    poll_p = sub.add_parser("poll", help="Poll inbox once")
+    loop_p = sub.add_parser("loop", help="Poll continuously")
+    loop_p.add_argument("--interval", type=int, default=30)
+    sub.add_parser("validate", help="Validate inbox entries without processing")
+
     args = parser.parse_args()
 
-    if args.once:
+    if args.cmd == "poll":
         count = poll_once()
         print(f"Processed {count} tasks")
-        if count > 0:
-            commit_changes()
-    elif args.loop:
+    elif args.cmd == "loop":
         while True:
             try:
                 count = poll_once()
-                if count > 0:
-                    log.info(f"Processed {count} tasks, committing...")
-                    commit_changes()
+                if count:
+                    log.info(f"Processed {count} tasks")
             except Exception as e:
                 log.error(f"Error: {e}")
             time.sleep(args.interval)
+    elif args.cmd == "validate":
+        if not INBOX.exists():
+            print("Inbox empty")
+        else:
+            with open(INBOX, "r") as f:
+                for i, line in enumerate(f):
+                    if not line.strip():
+                        continue
+                    task = json.loads(line)
+                    valid, err = validate_task_envelope(task)
+                    tid = task.get("context", {}).get("task_id", "?")
+                    status = "✓" if valid else f"✗ {err}"
+                    print(f"  {tid}: {status}")
     else:
         parser.print_help()
