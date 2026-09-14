@@ -143,3 +143,43 @@ def test_control_api_approve_reject_flow():
 
     finally:
         shutil.rmtree(tmp_dir)
+
+
+# ── execution gate tests ──
+
+def test_live_approved_with_gate_still_execution_disabled():
+    """Even with approval AND gate=True, execution_enabled stays False."""
+    decision = authorize(
+        {"id": "g1", "mode": "LIVE", "approval_status": "approved"},
+        execution_gate=True,
+    )
+    assert decision.execution_enabled is False
+    assert decision.decision == "approved"
+    assert "gate active" in decision.reason
+
+
+def test_live_approved_gate_none_keeps_gate_absent():
+    decision = authorize(
+        {"id": "g2", "mode": "LIVE", "approval_status": "approved"},
+        execution_gate=None,
+    )
+    assert decision.execution_enabled is False
+    assert "gate absent" in decision.reason
+
+
+def test_live_approved_gate_false_keeps_gate_absent():
+    decision = authorize(
+        {"id": "g3", "mode": "LIVE", "approval_status": "approved"},
+        execution_gate=False,
+    )
+    assert decision.execution_enabled is False
+    assert "gate absent" in decision.reason
+
+
+def test_dryrun_ignores_gate_parameter():
+    decision = authorize(
+        {"id": "g4", "mode": "DRYRUN"},
+        execution_gate=True,
+    )
+    assert decision.execution_enabled is False
+    assert decision.decision == "dryrun_only"

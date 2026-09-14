@@ -4,6 +4,10 @@
 The root is the durable authority-observation boundary. It classifies queued
 commands through governed_authority and records the latest decision without
 ever granting executor authority.
+
+Paths are instance-rooted: derived from ``repo_root()`` instead of
+``__file__``. Call ``set_repo_root(path)`` before starting to isolate
+different instances (e.g. for testing or multi-repo setups).
 """
 import json
 import os
@@ -18,12 +22,33 @@ try:
 except ImportError:
     from governed_authority import authorize
 
-ROOT = Path(__file__).resolve().parent.parent
-STATE = ROOT / "state"
-STATUS = STATE / "governed_root_status.json"
-QUEUE = STATE / "command_queue.jsonl"
-APPROVALS = STATE / "approval_queue.json"
-DECISIONS = STATE / "governed_decisions.json"
+_ROOT_PATH = Path(__file__).resolve().parent.parent
+
+
+def repo_root() -> Path:
+    return _ROOT_PATH
+
+
+def set_repo_root(path) -> None:
+    global _ROOT_PATH
+    _ROOT_PATH = Path(path)
+
+
+def _resolve_status() -> Path:
+    return _ROOT_PATH / "state" / "governed_root_status.json"
+
+
+def _resolve_queue() -> Path:
+    return _ROOT_PATH / "state" / "command_queue.jsonl"
+
+
+def _resolve_approvals() -> Path:
+    return _ROOT_PATH / "state" / "approval_queue.json"
+
+
+def _resolve_decisions() -> Path:
+    return _ROOT_PATH / "state" / "governed_decisions.json"
+
 
 stop = False
 
@@ -34,28 +59,31 @@ def handle_stop(signum, _frame):
 
 
 def queue_counts():
+    queue = _resolve_queue()
+    approvals = _resolve_approvals()
     pending = 0
-    if QUEUE.exists():
-        for line in QUEUE.read_text().splitlines():
+    if queue.exists():
+        for line in queue.read_text().splitlines():
             try:
                 if json.loads(line).get("status") == "pending":
                     pending += 1
             except Exception:
                 continue
     approval_pending = 0
-    if APPROVALS.exists():
+    if approvals.exists():
         try:
-            approval_pending = len(json.loads(APPROVALS.read_text()).get("pending", []))
+            approval_pending = len(json.loads(approvals.read_text()).get("pending", []))
         except Exception:
             pass
     return pending, approval_pending
 
 
 def pending_commands():
-    if not QUEUE.exists():
+    queue = _resolve_queue()
+    if not queue.exists():
         return []
     commands = []
-    for line in QUEUE.read_text().splitlines():
+    for line in queue.read_text().splitlines():
         try:
             command = json.loads(line)
             if command.get("status") == "pending":
@@ -66,9 +94,10 @@ def pending_commands():
 
 
 def load_decisions():
-    if DECISIONS.exists():
+    decisions_file = _resolve_decisions()
+    if decisions_file.exists():
         try:
-            data = json.loads(DECISIONS.read_text())
+            data = json.loads(decisions_file.read_text())
             if isinstance(data, dict):
                 return data
         except Exception:
@@ -78,6 +107,7 @@ def load_decisions():
 
 def record_decisions():
     decisions = load_decisions()
+    decisions_file = _resolve_decisions()
     changed = False
     for command in pending_commands():
         command_id = str(command.get("id") or command.get("command_id") or "")
@@ -96,8 +126,9 @@ def record_decisions():
         if decisions.get(command_id) != fingerprint:
             decisions[command_id] = fingerprint
             changed = True
-    if changed or not DECISIONS.exists():
-        DECISIONS.write_text(json.dumps(decisions, indent=2, sort_keys=True) + "\n")
+    if changed or not decisions_file.exists():
+        decisions_file.parent.mkdir(parents=True, exist_ok=True)
+        decisions_file.write_text(json.dumps(decisions, indent=2, sort_keys=True) + "\n")
     return decisions
 
 
@@ -107,12 +138,12 @@ def run_forever():
     signal.signal(signal.SIGTERM, handle_stop)
     signal.signal(signal.SIGINT, handle_stop)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
-    STATE.mkdir(parents=True, exist_ok=True)
+    (_ROOT_PATH / "state").mkdir(parents=True, exist_ok=True)
 
     while not stop:
         decisions = record_decisions()
         pending_commands_count, pending_approvals = queue_counts()
-        STATUS.write_text(json.dumps({
+        _resolve_status().write_text(json.dumps({
             "status": "running",
             "authority": "governed_authority",
             "execution_enabled": False,
@@ -125,7 +156,7 @@ def run_forever():
         }, indent=2) + "\n")
         time.sleep(10)
 
-    STATUS.write_text(json.dumps({
+    _resolve_status().write_text(json.dumps({
         "status": "stopped",
         "authority": "governed_authority",
         "execution_enabled": False,

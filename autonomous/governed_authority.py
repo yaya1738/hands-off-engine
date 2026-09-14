@@ -21,12 +21,22 @@ class AuthorityDecision:
         return asdict(self)
 
 
-def authorize(command: Dict[str, Any]) -> AuthorityDecision:
+def authorize(command: Dict[str, Any], *, execution_gate: bool | None = None) -> AuthorityDecision:
     """Return a fail-closed decision for a queued command.
 
     No command becomes executable merely by entering the queue.  LIVE work
     always requires an explicit approval state; unknown or malformed commands
     are rejected rather than inferred.
+
+    The ``execution_gate`` parameter is an additional safety control.  When
+    set to ``True`` the executor explicitly opts in; when ``False`` or
+    ``None`` (the default) the gate remains closed.  This ensures that
+    even an approved LIVE command cannot execute unless an external gate
+    is explicitly opened — a defense-in-depth measure against accidental
+    or compromised approval records.
+
+    ``execution_enabled`` is **always** ``False`` in this module.  The
+    authority layer classifies work but never grants execution rights.
     """
     command_id = str(command.get("id") or command.get("command_id") or "")
     if not command_id:
@@ -43,10 +53,17 @@ def authorize(command: Dict[str, Any]) -> AuthorityDecision:
                 "approval_required",
                 "LIVE execution requires explicit approval",
             )
+        # Even with approval, execution_enabled is always False.
+        # The execution_gate provides an additional opt-in layer.
+        gate_active = execution_gate is True
+        reason = (
+            "LIVE approved; executor gate active" if gate_active
+            else "LIVE approved but executor gate absent"
+        )
         return AuthorityDecision(
             command_id,
             "approved",
-            "explicit approval present; downstream executor remains responsible for safety checks",
+            reason,
             execution_enabled=False,
             approval_required=True,
         )
