@@ -1,51 +1,62 @@
 # Hands-Off Engine
 
-This repository is the canonical codebase for my "Hands-Off" personal finance, trading,
-and automation engine. It is designed to be driven primarily by AI coding agents
-(LLMs) with minimal manual involvement.
+Multi-AI coordination system running on Android phone (Termux/proot).
 
-High-level goals:
-- Central, versioned home for all core engine code (Termux + DigitalOcean).
-- Safe, auditable evolution of risk models, execution logic, and infra scripts.
-- Multi-agent friendly: can be used by ChatGPT, Claude Code CLI, aider, quad, etc.
+## Architecture
 
-This repo is intentionally minimal at first; existing scripts will be migrated into a
-clean structure step by step.
-
-## Current Status
-
-### Batch 18: Unified Brain Summary ✅
-
-**Latest:** A top-level "brain summary" module that consolidates all key system state into a single unified view.
-
-**Quick Start:**
-```bash
-# Generate unified brain summary
-python3 reports/ho_brain_report.py
-
-# View results
-cat state/hands_off_brain.txt
-cat state/hands_off_brain.json | jq .
+```
+Factory (ChatGPT) → messages.jsonl → AnyClaw (this) → task_result → Factory
+                        ↕
+                   Telegram alerts → Yair
+                   Control Room → browser
+                   Learning Loop → self-improvement
 ```
 
-**Key Features:**
-- Consolidates health, pipeline, history, and AI loop state
-- Dual output: JSON (machine-readable) + text (human-readable)
-- Graceful handling of missing/malformed input files
-- Clear status signals: `ok` / `warn` / `error`
-- DRYRUN-only, read-mostly, production-safe
+## Quick Start
 
-**Documentation:**
-- `reports/README.md` - Quick reference for brain report module
-- `docs/BATCH_18_STATUS_REPORT.md` - Complete technical documentation
-- `tests/integration/test_brain_report.py` - Test suite (12 tests, all passing)
+```bash
+# Start everything
+setsid nohup python3 scripts/node1_runtime.py run &
+setsid nohup python3 scripts/telegram_bridge.py &
+setsid nohup python3 scripts/yair_control_room.py &
+setsid nohup python3 scripts/scheduler.py &
 
-### Previous Batches
+# Dashboard
+python3 scripts/dashboard.py
+```
 
-The engine includes foundations from earlier batches including:
-- Polymarket DRYRUN pipeline (alpha/decider/executor)
-- Health monitoring and history analytics
-- AI task generator and runner
-- Autonomous AI loop orchestration
+## Scripts
 
-See `docs/` for detailed batch reports.
+| Script | Purpose |
+|--------|---------|
+| `scripts/node1_runtime.py` | Unified compute node |
+| `scripts/telegram_bridge.py` | Telegram alerts |
+| `scripts/yair_control_room.py` | Web UI (localhost:8787) |
+| `scripts/dashboard.py` | Terminal dashboard |
+| `scripts/learning_loop.py` | Task outcome tracking |
+| `scripts/health_monitor.py` | Service health checks |
+| `scripts/self_improvement.py` | Improvement generator |
+| `scripts/state_integrity.py` | State file tamper detection |
+| `scripts/bus_cleanup.py` | Archive old bus messages |
+| `scripts/scheduler.py` | Periodic improvement cycles |
+| `scripts/improvement_cycle.py` | All subsystems in one cycle |
+| `scripts/web_research.py` | Public data research |
+
+## Coordination Bus
+
+`ai/coordination/messages.jsonl` — canonical transport for all AI communication.
+
+Parties: operator, factory, anyclaw, chatgpt, grok, openclaw, claude-code, copilot, telegram, system_internal
+
+## Security
+
+- Fail-closed authority: `execution_enabled` always False
+- Sender validation: unknown parties rejected from bus
+- State integrity: SHA-256 checksums for critical files
+- No secrets in bus, no live execution without approval
+
+## Tests
+
+```bash
+python3 -m pytest tests/ -q --tb=no
+```
