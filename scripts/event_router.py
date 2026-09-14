@@ -100,7 +100,11 @@ class EventRouter:
         self.repo_root = Path(repo_root) if repo_root else REPO_ROOT
         self.state_dir = self.repo_root / "state"
         self.state_dir.mkdir(parents=True, exist_ok=True)
-        INBOUND_DIR.mkdir(parents=True, exist_ok=True)
+        self.messages_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
+        self.router_state = self.state_dir / "router_state.json"
+        self.trigger_requests = self.state_dir / "trigger_requests.jsonl"
+        self.inbound_dir = self.state_dir / "inbound"
+        self.inbound_dir.mkdir(parents=True, exist_ok=True)
 
         self.processed_ids = self._load_processed()
         self.cursor = 0  # byte offset into messages.jsonl
@@ -125,24 +129,24 @@ class EventRouter:
         path.write_text(json.dumps(ids))
 
     def _load_cursor(self):
-        if ROUTER_STATE.exists():
+        if self.router_state.exists():
             try:
-                state = json.loads(ROUTER_STATE.read_text())
+                state = json.loads(self.router_state.read_text())
                 self.cursor = state.get("cursor", 0)
             except Exception:
                 pass
 
     def _save_cursor(self):
-        ROUTER_STATE.write_text(json.dumps({"cursor": self.cursor}))
+        self.router_state.write_text(json.dumps({"cursor": self.cursor}))
 
     def read_new_messages(self) -> List[Dict]:
         """Read new messages from messages.jsonl since last cursor."""
-        if not MESSAGES_FILE.exists():
+        if not self.messages_file.exists():
             return []
 
         messages = []
         try:
-            with open(MESSAGES_FILE, "r") as f:
+            with open(self.messages_file, "r") as f:
                 f.seek(self.cursor)
                 while True:
                     line = f.readline()
@@ -233,7 +237,7 @@ class EventRouter:
         }
 
         # Write to handler's inbound queue
-        inbound_file = INBOUND_DIR / f"{handler}.jsonl"
+        inbound_file = self.inbound_dir / f"{handler}.jsonl"
         try:
             with open(inbound_file, "a") as f:
                 f.write(json.dumps(record) + "\n")
@@ -267,9 +271,9 @@ class EventRouter:
 
         # Dedup trigger requests
         existing = set()
-        if TRIGGER_REQUESTS.exists():
+        if self.trigger_requests.exists():
             try:
-                with open(TRIGGER_REQUESTS, "r") as f:
+                with open(self.trigger_requests, "r") as f:
                     for line in f:
                         if line.strip():
                             r = json.loads(line)
@@ -279,7 +283,7 @@ class EventRouter:
 
         if request["request_id"] not in existing:
             try:
-                with open(TRIGGER_REQUESTS, "a") as f:
+                with open(self.trigger_requests, "a") as f:
                     f.write(json.dumps(request) + "\n")
                 log.info(f"Trigger request created for {handler}: {record['event_type']}")
             except Exception as e:
@@ -303,7 +307,7 @@ class EventRouter:
 
     def get_pending_triggers(self) -> List[Dict]:
         """Get unprocessed trigger requests."""
-        if not TRIGGER_REQUESTS.exists():
+        if not self.trigger_requests.exists():
             return []
         requests = []
         handled = set()
@@ -318,7 +322,7 @@ class EventRouter:
             except Exception:
                 pass
 
-        with open(TRIGGER_REQUESTS, "r") as f:
+        with open(self.trigger_requests, "r") as f:
             for line in f:
                 if line.strip():
                     r = json.loads(line)
@@ -332,8 +336,8 @@ class EventRouter:
             "cursor": self.cursor,
             "processed_count": len(self.processed_ids),
             "pending_triggers": len(self.get_pending_triggers()),
-            "messages_file_exists": MESSAGES_FILE.exists(),
-            "messages_file_size": MESSAGES_FILE.stat().st_size if MESSAGES_FILE.exists() else 0,
+            "messages_file_exists": self.messages_file.exists(),
+            "messages_file_size": self.messages_file.stat().st_size if self.messages_file.exists() else 0,
         }
 
 

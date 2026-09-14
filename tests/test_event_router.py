@@ -6,7 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 def _make_router():
     """Create a router with temp state dir."""
-    from scripts.event_router import EventRouter, MESSAGES_FILE, STATE_DIR, ROUTER_STATE, INBOUND_DIR, TRIGGER_REQUESTS
+    from scripts.event_router import EventRouter
     import scripts.event_router as r
     tmp = Path(tempfile.mkdtemp())
     (tmp / "state").mkdir()
@@ -15,14 +15,13 @@ def _make_router():
     router = EventRouter.__new__(EventRouter)
     router.repo_root = tmp
     router.state_dir = tmp / "state"
+    router.messages_file = tmp / "ai" / "coordination" / "messages.jsonl"
+    router.router_state = tmp / "state" / "router_state.json"
+    router.trigger_requests = tmp / "state" / "trigger_requests.jsonl"
+    router.inbound_dir = tmp / "state" / "inbound"
+    router.inbound_dir.mkdir(exist_ok=True)
     router.processed_ids = set()
     router.cursor = 0
-
-    r.MESSAGES_FILE = tmp / "ai" / "coordination" / "messages.jsonl"
-    r.ROUTER_STATE = tmp / "state" / "router_state.json"
-    r.TRIGGER_REQUESTS = tmp / "state" / "trigger_requests.jsonl"
-    r.INBOUND_DIR = tmp / "state" / "inbound"
-    r.INBOUND_DIR.mkdir(exist_ok=True)
 
     router._tmp = tmp
     return router
@@ -30,8 +29,7 @@ def _make_router():
 
 def _write_msg(router, msg):
     """Append a message to the messages.jsonl."""
-    import scripts.event_router as r
-    with open(r.MESSAGES_FILE, "a") as f:
+    with open(router.messages_file, "a") as f:
         f.write(json.dumps(msg) + "\n")
 
 
@@ -98,7 +96,6 @@ def test_dedup_by_msg_id():
         "msg_id": "dup-001",
         "context": {"task_id": "t-dup"},
     }
-    # Write same message twice
     _write_msg(router, msg)
     _write_msg(router, msg)
 
@@ -117,7 +114,6 @@ def test_process_once_end_to_end():
     count = router.process_once()
     assert count == 1
 
-    # Verify routed to factory's inbound
     inbound = router.state_dir / "inbound" / "factory.jsonl"
     assert inbound.exists()
     records = [json.loads(l) for l in inbound.read_text().strip().split("\n") if l.strip()]
