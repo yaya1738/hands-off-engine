@@ -164,7 +164,7 @@ class AIConnector:
         elif backend == "telegram_relay":
             return self._dispatch_to_operator(enriched_task, task_id)
         elif backend == "codex_anyclaw":
-            return self._dispatch_to_coordination(enriched_task, task_id)
+            return self._dispatch_to_anyclaw(enriched_task, task_id)
         elif backend == "messages_jsonl":
             return self._dispatch_to_coordination(enriched_task, task_id)
         else:
@@ -328,28 +328,47 @@ class AIConnector:
 
     # ── Coordination bus (async agent handoff) ──
 
-    def _dispatch_to_coordination(self, task_dict, task_id):
-        """Post task to coordination bus for any available agent to pick up."""
+    def _dispatch_to_anyclaw(self, task_dict, task_id):
+        """Post task specifically to AnyClaw (Codex CLI) party."""
         try:
             from scripts.comm_hub import CommHub
             hub = CommHub(repo_root=self.repo_root)
             result = hub.send(
-                "claude-code", "task_assignment",
+                "anyclaw", "task_assignment",
                 {"task_id": task_id, "task": task_dict["task"], "context": task_dict.get("context", {})},
                 source="ai_connector",
             )
-
-            # Also save locally
             pending = self._load_pending()
             pending[task_id] = {
                 "task": task_dict,
                 "sent_at": datetime.now(timezone.utc).isoformat(),
                 "status": "awaiting_agent",
-                "dispatched_to": "claude-code",
+                "dispatched_to": "anyclaw",
             }
             self._save_pending(pending)
+            return {"status": "dispatched", "task_id": task_id, "channel": "coordination_bus", "dispatched_to": "anyclaw", "result": result}
+        except Exception as e:
+            return {"status": "error", "error": str(e), "task_id": task_id}
 
-            return {"status": "dispatched", "task_id": task_id, "channel": "coordination_bus", "result": result}
+    def _dispatch_to_coordination(self, task_dict, task_id):
+        """Post task to coordination bus — routes to AnyClaw by default."""
+        try:
+            from scripts.comm_hub import CommHub
+            hub = CommHub(repo_root=self.repo_root)
+            result = hub.send(
+                "anyclaw", "task_assignment",
+                {"task_id": task_id, "task": task_dict["task"], "context": task_dict.get("context", {})},
+                source="ai_connector",
+            )
+            pending = self._load_pending()
+            pending[task_id] = {
+                "task": task_dict,
+                "sent_at": datetime.now(timezone.utc).isoformat(),
+                "status": "awaiting_agent",
+                "dispatched_to": "anyclaw",
+            }
+            self._save_pending(pending)
+            return {"status": "dispatched", "task_id": task_id, "channel": "coordination_bus", "dispatched_to": "anyclaw", "result": result}
         except Exception as e:
             return {"status": "error", "error": str(e), "task_id": task_id}
 
