@@ -8,6 +8,8 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
+from autonomous.governed_authority import authorize
+
 
 def build_authority_input(handoff: Dict[str, Any]) -> Dict[str, Any]:
     """Return the minimal explicit authority input, fail-closed."""
@@ -38,4 +40,14 @@ def build_authority_input(handoff: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-__all__ = ["build_authority_input"]
+def classify_authority_input(handoff: Dict[str, Any]) -> Dict[str, Any]:
+    """Classify the adapter output through the existing authority seam."""
+    projected = build_authority_input(handoff)
+    if not projected.get("available", False):
+        return {"available": False}
+
+    decision = authorize(projected["command"])
+    return {"available": True, "decision": decision.to_dict()}
+
+
+__all__ = ["build_authority_input", "classify_authority_input"]
