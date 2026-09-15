@@ -158,13 +158,14 @@ def test_fix_config():
 
 
 def test_add_test():
-    """add_test creates a test stub for untested modules."""
+    """add_test creates a test stub for an importable untested module."""
     applier = _make_applier()
     try:
-        # Create a fake untested module
+        # Create a valid importable module in the applier's scripts dir
         scripts_dir = applier._tmp / "scripts"
         scripts_dir.mkdir()
-        (scripts_dir / "fake_module.py").write_text("# fake module")
+        (scripts_dir / "fake_module.py").write_text("# fake module\n\ndef hello():\n    return 'hi'\n")
+        sys.path.insert(0, str(applier._tmp))
         imp = {"id": "test-addtest-1", "category": "quality", "title": "Add tests",
                "description": "Generate test stubs", "action": "add_test"}
         result = applier.apply_improvement(imp)
@@ -172,6 +173,7 @@ def test_add_test():
         test_file = applier._tmp / "tests" / "test_fake_module.py"
         assert test_file.exists()
         assert "fake_module" in test_file.read_text()
+        sys.path.remove(str(applier._tmp))
     finally:
         _teardown(applier)
 

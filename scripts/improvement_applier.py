@@ -331,8 +331,19 @@ class ImprovementApplier:
                        if f.stem not in existing_tests and not f.stem.startswith("_")]
             if not untested:
                 return "All modules already have tests"
-            # Create stub for first untested module
-            module = untested[0]
+            # Verify each candidate imports cleanly before generating a stub
+            import importlib, sys as _sys
+            importable = []
+            for name in untested:
+                try:
+                    importlib.import_module(f"scripts.{name}")
+                    importable.append(name)
+                except Exception:
+                    continue
+            if not importable:
+                return "No untested modules import cleanly"
+            # Create stub for first importable untested module
+            module = importable[0]
             test_file = tests_dir / f"test_{module}.py"
             test_content = (
                 "import sys\n"
