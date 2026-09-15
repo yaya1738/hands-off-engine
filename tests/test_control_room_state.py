@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 from scripts.control_room_state import build_snapshot
+from scripts.interaction_observability import read_interaction_health
 
 
 def test_snapshot_uses_canonical_bus_and_lifecycle(tmp_path: Path):
@@ -67,6 +68,19 @@ def test_correlation_health_is_explicit_and_window_state_is_exact(tmp_path: Path
 
     exact = build_snapshot(tmp_path, bus_limit=4, lifecycle_limit=0)["correlation_health"]
     assert exact["window"] == {"bounded": True, "limit": 4, "truncated": False}
+
+
+def test_machine_observability_adapter_reuses_snapshot_health(tmp_path: Path):
+    bus = tmp_path / "ai" / "coordination" / "messages.jsonl"
+    bus.parent.mkdir(parents=True)
+    bus.write_text(json.dumps({"msg_id": "m1", "context": {"task_id": "t1"}}) + "\n")
+
+    health = read_interaction_health(tmp_path, bus_limit=1)
+
+    assert health["event_count"] == 1
+    assert health["explicit_task_event_count"] == 1
+    assert health["thread_count"] == 1
+    assert health["window"] == {"bounded": True, "limit": 1, "truncated": True}
 
 
 def test_snapshot_skips_malformed_bus_tail_until_limit(tmp_path: Path):
