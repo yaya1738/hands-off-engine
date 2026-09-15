@@ -16,6 +16,8 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
 
 HTML = r'''<!doctype html>
@@ -65,7 +67,7 @@ class Handler(BaseHTTPRequestHandler):
             events=read_events(); self.send_json(200,{'available':BUS.exists(),'events':events}); return
         if path=='/api/state':
             try:
-                sys.path.insert(0,str(ROOT)); from scripts.control_room_state import build_snapshot
+                from scripts.control_room_state import build_snapshot
                 self.send_json(200,build_snapshot(ROOT, bus_limit=120, lifecycle_limit=100))
             except Exception as e: self.send_json(500,{'error':str(e)})
             return
@@ -77,7 +79,7 @@ class Handler(BaseHTTPRequestHandler):
         text=str(body.get('message','')).strip()
         if not text or len(text)>4000: self.send_json(400,{'error':'message must be 1-4000 characters'}); return
         try:
-            sys.path.insert(0,str(ROOT)); from scripts.comm_hub import CommHub
+            from scripts.comm_hub import CommHub
             result=CommHub(repo_root=ROOT).receive('operator','inbound_from_operator',{'message':text,'source':'yair_control_room','timestamp':datetime.now(timezone.utc).isoformat()},channel='webhook')
             self.send_json(200,{'status':'sent','result':result})
         except Exception as e: self.send_json(500,{'error':str(e)})
