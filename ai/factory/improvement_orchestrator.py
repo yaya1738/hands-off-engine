@@ -7,10 +7,12 @@ class FactoryImprovementOrchestrator:
         assessor=None,
         planner=None,
         queue=None,
+        assessment_publisher=None,
     ):
         self.assessor = assessor
         self.planner = planner
         self.queue = queue
+        self.assessment_publisher = assessment_publisher
         self._history: List[Dict[str, Any]] = []
 
     def run_cycle(
@@ -20,6 +22,9 @@ class FactoryImprovementOrchestrator:
         assessment = self.assessor.assess(
             metrics
         )
+
+        if self.assessment_publisher is not None:
+            self.assessment_publisher.publish(assessment)
 
         plan = self.planner.plan(
             assessment
@@ -38,10 +43,6 @@ class FactoryImprovementOrchestrator:
                         "priority": plan.get(
                             "priority",
                             0,
-                        ),
-                        "capability_context": plan.get(
-                            "capability_context",
-                            {},
                         ),
                         "capability_context": plan.get(
                             "capability_context",
