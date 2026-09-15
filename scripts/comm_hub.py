@@ -182,6 +182,8 @@ class CommHub:
         self.repo_root = Path(repo_root) if repo_root else REPO_ROOT
         self.state_dir = self.repo_root / "state"
         self.state_dir.mkdir(parents=True, exist_ok=True)
+        self.registry_file = self.state_dir / "party_registry.json"
+        self.comm_log = self.state_dir / "comm_log.jsonl"
         MESSAGES_FILE.parent.mkdir(parents=True, exist_ok=True)
         INBOUND_DIR.mkdir(parents=True, exist_ok=True)
         OUTBOUND_DIR.mkdir(parents=True, exist_ok=True)
@@ -191,17 +193,21 @@ class CommHub:
 
     # ── party registry ──
 
+    def _registry_path(self):
+        return getattr(self, "registry_file", None) or (self.state_dir / "party_registry.json")
+
     def _load_parties(self):
-        if PARTY_REGISTRY.exists():
+        registry = self._registry_path()
+        if registry.exists():
             try:
-                return json.loads(PARTY_REGISTRY.read_text())
+                return json.loads(registry.read_text())
             except Exception:
                 pass
-        PARTY_REGISTRY.write_text(json.dumps(DEFAULT_PARTIES, indent=2) + "\n")
+        registry.write_text(json.dumps(DEFAULT_PARTIES, indent=2) + "\n")
         return dict(DEFAULT_PARTIES)
 
     def _save_parties(self):
-        PARTY_REGISTRY.write_text(json.dumps(self.parties, indent=2) + "\n")
+        self._registry_path().write_text(json.dumps(self.parties, indent=2) + "\n")
 
     def register_party(self, party_id, name, role, channels, trust_level=5, info_scope="structured",
                        notify_on=None, fmt="json"):
@@ -260,8 +266,11 @@ class CommHub:
         # Log
         self._log_outbound(msg, result)
 
-        # Write to coordination bus
-        self._write_to_messages_jsonl(msg)
+        # Write to coordination bus exactly once:
+        # - messages_jsonl/webhook channels already append during delivery
+        # - other channels append the canonical entry here
+        if channel not in ("messages_jsonl", "webhook"):
+            self._write_to_messages_jsonl(msg)
 
         # Handle ack tracking
         if meta.get("requires_ack"):
@@ -644,7 +653,9 @@ class CommHub:
     def _append_log(self, entry):
         entry["logged_at"] = datetime.now(timezone.utc).isoformat()
         try:
-            with open(COMM_LOG, "a") as f:
+            log_path = getattr(self, "comm_log", None) or (self.state_dir / "comm_log.jsonl")
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(log_path, "a") as f:
                 f.write(json.dumps(entry, default=str) + "\n")
         except Exception:
             pass

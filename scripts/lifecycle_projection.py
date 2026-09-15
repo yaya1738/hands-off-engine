@@ -142,11 +142,14 @@ class LifecycleProjector:
         state = _load(self.state_file)
         if messages is None:
             messages = self._read_messages()
-        changed = 0
+        changed_tasks = set()
         for message in messages:
             if apply_message(state, message):
-                changed += 1
+                task_id = _task_id(message)
+                if task_id:
+                    changed_tasks.add(task_id)
         _save(self.state_file, state)
+        changed = len(changed_tasks)
         return {"tasks": len(state), "changed": changed, "state_file": str(self.state_file)}
 
     def _read_messages(self):
