@@ -37,3 +37,12 @@ Architecture review (#288 — 4 invariants confirmed):
 4. Fan-out guard: `_should_follow_up` returns False for standard task_completed (no next_action); regression test confirms.
 
 Tests: 233/233. Open: #305 (CI observability), #279 (DASS coordination).
+
+## Delta 22 — 2026-09-15 (CI observability root cause)
+
+#305 root cause identified: GitHub Actions billing block — no runner assigned (`runner_id: 0`).
+Annotation: "recent account payments have failed or your spending limit needs to be increased."
+No code change needed; requires account owner (Yair) to update payment method in GitHub Settings → Billing.
+Resolution: human account-level action; after clearing, re-run any workflow to confirm.
+
+Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runtimes alive.
