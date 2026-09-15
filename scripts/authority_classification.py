@@ -26,15 +26,16 @@ def classify_and_publish(
         return {"status": "rejected", "reason": "invalid_command"}
 
     decision = authorize(command, execution_gate=execution_gate)
+    correlation = command.get("correlation")
+    if not isinstance(correlation, dict):
+        correlation = {}
+
     decision_payload = decision.to_dict()
     decision_payload.update(
         {
-            "reply_to": command.get("correlation", {}).get("reply_to")
-            if isinstance(command.get("correlation"), dict)
-            else None,
-            "task_id": command.get("correlation", {}).get("task_id")
-            if isinstance(command.get("correlation"), dict)
-            else None,
+            "msg_id": correlation.get("msg_id") or decision.command_id,
+            "reply_to": correlation.get("reply_to"),
+            "task_id": correlation.get("task_id"),
             "decided_at": None,
         }
     )
