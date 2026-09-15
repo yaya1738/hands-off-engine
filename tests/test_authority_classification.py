@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from scripts.authority_classification import classify_and_publish
 
 
@@ -33,6 +35,7 @@ def test_classifies_dryrun_and_preserves_correlation(monkeypatch):
     assert decision["decision"] == "dryrun_only"
     assert decision["execution_enabled"] is False
     assert decision["approval_required"] is False
+    datetime.fromisoformat(decision["decided_at"])
 
 
 def test_live_never_becomes_execution_enabled(monkeypatch):
