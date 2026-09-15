@@ -104,3 +104,9 @@ Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runti
   - `lifecycle_summary`: summarize task lifecycle states
 - All actions fail-closed, timeout-guarded, enable real autonomous analysis work.
 - Tests: 254/254 pass (3 new action tests with proper module-level save/restore).
+
+## Delta 29 — 2026-09-15 (Factory decision context)
+
+- Merged PR #313 (commit 6fad8f55): `scripts/factory_decision_context.py` — bounded Factory decision context from shared snapshot (interaction/admission/authority/assessment blocks, fail-closed).
+- Git strategy preserved my task worker expansion (bus_summary/test_status/lifecycle_summary) + new decision-context files.
+- Tests: 256/256 pass.
