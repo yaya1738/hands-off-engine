@@ -1,1 +1,1 @@
-# This branch is superseded; runtime wiring must be rebuilt from the complete Factory runtime.
+# Superseded branch. Use the complete Factory runtime from the canonical Factory lineage.
