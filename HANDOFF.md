@@ -46,3 +46,11 @@ No code change needed; requires account owner (Yair) to update payment method in
 Resolution: human account-level action; after clearing, re-run any workflow to confirm.
 
 Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runtimes alive.
+
+## Delta 23 — 2026-09-15 (bus compaction + duplicate node1 cleanup)
+
+- Killed duplicate node1 (pid 17611): pre-existing multi-AI bootstrap was emitting spurious BLOCKED events with stale test fixture strings ("token missing"/"bot token"). Existing `NodeLock` guard (fcntl.flock) now effective for preventing recurrence.
+- Implemented `scripts/bus_compact.py`: deduplicates by event_id/msg_id, drops stale blocker events (>24h), atomic write, dry-run mode. Live bus: 665 → 88 messages (577 noise events removed).
+- Control Room post-compaction: `window.truncated=false` (full bus now within 120-event window), `orphan_reply_count=0` (corrected from inflated noise).
+- Added `tests/test_bus_compact.py` (3 tests). Full suite: 236/236 pass.
+- Posted liveness + 3 bounded objectives on #279.
