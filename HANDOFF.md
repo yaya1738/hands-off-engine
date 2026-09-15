@@ -54,3 +54,14 @@ Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runti
 - Control Room post-compaction: `window.truncated=false` (full bus now within 120-event window), `orphan_reply_count=0` (corrected from inflated noise).
 - Added `tests/test_bus_compact.py` (3 tests). Full suite: 236/236 pass.
 - Posted liveness + 3 bounded objectives on #279.
+
+## Delta 24 — 2026-09-15 (admission observation contract)
+
+- Merged PR #312 (commit 2caaf376): canonical admission-observation path.
+  - `scripts/admission_observability.py`: reads latest explicit admission decision from bus, fail-closed.
+  - `scripts/admission_publisher.py`: publishes bounded admission decisions through CommHub.
+  - `scripts/factory_admission_observability.py`: projects admission observation from snapshot.
+  - `control_room_state.py`: adds `admission_observation` to shared snapshot.
+  - 12 new tests. Full suite: 248/248 pass.
+- Control Room live: `admission_observation: {available: false}` (fail-closed, no bus events yet).
+- PR #312 closed as completed. Bus: 102 messages, truncated=false.
