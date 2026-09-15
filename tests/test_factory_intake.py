@@ -179,3 +179,40 @@ def test_assignment_written_to_bus():
     assert len(assignments) == 1
     assert assignments[0]["context"]["task_id"].startswith("intake-")
     assert assignments[0]["context"]["source_event"] == "evt-bus"
+
+
+def test_task_completed_without_next_action_does_not_fan_out():
+    """Generic completion is observed but must not create a new assignment."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-completed-no-next",
+        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-no-next", "status": "success"},
+        "message": "completed successfully",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    assert decisions[0]["assigned_msg_id"] is None
+
+    with open(fi.MESSAGES_FILE) as f:
+        assignments = [json.loads(line) for line in f if line.strip() and json.loads(line).get("type") == "task_assignment"]
+    assert assignments == []
+
+
+def test_task_completed_with_next_action_fans_out():
+    """Explicit next_action permits intentional continuation fan-out."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-completed-next",
+        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-next", "status": "success", "next_action": "run system_status"},
+        "message": "completed; continue with status check",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    assert decisions[0]["assigned_msg_id"] == "factory-intake-" + fi._event_fingerprint({
+        "type": "continuation_event",
+        "event_id": "evt-completed-next",
+        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-next", "status": "success", "next_action": "run system_status"},
+        "message": "completed; continue with status check",
+    })[:12]
