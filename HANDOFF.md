@@ -84,3 +84,13 @@ Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runti
 - **self_improvement.py fix**: `generate_improvements` now loads applied titles from `improvement_applier_state.json` and skips already-applied candidates. Previously regenerates "Termux boot launcher", "sender validation", and "add tests" every cycle. Now 0 redundant candidates generated.
 - **Test fix**: `test_dashboard_learning_health.py` updated to use real bus format (context dict instead of message-as-JSON).
 - Full improvement cycle: 8/8 subsystems green. Full suite: 248/248 pass.
+
+## Delta 27 — 2026-09-15 (process supervisor)
+
+- Created `scripts/supervisor.py`: manages node1_runtime + yair_control_room with bounded backoff.
+  - Exponential backoff (5s → 5min), max 10 consecutive failures → 10min cooldown.
+  - File lock prevents duplicate supervisor instances.
+  - State tracked in `state/supervisor_state.json`.
+- Updated `termux/boot-start.sh` to use supervisor instead of individual process starts.
+- Tests: 251/251 pass (3 new supervisor tests).
+- This closes the reliability gap: if either process crashes, the supervisor restarts it automatically.
