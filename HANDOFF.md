@@ -17,3 +17,11 @@ Canonical bus: `ai/coordination/messages.jsonl`. Live changes to the bus are nev
 ### Open items
 - PR #280 (stale DASS heartbeat) — likely superseded by #302; awaiting Factory.
 - Next milestone: full continuous autonomous self-improvement loops; both runtimes now on same correlation contract.
+
+## Delta 20 — 2026-09-15 (observability adoption + bus-derived assessment)
+
+- Merged PR #307 (correlation health observability: bounded-window truncation probe, `window` shape, machine/Factory adapters) and PR #309 (factory_assessment snapshot projection).
+- Absorbed `6a08c55c` bus-derived Factory assessment + `eabf17b2` fail-closed sentinel fix in `_factory_assessment_observation`.
+- Fixed stale/inconsistent Factory tests to match tail-window semantics (correlated=0/orphan=2 for limit-3 over 4 events; `bounded_window_truncated` → `window`).
+- Tests: 233 passed. Live Control Room: `factory_assessment.available=false` (fail-closed), `correlation_health.window={bounded:true, limit:120, truncated:true}`, threads=20.
+- #284 updated (comment 5675173937); Telegram sent. Open: PR #280 (awaiting Factory); orphan-vs-truncation nuance flagged to Factory.
