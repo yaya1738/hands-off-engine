@@ -7,6 +7,7 @@ It runs all core services as a single supervised process:
 - Task worker: polls inbox, processes tasks, emits continuation events
 - Event router: reads messages.jsonl, routes events between parties
 - Factory intake: consumes continuation events, produces next tasks
+- Lifecycle projector: materializes durable task state from the canonical bus
 
 Design:
 - Durable: state persists across restarts (crash-safe)
@@ -206,6 +207,13 @@ class Node1Runtime:
             emitter = None
             log.warning("continuation emitter not available")
 
+        try:
+            from scripts.lifecycle_projection import LifecycleProjector
+            projector = LifecycleProjector(repo_root=REPO_ROOT)
+        except ImportError:
+            projector = None
+            log.warning("lifecycle_projection not available")
+
         # Main loop: 10s tick
         tick = 0
         while self.running:
@@ -231,6 +239,15 @@ class Node1Runtime:
                             )
                     except Exception as e:
                         log.error(f"Event router error: {e}")
+
+                # 2b. Lifecycle projection (observation only, every 30s)
+                if projector and tick % 3 == 0:
+                    try:
+                        projection = projector.project()
+                        self.state.data["lifecycle_tasks"] = projection["tasks"]
+                        self.state.data["lifecycle_last_changed"] = projection["changed"]
+                    except Exception as e:
+                        log.error(f"Lifecycle projection error: {e}")
 
                 # 3. Factory intake (consume continuation events, emit next task)
                 if intake and tick % 3 == 0:  # every 30s to avoid rapid looping
