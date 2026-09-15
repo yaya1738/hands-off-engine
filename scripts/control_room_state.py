@@ -12,31 +12,35 @@ ROOT = Path(__file__).resolve().parent.parent
 def _read_bus(path: Path, limit: int) -> List[dict]:
     if not path.exists() or limit <= 0:
         return []
-    rows: List[dict] = []
+    lines: List[bytes] = []
     with path.open("rb") as handle:
-        buffer = b""
-        while len(rows) < limit:
-            chunk = handle.read(8192)
-            if not chunk:
-                break
-            buffer += chunk
-            lines = buffer.split(b"\n")
-            buffer = lines.pop()
-            for line in lines:
-                try:
-                    value = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if isinstance(value, dict):
-                    rows.append(value)
-        if buffer and len(rows) < limit:
-            try:
-                value = json.loads(buffer)
-            except json.JSONDecodeError:
-                value = None
-            if isinstance(value, dict):
-                rows.append(value)
-    return rows[-limit:]
+        handle.seek(0, 2)
+        position = handle.tell()
+        carry = b""
+        while position > 0 and len(lines) < limit:
+            size = min(8192, position)
+            position -= size
+            handle.seek(position)
+            chunk = handle.read(size)
+            data = chunk + carry
+            parts = data.split(b"\n")
+            carry = parts.pop(0)
+            for line in reversed(parts):
+                if line:
+                    lines.append(line)
+                    if len(lines) >= limit:
+                        break
+    if carry and len(lines) < limit:
+        lines.append(carry)
+    rows: List[dict] = []
+    for line in reversed(lines[:limit]):
+        try:
+            value = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(value, dict):
+            rows.append(value)
+    return rows
 
 
 def _read_lifecycle(path: Path, limit: int) -> Dict[str, dict]:
