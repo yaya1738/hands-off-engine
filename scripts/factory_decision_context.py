@@ -13,6 +13,7 @@ def build_factory_decision_context(snapshot: Dict[str, Any]) -> Dict[str, Any]:
     health = snapshot.get("correlation_health")
     admission = snapshot.get("admission_observation")
     assessment = snapshot.get("factory_assessment")
+    authority = snapshot.get("authority_decision")
 
     if not isinstance(health, dict):
         health = {"available": False}
@@ -20,6 +21,8 @@ def build_factory_decision_context(snapshot: Dict[str, Any]) -> Dict[str, Any]:
         admission = {"available": False}
     if not isinstance(assessment, dict):
         assessment = {"available": False}
+    if not isinstance(authority, dict):
+        authority = {"available": False}
 
     return {
         "available": bool(health.get("available", False)),
@@ -42,6 +45,17 @@ def build_factory_decision_context(snapshot: Dict[str, Any]) -> Dict[str, Any]:
             "admitted": bool(admission.get("admitted", False)),
             "reason": admission.get("reason"),
             "decided_at": admission.get("decided_at"),
+        },
+        "authority": {
+            "available": bool(authority.get("available", False)),
+            "msg_id": authority.get("msg_id"),
+            "reply_to": authority.get("reply_to"),
+            "task_id": authority.get("task_id"),
+            "decision": authority.get("decision"),
+            "reason": authority.get("reason"),
+            "approval_required": bool(authority.get("approval_required", True)),
+            "execution_enabled": bool(authority.get("execution_enabled", False)),
+            "decided_at": authority.get("decided_at"),
         },
         "assessment": {
             "available": bool(assessment.get("available", False)),
