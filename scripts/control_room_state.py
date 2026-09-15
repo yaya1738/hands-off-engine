@@ -110,6 +110,59 @@ def _read_dass_heartbeat(path: Path) -> Dict[str, Any]:
     return {"available": True, "status": value.get("status"), "timestamp": value.get("timestamp"), "processed_commands": value.get("processed_commands", 0), "governed_decisions": value.get("governed_decisions", 0), "execution_enabled": False, "fail_closed": True}
 
 
+def _correlation_health(events: List[dict], bus_limit: int) -> Dict[str, Any]:
+    """Summarize explicit correlation quality without inferring relationships."""
+    msg_to_task: Dict[str, str] = {}
+    msg_ids = set()
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        context = event.get("context") or {}
+        msg_id = event.get("msg_id")
+        task_id = event.get("task_id") or context.get("task_id")
+        if msg_id is not None:
+            msg_ids.add(str(msg_id))
+            if task_id is not None:
+                msg_to_task[str(msg_id)] = str(task_id)
+
+    correlated = orphan = single = explicit_task = 0
+    task_keys = set()
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        context = event.get("context") or {}
+        task_id = event.get("task_id") or context.get("task_id")
+        reply_to = event.get("reply_to") or context.get("reply_to")
+        if task_id is not None:
+            explicit_task += 1
+            correlated += 1
+            task_keys.add(str(task_id))
+        elif reply_to is not None:
+            target = str(reply_to)
+            if target in msg_ids:
+                correlated += 1
+                target_task = msg_to_task.get(target)
+                if target_task:
+                    task_keys.add(target_task)
+            else:
+                orphan += 1
+        else:
+            single += 1
+
+    event_count = len(events)
+    return {
+        "available": bool(events),
+        "event_count": event_count,
+        "thread_count": len(task_keys),
+        "correlated_event_count": correlated,
+        "orphan_reply_count": orphan,
+        "single_event_count": single,
+        "explicit_task_event_count": explicit_task,
+        "explicit_task_thread_coverage": (explicit_task / event_count) if event_count else None,
+        "bounded_window_truncated": bool(bus_limit > 0 and event_count >= bus_limit),
+    }
+
+
 def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifecycle_limit: int = 100, intake_limit: int = 20, thread_limit: int = 20, events_per_thread: int = 20) -> Dict[str, Any]:
     """Return bounded bus + lifecycle + interaction state without executing or mutating work."""
     root = Path(repo_root) if repo_root else ROOT
@@ -125,6 +178,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
         "bus": {"available": bus.exists(), "event_count": len(events), "events": events},
         "lifecycle": {"available": lifecycle.exists(), "task_count": len(tasks), "tasks": tasks},
         "threads": project_threads(events, tasks, limit=thread_limit, events_per_thread=events_per_thread),
+        "correlation_health": _correlation_health(events, bus_limit),
         "intake": {"request": _read_request_intake(request_intake, intake_limit), "factory": _read_factory_intake(factory_intake, intake_limit)},
         "heartbeat": _read_dass_heartbeat(heartbeat),
     }
