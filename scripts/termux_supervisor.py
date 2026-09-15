@@ -68,6 +68,16 @@ DAEMONS = {
         "required": False,
         "timeout": None,
     },
+    "control_room": {
+        "script": REPO_ROOT / "scripts" / "yair_control_room.py",
+        "required": True,
+        "timeout": None,
+    },
+    "telegram_bridge": {
+        "script": REPO_ROOT / "scripts" / "telegram_bridge.py",
+        "required": True,
+        "timeout": None,
+    },
 }
 
 import fcntl
