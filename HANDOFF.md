@@ -77,3 +77,10 @@ Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runti
   - Objective 2: bus compaction (scripts/bus_compact.py, 665→88 messages)
   - Objective 3: Termux:Boot service (termux/boot-start.sh)
 - HEAD: ab1eb8a9 | 248/248 tests | Bus: ~102 messages | Node1 + Control Room alive
+
+## Delta 26 — 2026-09-15 (self-improvement loop fixes)
+
+- **learning_loop.py fix**: `analyze_outcomes` now reads `context.task_id` and `context.status` from bus task_result messages instead of trying to JSON-parse the `message` field (which is plain text). Learning state now correctly reports 100% success (6/6) instead of 0% (9 parse errors).
+- **self_improvement.py fix**: `generate_improvements` now loads applied titles from `improvement_applier_state.json` and skips already-applied candidates. Previously regenerates "Termux boot launcher", "sender validation", and "add tests" every cycle. Now 0 redundant candidates generated.
+- **Test fix**: `test_dashboard_learning_health.py` updated to use real bus format (context dict instead of message-as-JSON).
+- Full improvement cycle: 8/8 subsystems green. Full suite: 248/248 pass.
