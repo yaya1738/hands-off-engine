@@ -1,1 +1,1 @@
-# Retired. No runtime source changes belong on this branch.
+# Retired branch.
