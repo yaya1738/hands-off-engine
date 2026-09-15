@@ -41,7 +41,7 @@ def build_authority_input(context: Dict[str, Any]) -> Dict[str, Any]:
             "mode": "DRYRUN",
             "approval_status": "pending",
             "objective": objective,
-            "priority": assessment.get("health", 0),
+            "priority": 0,
             "correlation": {
                 "msg_id": str(msg_id) if msg_id else None,
                 "task_id": str(task_id) if task_id else None,
