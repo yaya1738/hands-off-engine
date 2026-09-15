@@ -40,6 +40,10 @@ class FactorySelfAssessment:
                 "capability_context",
                 {},
             ),
+            "interaction_health": metrics.get(
+                "interaction_health",
+                {},
+            ),
         }
 
         self._history.append(
@@ -69,6 +73,19 @@ class FactorySelfAssessment:
             gaps.append(
                 "low improvement impact"
             )
+
+        interaction = metrics.get(
+            "interaction_health",
+            {},
+        )
+
+        if isinstance(interaction, dict) and interaction.get("available", False):
+            if interaction.get("interaction_correlation_rate", 1.0) < 0.8:
+                gaps.append("low interaction correlation")
+            if interaction.get("interaction_orphan_replies", 0) > 0:
+                gaps.append("orphaned interaction replies")
+            if interaction.get("interaction_window_truncated", False):
+                gaps.append("truncated interaction observation window")
 
         return gaps
 
