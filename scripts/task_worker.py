@@ -53,6 +53,9 @@ ALLOWED_ACTIONS = frozenset({
     "read_file_fact",
     "list_backends",
     "list_parties",
+    "bus_summary",
+    "test_status",
+    "lifecycle_summary",
 })
 
 SAFE_READ_DIRS = frozenset({
@@ -228,6 +231,61 @@ def process_task(task):
             from scripts.comm_hub import CommHub
             hub = CommHub(repo_root=REPO_ROOT)
             result = {"status": "success", "result": [p["id"] for p in hub.list_parties()]}
+        elif action == "bus_summary":
+            bus_file = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
+            if bus_file.exists():
+                from collections import Counter
+                msgs = []
+                for line in bus_file.read_text().splitlines():
+                    if line.strip():
+                        try: msgs.append(json.loads(line))
+                        except: pass
+                types = Counter(m.get("type", "?") for m in msgs)
+                msg_ids = [m.get("msg_id") or m.get("event_id") for m in msgs]
+                unique_ids = len(set(mid for mid in msg_ids if mid))
+                result = {"status": "success", "result": {
+                    "total": len(msgs),
+                    "by_type": dict(types.most_common()),
+                    "unique_ids": unique_ids,
+                    "dedup_ratio": round(unique_ids / max(len(msgs), 1), 2),
+                    "truncated": len(msgs) > 120,
+                }}
+            else:
+                result = {"status": "error", "error": "Bus file not found"}
+        elif action == "test_status":
+            import subprocess
+            try:
+                r = subprocess.run(
+                    [sys.executable, "-m", "pytest", "tests/",
+                     "--ignore=tests/integration", "--ignore=tests/unit",
+                     "--ignore=tests/test_alpha_pipeline.py", "-q", "--tb=no"],
+                    capture_output=True, text=True, cwd=str(REPO_ROOT), timeout=120
+                )
+                output = r.stdout.strip()
+                passed = output.count(".") if "." in output else 0
+                result = {"status": "success", "result": {
+                    "exit_code": r.returncode,
+                    "passed": passed,
+                    "output_preview": output[:200],
+                }}
+            except subprocess.TimeoutExpired:
+                result = {"status": "error", "error": "Test suite timed out (120s)"}
+            except Exception as e:
+                result = {"status": "error", "error": str(e)}
+        elif action == "lifecycle_summary":
+            lifecycle_file = REPO_ROOT / "state" / "task_lifecycle.json"
+            if lifecycle_file.exists():
+                lc = json.loads(lifecycle_file.read_text())
+                states = {}
+                for tid, entry in lc.items():
+                    state = max((entry.get("states", {}).keys()), key=lambda s: entry["states"].get(s, ""), default="unknown")
+                    states[state] = states.get(state, 0) + 1
+                result = {"status": "success", "result": {
+                    "total_tasks": len(lc),
+                    "by_state": states,
+                }}
+            else:
+                result = {"status": "success", "result": {"total_tasks": 0, "by_state": {}}}
         else:
             result = {"status": "error", "error": f"Action '{action}' not implemented"}
     except Exception as e:
