@@ -110,7 +110,7 @@ def _read_dass_heartbeat(path: Path) -> Dict[str, Any]:
     return {"available": True, "status": value.get("status"), "timestamp": value.get("timestamp"), "processed_commands": value.get("processed_commands", 0), "governed_decisions": value.get("governed_decisions", 0), "execution_enabled": False, "fail_closed": True}
 
 
-def _correlation_health(events: List[dict], bus_limit: int) -> Dict[str, Any]:
+def _correlation_health(events: List[dict], bus_limit: int, window_truncated: bool = False) -> Dict[str, Any]:
     """Summarize explicit correlation quality without inferring relationships."""
     msg_to_task: Dict[str, str] = {}
     msg_ids = set()
@@ -126,7 +126,7 @@ def _correlation_health(events: List[dict], bus_limit: int) -> Dict[str, Any]:
                 msg_to_task[str(msg_id)] = str(task_id)
 
     correlated = orphan = single = explicit_task = 0
-    task_keys = set()
+    thread_keys = set()
     for event in events:
         if not isinstance(event, dict):
             continue
@@ -136,30 +136,31 @@ def _correlation_health(events: List[dict], bus_limit: int) -> Dict[str, Any]:
         if task_id is not None:
             explicit_task += 1
             correlated += 1
-            task_keys.add(str(task_id))
+            thread_keys.add(f"task:{task_id}")
         elif reply_to is not None:
             target = str(reply_to)
             if target in msg_ids:
                 correlated += 1
                 target_task = msg_to_task.get(target)
-                if target_task:
-                    task_keys.add(target_task)
+                thread_keys.add(f"task:{target_task}" if target_task else f"reply:{target}")
             else:
                 orphan += 1
         else:
             single += 1
+            if event.get("msg_id") is not None:
+                thread_keys.add(f"msg:{event['msg_id']}")
 
     event_count = len(events)
     return {
         "available": bool(events),
         "event_count": event_count,
-        "thread_count": len(task_keys),
+        "thread_count": len(thread_keys),
         "correlated_event_count": correlated,
         "orphan_reply_count": orphan,
         "single_event_count": single,
         "explicit_task_event_count": explicit_task,
         "explicit_task_thread_coverage": (explicit_task / event_count) if event_count else None,
-        "bounded_window_truncated": bool(bus_limit > 0 and event_count >= bus_limit),
+        "window": {"bounded": bus_limit > 0, "limit": bus_limit, "truncated": window_truncated},
     }
 
 
@@ -168,7 +169,10 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
     root = Path(repo_root) if repo_root else ROOT
     bus = root / "ai" / "coordination" / "messages.jsonl"
     lifecycle = root / "state" / "task_lifecycle.json"
-    events = _read_bus(bus, bus_limit)
+    probe_limit = bus_limit + 1 if bus_limit > 0 else 0
+    probed_events = _read_bus(bus, probe_limit)
+    window_truncated = bus_limit > 0 and len(probed_events) > bus_limit
+    events = probed_events[-bus_limit:] if bus_limit > 0 else []
     tasks = _read_lifecycle(lifecycle, lifecycle_limit)
     request_intake = root / "state" / "request_intake_state.json"
     factory_intake = root / "state" / "factory_intake_state.json"
@@ -178,7 +182,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
         "bus": {"available": bus.exists(), "event_count": len(events), "events": events},
         "lifecycle": {"available": lifecycle.exists(), "task_count": len(tasks), "tasks": tasks},
         "threads": project_threads(events, tasks, limit=thread_limit, events_per_thread=events_per_thread),
-        "correlation_health": _correlation_health(events, bus_limit),
+        "correlation_health": _correlation_health(events, bus_limit, window_truncated),
         "intake": {"request": _read_request_intake(request_intake, intake_limit), "factory": _read_factory_intake(factory_intake, intake_limit)},
         "heartbeat": _read_dass_heartbeat(heartbeat),
     }
