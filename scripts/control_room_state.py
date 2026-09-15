@@ -169,6 +169,8 @@ def _factory_assessment_observation(assessment: Optional[Dict[str, Any]]) -> Dic
     """Project an already-produced Factory assessment without re-observing or mutating it."""
     if not isinstance(assessment, dict):
         return {"available": False}
+    if assessment.get("available") is False:
+        return {"available": False}
     interaction = assessment.get("interaction_health", {})
     if not isinstance(interaction, dict):
         interaction = {}
