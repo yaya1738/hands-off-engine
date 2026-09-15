@@ -133,53 +133,82 @@ def _read_dass_heartbeat(path: Path) -> Dict[str, Any]:
 
 
 def _build_threads(events: List[dict], lifecycle_tasks: Dict[str, dict], limit: int = 10) -> Dict[str, Any]:
-    """Build a bounded thread view using only explicitly observed ids.
+    """Build bounded threads from explicit IDs only.
 
-    Threads are joined exclusively on msg_id / task_id / reply_to equality;
-    relationships are never inferred from ordering or message text. Missing
-    identifiers render as "unknown". Read-only; no routing or mutation.
+    task_id is authoritative when present. reply_to links only to an observed
+    msg_id, and the target's explicit task_id wins when that target belongs to
+    a task. Relationships are resolved independent of event ordering; no
+    proximity or message-text inference is used. Read-only; no routing/mutation.
     """
-    known_ids = set()
+    if limit <= 0:
+        return {"available": bool(events), "count": 0, "threads": []}
+
+    msg_to_task: Dict[str, str] = {}
+    msg_ids = set()
     for event in events:
+        if not isinstance(event, dict):
+            continue
         context = event.get("context") or {}
-        if event.get("msg_id"):
-            known_ids.add(event["msg_id"])
-        if context.get("task_id"):
-            known_ids.add(context["task_id"])
+        msg_id = event.get("msg_id")
+        task_id = event.get("task_id") or context.get("task_id")
+        if msg_id:
+            msg_ids.add(str(msg_id))
+            if task_id:
+                msg_to_task[str(msg_id)] = str(task_id)
+
+    def target_key(reply_to: Any) -> Optional[str]:
+        if reply_to is None:
+            return None
+        target = str(reply_to)
+        if target not in msg_ids:
+            return None
+        task_id = msg_to_task.get(target)
+        return f"task:{task_id}" if task_id else f"msg:{target}"
 
     threads: Dict[str, dict] = {}
     order: List[str] = []
-    for event in events:
+    for index, event in enumerate(events):
+        if not isinstance(event, dict):
+            continue
         context = event.get("context") or {}
-        mid = event.get("msg_id")
-        tid = context.get("task_id")
-        reply = context.get("reply_to")
-        if reply and reply in known_ids:
-            key = reply
-        elif tid and tid in known_ids:
-            key = tid
-        elif mid:
-            key = mid
+        msg_id = event.get("msg_id")
+        task_id = event.get("task_id") or context.get("task_id")
+        reply_to = event.get("reply_to") or context.get("reply_to")
+
+        if task_id:
+            key = f"task:{task_id}"
+            quality = "correlated"
         else:
-            key = f"unknown-{len(order) + 1}"
+            key = target_key(reply_to)
+            if key is not None:
+                quality = "correlated"
+            elif reply_to is not None:
+                key = f"orphan:{msg_id or f'event-{index + 1}'}"
+                quality = "orphan_reply"
+            elif msg_id:
+                key = f"msg:{msg_id}"
+                quality = "single_event"
+            else:
+                key = f"unknown:{index + 1}"
+                quality = "single_event"
+
         if key not in threads:
-            threads[key] = {"key": key, "events": []}
+            threads[key] = {"key": key, "events": [], "correlation_quality": quality}
             order.append(key)
         entry = {
-            "msg_id": mid or "unknown",
+            "msg_id": msg_id or "unknown",
             "type": event.get("type", "unknown"),
             "timestamp": event.get("timestamp", ""),
-            "task_id": tid or "unknown",
-            "reply_to": reply or "unknown",
-            "lifecycle_state": (lifecycle_tasks.get(tid) or lifecycle_tasks.get(mid) or {}).get("current_state", "unknown"),
+            "task_id": task_id or "unknown",
+            "reply_to": reply_to or "unknown",
+            "lifecycle_state": (lifecycle_tasks.get(str(task_id)) or {}).get("current_state", "unknown") if task_id else "unknown",
+            "correlation_quality": quality,
         }
         threads[key]["events"].append(entry)
+        if quality == "correlated":
+            threads[key]["correlation_quality"] = "correlated"
 
-    out = []
-    for key in order:
-        out.append(threads[key])
-        if len(out) >= limit:
-            break
+    out = [threads[key] for key in order[-limit:]]
     return {
         "available": bool(events),
         "count": len(out),
@@ -200,20 +229,9 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
     return {
         "threads": _build_threads(events, tasks, thread_limit),
         "source_of_truth": "ai/coordination/messages.jsonl",
-        "bus": {
-            "available": bus.exists(),
-            "event_count": len(events),
-            "events": events,
-        },
-        "lifecycle": {
-            "available": lifecycle.exists(),
-            "task_count": len(tasks),
-            "tasks": tasks,
-        },
-        "intake": {
-            "request": _read_request_intake(request_intake, intake_limit),
-            "factory": _read_factory_intake(factory_intake, intake_limit),
-        },
+        "bus": {"available": bus.exists(), "event_count": len(events), "events": events},
+        "lifecycle": {"available": lifecycle.exists(), "task_count": len(tasks), "tasks": tasks},
+        "intake": {"request": _read_request_intake(request_intake, intake_limit), "factory": _read_factory_intake(factory_intake, intake_limit)},
         "heartbeat": _read_dass_heartbeat(heartbeat),
     }
 
