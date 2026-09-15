@@ -38,13 +38,15 @@ def _read_bus(path: Path, limit: int) -> List[dict]:
     if carry and len(lines) < limit:
         lines.append(carry)
     rows: List[dict] = []
-    for line in reversed(lines[:limit]):
+    for line in reversed(lines):
         try:
             value = json.loads(line)
         except json.JSONDecodeError:
             continue
         if isinstance(value, dict):
             rows.append(value)
+            if len(rows) >= limit:
+                break
     return rows
 
 
