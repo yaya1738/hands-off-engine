@@ -40,7 +40,7 @@ def _read_bus(path: Path, limit: int) -> List[dict]:
                     continue
                 try:
                     value = json.loads(line)
-                except json.JSONDecodeError:
+                except (json.JSONDecodeError, UnicodeDecodeError):
                     continue
                 if isinstance(value, dict):
                     rows.append(value)
@@ -49,7 +49,7 @@ def _read_bus(path: Path, limit: int) -> List[dict]:
     if carry and len(rows) < limit:
         try:
             value = json.loads(carry)
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, UnicodeDecodeError):
             value = None
         if isinstance(value, dict):
             rows.append(value)

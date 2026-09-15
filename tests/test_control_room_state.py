@@ -57,6 +57,20 @@ def test_snapshot_skips_malformed_bus_tail_until_limit(tmp_path: Path):
     assert bus.read_text() == before
 
 
+
+
+def test_snapshot_skips_invalid_utf8_bus_tail_until_limit(tmp_path: Path):
+    bus = tmp_path / "ai" / "coordination" / "messages.jsonl"
+    bus.parent.mkdir(parents=True)
+    bus.write_bytes(
+        json.dumps({"type": "x", "n": 1}).encode() + b"\n"
+        + json.dumps({"type": "x", "n": 2}).encode() + b"\n"
+        + b"{\xffinvalid}\n"
+    )
+    snapshot = build_snapshot(tmp_path, bus_limit=2, lifecycle_limit=0)
+    assert [event["n"] for event in snapshot["bus"]["events"]] == [1, 2]
+
+
 def test_lifecycle_limit_selects_newest_by_updated_at(tmp_path: Path):
     lifecycle = tmp_path / "state" / "task_lifecycle.json"
     lifecycle.parent.mkdir(parents=True)
