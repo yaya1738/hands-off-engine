@@ -88,6 +88,57 @@ def _teardown(intake):
     shutil.rmtree(intake._tmp)
 
 
+
+
+def _seed_repo(tmp):
+    """Seed a checkout-local repo root with party registry + empty bus."""
+    (tmp / "state").mkdir(parents=True, exist_ok=True)
+    (tmp / "ai" / "coordination").mkdir(parents=True, exist_ok=True)
+    parties = {"anyclaw": {"id": "anyclaw", "name": "AnyClaw", "role": "agent", "trust_level": 9, "channels": ["messages_jsonl"]}}
+    (tmp / "state" / "party_registry.json").write_text(json.dumps(parties))
+    return tmp
+
+
+def test_two_repo_roots_do_not_cross_contaminate():
+    """RequestIntake instances are fully checkout-local (no module-global state)."""
+    tmp_a = _seed_repo(Path(tempfile.mkdtemp()))
+    tmp_b = _seed_repo(Path(tempfile.mkdtemp()))
+
+    with open(tmp_a / "ai" / "coordination" / "messages.jsonl", "a") as f:
+        f.write(json.dumps({
+            "from": "anyclaw", "to": "factory", "type": "task_request",
+            "message": "request A", "msg_id": "req-a",
+            "context": {"request_type": "work_request", "params": {}},
+        }) + "\n")
+    with open(tmp_b / "ai" / "coordination" / "messages.jsonl", "a") as f:
+        f.write(json.dumps({
+            "from": "anyclaw", "to": "factory", "type": "task_request",
+            "message": "request B", "msg_id": "req-b",
+            "context": {"request_type": "work_request", "params": {}},
+        }) + "\n")
+
+    intake_a = fri.RequestIntake(repo_root=tmp_a)
+    decisions_a = intake_a.admit_once()
+    assert len(decisions_a) == 1 and decisions_a[0]["msg_id"] == "req-a"
+
+    intake_b = fri.RequestIntake(repo_root=tmp_b)
+    decisions_b = intake_b.admit_once()
+    assert len(decisions_b) == 1 and decisions_b[0]["msg_id"] == "req-b"
+
+    # Cross-contamination would leak req-a into B's admission set or state file.
+    assert "req-a" not in intake_b.admitted_ids
+    assert "req-b" not in intake_a.admitted_ids
+    state_a = json.loads((tmp_a / "state" / "request_intake_state.json").read_text())
+    state_b = json.loads((tmp_b / "state" / "request_intake_state.json").read_text())
+    admitted_a = [d["msg_id"] for d in state_a.get("admissions", [])]
+    admitted_b = [d["msg_id"] for d in state_b.get("admissions", [])]
+    assert admitted_a == ["req-a"]
+    assert admitted_b == ["req-b"]
+
+    for tmp in (tmp_a, tmp_b):
+        shutil.rmtree(tmp)
+
+
 def _write_task_request(msg_id, sender="anyclaw", request_type="work_request", message="Ready for work"):
     """Write a task_request message to the bus."""
     with open(fri.MESSAGES_FILE, "a") as f:
@@ -229,14 +280,8 @@ def test_restart_does_not_re_admit():
         d1 = intake.admit_once()
         assert len(d1) == 2
 
-        # Simulate restart: create new intake from same state file
-        state_file = intake.state_file
-        fri.INTAKE_STATE = state_file
-        intake2 = fri.RequestIntake()
-        intake2.repo_root = intake._tmp
-        intake2.messages_file = fri.MESSAGES_FILE
-        intake2.state_file = state_file
-        intake2.parties = json.loads((intake._tmp / "state" / "party_registry.json").read_text())
+        # Simulate restart: create a fresh checkout-local intake from the same repo root
+        intake2 = fri.RequestIntake(repo_root=intake._tmp)
 
         d2 = intake2.admit_once()
         assert len(d2) == 0  # already in state, no re-admit

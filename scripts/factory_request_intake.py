@@ -47,21 +47,23 @@ ALLOWED_SENDERS = frozenset({"anyclaw", "openclaw"})
 MAX_MESSAGE_LENGTH = 2048
 
 
-def _load_party_registry() -> dict:
+def _load_party_registry(path: Optional[Path] = None) -> dict:
     """Load party registry for sender validation."""
-    if PARTY_REGISTRY.exists():
+    registry_path = Path(path) if path else PARTY_REGISTRY
+    if registry_path.exists():
         try:
-            return json.loads(PARTY_REGISTRY.read_text())
+            return json.loads(registry_path.read_text())
         except Exception:
             pass
     return {}
 
 
-def _load_state() -> dict:
+def _load_state(path: Optional[Path] = None) -> dict:
     """Load durable intake state."""
-    if INTAKE_STATE.exists():
+    state_path = Path(path) if path else INTAKE_STATE
+    if state_path.exists():
         try:
-            return json.loads(INTAKE_STATE.read_text())
+            return json.loads(state_path.read_text())
         except Exception:
             pass
     return {
@@ -72,10 +74,11 @@ def _load_state() -> dict:
     }
 
 
-def _save_state(state: dict):
+def _save_state(state: dict, path: Optional[Path] = None):
     """Persist intake state."""
-    INTAKE_STATE.parent.mkdir(parents=True, exist_ok=True)
-    INTAKE_STATE.write_text(json.dumps(state, indent=2) + "\n")
+    state_path = Path(path) if path else INTAKE_STATE
+    state_path.parent.mkdir(parents=True, exist_ok=True)
+    state_path.write_text(json.dumps(state, indent=2) + "\n")
 
 
 def _fingerprint(msg: dict) -> str:
@@ -95,10 +98,11 @@ class RequestIntake:
         self.repo_root = Path(repo_root) if repo_root else REPO_ROOT
         self.messages_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
         self.state_file = self.repo_root / "state" / "request_intake_state.json"
-        self.state = _load_state()
+        self.party_registry = self.repo_root / "state" / "party_registry.json"
+        self.state = _load_state(self.state_file)
         self.admitted_ids = set(self.state.get("admitted_ids", []))
         self.rejected_ids = set(self.state.get("rejected_ids", []))
-        self.parties = _load_party_registry()
+        self.parties = _load_party_registry(self.party_registry)
 
     def _persist(self):
         """Save state with bounded history."""
@@ -106,7 +110,7 @@ class RequestIntake:
         self.state["rejected_ids"] = sorted(self.rejected_ids)[-2000:]
         self.state["admissions"] = self.state.get("admissions", [])[-200:]
         self.state["rejections"] = self.state.get("rejections", [])[-200:]
-        _save_state(self.state)
+        _save_state(self.state, self.state_file)
 
     def _validate_sender(self, msg: dict) -> Tuple[bool, str]:
         """Validate sender is registered and allowed to make requests."""
