@@ -31,6 +31,18 @@ def test_snapshot_is_bounded_and_read_only(tmp_path: Path):
     assert bus.read_text() == before
 
 
+def test_snapshot_skips_malformed_bus_tail_until_limit(tmp_path: Path):
+    bus = tmp_path / "ai" / "coordination" / "messages.jsonl"
+    bus.parent.mkdir(parents=True)
+    bus.write_text("\n".join([
+        json.dumps({"type": "x", "n": 1}),
+        json.dumps({"type": "x", "n": 2}),
+        "{partial",
+    ]) + "\n")
+    snapshot = build_snapshot(tmp_path, bus_limit=2, lifecycle_limit=0)
+    assert [event["n"] for event in snapshot["bus"]["events"]] == [1, 2]
+
+
 def test_lifecycle_limit_selects_newest_by_updated_at(tmp_path: Path):
     lifecycle = tmp_path / "state" / "task_lifecycle.json"
     lifecycle.parent.mkdir(parents=True)
