@@ -1,1 +1,1 @@
-# Superseded branch. Use the complete Factory runtime from the canonical Factory lineage.
+# Retired. No runtime source changes belong on this branch.
