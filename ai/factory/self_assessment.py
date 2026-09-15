@@ -1,9 +1,15 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
+
+from ai.factory.interaction_health_observer import FactoryInteractionHealthObserver
 
 
 class FactorySelfAssessment:
-    def __init__(self):
+    def __init__(
+        self,
+        interaction_observer: Optional[FactoryInteractionHealthObserver] = None,
+    ):
         self._history: List[Dict[str, Any]] = []
+        self._interaction_observer = interaction_observer or FactoryInteractionHealthObserver()
 
     def assess(
         self,
@@ -16,10 +22,17 @@ class FactorySelfAssessment:
 
         health = success_rate
 
+        interaction_health = metrics.get("interaction_health")
+        if interaction_health is None:
+            interaction_health = self._interaction_observer.observe()
+
+        assessment_metrics = dict(metrics)
+        assessment_metrics["interaction_health"] = interaction_health
+
         result = {
             "health": health,
             "gaps": self.detect_gaps(
-                metrics
+                assessment_metrics
             ),
             "objective": metrics.get(
                 "objective"
@@ -40,10 +53,7 @@ class FactorySelfAssessment:
                 "capability_context",
                 {},
             ),
-            "interaction_health": metrics.get(
-                "interaction_health",
-                {},
-            ),
+            "interaction_health": interaction_health,
         }
 
         self._history.append(
