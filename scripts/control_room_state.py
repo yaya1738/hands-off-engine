@@ -164,7 +164,23 @@ def _correlation_health(events: List[dict], bus_limit: int, window_truncated: bo
     }
 
 
-def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifecycle_limit: int = 100, intake_limit: int = 20, thread_limit: int = 20, events_per_thread: int = 20) -> Dict[str, Any]:
+def _factory_assessment_observation(assessment: Optional[Dict[str, Any]]) -> Dict[str, Any]:
+    """Project an already-produced Factory assessment without re-observing or mutating it."""
+    if not isinstance(assessment, dict):
+        return {"available": False}
+    interaction = assessment.get("interaction_health", {})
+    if not isinstance(interaction, dict):
+        interaction = {}
+    return {
+        "available": True,
+        "health": assessment.get("health"),
+        "gaps": list(assessment.get("gaps", [])),
+        "objective": assessment.get("objective"),
+        "interaction_health": interaction,
+    }
+
+
+def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifecycle_limit: int = 100, intake_limit: int = 20, thread_limit: int = 20, events_per_thread: int = 20, factory_assessment: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
     """Return bounded bus + lifecycle + interaction state without executing or mutating work."""
     root = Path(repo_root) if repo_root else ROOT
     bus = root / "ai" / "coordination" / "messages.jsonl"
@@ -183,6 +199,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
         "lifecycle": {"available": lifecycle.exists(), "task_count": len(tasks), "tasks": tasks},
         "threads": project_threads(events, tasks, limit=thread_limit, events_per_thread=events_per_thread),
         "correlation_health": _correlation_health(events, bus_limit, window_truncated),
+        "factory_assessment": _factory_assessment_observation(factory_assessment),
         "intake": {"request": _read_request_intake(request_intake, intake_limit), "factory": _read_factory_intake(factory_intake, intake_limit)},
         "heartbeat": _read_dass_heartbeat(heartbeat),
     }
