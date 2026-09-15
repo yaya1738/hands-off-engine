@@ -25,3 +25,15 @@ Canonical bus: `ai/coordination/messages.jsonl`. Live changes to the bus are nev
 - Fixed stale/inconsistent Factory tests to match tail-window semantics (correlated=0/orphan=2 for limit-3 over 4 events; `bounded_window_truncated` → `window`).
 - Tests: 233 passed. Live Control Room: `factory_assessment.available=false` (fail-closed), `correlation_health.window={bounded:true, limit:120, truncated:true}`, threads=20.
 - #284 updated (comment 5675173937); Telegram sent. Open: PR #280 (awaiting Factory); orphan-vs-truncation nuance flagged to Factory.
+
+## Delta 21 — 2026-09-15 (cleanup + #288 architecture review)
+
+Housekeeping: closed PR #308 (superseded by #309+6a08c55c), PR #280 (DASS heartbeat superseded by #302), issue #306 (resolved by #307), issue #283 (Telegram blocker resolved).
+
+Architecture review (#288 — 4 invariants confirmed):
+1. task_id/reply_to: preserved verbatim through task_assignment → task_result → continuation (live-bus trace: intake-20260914163206 reply_to=281 in both).
+2. Exactly-once: PublishLock + fcntl.flock + existing-id scan; 0 duplicate task_results on live bus.
+3. Read-only + Termux-safe: all observation adapters pure reads; lifecycle_projection writes only gitignored state/; no native deps.
+4. Fan-out guard: `_should_follow_up` returns False for standard task_completed (no next_action); regression test confirms.
+
+Tests: 233/233. Open: #305 (CI observability), #279 (DASS coordination).
