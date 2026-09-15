@@ -111,6 +111,27 @@ def _read_factory_intake(path: Path, limit: int) -> Dict[str, Any]:
     return {"available": True, "decision_count": len(decisions), "decisions": decisions[-limit:]}
 
 
+def _read_dass_heartbeat(path: Path) -> Dict[str, Any]:
+    """Expose heartbeat status as read-only telemetry; never infer authority."""
+    if not path.exists():
+        return {"available": False}
+    try:
+        value = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return {"available": False}
+    if not isinstance(value, dict):
+        return {"available": False}
+    return {
+        "available": True,
+        "status": value.get("status"),
+        "timestamp": value.get("timestamp"),
+        "processed_commands": value.get("processed_commands", 0),
+        "governed_decisions": value.get("governed_decisions", 0),
+        "execution_enabled": False,
+        "fail_closed": True,
+    }
+
+
 def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifecycle_limit: int = 100, intake_limit: int = 20) -> Dict[str, Any]:
     """Return bounded bus + lifecycle state without executing or mutating work."""
     root = Path(repo_root) if repo_root else ROOT
@@ -120,6 +141,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
     tasks = _read_lifecycle(lifecycle, lifecycle_limit)
     request_intake = root / "state" / "request_intake_state.json"
     factory_intake = root / "state" / "factory_intake_state.json"
+    heartbeat = root / "state" / "dass_heartbeat_status.json"
     return {
         "source_of_truth": "ai/coordination/messages.jsonl",
         "bus": {
@@ -136,6 +158,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
             "request": _read_request_intake(request_intake, intake_limit),
             "factory": _read_factory_intake(factory_intake, intake_limit),
         },
+        "heartbeat": _read_dass_heartbeat(heartbeat),
     }
 
 
@@ -149,5 +172,4 @@ def main() -> None:
     print(json.dumps(build_snapshot(args.repo_root, args.bus_limit, args.lifecycle_limit), indent=2, sort_keys=True))
 
 
-if __name__ == "__main__":
-    main()
+if __name__ == "__main__": main()
