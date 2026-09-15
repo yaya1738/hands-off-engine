@@ -61,6 +61,29 @@ def _event_fingerprint(event: dict) -> str:
     return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
+NEXT_ACTION_FIELDS = ("next_action", "follow_up", "followup")
+
+
+def _explicit_next_action(event: dict) -> Optional[dict]:
+    """Return the event's declared follow-up action, or None (fail-closed).
+
+    Only an explicitly declared next action authorizes promotion of a
+    completed task into a new assignment; otherwise no generic follow-up is
+    emitted.
+    """
+    context = event.get("context") or {}
+    for field in NEXT_ACTION_FIELDS:
+        spec = context.get(field)
+        if isinstance(spec, dict) and spec.get("action"):
+            return dict(spec)
+    if context.get("action"):
+        spec = {"action": context["action"], "params": context.get("params") or {}}
+        if context.get("reply_to"):
+            spec["reply_to"] = context["reply_to"]
+        return spec
+    return None
+
+
 def read_continuation_events(messages_file: Optional[Path] = None) -> List[dict]:
     path = Path(messages_file) if messages_file else MESSAGES_FILE
     if not path.exists():
@@ -137,7 +160,8 @@ class FactoryIntake:
             return None
         task_id = _get_task_correlation(event) or "uncorrelated"
         if not self._should_follow_up(event, task_id):
-            decision = {"fingerprint": fp, "event_id": event.get("event_id") or event.get("msg_id"), "event_type": event_type, "task_id": task_id, "assigned_msg_id": None, "decided_at": datetime.now(timezone.utc).isoformat()}
+            reason = "no_explicit_next_action" if event_type == "task_completed" else None
+            decision = {"fingerprint": fp, "event_id": event.get("event_id") or event.get("msg_id"), "event_type": event_type, "task_id": task_id, "assigned_msg_id": None, "reason": reason, "decided_at": datetime.now(timezone.utc).isoformat()}
             self.decisions.append(decision)
             self._persist()
             return decision
@@ -155,7 +179,9 @@ class FactoryIntake:
             return True
         if event_type == "task_completed":
             status = (event.get("context") or {}).get("status", "")
-            return status in {"success", "error", "failed"}
+            if status not in {"success", "error", "failed"}:
+                return False
+            return _explicit_next_action(event) is not None
         return False
 
     def _emit_next_task(self, event: dict, task_id: str) -> dict:
@@ -165,7 +191,11 @@ class FactoryIntake:
         source_id = event.get("event_id") or event.get("msg_id") or suffix
         next_task_id = f"intake-{now.strftime('%Y%m%d%H%M%S')}-{suffix}"
         msg_id = f"factory-intake-{suffix}"
-        assignment = {"from": "factory", "to": TARGET_PARTY, "type": "task_assignment", "message": f"Factory continuation intake: follow-up on {task_id[:12]}... ({_get_event_type(event)})", "msg_id": msg_id, "timestamp": now.isoformat(), "context": {"task_id": next_task_id, "action": "system_status", "params": {}, "reply_to": "281", "source_event": source_id, "source_event_type": _get_event_type(event)}}
+        next_action = _explicit_next_action(event) or {}
+        action = next_action.get("action") or "system_status"
+        params = next_action.get("params") or {}
+        reply_to = next_action.get("reply_to") or (event.get("context") or {}).get("reply_to") or source_id
+        assignment = {"from": "factory", "to": TARGET_PARTY, "type": "task_assignment", "message": f"Factory continuation intake: follow-up on {task_id[:12]}... ({_get_event_type(event)})", "msg_id": msg_id, "timestamp": now.isoformat(), "context": {"task_id": next_task_id, "action": action, "params": params, "reply_to": reply_to, "source_event": source_id, "source_event_type": _get_event_type(event), "source_task_id": task_id}}
         try:
             messages_path.parent.mkdir(parents=True, exist_ok=True)
             with messages_path.open("a") as f:

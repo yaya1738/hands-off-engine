@@ -150,6 +150,64 @@ def test_all_wake_types_accepted():
         assert len(decisions) == 1, f"Wake type {wake_type} should be accepted"
 
 
+
+
+def test_task_completed_without_explicit_action_not_promoted():
+    """task_completed without an explicit next action is not promoted (fail-closed)."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-generic-done",
+        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-generic", "status": "success"},
+        "message": "done",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    assert decisions[0]["assigned_msg_id"] is None
+    assert decisions[0]["reason"] == "no_explicit_next_action"
+
+    assignments = []
+    with open(fi.MESSAGES_FILE) as f:
+        for line in f:
+            if line.strip() and json.loads(line).get("type") == "task_assignment":
+                assignments.append(json.loads(line))
+    assert assignments == [], "Generic task_completed must not fan out an assignment"
+
+
+def test_task_completed_with_explicit_action_promoted():
+    """task_completed with an explicit next_action is promoted with that exact spec."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-explicit-done",
+        "context": {
+            "event_type": "task_completed",
+            "is_wake": True,
+            "task_id": "t-explicit",
+            "status": "success",
+            "next_action": {"action": "verify_checkout", "params": {"path": "scripts/factory_intake.py"}, "reply_to": "t-explicit"},
+        },
+        "message": "done",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    assert decisions[0]["assigned_msg_id"] is not None
+
+    assignments = []
+    with open(fi.MESSAGES_FILE) as f:
+        for line in f:
+            if line.strip() and json.loads(line).get("type") == "task_assignment":
+                assignments.append(json.loads(line))
+    assert len(assignments) == 1
+    ctx = assignments[0]["context"]
+    assert ctx["action"] == "verify_checkout"
+    assert ctx["params"] == {"path": "scripts/factory_intake.py"}
+    assert ctx["reply_to"] == "t-explicit"
+    assert ctx["source_task_id"] == "t-explicit"
+    assert ctx["source_event"] == "evt-explicit-done"
+    assert ctx["reply_to"] != "281"
+
+
 def test_pending_wake_events():
     """pending_wake_events returns unconsumed wake events."""
     intake = _make_intake()
