@@ -184,9 +184,12 @@ class CommHub:
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.registry_file = self.state_dir / "party_registry.json"
         self.comm_log = self.state_dir / "comm_log.jsonl"
-        MESSAGES_FILE.parent.mkdir(parents=True, exist_ok=True)
-        INBOUND_DIR.mkdir(parents=True, exist_ok=True)
-        OUTBOUND_DIR.mkdir(parents=True, exist_ok=True)
+        self.messages_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
+        self.inbound_dir = self.state_dir / "inbound"
+        self.outbound_dir = self.state_dir / "outbound"
+        self.messages_file.parent.mkdir(parents=True, exist_ok=True)
+        self.inbound_dir.mkdir(parents=True, exist_ok=True)
+        self.outbound_dir.mkdir(parents=True, exist_ok=True)
         self.parties = self._load_parties()
         self.pending_acks = {}
         self._load_pending_acks()
@@ -429,11 +432,13 @@ class CommHub:
             return {"status": "error", "error": str(e)}
 
     def _deliver_file(self, msg, party_id):
-        """Write to an outbound file for the party to read."""
-        out_file = OUTBOUND_DIR / f"{party_id}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
+        """Write to an outbound file for the party to read (checkout-local)."""
+        out_dir = getattr(self, "outbound_dir", None) or OUTBOUND_DIR
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_file = out_dir / f"{party_id}_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}.json"
         try:
             out_file.write_text(json.dumps(msg, indent=2) + "\n")
-            return {"status": "sent", "channel": "file", "path": str(out_file)}
+            return {"status": "delivered", "channel": "file", "path": str(out_file)}
         except Exception as e:
             return {"status": "error", "error": str(e)}
 
