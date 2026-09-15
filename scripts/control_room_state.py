@@ -52,8 +52,9 @@ def _read_lifecycle(path: Path, limit: int) -> Dict[str, dict]:
         return {}
     if not isinstance(value, dict):
         return {}
-    items = list(value.items())[-limit:]
-    return {str(k): v for k, v in items if isinstance(v, dict)}
+    items = [(str(k), v) for k, v in value.items() if isinstance(v, dict)]
+    items.sort(key=lambda item: (str(item[1].get("updated_at", "")), item[0]), reverse=True)
+    return {k: v for k, v in items[:limit]}
 
 
 def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifecycle_limit: int = 100) -> Dict[str, Any]:
