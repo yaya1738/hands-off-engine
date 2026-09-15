@@ -44,11 +44,12 @@ def test_projection_is_bounded():
     assert all(len(thread["events"]) <= 1 for thread in threads)
 
 
-def test_reply_only_event_can_correlate_to_explicit_message():
+def test_reply_only_event_inherits_referenced_message_thread():
     events = [
         {"type": "request", "msg_id": "m1"},
         {"type": "reply", "msg_id": "m2", "reply_to": "m1"},
     ]
     threads = project_threads(events, {})
-    assert threads[1]["correlation_key"] == "reply:m1"
-    assert threads[1]["correlation_quality"] == "correlated"
+    assert len(threads) == 1
+    assert threads[0]["correlation_key"] == "msg:m1"
+    assert threads[0]["events"][-1]["correlation_quality"] == "correlated"

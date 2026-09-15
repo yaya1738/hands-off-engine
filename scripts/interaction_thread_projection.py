@@ -5,7 +5,7 @@ interprets explicit correlation identifiers already present in events.
 """
 from __future__ import annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 
 def _field(event: dict, name: str) -> Any:
@@ -23,10 +23,32 @@ def project_threads(events: List[dict], lifecycle: Dict[str, dict], limit: int =
     if limit <= 0 or events_per_thread <= 0:
         return []
 
-    by_msg: Dict[str, dict] = {}
+    # Order-independent resolution: an event's msg_id/task_id map is built
+    # across the whole bounded window before grouping, so a reply links to its
+    # referenced message regardless of event ordering (never from proximity).
+    msg_ids: set = set()
+    msg_to_task: Dict[str, str] = {}
+    for event in events:
+        if not isinstance(event, dict):
+            continue
+        msg_id = _field(event, "msg_id")
+        task_id = _field(event, "task_id")
+        if msg_id is not None:
+            msg_ids.add(str(msg_id))
+            if task_id is not None:
+                msg_to_task[str(msg_id)] = str(task_id)
+
+    def target_key(reply_to: Any) -> Optional[str]:
+        if reply_to is None:
+            return None
+        target = str(reply_to)
+        if target not in msg_ids:
+            return None
+        task_id = msg_to_task.get(target)
+        return f"task:{task_id}" if task_id else f"msg:{target}"
+
     groups: Dict[str, List[dict]] = {}
     order: List[str] = []
-    orphan_count: Dict[str, str] = {}
 
     for index, event in enumerate(events):
         if not isinstance(event, dict):
@@ -35,34 +57,24 @@ def project_threads(events: List[dict], lifecycle: Dict[str, dict], limit: int =
         task_id = _field(event, "task_id")
         reply_to = _field(event, "reply_to")
         msg_key = str(msg_id) if msg_id is not None else f"event-{index}"
-        if msg_id is not None:
-            by_msg[str(msg_id)] = event
 
         if task_id is not None:
             key = f"task:{task_id}"
-            kind = "task"
             quality = "correlated"
-        elif reply_to is not None and str(reply_to) in by_msg:
-            key = f"reply:{reply_to}"
-            kind = "reply"
-            quality = "correlated"
-        elif reply_to is not None:
-            key = f"orphan:{msg_key}"
-            kind = "reply"
-            quality = "orphan_reply"
-            orphan_count[key] = "unknown_reference"
         else:
-            key = f"msg:{msg_key}"
-            kind = "message"
-            quality = "single_event"
+            linked = target_key(reply_to)
+            if linked is not None:
+                key, quality = linked, "correlated"
+            elif reply_to is not None:
+                key, quality = f"orphan:{msg_key}", "orphan_reply"
+            else:
+                key, quality = f"msg:{msg_key}", "single_event"
 
         if key not in groups:
             groups[key] = []
             order.append(key)
         groups[key].append({**event, "_index": index, "_correlation_quality": quality})
 
-    # A reply encountered before its referenced message remains an explicit
-    # orphan rather than being retroactively grouped by adjacency.
     for key, entries in groups.items():
         for entry in entries:
             entry.pop("_index", None)
