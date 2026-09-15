@@ -17,7 +17,7 @@ def test_snapshot_exposes_bounded_correlation_health(tmp_path):
     assert health["single_event_count"] == 1
     assert health["explicit_task_event_count"] == 1
     assert health["explicit_task_thread_coverage"] == 0.25
-    assert health["bounded_window_truncated"] is True
+    assert health["window"] == {"bounded": True, "limit": 4, "truncated": False}
 
 
 def test_correlation_health_is_empty_without_events(tmp_path):
@@ -25,4 +25,4 @@ def test_correlation_health_is_empty_without_events(tmp_path):
     assert health["available"] is False
     assert health["event_count"] == 0
     assert health["explicit_task_thread_coverage"] is None
-    assert health["bounded_window_truncated"] is False
+    assert health["window"] == {"bounded": True, "limit": 10, "truncated": False}
