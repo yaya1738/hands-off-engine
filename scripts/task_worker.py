@@ -38,6 +38,7 @@ COORDINATION_BUS = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
 RESULTS = REPO_ROOT / "state" / "task_results.jsonl"
 LOCK_DIR = REPO_ROOT / "state" / "task_locks"
 PROCESSED_IDS = REPO_ROOT / "state" / "processed_task_ids.json"
+PUBLISH_LOCK = REPO_ROOT / "state" / "task_result_publish.lock"
 
 _emitter = None
 def get_emitter():
@@ -112,6 +113,26 @@ class TaskLock:
             self.lock_path.unlink(missing_ok=True)
         except Exception:
             pass
+
+
+class PublishLock:
+    """Process-safe lock around result deduplication plus canonical append."""
+    def __init__(self):
+        PUBLISH_LOCK.parent.mkdir(parents=True, exist_ok=True)
+        self.fd = None
+
+    def __enter__(self):
+        self.fd = open(PUBLISH_LOCK, "w")
+        fcntl.flock(self.fd, fcntl.LOCK_EX)
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self.fd:
+            try:
+                fcntl.flock(self.fd, fcntl.LOCK_UN)
+            finally:
+                self.fd.close()
+                self.fd = None
 
 
 def safe_resolve(file_path):
@@ -227,6 +248,35 @@ def process_task(task):
     }
 
 
+def _publish_result_to_bus(result):
+    """Publish one task_result to the canonical bus, idempotently by task_id."""
+    task_id = (result.get("context") or {}).get("task_id") or result.get("msg_id")
+    if not task_id:
+        raise ValueError("task_result missing task_id")
+    COORDINATION_BUS.parent.mkdir(parents=True, exist_ok=True)
+    with PublishLock():
+        existing_ids = set()
+        if COORDINATION_BUS.exists():
+            with COORDINATION_BUS.open("r") as handle:
+                for line in handle:
+                    if not line.strip():
+                        continue
+                    try:
+                        message = json.loads(line)
+                    except json.JSONDecodeError:
+                        continue
+                    context = message.get("context") or {}
+                    if message.get("type") == "task_result":
+                        existing = context.get("task_id") or message.get("msg_id")
+                        if existing:
+                            existing_ids.add(existing)
+        if task_id in existing_ids:
+            return False
+        with COORDINATION_BUS.open("a") as handle:
+            handle.write(json.dumps(result, default=str) + "\n")
+        return True
+
+
 def _load_result_ids():
     result_ids = set()
     if RESULTS.exists():
@@ -291,6 +341,7 @@ def poll_once():
             RESULTS.parent.mkdir(parents=True, exist_ok=True)
             with open(RESULTS, "a") as f:
                 f.write(json.dumps(result, default=str) + "\n")
+            _publish_result_to_bus(result)
             save_processed(processed)
             emitter = get_emitter()
             if emitter:
