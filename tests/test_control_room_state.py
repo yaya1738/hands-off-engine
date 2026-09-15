@@ -102,6 +102,40 @@ def test_lifecycle_current_state_uses_declared_precedence(tmp_path: Path):
     assert snapshot["lifecycle"]["tasks"]["t-1"]["current_state"] == "result_published"
 
 
+
+
+def test_snapshot_projects_bounded_intake_views(tmp_path: Path):
+    request_state = tmp_path / "state" / "request_intake_state.json"
+    factory_state = tmp_path / "state" / "factory_intake_state.json"
+    request_state.parent.mkdir(parents=True)
+    request_state.write_text(json.dumps({
+        "admissions": [{"msg_id": f"req-{i}", "admitted": True} for i in range(3)],
+        "rejections": [{"msg_id": f"bad-{i}", "admitted": False} for i in range(2)],
+    }))
+    factory_state.write_text(json.dumps({
+        "decisions": [{"fingerprint": f"fp-{i}", "event_id": f"evt-{i}"} for i in range(4)],
+    }))
+    snapshot = build_snapshot(tmp_path, bus_limit=0, lifecycle_limit=0, intake_limit=2)
+    intake = snapshot["intake"]
+    assert intake["request"]["admitted_count"] == 3
+    assert intake["request"]["rejected_count"] == 2
+    assert len(intake["request"]["admissions"]) == 2
+    assert intake["request"]["admissions"][-1]["msg_id"] == "req-2"
+    assert len(intake["request"]["rejections"]) == 2
+    assert intake["factory"]["decision_count"] == 4
+    assert len(intake["factory"]["decisions"]) == 2
+    assert intake["factory"]["decisions"][-1]["event_id"] == "evt-3"
+
+
+def test_snapshot_intake_views_fail_closed_when_missing(tmp_path: Path):
+    snapshot = build_snapshot(tmp_path, bus_limit=0, lifecycle_limit=0)
+    intake = snapshot["intake"]
+    assert intake["request"]["available"] is False
+    assert intake["request"]["admissions"] == []
+    assert intake["factory"]["available"] is False
+    assert intake["factory"]["decisions"] == []
+
+
 def test_snapshot_cli_bootstraps_repo_imports(tmp_path: Path):
     result = subprocess.run(
         [sys.executable, "scripts/control_room_state.py", "--repo-root", str(tmp_path), "--bus-limit", "0", "--lifecycle-limit", "0"],

@@ -74,13 +74,52 @@ def _read_lifecycle(path: Path, limit: int) -> Dict[str, dict]:
     }
 
 
-def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifecycle_limit: int = 100) -> Dict[str, Any]:
+def _read_request_intake(path: Path, limit: int) -> Dict[str, Any]:
+    if not path.exists() or limit <= 0:
+        return {"available": False, "admitted_count": 0, "rejected_count": 0, "admissions": [], "rejections": []}
+    try:
+        value = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return {"available": False, "admitted_count": 0, "rejected_count": 0, "admissions": [], "rejections": []}
+    if not isinstance(value, dict):
+        return {"available": False, "admitted_count": 0, "rejected_count": 0, "admissions": [], "rejections": []}
+    admissions = value.get("admissions") or []
+    rejections = value.get("rejections") or []
+    if not isinstance(admissions, list) or not isinstance(rejections, list):
+        return {"available": True, "admitted_count": 0, "rejected_count": 0, "admissions": [], "rejections": []}
+    return {
+        "available": True,
+        "admitted_count": len(admissions),
+        "rejected_count": len(rejections),
+        "admissions": admissions[-limit:],
+        "rejections": rejections[-limit:],
+    }
+
+
+def _read_factory_intake(path: Path, limit: int) -> Dict[str, Any]:
+    if not path.exists() or limit <= 0:
+        return {"available": False, "decision_count": 0, "decisions": []}
+    try:
+        value = json.loads(path.read_text())
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return {"available": False, "decision_count": 0, "decisions": []}
+    if not isinstance(value, dict):
+        return {"available": False, "decision_count": 0, "decisions": []}
+    decisions = value.get("decisions") or []
+    if not isinstance(decisions, list):
+        return {"available": True, "decision_count": 0, "decisions": []}
+    return {"available": True, "decision_count": len(decisions), "decisions": decisions[-limit:]}
+
+
+def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifecycle_limit: int = 100, intake_limit: int = 20) -> Dict[str, Any]:
     """Return bounded bus + lifecycle state without executing or mutating work."""
     root = Path(repo_root) if repo_root else ROOT
     bus = root / "ai" / "coordination" / "messages.jsonl"
     lifecycle = root / "state" / "task_lifecycle.json"
     events = _read_bus(bus, bus_limit)
     tasks = _read_lifecycle(lifecycle, lifecycle_limit)
+    request_intake = root / "state" / "request_intake_state.json"
+    factory_intake = root / "state" / "factory_intake_state.json"
     return {
         "source_of_truth": "ai/coordination/messages.jsonl",
         "bus": {
@@ -92,6 +131,10 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
             "available": lifecycle.exists(),
             "task_count": len(tasks),
             "tasks": tasks,
+        },
+        "intake": {
+            "request": _read_request_intake(request_intake, intake_limit),
+            "factory": _read_factory_intake(factory_intake, intake_limit),
         },
     }
 
