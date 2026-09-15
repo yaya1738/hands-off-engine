@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 """Translate a governed Factory handoff into the existing authority input.
 
-This is an adapter only. It does not call the authority function, publish to
-any bus, approve work, or enable execution.
+This adapter preserves the single authority publication path. It does not
+approve work or enable execution itself.
 """
 from __future__ import annotations
 
 from typing import Any, Dict
 
-from autonomous.governed_authority import authorize
+from scripts.authority_classification import classify_and_publish
 
 
 def build_authority_input(handoff: Dict[str, Any]) -> Dict[str, Any]:
@@ -24,30 +24,30 @@ def build_authority_input(handoff: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(objective, str) or not objective.strip():
         return {"available": False}
 
+    correlation = {
+        "msg_id": body.get("msg_id"),
+        "reply_to": body.get("reply_to"),
+        "task_id": body.get("task_id"),
+    }
+    command_id = correlation["msg_id"] or correlation["task_id"] or ""
     return {
         "available": True,
         "command": {
-            "id": body.get("msg_id") or body.get("task_id") or "",
+            "id": command_id,
             "mode": "DRYRUN",
             "approval_status": "pending",
             "objective": objective,
-            "correlation": {
-                "msg_id": body.get("msg_id"),
-                "reply_to": body.get("reply_to"),
-                "task_id": body.get("task_id"),
-            },
+            "correlation": correlation,
         },
     }
 
 
-def classify_authority_input(handoff: Dict[str, Any]) -> Dict[str, Any]:
-    """Classify the adapter output through the existing authority seam."""
+def classify_authority_input(handoff: Dict[str, Any], *, repo_root=None) -> Dict[str, Any]:
+    """Classify and publish through the established canonical authority bridge."""
     projected = build_authority_input(handoff)
     if not projected.get("available", False):
         return {"available": False}
-
-    decision = authorize(projected["command"])
-    return {"available": True, "decision": decision.to_dict()}
+    return classify_and_publish(projected["command"], repo_root=repo_root)
 
 
 __all__ = ["build_authority_input", "classify_authority_input"]
