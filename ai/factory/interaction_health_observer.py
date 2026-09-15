@@ -18,14 +18,12 @@ class FactoryInteractionHealthObserver:
         if not health.get("available", True):
             return {"available": False}
 
-        events = int(health.get("correlated_event_count", 0))
-        total = events + int(health.get("orphan_reply_count", 0)) + int(
-            health.get("single_event_count", 0)
-        )
+        total = int(health.get("event_count", 0))
+        correlated = int(health.get("correlated_event_count", 0))
         return {
             "available": True,
             "interaction_correlation_rate": (
-                events / total if total else 1.0
+                correlated / total if total else 1.0
             ),
             "interaction_orphan_replies": int(
                 health.get("orphan_reply_count", 0)
