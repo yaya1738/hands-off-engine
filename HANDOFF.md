@@ -65,3 +65,15 @@ Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runti
   - 12 new tests. Full suite: 248/248 pass.
 - Control Room live: `admission_observation: {available: false}` (fail-closed, no bus events yet).
 - PR #312 closed as completed. Bus: 102 messages, truncated=false.
+
+## Delta 25 — 2026-09-15 (Termux:Boot service + #279 objectives)
+
+- Implemented Termux:Boot auto-start: `termux/boot-start.sh` + `termux/SETUP.md`.
+  - Auto-starts node1_runtime.py + yair_control_room.py on device boot.
+  - Runs bus compaction (dedup + stale blocker cleanup) on boot.
+  - Deploy to `~/.termux/boot/` inside Termux (not proot).
+- All #279 proposed objectives complete:
+  - Objective 1: pid-lock guard (already existed, 17611 killed, guard effective)
+  - Objective 2: bus compaction (scripts/bus_compact.py, 665→88 messages)
+  - Objective 3: Termux:Boot service (termux/boot-start.sh)
+- HEAD: ab1eb8a9 | 248/248 tests | Bus: ~102 messages | Node1 + Control Room alive
