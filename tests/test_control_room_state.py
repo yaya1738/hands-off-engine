@@ -1,4 +1,6 @@
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 from scripts.control_room_state import build_snapshot
@@ -58,3 +60,16 @@ def test_lifecycle_current_state_uses_declared_precedence(tmp_path: Path):
     }))
     snapshot = build_snapshot(tmp_path, bus_limit=0, lifecycle_limit=1)
     assert snapshot["lifecycle"]["tasks"]["t-1"]["current_state"] == "result_published"
+
+
+def test_snapshot_cli_bootstraps_repo_imports(tmp_path: Path):
+    result = subprocess.run(
+        [sys.executable, "scripts/control_room_state.py", "--repo-root", str(tmp_path), "--bus-limit", "0", "--lifecycle-limit", "0"],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    snapshot = json.loads(result.stdout)
+    assert snapshot["source_of_truth"] == "ai/coordination/messages.jsonl"
+    assert snapshot["bus"]["event_count"] == 0
+    assert snapshot["lifecycle"]["task_count"] == 0
