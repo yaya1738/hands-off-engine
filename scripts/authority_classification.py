@@ -6,6 +6,7 @@ work, opens the executor gate, or creates a second state store.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, Optional
 
@@ -36,7 +37,7 @@ def classify_and_publish(
             "msg_id": correlation.get("msg_id") or decision.command_id,
             "reply_to": correlation.get("reply_to"),
             "task_id": correlation.get("task_id"),
-            "decided_at": None,
+            "decided_at": datetime.now(timezone.utc).isoformat(),
         }
     )
 
