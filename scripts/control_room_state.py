@@ -8,27 +8,50 @@ views without introducing another transport or mutating execution state.
 from __future__ import annotations
 
 import json
+import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from scripts.lifecycle_dashboard import current_state
-
 ROOT = Path(__file__).resolve().parent.parent
-BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
-LIFECYCLE = ROOT / "state" / "task_lifecycle.json"
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from scripts.lifecycle_dashboard import current_state
 
 
 def _read_bus(path: Path, limit: int) -> List[dict]:
     if not path.exists() or limit <= 0:
         return []
+    lines: List[bytes] = []
+    with path.open("rb") as handle:
+        handle.seek(0, 2)
+        position = handle.tell()
+        carry = b""
+        while position > 0 and len(lines) < limit:
+            size = min(8192, position)
+            position -= size
+            handle.seek(position)
+            chunk = handle.read(size)
+            data = chunk + carry
+            parts = data.split(b"\n")
+            carry = parts.pop(0)
+            for line in reversed(parts):
+                if line:
+                    lines.append(line)
+                    if len(lines) >= limit:
+                        break
+    if carry and len(lines) < limit:
+        lines.append(carry)
     rows: List[dict] = []
-    for line in path.read_text(errors="replace").splitlines()[-limit:]:
+    for line in reversed(lines):
         try:
             value = json.loads(line)
         except json.JSONDecodeError:
             continue
         if isinstance(value, dict):
             rows.append(value)
+            if len(rows) >= limit:
+                break
     return rows
 
 
