@@ -154,8 +154,9 @@ class FactoryIntake:
         if event_type in {"security_boundary", "authorization_required", "test_failure", "blocked"}:
             return True
         if event_type == "task_completed":
-            status = (event.get("context") or {}).get("status", "")
-            return status in {"success", "error", "failed"}
+            context = event.get("context") or {}
+            next_action = context.get("next_action") or event.get("next_action")
+            return isinstance(next_action, str) and bool(next_action.strip())
         return False
 
     def _emit_next_task(self, event: dict, task_id: str) -> dict:
