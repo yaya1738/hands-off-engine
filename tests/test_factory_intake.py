@@ -208,6 +208,45 @@ def test_task_completed_with_explicit_action_promoted():
     assert ctx["reply_to"] != "281"
 
 
+
+
+def test_task_completed_without_next_action_does_not_fan_out():
+    """Generic completion is observed but must not create a new assignment."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-no-next",
+        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-no-next", "status": "success"},
+        "message": "completed successfully",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    assert decisions[0]["assigned_msg_id"] is None
+
+    with open(fi.MESSAGES_FILE) as f:
+        assignments = [json.loads(line) for line in f if line.strip() and json.loads(line).get("type") == "task_assignment"]
+    assert assignments == []
+
+
+def test_task_completed_with_string_next_action_fans_out():
+    """A non-empty string next_action authorizes intentional continuation fan-out."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-next",
+        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-next", "status": "success", "next_action": "run system_status"},
+        "message": "completed; continue with status check",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    assert decisions[0]["assigned_msg_id"] is not None
+
+    with open(fi.MESSAGES_FILE) as f:
+        assignments = [json.loads(line) for line in f if line.strip() and json.loads(line).get("type") == "task_assignment"]
+    assert len(assignments) == 1
+    assert assignments[0]["context"]["source_event"] == "evt-next"
+
+
 def test_pending_wake_events():
     """pending_wake_events returns unconsumed wake events."""
     intake = _make_intake()
