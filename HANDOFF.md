@@ -94,3 +94,13 @@ Open: #279 (DASS coordination). Pipeline clean (233/233), bus healthy, all runti
 - Updated `termux/boot-start.sh` to use supervisor instead of individual process starts.
 - Tests: 251/251 pass (3 new supervisor tests).
 - This closes the reliability gap: if either process crashes, the supervisor restarts it automatically.
+
+## Delta 28 — 2026-09-15 (expanded task worker + bus compaction)
+
+- Bus compacted again: 200 → 96 messages (104 duplicates removed). `window.truncated: false`.
+- Added 3 new read-only actions to `task_worker.py`:
+  - `bus_summary`: analyze bus health (counts, dedup ratio, truncation status)
+  - `test_status`: run test suite with 120s timeout, return pass/fail
+  - `lifecycle_summary`: summarize task lifecycle states
+- All actions fail-closed, timeout-guarded, enable real autonomous analysis work.
+- Tests: 254/254 pass (3 new action tests with proper module-level save/restore).
