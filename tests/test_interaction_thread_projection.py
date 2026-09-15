@@ -17,20 +17,14 @@ def test_correlates_explicit_task_chain_and_enriches_lifecycle():
 
 
 def test_missing_task_id_remains_single_event_without_inference():
-    events = [
-        {"type": "a", "msg_id": "m1"},
-        {"type": "b", "msg_id": "m2"},
-    ]
+    events = [{"type": "a", "msg_id": "m1"}, {"type": "b", "msg_id": "m2"}]
     threads = project_threads(events, {})
     assert [thread["correlation_key"] for thread in threads] == ["msg:m1", "msg:m2"]
     assert all(thread["correlation_quality"] == "single_event" for thread in threads)
 
 
 def test_orphan_reply_is_visible_and_not_grouped_by_proximity():
-    events = [
-        {"type": "task_result", "msg_id": "m2", "reply_to": "missing"},
-        {"type": "unrelated", "msg_id": "m3"},
-    ]
+    events = [{"type": "task_result", "msg_id": "m2", "reply_to": "missing"}, {"type": "unrelated", "msg_id": "m3"}]
     threads = project_threads(events, {})
     assert threads[0]["correlation_quality"] == "orphan_reply"
     assert threads[0]["correlation_kind"] == "reply"
@@ -45,10 +39,27 @@ def test_projection_is_bounded():
 
 
 def test_reply_only_event_can_correlate_to_explicit_message():
-    events = [
-        {"type": "request", "msg_id": "m1"},
-        {"type": "reply", "msg_id": "m2", "reply_to": "m1"},
-    ]
+    events = [{"type": "request", "msg_id": "m1"}, {"type": "reply", "msg_id": "m2", "reply_to": "m1"}]
     threads = project_threads(events, {})
     assert threads[1]["correlation_key"] == "reply:m1"
     assert threads[1]["correlation_quality"] == "correlated"
+
+
+def test_reply_before_target_inherits_explicit_task_order_independently():
+    events = [
+        {"type": "reply", "msg_id": "m2", "context": {"reply_to": "m1"}},
+        {"type": "request", "msg_id": "m1", "context": {"task_id": "t1"}},
+    ]
+    threads = project_threads(events, {})
+    assert len(threads) == 1
+    assert threads[0]["correlation_key"] == "task:t1"
+    assert threads[0]["correlation_quality"] == "correlated"
+
+
+def test_task_id_wins_over_reply_target():
+    events = [
+        {"type": "request", "msg_id": "m1", "context": {"task_id": "t1"}},
+        {"type": "result", "msg_id": "m2", "context": {"task_id": "t2", "reply_to": "m1"}},
+    ]
+    threads = project_threads(events, {})
+    assert [thread["correlation_key"] for thread in threads] == ["task:t1", "task:t2"]
