@@ -172,6 +172,8 @@ class RequestIntake:
 
     def _publish_decision(self, decision: dict) -> bool:
         """Publish an already-persisted decision as a bounded canonical observation."""
+        if not hasattr(self, "published_admission_ids"):
+            self.published_admission_ids = set()
         msg_id = decision.get("msg_id")
         if not msg_id or msg_id in self.published_admission_ids:
             return True
@@ -188,6 +190,8 @@ class RequestIntake:
 
     def _publish_pending_observations(self):
         """Retry observations for durable decisions not yet marked published."""
+        if not hasattr(self, "published_admission_ids"):
+            self.published_admission_ids = set()
         pending = []
         for decision in self.state.get("admissions", []) + self.state.get("rejections", []):
             msg_id = decision.get("msg_id")
@@ -201,6 +205,8 @@ class RequestIntake:
             self._persist()
 
     def admit_once(self) -> List[dict]:
+        if not hasattr(self, "published_admission_ids"):
+            self.published_admission_ids = set()
         self._publish_pending_observations()
         requests = self._read_task_requests()
         decisions = []
