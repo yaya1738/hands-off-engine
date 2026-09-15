@@ -22,12 +22,12 @@ from scripts.lifecycle_dashboard import current_state
 def _read_bus(path: Path, limit: int) -> List[dict]:
     if not path.exists() or limit <= 0:
         return []
-    lines: List[bytes] = []
+    rows: List[dict] = []
     with path.open("rb") as handle:
         handle.seek(0, 2)
         position = handle.tell()
         carry = b""
-        while position > 0 and len(lines) < limit:
+        while position > 0 and len(rows) < limit:
             size = min(8192, position)
             position -= size
             handle.seek(position)
@@ -36,22 +36,24 @@ def _read_bus(path: Path, limit: int) -> List[dict]:
             parts = data.split(b"\n")
             carry = parts.pop(0)
             for line in reversed(parts):
-                if line:
-                    lines.append(line)
-                    if len(lines) >= limit:
+                if not line:
+                    continue
+                try:
+                    value = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(value, dict):
+                    rows.append(value)
+                    if len(rows) >= limit:
                         break
-    if carry and len(lines) < limit:
-        lines.append(carry)
-    rows: List[dict] = []
-    for line in reversed(lines):
+    if carry and len(rows) < limit:
         try:
-            value = json.loads(line)
+            value = json.loads(carry)
         except json.JSONDecodeError:
-            continue
+            value = None
         if isinstance(value, dict):
             rows.append(value)
-            if len(rows) >= limit:
-                break
+    rows.reverse()
     return rows
 
 
