@@ -59,7 +59,7 @@ def _load_state(path: Optional[Path] = None) -> dict:
             return json.loads(state_path.read_text())
         except Exception:
             pass
-    return {"admitted_ids": [], "rejected_ids": [], "admissions": [], "rejections": []}
+    return {"admitted_ids": [], "rejected_ids": [], "admissions": [], "rejections": [], "published_admission_ids": []}
 
 
 def _save_state(state: dict, path: Optional[Path] = None):
@@ -84,6 +84,7 @@ class RequestIntake:
         self.state = _load_state(self.state_file)
         self.admitted_ids = set(self.state.get("admitted_ids", []))
         self.rejected_ids = set(self.state.get("rejected_ids", []))
+        self.published_admission_ids = set(self.state.get("published_admission_ids", []))
         self.parties = _load_party_registry(self.party_registry)
 
     def _persist(self):
@@ -91,6 +92,7 @@ class RequestIntake:
         self.state["rejected_ids"] = sorted(self.rejected_ids)[-2000:]
         self.state["admissions"] = self.state.get("admissions", [])[-200:]
         self.state["rejections"] = self.state.get("rejections", [])[-200:]
+        self.state["published_admission_ids"] = sorted(self.published_admission_ids)[-2000:]
         _save_state(self.state, self.state_file)
 
     def _validate_sender(self, msg: dict) -> Tuple[bool, str]:
@@ -168,7 +170,38 @@ class RequestIntake:
             pass
         return requests
 
+    def _publish_decision(self, decision: dict) -> bool:
+        """Publish an already-persisted decision as a bounded canonical observation."""
+        msg_id = decision.get("msg_id")
+        if not msg_id or msg_id in self.published_admission_ids:
+            return True
+        try:
+            from scripts.admission_publisher import publish_admission_decision
+            result = publish_admission_decision(decision, repo_root=self.repo_root)
+        except Exception as exc:
+            log.warning(f"Admission observation publish failed for {msg_id}: {exc}")
+            return False
+        if result.get("status") in ("published", "already_published"):
+            self.published_admission_ids.add(msg_id)
+            return True
+        return False
+
+    def _publish_pending_observations(self):
+        """Retry observations for durable decisions not yet marked published."""
+        pending = []
+        for decision in self.state.get("admissions", []) + self.state.get("rejections", []):
+            msg_id = decision.get("msg_id")
+            if msg_id and msg_id not in self.published_admission_ids:
+                pending.append(decision)
+        changed = False
+        for decision in pending:
+            if self._publish_decision(decision):
+                changed = True
+        if changed:
+            self._persist()
+
     def admit_once(self) -> List[dict]:
+        self._publish_pending_observations()
         requests = self._read_task_requests()
         decisions = []
         for msg in requests:
@@ -186,6 +219,9 @@ class RequestIntake:
                 "admitted": ok,
                 "reason": reason,
                 "decided_at": datetime.now(timezone.utc).isoformat(),
+                "context": {
+                    "task_id": (msg.get("context") or {}).get("task_id"),
+                },
             }
             if ok:
                 self.admitted_ids.add(msg_id)
@@ -198,6 +234,9 @@ class RequestIntake:
             decisions.append(decision)
         if decisions:
             self._persist()
+            for decision in decisions:
+                if self._publish_decision(decision):
+                    self._persist()
         return decisions
 
     def status(self) -> dict:
