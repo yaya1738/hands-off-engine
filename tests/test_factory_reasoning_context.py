@@ -12,17 +12,19 @@ def test_reasoning_context_contains_only_bounded_observation_fields():
     })
     assert result["available"] is True
     assert result["diagnosis"] == "healthy"
-    assert result["authority"]["execution_enabled"] is True
+    assert result["authority"]["decision"] == "approved"
+    assert "execution_enabled" not in result["authority"]
     assert "secret" not in result
 
 
-def test_reasoning_context_does_not_change_authority_semantics():
+def test_reasoning_context_does_not_expose_execution_capability():
     result = build_factory_reasoning_context({
         "interaction": {"available": True, "correlation_rate": 1.0},
         "system_health": {"available": True, "status": "ok", "error_count": 0},
         "authority": {"available": True, "decision": "approved", "execution_enabled": True},
     })
-    assert result["authority"]["execution_enabled"] is True
+    assert result["authority"]["decision"] == "approved"
+    assert "execution_enabled" not in result["authority"]
 
 
 def test_reasoning_context_preserves_incomplete_diagnosis():
