@@ -12,6 +12,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from scripts.admission_observability import latest_admission_decision
+from scripts.authority_decision_observability import latest_authority_decision
 from scripts.factory_assessment_observability import latest_factory_assessment
 from scripts.interaction_thread_projection import project_threads
 from scripts.lifecycle_dashboard import current_state
@@ -208,6 +209,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
         "correlation_health": _correlation_health(events, bus_limit, window_truncated),
         "factory_assessment": _factory_assessment_observation(assessment),
         "admission_observation": latest_admission_decision(events),
+        "authority_decision": latest_authority_decision(events),
         "intake": {"request": _read_request_intake(request_intake, intake_limit), "factory": _read_factory_intake(factory_intake, intake_limit)},
         "heartbeat": _read_dass_heartbeat(heartbeat),
     }
