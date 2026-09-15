@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from scripts.admission_observability import latest_admission_decision
 from scripts.factory_assessment_observability import latest_factory_assessment
 from scripts.interaction_thread_projection import project_threads
 from scripts.lifecycle_dashboard import current_state
@@ -187,11 +188,11 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
     """Return bounded bus + lifecycle + interaction state without executing or mutating work."""
     root = Path(repo_root) if repo_root else ROOT
     bus = root / "ai" / "coordination" / "messages.jsonl"
-    lifecycle = root / "state" / "task_lifecycle.json"
     probe_limit = bus_limit + 1 if bus_limit > 0 else 0
     probed_events = _read_bus(bus, probe_limit)
     window_truncated = bus_limit > 0 and len(probed_events) > bus_limit
     events = probed_events[-bus_limit:] if bus_limit > 0 else []
+    lifecycle = root / "state" / "task_lifecycle.json"
     tasks = _read_lifecycle(lifecycle, lifecycle_limit)
     request_intake = root / "state" / "request_intake_state.json"
     factory_intake = root / "state" / "factory_intake_state.json"
@@ -206,6 +207,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
         "threads": project_threads(events, tasks, limit=thread_limit, events_per_thread=events_per_thread),
         "correlation_health": _correlation_health(events, bus_limit, window_truncated),
         "factory_assessment": _factory_assessment_observation(assessment),
+        "admission_observation": latest_admission_decision(events),
         "intake": {"request": _read_request_intake(request_intake, intake_limit), "factory": _read_factory_intake(factory_intake, intake_limit)},
         "heartbeat": _read_dass_heartbeat(heartbeat),
     }
