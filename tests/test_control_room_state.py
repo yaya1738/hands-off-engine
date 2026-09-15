@@ -27,3 +27,34 @@ def test_snapshot_is_bounded_and_read_only(tmp_path: Path):
     assert [e["n"] for e in snapshot["bus"]["events"]] == [3, 4]
     assert snapshot["lifecycle"]["task_count"] == 0
     assert bus.read_text() == before
+
+
+def test_lifecycle_limit_selects_newest_by_updated_at(tmp_path: Path):
+    lifecycle = tmp_path / "state" / "task_lifecycle.json"
+    lifecycle.parent.mkdir(parents=True)
+    lifecycle.write_text(json.dumps({
+        "aaa-old": {"updated_at": "2026-09-15T00:00:00+00:00", "states": {"sent": "old"}},
+        "zzz-new": {"updated_at": "2026-09-15T02:00:00+00:00", "states": {"completed": "new"}},
+        "mmm-mid": {"updated_at": "2026-09-15T01:00:00+00:00", "states": {"claimed": "mid"}},
+    }))
+    snapshot = build_snapshot(tmp_path, bus_limit=0, lifecycle_limit=2)
+    tasks = snapshot["lifecycle"]["tasks"]
+    assert list(tasks) == ["zzz-new", "mmm-mid"]
+    assert "aaa-old" not in tasks
+
+
+def test_lifecycle_current_state_uses_declared_precedence(tmp_path: Path):
+    lifecycle = tmp_path / "state" / "task_lifecycle.json"
+    lifecycle.parent.mkdir(parents=True)
+    lifecycle.write_text(json.dumps({
+        "t-1": {
+            "updated_at": "2026-09-15T03:00:00+00:00",
+            "states": {
+                "sent": "1",
+                "completed": "2",
+                "result_published": "3",
+            },
+        }
+    }))
+    snapshot = build_snapshot(tmp_path, bus_limit=0, lifecycle_limit=1)
+    assert snapshot["lifecycle"]["tasks"]["t-1"]["current_state"] == "result_published"
