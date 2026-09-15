@@ -1,5 +1,7 @@
 from typing import Any, Dict, List
 
+from ai.factory.assessment_bus_publisher import FactoryAssessmentBusPublisher
+
 
 class FactoryImprovementOrchestrator:
     def __init__(
@@ -12,7 +14,7 @@ class FactoryImprovementOrchestrator:
         self.assessor = assessor
         self.planner = planner
         self.queue = queue
-        self.assessment_publisher = assessment_publisher
+        self.assessment_publisher = assessment_publisher or FactoryAssessmentBusPublisher()
         self._history: List[Dict[str, Any]] = []
 
     def run_cycle(
