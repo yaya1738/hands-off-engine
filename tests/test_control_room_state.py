@@ -43,6 +43,32 @@ def test_snapshot_is_bounded_and_read_only(tmp_path: Path):
     assert bus.read_text() == before
 
 
+def test_correlation_health_is_explicit_and_window_state_is_exact(tmp_path: Path):
+    bus = tmp_path / "ai" / "coordination" / "messages.jsonl"
+    bus.parent.mkdir(parents=True)
+    bus.write_text("\n".join([
+        json.dumps({"type": "request", "msg_id": "m1", "context": {"task_id": "t1"}}),
+        json.dumps({"type": "reply", "msg_id": "m2", "context": {"reply_to": "m1"}}),
+        json.dumps({"type": "orphan", "msg_id": "m3", "context": {"reply_to": "missing"}}),
+        json.dumps({"type": "unlinked", "msg_id": "m4"}),
+    ]) + "\n")
+
+    snapshot = build_snapshot(tmp_path, bus_limit=3, lifecycle_limit=0)
+    health = snapshot["correlation_health"]
+
+    assert health["event_count"] == 3
+    assert health["correlated_event_count"] == 2
+    assert health["orphan_reply_count"] == 1
+    assert health["single_event_count"] == 0
+    assert health["explicit_task_event_count"] == 1
+    assert health["explicit_task_thread_coverage"] == 1 / 3
+    assert health["thread_count"] == 2
+    assert health["window"] == {"bounded": True, "limit": 3, "truncated": True}
+
+    exact = build_snapshot(tmp_path, bus_limit=4, lifecycle_limit=0)["correlation_health"]
+    assert exact["window"] == {"bounded": True, "limit": 4, "truncated": False}
+
+
 def test_snapshot_skips_malformed_bus_tail_until_limit(tmp_path: Path):
     bus = tmp_path / "ai" / "coordination" / "messages.jsonl"
     bus.parent.mkdir(parents=True)
@@ -55,8 +81,6 @@ def test_snapshot_skips_malformed_bus_tail_until_limit(tmp_path: Path):
     snapshot = build_snapshot(tmp_path, bus_limit=2, lifecycle_limit=0)
     assert [event["n"] for event in snapshot["bus"]["events"]] == [1, 2]
     assert bus.read_text() == before
-
-
 
 
 def test_snapshot_skips_invalid_utf8_bus_tail_until_limit(tmp_path: Path):
@@ -100,8 +124,6 @@ def test_lifecycle_current_state_uses_declared_precedence(tmp_path: Path):
     }))
     snapshot = build_snapshot(tmp_path, bus_limit=0, lifecycle_limit=1)
     assert snapshot["lifecycle"]["tasks"]["t-1"]["current_state"] == "result_published"
-
-
 
 
 def test_snapshot_projects_bounded_intake_views(tmp_path: Path):
