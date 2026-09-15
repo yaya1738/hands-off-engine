@@ -59,6 +59,9 @@ def main():
     # 7. Approval check (notify operator of pending risky improvements)
     approval = run_subprocess("improvement_approval.py check")
     
+    # 8. Lifecycle projection refresh (shared task view stays current)
+    projection = run_subprocess("lifecycle_projection.py")
+    
     # Load results
     cycle_result = {
         "timestamp": now,
@@ -69,6 +72,7 @@ def main():
         "applier": applier["success"],
         "feedback": feedback["success"],
         "approval": approval["success"],
+        "projection": projection["success"],
     }
     
     # Save cycle history
