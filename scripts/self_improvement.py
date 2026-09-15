@@ -91,6 +91,14 @@ def _candidate(category, title, description, priority):
     }
 
 
+def get_applied_titles():
+    """Load titles of already-applied improvements to avoid regeneration."""
+    path = STATE / "improvement_applier_state.json"
+    data = load_json(path)
+    applied = data.get("applied", [])
+    return {a.get("title", "") for a in applied}
+
+
 def get_feedback_recommendations():
     """Load feedback recommendations to inform candidate generation."""
     if FEEDBACK_FILE.exists():
@@ -106,15 +114,16 @@ def generate_improvements():
     """Generate deterministic improvement candidates from current state.
 
     Uses feedback data to prefer categories that historically helped
-    and deprioritize categories that didn't.
+    and deprioritize categories that didn't. Skips already-applied improvements.
     """
     improvements = []
+    applied = get_applied_titles()
     learning = get_learning_state()
     health = get_health_trend()
     patterns = learning.get("patterns", {})
     feedback_cats = get_feedback_recommendations()
 
-    if health["issues"] > 0:
+    if health["issues"] > 0 and "Investigate health failures" not in applied:
         priority = "high"
         if feedback_cats.get("reliability", {}).get("recommendation") == "prefer":
             priority = "critical"
@@ -123,10 +132,11 @@ def generate_improvements():
             f"{health['issues']} health issues in last {health['checks']} checks. Review health_log.jsonl for patterns.",
             priority))
 
-    # Test coverage: add tests for untested modules
+    # Test coverage: add tests for untested modules (skip if recently applied)
     scripts_dir = ROOT / "scripts"
     tests_dir = ROOT / "tests"
-    if scripts_dir.exists() and tests_dir.exists():
+    already_added_tests = any("Add tests for" in t for t in applied)
+    if scripts_dir.exists() and tests_dir.exists() and not already_added_tests:
         existing_tests = {f.stem.replace("test_", "") for f in tests_dir.glob("test_*.py")}
         untested = [f.stem for f in scripts_dir.glob("*.py")
                     if f.stem not in existing_tests and not f.stem.startswith("_")]
@@ -151,15 +161,17 @@ def generate_improvements():
                 f"Bus has {lines} lines. Archive old continuation events, keep task_assignments and results.",
                 "medium"))
 
-    improvements.append(_candidate(
-        "usability", "Add Termux boot launcher",
-        "Create Termux:Boot script to auto-start Node 1 + Telegram bridge + Control Room on device boot.",
-        "medium"))
+    if "Add Termux boot launcher" not in applied:
+        improvements.append(_candidate(
+            "usability", "Add Termux boot launcher",
+            "Create Termux:Boot script to auto-start Node 1 + Telegram bridge + Control Room on device boot.",
+            "medium"))
 
-    improvements.append(_candidate(
-        "security", "Validate sender_id against registered parties",
-        "CommHub.receive() should reject unknown sender_ids to prevent bus poisoning.",
-        "medium"))
+    if "Validate sender_id against registered parties" not in applied:
+        improvements.append(_candidate(
+            "security", "Validate sender_id against registered parties",
+            "CommHub.receive() should reject unknown sender_ids to prevent bus poisoning.",
+            "medium"))
 
     if patterns.get("total_tasks", 0) > 10 and rate > 0.9:
         improvements.append(_candidate(

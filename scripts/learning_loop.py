@@ -53,22 +53,14 @@ def analyze_outcomes(msgs):
     outcomes = []
     for m in msgs:
         if m.get("type") == "task_result":
-            try:
-                payload = json.loads(m.get("message", "{}"))
-                outcomes.append({
-                    "task_id": payload.get("task_id", "unknown"),
-                    "status": payload.get("status", "unknown"),
-                    "from": m.get("from"),
-                    "timestamp": m.get("timestamp"),
-                    "msg_id": m.get("msg_id"),
-                })
-            except (json.JSONDecodeError, TypeError):
-                outcomes.append({
-                    "task_id": "parse_error",
-                    "status": "error",
-                    "from": m.get("from"),
-                    "timestamp": m.get("timestamp"),
-                })
+            context = m.get("context") or {}
+            outcomes.append({
+                "task_id": context.get("task_id") or m.get("msg_id", "unknown"),
+                "status": context.get("status", "unknown"),
+                "from": m.get("from"),
+                "timestamp": m.get("timestamp"),
+                "msg_id": m.get("msg_id"),
+            })
     return outcomes
 
 

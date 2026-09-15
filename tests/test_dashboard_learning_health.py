@@ -17,9 +17,9 @@ def test_learning_loop_analyzes_bus(tmp_path, monkeypatch):
     bus = tmp_path / "ai" / "coordination" / "messages.jsonl"
     bus.parent.mkdir(parents=True, exist_ok=True)
     bus.write_text(
-        json.dumps({"type": "task_result", "from": "anyclaw", "message": json.dumps({"task_id": "t1", "status": "success"})}) + "\n"
-        + json.dumps({"type": "task_result", "from": "anyclaw", "message": json.dumps({"task_id": "t2", "status": "success"})}) + "\n"
-        + json.dumps({"type": "task_result", "from": "anyclaw", "message": json.dumps({"task_id": "t3", "status": "error"})}) + "\n"
+        json.dumps({"type": "task_result", "from": "anyclaw", "context": {"task_id": "t1", "status": "success"}}) + "\n"
+        + json.dumps({"type": "task_result", "from": "anyclaw", "context": {"task_id": "t2", "status": "success"}}) + "\n"
+        + json.dumps({"type": "task_result", "from": "anyclaw", "context": {"task_id": "t3", "status": "error"}}) + "\n"
     )
     monkeypatch.setattr(learning_loop, "BUS", bus)
     monkeypatch.setattr(learning_loop, "STATE", tmp_path / "state.json")
