@@ -12,11 +12,13 @@ def build_factory_decision_context(snapshot: Dict[str, Any]) -> Dict[str, Any]:
     authority = snapshot.get("authority_decision")
     assessment = snapshot.get("factory_assessment")
     system_health = snapshot.get("system_health_observation")
+    learning = snapshot.get("learning_observation")
     if not isinstance(health, dict): health = {"available": False}
     if not isinstance(admission, dict): admission = {"available": False}
     if not isinstance(authority, dict): authority = {"available": False}
     if not isinstance(assessment, dict): assessment = {"available": False}
     if not isinstance(system_health, dict): system_health = {"available": False}
+    if not isinstance(learning, dict): learning = {"available": False}
     event_count = int(health.get("event_count", 0))
     correlated = int(health.get("correlated_event_count", 0))
     return {
@@ -54,6 +56,16 @@ def build_factory_decision_context(snapshot: Dict[str, Any]) -> Dict[str, Any]:
             "most_recent_run_status": system_health.get("most_recent_run_status"),
             "latest_snapshot_age_sec": system_health.get("latest_snapshot_age_sec"),
             "latest_fetch_age_sec": system_health.get("latest_fetch_age_sec"),
+        },
+        "learning": {
+            "available": bool(learning.get("available", False)),
+            "lifecycle_entry_count": int(learning.get("lifecycle_entry_count", 0)),
+            "completed_count": int(learning.get("completed_count", 0)),
+            "observed_count": int(learning.get("observed_count", 0)),
+            "outcome_count": int(learning.get("outcome_count", 0)),
+            "success_count": int(learning.get("success_count", 0)),
+            "failure_count": int(learning.get("failure_count", 0)),
+            "outcome_observation_rate": learning.get("outcome_observation_rate"),
         },
     }
 
