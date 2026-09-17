@@ -15,6 +15,7 @@ from scripts.admission_observability import latest_admission_decision
 from scripts.factory_assessment_observability import latest_factory_assessment
 from scripts.interaction_thread_projection import project_threads
 from scripts.lifecycle_dashboard import current_state
+from scripts.learning_observability import project_learning_observation
 
 
 def _read_bus(path: Path, limit: int) -> List[dict]:
@@ -200,6 +201,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
     assessment = factory_assessment
     if assessment is None:
         assessment = latest_factory_assessment(events)
+    learning = project_learning_observation(tasks.values(), events)
     return {
         "source_of_truth": "ai/coordination/messages.jsonl",
         "bus": {"available": bus.exists(), "event_count": len(events), "events": events},
@@ -207,6 +209,7 @@ def build_snapshot(repo_root: Optional[Path] = None, bus_limit: int = 120, lifec
         "threads": project_threads(events, tasks, limit=thread_limit, events_per_thread=events_per_thread),
         "correlation_health": _correlation_health(events, bus_limit, window_truncated),
         "factory_assessment": _factory_assessment_observation(assessment),
+        "learning_observation": learning,
         "admission_observation": latest_admission_decision(events),
         "intake": {"request": _read_request_intake(request_intake, intake_limit), "factory": _read_factory_intake(factory_intake, intake_limit)},
         "heartbeat": _read_dass_heartbeat(heartbeat),
