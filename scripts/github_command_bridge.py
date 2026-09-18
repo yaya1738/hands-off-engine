@@ -63,6 +63,10 @@ def _parse(body):
     if not d.get("idempotency_key") or not d.get("objective") or d.get("action") not in ACTIONS:
         return None
     params={}
+    next_action=None
+    if d.get("next_action_action"):
+        if d["next_action_action"] not in ACTIONS: return None
+        next_action={"action":d["next_action_action"],"params":{}}
     if d["action"]=="read_file_fact":
         if not d.get("file_path"): return None
         params={k:d[k] for k in ("file_path","fact") if d.get(k)}
@@ -82,7 +86,7 @@ def poll_once():
         done.add(cid)
         if actor not in ACTORS or parsed is None: continue
         d,params=parsed
-        msg={"from":"factory","to":"anyclaw","type":"task_assignment","message":d["objective"][:240],"msg_id":f"github-command-{cid}","timestamp":datetime.now(timezone.utc).isoformat(),"context":{"task_id":f"github-{d['idempotency_key']}","action":d["action"],"params":params,"reply_to":f"github-issue-{ISSUE}-comment-{cid}","source":"github_issue","source_comment_id":cid,"idempotency_key":d["idempotency_key"],"execution_enabled":False}}
+        msg={"from":"factory","to":"anyclaw","type":"task_assignment","message":d["objective"][:240],"msg_id":f"github-command-{cid}","timestamp":datetime.now(timezone.utc).isoformat(),"context":{"task_id":f"github-{d['idempotency_key']}","action":d["action"],"params":params,"reply_to":f"github-issue-{ISSUE}-comment-{cid}","source":"github_issue","source_comment_id":cid,"idempotency_key":d["idempotency_key"],"execution_enabled":False,"next_action":next_action}}
         BUS.parent.mkdir(parents=True,exist_ok=True)
         with BUS.open("a") as f: f.write(json.dumps(msg)+"\n")
         admitted+=1
