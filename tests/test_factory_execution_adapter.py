@@ -101,3 +101,27 @@ def test_system_listener_routes_approved_factory_command(monkeypatch):
     assert result["execution_result"]["correlation_id"] == "mailbox-77"
     assert calls["execution_gate"] is True
     assert calls["command"]["objective"] == "inspect runtime"
+
+
+def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
+    import scripts.system_listener_inline as listener
+
+    calls = []
+
+    def fake_execute(command, execution_gate=False):
+        calls.append(command)
+        return {"status": "completed"}
+
+    monkeypatch.setattr(listener, "execute_factory_command", fake_execute)
+
+    result = listener.process_command({
+        "id": "fx-listener-missing-objective",
+        "action": "execute",
+        "target": "factory",
+        "mode": "LIVE",
+        "approval_status": "approved",
+        "payload": {"action": "factory_execute"},
+    })
+
+    assert result["command_status"] == "rejected"
+    assert calls == []
