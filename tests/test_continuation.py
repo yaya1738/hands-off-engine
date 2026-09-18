@@ -117,3 +117,12 @@ def test_task_completed_canonical_context_preserves_task_id():
     record = json.loads(bus.read_text().strip())
     assert record["type"] == "continuation_event"
     assert record["context"]["task_id"] == "t-correlation"
+
+
+def test_emit_task_completed_blocked_is_wakeable_blocked_event():
+    e = _make_emitter()
+    event = e.emit_task_completed("t-blocked", "blocked", "Factory execution blocked")
+    assert event is not None
+    assert event["event_type"] == "blocked"
+    assert event["is_wake"] is True
+    assert event["context"]["task_id"] == "t-blocked"
