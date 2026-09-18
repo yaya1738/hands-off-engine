@@ -300,7 +300,7 @@ def process_task(task):
                 factory_status = factory_result.get("status")
                 result_status = (
                     factory_status
-                    if factory_status in {"blocked", "authorization_required"}
+                    if factory_status in {"blocked", "authorization_required", "in_progress"}
                     else "error"
                 )
                 result = {
