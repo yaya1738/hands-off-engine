@@ -33,6 +33,7 @@ def execute_factory_command(
             "status": decision.decision,
             "reason": decision.reason,
             "command_id": decision.command_id,
+            "correlation_id": correlation_id,
         }
 
     if not execution_gate:
@@ -41,6 +42,8 @@ def execute_factory_command(
             "reason": decision.reason,
             "command_id": decision.command_id,
         }
+
+    correlation_id = command.get("correlation_id") or command.get("reply_to") or decision.command_id
 
     objective = command.get("objective")
     if objective is None:
@@ -61,6 +64,7 @@ def execute_factory_command(
             "status": "blocked",
             "reason": "Factory authority gateway unavailable",
             "command_id": decision.command_id,
+            "correlation_id": correlation_id,
             "error": str(exc),
         }
 
@@ -73,6 +77,7 @@ def execute_factory_command(
         return {
             "status": "completed",
             "command_id": decision.command_id,
+            "correlation_id": correlation_id,
             "factory": result,
         }
     except Exception as exc:
