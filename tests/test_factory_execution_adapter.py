@@ -125,3 +125,26 @@ def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
 
     assert result["command_status"] == "rejected"
     assert calls == []
+
+
+def test_factory_adapter_preserves_terminal_status(monkeypatch):
+    import types
+    import sys
+
+    class FakeGateway:
+        def execute_autonomous(self, objective, idempotency_key=None):
+            return {"status": "blocked", "execution_id": "ex-1"}
+
+    fake_module = types.ModuleType("ai.factory.authority_gateway")
+    fake_module.FactoryAuthorityGateway = FakeGateway
+    monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
+
+    result = execute_factory_command({
+        "id": "fx-status-1",
+        "mode": "LIVE",
+        "approval_status": "approved",
+        "objective": "inspect runtime",
+    }, execution_gate=True)
+
+    assert result["status"] == "blocked"
+    assert result["factory"]["status"] == "blocked"
