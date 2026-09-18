@@ -148,3 +148,26 @@ def test_factory_adapter_preserves_terminal_status(monkeypatch):
 
     assert result["status"] == "blocked"
     assert result["factory"]["status"] == "blocked"
+
+
+def test_factory_adapter_maps_verified_to_completed(monkeypatch):
+    import types
+    import sys
+
+    class FakeGateway:
+        def execute_autonomous(self, objective, idempotency_key=None):
+            return {"status": "verified", "execution_id": "ex-verified"}
+
+    fake_module = types.ModuleType("ai.factory.authority_gateway")
+    fake_module.FactoryAuthorityGateway = FakeGateway
+    monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
+
+    result = execute_factory_command({
+        "id": "fx-status-verified",
+        "mode": "LIVE",
+        "approval_status": "approved",
+        "objective": "inspect runtime",
+    }, execution_gate=True)
+
+    assert result["status"] == "completed"
+    assert result["factory"]["status"] == "verified"
