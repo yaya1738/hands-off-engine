@@ -23,7 +23,7 @@ def _save(s):
     STATE.write_text(json.dumps(s,indent=2)+"\n")
 
 def _comments():
-    url=f"https://api.github.com/repos/{REPO}/issues/{ISSUE}/comments?per_page=100&direction=asc"
+    url=f"https://api.github.com/repos/{REPO}/issues/{ISSUE}/comments?per_page=100&direction=desc"
     req=urllib.request.Request(url,headers={"Accept":"application/vnd.github+json","User-Agent":"hands-off-engine-node1"})
     with urllib.request.urlopen(req,timeout=10) as r: return json.loads(r.read())
 
