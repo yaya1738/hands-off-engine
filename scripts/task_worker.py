@@ -290,6 +290,8 @@ def process_task(task):
                 "approval_status": params.get("approval_status", task["context"].get("approval_status")),
                 "objective": task["context"].get("objective") or params.get("objective"),
                 "payload": params,
+                "correlation_id": task["context"].get("reply_to") or task["context"].get("correlation_id") or task_id,
+                "reply_to": task["context"].get("reply_to"),
             }
             factory_result = execute_factory_command(command, execution_gate=True)
             if factory_result.get("status") in {"completed", "dryrun_only"}:
