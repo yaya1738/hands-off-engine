@@ -30,15 +30,20 @@ def _comments():
         with urllib.request.urlopen(req,timeout=10) as r:
             return json.loads(r.read()), r.headers.get("Link","")
     first, link=fetch(f"{base}?per_page=100&direction=desc")
-    urls=[f"{base}?per_page=100&direction=desc"]
     match=re.search(r'<([^>]+[?&]page=(\\d+)[^>]*)>;\\s*rel="last"',link)
     if match:
-        last_url=match.group(1)
         last_page=int(match.group(2))
-        urls=[f"{base}?per_page=100&page={p}" for p in range(max(1,last_page-2),last_page+1)]
+        # GitHub's public REST endpoint on this environment returns the
+        # oldest page for direction=desc; explicitly probe every bounded page
+        # advertised by Link (currently only a few hundred comments).
+        pages=[first]
+        for p in range(2,last_page+1):
+            page,_=fetch(f"{base}?per_page=100&page={p}")
+            pages.append(page)
+    else:
+        pages=[first]
     merged={}
-    for url in urls:
-        page=first if url==urls[0] and url.endswith("direction=desc") else fetch(url)[0]
+    for page in pages:
         for comment in page:
             merged[str(comment.get("id",""))]=comment
     return list(merged.values())
