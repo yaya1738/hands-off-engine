@@ -261,6 +261,7 @@ class ContinuationEmitter:
                     "is_wake": event["is_wake"],
                     "commit": event["commit"],
                     "correlation_id": event.get("correlation_id"),
+                    "next_action": (event.get("context") or {}).get("next_action"),
                 },
             }
             with open(coord_file, "a") as f:
