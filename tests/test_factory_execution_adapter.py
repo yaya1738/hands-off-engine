@@ -36,3 +36,34 @@ def test_factory_missing_objective_fails_closed():
         execution_gate=True,
     )
     assert result["status"] == "rejected"
+
+
+def test_factory_live_preserves_correlation(monkeypatch):
+    import types
+    import sys
+
+    class FakeGateway:
+        def execute_autonomous(self, objective, idempotency_key=None):
+            assert objective == "inspect runtime"
+            assert idempotency_key == "fx-5"
+            return {"decision": "accepted"}
+
+    fake_module = types.ModuleType("ai.factory.authority_gateway")
+    fake_module.FactoryAuthorityGateway = FakeGateway
+    monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
+
+    result = execute_factory_command(
+        {
+            "id": "fx-5",
+            "mode": "LIVE",
+            "approval_status": "approved",
+            "objective": "inspect runtime",
+            "reply_to": "mailbox-42",
+        },
+        execution_gate=True,
+    )
+
+    assert result["status"] == "completed"
+    assert result["command_id"] == "fx-5"
+    assert result["correlation_id"] == "mailbox-42"
+    assert result["factory"] == {"decision": "accepted"}
