@@ -291,3 +291,12 @@ def test_blocked_without_explicit_action_does_not_fan_out():
     assert len(decisions) == 1
     assert decisions[0]["assigned_msg_id"] is None
     assert decisions[0]["reason"] == "no_explicit_next_action"
+
+
+def test_intake_once_respects_max_events():
+    """Bounded intake consumes at most the requested number of decisions."""
+    intake = _make_intake()
+    for i in range(3):
+        _write_msg({"type": "continuation_event", "event_id": f"evt-bound-{i}", "context": {"event_type": "task_completed", "is_wake": True, "task_id": f"t-bound-{i}"}, "message": "done"})
+    decisions = intake.intake_once(max_events=1)
+    assert len(decisions) == 1
