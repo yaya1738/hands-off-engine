@@ -126,3 +126,19 @@ def test_emit_task_completed_blocked_is_wakeable_blocked_event():
     assert event["event_type"] == "blocked"
     assert event["is_wake"] is True
     assert event["context"]["task_id"] == "t-blocked"
+
+
+def test_task_completed_canonical_context_preserves_explicit_next_action():
+    """Explicit follow-up survives projection onto the canonical coordination bus."""
+    import scripts.continuation as c
+    e = _make_emitter()
+    c.REPO_ROOT = e._tmp
+    next_action = {"action": "factory_execute", "params": {"objective": "continue convergence"}}
+    event = e.emit_task_completed(
+        "t-next-action", "completed", "bounded continuation result",
+        correlation_id="corr-next-action", next_action=next_action,
+    )
+    assert event is not None
+    bus = e._tmp / "ai" / "coordination" / "messages.jsonl"
+    record = json.loads(bus.read_text().strip())
+    assert record["context"]["next_action"] == next_action
