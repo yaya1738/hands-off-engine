@@ -27,6 +27,7 @@ def execute_factory_command(
         return {"status": "rejected", "reason": "command must be a dict"}
 
     decision = authorize(command, execution_gate=execution_gate)
+    correlation_id = command.get("correlation_id") or command.get("reply_to") or decision.command_id
 
     if decision.decision != "approved":
         return {
@@ -43,8 +44,6 @@ def execute_factory_command(
             "command_id": decision.command_id,
         }
 
-    correlation_id = command.get("correlation_id") or command.get("reply_to") or decision.command_id
-
     objective = command.get("objective")
     if objective is None:
         payload = command.get("payload") or {}
@@ -55,6 +54,7 @@ def execute_factory_command(
             "status": "rejected",
             "reason": "missing Factory objective",
             "command_id": decision.command_id,
+            "correlation_id": correlation_id,
         }
 
     try:
@@ -84,6 +84,7 @@ def execute_factory_command(
         return {
             "status": "error",
             "command_id": decision.command_id,
+            "correlation_id": correlation_id,
             "error": str(exc),
         }
 
