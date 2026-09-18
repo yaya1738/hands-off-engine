@@ -246,6 +246,7 @@ class ContinuationEmitter:
                 "timestamp": event["timestamp"],
                 "msg_id": event["event_id"],
                 "context": {
+                    "task_id": (event.get("context") or {}).get("task_id"),
                     "event_type": event["event_type"],
                     "is_wake": event["is_wake"],
                     "commit": event["commit"],

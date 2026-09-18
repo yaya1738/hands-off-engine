@@ -104,3 +104,16 @@ def test_github_posting_disabled():
     source = Path(c.__file__).read_text()
     assert "gh_token.txt" not in source
     assert "Authorization: token" not in source
+
+
+def test_task_completed_canonical_context_preserves_task_id():
+    """Canonical continuation events must retain task_id for FactoryIntake correlation."""
+    import scripts.continuation as c
+    e = _make_emitter()
+    c.REPO_ROOT = e._tmp
+    event = e.emit_task_completed("t-correlation", "ok", "continuation correlation regression")
+    assert event is not None
+    bus = e._tmp / "ai" / "coordination" / "messages.jsonl"
+    record = json.loads(bus.read_text().strip())
+    assert record["type"] == "continuation_event"
+    assert record["context"]["task_id"] == "t-correlation"
