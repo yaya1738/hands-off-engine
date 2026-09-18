@@ -53,10 +53,14 @@ def poll_once():
     s=_state(); done=set(map(str,s.get("processed",[]))); admitted=0
     for c in _comments():
         cid=str(c.get("id",""))
-        if not cid or cid in done: continue
-        done.add(cid)
+        if not cid: continue
         actor=((c.get("user") or {}).get("login") or "")
         parsed=_parse(c.get("body") or "")
+        if cid in done:
+            # Recover commands marked processed before their bus admission persisted.
+            if f'"github-command-{cid}"' in BUS.read_text(errors="ignore"):
+                continue
+        done.add(cid)
         if actor not in ACTORS or parsed is None: continue
         d,params=parsed
         msg={"from":"factory","to":"anyclaw","type":"task_assignment","message":d["objective"][:240],"msg_id":f"github-command-{cid}","timestamp":datetime.now(timezone.utc).isoformat(),"context":{"task_id":f"github-{d['idempotency_key']}","action":d["action"],"params":params,"reply_to":f"github-issue-{ISSUE}-comment-{cid}","source":"github_issue","source_comment_id":cid,"idempotency_key":d["idempotency_key"],"execution_enabled":False}}
