@@ -51,6 +51,8 @@ def _parse(body):
     # GitHub REST can normalize comment line endings/whitespace; parse the
     # canonical command marker and key/value fields tolerantly.
     if not isinstance(body,str): return None
+    # Some GitHub/API paths can expose escaped newlines as literal \\n.
+    body=body.replace("\\\\r\\\\n","\\n").replace("\\\\n","\\n").replace("\\\\r","\\n")
     lines=[x.strip() for x in body.splitlines()]
     marker=next((i for i,x in enumerate(lines) if x=="[factory-command]"),None)
     if marker is None: return None
