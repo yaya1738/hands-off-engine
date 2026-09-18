@@ -20,21 +20,16 @@ def _state():
 def _save(s):
     STATE.parent.mkdir(parents=True,exist_ok=True)
     s["processed"]=sorted(set(s.get("processed",[])))[-5000:]
-    STATE.write_text(json.dumps(s,indent=2)+"
-")
+    STATE.write_text(json.dumps(s,indent=2)+"\n")
 
 def _comments():
     base=f"https://api.github.com/repos/{REPO}/issues/{ISSUE}/comments"
     headers={"Accept":"application/vnd.github+json","User-Agent":"hands-off-engine-node1"}
-
     def fetch(url):
         req=urllib.request.Request(url,headers=headers)
         with urllib.request.urlopen(req,timeout=10) as r:
             return json.loads(r.read()), r.headers.get("Link","")
-
     comments, link=fetch(f"{base}?per_page=100&direction=desc")
-    # GitHub may return the first/oldest page despite direction. Follow the
-    # API's explicit last-page relation so the bridge always sees newest data.
     match=re.search(r'<([^>]+[?&]page=(\d+)[^>]*)>;\s*rel="last"',link)
     if match and int(match.group(2)) > 1:
         comments, _=fetch(match.group(1))
