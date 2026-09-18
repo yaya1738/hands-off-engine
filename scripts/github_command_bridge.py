@@ -30,7 +30,7 @@ def _comments():
         with urllib.request.urlopen(req,timeout=10) as r:
             return json.loads(r.read()), r.headers.get("Link","")
     first, link=fetch(f"{base}?per_page=100&direction=desc")
-    match=re.search(r'<([^>]+[?&]page=(\\d+)[^>]*)>;\\s*rel="last"',link)
+    match=re.search(r'<([^>]+[?&]page=(\d+)[^>]*)>;\\s*rel="last"',link)
     if match:
         last_page=int(match.group(2))
         # GitHub's public REST endpoint on this environment returns the
