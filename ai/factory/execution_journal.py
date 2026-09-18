@@ -142,8 +142,8 @@ class FactoryExecutionJournal:
             "intent": intent or {},
             "ts": datetime.now(timezone.utc).isoformat(),
         }
-        self._persist(entry)
         self._entries.append(entry)
+        self._persist(entry)
         return entry
 
     def latest(self, execution_id: str) -> Optional[Dict[str, Any]]:
