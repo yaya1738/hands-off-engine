@@ -67,3 +67,37 @@ def test_factory_live_preserves_correlation(monkeypatch):
     assert result["command_id"] == "fx-5"
     assert result["correlation_id"] == "mailbox-42"
     assert result["factory"] == {"decision": "accepted"}
+
+
+def test_system_listener_routes_approved_factory_command(monkeypatch):
+    import scripts.system_listener_inline as listener
+
+    calls = {}
+
+    def fake_execute(command, execution_gate=False):
+        calls["command"] = command
+        calls["execution_gate"] = execution_gate
+        return {
+            "status": "completed",
+            "command_id": command["id"],
+            "correlation_id": command["correlation_id"],
+            "factory": {"status": "verified"},
+        }
+
+    monkeypatch.setattr(listener, "execute_factory_command", fake_execute)
+
+    result = listener.process_command({
+        "id": "fx-listener-1",
+        "action": "execute",
+        "target": "factory",
+        "mode": "LIVE",
+        "approval_status": "approved",
+        "objective": "inspect runtime",
+        "reply_to": "mailbox-77",
+        "payload": {"objective": "inspect runtime"},
+    })
+
+    assert result["command_status"] == "completed"
+    assert result["execution_result"]["correlation_id"] == "mailbox-77"
+    assert calls["execution_gate"] is True
+    assert calls["command"]["objective"] == "inspect runtime"
