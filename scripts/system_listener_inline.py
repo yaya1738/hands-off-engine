@@ -42,7 +42,7 @@ def process_command(cmd):
 
     # --- governed authority gate for execute commands ---
     if action == "execute":
-        decision = authorize(cmd)
+        decision = authorize(cmd, execution_gate=True)
         log.info(f"Authority decision for {cmd.get('id','?')}: {decision.decision} ({decision.reason})")
 
         if decision.decision == "rejected":
