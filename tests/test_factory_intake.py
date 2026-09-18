@@ -115,7 +115,7 @@ def test_emits_exactly_one_assignment():
         _write_msg({
             "type": "continuation_event",
             "event_id": f"evt-multi-{i}",
-            "context": {"event_type": "security_boundary", "is_wake": True, "task_id": f"t-multi-{i}"},
+            "context": {"event_type": "security_boundary", "is_wake": True, "task_id": f"t-multi-{i}", "next_action": {"action": "system_status", "params": {"reason": "security_boundary"}}},
             "message": f"security {i}",
         })
     decisions = intake.intake_once()
@@ -228,8 +228,8 @@ def test_task_completed_without_next_action_does_not_fan_out():
     assert assignments == []
 
 
-def test_task_completed_with_string_next_action_fans_out():
-    """A non-empty string next_action authorizes intentional continuation fan-out."""
+def test_task_completed_with_structured_next_action_fans_out():
+    """A structured explicit next_action authorizes intentional continuation fan-out."""
     intake = _make_intake()
     _write_msg({
         "type": "continuation_event",
@@ -263,7 +263,7 @@ def test_assignment_written_to_bus():
     msg = {
         "type": "continuation_event",
         "event_id": "evt-bus",
-        "context": {"event_type": "test_failure", "is_wake": True, "task_id": "t-bus"},
+        "context": {"event_type": "test_failure", "is_wake": True, "task_id": "t-bus", "next_action": {"action": "system_status", "params": {"reason": "test_failure"}}},
         "message": "test fail",
     }
     _write_msg(msg)
