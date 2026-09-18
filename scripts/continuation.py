@@ -51,6 +51,7 @@ WAKE_EVENT_TYPES = frozenset({
     "approval_needed",
     "test_failure",
     "security_boundary",
+    "in_progress",
 })
 
 HEARTBEAT_EVENT_TYPES = frozenset({
@@ -147,6 +148,8 @@ class ContinuationEmitter:
         event_type = (
             "blocked"
             if str(status).lower() in {"blocked", "authorization_required"}
+            else "in_progress"
+            if str(status).lower() == "in_progress"
             else "task_completed"
         )
         return self.emit(
