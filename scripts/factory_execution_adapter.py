@@ -47,7 +47,7 @@ def execute_factory_command(
     objective = command.get("objective")
     if objective is None:
         payload = command.get("payload") or {}
-        objective = payload.get("objective") or payload.get("action")
+        objective = payload.get("objective")
 
     if not isinstance(objective, str) or not objective.strip():
         return {
