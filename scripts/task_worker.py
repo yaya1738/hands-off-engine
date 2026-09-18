@@ -297,7 +297,16 @@ def process_task(task):
             if factory_result.get("status") in {"completed", "verified", "idempotent_replay", "dryrun_only"}:
                 result = {"status": "success", "result": factory_result}
             else:
-                result = {"status": "error", "error": factory_result.get("reason") or factory_result.get("error") or factory_result}
+                factory_status = factory_result.get("status")
+                result_status = (
+                    factory_status
+                    if factory_status in {"blocked", "authorization_required"}
+                    else "error"
+                )
+                result = {
+                    "status": result_status,
+                    "error": factory_result.get("reason") or factory_result.get("error") or factory_result,
+                }
         elif action == "lifecycle_summary":
             lifecycle_file = REPO_ROOT / "state" / "task_lifecycle.json"
             if lifecycle_file.exists():
