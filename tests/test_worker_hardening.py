@@ -257,3 +257,22 @@ def test_crash_recovery_reuses_existing_result():
         assert count == 0, f"Should not re-execute, got {count}"
     finally:
         shutil.rmtree(tmp)
+
+
+def test_poll_once_respects_max_tasks(monkeypatch):
+    """Bounded worker processes at most the requested number of tasks."""
+    w = _fresh_worker()
+    tmp = Path(tempfile.mkdtemp())
+    try:
+        w.COORDINATION_BUS = tmp / "inbox.jsonl"
+        w.RESULTS = tmp / "results.jsonl"
+        w.PROCESSED_IDS = tmp / "processed.json"
+        w.LOCK_DIR = tmp / "locks"
+        monkeypatch.setattr(w, "get_emitter", lambda: None)
+        tasks = []
+        for i in range(3):
+            tasks.append(json.dumps({"from": "factory", "type": "task_assignment", "msg_id": f"bound-{i}", "to": "anyclaw", "context": {"task_id": f"bound-{i}", "action": "health_check"}}))
+        w.COORDINATION_BUS.write_text("\\n".join(tasks) + "\\n")
+        assert w.poll_once(max_tasks=1) == 1
+    finally:
+        shutil.rmtree(tmp)
