@@ -74,8 +74,14 @@ def execute_factory_command(
             objective.strip(),
             idempotency_key=decision.command_id,
         )
+        factory_status = result.get("status") if isinstance(result, dict) else None
+        adapter_status = (
+            "completed"
+            if factory_status in {"verified", "completed", "idempotent_replay"}
+            else factory_status or "completed"
+        )
         return {
-            "status": "completed",
+            "status": adapter_status,
             "command_id": decision.command_id,
             "correlation_id": correlation_id,
             "factory": result,
