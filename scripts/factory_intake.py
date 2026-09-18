@@ -140,13 +140,15 @@ class FactoryIntake:
         state = {"consumed_ids": sorted(self.consumed_ids)[-5000:], "decisions": self.decisions[-5000:]}
         _save_state(state, state_path)
 
-    def intake_once(self) -> List[dict]:
+    def intake_once(self, max_events: Optional[int] = None) -> List[dict]:
         messages_path, _ = self._paths()
         decisions = []
         for event in read_continuation_events(messages_path):
             decision = self.process_event(event)
             if decision:
                 decisions.append(decision)
+                if max_events is not None and len(decisions) >= max_events:
+                    break
         return decisions
 
     def process_event(self, event: dict):
