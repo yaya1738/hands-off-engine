@@ -55,3 +55,14 @@ def test_history():
     engine.save_state({})
 
     assert len(engine.history()) == 1
+
+
+def test_load_state_does_not_grow_history():
+    engine = build()
+    engine.save_state({"status": "running"})
+    before = len(engine.history())
+
+    result = engine.load_state()
+
+    assert result["loaded"] is True
+    assert len(engine.history()) == before
