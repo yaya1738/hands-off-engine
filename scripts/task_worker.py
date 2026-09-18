@@ -408,6 +408,7 @@ def poll_once():
                     status=result['context']['status'],
                     result_summary=str(result['context'].get('result', result['context'].get('error', '')))[:200],
                     correlation_id=task.get('context', {}).get('reply_to'),
+                    next_action=task.get('context', {}).get('next_action'),
                 )
             count += 1
         finally:
