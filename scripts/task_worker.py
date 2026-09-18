@@ -337,6 +337,7 @@ def process_task(task):
             "result": result.get("result"),
             "error": result.get("error"),
             "reply_to": task.get("context", {}).get("reply_to"),
+            "correlation_id": task.get("context", {}).get("correlation_id") or task.get("context", {}).get("reply_to") or task_id,
         },
     }
 
@@ -442,7 +443,7 @@ def poll_once():
                     task_id=task_id,
                     status=result['context']['status'],
                     result_summary=str(result['context'].get('result', result['context'].get('error', '')))[:200],
-                    correlation_id=task.get('context', {}).get('reply_to'),
+                    correlation_id=result['context'].get('correlation_id'),
                     next_action=task.get('context', {}).get('next_action'),
                 )
             count += 1
