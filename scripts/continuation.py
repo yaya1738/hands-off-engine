@@ -144,8 +144,13 @@ class ContinuationEmitter:
                             correlation_id: Optional[str] = None,
                             next_action: Optional[Dict] = None):
         """Emit after completing a Factory task."""
+        event_type = (
+            "blocked"
+            if str(status).lower() in {"blocked", "authorization_required"}
+            else "task_completed"
+        )
         return self.emit(
-            event_type="task_completed",
+            event_type=event_type,
             message=f"Task {task_id[:8]}... completed: {status} — {result_summary}",
             context={**{"task_id": task_id, "status": status, "result_summary": result_summary},
                      **({"next_action": next_action} if isinstance(next_action, dict) and next_action.get("action") else {})},
