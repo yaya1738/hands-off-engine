@@ -48,13 +48,18 @@ def _comments():
             merged[str(comment.get("id",""))]=comment
     return list(merged.values())
 def _parse(body):
+    # GitHub REST can normalize comment line endings/whitespace; parse the
+    # canonical command marker and key/value fields tolerantly.
+    if not isinstance(body,str): return None
     lines=[x.strip() for x in body.splitlines()]
-    if "[factory-command]" not in lines: return None
+    marker=next((i for i,x in enumerate(lines) if x=="[factory-command]"),None)
+    if marker is None: return None
     d={}
-    for line in lines[lines.index("[factory-command]")+1:]:
+    for line in lines[marker+1:]:
         if "=" in line:
             k,v=line.split("=",1); d[k.strip()]=v.strip()
-    if not d.get("idempotency_key") or not d.get("objective") or d.get("action") not in ACTIONS: return None
+    if not d.get("idempotency_key") or not d.get("objective") or d.get("action") not in ACTIONS:
+        return None
     params={}
     if d["action"]=="read_file_fact":
         if not d.get("file_path"): return None
