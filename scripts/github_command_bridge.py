@@ -29,11 +29,18 @@ def _comments():
         req=urllib.request.Request(url,headers=headers)
         with urllib.request.urlopen(req,timeout=10) as r:
             return json.loads(r.read()), r.headers.get("Link","")
-    comments, link=fetch(f"{base}?per_page=100&direction=desc")
+    first, link=fetch(f"{base}?per_page=100&direction=desc")
+    pages=[first]
     match=re.search(r'<([^>]+[?&]page=(\d+)[^>]*)>;\s*rel="last"',link)
     if match and int(match.group(2)) > 1:
-        comments, _=fetch(match.group(1))
-    return comments
+        last_url=match.group(1)
+        last, _=fetch(last_url)
+        pages.append(last)
+    merged={}
+    for page in pages:
+        for comment in page:
+            merged[str(comment.get("id",""))]=comment
+    return list(merged.values())
 
 def _parse(body):
     lines=[x.strip() for x in body.splitlines()]
