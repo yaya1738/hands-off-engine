@@ -23,8 +23,12 @@ class FactoryRuntimeState:
             with open(self.storage_path, "r", encoding="utf-8") as handle:
                 payload = json.load(handle)
             self.state = copy.deepcopy(payload.get("state", {}))
-            self._snapshots = copy.deepcopy(payload.get("snapshots", []))
-            self._history = copy.deepcopy(payload.get("history", []))
+            # History can be large and is already deserialized from trusted JSON.
+            # Avoid recursively copying the entire historical record on every load.
+            history = payload.get("history", [])
+            self._history = list(history) if isinstance(history, list) else []
+            snapshots = payload.get("snapshots", [])
+            self._snapshots = list(snapshots) if isinstance(snapshots, list) else []
         except FileNotFoundError:
             return
         except (OSError, ValueError, TypeError):
@@ -62,10 +66,7 @@ class FactoryRuntimeState:
 
     def load_state(self):
         self._load_from_disk()
-        result = {"loaded": True, "state": copy.deepcopy(self.state)}
-        self._history.append(result)
-        self._persist()
-        return result
+        return {"loaded": True, "state": copy.deepcopy(self.state)}
 
     def snapshot(self):
         snapshot = copy.deepcopy(self.state)
