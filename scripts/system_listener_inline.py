@@ -5,6 +5,10 @@ from datetime import datetime, timezone
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from autonomous.governed_authority import authorize
 try:
+    from scripts.factory_execution_adapter import execute_factory_command
+except ImportError:
+    execute_factory_command = None
+try:
     from scripts.executor import Executor
 except ImportError:
     Executor = None
@@ -68,6 +72,17 @@ def process_command(cmd):
             return {"action": "execute", "dryrun": True, "message": f"DRYRUN processed: {cmd.get('payload',{}).get('action','?')}", "timestamp": datetime.now(timezone.utc).isoformat()}
 
         if decision.decision == "approved":
+            payload = cmd.get("payload") or {}
+            if cmd.get("target") == "factory" or payload.get("action") == "factory_execute":
+                if execute_factory_command is None:
+                    return {"action": "execute", "error": "Factory execution adapter unavailable", "command_status": "blocked", "timestamp": datetime.now(timezone.utc).isoformat()}
+                factory_command = dict(cmd)
+                factory_command["objective"] = cmd.get("objective") or payload.get("objective") or payload.get("action")
+                factory_command["correlation_id"] = cmd.get("reply_to") or cmd.get("correlation_id") or cmd.get("id")
+                factory_result = execute_factory_command(factory_command, execution_gate=True)
+                status = factory_result.get("status")
+                return {"action": "execute", "execution_result": factory_result, "command_status": status, "timestamp": datetime.now(timezone.utc).isoformat()}
+
             if Executor is not None:
                 try:
                     executor = Executor()
