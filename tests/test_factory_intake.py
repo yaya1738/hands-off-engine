@@ -105,6 +105,8 @@ def test_correlation_preserves_task_id():
     _write_msg(msg)
     decisions = intake.intake_once()
     assert len(decisions) == 1
+    assert decisions[0]["task_id"] == "t-bound-0"
+    assert intake.state["consumed_ids"] == ["evt-bound-0"]
     assert decisions[0]["task_id"] == "t-corr-42"
 
 
