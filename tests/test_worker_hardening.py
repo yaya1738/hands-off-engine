@@ -274,5 +274,7 @@ def test_poll_once_respects_max_tasks(monkeypatch):
             tasks.append(json.dumps({"from": "factory", "type": "task_assignment", "msg_id": f"bound-{i}", "to": "anyclaw", "context": {"task_id": f"bound-{i}", "action": "health_check"}}))
         w.COORDINATION_BUS.write_text("\\n".join(tasks) + "\\n")
         assert w.poll_once(max_tasks=1) == 1
+        processed = json.loads(w.PROCESSED_IDS.read_text())
+        assert len(processed) == 1
     finally:
         shutil.rmtree(tmp)
