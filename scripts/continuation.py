@@ -141,12 +141,14 @@ class ContinuationEmitter:
         return event
 
     def emit_task_completed(self, task_id: str, status: str, result_summary: str,
-                            correlation_id: Optional[str] = None):
+                            correlation_id: Optional[str] = None,
+                            next_action: Optional[Dict] = None):
         """Emit after completing a Factory task."""
         return self.emit(
             event_type="task_completed",
             message=f"Task {task_id[:8]}... completed: {status} — {result_summary}",
-            context={"task_id": task_id, "status": status, "result_summary": result_summary},
+            context={**{"task_id": task_id, "status": status, "result_summary": result_summary},
+                     **({"next_action": next_action} if isinstance(next_action, dict) and next_action.get("action") else {})},
             correlation_id=correlation_id or task_id,
             is_wake=True,
         )
