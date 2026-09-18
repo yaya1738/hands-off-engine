@@ -168,6 +168,12 @@ class Node1Runtime:
             log.warning("task_worker not available")
 
         try:
+            from scripts.github_command_bridge import poll_once as poll_github_commands
+        except ImportError:
+            poll_github_commands = None
+            log.warning("github_command_bridge not available")
+
+        try:
             from scripts.event_router import EventRouter
             router = EventRouter(repo_root=REPO_ROOT)
         except ImportError:
@@ -218,6 +224,18 @@ class Node1Runtime:
         tick = 0
         while self.running:
             try:
+                # 0. Poll canonical GitHub control mailbox (every 30s)
+                if poll_github_commands and tick % 3 == 0:
+                    try:
+                        admitted = poll_github_commands()
+                        if admitted:
+                            log.info(f"GitHub command bridge: {admitted} commands admitted")
+                            self.state.data["github_commands_admitted"] = (
+                                self.state.data.get("github_commands_admitted", 0) + admitted
+                            )
+                    except Exception as e:
+                        log.error(f"GitHub command bridge error: {e}")
+
                 # 1. Poll task worker (process inbox)
                 if poll_once:
                     try:
