@@ -294,7 +294,7 @@ def process_task(task):
                 "reply_to": task["context"].get("reply_to"),
             }
             factory_result = execute_factory_command(command, execution_gate=True)
-            if factory_result.get("status") in {"completed", "dryrun_only"}:
+            if factory_result.get("status") in {"completed", "verified", "idempotent_replay", "dryrun_only"}:
                 result = {"status": "success", "result": factory_result}
             else:
                 result = {"status": "error", "error": factory_result.get("reason") or factory_result.get("error") or factory_result}
