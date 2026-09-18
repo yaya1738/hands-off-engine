@@ -171,3 +171,26 @@ def test_factory_adapter_maps_verified_to_completed(monkeypatch):
 
     assert result["status"] == "completed"
     assert result["factory"]["status"] == "verified"
+
+
+def test_factory_adapter_rejects_action_as_objective(monkeypatch):
+    import types
+    import sys
+
+    class ExplodingGateway:
+        def __init__(self):
+            raise AssertionError("Gateway must not be reached")
+
+    fake_module = types.ModuleType("ai.factory.authority_gateway")
+    fake_module.FactoryAuthorityGateway = ExplodingGateway
+    monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
+
+    result = execute_factory_command({
+        "id": "fx-missing-objective",
+        "mode": "LIVE",
+        "approval_status": "approved",
+        "payload": {"action": "factory_execute"},
+    }, execution_gate=True)
+
+    assert result["status"] == "rejected"
+    assert result["reason"] == "missing Factory objective"
