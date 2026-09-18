@@ -30,18 +30,18 @@ def _comments():
         with urllib.request.urlopen(req,timeout=10) as r:
             return json.loads(r.read()), r.headers.get("Link","")
     first, link=fetch(f"{base}?per_page=100&direction=desc")
-    pages=[first]
-    match=re.search(r'<([^>]+[?&]page=(\d+)[^>]*)>;\s*rel="last"',link)
-    if match and int(match.group(2)) > 1:
+    urls=[f"{base}?per_page=100&direction=desc"]
+    match=re.search(r'<([^>]+[?&]page=(\\d+)[^>]*)>;\\s*rel="last"',link)
+    if match:
         last_url=match.group(1)
-        last, _=fetch(last_url)
-        pages.append(last)
+        last_page=int(match.group(2))
+        urls=[f"{base}?per_page=100&page={p}" for p in range(max(1,last_page-2),last_page+1)]
     merged={}
-    for page in pages:
+    for url in urls:
+        page=first if url==urls[0] and url.endswith("direction=desc") else fetch(url)[0]
         for comment in page:
             merged[str(comment.get("id",""))]=comment
     return list(merged.values())
-
 def _parse(body):
     lines=[x.strip() for x in body.splitlines()]
     if "[factory-command]" not in lines: return None
