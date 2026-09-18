@@ -276,3 +276,18 @@ def test_assignment_written_to_bus():
     assert len(assignments) == 1
     assert assignments[0]["context"]["task_id"].startswith("intake-")
     assert assignments[0]["context"]["source_event"] == "evt-bus"
+
+
+def test_blocked_without_explicit_action_does_not_fan_out():
+    """A blocked wake is observable but cannot self-authorize a follow-up assignment."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-blocked-no-next",
+        "context": {"event_type": "blocked", "is_wake": True, "task_id": "t-blocked-no-next"},
+        "message": "blocked without declared recovery action",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    assert decisions[0]["assigned_msg_id"] is None
+    assert decisions[0]["reason"] == "no_explicit_next_action"
