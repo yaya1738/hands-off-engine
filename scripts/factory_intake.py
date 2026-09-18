@@ -160,7 +160,7 @@ class FactoryIntake:
             return None
         task_id = _get_task_correlation(event) or "uncorrelated"
         if not self._should_follow_up(event, task_id):
-            reason = "no_explicit_next_action" if event_type == "task_completed" else None
+            reason = "no_explicit_next_action" if event_type in {"task_completed", "blocked", "authorization_required", "security_boundary", "test_failure"} else None
             decision = {"fingerprint": fp, "event_id": event.get("event_id") or event.get("msg_id"), "event_type": event_type, "task_id": task_id, "assigned_msg_id": None, "reason": reason, "decided_at": datetime.now(timezone.utc).isoformat()}
             self.decisions.append(decision)
             self._persist()
