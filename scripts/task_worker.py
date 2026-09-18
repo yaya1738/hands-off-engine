@@ -56,6 +56,7 @@ ALLOWED_ACTIONS = frozenset({
     "bus_summary",
     "test_status",
     "lifecycle_summary",
+    "factory_execute",
 })
 
 SAFE_READ_DIRS = frozenset({
@@ -182,6 +183,15 @@ def validate_task_envelope(task):
         return False, "missing action"
     if action not in ALLOWED_ACTIONS:
         return False, f"action '{action}' not in allowlist"
+    if action == "factory_execute":
+        mode = str(context.get("mode", "DRYRUN")).upper()
+        if mode not in {"DRYRUN", "LIVE"}:
+            return False, "factory_execute has unsupported execution mode"
+        objective = context.get("objective") or (context.get("params") or {}).get("objective")
+        if not objective:
+            return False, "factory_execute missing objective"
+        if mode == "LIVE" and context.get("approval_status") != "approved":
+            return False, "factory_execute LIVE requires explicit approval"
     to_field = task.get("to", "")
     if to_field and to_field not in ("anyclaw", "all"):
         return False, f"task addressed to '{to_field}', not 'anyclaw'"
@@ -272,6 +282,20 @@ def process_task(task):
                 result = {"status": "error", "error": "Test suite timed out (120s)"}
             except Exception as e:
                 result = {"status": "error", "error": str(e)}
+        elif action == "factory_execute":
+            from scripts.factory_execution_adapter import execute_factory_command
+            command = {
+                "id": task_id,
+                "mode": params.get("mode", task["context"].get("mode", "DRYRUN")),
+                "approval_status": params.get("approval_status", task["context"].get("approval_status")),
+                "objective": task["context"].get("objective") or params.get("objective"),
+                "payload": params,
+            }
+            factory_result = execute_factory_command(command, execution_gate=True)
+            if factory_result.get("status") in {"completed", "dryrun_only"}:
+                result = {"status": "success", "result": factory_result}
+            else:
+                result = {"status": "error", "error": factory_result.get("reason") or factory_result.get("error") or factory_result}
         elif action == "lifecycle_summary":
             lifecycle_file = REPO_ROOT / "state" / "task_lifecycle.json"
             if lifecycle_file.exists():
