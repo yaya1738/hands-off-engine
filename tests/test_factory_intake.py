@@ -234,7 +234,7 @@ def test_task_completed_with_structured_next_action_fans_out():
     _write_msg({
         "type": "continuation_event",
         "event_id": "evt-next",
-        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-next", "status": "success", "next_action": "run system_status"},
+        "context": {"event_type": "task_completed", "is_wake": True, "task_id": "t-next", "status": "success", "next_action": {"action": "system_status", "params": {"reason": "structured-action-regression"}}},
         "message": "completed; continue with status check",
     })
     decisions = intake.intake_once()
