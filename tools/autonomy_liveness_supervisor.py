@@ -17,6 +17,8 @@ from ai.factory.autonomous_objective_loop import FactoryAutonomousObjectiveLoop
 from ai.factory.authority_gateway import FactoryAuthorityGateway
 from ai.factory.runtime import FactoryRuntime
 from scripts.autonomous_task_queue import AutonomousTaskQueue
+from scripts.factory_intake import FactoryIntake
+from scripts.task_worker import poll_once
 
 
 INTERVAL_SECONDS = 10 * 60
@@ -273,6 +275,7 @@ def persist(repo_root: Path, state: dict) -> None:
 
 def run_once(repo_root: Path) -> dict:
     started = time.monotonic()
+
     try:
         signal.alarm(CYCLE_TIMEOUT_SECONDS)
         state = run_cycle(repo_root)
@@ -283,6 +286,33 @@ def run_once(repo_root: Path) -> dict:
     except Exception as exc:
         signal.alarm(0)
         state = {"timestamp": utc_now(), "status": "degraded", "error": str(exc), "live_system_active": False, "operating_state": "offline"}
+
+    continuation = {
+        "intake_decisions": 0,
+        "tasks_processed": 0,
+        "errors": [],
+    }
+
+    # Bounded continuation bridge: one wake event and one task per
+    # autonomous cycle. Continuation is subordinate to the completed
+    # core cycle and must never make that cycle fail.
+    try:
+        intake = FactoryIntake(repo_root)
+        decisions = intake.intake_once(max_events=1)
+        continuation["intake_decisions"] = len(decisions)
+    except Exception as exc:
+        continuation["errors"].append(
+            {"stage": "intake", "error": str(exc)}
+        )
+
+    try:
+        continuation["tasks_processed"] = int(poll_once(max_tasks=1) or 0)
+    except Exception as exc:
+        continuation["errors"].append(
+            {"stage": "task_worker", "error": str(exc)}
+        )
+
+    state["continuation"] = continuation
     state["cycle_duration_seconds"] = round(time.monotonic() - started, 3)
     persist(repo_root, state)
     control_channel.publish_state(
