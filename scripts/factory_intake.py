@@ -175,16 +175,17 @@ class FactoryIntake:
         if not task_id or task_id == "uncorrelated":
             return False
         event_type = _get_event_type(event)
-        if event_type in {"security_boundary", "authorization_required", "test_failure", "blocked"}:
-            return True
-        if event_type == "task_completed":
-            context = event.get("context") or {}
-            next_action = context.get("next_action") or event.get("next_action")
-            explicit = _explicit_next_action(event)
-            if explicit is not None:
-                return True
-            return isinstance(next_action, str) and bool(next_action.strip())
-        return False
+        if event_type not in {
+            "security_boundary",
+            "authorization_required",
+            "test_failure",
+            "blocked",
+            "task_completed",
+        }:
+            return False
+        # Wake-worthy does not mean self-authorizing. A follow-up assignment
+        # requires an explicit next-action declaration on every event type.
+        return _explicit_next_action(event) is not None
 
     def _emit_next_task(self, event: dict, task_id: str) -> dict:
         messages_path, _ = self._paths()
