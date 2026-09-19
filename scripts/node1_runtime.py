@@ -168,6 +168,12 @@ class Node1Runtime:
             log.warning("task_worker not available")
 
         try:
+            from scripts.factory_control_bridge import poll_once as poll_factory_control
+        except ImportError:
+            poll_factory_control = None
+            log.warning("factory_control_bridge not available")
+
+        try:
             from scripts.github_command_bridge import poll_once as poll_github_commands
         except ImportError:
             poll_github_commands = None
@@ -235,6 +241,18 @@ class Node1Runtime:
                             )
                     except Exception as e:
                         log.error(f"GitHub command bridge error: {e}")
+
+                # 0b. Poll shared Factory control channel (bounded, safe actions only)
+                if poll_factory_control and tick % 3 == 0:
+                    try:
+                        admitted = poll_factory_control(max_commands=1)
+                        if admitted:
+                            log.info(f"Factory control bridge: {admitted} command admitted")
+                            self.state.data["factory_control_admitted"] = (
+                                self.state.data.get("factory_control_admitted", 0) + admitted
+                            )
+                    except Exception as e:
+                        log.error(f"Factory control bridge error: {e}")
 
                 # 1. Poll task worker (process inbox)
                 if poll_once:
