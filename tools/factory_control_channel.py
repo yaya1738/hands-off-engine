@@ -31,6 +31,13 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
+def _control_root(repo_root: Path) -> Path:
+    configured = os.environ.get("FACTORY_CONTROL_ROOT", "").strip()
+    if configured:
+        return Path(configured).expanduser()
+    return repo_root / "state"
+
+
 def _atomic_write(path: Path, payload: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     fd, name = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
@@ -63,6 +70,16 @@ def _read_jsonl(path: Path) -> Iterable[Dict[str, Any]]:
         except json.JSONDecodeError:
             continue
     return records
+
+
+def _append_unique(path: Path, record: Dict[str, Any], *, idempotency_key: str) -> Dict[str, Any]:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    for existing in _read_jsonl(path):
+        if existing.get("idempotency_key") == idempotency_key:
+            return existing
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(record, sort_keys=True) + "\n")
+    return record
 
 
 def command_idempotency_key(command: Dict[str, Any]) -> str:
@@ -99,14 +116,43 @@ def append_command(
         "metadata": metadata or {},
     }
     command["idempotency_key"] = command_idempotency_key(command)
-    path = repo_root / "state" / "factory_control_commands.jsonl"
-    path.parent.mkdir(parents=True, exist_ok=True)
-    for existing in _read_jsonl(path):
-        if existing.get("idempotency_key") == command["idempotency_key"]:
-            return existing
-    with path.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(command, sort_keys=True) + "\n")
-    return command
+    return _append_unique(
+        _control_root(repo_root) / "factory_control_commands.jsonl",
+        command,
+        idempotency_key=command["idempotency_key"],
+    )
+
+
+def append_result(
+    repo_root: Path,
+    command_id: str,
+    *,
+    status: str,
+    result: Any = None,
+    correlation_id: Optional[str] = None,
+) -> Dict[str, Any]:
+    command_id = str(command_id).strip()
+    if not command_id:
+        raise ValueError("command_id must not be empty")
+    status = str(status).strip()
+    if not status:
+        raise ValueError("status must not be empty")
+    record = {
+        "schema_version": SCHEMA_VERSION,
+        "id": str(uuid.uuid4()),
+        "command_id": command_id,
+        "status": status,
+        "result": result,
+        "correlation_id": correlation_id,
+        "created_at": _now(),
+    }
+    key = f"{command_id}:{status}:{correlation_id or ''}"
+    record["idempotency_key"] = hashlib.sha256(key.encode("utf-8")).hexdigest()
+    return _append_unique(
+        _control_root(repo_root) / "factory_control_results.jsonl",
+        record,
+        idempotency_key=record["idempotency_key"],
+    )
 
 
 def compact_snapshot(repo_root: Path) -> Dict[str, Any]:
@@ -115,7 +161,7 @@ def compact_snapshot(repo_root: Path) -> Dict[str, Any]:
 
 
 def load_state(repo_root: Path) -> Dict[str, Any]:
-    path = repo_root / "state" / "factory_control_state.json"
+    path = _control_root(repo_root) / "factory_control_state.json"
     if not path.exists():
         return dict(DEFAULT_STATE)
     try:
@@ -131,17 +177,26 @@ def pending_commands(
     repo_root: Path,
     claimed_ids: Optional[set[str]] = None,
 ) -> list[Dict[str, Any]]:
-    if not claimed_ids:
-        claimed_ids = set()
+    claimed_ids = claimed_ids or set()
     return [
-        c for c in _read_jsonl(repo_root / "state" / "factory_control_commands.jsonl")
+        c
+        for c in _read_jsonl(_control_root(repo_root) / "factory_control_commands.jsonl")
         if c.get("id") not in claimed_ids
+    ]
+
+
+def pending_results(repo_root: Path, claimed_ids: Optional[set[str]] = None) -> list[Dict[str, Any]]:
+    claimed_ids = claimed_ids or set()
+    return [
+        r
+        for r in _read_jsonl(_control_root(repo_root) / "factory_control_results.jsonl")
+        if r.get("id") not in claimed_ids
     ]
 
 
 def publish_state(repo_root: Path, **updates: Any) -> Dict[str, Any]:
     """Publish one bounded state snapshot and return it."""
-    path = repo_root / "state" / "factory_control_state.json"
+    path = _control_root(repo_root) / "factory_control_state.json"
     current = dict(DEFAULT_STATE)
     if path.exists():
         try:
