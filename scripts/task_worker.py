@@ -27,6 +27,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 try:
     from scripts.continuation import ContinuationEmitter
+try:
+    from tools import factory_control_channel as factory_control
+except ImportError:
+    factory_control = None
 except ImportError:
     ContinuationEmitter = None
 
@@ -436,6 +440,15 @@ def poll_once():
             with open(RESULTS, "a") as f:
                 f.write(json.dumps(result, default=str) + "\n")
             _publish_result_to_bus(result)
+            control_command_id = result["context"].get("factory_control_command_id")
+            if factory_control and control_command_id:
+                factory_control.append_result(
+                    REPO_ROOT,
+                    control_command_id,
+                    status=result["context"]["status"],
+                    result=result["context"].get("result", result["context"].get("error")),
+                    correlation_id=result["context"].get("correlation_id"),
+                )
             save_processed(processed)
             emitter = get_emitter()
             if emitter:
