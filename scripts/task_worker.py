@@ -27,12 +27,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 try:
     from scripts.continuation import ContinuationEmitter
+except ImportError:
+    ContinuationEmitter = None
+
 try:
     from tools import factory_control_channel as factory_control
 except ImportError:
     factory_control = None
-except ImportError:
-    ContinuationEmitter = None
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [TaskWorker] %(message)s')
 log = logging.getLogger("TaskWorker")
@@ -342,6 +343,7 @@ def process_task(task):
             "error": result.get("error"),
             "reply_to": task.get("context", {}).get("reply_to"),
             "correlation_id": task.get("context", {}).get("correlation_id") or task.get("context", {}).get("reply_to") or task_id,
+            "factory_control_command_id": task.get("context", {}).get("factory_control_command_id"),
         },
     }
 
