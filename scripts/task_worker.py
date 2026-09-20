@@ -416,8 +416,8 @@ def _iter_canonical_assignments():
             yield message
 
 
-def poll_once():
-    """Consume canonical Factory assignments once; legacy ai/tasks is not read."""
+def poll_once(max_tasks=None):
+    """Consume canonical Factory assignments once; optionally bound completed tasks."""
     processed = load_processed()
     processed |= _load_result_ids()
     count = 0
@@ -462,6 +462,8 @@ def poll_once():
                     next_action=task.get('context', {}).get('next_action'),
                 )
             count += 1
+            if max_tasks is not None and count >= max_tasks:
+                break
         finally:
             lock.release()
     return count
