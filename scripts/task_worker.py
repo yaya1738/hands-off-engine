@@ -416,15 +416,18 @@ def _iter_canonical_assignments():
             yield message
 
 
-def poll_once(max_tasks=None):
-    """Consume canonical Factory assignments once; optionally bound completed tasks."""
+def poll_once(max_tasks=None, task_id=None):
+    """Consume canonical assignments once; optionally bound or target specific tasks."""
     processed = load_processed()
     processed |= _load_result_ids()
     count = 0
     for task in _iter_canonical_assignments():
-        task_id = task.get("context", {}).get("task_id", "")
-        if not task_id or task_id in processed:
+        current_task_id = task.get("context", {}).get("task_id", "")
+        if not current_task_id or current_task_id in processed:
             continue
+        if task_id is not None and current_task_id != task_id:
+            continue
+        task_id = current_task_id
         valid, err = validate_task_envelope(task)
         if not valid:
             log.warning(f"Rejected invalid task: {err}")
