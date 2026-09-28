@@ -29,12 +29,16 @@ jobs:
         id: inputs
         run: |
           if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            echo "droplet_ip=${{ github.event.client_payload.droplet_ip || 'do138' }}" >> $GITHUB_OUTPUT
-            echo "ssh_user=${{ github.event.client_payload.ssh_user || 'root' }}" >> $GITHUB_OUTPUT
+            DROPLET_IP="${{ github.event.client_payload.droplet_ip || 'do138' }}"
+            SSH_USER="${{ github.event.client_payload.ssh_user || 'root' }}"
           else
-            echo "droplet_ip=${{ github.event.inputs.droplet_ip }}" >> $GITHUB_OUTPUT
-            echo "ssh_user=${{ github.event.inputs.ssh_user }}" >> $GITHUB_OUTPUT
+            DROPLET_IP="${{ github.event.inputs.droplet_ip }}"
+            SSH_USER="${{ github.event.inputs.ssh_user }}"
           fi
+          if ! printf "%s" "$DROPLET_IP" | grep -Eq "^[A-Za-z0-9][A-Za-z0-9.-]{0,252}$"; then echo "::error::Invalid droplet host"; exit 1; fi
+          if ! printf "%s" "$SSH_USER" | grep -Eq "^[A-Za-z_][A-Za-z0-9_.-]{0,31}$"; then echo "::error::Invalid SSH user"; exit 1; fi
+          printf "droplet_ip=%s\n" "$DROPLET_IP" >> "$GITHUB_OUTPUT"
+          printf "ssh_user=%s\n" "$SSH_USER" >> "$GITHUB_OUTPUT"
       
       - name: Checkout repository
         uses: actions/checkout@v6
