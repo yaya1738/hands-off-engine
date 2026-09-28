@@ -59,6 +59,46 @@ fi
 
 log_info "Setting up GitHub Actions runner for repository: $REPO"
 
+# Idempotency guard: never tear down an existing runner merely because deployment
+# was re-run. Verify its configured repository before deciding whether repair is safe.
+if [ -f "$RUNNER_HOME/.runner" ]; then
+    CONFIGURED_REPO=$(python3 - "$RUNNER_HOME/.runner" <<'PY'
+import json
+import sys
+from pathlib import Path
+
+try:
+    data = json.loads(Path(sys.argv[1]).read_text(encoding="utf-8"))
+    url = data.get("serverUrl", "")
+    prefix = "https://github.com/"
+    if url.startswith(prefix):
+        print(url[len(prefix):].rstrip("/"))
+except (OSError, json.JSONDecodeError):
+    pass
+PY
+)
+    if [ "$CONFIGURED_REPO" != "$REPO" ]; then
+        log_error "Existing runner is configured for a different repository; refusing to replace it."
+        exit 1
+    fi
+
+    if [ ! -x "$RUNNER_HOME/svc.sh" ]; then
+        log_error "Existing runner configuration found but service manager is missing; refusing destructive repair."
+        exit 1
+    fi
+
+    if "$RUNNER_HOME/svc.sh" status >/dev/null 2>&1; then
+        log_info "Existing runner is already configured and its service is active; no re-registration needed."
+        exit 0
+    fi
+
+    log_warn "Existing runner is configured for this repository but its service is not active; attempting a non-destructive restart."
+    "$RUNNER_HOME/svc.sh" start
+    "$RUNNER_HOME/svc.sh" status
+    log_info "Existing runner service restarted successfully."
+    exit 0
+fi
+
 # Create runner user if doesn't exist
 if ! id -u "$RUNNER_USER" >/dev/null 2>&1; then
     log_info "Creating runner user: $RUNNER_USER"
@@ -114,11 +154,8 @@ printf '%s' "$RUNNER_TOKEN" > "$RUNNER_TOKEN_FILE"
 chown "$RUNNER_USER:$RUNNER_USER" "$RUNNER_TOKEN_FILE"
 trap 'rm -f "$RUNNER_TOKEN_FILE"' EXIT
 
-# Remove existing config if present (for re-runs)
-if [ -f "$RUNNER_HOME/.runner" ]; then
-    log_warn "Removing existing runner configuration"
-    su - "$RUNNER_USER" -c "TOKEN=\$(cat \"$RUNNER_TOKEN_FILE\"); cd \"$RUNNER_HOME\" && ./config.sh remove --token \"\$TOKEN\"" || true
-fi
+# A pre-existing .runner configuration is handled by the idempotency guard above.
+# Re-registration is intentionally not performed automatically.
 
 # Configure runner
 su - "$RUNNER_USER" -c "TOKEN=\$(cat \"$RUNNER_TOKEN_FILE\"); cd \"$RUNNER_HOME\" && ./config.sh \
