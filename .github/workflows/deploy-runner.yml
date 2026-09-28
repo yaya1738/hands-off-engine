@@ -89,7 +89,6 @@ jobs:
           pip install requests
 
       - name: Get Runner Registration Token
-        id: token
         env:
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
@@ -100,7 +99,9 @@ jobs:
             exit 1
           fi
           echo "::add-mask::$TOKEN"
-          printf "token=%s\n" "$TOKEN" >> "$GITHUB_OUTPUT"
+          umask 077
+          printf '%s' "$TOKEN" > "$RUNNER_TEMP/runner_registration_token"
+          unset TOKEN
           echo "Token obtained successfully"
 
       - name: Setup SSH
@@ -152,9 +153,10 @@ jobs:
         env:
           DROPLET_IP: ${{ steps.inputs.outputs.droplet_ip }}
           SSH_USER: ${{ steps.inputs.outputs.ssh_user }}
-          RUNNER_TOKEN: ${{ steps.token.outputs.token }}
           REPO: ${{ github.repository }}
         run: |
+          RUNNER_TOKEN="$(cat "$RUNNER_TEMP/runner_registration_token")"
+          rm -f "$RUNNER_TEMP/runner_registration_token"
           echo "Running setup script on droplet..."
           if ! printf '%s\n%s\n' "$RUNNER_TOKEN" "$REPO" | ssh "$SSH_USER@$DROPLET_IP" \
             'read -r RUNNER_TOKEN && read -r REPO && export RUNNER_TOKEN REPO && bash /tmp/setup_self_hosted_runner.sh'; then
