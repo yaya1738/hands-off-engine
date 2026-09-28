@@ -4,6 +4,9 @@ on:
   issues:
     types: [labeled]
 
+env:
+  TRUSTED_ACTORS: "yaya1738,copilot,copilot-swe-agent,app/copilot-swe-agent,github-actions[bot],dependabot[bot]"
+
 jobs:
   assign-to-copilot:
     if: contains(github.event.label.name, 'copilot-task')
@@ -12,6 +15,26 @@ jobs:
       contents: write
       issues: write
     steps:
+      - name: Authorize task assignment actor
+        env:
+          ACTOR: ${{ github.actor }}
+          TRUSTED_ACTORS: ${{ env.TRUSTED_ACTORS }}
+        run: |
+          ACTOR_LOWER=$(printf '%s' "$ACTOR" | tr '[:upper:]' '[:lower:]')
+          AUTHORIZED="false"
+          for trusted in $(printf '%s' "$TRUSTED_ACTORS" | tr ',' ' '); do
+            trusted_lower=$(printf '%s' "$trusted" | tr '[:upper:]' '[:lower:]')
+            if [ "$ACTOR_LOWER" = "$trusted_lower" ]; then
+              AUTHORIZED="true"
+              break
+            fi
+          done
+          if [ "$AUTHORIZED" != "true" ]; then
+            echo "::error::Task assignment is restricted to trusted actors"
+            exit 1
+          fi
+          echo "Task assignment actor authorized"
+
       - name: Log task assignment
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
