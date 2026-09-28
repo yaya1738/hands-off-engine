@@ -13,6 +13,29 @@ jobs:
     permissions:
       contents: write  # Need write to commit state changes
     steps:
+      - name: Authenticate Spark caller
+        env:
+          SPARK_WEBHOOK_TOKEN: ${{ secrets.SPARK_WEBHOOK_TOKEN }}
+          PROVIDED_TOKEN: ${{ github.event.client_payload.webhook_token }}
+        run: |
+          if [ -z "$SPARK_WEBHOOK_TOKEN" ]; then
+            echo "::error::SPARK_WEBHOOK_TOKEN repository secret is not configured"
+            exit 1
+          fi
+          if [ -z "$PROVIDED_TOKEN" ]; then
+            echo "::error::Missing Spark webhook token"
+            exit 1
+          fi
+          python - "$SPARK_WEBHOOK_TOKEN" "$PROVIDED_TOKEN" <<'PY'
+          import hmac
+          import sys
+          expected, provided = sys.argv[1], sys.argv[2]
+          if not hmac.compare_digest(expected, provided):
+              print("::error::Invalid Spark webhook authentication")
+              raise SystemExit(1)
+          PY
+          echo "Spark caller authenticated"
+
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       
       - name: Set up Python
