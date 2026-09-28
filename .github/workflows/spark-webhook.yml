@@ -26,10 +26,11 @@ jobs:
             echo "::error::Missing Spark webhook token"
             exit 1
           fi
-          python - "$SPARK_WEBHOOK_TOKEN" "$PROVIDED_TOKEN" <<'PY'
+          python - <<'PY'
           import hmac
-          import sys
-          expected, provided = sys.argv[1], sys.argv[2]
+          import os
+          expected = os.environ["SPARK_WEBHOOK_TOKEN"]
+          provided = os.environ["PROVIDED_TOKEN"]
           if not hmac.compare_digest(expected, provided):
               print("::error::Invalid Spark webhook authentication")
               raise SystemExit(1)
