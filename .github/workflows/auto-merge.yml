@@ -46,7 +46,6 @@ jobs:
     # - Repository dispatch
     if: >
       github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'repository_dispatch' ||
       (github.event_name == 'pull_request' && github.event.pull_request.draft == false) ||
       (github.event_name == 'check_suite' && github.event.check_suite.conclusion == 'success')
 
@@ -59,8 +58,6 @@ jobs:
         run: |
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "pr=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
-          elif [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            echo "pr=${{ github.event.client_payload.pr_number }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" == "pull_request" ]; then
             echo "pr=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" == "check_suite" ]; then
@@ -144,8 +141,8 @@ jobs:
           done
           
           # Manual/API triggers allow merge regardless of author
-          if [ "${{ github.event_name }}" == "workflow_dispatch" ] || [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            echo "Manual/API trigger, will attempt merge"
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "Manual trigger, will attempt merge"
             SHOULD_MERGE="true"
           fi
           
