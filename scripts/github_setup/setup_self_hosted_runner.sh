@@ -110,18 +110,19 @@ log_info "Configuring runner"
 # Remove existing config if present (for re-runs)
 if [ -f "$RUNNER_HOME/.runner" ]; then
     log_warn "Removing existing runner configuration"
-    su - "$RUNNER_USER" -c "cd $RUNNER_HOME && ./config.sh remove --token $RUNNER_TOKEN" || true
+    su - "$RUNNER_USER" -c 'cd "$RUNNER_HOME" && ./config.sh remove --token "$RUNNER_TOKEN"' || true
 fi
 
 # Configure runner
-su - "$RUNNER_USER" -c "cd $RUNNER_HOME && ./config.sh \
-    --url https://github.com/$REPO \
-    --token $RUNNER_TOKEN \
-    --name 'droplet-$(hostname)' \
+export RUNNER_TOKEN REPO RUNNER_HOME
+su - "$RUNNER_USER" -c 'cd "$RUNNER_HOME" && ./config.sh \
+    --url "https://github.com/$REPO" \
+    --token "$RUNNER_TOKEN" \
+    --name "droplet-$(hostname)" \
     --labels self-hosted,linux,droplet \
     --work _work \
     --replace \
-    --unattended"
+    --unattended'
 
 # Install systemd service
 log_info "Installing systemd service"
