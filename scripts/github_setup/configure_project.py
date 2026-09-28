@@ -233,10 +233,7 @@ def create_project(token: str, owner: str, repo: str):
 
 def main():
     """Main entry point."""
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("ADMIN_TOKEN")
-    if not token:
-        print("❌ ERROR: GITHUB_TOKEN or ADMIN_TOKEN environment variable not set")
-        sys.exit(1)
+    token = os.environ.get("ADMIN_TOKEN")
     
     owner, repo = get_github_info()
     if not owner or not repo:
