@@ -149,10 +149,10 @@ jobs:
           fi
           
           # Handle pull_request event (automatic trigger)
-          PR_NUM="${{ github.event.pull_request.number }}"
-          AUTHOR="${{ github.event.pull_request.user.login }}"
+          PR_NUM="$PR_EVENT_NUMBER"
+          AUTHOR="$PR_EVENT_AUTHOR"
           AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
-          PR_NODE_ID="${{ github.event.pull_request.node_id }}"
+          PR_NODE_ID="$PR_EVENT_NODE_ID"
           
           echo "Draft PR #$PR_NUM opened by: $AUTHOR"
           
@@ -189,3 +189,6 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
+          PR_EVENT_NUMBER: ${{ github.event.pull_request.number }}
+          PR_EVENT_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_EVENT_NODE_ID: ${{ github.event.pull_request.node_id }}
