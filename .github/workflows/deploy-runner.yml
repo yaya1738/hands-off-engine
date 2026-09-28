@@ -83,11 +83,6 @@ jobs:
         with:
           python-version: '3.11'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install requests
-
       - name: Get Runner Registration Token
         env:
           ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
