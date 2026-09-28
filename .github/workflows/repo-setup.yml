@@ -26,18 +26,39 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Weekly on Sunday at midnight UTC
   repository_dispatch:
-    types: [telegram_trigger_setup]  # Triggered by Telegram bot
+    types: [telegram_trigger_setup]  # Requires TELEGRAM_SETUP_TOKEN authentication.
 
 permissions:
   contents: read
-  issues: write
-  pull-requests: write
 
 jobs:
   configure:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Authenticate Telegram setup caller
+        if: github.event_name == 'repository_dispatch'
+        env:
+          TELEGRAM_SETUP_TOKEN: ${{ secrets.TELEGRAM_SETUP_TOKEN }}
+          PROVIDED_TOKEN: ${{ github.event.client_payload.webhook_token }}
+        run: |
+          if [ -z "$TELEGRAM_SETUP_TOKEN" ]; then
+            echo "::error::TELEGRAM_SETUP_TOKEN repository secret is not configured"
+            exit 1
+          fi
+          if [ -z "$PROVIDED_TOKEN" ]; then
+            echo "::error::Missing Telegram setup authentication token"
+            exit 1
+          fi
+          TELEGRAM_SETUP_TOKEN="$TELEGRAM_SETUP_TOKEN" PROVIDED_TOKEN="$PROVIDED_TOKEN" python - <<'PY'
+          import hmac
+          import os
+          if not hmac.compare_digest(os.environ["TELEGRAM_SETUP_TOKEN"], os.environ["PROVIDED_TOKEN"]):
+              print("::error::Invalid Telegram setup authentication")
+              raise SystemExit(1)
+          PY
+          echo "Telegram setup caller authenticated"
+
       - name: Checkout repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       
