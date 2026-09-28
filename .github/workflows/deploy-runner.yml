@@ -144,6 +144,20 @@ jobs:
             "$SSH_USER@$DROPLET_IP:/tmp/"
           echo "Script copied"
 
+      - name: Verify Setup Script Integrity
+        env:
+          DROPLET_IP: ${{ steps.inputs.outputs.droplet_ip }}
+          SSH_USER: ${{ steps.inputs.outputs.ssh_user }}
+        run: |
+          EXPECTED_SHA256="$(sha256sum scripts/github_setup/setup_self_hosted_runner.sh | awk '{print $1}')"
+          echo "Verifying setup script integrity on droplet..."
+          if ! ssh "$SSH_USER@$DROPLET_IP" \
+            "printf '%s  %s\\n' \"$EXPECTED_SHA256\" /tmp/setup_self_hosted_runner.sh | sha256sum --check --status -"; then
+            echo "::error::Setup script integrity verification failed"
+            exit 1
+          fi
+          echo "Setup script integrity verified"
+
       - name: Run Setup Script on Droplet
         env:
           DROPLET_IP: ${{ steps.inputs.outputs.droplet_ip }}
@@ -155,10 +169,23 @@ jobs:
           echo "Running setup script on droplet..."
           if ! printf '%s\n%s\n' "$RUNNER_TOKEN" "$REPO" | ssh "$SSH_USER@$DROPLET_IP" \
             'read -r RUNNER_TOKEN && read -r REPO && export RUNNER_TOKEN REPO && bash /tmp/setup_self_hosted_runner.sh'; then
+            unset RUNNER_TOKEN
             echo "::error::Runner setup failed"
             exit 1
           fi
+          unset RUNNER_TOKEN
           echo "Runner setup complete"
+
+      - name: Remove Remote Setup Script
+        if: ${{ always() }}
+        env:
+          DROPLET_IP: ${{ steps.inputs.outputs.droplet_ip }}
+          SSH_USER: ${{ steps.inputs.outputs.ssh_user }}
+        run: |
+          echo "Removing temporary setup script from droplet..."
+          if ! ssh "$SSH_USER@$DROPLET_IP" 'rm -f /tmp/setup_self_hosted_runner.sh'; then
+            echo "::warning::Could not remove temporary setup script"
+          fi
 
       - name: Verify Runner Registration
         env:
