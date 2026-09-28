@@ -105,6 +105,12 @@ if ! id -u "$RUNNER_USER" >/dev/null 2>&1; then
     useradd -m -s /bin/bash "$RUNNER_USER"
 fi
 
+# Refuse unsafe pre-existing identities. The runner must never execute as root.
+if [ "$(id -u "$RUNNER_USER")" -eq 0 ]; then
+    log_error "Runner account resolves to UID 0; refusing to continue."
+    exit 1
+fi
+
 # Create runner directory
 log_info "Creating runner directory: $RUNNER_HOME"
 mkdir -p "$RUNNER_HOME"
