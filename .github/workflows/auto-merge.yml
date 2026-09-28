@@ -59,7 +59,7 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             echo "pr=${{ github.event.inputs.pr_number }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" == "pull_request" ]; then
-            echo "pr=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
+            echo "pr=$PR_EVENT_NUMBER" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" == "check_suite" ]; then
             # Get PR associated with this check suite
             HEAD_BRANCH="$CHECK_SUITE_HEAD_BRANCH"
@@ -167,6 +167,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
           CHECK_SUITE_HEAD_BRANCH: ${{ github.event.check_suite.head_branch }}
+          PR_EVENT_NUMBER: ${{ github.event.pull_request.number }}
 
   # Separate job to handle draft PRs when they become ready
   mark-ready-and-merge:
@@ -179,7 +180,7 @@ jobs:
       - name: Auto-merge ready PR from trusted source
         run: |
           PR_NUM="${{ github.event.pull_request.number }}"
-          AUTHOR="${{ github.event.pull_request.user.login }}"
+          AUTHOR="$PR_EVENT_AUTHOR"
           AUTHOR_LOWER=$(echo "$AUTHOR" | tr '[:upper:]' '[:lower:]')
           
           echo "PR #$PR_NUM is now ready for review (author: $AUTHOR)"
