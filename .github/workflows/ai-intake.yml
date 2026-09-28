@@ -22,6 +22,20 @@ jobs:
       AI_INTAKE_ISSUE_NUMBER: "1"
 
     steps:
+      - name: Authorize AI intake caller
+        env:
+          COMMENT_AUTHOR_ASSOCIATION: ${{ github.event.comment.author_association }}
+        run: |
+          case "$COMMENT_AUTHOR_ASSOCIATION" in
+            OWNER|MEMBER|COLLABORATOR)
+              echo "AI intake caller authorized"
+              ;;
+            *)
+              echo "::error::AI intake is restricted to repository collaborators"
+              exit 1
+              ;;
+          esac
+
       - name: Check out repository
         uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
 
