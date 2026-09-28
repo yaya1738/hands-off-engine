@@ -70,11 +70,10 @@ log_info "Creating runner directory: $RUNNER_HOME"
 mkdir -p "$RUNNER_HOME"
 cd "$RUNNER_HOME"
 
-# Download runner if not already present
-if [ ! -f "$RUNNER_HOME/bin/Runner.Listener" ]; then
-    log_info "Downloading GitHub Actions runner v$RUNNER_VERSION"
+# Download and verify the exact pinned runner artifact on every setup run.
+log_info "Downloading GitHub Actions runner v$RUNNER_VERSION"
 
-    # Determine architecture and use the GitHub-published SHA-256 digest for this exact release artifact.
+# Determine architecture and use the GitHub-published SHA-256 digest for this exact release artifact.
     ARCH=$(uname -m)
     case "$ARCH" in
         x86_64)
@@ -97,13 +96,10 @@ if [ ! -f "$RUNNER_HOME/bin/Runner.Listener" ]; then
     curl --fail --silent --show-error --location --output "$RUNNER_PKG" "$RUNNER_URL"
     printf '%s  %s\n' "$RUNNER_SHA256" "$RUNNER_PKG" | sha256sum --check --status -
 
-    # Extract runner
-    log_info "Extracting runner package"
-    tar xzf "$RUNNER_PKG"
-    rm "$RUNNER_PKG"
-else
-    log_info "Runner already downloaded, skipping download"
-fi
+# Extract runner
+log_info "Extracting runner package"
+tar xzf "$RUNNER_PKG"
+rm "$RUNNER_PKG"
 
 # Set ownership
 chown -R "$RUNNER_USER:$RUNNER_USER" "$RUNNER_HOME"
