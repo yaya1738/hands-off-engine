@@ -100,11 +100,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           printf "%s\n" "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
-          cat > ~/.ssh/config <<'EOF'
-          Host *
-            StrictHostKeyChecking yes
-            UserKnownHostsFile ~/.ssh/known_hosts
-          EOF
+          printf '%s\n' 'Host *' '  StrictHostKeyChecking yes' '  UserKnownHostsFile ~/.ssh/known_hosts' > ~/.ssh/config
           chmod 600 ~/.ssh/config
           echo "SSH configured with strict host-key verification"
 
@@ -137,8 +133,8 @@ jobs:
           REPO: ${{ github.repository }}
         run: |
           echo "Running setup script on droplet..."
-          if ! printf '%s\n' "$RUNNER_TOKEN" | ssh "$SSH_USER@$DROPLET_IP" \
-            'read -r RUNNER_TOKEN && export RUNNER_TOKEN && bash /tmp/setup_self_hosted_runner.sh'; then
+          if ! printf '%s\n%s\n' "$RUNNER_TOKEN" "$REPO" | ssh "$SSH_USER@$DROPLET_IP" \
+            'read -r RUNNER_TOKEN && read -r REPO && export RUNNER_TOKEN REPO && bash /tmp/setup_self_hosted_runner.sh'; then
             echo "::error::Runner setup failed"
             exit 1
           fi
