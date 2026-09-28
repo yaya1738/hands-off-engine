@@ -191,10 +191,7 @@ def configure_branch_protection(token: str, owner: str, repo: str, branch: str =
 def main():
     """Main entry point."""
     # Get GitHub token
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("ADMIN_TOKEN")
-    if not token:
-        print("❌ ERROR: GITHUB_TOKEN or ADMIN_TOKEN environment variable not set")
-        sys.exit(1)
+    token = os.environ.get("ADMIN_TOKEN")
     
     # Get repository info
     owner, repo = get_github_info()
