@@ -233,9 +233,9 @@ def create_project(token: str, owner: str, repo: str):
 
 def main():
     """Main entry point."""
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("ADMIN_TOKEN")
+    token = os.environ.get("ADMIN_TOKEN")
     if not token:
-        print("❌ ERROR: GITHUB_TOKEN or ADMIN_TOKEN environment variable not set")
+        print("❌ ERROR: ADMIN_TOKEN environment variable not set; refusing privileged repository configuration")
         sys.exit(1)
     
     owner, repo = get_github_info()

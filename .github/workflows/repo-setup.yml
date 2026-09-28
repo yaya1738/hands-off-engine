@@ -26,23 +26,44 @@ on:
   schedule:
     - cron: '0 0 * * 0'  # Weekly on Sunday at midnight UTC
   repository_dispatch:
-    types: [telegram_trigger_setup]  # Triggered by Telegram bot
+    types: [telegram_trigger_setup]  # Requires TELEGRAM_SETUP_TOKEN authentication.
 
 permissions:
   contents: read
-  issues: write
-  pull-requests: write
 
 jobs:
   configure:
     runs-on: ubuntu-latest
     
     steps:
+      - name: Authenticate Telegram setup caller
+        if: github.event_name == 'repository_dispatch'
+        env:
+          TELEGRAM_SETUP_TOKEN: ${{ secrets.TELEGRAM_SETUP_TOKEN }}
+          PROVIDED_TOKEN: ${{ github.event.client_payload.webhook_token }}
+        run: |
+          if [ -z "$TELEGRAM_SETUP_TOKEN" ]; then
+            echo "::error::TELEGRAM_SETUP_TOKEN repository secret is not configured"
+            exit 1
+          fi
+          if [ -z "$PROVIDED_TOKEN" ]; then
+            echo "::error::Missing Telegram setup authentication token"
+            exit 1
+          fi
+          TELEGRAM_SETUP_TOKEN="$TELEGRAM_SETUP_TOKEN" PROVIDED_TOKEN="$PROVIDED_TOKEN" python - <<'PY'
+          import hmac
+          import os
+          if not hmac.compare_digest(os.environ["TELEGRAM_SETUP_TOKEN"], os.environ["PROVIDED_TOKEN"]):
+              print("::error::Invalid Telegram setup authentication")
+              raise SystemExit(1)
+          PY
+          echo "Telegram setup caller authenticated"
+
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       
       - name: Setup Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.11'
       
@@ -54,7 +75,7 @@ jobs:
       - name: Configure Branch Protection
         if: ${{ !inputs.skip_branch_protection }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Branch Protection Configuration"
           python scripts/github_setup/configure_branch_protection.py || {
@@ -66,7 +87,7 @@ jobs:
       - name: Configure Environments
         if: ${{ !inputs.skip_environments }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Environments Configuration"
           python scripts/github_setup/configure_environments.py || {
@@ -77,7 +98,7 @@ jobs:
       - name: Configure Security Features
         if: ${{ !inputs.skip_security }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Security Configuration"
           python scripts/github_setup/configure_security.py || {
@@ -88,7 +109,7 @@ jobs:
       - name: Configure Project Board
         if: ${{ !inputs.skip_project }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Project Board Configuration"
           python scripts/github_setup/configure_project.py || {
@@ -108,7 +129,7 @@ jobs:
       
       - name: Upload Configuration Logs
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4
         with:
           name: github-setup-logs
           path: logs/github_setup.jsonl

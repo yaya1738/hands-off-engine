@@ -76,7 +76,7 @@ Installs GitHub Actions runner on Ubuntu server.
 RUNNER_TOKEN=<token> REPO=owner/repo bash setup_self_hosted_runner.sh
 ```
 
-Installs runner as systemd service with labels: `self-hosted`, `linux`, `droplet`
+Installs runner as a systemd service with the repository-specific label `hands-off-engine-dedicated`. GitHub automatically supplies the `self-hosted`, OS, and architecture labels.
 
 ### Status Checking
 
@@ -272,3 +272,10 @@ python scripts/github_setup/check_setup_status.py
 - [GitHub GraphQL API](https://docs.github.com/en/graphql)
 - [GitHub Actions Runner](https://github.com/actions/runner)
 - [Branch Protection Rules](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches)
+
+
+### Runner targeting policy
+
+The runner is intentionally tagged with the dedicated label `hands-off-engine-dedicated`. Any future workflow that needs this runner must explicitly target both `self-hosted` and `hands-off-engine-dedicated`.
+
+Do not target the runner using a broad `runs-on: self-hosted` selector.

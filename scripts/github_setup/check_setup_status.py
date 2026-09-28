@@ -12,16 +12,11 @@ Returns JSON with current state of:
 
 import os
 import sys
+import urllib.request
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any, Optional
-
-try:
-    import requests
-except ImportError:
-    print(json.dumps({"error": "requests library not installed"}))
-    sys.exit(1)
 
 
 def get_github_info():
@@ -78,7 +73,7 @@ def check_branch_protection(token: str, owner: str, repo: str, branch: str = "ma
     }
     
     try:
-        response = requests.get(url, headers=headers)
+        response = urllib.request.urlopen(urllib.request.Request(url, headers=headers), timeout=30)
         if response.status_code == 200:
             data = response.json()
             return {

@@ -65,6 +65,7 @@ fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
     event_type: 'spark_emergency_stop',
     client_payload: {
       user: 'AUTHENTICATED_USERNAME',
+      webhook_token: 'SPARK_WEBHOOK_TOKEN_VALUE',
       reason: 'Manual emergency stop'
     }
   })
@@ -83,6 +84,7 @@ fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
     event_type: 'spark_approve_trade',
     client_payload: {
       user: 'AUTHENTICATED_USERNAME',
+      webhook_token: 'SPARK_WEBHOOK_TOKEN_VALUE',
       trade_id: 'trade_12345'
     }
   })
@@ -100,7 +102,8 @@ fetch('https://api.github.com/repos/yaya1738/hands-off-engine/dispatches', {
   body: JSON.stringify({
     event_type: 'spark_health_check',
     client_payload: {
-      user: 'AUTHENTICATED_USERNAME'
+      user: 'AUTHENTICATED_USERNAME',
+      webhook_token: 'SPARK_WEBHOOK_TOKEN_VALUE'
     }
   })
 })
@@ -139,7 +142,17 @@ const messages = messagesText.split('\n').filter(l => l).map(JSON.parse)
 
 ## Security Considerations
 
-1. **Token Management:** Spark apps need a GitHub token with `repo` scope
+1. **Repository Dispatch Authentication:** The workflow requires a shared `SPARK_WEBHOOK_TOKEN` repository secret. Every Spark dispatch must include the same value as `client_payload.webhook_token`. The workflow rejects missing or invalid tokens before checkout or any state mutation.
+   - Configure `SPARK_WEBHOOK_TOKEN` as a GitHub Actions repository secret.
+   - Store the same value in the authenticated Spark application's server-side secret store.
+   - Do not embed the value in client-side JavaScript, logs, URLs, or source control.
+   - Rotate the secret whenever the Spark integration is suspected of compromise.
+   - The token authenticates the Spark integration; the `user` field remains application-supplied metadata and must only be populated from Spark's authenticated user session.
+
+2. **GitHub API Token Management:** Spark apps need a GitHub token capable of calling `repository_dispatch`.
+   - Prefer a fine-grained token limited to `yaya1738/hands-off-engine`.
+   - Grant only the repository permissions required by the Spark app.
+   - Set an expiration and rotate tokens regularly.
    - Create a fine-grained personal access token
    - Limit to `yaya1738/hands-off-engine` repository
    - Grant read access for data fetching

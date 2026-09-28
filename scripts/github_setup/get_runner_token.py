@@ -7,18 +7,15 @@ Outputs a registration token that can be used to register a self-hosted runner.
 
 import os
 import sys
+import urllib.error
+import urllib.request
 import json
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, Any
 
 try:
-    import requests
-except ImportError:
-    print("ERROR: requests library not installed. Run: pip install requests", file=sys.stderr)
-    sys.exit(1)
-
-
+    
 def log_action(action: str, status: str, details: Dict[str, Any] = None):
     """Log configuration action to audit trail."""
     log_dir = Path(__file__).parent.parent.parent / "logs"
@@ -93,10 +90,10 @@ def get_runner_registration_token(token: str, owner: str, repo: str) -> str:
     log_action("get_runner_token", "started", {"owner": owner, "repo": repo})
     
     try:
-        response = requests.post(url, headers=headers)
-        
-        if response.status_code == 201:
-            data = response.json()
+        request = urllib.request.Request(url, method="POST", headers=headers)
+        with urllib.request.urlopen(request, timeout=30) as response:
+            data = json.load(response)
+        if response.status == 201
             runner_token = data.get("token")
             expires_at = data.get("expires_at")
             
@@ -113,8 +110,8 @@ def get_runner_registration_token(token: str, owner: str, repo: str) -> str:
             print(runner_token)
             return runner_token
             
-        elif response.status_code == 403:
-            error_msg = response.json().get("message", "Permission denied")
+        elif response.status == 403:
+            error_msg = json.load(response).get("message", "Permission denied")
             print(f"❌ Permission denied: {error_msg}", file=sys.stderr)
             print("   This operation requires admin access to the repository.", file=sys.stderr)
             log_action("get_runner_token", "permission_denied", {
@@ -124,9 +121,9 @@ def get_runner_registration_token(token: str, owner: str, repo: str) -> str:
             })
             sys.exit(1)
         else:
-            error_msg = response.json().get("message", "Unknown error")
+            error_msg = json.load(response).get("message", "Unknown error")
             print(f"❌ Failed to get runner token: {error_msg}", file=sys.stderr)
-            print(f"   Status code: {response.status_code}", file=sys.stderr)
+            print(f"   Status code: {response.status}", file=sys.stderr)
             log_action("get_runner_token", "failed", {
                 "owner": owner,
                 "repo": repo,
@@ -147,9 +144,9 @@ def get_runner_registration_token(token: str, owner: str, repo: str) -> str:
 
 def main():
     """Main entry point."""
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("ADMIN_TOKEN")
+    token = os.environ.get("ADMIN_TOKEN")
     if not token:
-        print("❌ ERROR: GITHUB_TOKEN or ADMIN_TOKEN environment variable not set", file=sys.stderr)
+        print("❌ ERROR: ADMIN_TOKEN environment variable not set; refusing runner registration-token issuance", file=sys.stderr)
         sys.exit(1)
     
     owner, repo = get_github_info()
