@@ -172,6 +172,19 @@ log_info "Installing systemd service"
 cd "$RUNNER_HOME"
 ./svc.sh install "$RUNNER_USER"
 
+# Lock down the dedicated runner account after configuration.
+# The runner service does not require interactive login or a password.
+usermod -s /usr/sbin/nologin "$RUNNER_USER"
+passwd -l "$RUNNER_USER" >/dev/null 2>&1 || true
+if id -nG "$RUNNER_USER" | grep -Eq '(^| )(sudo|admin|wheel)( |$)'; then
+    log_error "Runner account has administrative group membership; refusing to start it."
+    exit 1
+fi
+
+# Restrict the runner installation directory to its dedicated service account.
+chown -R "$RUNNER_USER:$RUNNER_USER" "$RUNNER_HOME"
+chmod 0750 "$RUNNER_HOME"
+
 # Start service
 log_info "Starting runner service"
 ./svc.sh start
