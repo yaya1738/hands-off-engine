@@ -36,9 +36,8 @@
     "polymarket": {
       "status": "working",
       "env_var": "POLYMARKET_PRIVATE_KEY",
-      "env_file": ".env.polymarket",
+      "env_file": "runtime secret store",
       "capabilities": ["trading", "market_data", "positions"],
-      "balance": "$8.99",
       "cost": "trading fees only",
       "notes": "Main trading venue"
     },
