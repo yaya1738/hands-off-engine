@@ -6,7 +6,7 @@
 # 2. Configures with repository token
 # 3. Installs as systemd service
 # 4. Registers with GitHub
-# 5. Adds labels: self-hosted, linux, droplet
+# 5. Adds the repository-specific label: hands-off-engine-dedicated (GitHub also supplies self-hosted/OS/arch labels automatically)
 
 set -e
 
@@ -168,7 +168,7 @@ su - "$RUNNER_USER" -c "TOKEN=\$(cat \"$RUNNER_TOKEN_FILE\"); cd \"$RUNNER_HOME\
     --url \"https://github.com/$REPO\" \
     --token \"\$TOKEN\" \
     --name \"droplet-\$(hostname)\" \
-    --labels self-hosted,linux,droplet \
+    --labels hands-off-engine-dedicated \
     --work _work \
     --replace \
     --unattended"
