@@ -92,11 +92,7 @@ class PolymarketActuator:
 
     def _init_trader(self):
         try:
-            # Set env vars from .env.polymarket
-            os.environ.setdefault('POLYMARKET_PRIVATE_KEY',
-                '0x644444ab1d39e9074b01f085a27a4bbf5a8536f411b9b2bea04eb3934f038493')
-            os.environ.setdefault('POLYMARKET_FUNDER_ADDRESS',
-                '0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D')
+            # Credentials are runtime-only; never embed signing keys or funder credentials.
             os.environ.setdefault('POLYMARKET_CLOB_HOST', 'https://clob.polymarket.com')
             os.environ.setdefault('POLYMARKET_CHAIN_ID', '137')
 

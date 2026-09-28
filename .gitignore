@@ -63,3 +63,14 @@ state/permanent/ACCESS_MASTER.md
 # Task inbox/outbox (local coordination bus)
 ai/tasks/inbox.jsonl
 ai/tasks/results.jsonl
+
+
+# Credentials, local environments, and generated backups
+.env.polymarket
+.env.polymarket.*
+*.env
+*.env.*
+backups/
+state/
+termux-hands-off/autopilot/*.env
+termux-hands-off/autopilot/*.env.save
