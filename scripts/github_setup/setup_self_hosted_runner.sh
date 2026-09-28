@@ -112,24 +112,23 @@ RUNNER_TOKEN_FILE=$(mktemp "$RUNNER_HOME/.runner-token.XXXXXX")
 chmod 600 "$RUNNER_TOKEN_FILE"
 printf '%s' "$RUNNER_TOKEN" > "$RUNNER_TOKEN_FILE"
 chown "$RUNNER_USER:$RUNNER_USER" "$RUNNER_TOKEN_FILE"
-export RUNNER_TOKEN_FILE RUNNER_HOME REPO
 trap 'rm -f "$RUNNER_TOKEN_FILE"' EXIT
 
 # Remove existing config if present (for re-runs)
 if [ -f "$RUNNER_HOME/.runner" ]; then
     log_warn "Removing existing runner configuration"
-    su - "$RUNNER_USER" -c 'TOKEN=$(cat "$RUNNER_TOKEN_FILE"); cd "$RUNNER_HOME" && ./config.sh remove --token "$TOKEN"' || true
+    su - "$RUNNER_USER" -c "TOKEN=\$(cat \"$RUNNER_TOKEN_FILE\"); cd \"$RUNNER_HOME\" && ./config.sh remove --token \"\$TOKEN\"" || true
 fi
 
 # Configure runner
-su - "$RUNNER_USER" -c 'TOKEN=$(cat "$RUNNER_TOKEN_FILE"); cd "$RUNNER_HOME" && ./config.sh \
-    --url "https://github.com/$REPO" \
-    --token "$TOKEN" \
-    --name "droplet-$(hostname)" \
+su - "$RUNNER_USER" -c "TOKEN=\$(cat \"$RUNNER_TOKEN_FILE\"); cd \"$RUNNER_HOME\" && ./config.sh \
+    --url \"https://github.com/$REPO\" \
+    --token \"\$TOKEN\" \
+    --name \"droplet-\$(hostname)\" \
     --labels self-hosted,linux,droplet \
     --work _work \
     --replace \
-    --unattended'
+    --unattended"
 
 # Install systemd service
 log_info "Installing systemd service"
