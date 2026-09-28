@@ -21,7 +21,7 @@ on:
         type: number
 
 permissions:
-  contents: write
+  contents: read
   pull-requests: write
 
 # Trusted bot authors that can auto-mark ready (case-insensitive matching used in script)
