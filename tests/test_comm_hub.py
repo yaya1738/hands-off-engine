@@ -131,3 +131,12 @@ def test_messages_jsonl_written():
     assert len(lines) >= 1
     entry = json.loads(lines[-1])
     assert entry["to"] == "operator"
+
+
+def test_human_contacts_are_communication_only():
+    hub = _make_hub()
+    for party_id in ("david_kaplan", "carol_kaplan"):
+        result = hub.send(party_id, "human_message", {"text": "hello"})
+        assert result["status"] == "sent"
+        denied = hub.send(party_id, "trade_alert", {"market": "ETH"})
+        assert denied["status"] == "denied"
