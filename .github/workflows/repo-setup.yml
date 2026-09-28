@@ -75,7 +75,7 @@ jobs:
       - name: Configure Branch Protection
         if: ${{ !inputs.skip_branch_protection }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Branch Protection Configuration"
           python scripts/github_setup/configure_branch_protection.py || {
@@ -87,7 +87,7 @@ jobs:
       - name: Configure Environments
         if: ${{ !inputs.skip_environments }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Environments Configuration"
           python scripts/github_setup/configure_environments.py || {
@@ -98,7 +98,7 @@ jobs:
       - name: Configure Security Features
         if: ${{ !inputs.skip_security }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Security Configuration"
           python scripts/github_setup/configure_security.py || {
@@ -109,7 +109,7 @@ jobs:
       - name: Configure Project Board
         if: ${{ !inputs.skip_project }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ADMIN_TOKEN: ${{ secrets.ADMIN_TOKEN }}
         run: |
           echo "::group::Project Board Configuration"
           python scripts/github_setup/configure_project.py || {
