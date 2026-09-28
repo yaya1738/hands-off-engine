@@ -15,7 +15,7 @@ on:
         required: false
         default: 'root'
   repository_dispatch:
-    types: [telegram_trigger_runner]
+    types: [telegram_trigger_runner]  # Requires TELEGRAM_RUNNER_TOKEN authentication.
 
 permissions:
   contents: read
@@ -25,6 +25,29 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Authenticate Telegram runner caller
+        if: github.event_name == 'repository_dispatch'
+        env:
+          TELEGRAM_RUNNER_TOKEN: ${{ secrets.TELEGRAM_RUNNER_TOKEN }}
+          PROVIDED_TOKEN: ${{ github.event.client_payload.webhook_token }}
+        run: |
+          if [ -z "$TELEGRAM_RUNNER_TOKEN" ]; then
+            echo "::error::TELEGRAM_RUNNER_TOKEN repository secret is not configured"
+            exit 1
+          fi
+          if [ -z "$PROVIDED_TOKEN" ]; then
+            echo "::error::Missing Telegram runner authentication token"
+            exit 1
+          fi
+          TELEGRAM_RUNNER_TOKEN="$TELEGRAM_RUNNER_TOKEN" PROVIDED_TOKEN="$PROVIDED_TOKEN" python - <<'PY'
+          import hmac
+          import os
+          if not hmac.compare_digest(os.environ["TELEGRAM_RUNNER_TOKEN"], os.environ["PROVIDED_TOKEN"]):
+              print("::error::Invalid Telegram runner authentication")
+              raise SystemExit(1)
+          PY
+          echo "Telegram runner caller authenticated"
+
       - name: Determine Input Values
         id: inputs
         env:
