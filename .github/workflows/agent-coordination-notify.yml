@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   issues: write
 
 jobs:
@@ -117,7 +117,25 @@ jobs:
               });
             }
 
+      - name: Validate dispatch source
+        env:
+          ACTOR: ${{ github.actor }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            case "$ACTOR" in
+              yaya1738|copilot|copilot-swe-agent|app/copilot-swe-agent|github-actions[bot]|dependabot[bot])
+                echo "Manual coordination dispatch authorized"
+                ;;
+              *)
+                echo "::error::Manual coordination dispatch is restricted to trusted actors"
+                exit 1
+                ;;
+            esac
+          fi
+
       - name: Trigger Copilot workflow if exists
+        if: github.event_name == 'workflow_dispatch' || github.event_name == 'push'
         continue-on-error: true
         run: |
           # This will trigger repository_dispatch event that Copilot can listen to
