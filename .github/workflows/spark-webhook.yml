@@ -37,6 +37,32 @@ jobs:
           PY
           echo "Spark caller authenticated"
 
+      - name: Validate Spark action payload
+        env:
+          EVENT_ACTION: ${{ github.event.action }}
+          TRADE_ID: ${{ github.event.client_payload.trade_id }}
+          SPARK_USER: ${{ github.event.client_payload.user }}
+        run: |
+          case "$EVENT_ACTION" in
+            spark_emergency_stop|spark_health_check)
+              ;;
+            spark_approve_trade)
+              if [ -z "$TRADE_ID" ] || [[ ! "$TRADE_ID" =~ ^[a-zA-Z0-9_-]{1,128}$ ]]; then
+                echo "::error::Invalid trade ID"
+                exit 1
+              fi
+              if [ -z "$SPARK_USER" ] || [[ ! "$SPARK_USER" =~ ^[a-zA-Z0-9_.@:-]{1,128}$ ]]; then
+                echo "::error::Invalid Spark user identifier"
+                exit 1
+              fi
+              ;;
+            *)
+              echo "::error::Unsupported Spark action"
+              exit 1
+              ;;
+          esac
+          echo "Spark action payload validated"
+
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       
       - name: Set up Python
