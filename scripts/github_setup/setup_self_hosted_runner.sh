@@ -2,7 +2,7 @@
 # Setup self-hosted GitHub Actions runner on Ubuntu server
 #
 # This script:
-# 1. Downloads GitHub Actions runner
+# 1. Downloads a pinned GitHub Actions runner release and verifies its SHA-256 digest
 # 2. Configures with repository token
 # 3. Installs as systemd service
 # 4. Registers with GitHub
@@ -11,7 +11,7 @@
 set -e
 
 # Configuration
-RUNNER_VERSION="2.311.0"
+RUNNER_VERSION="2.337.0"
 RUNNER_USER="runner"
 RUNNER_HOME="/opt/actions-runner"
 
@@ -34,22 +34,26 @@ log_error() {
 }
 
 # Check if running as root
-if [ "$EUID" -ne 0 ]; then 
+if [ "$EUID" -ne 0 ]; then
     log_error "Please run as root (use sudo)"
     exit 1
 fi
 
-# Get runner token from environment or argument
-RUNNER_TOKEN="${RUNNER_TOKEN:-$1}"
+# Get runner token from environment only so it is not accepted as a command-line argument.
+RUNNER_TOKEN="${RUNNER_TOKEN:-}"
 if [ -z "$RUNNER_TOKEN" ]; then
-    log_error "RUNNER_TOKEN not set. Pass as argument or set environment variable."
+    log_error "RUNNER_TOKEN environment variable is required."
     exit 1
 fi
 
-# Get repository from environment or argument
-REPO="${REPO:-$2}"
+# Get repository from environment only.
+REPO="${REPO:-}"
 if [ -z "$REPO" ]; then
-    log_error "REPO not set (format: owner/repo). Pass as argument or set environment variable."
+    log_error "REPO environment variable is required (format: owner/repo)."
+    exit 1
+fi
+if ! printf '%s' "$REPO" | grep -Eq '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$'; then
+    log_error "REPO must use owner/repo format."
     exit 1
 fi
 
@@ -69,23 +73,30 @@ cd "$RUNNER_HOME"
 # Download runner if not already present
 if [ ! -f "$RUNNER_HOME/bin/Runner.Listener" ]; then
     log_info "Downloading GitHub Actions runner v$RUNNER_VERSION"
-    
-    # Determine architecture
+
+    # Determine architecture and use the GitHub-published SHA-256 digest for this exact release artifact.
     ARCH=$(uname -m)
-    if [ "$ARCH" = "x86_64" ]; then
-        RUNNER_ARCH="x64"
-    elif [ "$ARCH" = "aarch64" ]; then
-        RUNNER_ARCH="arm64"
-    else
-        log_error "Unsupported architecture: $ARCH"
-        exit 1
-    fi
-    
+    case "$ARCH" in
+        x86_64)
+            RUNNER_ARCH="x64"
+            RUNNER_SHA256="70920811a4f8ad4328818682bca5c6469c1c942fab52448868071d0063816613"
+            ;;
+        aarch64)
+            RUNNER_ARCH="arm64"
+            RUNNER_SHA256="9b1dc70626422526e3c94767cf024896beb15da5342a3f4819bf2feac13e0393"
+            ;;
+        *)
+            log_error "Unsupported architecture: $ARCH"
+            exit 1
+            ;;
+    esac
+
     RUNNER_PKG="actions-runner-linux-${RUNNER_ARCH}-${RUNNER_VERSION}.tar.gz"
     RUNNER_URL="https://github.com/actions/runner/releases/download/v${RUNNER_VERSION}/${RUNNER_PKG}"
-    
-    curl -o "$RUNNER_PKG" -L "$RUNNER_URL"
-    
+
+    curl --fail --silent --show-error --location --output "$RUNNER_PKG" "$RUNNER_URL"
+    printf '%s  %s\n' "$RUNNER_SHA256" "$RUNNER_PKG" | sha256sum --check --status -
+
     # Extract runner
     log_info "Extracting runner package"
     tar xzf "$RUNNER_PKG"
@@ -135,5 +146,5 @@ log_info ""
 log_info "To manage the runner:"
 log_info "  Check status:  sudo $RUNNER_HOME/svc.sh status"
 log_info "  Stop:          sudo $RUNNER_HOME/svc.sh stop"
-log_info "  Start:         sudo $RUNNER_HOME/svc.sh start"
+log_info "  Start:          sudo $RUNNER_HOME/svc.sh start"
 log_info "  Uninstall:     sudo $RUNNER_HOME/svc.sh uninstall"
