@@ -184,6 +184,9 @@ def create_environment(token: str, owner: str, repo: str, env_name: str, require
 def main():
     """Main entry point."""
     token = os.environ.get("ADMIN_TOKEN")
+    if not token:
+        print("❌ ERROR: ADMIN_TOKEN environment variable not set; refusing privileged repository configuration")
+        sys.exit(1)
     
     owner, repo = get_github_info()
     if not owner or not repo:
