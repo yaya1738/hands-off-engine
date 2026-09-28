@@ -62,7 +62,7 @@ jobs:
             echo "pr=${{ github.event.pull_request.number }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" == "check_suite" ]; then
             # Get PR associated with this check suite
-            HEAD_BRANCH="${{ github.event.check_suite.head_branch }}"
+            HEAD_BRANCH="$CHECK_SUITE_HEAD_BRANCH"
             PR=$(gh pr list --json number,headRefName --jq ".[] | select(.headRefName == \"$HEAD_BRANCH\") | .number" 2>/dev/null | head -1)
             echo "pr=$PR" >> $GITHUB_OUTPUT
           fi
@@ -166,6 +166,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TRUSTED_AUTHORS: ${{ env.TRUSTED_AUTHORS }}
+          CHECK_SUITE_HEAD_BRANCH: ${{ github.event.check_suite.head_branch }}
 
   # Separate job to handle draft PRs when they become ready
   mark-ready-and-merge:
