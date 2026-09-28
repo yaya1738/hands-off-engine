@@ -327,6 +327,15 @@ class CommHub:
             return {"routed_to": "rejected", "error": f"Unknown sender: {sender_id}"}
         sender = self.parties[sender_id]
 
+        # Human identities are inbound communication peers only. They cannot
+        # submit approvals, trades, execution commands, or agent tasks.
+        if sender.get("role") == "human":
+            capabilities = HumanCapabilityRegistry()
+            if not capabilities.allowed(sender_id, "communicate"):
+                return {"routed_to": "rejected", "error": f"Human capability denied: {sender_id}"}
+            if msg_type not in ("human_message", "status_query", "health_query"):
+                return {"routed_to": "rejected", "error": "Human identities may only send communication/status queries"}
+
         msg = {
             "id": str(uuid.uuid4()),
             "from": sender_id,
