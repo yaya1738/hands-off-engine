@@ -170,3 +170,26 @@ def test_approval_needed_routes_to_operator():
     }
     record = router.route_event(msg)
     assert record["to"] == "operator"
+def test_human_communication_is_capability_gated():
+    router = _make_router()
+    msg = {
+        "from": "factory", "type": "human_message",
+        "msg_id": "human-001",
+        "context": {"target_identity": "David Kaplan"},
+        "message": "Status update",
+    }
+    record = router.route_event(msg)
+    assert record["to"] == "human:david_kaplan"
+    assert record["routed"] is True
+
+
+def test_unknown_human_cannot_receive_communication_route():
+    router = _make_router()
+    msg = {
+        "from": "factory", "type": "human_message",
+        "msg_id": "human-002",
+        "context": {"target_identity": "Unknown Person"},
+        "message": "Status update",
+    }
+    assert router.route_event(msg) is None
+
