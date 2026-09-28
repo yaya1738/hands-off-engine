@@ -104,20 +104,27 @@ rm "$RUNNER_PKG"
 # Set ownership
 chown -R "$RUNNER_USER:$RUNNER_USER" "$RUNNER_HOME"
 
-# Configure runner as runner user
+# Configure runner as runner user.
+# The runner CLI requires --token, so the token must briefly exist in the config process argv.
+# Keep it out of the parent su command line by passing it through a root-only temporary file.
 log_info "Configuring runner"
+RUNNER_TOKEN_FILE=$(mktemp "$RUNNER_HOME/.runner-token.XXXXXX")
+chmod 600 "$RUNNER_TOKEN_FILE"
+printf '%s' "$RUNNER_TOKEN" > "$RUNNER_TOKEN_FILE"
+chown "$RUNNER_USER:$RUNNER_USER" "$RUNNER_TOKEN_FILE"
+export RUNNER_TOKEN_FILE RUNNER_HOME REPO
+trap 'rm -f "$RUNNER_TOKEN_FILE"' EXIT
 
 # Remove existing config if present (for re-runs)
 if [ -f "$RUNNER_HOME/.runner" ]; then
     log_warn "Removing existing runner configuration"
-    su - "$RUNNER_USER" -c 'cd "$RUNNER_HOME" && ./config.sh remove --token "$RUNNER_TOKEN"' || true
+    su - "$RUNNER_USER" -c 'TOKEN=$(cat "$RUNNER_TOKEN_FILE"); cd "$RUNNER_HOME" && ./config.sh remove --token "$TOKEN"' || true
 fi
 
 # Configure runner
-export RUNNER_TOKEN REPO RUNNER_HOME
-su - "$RUNNER_USER" -c 'cd "$RUNNER_HOME" && ./config.sh \
+su - "$RUNNER_USER" -c 'TOKEN=$(cat "$RUNNER_TOKEN_FILE"); cd "$RUNNER_HOME" && ./config.sh \
     --url "https://github.com/$REPO" \
-    --token "$RUNNER_TOKEN" \
+    --token "$TOKEN" \
     --name "droplet-$(hostname)" \
     --labels self-hosted,linux,droplet \
     --work _work \
