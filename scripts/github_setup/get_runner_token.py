@@ -147,9 +147,9 @@ def get_runner_registration_token(token: str, owner: str, repo: str) -> str:
 
 def main():
     """Main entry point."""
-    token = os.environ.get("GITHUB_TOKEN") or os.environ.get("ADMIN_TOKEN")
+    token = os.environ.get("ADMIN_TOKEN")
     if not token:
-        print("❌ ERROR: GITHUB_TOKEN or ADMIN_TOKEN environment variable not set", file=sys.stderr)
+        print("❌ ERROR: ADMIN_TOKEN environment variable not set; refusing runner registration-token issuance", file=sys.stderr)
         sys.exit(1)
     
     owner, repo = get_github_info()
