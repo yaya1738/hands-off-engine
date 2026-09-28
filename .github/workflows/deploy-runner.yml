@@ -15,7 +15,7 @@ on:
         required: false
         default: 'root'
   repository_dispatch:
-    types: [telegram_trigger_runner]  # Triggered by Telegram bot
+    types: [telegram_trigger_runner]
 
 permissions:
   contents: read
@@ -23,41 +23,48 @@ permissions:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Determine Input Values
         id: inputs
-        run: |
         env:
           DISPATCH_DROPLET_IP: ${{ github.event.client_payload.droplet_ip || 'do138' }}
           DISPATCH_SSH_USER: ${{ github.event.client_payload.ssh_user || 'root' }}
           MANUAL_DROPLET_IP: ${{ github.event.inputs.droplet_ip }}
           MANUAL_SSH_USER: ${{ github.event.inputs.ssh_user }}
-          if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [ "$EVENT_NAME" = "repository_dispatch" ]; then
             DROPLET_IP="$DISPATCH_DROPLET_IP"
             SSH_USER="$DISPATCH_SSH_USER"
           else
             DROPLET_IP="$MANUAL_DROPLET_IP"
             SSH_USER="$MANUAL_SSH_USER"
           fi
-          if ! printf "%s" "$DROPLET_IP" | grep -Eq "^[A-Za-z0-9][A-Za-z0-9.-]{0,252}$"; then echo "::error::Invalid droplet host"; exit 1; fi
-          if ! printf "%s" "$SSH_USER" | grep -Eq "^[A-Za-z_][A-Za-z0-9_.-]{0,31}$"; then echo "::error::Invalid SSH user"; exit 1; fi
+          if ! printf "%s" "$DROPLET_IP" | grep -Eq "^[A-Za-z0-9][A-Za-z0-9.-]{0,252}$"; then
+            echo "::error::Invalid droplet host"
+            exit 1
+          fi
+          if ! printf "%s" "$SSH_USER" | grep -Eq "^[A-Za-z_][A-Za-z0-9_.-]{0,31}$"; then
+            echo "::error::Invalid SSH user"
+            exit 1
+          fi
           printf "droplet_ip=%s\n" "$DROPLET_IP" >> "$GITHUB_OUTPUT"
           printf "ssh_user=%s\n" "$SSH_USER" >> "$GITHUB_OUTPUT"
-      
+
       - name: Checkout repository
         uses: actions/checkout@v6
-      
+
       - name: Setup Python
         uses: actions/setup-python@v6
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install requests
-      
+
       - name: Get Runner Registration Token
         id: token
         env:
@@ -69,78 +76,82 @@ jobs:
             echo "::error::Failed to get runner registration token"
             exit 1
           fi
-          # Mask the token in logs
           echo "::add-mask::$TOKEN"
-          echo "token=$TOKEN" >> $GITHUB_OUTPUT
-          echo "✅ Token obtained successfully"
-      
+          printf "token=%s\n" "$TOKEN" >> "$GITHUB_OUTPUT"
+          echo "Token obtained successfully"
+
       - name: Setup SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.DO_SSH_KEY }}
+          SSH_KNOWN_HOSTS: ${{ secrets.DO_SSH_KNOWN_HOSTS }}
         run: |
           if [ -z "$SSH_PRIVATE_KEY" ]; then
             echo "::error::DO_SSH_KEY secret not set"
-            echo "Please add your SSH private key as DO_SSH_KEY secret in repository settings"
             exit 1
           fi
-          
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          
-          # Add host key (skip host key checking for automation)
-          # In production, you might want to verify the host key
-          echo "Host *" > ~/.ssh/config
-          echo "  StrictHostKeyChecking no" >> ~/.ssh/config
-          echo "  UserKnownHostsFile=/dev/null" >> ~/.ssh/config
-          chmod 600 ~/.ssh/config
-          
-          echo "✅ SSH configured"
-      
-      - name: Test SSH Connection
-        run: |
-          echo "Testing SSH connection to ${{ steps.inputs.outputs.droplet_ip }}..."
-          ssh ${{ steps.inputs.outputs.ssh_user }}@${{ steps.inputs.outputs.droplet_ip }} "echo '✅ SSH connection successful'; uname -a" || {
-            echo "::error::SSH connection failed"
-            echo "Please verify:"
-            echo "  1. DO_SSH_KEY secret is correctly set"
-            echo "  2. Droplet IP/hostname is correct: ${{ steps.inputs.outputs.droplet_ip }}"
-            echo "  3. SSH user has access: ${{ steps.inputs.outputs.ssh_user }}"
+          if [ -z "$SSH_KNOWN_HOSTS" ]; then
+            echo "::error::DO_SSH_KNOWN_HOSTS secret not set"
+            echo "Store the droplet's verified SSH host key line(s) in this secret."
             exit 1
-          }
-      
+          fi
+
+          mkdir -p ~/.ssh
+          printf "%s\n" "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          printf "%s\n" "$SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+          cat > ~/.ssh/config <<'EOF'
+          Host *
+            StrictHostKeyChecking yes
+            UserKnownHostsFile ~/.ssh/known_hosts
+          EOF
+          chmod 600 ~/.ssh/config
+          echo "SSH configured with strict host-key verification"
+
+      - name: Test SSH Connection
+        env:
+          DROPLET_IP: ${{ steps.inputs.outputs.droplet_ip }}
+          SSH_USER: ${{ steps.inputs.outputs.ssh_user }}
+        run: |
+          echo "Testing SSH connection to $DROPLET_IP..."
+          if ! ssh "$SSH_USER@$DROPLET_IP" "echo 'SSH connection successful'; uname -a"; then
+            echo "::error::SSH connection failed"
+            exit 1
+          fi
+
       - name: Copy Setup Script to Droplet
+        env:
+          DROPLET_IP: ${{ steps.inputs.outputs.droplet_ip }}
+          SSH_USER: ${{ steps.inputs.outputs.ssh_user }}
         run: |
           echo "Copying setup script to droplet..."
           scp scripts/github_setup/setup_self_hosted_runner.sh \
-            ${{ steps.inputs.outputs.ssh_user }}@${{ steps.inputs.outputs.droplet_ip }}:/tmp/
-          echo "✅ Script copied"
-      
+            "$SSH_USER@$DROPLET_IP:/tmp/"
+          echo "Script copied"
+
       - name: Run Setup Script on Droplet
         env:
+          DROPLET_IP: ${{ steps.inputs.outputs.droplet_ip }}
+          SSH_USER: ${{ steps.inputs.outputs.ssh_user }}
           RUNNER_TOKEN: ${{ steps.token.outputs.token }}
+          REPO: ${{ github.repository }}
         run: |
           echo "Running setup script on droplet..."
-          ssh ${{ steps.inputs.outputs.ssh_user }}@${{ steps.inputs.outputs.droplet_ip }} \
-            "RUNNER_TOKEN='$RUNNER_TOKEN' REPO='${{ github.repository }}' bash /tmp/setup_self_hosted_runner.sh"
-          
-          echo "✅ Runner setup complete"
-      
+          if ! printf '%s\n' "$RUNNER_TOKEN" | ssh "$SSH_USER@$DROPLET_IP" \
+            'read -r RUNNER_TOKEN && export RUNNER_TOKEN && bash /tmp/setup_self_hosted_runner.sh'; then
+            echo "::error::Runner setup failed"
+            exit 1
+          fi
+          echo "Runner setup complete"
+
       - name: Verify Runner Registration
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "Waiting 10 seconds for runner to register..."
           sleep 10
-          
           echo "Checking runner status..."
           python scripts/github_setup/check_setup_status.py | jq '.runners'
-          
           echo ""
-          echo "✅ Deployment complete!"
+          echo "Deployment complete!"
           echo "Check Settings > Actions > Runners to see the new runner"
-          echo ""
-          echo "Runner management commands on droplet:"
-          echo "  sudo /opt/actions-runner/svc.sh status"
-          echo "  sudo /opt/actions-runner/svc.sh stop"
-          echo "  sudo /opt/actions-runner/svc.sh start"
