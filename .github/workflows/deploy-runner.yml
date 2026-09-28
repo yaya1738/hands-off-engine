@@ -28,12 +28,17 @@ jobs:
       - name: Determine Input Values
         id: inputs
         run: |
+        env:
+          DISPATCH_DROPLET_IP: ${{ github.event.client_payload.droplet_ip || 'do138' }}
+          DISPATCH_SSH_USER: ${{ github.event.client_payload.ssh_user || 'root' }}
+          MANUAL_DROPLET_IP: ${{ github.event.inputs.droplet_ip }}
+          MANUAL_SSH_USER: ${{ github.event.inputs.ssh_user }}
           if [ "${{ github.event_name }}" == "repository_dispatch" ]; then
-            DROPLET_IP="${{ github.event.client_payload.droplet_ip || 'do138' }}"
-            SSH_USER="${{ github.event.client_payload.ssh_user || 'root' }}"
+            DROPLET_IP="$DISPATCH_DROPLET_IP"
+            SSH_USER="$DISPATCH_SSH_USER"
           else
-            DROPLET_IP="${{ github.event.inputs.droplet_ip }}"
-            SSH_USER="${{ github.event.inputs.ssh_user }}"
+            DROPLET_IP="$MANUAL_DROPLET_IP"
+            SSH_USER="$MANUAL_SSH_USER"
           fi
           if ! printf "%s" "$DROPLET_IP" | grep -Eq "^[A-Za-z0-9][A-Za-z0-9.-]{0,252}$"; then echo "::error::Invalid droplet host"; exit 1; fi
           if ! printf "%s" "$SSH_USER" | grep -Eq "^[A-Za-z_][A-Za-z0-9_.-]{0,31}$"; then echo "::error::Invalid SSH user"; exit 1; fi
