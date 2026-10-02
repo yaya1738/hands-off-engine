@@ -11,12 +11,20 @@ def test_handoff_preserves_proposal_and_cannot_enable_execution():
             "observation_complete": True,
             "requires_governance": True,
             "execution_enabled": True,
+            "correlation": {
+                "msg_id": "msg-123",
+                "reply_to": "msg-99",
+                "task_id": "task-7",
+            },
         },
     })
     handoff = result["handoff"]
     assert handoff["objective"] == "improve interaction reliability"
     assert handoff["requires_governance"] is True
     assert handoff["execution_enabled"] is False
+    assert handoff["msg_id"] == "msg-123"
+    assert handoff["reply_to"] == "msg-99"
+    assert handoff["task_id"] == "task-7"
 
 
 def test_missing_governance_requirement_fails_closed():
