@@ -19,6 +19,10 @@ def build_governed_handoff(proposal: Dict[str, Any]) -> Dict[str, Any]:
     if not isinstance(body, dict) or not body.get("requires_governance", False):
         return {"available": False}
 
+    correlation = body.get("correlation")
+    if not isinstance(correlation, dict):
+        correlation = {"msg_id": None, "reply_to": None, "task_id": None}
+
     return {
         "available": True,
         "handoff": {
@@ -29,6 +33,9 @@ def build_governed_handoff(proposal: Dict[str, Any]) -> Dict[str, Any]:
             "observation_complete": bool(body.get("observation_complete", False)),
             "requires_governance": True,
             "execution_enabled": False,
+            "msg_id": correlation.get("msg_id"),
+            "reply_to": correlation.get("reply_to"),
+            "task_id": correlation.get("task_id"),
         },
     }
 
