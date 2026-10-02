@@ -25,6 +25,16 @@ def build_governed_proposal(reasoning: Dict[str, Any]) -> Dict[str, Any]:
     if objective is not None and not isinstance(objective, str):
         objective = None
 
+    authority = reasoning.get("authority")
+    if not isinstance(authority, dict):
+        authority = {}
+
+    correlation = {
+        "msg_id": authority.get("msg_id"),
+        "reply_to": authority.get("reply_to"),
+        "task_id": authority.get("task_id"),
+    }
+
     return {
         "available": True,
         "proposal": {
@@ -34,6 +44,7 @@ def build_governed_proposal(reasoning: Dict[str, Any]) -> Dict[str, Any]:
             "observation_complete": bool(reasoning.get("observation_complete", False)),
             "requires_governance": True,
             "execution_enabled": False,
+            "correlation": correlation,
         },
     }
 
