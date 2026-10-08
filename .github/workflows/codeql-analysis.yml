@@ -36,10 +36,10 @@ jobs:
 
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v4
+      uses: github/codeql-action/init@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2
       with:
         languages: ${{ matrix.language }}
         # Queries to run (default, security-extended, or security-and-quality)
@@ -49,12 +49,12 @@ jobs:
         # config-file: ./.github/codeql/codeql-config.yml
 
     - name: Autobuild
-      uses: github/codeql-action/autobuild@v4
+      uses: github/codeql-action/autobuild@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2
       # Autobuild attempts to build any compiled languages
       # For Python, this is typically not needed but included for completeness
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v4
+      uses: github/codeql-action/analyze@2892aa5e19bbd11bc0cff5427e3b750a04d9e3c2
       with:
         category: "/language:${{matrix.language}}"
         # Upload results to GitHub Security tab
