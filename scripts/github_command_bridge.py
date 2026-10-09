@@ -74,7 +74,7 @@ def _parse(body):
         # The GitHub bridge exposes DRYRUN only. LIVE execution must use
         # the separate explicit-approval path in the governed runtime.
         params={"mode":"DRYRUN","objective":d["objective"]}
-    return d,params
+    return d,params,next_action
 
 def poll_once():
     s=_state(); done=set(map(str,s.get("processed",[]))); admitted=0
@@ -89,7 +89,7 @@ def poll_once():
                 continue
         done.add(cid)
         if actor not in ACTORS or parsed is None: continue
-        d,params=parsed
+        d,params,next_action=parsed
         msg={"from":"factory","to":"anyclaw","type":"task_assignment","message":d["objective"][:240],"msg_id":f"github-command-{cid}","timestamp":datetime.now(timezone.utc).isoformat(),"context":{"task_id":f"github-{d['idempotency_key']}","action":d["action"],"params":params,"reply_to":f"github-issue-{ISSUE}-comment-{cid}","source":"github_issue","source_comment_id":cid,"idempotency_key":d["idempotency_key"],"execution_enabled":False,"next_action":next_action}}
         BUS.parent.mkdir(parents=True,exist_ok=True)
         with BUS.open("a") as f: f.write(json.dumps(msg)+"\n")
