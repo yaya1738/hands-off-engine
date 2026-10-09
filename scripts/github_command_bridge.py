@@ -10,7 +10,7 @@ STATE=ROOT/"state/github_command_bridge_state.json"
 ISSUE=int(os.getenv("FACTORY_CONTROL_ISSUE","272"))
 REPO=os.getenv("FACTORY_GITHUB_REPO","yaya1738/hands-off-engine")
 ACTORS=frozenset(x.strip() for x in os.getenv("FACTORY_GITHUB_COMMAND_ACTORS","yaya1738").split(",") if x.strip())
-ACTIONS=frozenset({"health_check","system_status","read_file_fact","list_backends","list_parties","bus_summary","test_status","lifecycle_summary"})
+ACTIONS=frozenset({"health_check","system_status","read_file_fact","list_backends","list_parties","bus_summary","test_status","lifecycle_summary","factory_execute"})
 log=logging.getLogger("GitHubCommandBridge")
 
 def _state():
@@ -70,6 +70,10 @@ def _parse(body):
     if d["action"]=="read_file_fact":
         if not d.get("file_path"): return None
         params={k:d[k] for k in ("file_path","fact") if d.get(k)}
+    elif d["action"]=="factory_execute":
+        # The GitHub bridge exposes DRYRUN only. LIVE execution must use
+        # the separate explicit-approval path in the governed runtime.
+        params={"mode":"DRYRUN","objective":d["objective"]}
     return d,params
 
 def poll_once():
