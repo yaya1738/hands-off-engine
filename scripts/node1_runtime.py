@@ -40,6 +40,7 @@ NODE_PID = STATE_DIR / "node1.pid"
 NODE_LOCK = STATE_DIR / "node1.lock"
 NODE_LOG = STATE_DIR / "logs" / "node1.log"
 MESSAGES_FILE = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
+from scripts.device_condition import assess_condition, collect_snapshot
 
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 (STATE_DIR / "logs").mkdir(parents=True, exist_ok=True)
@@ -134,6 +135,20 @@ class NodeState:
     def record_intake(self):
         self.data["intake_decisions"] = self.data.get("intake_decisions", 0) + 1
 
+    def record_device_condition(self, snapshot, assessment):
+        observation = {
+            "observed_at": datetime.now(timezone.utc).isoformat(),
+            "snapshot": snapshot,
+            "assessment": assessment,
+        }
+        history = self.data.get("device_condition_history")
+        if not isinstance(history, list):
+            history = []
+        history.append(observation)
+        self.data["device_condition_history"] = history[-24:]
+        self.data["device_condition"] = observation
+        self.save()
+
 
 class Node1Runtime:
     """Unified Node 1 runtime — task worker + event router + factory intake."""
@@ -143,6 +158,7 @@ class Node1Runtime:
         self.state = NodeState()
         self.running = True
         self.last_heartbeat = 0
+        self.last_condition_sample = 0
 
     def run(self):
         if not self.lock.try_acquire():
@@ -316,6 +332,17 @@ class Node1Runtime:
                         analyze_feedback()
                     except Exception as e:
                         log.error(f"Feedback analysis error: {e}")
+
+                # 3e. Device condition telemetry (every five minutes; observational only)
+                if time.time() - self.last_condition_sample >= 300:
+                    self.last_condition_sample = time.time()
+                    try:
+                        snapshot = collect_snapshot()
+                        assessment = assess_condition(snapshot)
+                        self.state.record_device_condition(snapshot, assessment)
+                        log.info("Device condition recorded: %s", assessment.get("status", "unknown"))
+                    except Exception as e:
+                        log.warning("Device-condition sampling failed: %s", e)
 
                 # 4. Heartbeat (every 60s)
                 if time.time() - self.last_heartbeat >= 60:
