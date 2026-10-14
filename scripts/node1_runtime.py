@@ -32,6 +32,7 @@ from pathlib import Path
 from datetime import datetime, timezone
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from scripts.device_condition import assess_condition, collect_snapshot
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 STATE_DIR = REPO_ROOT / "state"
@@ -40,8 +41,6 @@ NODE_PID = STATE_DIR / "node1.pid"
 NODE_LOCK = STATE_DIR / "node1.lock"
 NODE_LOG = STATE_DIR / "logs" / "node1.log"
 MESSAGES_FILE = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
-from scripts.device_condition import assess_condition, collect_snapshot
-
 STATE_DIR.mkdir(parents=True, exist_ok=True)
 (STATE_DIR / "logs").mkdir(parents=True, exist_ok=True)
 
