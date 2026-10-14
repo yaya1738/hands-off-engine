@@ -3,6 +3,20 @@
 This adapter adds a guarded outbound channel; it does not bypass WhatsApp's
 business messaging rules or send anything automatically at installation time.
 
+## The only manual setup needed next
+
+Open the official Meta setup: https://developers.facebook.com/docs/whatsapp/cloud-api/get-started/
+
+In Meta for Developers, create/select an app, add the WhatsApp product, and follow the Cloud API getting-started flow. Use Meta's test sender first if offered; a production sender can be configured after the test path works.
+
+When Meta shows the WhatsApp API setup panel, the two values needed for integration are:
+- **Phone Number ID** (an identifier, not the phone number itself)
+- **Access token** (secret — never paste it into ChatGPT, GitHub issues, or source code)
+
+Keep the token in a private runtime secret store or an untracked local environment file. A temporary setup token may expire; before production, use Meta's supported production-token setup. The Graph API version must be a currently supported version for the app.
+
+Once you've reached that panel, the smallest useful thing to send back here is just: **“Meta setup ready”** plus the non-secret **Phone Number ID**. Do not send the token. I can then finish wiring the configuration instructions around the actual sender setup. The integration stays disabled until the PR's security checks pass, it is reviewed/merged, the private runtime config is installed, and the approved message template is ready.
+
 ## One-time provider setup
 
 1. Configure the WhatsApp product in Meta for Developers and add a WhatsApp
