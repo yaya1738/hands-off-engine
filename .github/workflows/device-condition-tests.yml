@@ -1,6 +1,14 @@
 name: Focused Python Tests
 
 on:
+  push:
+    branches: ["feat/node1-device-condition-observations"]
+    paths:
+      - "scripts/device_condition.py"
+      - "scripts/node1_runtime.py"
+      - "tests/test_device_condition.py"
+      - "tests/test_node1_device_condition_persistence.py"
+      - ".github/workflows/device-condition-tests.yml"
   pull_request:
     branches: ["main"]
     paths:
@@ -25,7 +33,6 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-          cache: "pip"
       - name: Install pytest
         run: python -m pip install --upgrade pip pytest
       - name: Run device-condition tests
