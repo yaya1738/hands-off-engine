@@ -152,3 +152,37 @@ def test_non_owner_cannot_approve_or_reject():
     hub.parties["aharon"]["approval_authority"] = False
     result = hub.receive("aharon", "approve", {"command_id": "fake-command"})
     assert result["routed_to"] == "rejected"
+
+
+
+def test_human_email_is_blocked_without_task_aware_context(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    with patch("messaging.email_smtp.send_email") as sender:
+        result = hub.send("aharon", "coordination", {
+            "subject": "Routine status", "text": "Everything is running.",
+            "correlation_id": "routine-status-1",
+        })
+    assert result["status"] == "blocked"
+    assert result["result"]["reason"].startswith("missing_context:")
+    sender.assert_not_called()
+
+
+def test_human_email_cooldown_is_enforced_at_send_boundary(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    payload = {
+        "text": "Need a decision.", "task_id": "task-rate-1",
+        "correlation_id": "task-rate-question-1",
+        "reason_code": "material_ambiguity",
+        "context": "Two safe paths remain.",
+        "question": "Which path should we take?",
+        "why_it_matters": "The answer changes the implementation.",
+    }
+    with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp") as sender:
+        first = hub.send("aharon", "coordination", payload)
+        second = hub.send("aharon", "coordination", payload)
+    assert first["status"] == "sent"
+    assert second["status"] == "blocked"
+    assert second["result"]["reason"] in {"duplicate_open_question", "participant_cooldown"}
+    assert sender.call_count == 1
