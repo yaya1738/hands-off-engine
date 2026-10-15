@@ -3,7 +3,9 @@
 import hashlib
 import json
 import logging
+import os
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
@@ -22,19 +24,53 @@ EVENT_TYPE_FIELD_CANDIDATES = ("event_type", "type")
 
 
 def _load_state(path: Optional[Path] = None) -> dict:
+    """Load durable intake state; never reset deduplication state on corruption."""
     state_path = Path(path) if path else INTAKE_STATE
-    if state_path.exists():
-        try:
-            return json.loads(state_path.read_text())
-        except Exception:
-            pass
-    return {"consumed_ids": [], "decisions": []}
+    if not state_path.exists():
+        return {"consumed_ids": [], "decisions": []}
+
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise RuntimeError(
+            f"Factory intake state is unreadable; refusing to replay events: {state_path}"
+        ) from exc
+
+    if (
+        not isinstance(state, dict)
+        or not isinstance(state.get("consumed_ids"), list)
+        or not all(isinstance(item, str) for item in state["consumed_ids"])
+        or not isinstance(state.get("decisions"), list)
+    ):
+        raise RuntimeError(
+            f"Factory intake state has an invalid schema; refusing to replay events: {state_path}"
+        )
+    return state
 
 
 def _save_state(state: dict, path: Optional[Path] = None):
+    """Persist state atomically so interruption cannot leave a partial JSON file."""
     state_path = Path(path) if path else INTAKE_STATE
     state_path.parent.mkdir(parents=True, exist_ok=True)
-    state_path.write_text(json.dumps(state, indent=2) + "\n")
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=str(state_path.parent),
+            prefix=f".{state_path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            temp_path = Path(handle.name)
+            json.dump(state, handle, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, state_path)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink()
 
 
 def _get_event_type(event: dict) -> str:
