@@ -275,9 +275,26 @@ class CommHub:
         if channel not in ("messages_jsonl", "webhook"):
             self._write_to_messages_jsonl(msg)
 
-        # Persist email reply correlation only after the transport accepted delivery.
-        if channel == "email" and result.get("status") == "sent":
-            self._record_message_correlation(msg, party_id)
+        # SMTP acceptance and local persistence are separate outcomes. Never
+        # report a clean send when the transport accepted the message but the
+        # correlation record could not be durably written.
+        if channel == "email" and result.get("status") in {"sent", "sent_audit_incomplete"}:
+            try:
+                self._record_message_correlation(msg, party_id)
+            except Exception as exc:
+                log.critical(
+                    "Email accepted but correlation persistence failed (%s); reply reconciliation required",
+                    type(exc).__name__,
+                )
+                result = {
+                    **result,
+                    "status": "sent_audit_incomplete",
+                    "transport_accepted": True,
+                    "correlation_recorded": False,
+                    "audit_error": type(exc).__name__,
+                }
+            else:
+                result = {**result, "transport_accepted": True, "correlation_recorded": True}
 
         # Handle ack tracking
         if meta.get("requires_ack"):
@@ -552,6 +569,7 @@ class CommHub:
             correlation_id = payload.get("correlation_id") or msg.get("id")
             body = f"{body}\n\nReference: {correlation_id}\nReply with this reference preserved so your response can be linked to the right task."
             result = send_email(recipient=recipient, subject=subject, body=body)
+            audit_incomplete = False
             if party.get("role") == "human_participant":
                 try:
                     history_store.record(
@@ -559,8 +577,18 @@ class CommHub:
                         now=datetime.fromisoformat(msg["timestamp"]),
                     )
                 except Exception as exc:
-                    log.critical("Email sent but contact history could not be persisted (%s)", type(exc).__name__)
-            return {"status": "sent", "channel": "email", "provider": result}
+                    audit_incomplete = True
+                    log.critical(
+                        "Email accepted but contact history could not be persisted (%s); reconciliation required",
+                        type(exc).__name__,
+                    )
+            return {
+                "status": "sent_audit_incomplete" if audit_incomplete else "sent",
+                "channel": "email",
+                "provider": result,
+                "transport_accepted": True,
+                "contact_history_recorded": not audit_incomplete,
+            }
         except (ValueError, OSError, TimeoutError) as e:
             return {"status": "error", "error": str(e)}
         except Exception as e:
