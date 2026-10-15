@@ -150,6 +150,32 @@ def test_duplicate_reply_is_not_ingested(monkeypatch):
     assert second["routed_to"] == "duplicate"
 
 
+def test_corrupt_reply_dedup_state_fails_closed(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
+        sent = hub.send("aharon", "coordination", {
+            "text": "Need a decision.", "task_id": "task-corrupt-state",
+            "correlation_id": "task-corrupt-state",
+            "reason_code": "human_context_gap",
+            "context": "A required preference is unknown.",
+            "question": "Which preference applies?",
+            "why_it_matters": "It changes the next decision.",
+        })
+    assert sent["status"] == "sent"
+    (hub.state_dir / "processed_email_replies.json").write_text("{corrupt")
+    reply = hub.receive_human_reply(
+        "aharon", "aharon@example.test", "task-corrupt-state",
+        "some reply", "provider-message-corrupt-state",
+    )
+    assert reply == {
+        "routed_to": "rejected",
+        "error": "Reply deduplication state unavailable",
+    }
+    bus = hub.messages_file.read_text()
+    assert "provider-message-corrupt-state" not in bus
+
+
 def test_non_owner_cannot_approve_or_reject():
     hub = _hub()
     hub.parties["aharon"]["approval_authority"] = False
