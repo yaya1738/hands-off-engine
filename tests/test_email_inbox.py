@@ -64,7 +64,7 @@ def test_inbound_reply_rejects_untrusted_auth_header_preceding_trusted_one(monke
     monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
     raw = _raw_email().replace(
         b"From:",
-        b"Authentication-Results: attacker.test; dkim=pass header.d=example.test\\r\\nFrom:",
+        b"Authentication-Results: attacker.test; dkim=pass header.d=example.test\r\nFrom:",
         1,
     )
     result = ingest_raw_reply(_hub(), raw, "mail-spoof-1")
@@ -75,7 +75,7 @@ def test_inbound_reply_rejects_duplicate_trusted_auth_headers(monkeypatch):
     monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
     raw = _raw_email().replace(
         b"From:",
-        b"Authentication-Results: mx.example.test; dkim=fail header.d=example.test\\r\\nFrom:",
+        b"Authentication-Results: mx.example.test; dkim=fail header.d=example.test\r\nFrom:",
         1,
     )
     result = ingest_raw_reply(_hub(), raw, "mail-spoof-2")
