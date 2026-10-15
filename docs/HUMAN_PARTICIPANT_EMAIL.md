@@ -15,7 +15,9 @@ Set these in an untracked environment file or secret manager, never in Git:
 - `EMAIL_FROM`
 - `EMAIL_ALLOWED_RECIPIENTS`
 - `EMAIL_IMAP_HOST`, `EMAIL_IMAP_USERNAME`, `EMAIL_IMAP_PASSWORD` (optional inbound polling)
-- `EMAIL_AUTH_SERV_ID` (exact trusted receiving server authserv-id, required to accept inbound replies) (comma-separated exact recipient addresses)
+- `EMAIL_AUTH_SERV_ID` (exact trusted receiving server authserv-id, required to accept inbound replies)
+
+`EMAIL_ALLOWED_RECIPIENTS` is a comma-separated list of exact recipient addresses.
 
 The participant's private runtime registry entry must include `email`,
 `email_consent: true`, and `channels: ["email"]`. Their address must also
@@ -34,6 +36,6 @@ actual receiving provider before enabling polling.
 
 ## Test
 
-Run `python -m pytest tests/test_comm_hub_email.py -q`. The tests mock the
-transport and make no network requests. A successful SMTP response means only
+Run `python -m pytest tests/test_comm_hub_email.py tests/test_email_inbox.py -q`.
+The tests mock the outbound transport and make no network requests. A successful SMTP response means only
 that the SMTP server accepted the message, not that it was delivered or read.
