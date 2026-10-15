@@ -5,6 +5,7 @@ on:
     paths:
       - "scripts/device_condition_trends.py"
       - "scripts/device_condition_routing_shadow.py"
+      - "tests/test_device_condition_trends.py"
       - "tests/test_device_condition_routing_shadow.py"
       - ".github/workflows/device-condition-shadow-routing-tests.yml"
   push:
@@ -13,6 +14,7 @@ on:
     paths:
       - "scripts/device_condition_trends.py"
       - "scripts/device_condition_routing_shadow.py"
+      - "tests/test_device_condition_trends.py"
       - "tests/test_device_condition_routing_shadow.py"
       - ".github/workflows/device-condition-shadow-routing-tests.yml"
 
