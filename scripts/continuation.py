@@ -143,7 +143,8 @@ class ContinuationEmitter:
 
     def emit_task_completed(self, task_id: str, status: str, result_summary: str,
                             correlation_id: Optional[str] = None,
-                            next_action: Optional[Dict] = None):
+                            next_action: Optional[Dict] = None,
+                            human_contact: Optional[Dict] = None):
         """Emit after completing a Factory task."""
         event_type = (
             "blocked"
@@ -156,7 +157,8 @@ class ContinuationEmitter:
             event_type=event_type,
             message=f"Task {task_id[:8]}... completed: {status} — {result_summary}",
             context={**{"task_id": task_id, "status": status, "result_summary": result_summary},
-                     **({"next_action": next_action} if isinstance(next_action, dict) and next_action.get("action") else {})},
+                     **({"next_action": next_action} if isinstance(next_action, dict) and next_action.get("action") else {}),
+                     **({"human_contact": human_contact} if isinstance(human_contact, dict) else {})},
             correlation_id=correlation_id or task_id,
             is_wake=True,
         )
