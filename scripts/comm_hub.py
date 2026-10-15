@@ -370,6 +370,8 @@ class CommHub:
                 return self._deliver_webhook(msg, party_id)
             elif channel == "messages_jsonl":
                 return self._deliver_jsonl(msg, party_id)
+            elif channel == "email":
+                return self._deliver_email(msg, party_id)
             elif channel == "notification":
                 return self._deliver_notification(msg, party_id)
             elif channel == "file":
@@ -417,6 +419,34 @@ class CommHub:
             return {"status": "sent", "channel": "messages_jsonl"}
         except Exception as e:
             return {"status": "error", "error": str(e)}
+
+    def _deliver_email(self, msg, party_id):
+        """Send email only when private configuration and explicit recipient consent are present."""
+        party = self.parties.get(party_id, {})
+        if not party.get("email_consent", False):
+            return {"status": "blocked", "reason": "email consent not recorded"}
+        recipient = str(party.get("email", "")).strip().lower()
+        allowed = {
+            item.strip().lower()
+            for item in os.getenv("EMAIL_ALLOWED_RECIPIENTS", "").split(",")
+            if item.strip()
+        }
+        if not recipient or recipient not in allowed:
+            return {"status": "blocked", "reason": "recipient missing or not allowlisted"}
+        try:
+            from messaging.email_smtp import send_email
+            payload = msg.get("payload", {})
+            subject = str(payload.get("subject") or f"Hands-Off Engine: {msg.get('type', 'update')}")[:180]
+            body = msg.get("formatted_text") or json.dumps(payload, indent=2, default=str)
+            correlation_id = payload.get("correlation_id") or msg.get("id")
+            body = f"{body}\n\nReference: {correlation_id}\nReply with this reference preserved so your response can be linked to the right task."
+            result = send_email(recipient=recipient, subject=subject, body=body)
+            return {"status": "sent", "channel": "email", "provider": result}
+        except (ValueError, OSError, TimeoutError) as e:
+            return {"status": "error", "error": str(e)}
+        except Exception as e:
+            log.error("Email delivery failed for %s: %s", party_id, type(e).__name__)
+            return {"status": "error", "error": "email delivery failed"}
 
     def _deliver_notification(self, msg, party_id):
         """Send a local notification (Android)."""
