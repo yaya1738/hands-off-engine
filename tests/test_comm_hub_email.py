@@ -122,6 +122,17 @@ def test_reply_rejects_sender_mismatch():
     assert reply["routed_to"] == "rejected"
 
 
+def test_invalid_correlation_ledger_shape_fails_closed():
+    hub = _hub()
+    ledger = hub.state_dir / "message_correlations.json"
+    ledger.write_text("[]")
+    reply = hub.receive_human_reply(
+        "aharon", "aharon@example.test", "task-123", "hello", "provider-message-invalid-ledger"
+    )
+    assert reply["routed_to"] == "rejected"
+    assert reply["error"] == "Reply correlation state unavailable"
+
+
 def test_reply_rejects_unknown_correlation():
     hub = _hub()
     reply = hub.receive_human_reply(
