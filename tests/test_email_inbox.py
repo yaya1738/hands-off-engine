@@ -40,7 +40,12 @@ def test_inbound_reply_matches_registered_participant_and_correlation(monkeypatc
     monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
     from unittest.mock import patch
     with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
-        hub.send("aharon", "coordination", {"text": "Question", "correlation_id": "task-inbox-1"})
+        hub.send("aharon", "coordination", {
+            "text": "Question", "task_id": "task-inbox-1", "correlation_id": "task-inbox-1",
+            "reason_code": "external_blocker", "context": "Need a missing human fact.",
+            "question": "Can you clarify this detail?",
+            "why_it_matters": "It unblocks the task.",
+        })
     result = ingest_raw_reply(hub, _raw_email(), "mail-3")
     assert result["routed_to"] == "advisory_input"
     assert result["authority"] == "none"
