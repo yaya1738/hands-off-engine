@@ -285,7 +285,9 @@ class CommHub:
             self._save_pending_acks()
 
         log.info(f"Sent {msg_type} to {party_id} via {channel}: {result.get('status', 'ok')}")
-        return {"status": "sent", "id": msg["id"], "channel": channel, "result": result}
+        # Do not report a guarded email send as successful when policy blocked it.
+        overall_status = result.get("status", "sent") if channel == "email" else "sent"
+        return {"status": overall_status, "id": msg["id"], "channel": channel, "result": result}
 
     def broadcast(self, msg_type, payload, source="system"):
         """Broadcast to all parties subscribed to this message type."""
