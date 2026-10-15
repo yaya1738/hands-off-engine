@@ -68,3 +68,17 @@ def test_unknown_task_class_fails_to_manual_policy_review():
     )
     assert result["recommendation"] == "manual_policy_review"
     assert "unknown_task_class" in result["reasons"]
+
+
+
+def test_recent_resource_pressure_is_visible_in_shadow_advice():
+    result = assess_node_routing_shadow(
+        {"node_id": "node-1", "device_condition_history": [
+            observation(2, {"battery_percent": 18},
+                        {"concerns": ["memory_pressure"], "warnings": ["battery_low"]}),
+        ]},
+        task_class="intensive", now=NOW,
+    )
+    assert "recurring_resource_pressure" in result["reasons"]
+    assert result["recommendation"] == "consider_alternate_capable_node"
+    assert result["dispatch_changed"] is False
