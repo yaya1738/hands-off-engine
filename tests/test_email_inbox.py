@@ -10,14 +10,14 @@ from tests.test_comm_hub_email import _hub
 
 def _raw_email(sender="aharon@example.test", auth="dkim=pass header.d=example.test"):
     return (
-        f"From: Aharon <{sender}>\\r\\n"
-        "To: factory@example.test\\r\\n"
-        "Subject: Re: Factory question\\r\\n"
-        f"Authentication-Results: mx.example.test; {auth}\\r\\n"
-        "Content-Type: text/plain; charset=utf-8\\r\\n"
-        "\\r\\n"
-        "I recommend option B.\\r\\n\\r\\n"
-        "Reference: task-inbox-1\\r\\n"
+        f"From: Aharon <{sender}>\r\n"
+        "To: factory@example.test\r\n"
+        "Subject: Re: Factory question\r\n"
+        f"Authentication-Results: mx.example.test; {auth}\r\n"
+        "Content-Type: text/plain; charset=utf-8\r\n"
+        "\r\n"
+        "I recommend option B.\r\n\r\n"
+        "Reference: task-inbox-1\r\n"
     ).encode()
 
 
@@ -29,7 +29,7 @@ def test_inbound_reply_requires_authentication(monkeypatch):
 
 def test_inbound_reply_requires_reference(monkeypatch):
     monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
-    raw = _raw_email().replace(b"Reference: task-inbox-1\\r\\n", b"No reference here\\r\\n")
+    raw = _raw_email().replace(b"Reference: task-inbox-1\r\n", b"No reference here\r\n")
     result = ingest_raw_reply(_hub(), raw, "mail-2")
     assert result["routed_to"] == "rejected"
 
@@ -47,7 +47,7 @@ def test_inbound_reply_matches_registered_participant_and_correlation(monkeypatc
 
 
 def test_inbox_polling_disabled_without_credentials(monkeypatch):
-    for key in ("EMAIL_IMAP_HOST", "EMAIL_IMAP_USERNAME", "EMAIL_IMAP_PASSWORD"):
+    for key in ("EMAIL_IMAP_HOST", "EMAIL_IMAP_USERNAME", "EMAIL_IMAP_PASSWORD", "EMAIL_AUTH_SERV_ID"):
         monkeypatch.delenv(key, raising=False)
     result = poll_inbox(_hub())
     assert result["status"] == "disabled"
