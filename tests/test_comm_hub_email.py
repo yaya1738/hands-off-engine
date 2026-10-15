@@ -197,6 +197,46 @@ def test_human_email_is_blocked_without_task_aware_context(monkeypatch):
     sender.assert_not_called()
 
 
+def test_smtp_accepted_but_contact_history_failure_is_reported(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    payload = {
+        "text": "Need a decision.", "task_id": "task-history-fail",
+        "correlation_id": "task-history-fail",
+        "reason_code": "human_context_gap",
+        "context": "A required preference is unknown.",
+        "question": "Which preference applies?",
+        "why_it_matters": "It changes the next decision.",
+    }
+    with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"), \
+         patch("messaging.human_participant_policy.ContactHistory.record", side_effect=OSError("disk unavailable")):
+        result = hub.send("aharon", "coordination", payload)
+    assert result["status"] == "sent_audit_incomplete"
+    assert result["result"]["transport_accepted"] is True
+    assert result["result"]["contact_history_recorded"] is False
+    assert result["result"]["correlation_recorded"] is True
+
+
+def test_smtp_accepted_but_correlation_failure_is_reported(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    hub._record_message_correlation = lambda *_args: (_ for _ in ()).throw(OSError("disk unavailable"))
+    payload = {
+        "text": "Need a decision.", "task_id": "task-correlation-fail",
+        "correlation_id": "task-correlation-fail",
+        "reason_code": "human_context_gap",
+        "context": "A required preference is unknown.",
+        "question": "Which preference applies?",
+        "why_it_matters": "It changes the next decision.",
+    }
+    with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
+        result = hub.send("aharon", "coordination", payload)
+    assert result["status"] == "sent_audit_incomplete"
+    assert result["result"]["transport_accepted"] is True
+    assert result["result"]["correlation_recorded"] is False
+    assert result["result"]["audit_error"] == "OSError"
+
+
 def test_human_email_cooldown_is_enforced_at_send_boundary(monkeypatch):
     hub = _hub()
     monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
