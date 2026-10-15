@@ -26,6 +26,8 @@ def assess_node_routing_shadow(node_state, task_class="routine", now=None,
         reasons.append("device_condition_stale")
     if summary["thermal_events_in_window"] >= thermal_event_threshold:
         reasons.append("recurring_thermal_pressure")
+    if summary["resource_pressure_events_in_window"]:
+        reasons.append("recurring_resource_pressure")
     if summary["manual_defects"]:
         reasons.append("reported_device_defect")
 
