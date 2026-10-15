@@ -163,6 +163,8 @@ def test_explicit_contact_flows_from_worker_to_review_proposal_end_to_end(monkey
     monkeypatch.setattr(continuation, "STATE_DIR", tmp_path / "state")
     monkeypatch.setattr(continuation, "EVENTS_FILE", tmp_path / "state" / "continuation_events.jsonl")
     monkeypatch.setattr(continuation, "EMITTED_IDS", tmp_path / "state" / "emitted_event_ids.json")
+    (tmp_path / "ai" / "coordination").mkdir(parents=True, exist_ok=True)
+    (tmp_path / "state").mkdir(parents=True, exist_ok=True)
 
     contact = {
         "participant_id": "reviewer-test",
