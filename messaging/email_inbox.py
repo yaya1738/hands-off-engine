@@ -48,11 +48,11 @@ def _authenticated_sender_domain(message, sender_email):
         return False
 
     value = values[0]
-    for match in re.finditer(r"dkim=pass\\s+header\\.d=([^;\\s]+)", value):
+    for match in re.finditer(r"dkim=pass\s+header\.d=([^;\s]+)", value):
         domain = match.group(1).strip(".")
         if sender_domain == domain or sender_domain.endswith("." + domain):
             return True
-    for match in re.finditer(r"spf=pass\\s+smtp\\.mailfrom=([^;\\s]+)", value):
+    for match in re.finditer(r"spf=pass\s+smtp\.mailfrom=([^;\s]+)", value):
         mailbox = match.group(1).strip("<>")
         domain = mailbox.rsplit("@", 1)[-1].strip(".")
         if domain and (sender_domain == domain or sender_domain.endswith("." + domain)):
