@@ -261,11 +261,38 @@ class CommHub:
             "urgency": urgency,
         }
 
+        # Task-aware contact policy is mandatory for human-participant email.
+        # Other channels and non-human parties retain their existing routing behavior.
+        contact_history = None
+        if channel == "email" and party.get("role") == "human_participant":
+            try:
+                from messaging.human_participant_policy import ContactHistory, evaluate_contact_request
+                contact_history = ContactHistory(self.state_dir / "human_contact_history.json")
+                history = contact_history.load()
+                decision = evaluate_contact_request(party, payload, history)
+            except Exception as exc:
+                log.error("Human email policy unavailable; refusing contact (%s)", type(exc).__name__)
+                decision = {"allowed": False, "reason": "policy_unavailable"}
+            if not decision.get("allowed"):
+                result = {"status": "blocked", "reason": decision.get("reason", "policy_denied")}
+                self._log_outbound(msg, result)
+                self._write_to_messages_jsonl({**msg, "delivery": result, "contact_policy": "denied"})
+                return {"status": "blocked", "id": msg["id"], "channel": channel, "result": result}
+
         # Format for the target channel
         formatted = self._format_for_channel(msg, party)
 
         # Deliver
         result = self._deliver(channel, formatted, party_id)
+        if channel == "email" and party.get("role") == "human_participant" and result.get("status") == "sent":
+            try:
+                contact_history.record(
+                    party_id, payload, "awaiting_reply",
+                    now=datetime.fromisoformat(msg["timestamp"]),
+                )
+            except Exception as exc:
+                # Delivery already occurred; make the degraded audit state visible.
+                log.critical("Email sent but contact history could not be persisted (%s)", type(exc).__name__)
 
         # Log
         self._log_outbound(msg, result)
