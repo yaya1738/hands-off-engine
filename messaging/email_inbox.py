@@ -27,9 +27,15 @@ def _decoded(value):
 
 def _authenticated_sender_domain(message, sender_email):
     sender_domain = sender_email.rsplit("@", 1)[-1].casefold()
+    trusted_authserv_id = os.getenv("EMAIL_AUTH_SERV_ID", "").strip().casefold()
+    if not trusted_authserv_id:
+        return False
     headers = message.get_all("Authentication-Results", [])
     for header in headers:
         value = str(header).casefold()
+        authserv_id = value.split(";", 1)[0].strip().split()[0] if value.strip() else ""
+        if authserv_id != trusted_authserv_id:
+            continue
         for match in re.finditer(r"dkim=pass\\s+header\\.d=([^;\\s]+)", value):
             domain = match.group(1).strip(".")
             if sender_domain == domain or sender_domain.endswith("." + domain):
