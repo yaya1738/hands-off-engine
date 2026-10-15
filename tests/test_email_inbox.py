@@ -21,18 +21,21 @@ def _raw_email(sender="aharon@example.test", auth="dkim=pass header.d=example.te
     ).encode()
 
 
-def test_inbound_reply_requires_authentication():
+def test_inbound_reply_requires_authentication(monkeypatch):
+    monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
     result = ingest_raw_reply(_hub(), _raw_email(auth="dkim=fail header.d=example.test"), "mail-1")
     assert result["routed_to"] == "rejected"
 
 
-def test_inbound_reply_requires_reference():
+def test_inbound_reply_requires_reference(monkeypatch):
+    monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
     raw = _raw_email().replace(b"Reference: task-inbox-1\\r\\n", b"No reference here\\r\\n")
     result = ingest_raw_reply(_hub(), raw, "mail-2")
     assert result["routed_to"] == "rejected"
 
 
 def test_inbound_reply_matches_registered_participant_and_correlation(monkeypatch):
+    monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
     hub = _hub()
     monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
     from unittest.mock import patch
