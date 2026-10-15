@@ -58,9 +58,9 @@ def evaluate_contact_request(participant, payload, history, *, now=None,
             sent_at = datetime.fromisoformat(str(entry.get("timestamp", "")).replace("Z", "+00:00"))
             if sent_at.tzinfo is None:
                 sent_at = sent_at.replace(tzinfo=timezone.utc)
-            if sent_at.date() == today and entry.get("status") in {"sent", "awaiting_reply"}:
+            if sent_at.date() == today and entry.get("status") in {"sent", "awaiting_reply", "answered"}:
                 sent_today += 1
-            if sent_at >= cutoff and entry.get("status") in {"sent", "awaiting_reply"}:
+            if sent_at >= cutoff and entry.get("status") in {"sent", "awaiting_reply", "answered"}:
                 return {"allowed": False, "reason": "participant_cooldown"}
         except (TypeError, ValueError):
             # Malformed history is not trusted as evidence of a recent contact.
