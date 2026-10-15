@@ -18,6 +18,14 @@ A request may be proposed when one of these conditions is recorded against a tas
 
 Do not contact for routine heartbeats, internal retries, transient errors with an automated recovery path, or information already available in trusted project state.
 
+## Producer-side decision contract
+
+The canonical task producer may opt into a contact proposal only by placing a structured `human_contact` object in the task assignment's `context`. The task worker forwards that object through the existing continuation event into the review-only coordination proposal. This is metadata for review, not a send instruction.
+
+The object must explicitly identify the participant and include the eligible `reason_code`, one concrete `question`, `why_it_matters`, and a bounded `summary` (plus the task/correlation identity supplied by the task/event). Use only information the producer has actually established. Do not synthesize a question from health warnings, assessment gaps, pending authority, generic blockers, or status changes. The router rejects missing fields and non-eligible reasons; the proposal remains `send_authorized: false` and must pass the separate participant policy and CommHub transport boundary.
+
+The shared Factory decision context remains evidence only. An `authority_decision`, `factory_assessment`, or `system_health_observation` does not itself imply human relevance, consent, or approval authority. This preserves the canonical coordination bus and avoids a second decision store.
+
 ## Required message context
 
 Every outbound request should carry structured fields in its payload:
