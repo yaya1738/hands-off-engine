@@ -197,6 +197,27 @@ def test_human_email_is_blocked_without_task_aware_context(monkeypatch):
     sender.assert_not_called()
 
 
+def test_corrupt_correlation_ledger_is_preserved_and_send_is_flagged(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    ledger = hub.state_dir / "message_correlations.json"
+    ledger.write_text("{corrupt-ledger")
+    payload = {
+        "text": "Need a decision.", "task_id": "task-corrupt-correlation",
+        "correlation_id": "task-corrupt-correlation",
+        "reason_code": "human_context_gap",
+        "context": "A required preference is unknown.",
+        "question": "Which preference applies?",
+        "why_it_matters": "It changes the next decision.",
+    }
+    with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
+        result = hub.send("aharon", "coordination", payload)
+    assert result["status"] == "sent_audit_incomplete"
+    assert result["result"]["transport_accepted"] is True
+    assert result["result"]["correlation_recorded"] is False
+    assert ledger.read_text() == "{corrupt-ledger"
+
+
 def test_smtp_accepted_but_contact_history_failure_is_reported(monkeypatch):
     hub = _hub()
     monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
