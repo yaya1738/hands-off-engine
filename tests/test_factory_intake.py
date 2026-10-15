@@ -105,9 +105,8 @@ def test_correlation_preserves_task_id():
     _write_msg(msg)
     decisions = intake.intake_once()
     assert len(decisions) == 1
-    assert decisions[0]["task_id"] == "t-bound-0"
-    assert intake.state["consumed_ids"] == ["evt-bound-0"]
     assert decisions[0]["task_id"] == "t-corr-42"
+    assert decisions[0]["event_id"] == "evt-corr"
 
 
 def test_emits_exactly_one_assignment():
@@ -117,7 +116,7 @@ def test_emits_exactly_one_assignment():
         _write_msg({
             "type": "continuation_event",
             "event_id": f"evt-multi-{i}",
-            "context": {"event_type": "security_boundary", "is_wake": True, "task_id": f"t-multi-{i}"},
+            "context": {"event_type": "security_boundary", "is_wake": True, "task_id": f"t-multi-{i}", "next_action": {"action": "system_status", "params": {}}},
             "message": f"security {i}",
         })
     decisions = intake.intake_once()
@@ -231,7 +230,7 @@ def test_task_completed_without_next_action_does_not_fan_out():
 
 
 def test_task_completed_with_string_next_action_fans_out():
-    """A non-empty string next_action authorizes intentional continuation fan-out."""
+    """String next_action is not a typed action and must fail closed."""
     intake = _make_intake()
     _write_msg({
         "type": "continuation_event",
@@ -241,12 +240,12 @@ def test_task_completed_with_string_next_action_fans_out():
     })
     decisions = intake.intake_once()
     assert len(decisions) == 1
-    assert decisions[0]["assigned_msg_id"] is not None
+    assert decisions[0]["assigned_msg_id"] is None
+    assert decisions[0]["reason"] == "no_explicit_next_action"
 
     with open(fi.MESSAGES_FILE) as f:
         assignments = [json.loads(line) for line in f if line.strip() and json.loads(line).get("type") == "task_assignment"]
-    assert len(assignments) == 1
-    assert assignments[0]["context"]["source_event"] == "evt-next"
+    assert assignments == []
 
 
 def test_pending_wake_events():
@@ -265,7 +264,7 @@ def test_assignment_written_to_bus():
     msg = {
         "type": "continuation_event",
         "event_id": "evt-bus",
-        "context": {"event_type": "test_failure", "is_wake": True, "task_id": "t-bus"},
+        "context": {"event_type": "test_failure", "is_wake": True, "task_id": "t-bus", "next_action": {"action": "system_status", "params": {}}},
         "message": "test fail",
     }
     _write_msg(msg)
