@@ -447,6 +447,13 @@ class CommHub:
         self._write_to_messages_jsonl(reply)
         seen.append(provider_message_id)
         seen_path.write_text(json.dumps(seen[-5000:], indent=2) + "\n")
+        try:
+            from messaging.human_participant_policy import ContactHistory
+            ContactHistory(self.state_dir / "human_contact_history.json").update_status(
+                reference, "answered", now=datetime.now(timezone.utc),
+            )
+        except Exception as exc:
+            log.critical("Advisory reply recorded but contact history could not be closed (%s)", type(exc).__name__)
         return {"routed_to": "advisory_input", "correlation_id": reference,
                 "requires_review": True, "authority": "none"}
 
