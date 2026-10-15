@@ -79,3 +79,63 @@ def test_email_delivery_uses_mocked_transport(monkeypatch):
     assert result["channel"] == "email"
     assert result["result"]["status"] == "sent"
     assert "task-123" in sender.call_args.kwargs["body"]
+
+
+
+def test_correlated_reply_is_advisory_only(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
+        sent = hub.send("aharon", "coordination", {
+            "subject": "Factory question", "text": "What do you think?",
+            "correlation_id": "task-123",
+        })
+    assert sent["status"] == "sent"
+    reply = hub.receive_human_reply(
+        "aharon", "aharon@example.test", "task-123", "I recommend option B.",
+        "provider-message-1",
+    )
+    assert reply["routed_to"] == "advisory_input"
+    assert reply["requires_review"] is True
+    assert reply["authority"] == "none"
+    bus = (hub.repo_root / "ai" / "coordination" / "messages.jsonl").read_text()
+    assert "human_reply_advisory" in bus
+    assert "I recommend option B." in bus
+
+
+def test_reply_rejects_sender_mismatch():
+    hub = _hub()
+    reply = hub.receive_human_reply(
+        "aharon", "attacker@example.test", "task-123", "approve", "provider-message-2"
+    )
+    assert reply["routed_to"] == "rejected"
+
+
+def test_reply_rejects_unknown_correlation():
+    hub = _hub()
+    reply = hub.receive_human_reply(
+        "aharon", "aharon@example.test", "unknown-task", "hello", "provider-message-3"
+    )
+    assert reply["routed_to"] == "rejected"
+
+
+def test_duplicate_reply_is_not_ingested(monkeypatch):
+    hub = _hub()
+    monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
+    with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
+        hub.send("aharon", "coordination", {"text": "Question", "correlation_id": "task-dup"})
+    first = hub.receive_human_reply(
+        "aharon", "aharon@example.test", "task-dup", "answer", "provider-message-dup"
+    )
+    second = hub.receive_human_reply(
+        "aharon", "aharon@example.test", "task-dup", "answer", "provider-message-dup"
+    )
+    assert first["routed_to"] == "advisory_input"
+    assert second["routed_to"] == "duplicate"
+
+
+def test_non_owner_cannot_approve_or_reject():
+    hub = _hub()
+    hub.parties["aharon"]["approval_authority"] = False
+    result = hub.receive("aharon", "approve", {"command_id": "fake-command"})
+    assert result["routed_to"] == "rejected"
