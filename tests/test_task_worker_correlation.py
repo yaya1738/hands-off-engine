@@ -202,8 +202,13 @@ def test_explicit_contact_flows_from_worker_to_review_proposal_end_to_end(monkey
     monkeypatch.setattr(worker, "save_processed", lambda processed: None)
     monkeypatch.setattr(worker, "_publish_result_to_bus", lambda result: True)
     monkeypatch.setattr(worker, "process_task", lambda task: {
-        "id": task["context"]["task_id"], "status": "blocked",
-        "summary": "Waiting for a human decision",
+        "id": task["context"]["task_id"],
+        "context": {
+            "task_id": task["context"]["task_id"],
+            "status": "blocked",
+            "result": "Waiting for a human decision",
+            "correlation_id": task["context"]["task_id"],
+        },
     })
     monkeypatch.setattr(worker, "get_emitter", continuation.ContinuationEmitter)
 
