@@ -107,3 +107,20 @@ class ContactHistory:
         temp = self.path.with_suffix(self.path.suffix + ".tmp")
         temp.write_text(json.dumps(entries[-5000:], indent=2) + "\n")
         temp.replace(self.path)
+
+
+    def update_status(self, correlation_id, status, *, now=None):
+        if status not in {"sent", "awaiting_reply", "answered", "expired", "failed"}:
+            raise ValueError("invalid contact status")
+        entries = self.load()
+        matches = [entry for entry in entries if entry.get("correlation_id") == str(correlation_id)]
+        if not matches:
+            return False
+        for entry in matches:
+            entry["status"] = status
+            entry["updated_at"] = (now or datetime.now(timezone.utc)).isoformat()
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        temp = self.path.with_suffix(self.path.suffix + ".tmp")
+        temp.write_text(json.dumps(entries[-5000:], indent=2) + "\n")
+        temp.replace(self.path)
+        return True
