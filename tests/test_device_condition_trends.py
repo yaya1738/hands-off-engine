@@ -83,3 +83,27 @@ def test_naive_now_is_rejected():
         assert "timezone-aware" in str(exc)
     else:
         raise AssertionError("expected timezone validation")
+
+
+
+def test_additional_observed_health_metrics_are_summarized_without_imputation():
+    result = summarize_device_condition(
+        [obs(1, {"cpu_load_percent": 75, "cpu_throttling_percent": 20,
+                 "network_quality_percent": None, "io_error_count": 3})],
+        now=NOW,
+    )
+    assert result["metrics"]["cpu_load_percent"]["latest"] == 75
+    assert result["metrics"]["cpu_throttling_percent"]["latest"] == 20
+    assert result["metrics"]["io_error_count"]["latest"] == 3
+    assert "network_quality_percent" not in result["metrics"]
+
+
+def test_assessment_resource_pressure_events_are_counted():
+    result = summarize_device_condition(
+        [obs(2, {"battery_percent": 20},
+             {"warnings": ["battery_low"], "concerns": ["memory_pressure"]})],
+        now=NOW,
+    )
+    assert result["resource_pressure_events_in_window"] == 2
+    assert result["concern_counts"]["memory_pressure"] == 1
+    assert result["warning_counts"]["battery_low"] == 1
