@@ -30,20 +30,33 @@ def _authenticated_sender_domain(message, sender_email):
     trusted_authserv_id = os.getenv("EMAIL_AUTH_SERV_ID", "").strip().casefold()
     if not trusted_authserv_id:
         return False
-    for header in message.get_all("Authentication-Results", []):
-        value = str(header).casefold()
-        authserv_id = value.split(";", 1)[0].strip().split()[0] if value.strip() else ""
-        if authserv_id != trusted_authserv_id:
-            continue
-        for match in re.finditer(r"dkim=pass\s+header\.d=([^;\s]+)", value):
-            domain = match.group(1).strip(".")
-            if sender_domain == domain or sender_domain.endswith("." + domain):
-                return True
-        for match in re.finditer(r"spf=pass\s+smtp\.mailfrom=([^;\s]+)", value):
-            mailbox = match.group(1).strip("<>")
-            domain = mailbox.rsplit("@", 1)[-1].strip(".")
-            if domain and (sender_domain == domain or sender_domain.endswith("." + domain)):
-                return True
+    headers = message.get_all("Authentication-Results", [])
+    if not headers:
+        return False
+
+    # Fail closed on ambiguous headers. Trust only the first Authentication-Results
+    # field, which should be stamped by the configured receiving server; a later
+    # matching field alone is not proof because senders can inject lookalike headers.
+    values = [str(header).casefold() for header in headers]
+    authserv_ids = [
+        value.split(";", 1)[0].strip().split()[0] if value.strip() else ""
+        for value in values
+    ]
+    if authserv_ids[0] != trusted_authserv_id:
+        return False
+    if authserv_ids.count(trusted_authserv_id) != 1:
+        return False
+
+    value = values[0]
+    for match in re.finditer(r"dkim=pass\\s+header\\.d=([^;\\s]+)", value):
+        domain = match.group(1).strip(".")
+        if sender_domain == domain or sender_domain.endswith("." + domain):
+            return True
+    for match in re.finditer(r"spf=pass\\s+smtp\\.mailfrom=([^;\\s]+)", value):
+        mailbox = match.group(1).strip("<>")
+        domain = mailbox.rsplit("@", 1)[-1].strip(".")
+        if domain and (sender_domain == domain or sender_domain.endswith("." + domain)):
+            return True
     return False
 
 
