@@ -224,3 +224,35 @@ def test_explicit_contact_flows_from_worker_to_review_proposal_end_to_end(monkey
     assert proposals[0]["context"]["send_authorized"] is False
     assert proposals[0]["context"]["requires_policy_check"] is True
     assert not any(record.get("type") == "email_sent" for record in records)
+
+
+    # Verify the generated proposal is usable by the real policy boundary,
+    # while consent and duplicate-open-question checks remain enforced.
+    from messaging.human_participant_policy import evaluate_contact_request
+
+    proposal_context = proposals[0]["context"]
+    participant = {
+        "id": proposal_context["participant_id"],
+        "role": "human_participant",
+        "email_consent": True,
+        "channels": ["email"],
+    }
+    payload = proposal_context["payload"]
+    assert evaluate_contact_request(participant, payload, [])["allowed"] is True
+
+    no_consent = dict(participant, email_consent=False)
+    assert evaluate_contact_request(no_consent, payload, []) == {
+        "allowed": False,
+        "reason": "consent_not_recorded",
+    }
+
+    open_question = [{
+        "participant_id": participant["id"],
+        "correlation_id": payload["correlation_id"],
+        "status": "awaiting_reply",
+        "timestamp": "2026-10-15T00:00:00+00:00",
+    }]
+    assert evaluate_contact_request(participant, payload, open_question) == {
+        "allowed": False,
+        "reason": "duplicate_open_question",
+    }
