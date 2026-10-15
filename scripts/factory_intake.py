@@ -201,6 +201,12 @@ class FactoryIntake:
         params = next_action.get("params") or {}
         reply_to = next_action.get("reply_to") or (event.get("context") or {}).get("reply_to") or source_id
         assignment = {"from": "factory", "to": TARGET_PARTY, "type": "task_assignment", "message": f"Factory continuation intake: follow-up on {task_id[:12]}... ({_get_event_type(event)})", "msg_id": msg_id, "timestamp": now.isoformat(), "context": {"task_id": next_task_id, "action": action, "params": params, "reply_to": reply_to, "source_event": source_id, "source_event_type": _get_event_type(event), "source_task_id": task_id}}
+        # Preserve only explicitly declared contact metadata; the downstream
+        # router/policy validates it. Intake never infers a person or question.
+        event_context = event.get("context") if isinstance(event.get("context"), dict) else {}
+        human_contact = event_context.get("human_contact")
+        if isinstance(human_contact, dict):
+            assignment["context"]["human_contact"] = human_contact
         try:
             messages_path.parent.mkdir(parents=True, exist_ok=True)
             with messages_path.open("a") as f:
