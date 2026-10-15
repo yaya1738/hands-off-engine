@@ -352,3 +352,41 @@ def test_human_contact_is_not_inferred_for_generic_blocker():
     bus = [json.loads(line) for line in fi.MESSAGES_FILE.read_text().splitlines() if line.strip()]
     assert not any(m.get("type") == "task_assignment" for m in bus)
     assert not any(m.get("type") == "human_contact_proposal" for m in bus)
+
+
+def test_corrupt_intake_state_fails_closed_without_reset(tmp_path):
+    """Corrupt persisted deduplication state must stop intake, not replay events."""
+    state_path = tmp_path / "factory_intake_state.json"
+    state_path.write_text('{"consumed_ids": [', encoding="utf-8")
+
+    try:
+        fi._load_state(state_path)
+    except RuntimeError as exc:
+        assert "refusing to replay events" in str(exc)
+    else:
+        raise AssertionError("Corrupt intake state must fail closed")
+
+
+def test_invalid_intake_state_schema_fails_closed(tmp_path):
+    """Valid JSON with a malformed schema must not reset consumed event IDs."""
+    state_path = tmp_path / "factory_intake_state.json"
+    state_path.write_text(json.dumps({"consumed_ids": "not-a-list", "decisions": []}), encoding="utf-8")
+
+    try:
+        fi._load_state(state_path)
+    except RuntimeError as exc:
+        assert "invalid schema" in str(exc)
+    else:
+        raise AssertionError("Invalid intake state schema must fail closed")
+
+
+def test_intake_state_save_is_readable_after_atomic_replace(tmp_path):
+    """Atomic persistence retains the full deduplication ledger across reloads."""
+    state_path = tmp_path / "state" / "factory_intake_state.json"
+    expected = {"consumed_ids": ["evt-1", "evt-2"], "decisions": [{"event_id": "evt-2"}]}
+
+    fi._save_state(expected, state_path)
+
+    assert fi._load_state(state_path) == expected
+    assert list(state_path.parent.glob(".factory_intake_state.json.*.tmp")) == []
+
