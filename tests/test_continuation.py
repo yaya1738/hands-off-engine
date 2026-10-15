@@ -142,3 +142,48 @@ def test_task_completed_canonical_context_preserves_explicit_next_action():
     bus = e._tmp / "ai" / "coordination" / "messages.jsonl"
     record = json.loads(bus.read_text().strip())
     assert record["context"]["next_action"] == next_action
+
+
+def test_explicit_human_contact_metadata_emits_review_proposal_without_sending():
+    import scripts.continuation as c
+    e = _make_emitter()
+    c.REPO_ROOT = e._tmp
+    event = e.emit(
+        event_type="blocker",
+        message="A material decision needs human context",
+        correlation_id="task-human-1",
+        context={
+            "task_id": "task-human-1",
+            "human_contact": {
+                "participant_id": "aharon",
+                "task": {
+                    "task_id": "task-human-1",
+                    "human_contact_reason": "material_ambiguity",
+                    "summary": "Two safe implementation approaches remain.",
+                    "human_question": "Which approach should Factory implement?",
+                    "human_question_impact": "The answer changes the implementation plan.",
+                },
+            },
+        },
+        is_wake=True,
+    )
+    assert event is not None
+    bus = (e._tmp / "ai" / "coordination" / "messages.jsonl").read_text().splitlines()
+    records = [json.loads(line) for line in bus]
+    proposals = [record for record in records if record["type"] == "human_contact_proposal"]
+    assert len(proposals) == 1
+    assert proposals[0]["context"]["send_authorized"] is False
+    assert proposals[0]["context"]["requires_policy_check"] is True
+    assert proposals[0]["context"]["payload"]["correlation_id"] == "task-human-1"
+    assert all(record["type"] != "email_sent" for record in records)
+
+
+def test_lifecycle_event_without_explicit_human_contact_does_not_propose():
+    import scripts.continuation as c
+    e = _make_emitter()
+    c.REPO_ROOT = e._tmp
+    e.emit_heartbeat("alive")
+    e.emit_blocker("generic infrastructure issue", "investigation")
+    bus = (e._tmp / "ai" / "coordination" / "messages.jsonl").read_text().splitlines()
+    records = [json.loads(line) for line in bus]
+    assert not any(record["type"] == "human_contact_proposal" for record in records)
