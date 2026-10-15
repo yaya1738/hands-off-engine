@@ -426,8 +426,11 @@ class CommHub:
         seen_path = self.state_dir / "processed_email_replies.json"
         try:
             seen = json.loads(seen_path.read_text()) if seen_path.exists() else []
-        except (OSError, ValueError):
-            seen = []
+            if not isinstance(seen, list) or any(not isinstance(item, str) for item in seen):
+                raise ValueError("processed reply state must be a list of message IDs")
+        except (OSError, ValueError, TypeError):
+            log.error("Processed email reply state unavailable; refusing inbound reply")
+            return {"routed_to": "rejected", "error": "Reply deduplication state unavailable"}
         if provider_message_id in seen:
             return {"routed_to": "duplicate", "provider_message_id": provider_message_id}
 
