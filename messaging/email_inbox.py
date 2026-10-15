@@ -13,7 +13,7 @@ from email.header import decode_header, make_header
 from email.utils import parseaddr
 
 
-_REFERENCE = re.compile(r"(?im)^\\s*Reference\\s*:\\s*([A-Za-z0-9._:-]{1,200})\\s*$")
+_REFERENCE = re.compile(r"(?im)^\s*Reference\s*:\s*([A-Za-z0-9._:-]{1,200})\s*$")
 
 
 def _decoded(value):
@@ -30,17 +30,16 @@ def _authenticated_sender_domain(message, sender_email):
     trusted_authserv_id = os.getenv("EMAIL_AUTH_SERV_ID", "").strip().casefold()
     if not trusted_authserv_id:
         return False
-    headers = message.get_all("Authentication-Results", [])
-    for header in headers:
+    for header in message.get_all("Authentication-Results", []):
         value = str(header).casefold()
         authserv_id = value.split(";", 1)[0].strip().split()[0] if value.strip() else ""
         if authserv_id != trusted_authserv_id:
             continue
-        for match in re.finditer(r"dkim=pass\\s+header\\.d=([^;\\s]+)", value):
+        for match in re.finditer(r"dkim=pass\s+header\.d=([^;\s]+)", value):
             domain = match.group(1).strip(".")
             if sender_domain == domain or sender_domain.endswith("." + domain):
                 return True
-        for match in re.finditer(r"spf=pass\\s+smtp\\.mailfrom=([^;\\s]+)", value):
+        for match in re.finditer(r"spf=pass\s+smtp\.mailfrom=([^;\s]+)", value):
             mailbox = match.group(1).strip("<>")
             domain = mailbox.rsplit("@", 1)[-1].strip(".")
             if domain and (sender_domain == domain or sender_domain.endswith("." + domain)):
@@ -64,7 +63,7 @@ def _plain_text(message):
         except Exception:
             payload = message.get_payload(decode=True) or b""
             parts.append(payload.decode(message.get_content_charset() or "utf-8", errors="replace"))
-    return "\\n".join(parts)[:12000]
+    return "\n".join(parts)[:12000]
 
 
 def ingest_raw_reply(hub, raw_message, provider_message_id):
@@ -99,8 +98,8 @@ def poll_inbox(hub, *, imap_factory=None, limit=25):
     username = os.getenv("EMAIL_IMAP_USERNAME", "").strip()
     password = os.getenv("EMAIL_IMAP_PASSWORD", "")
     folder = os.getenv("EMAIL_IMAP_FOLDER", "INBOX").strip() or "INBOX"
-    if not all((host, username, password)):
-        return {"status": "disabled", "reason": "IMAP configuration incomplete", "processed": 0}
+    if not all((host, username, password, os.getenv("EMAIL_AUTH_SERV_ID", "").strip())):
+        return {"status": "disabled", "reason": "IMAP or trusted authentication configuration incomplete", "processed": 0}
     factory = imap_factory or imaplib.IMAP4_SSL
     processed = 0
     rejected = 0
@@ -123,7 +122,6 @@ def poll_inbox(hub, *, imap_factory=None, limit=25):
                 processed += 1
                 if result.get("routed_to") not in ("advisory_input", "duplicate"):
                     rejected += 1
-                # Mark each handled message seen so it is not repeatedly ingested.
                 mailbox.store(message_id, "+FLAGS", "\\Seen")
             return {"status": "ok", "processed": processed, "rejected": rejected}
     except Exception as exc:
