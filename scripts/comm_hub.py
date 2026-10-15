@@ -349,6 +349,7 @@ class CommHub:
 
         # Approval responses require explicit authority, not merely a registered identity.
         if msg_type in ("approve", "reject"):
+            sender = self.parties.get(msg.get("from"), {})
             if sender.get("role") != "owner" or sender.get("approval_authority") is not True:
                 return {"routed_to": "rejected", "error": "Sender lacks explicit approval authority"}
             return self._handle_approval_response(msg)
@@ -391,7 +392,7 @@ class CommHub:
             "created_at": msg.get("timestamp"),
             "status": "awaiting_reply",
         }
-        path.write_text(json.dumps(records, indent=2) + "\\n")
+        path.write_text(json.dumps(records, indent=2) + "\n")
 
     def receive_human_reply(self, sender_id, verified_sender, correlation_id, body,
                             provider_message_id, channel="email"):
@@ -446,7 +447,7 @@ class CommHub:
         self._log_inbound(reply)
         self._write_to_messages_jsonl(reply)
         seen.append(provider_message_id)
-        seen_path.write_text(json.dumps(seen[-5000:], indent=2) + "\\n")
+        seen_path.write_text(json.dumps(seen[-5000:], indent=2) + "\n")
         return {"routed_to": "advisory_input", "correlation_id": reference,
                 "requires_review": True, "authority": "none"}
 
