@@ -55,6 +55,7 @@ DEFAULT_PARTIES = {
         "name": "Yair Siegel",
         "role": "owner",
         "trust_level": 10,
+        "approval_authority": True,
         "channels": ["telegram", "webhook", "notification"],
         "info_scope": "full",
         "notify_on": ["trade_alert", "approval_needed", "system_status", "error", "daily_digest", "income_update"],
@@ -275,6 +276,10 @@ class CommHub:
         if channel not in ("messages_jsonl", "webhook"):
             self._write_to_messages_jsonl(msg)
 
+        # Persist email reply correlation only after the transport accepted delivery.
+        if channel == "email" and result.get("status") == "sent":
+            self._record_message_correlation(msg, party_id)
+
         # Handle ack tracking
         if meta.get("requires_ack"):
             self.pending_acks[msg["id"]] = {
@@ -342,8 +347,10 @@ class CommHub:
         msg_type = msg.get("type", "")
         sender_trust = msg.get("sender_trust", 0)
 
-        # Approval responses
+        # Approval responses require explicit authority, not merely a registered identity.
         if msg_type in ("approve", "reject"):
+            if sender.get("role") != "owner" or sender.get("approval_authority") is not True:
+                return {"routed_to": "rejected", "error": "Sender lacks explicit approval authority"}
             return self._handle_approval_response(msg)
 
         # Status queries
@@ -360,6 +367,88 @@ class CommHub:
 
         # Generic inbound — log and acknowledge
         return {"routed_to": "logged", "acknowledged": True}
+
+    # ── human participant reply correlation ──
+
+    def _correlation_path(self):
+        return self.state_dir / "message_correlations.json"
+
+    def _record_message_correlation(self, msg, party_id):
+        """Record an outbound email reference for later verified reply matching."""
+        path = self._correlation_path()
+        try:
+            records = json.loads(path.read_text()) if path.exists() else {}
+        except (OSError, ValueError):
+            records = {}
+        payload = msg.get("payload", {})
+        reference = str(payload.get("correlation_id") or msg.get("id") or "").strip()
+        if not reference:
+            return
+        records[reference] = {
+            "message_id": msg.get("id"),
+            "party_id": party_id,
+            "message_type": msg.get("type"),
+            "created_at": msg.get("timestamp"),
+            "status": "awaiting_reply",
+        }
+        path.write_text(json.dumps(records, indent=2) + "\\n")
+
+    def receive_human_reply(self, sender_id, verified_sender, correlation_id, body,
+                            provider_message_id, channel="email"):
+        """Persist a verified, correlated human reply as advisory input only.
+
+        This method deliberately does not route replies through command/approval
+        handlers. The adapter must establish sender identity before calling it.
+        """
+        party = self.parties.get(sender_id)
+        if not party or party.get("role") != "human_participant":
+            return {"routed_to": "rejected", "error": "Unknown human participant"}
+        if not party.get("email_consent", False) or "email" not in party.get("channels", []):
+            return {"routed_to": "rejected", "error": "Email participation is not enabled"}
+        expected = str(party.get("email", "")).strip().casefold()
+        actual = str(verified_sender or "").strip().casefold()
+        if not expected or not actual or actual != expected:
+            return {"routed_to": "rejected", "error": "Sender identity mismatch"}
+        provider_message_id = str(provider_message_id or "").strip()
+        reference = str(correlation_id or "").strip()
+        if not provider_message_id or not reference:
+            return {"routed_to": "rejected", "error": "Missing provider message ID or correlation reference"}
+
+        path = self._correlation_path()
+        try:
+            records = json.loads(path.read_text()) if path.exists() else {}
+        except (OSError, ValueError):
+            records = {}
+        correlation = records.get(reference)
+        if not correlation or correlation.get("party_id") != sender_id:
+            return {"routed_to": "rejected", "error": "Unknown or mismatched correlation reference"}
+
+        seen_path = self.state_dir / "processed_email_replies.json"
+        try:
+            seen = json.loads(seen_path.read_text()) if seen_path.exists() else []
+        except (OSError, ValueError):
+            seen = []
+        if provider_message_id in seen:
+            return {"routed_to": "duplicate", "provider_message_id": provider_message_id}
+
+        reply = {
+            "id": str(uuid.uuid4()),
+            "from": sender_id,
+            "to": "system_internal",
+            "type": "human_reply_advisory",
+            "channel": channel,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "correlation_id": reference,
+            "in_reply_to_message_id": correlation.get("message_id"),
+            "provider_message_id": provider_message_id,
+            "payload": {"text": str(body or "")[:12000], "disposition": "advisory_pending_review"},
+        }
+        self._log_inbound(reply)
+        self._write_to_messages_jsonl(reply)
+        seen.append(provider_message_id)
+        seen_path.write_text(json.dumps(seen[-5000:], indent=2) + "\\n")
+        return {"routed_to": "advisory_input", "correlation_id": reference,
+                "requires_review": True, "authority": "none"}
 
     # ── channel delivery ──
 
