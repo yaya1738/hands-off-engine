@@ -441,10 +441,14 @@ class CommHub:
         path = self._correlation_path()
         try:
             records = json.loads(path.read_text()) if path.exists() else {}
-        except (OSError, ValueError):
-            records = {}
+        except (OSError, ValueError, TypeError):
+            log.error("Message correlation state unavailable; refusing inbound reply")
+            return {"routed_to": "rejected", "error": "Reply correlation state unavailable"}
+        if not isinstance(records, dict):
+            log.error("Message correlation state has invalid shape; refusing inbound reply")
+            return {"routed_to": "rejected", "error": "Reply correlation state unavailable"}
         correlation = records.get(reference)
-        if not correlation or correlation.get("party_id") != sender_id:
+        if not isinstance(correlation, dict) or correlation.get("party_id") != sender_id:
             return {"routed_to": "rejected", "error": "Unknown or mismatched correlation reference"}
 
         seen_path = self.state_dir / "processed_email_replies.json"
