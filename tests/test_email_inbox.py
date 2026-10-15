@@ -57,3 +57,26 @@ def test_reply_requires_configured_authentication_service(monkeypatch):
     monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "trusted.example.test")
     result = ingest_raw_reply(_hub(), _raw_email(), "mail-4")
     assert result["routed_to"] == "rejected"
+
+
+
+def test_inbound_reply_rejects_untrusted_auth_header_preceding_trusted_one(monkeypatch):
+    monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
+    raw = _raw_email().replace(
+        b"From:",
+        b"Authentication-Results: attacker.test; dkim=pass header.d=example.test\\r\\nFrom:",
+        1,
+    )
+    result = ingest_raw_reply(_hub(), raw, "mail-spoof-1")
+    assert result["routed_to"] == "rejected"
+
+
+def test_inbound_reply_rejects_duplicate_trusted_auth_headers(monkeypatch):
+    monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "mx.example.test")
+    raw = _raw_email().replace(
+        b"From:",
+        b"Authentication-Results: mx.example.test; dkim=fail header.d=example.test\\r\\nFrom:",
+        1,
+    )
+    result = ingest_raw_reply(_hub(), raw, "mail-spoof-2")
+    assert result["routed_to"] == "rejected"
