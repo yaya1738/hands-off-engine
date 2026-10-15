@@ -187,3 +187,32 @@ def test_lifecycle_event_without_explicit_human_contact_does_not_propose():
     bus = (e._tmp / "ai" / "coordination" / "messages.jsonl").read_text().splitlines()
     records = [json.loads(line) for line in bus]
     assert not any(record["type"] == "human_contact_proposal" for record in records)
+
+
+def test_task_completion_human_contact_metadata_reaches_review_proposal():
+    """Explicit task contact metadata flows through continuation into review."""
+    import scripts.continuation as c
+    e = _make_emitter()
+    c.REPO_ROOT = e._tmp
+    contact = {
+        "participant_id": "stakeholder-1",
+        "task": {
+            "task_id": "task-worker-contact",
+            "human_contact_reason": "stakeholder_validation",
+            "summary": "Factory has a concrete stakeholder validation question.",
+            "human_question": "Does this acceptance criterion match the intended workflow?",
+            "human_question_impact": "The answer determines whether this implementation meets the requirement.",
+        },
+    }
+    event = e.emit_task_completed(
+        "task-worker-contact", "blocked", "Waiting for stakeholder validation",
+        correlation_id="task-worker-contact", human_contact=contact,
+    )
+    assert event is not None
+    bus = e._tmp / "ai" / "coordination" / "messages.jsonl"
+    records = [json.loads(line) for line in bus.read_text().splitlines()]
+    proposals = [record for record in records if record["type"] == "human_contact_proposal"]
+    assert len(proposals) == 1
+    assert proposals[0]["context"]["participant_id"] == "stakeholder-1"
+    assert proposals[0]["context"]["send_authorized"] is False
+    assert all(record["type"] != "email_sent" for record in records)
