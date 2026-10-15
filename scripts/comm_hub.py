@@ -55,6 +55,7 @@ DEFAULT_PARTIES = {
         "name": "Yair Siegel",
         "role": "owner",
         "trust_level": 10,
+        "approval_authority": True,
         "channels": ["telegram", "webhook", "notification"],
         "info_scope": "full",
         "notify_on": ["trade_alert", "approval_needed", "system_status", "error", "daily_digest", "income_update"],
@@ -265,7 +266,6 @@ class CommHub:
 
         # Deliver
         result = self._deliver(channel, formatted, party_id)
-
         # Log
         self._log_outbound(msg, result)
 
@@ -274,6 +274,27 @@ class CommHub:
         # - other channels append the canonical entry here
         if channel not in ("messages_jsonl", "webhook"):
             self._write_to_messages_jsonl(msg)
+
+        # SMTP acceptance and local persistence are separate outcomes. Never
+        # report a clean send when the transport accepted the message but the
+        # correlation record could not be durably written.
+        if channel == "email" and result.get("status") in {"sent", "sent_audit_incomplete"}:
+            try:
+                self._record_message_correlation(msg, party_id)
+            except Exception as exc:
+                log.critical(
+                    "Email accepted but correlation persistence failed (%s); reply reconciliation required",
+                    type(exc).__name__,
+                )
+                result = {
+                    **result,
+                    "status": "sent_audit_incomplete",
+                    "transport_accepted": True,
+                    "correlation_recorded": False,
+                    "audit_error": type(exc).__name__,
+                }
+            else:
+                result = {**result, "transport_accepted": True, "correlation_recorded": True}
 
         # Handle ack tracking
         if meta.get("requires_ack"):
@@ -285,7 +306,9 @@ class CommHub:
             self._save_pending_acks()
 
         log.info(f"Sent {msg_type} to {party_id} via {channel}: {result.get('status', 'ok')}")
-        return {"status": "sent", "id": msg["id"], "channel": channel, "result": result}
+        # Do not report a guarded email send as successful when policy blocked it.
+        overall_status = result.get("status", "sent") if channel == "email" else "sent"
+        return {"status": overall_status, "id": msg["id"], "channel": channel, "result": result}
 
     def broadcast(self, msg_type, payload, source="system"):
         """Broadcast to all parties subscribed to this message type."""
@@ -340,8 +363,11 @@ class CommHub:
         msg_type = msg.get("type", "")
         sender_trust = msg.get("sender_trust", 0)
 
-        # Approval responses
+        # Approval responses require explicit authority, not merely a registered identity.
         if msg_type in ("approve", "reject"):
+            sender = self.parties.get(msg.get("from"), {})
+            if sender.get("role") != "owner" or sender.get("approval_authority") is not True:
+                return {"routed_to": "rejected", "error": "Sender lacks explicit approval authority"}
             return self._handle_approval_response(msg)
 
         # Status queries
@@ -359,6 +385,109 @@ class CommHub:
         # Generic inbound — log and acknowledge
         return {"routed_to": "logged", "acknowledged": True}
 
+    # ── human participant reply correlation ──
+
+    def _correlation_path(self):
+        return self.state_dir / "message_correlations.json"
+
+    def _record_message_correlation(self, msg, party_id):
+        """Record an outbound email reference for later verified reply matching."""
+        path = self._correlation_path()
+        try:
+            records = json.loads(path.read_text()) if path.exists() else {}
+        except (OSError, ValueError, TypeError) as exc:
+            # Do not replace an unreadable correlation ledger: that could erase
+            # references needed to authenticate replies to earlier messages.
+            raise RuntimeError("message correlation state unavailable") from exc
+        if not isinstance(records, dict):
+            raise RuntimeError("message correlation state must be an object")
+        payload = msg.get("payload", {})
+        reference = str(payload.get("correlation_id") or msg.get("id") or "").strip()
+        if not reference:
+            return
+        records[reference] = {
+            "message_id": msg.get("id"),
+            "party_id": party_id,
+            "message_type": msg.get("type"),
+            "created_at": msg.get("timestamp"),
+            "status": "awaiting_reply",
+        }
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp = path.with_suffix(path.suffix + ".tmp")
+        temp.write_text(json.dumps(records, indent=2) + "\n")
+        temp.replace(path)
+
+    def receive_human_reply(self, sender_id, verified_sender, correlation_id, body,
+                            provider_message_id, channel="email"):
+        """Persist a verified, correlated human reply as advisory input only.
+
+        This method deliberately does not route replies through command/approval
+        handlers. The adapter must establish sender identity before calling it.
+        """
+        party = self.parties.get(sender_id)
+        if not party or party.get("role") != "human_participant":
+            return {"routed_to": "rejected", "error": "Unknown human participant"}
+        if not party.get("email_consent", False) or "email" not in party.get("channels", []):
+            return {"routed_to": "rejected", "error": "Email participation is not enabled"}
+        expected = str(party.get("email", "")).strip().casefold()
+        actual = str(verified_sender or "").strip().casefold()
+        if not expected or not actual or actual != expected:
+            return {"routed_to": "rejected", "error": "Sender identity mismatch"}
+        provider_message_id = str(provider_message_id or "").strip()
+        reference = str(correlation_id or "").strip()
+        if not provider_message_id or not reference:
+            return {"routed_to": "rejected", "error": "Missing provider message ID or correlation reference"}
+
+        path = self._correlation_path()
+        try:
+            records = json.loads(path.read_text()) if path.exists() else {}
+        except (OSError, ValueError, TypeError):
+            log.error("Message correlation state unavailable; refusing inbound reply")
+            return {"routed_to": "rejected", "error": "Reply correlation state unavailable"}
+        if not isinstance(records, dict):
+            log.error("Message correlation state has invalid shape; refusing inbound reply")
+            return {"routed_to": "rejected", "error": "Reply correlation state unavailable"}
+        correlation = records.get(reference)
+        if not isinstance(correlation, dict) or correlation.get("party_id") != sender_id:
+            return {"routed_to": "rejected", "error": "Unknown or mismatched correlation reference"}
+
+        seen_path = self.state_dir / "processed_email_replies.json"
+        try:
+            seen = json.loads(seen_path.read_text()) if seen_path.exists() else []
+            if not isinstance(seen, list) or any(not isinstance(item, str) for item in seen):
+                raise ValueError("processed reply state must be a list of message IDs")
+        except (OSError, ValueError, TypeError):
+            log.error("Processed email reply state unavailable; refusing inbound reply")
+            return {"routed_to": "rejected", "error": "Reply deduplication state unavailable"}
+        if provider_message_id in seen:
+            return {"routed_to": "duplicate", "provider_message_id": provider_message_id}
+
+        reply = {
+            "id": str(uuid.uuid4()),
+            "from": sender_id,
+            "to": "system_internal",
+            "type": "human_reply_advisory",
+            "channel": channel,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "correlation_id": reference,
+            "in_reply_to_message_id": correlation.get("message_id"),
+            "provider_message_id": provider_message_id,
+            "payload": {"text": str(body or "")[:12000], "disposition": "advisory_pending_review"},
+        }
+        self._log_inbound(reply)
+        self._write_to_messages_jsonl(reply)
+        seen.append(provider_message_id)
+        seen_path.write_text(json.dumps(seen[-5000:], indent=2) + "\n")
+        try:
+            from messaging.human_participant_policy import ContactHistory
+            ContactHistory(self.state_dir / "human_contact_history.json").update_status(
+                reference, "answered", now=datetime.now(timezone.utc),
+            )
+        except Exception as exc:
+            log.critical("Advisory reply recorded but contact history could not be closed (%s)", type(exc).__name__)
+        return {"routed_to": "advisory_input", "correlation_id": reference,
+                "requires_review": True, "authority": "none"}
+
     # ── channel delivery ──
 
     def _deliver(self, channel, msg, party_id):
@@ -370,6 +499,8 @@ class CommHub:
                 return self._deliver_webhook(msg, party_id)
             elif channel == "messages_jsonl":
                 return self._deliver_jsonl(msg, party_id)
+            elif channel == "email":
+                return self._deliver_email(msg, party_id)
             elif channel == "notification":
                 return self._deliver_notification(msg, party_id)
             elif channel == "file":
@@ -417,6 +548,63 @@ class CommHub:
             return {"status": "sent", "channel": "messages_jsonl"}
         except Exception as e:
             return {"status": "error", "error": str(e)}
+
+    def _deliver_email(self, msg, party_id):
+        """Send email only when consent, allowlisting, and task-aware policy pass."""
+        party = self.parties.get(party_id, {})
+        if party.get("role") == "human_participant":
+            try:
+                from messaging.human_participant_policy import ContactHistory, evaluate_contact_request
+                history_store = ContactHistory(self.state_dir / "human_contact_history.json")
+                decision = evaluate_contact_request(party, msg.get("payload", {}), history_store.load())
+            except Exception as exc:
+                log.error("Human email policy unavailable; refusing contact (%s)", type(exc).__name__)
+                return {"status": "blocked", "reason": "policy_unavailable"}
+            if not decision.get("allowed"):
+                return {"status": "blocked", "reason": decision.get("reason", "policy_denied")}
+        if not party.get("email_consent", False):
+            return {"status": "blocked", "reason": "email consent not recorded"}
+        recipient = str(party.get("email", "")).strip().lower()
+        allowed = {
+            item.strip().lower()
+            for item in os.getenv("EMAIL_ALLOWED_RECIPIENTS", "").split(",")
+            if item.strip()
+        }
+        if not recipient or recipient not in allowed:
+            return {"status": "blocked", "reason": "recipient missing or not allowlisted"}
+        try:
+            from messaging.email_smtp import send_email
+            payload = msg.get("payload", {})
+            subject = str(payload.get("subject") or f"Hands-Off Engine: {msg.get('type', 'update')}")[:180]
+            body = msg.get("formatted_text") or json.dumps(payload, indent=2, default=str)
+            correlation_id = payload.get("correlation_id") or msg.get("id")
+            body = f"{body}\n\nReference: {correlation_id}\nReply with this reference preserved so your response can be linked to the right task."
+            result = send_email(recipient=recipient, subject=subject, body=body)
+            audit_incomplete = False
+            if party.get("role") == "human_participant":
+                try:
+                    history_store.record(
+                        party_id, payload, "awaiting_reply",
+                        now=datetime.fromisoformat(msg["timestamp"]),
+                    )
+                except Exception as exc:
+                    audit_incomplete = True
+                    log.critical(
+                        "Email accepted but contact history could not be persisted (%s); reconciliation required",
+                        type(exc).__name__,
+                    )
+            return {
+                "status": "sent_audit_incomplete" if audit_incomplete else "sent",
+                "channel": "email",
+                "provider": result,
+                "transport_accepted": True,
+                "contact_history_recorded": not audit_incomplete,
+            }
+        except (ValueError, OSError, TimeoutError) as e:
+            return {"status": "error", "error": str(e)}
+        except Exception as e:
+            log.error("Email delivery failed for %s: %s", party_id, type(e).__name__)
+            return {"status": "error", "error": "email delivery failed"}
 
     def _deliver_notification(self, msg, party_id):
         """Send a local notification (Android)."""

@@ -105,9 +105,8 @@ def test_correlation_preserves_task_id():
     _write_msg(msg)
     decisions = intake.intake_once()
     assert len(decisions) == 1
-    assert decisions[0]["task_id"] == "t-bound-0"
-    assert intake.state["consumed_ids"] == ["evt-bound-0"]
     assert decisions[0]["task_id"] == "t-corr-42"
+    assert decisions[0]["event_id"] == "evt-corr"
 
 
 def test_emits_exactly_one_assignment():
@@ -117,7 +116,7 @@ def test_emits_exactly_one_assignment():
         _write_msg({
             "type": "continuation_event",
             "event_id": f"evt-multi-{i}",
-            "context": {"event_type": "security_boundary", "is_wake": True, "task_id": f"t-multi-{i}"},
+            "context": {"event_type": "security_boundary", "is_wake": True, "task_id": f"t-multi-{i}", "next_action": {"action": "system_status", "params": {}}},
             "message": f"security {i}",
         })
     decisions = intake.intake_once()
@@ -231,7 +230,7 @@ def test_task_completed_without_next_action_does_not_fan_out():
 
 
 def test_task_completed_with_string_next_action_fans_out():
-    """A non-empty string next_action authorizes intentional continuation fan-out."""
+    """String next_action is not a typed action and must fail closed."""
     intake = _make_intake()
     _write_msg({
         "type": "continuation_event",
@@ -241,12 +240,12 @@ def test_task_completed_with_string_next_action_fans_out():
     })
     decisions = intake.intake_once()
     assert len(decisions) == 1
-    assert decisions[0]["assigned_msg_id"] is not None
+    assert decisions[0]["assigned_msg_id"] is None
+    assert decisions[0]["reason"] == "no_explicit_next_action"
 
     with open(fi.MESSAGES_FILE) as f:
         assignments = [json.loads(line) for line in f if line.strip() and json.loads(line).get("type") == "task_assignment"]
-    assert len(assignments) == 1
-    assert assignments[0]["context"]["source_event"] == "evt-next"
+    assert assignments == []
 
 
 def test_pending_wake_events():
@@ -265,7 +264,7 @@ def test_assignment_written_to_bus():
     msg = {
         "type": "continuation_event",
         "event_id": "evt-bus",
-        "context": {"event_type": "test_failure", "is_wake": True, "task_id": "t-bus"},
+        "context": {"event_type": "test_failure", "is_wake": True, "task_id": "t-bus", "next_action": {"action": "system_status", "params": {}}},
         "message": "test fail",
     }
     _write_msg(msg)
@@ -302,3 +301,92 @@ def test_intake_once_respects_max_events():
         _write_msg({"type": "continuation_event", "event_id": f"evt-bound-{i}", "context": {"event_type": "task_completed", "is_wake": True, "task_id": f"t-bound-{i}"}, "message": "done"})
     decisions = intake.intake_once(max_events=1)
     assert len(decisions) == 1
+
+
+def test_explicit_human_contact_metadata_is_preserved_in_followup_assignment():
+    """Only declared human-contact metadata is carried to the worker boundary."""
+    intake = _make_intake()
+    contact = {
+        "participant_id": "stakeholder-1",
+        "task": {
+            "task_id": "source-human-task",
+            "human_contact_reason": "stakeholder_validation",
+            "summary": "Validate the acceptance criterion.",
+            "human_question": "Does this match the intended workflow?",
+            "human_question_impact": "The answer determines acceptance.",
+        },
+    }
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-explicit-human-contact",
+        "context": {
+            "event_type": "blocked", "is_wake": True,
+            "task_id": "source-human-task",
+            "next_action": {"action": "system_status", "params": {}, "reply_to": "source-human-task"},
+            "human_contact": contact,
+        },
+        "message": "Explicitly waiting for stakeholder validation",
+    })
+
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    bus = [json.loads(line) for line in fi.MESSAGES_FILE.read_text().splitlines() if line.strip()]
+    assignments = [m for m in bus if m.get("type") == "task_assignment"]
+    assert len(assignments) == 1
+    assert assignments[0]["context"]["human_contact"] == contact
+    assert assignments[0]["context"]["source_task_id"] == "source-human-task"
+    assert assignments[0]["context"]["reply_to"] == "source-human-task"
+
+
+def test_human_contact_is_not_inferred_for_generic_blocker():
+    """A generic blocked event creates no assignment and no contact metadata."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-generic-blocked-no-contact",
+        "context": {"event_type": "blocked", "is_wake": True, "task_id": "blocked-task"},
+        "message": "Generic blocker without declared next action or human contact",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    bus = [json.loads(line) for line in fi.MESSAGES_FILE.read_text().splitlines() if line.strip()]
+    assert not any(m.get("type") == "task_assignment" for m in bus)
+    assert not any(m.get("type") == "human_contact_proposal" for m in bus)
+
+
+def test_corrupt_intake_state_fails_closed_without_reset(tmp_path):
+    """Corrupt persisted deduplication state must stop intake, not replay events."""
+    state_path = tmp_path / "factory_intake_state.json"
+    state_path.write_text('{"consumed_ids": [', encoding="utf-8")
+
+    try:
+        fi._load_state(state_path)
+    except RuntimeError as exc:
+        assert "refusing to replay events" in str(exc)
+    else:
+        raise AssertionError("Corrupt intake state must fail closed")
+
+
+def test_invalid_intake_state_schema_fails_closed(tmp_path):
+    """Valid JSON with a malformed schema must not reset consumed event IDs."""
+    state_path = tmp_path / "factory_intake_state.json"
+    state_path.write_text(json.dumps({"consumed_ids": "not-a-list", "decisions": []}), encoding="utf-8")
+
+    try:
+        fi._load_state(state_path)
+    except RuntimeError as exc:
+        assert "invalid schema" in str(exc)
+    else:
+        raise AssertionError("Invalid intake state schema must fail closed")
+
+
+def test_intake_state_save_is_readable_after_atomic_replace(tmp_path):
+    """Atomic persistence retains the full deduplication ledger across reloads."""
+    state_path = tmp_path / "state" / "factory_intake_state.json"
+    expected = {"consumed_ids": ["evt-1", "evt-2"], "decisions": [{"event_id": "evt-2"}]}
+
+    fi._save_state(expected, state_path)
+
+    assert fi._load_state(state_path) == expected
+    assert list(state_path.parent.glob(".factory_intake_state.json.*.tmp")) == []
+

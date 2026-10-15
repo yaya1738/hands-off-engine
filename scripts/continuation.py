@@ -143,7 +143,8 @@ class ContinuationEmitter:
 
     def emit_task_completed(self, task_id: str, status: str, result_summary: str,
                             correlation_id: Optional[str] = None,
-                            next_action: Optional[Dict] = None):
+                            next_action: Optional[Dict] = None,
+                            human_contact: Optional[Dict] = None):
         """Emit after completing a Factory task."""
         event_type = (
             "blocked"
@@ -156,7 +157,8 @@ class ContinuationEmitter:
             event_type=event_type,
             message=f"Task {task_id[:8]}... completed: {status} — {result_summary}",
             context={**{"task_id": task_id, "status": status, "result_summary": result_summary},
-                     **({"next_action": next_action} if isinstance(next_action, dict) and next_action.get("action") else {})},
+                     **({"next_action": next_action} if isinstance(next_action, dict) and next_action.get("action") else {}),
+                     **({"human_contact": human_contact} if isinstance(human_contact, dict) else {})},
             correlation_id=correlation_id or task_id,
             is_wake=True,
         )
@@ -245,9 +247,10 @@ class ContinuationEmitter:
             pass
 
     def _emit_to_coordination(self, event):
-        """Emit to the messages.jsonl coordination bus."""
+        """Emit lifecycle event and, when explicitly requested, a non-sending contact proposal."""
         try:
             coord_file = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
+            event_context = event.get("context") or {}
             msg = {
                 "from": "anyclaw",
                 "to": "factory",
@@ -256,16 +259,42 @@ class ContinuationEmitter:
                 "timestamp": event["timestamp"],
                 "msg_id": event["event_id"],
                 "context": {
-                    "task_id": (event.get("context") or {}).get("task_id"),
+                    "task_id": event_context.get("task_id"),
                     "event_type": event["event_type"],
                     "is_wake": event["is_wake"],
                     "commit": event["commit"],
                     "correlation_id": event.get("correlation_id"),
-                    "next_action": (event.get("context") or {}).get("next_action"),
+                    "next_action": event_context.get("next_action"),
                 },
             }
             with open(coord_file, "a") as f:
                 f.write(json.dumps(msg) + "\n")
+
+            # Only explicit task metadata can create a proposal. This writes an
+            # advisory review item; it never invokes email delivery.
+            contact = event_context.get("human_contact")
+            if isinstance(contact, dict):
+                try:
+                    from messaging.human_participant_router import build_contact_proposal
+                    proposal = build_contact_proposal(
+                        event,
+                        contact.get("task"),
+                        contact.get("participant_id"),
+                    )
+                    if proposal.get("status") == "proposal_ready":
+                        proposal_msg = {
+                            "from": "factory",
+                            "to": "factory_review",
+                            "type": "human_contact_proposal",
+                            "message": "Review an explicitly requested human-input proposal; no message sent.",
+                            "timestamp": event["timestamp"],
+                            "msg_id": "human-contact-" + event["event_id"],
+                            "context": proposal,
+                        }
+                        with open(coord_file, "a") as f:
+                            f.write(json.dumps(proposal_msg) + "\n")
+                except Exception as exc:
+                    log.warning("Human contact proposal skipped (%s)", type(exc).__name__)
         except Exception:
             pass
 
