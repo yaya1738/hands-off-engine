@@ -73,7 +73,11 @@ def test_email_delivery_uses_mocked_transport(monkeypatch):
     with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp") as sender:
         result = hub.send("aharon", "coordination", {
             "subject": "Factory question", "text": "What do you think?",
-            "correlation_id": "task-123",
+            "task_id": "task-123", "correlation_id": "task-123",
+            "reason_code": "material_ambiguity",
+            "context": "Two safe approaches remain.",
+            "question": "Which approach should we choose?",
+            "why_it_matters": "The answer changes the implementation plan.",
         })
     assert result["status"] == "sent"
     assert result["channel"] == "email"
@@ -88,7 +92,11 @@ def test_correlated_reply_is_advisory_only(monkeypatch):
     with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
         sent = hub.send("aharon", "coordination", {
             "subject": "Factory question", "text": "What do you think?",
-            "correlation_id": "task-123",
+            "task_id": "task-123", "correlation_id": "task-123",
+            "reason_code": "material_ambiguity",
+            "context": "Two safe approaches remain.",
+            "question": "Which approach should we choose?",
+            "why_it_matters": "The answer changes the implementation plan.",
         })
     assert sent["status"] == "sent"
     reply = hub.receive_human_reply(
@@ -123,7 +131,12 @@ def test_duplicate_reply_is_not_ingested(monkeypatch):
     hub = _hub()
     monkeypatch.setenv("EMAIL_ALLOWED_RECIPIENTS", "aharon@example.test")
     with patch("messaging.email_smtp.send_email", return_value="accepted_by_smtp"):
-        hub.send("aharon", "coordination", {"text": "Question", "correlation_id": "task-dup"})
+        hub.send("aharon", "coordination", {
+            "text": "Question", "task_id": "task-dup", "correlation_id": "task-dup",
+            "reason_code": "human_context_gap", "context": "A user preference is unknown.",
+            "question": "Which preference applies?",
+            "why_it_matters": "It changes the next decision.",
+        })
     first = hub.receive_human_reply(
         "aharon", "aharon@example.test", "task-dup", "answer", "provider-message-dup"
     )
