@@ -261,39 +261,11 @@ class CommHub:
             "urgency": urgency,
         }
 
-        # Task-aware contact policy is mandatory for human-participant email.
-        # Other channels and non-human parties retain their existing routing behavior.
-        contact_history = None
-        if channel == "email" and party.get("role") == "human_participant":
-            try:
-                from messaging.human_participant_policy import ContactHistory, evaluate_contact_request
-                contact_history = ContactHistory(self.state_dir / "human_contact_history.json")
-                history = contact_history.load()
-                decision = evaluate_contact_request(party, payload, history)
-            except Exception as exc:
-                log.error("Human email policy unavailable; refusing contact (%s)", type(exc).__name__)
-                decision = {"allowed": False, "reason": "policy_unavailable"}
-            if not decision.get("allowed"):
-                result = {"status": "blocked", "reason": decision.get("reason", "policy_denied")}
-                self._log_outbound(msg, result)
-                self._write_to_messages_jsonl({**msg, "delivery": result, "contact_policy": "denied"})
-                return {"status": "blocked", "id": msg["id"], "channel": channel, "result": result}
-
         # Format for the target channel
         formatted = self._format_for_channel(msg, party)
 
         # Deliver
         result = self._deliver(channel, formatted, party_id)
-        if channel == "email" and party.get("role") == "human_participant" and result.get("status") == "sent":
-            try:
-                contact_history.record(
-                    party_id, payload, "awaiting_reply",
-                    now=datetime.fromisoformat(msg["timestamp"]),
-                )
-            except Exception as exc:
-                # Delivery already occurred; make the degraded audit state visible.
-                log.critical("Email sent but contact history could not be persisted (%s)", type(exc).__name__)
-
         # Log
         self._log_outbound(msg, result)
 
@@ -540,8 +512,18 @@ class CommHub:
             return {"status": "error", "error": str(e)}
 
     def _deliver_email(self, msg, party_id):
-        """Send email only when private configuration and explicit recipient consent are present."""
+        """Send email only when consent, allowlisting, and task-aware policy pass."""
         party = self.parties.get(party_id, {})
+        if party.get("role") == "human_participant":
+            try:
+                from messaging.human_participant_policy import ContactHistory, evaluate_contact_request
+                history_store = ContactHistory(self.state_dir / "human_contact_history.json")
+                decision = evaluate_contact_request(party, msg.get("payload", {}), history_store.load())
+            except Exception as exc:
+                log.error("Human email policy unavailable; refusing contact (%s)", type(exc).__name__)
+                return {"status": "blocked", "reason": "policy_unavailable"}
+            if not decision.get("allowed"):
+                return {"status": "blocked", "reason": decision.get("reason", "policy_denied")}
         if not party.get("email_consent", False):
             return {"status": "blocked", "reason": "email consent not recorded"}
         recipient = str(party.get("email", "")).strip().lower()
@@ -560,6 +542,14 @@ class CommHub:
             correlation_id = payload.get("correlation_id") or msg.get("id")
             body = f"{body}\n\nReference: {correlation_id}\nReply with this reference preserved so your response can be linked to the right task."
             result = send_email(recipient=recipient, subject=subject, body=body)
+            if party.get("role") == "human_participant":
+                try:
+                    history_store.record(
+                        party_id, payload, "awaiting_reply",
+                        now=datetime.fromisoformat(msg["timestamp"]),
+                    )
+                except Exception as exc:
+                    log.critical("Email sent but contact history could not be persisted (%s)", type(exc).__name__)
             return {"status": "sent", "channel": "email", "provider": result}
         except (ValueError, OSError, TimeoutError) as e:
             return {"status": "error", "error": str(e)}
