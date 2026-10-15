@@ -7,7 +7,7 @@ Manual reports require explicit provenance and timestamp.
 from datetime import datetime, timedelta, timezone
 from statistics import mean
 
-METRICS = ("battery_percent", "temperature_c", "memory_available_percent", "disk_free_percent")
+METRICS = ("battery_percent", "temperature_c", "memory_available_percent", "disk_free_percent", "cpu_load_percent", "cpu_throttling_percent", "network_quality_percent", "battery_capacity_percent", "performance_drift_percent", "io_error_count")
 
 
 def _timestamp(value):
@@ -69,6 +69,24 @@ def summarize_device_condition(observations, now=None, max_age_seconds=900,
                 "mean": round(mean(values), 3),
             }
 
+    concern_counts = {}
+    warning_counts = {}
+    for _, _, assessment in window:
+        for field, counts in (("concerns", concern_counts), ("warnings", warning_counts)):
+            values = assessment.get(field, [])
+            if isinstance(values, (list, tuple)):
+                for value in values:
+                    if isinstance(value, str) and value:
+                        counts[value] = counts.get(value, 0) + 1
+
+    resource_pressure_events = sum(
+        count for key, count in concern_counts.items()
+        if key in {"low_battery", "memory_pressure", "low_storage", "cpu_pressure", "network_degraded", "io_errors"}
+    ) + sum(
+        count for key, count in warning_counts.items()
+        if key in {"battery_low", "memory_pressure", "storage_low", "cpu_pressure", "network_degraded", "io_errors"}
+    )
+
     thermal_events = sum(
         1 for _, snapshot, assessment in window
         if (_numeric(snapshot.get("temperature_c")) is not None
@@ -96,6 +114,9 @@ def summarize_device_condition(observations, now=None, max_age_seconds=900,
         "age_seconds": round(age, 3) if age is not None else None,
         "max_age_seconds": max_age_seconds, "window_seconds": window_seconds,
         "observations_in_window": len(window), "metrics": metrics,
-        "thermal_events_in_window": thermal_events, "manual_defects": attributed_reports,
+        "thermal_events_in_window": thermal_events,
+        "resource_pressure_events_in_window": resource_pressure_events,
+        "concern_counts": concern_counts, "warning_counts": warning_counts,
+        "manual_defects": attributed_reports,
         "advisory_only": True,
     }
