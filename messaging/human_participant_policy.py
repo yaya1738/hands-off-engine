@@ -52,6 +52,7 @@ def evaluate_contact_request(participant, payload, history, *, now=None,
 
     today = now.date()
     sent_today = 0
+    recent_contact = False
     cutoff = now - timedelta(hours=max(0, cooldown_hours))
     for entry in entries:
         try:
@@ -61,13 +62,15 @@ def evaluate_contact_request(participant, payload, history, *, now=None,
             if sent_at.date() == today and entry.get("status") in {"sent", "awaiting_reply", "answered"}:
                 sent_today += 1
             if sent_at >= cutoff and entry.get("status") in {"sent", "awaiting_reply", "answered"}:
-                return {"allowed": False, "reason": "participant_cooldown"}
+                recent_contact = True
         except (TypeError, ValueError):
             # Malformed history is not trusted as evidence of a recent contact.
             continue
 
     if sent_today >= max(1, int(daily_cap)):
         return {"allowed": False, "reason": "daily_contact_cap"}
+    if recent_contact:
+        return {"allowed": False, "reason": "participant_cooldown"}
     return {"allowed": True, "reason": "eligible", "task_id": task_id,
             "correlation_id": correlation_id}
 
