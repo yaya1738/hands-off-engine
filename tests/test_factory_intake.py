@@ -302,3 +302,54 @@ def test_intake_once_respects_max_events():
         _write_msg({"type": "continuation_event", "event_id": f"evt-bound-{i}", "context": {"event_type": "task_completed", "is_wake": True, "task_id": f"t-bound-{i}"}, "message": "done"})
     decisions = intake.intake_once(max_events=1)
     assert len(decisions) == 1
+
+
+def test_explicit_human_contact_metadata_is_preserved_in_followup_assignment():
+    """Only declared human-contact metadata is carried to the worker boundary."""
+    intake = _make_intake()
+    contact = {
+        "participant_id": "stakeholder-1",
+        "task": {
+            "task_id": "source-human-task",
+            "human_contact_reason": "stakeholder_validation",
+            "summary": "Validate the acceptance criterion.",
+            "human_question": "Does this match the intended workflow?",
+            "human_question_impact": "The answer determines acceptance.",
+        },
+    }
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-explicit-human-contact",
+        "context": {
+            "event_type": "blocked", "is_wake": True,
+            "task_id": "source-human-task",
+            "next_action": {"action": "system_status", "params": {}, "reply_to": "source-human-task"},
+            "human_contact": contact,
+        },
+        "message": "Explicitly waiting for stakeholder validation",
+    })
+
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    bus = [json.loads(line) for line in fi.MESSAGES_FILE.read_text().splitlines() if line.strip()]
+    assignments = [m for m in bus if m.get("type") == "task_assignment"]
+    assert len(assignments) == 1
+    assert assignments[0]["context"]["human_contact"] == contact
+    assert assignments[0]["context"]["source_task_id"] == "source-human-task"
+    assert assignments[0]["context"]["reply_to"] == "source-human-task"
+
+
+def test_human_contact_is_not_inferred_for_generic_blocker():
+    """A generic blocked event creates no assignment and no contact metadata."""
+    intake = _make_intake()
+    _write_msg({
+        "type": "continuation_event",
+        "event_id": "evt-generic-blocked-no-contact",
+        "context": {"event_type": "blocked", "is_wake": True, "task_id": "blocked-task"},
+        "message": "Generic blocker without declared next action or human contact",
+    })
+    decisions = intake.intake_once()
+    assert len(decisions) == 1
+    bus = [json.loads(line) for line in fi.MESSAGES_FILE.read_text().splitlines() if line.strip()]
+    assert not any(m.get("type") == "task_assignment" for m in bus)
+    assert not any(m.get("type") == "human_contact_proposal" for m in bus)
