@@ -109,6 +109,9 @@ def test_correlated_reply_is_advisory_only(monkeypatch):
     bus = (hub.repo_root / "ai" / "coordination" / "messages.jsonl").read_text()
     assert "human_reply_advisory" in bus
     assert "I recommend option B." in bus
+    import json
+    history = json.loads((hub.state_dir / "human_contact_history.json").read_text())
+    assert history[-1]["status"] == "answered"
 
 
 def test_reply_rejects_sender_mismatch():
