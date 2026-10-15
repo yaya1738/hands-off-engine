@@ -50,3 +50,21 @@ def test_missing_context_never_gets_invented():
 def test_missing_correlation_prevents_proposal():
     event = {**_event(), "correlation_id": ""}
     assert build_contact_proposal(event, _task(), "aharon")["reason"] == "task_or_correlation_missing"
+
+def test_factory_decision_evidence_alone_never_infers_human_contact():
+    # Shared decision/health evidence is evidence, not a contact instruction.
+    # A producer must attach an explicit, task-scoped human_contact request.
+    task = {
+        "task_id": "task-9",
+        "summary": "The system has an assessment gap.",
+        "factory_decision_context": {
+            "available": True,
+            "assessment": {"available": True, "gaps": ["missing context"]},
+            "authority": {"available": True, "decision": "pending", "approval_required": True},
+            "system_health": {"available": True, "status": "warn"},
+        },
+    }
+    result = build_contact_proposal(_event(), task, "aharon")
+    assert result["status"] == "not_eligible"
+    assert result["reason"] == "human_relevance_not_explicit"
+    assert result.get("send_authorized") is not True
