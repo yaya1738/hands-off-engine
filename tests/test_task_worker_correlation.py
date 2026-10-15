@@ -148,3 +148,72 @@ def test_poll_once_does_not_infer_human_contact_from_decision_evidence(monkeypat
     assert len(emitter.calls) == 1
     assert emitter.calls[0]["human_contact"] is None
 
+
+
+def test_explicit_contact_flows_from_worker_to_review_proposal_end_to_end(monkeypatch, tmp_path):
+    """Exercise the real worker/emitter/router path without transport delivery."""
+    import scripts.task_worker as worker
+    import scripts.continuation as continuation
+
+    monkeypatch.setattr(worker, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(worker, "COORDINATION_BUS", tmp_path / "ai" / "coordination" / "messages.jsonl")
+    monkeypatch.setattr(worker, "RESULTS", tmp_path / "state" / "task_results.jsonl")
+    monkeypatch.setattr(worker, "PROCESSED_IDS", tmp_path / "state" / "processed.json")
+    monkeypatch.setattr(continuation, "REPO_ROOT", tmp_path)
+    monkeypatch.setattr(continuation, "STATE_DIR", tmp_path / "state")
+    monkeypatch.setattr(continuation, "EVENTS_FILE", tmp_path / "state" / "continuation_events.jsonl")
+    monkeypatch.setattr(continuation, "EMITTED_IDS", tmp_path / "state" / "emitted_event_ids.json")
+
+    contact = {
+        "participant_id": "reviewer-test",
+        "task": {
+            "task_id": "task-e2e-1",
+            "human_contact_reason": "material_ambiguity",
+            "summary": "Two safe approaches remain.",
+            "human_question": "Which approach should Factory implement?",
+            "human_question_impact": "The answer changes the implementation plan.",
+        },
+    }
+    task = {
+        "from": "factory",
+        "to": "anyclaw",
+        "type": "task_assignment",
+        "msg_id": "assignment-e2e-1",
+        "message": "Review a material design ambiguity",
+        "context": {
+            "task_id": "task-e2e-1",
+            "action": "health_check",
+            "human_contact": contact,
+        },
+    }
+
+    class Lock:
+        def __init__(self, task_id):
+            self.task_id = task_id
+        def try_acquire(self):
+            return True
+        def release(self):
+            pass
+
+    monkeypatch.setattr(worker, "_iter_canonical_assignments", lambda: iter([task]))
+    monkeypatch.setattr(worker, "load_processed", lambda: set())
+    monkeypatch.setattr(worker, "_load_result_ids", lambda: set())
+    monkeypatch.setattr(worker, "TaskLock", Lock)
+    monkeypatch.setattr(worker, "save_processed", lambda processed: None)
+    monkeypatch.setattr(worker, "_publish_result_to_bus", lambda result: True)
+    monkeypatch.setattr(worker, "process_task", lambda task: {
+        "id": task["context"]["task_id"], "status": "blocked",
+        "summary": "Waiting for a human decision",
+    })
+    monkeypatch.setattr(worker, "get_emitter", continuation.ContinuationEmitter)
+
+    assert worker.poll_once(max_tasks=1) == 1
+    bus = tmp_path / "ai" / "coordination" / "messages.jsonl"
+    records = [json.loads(line) for line in bus.read_text().splitlines()]
+    proposals = [record for record in records if record.get("type") == "human_contact_proposal"]
+    assert len(proposals) == 1
+    assert proposals[0]["context"]["participant_id"] == "reviewer-test"
+    assert proposals[0]["context"]["payload"]["task_id"] == "task-e2e-1"
+    assert proposals[0]["context"]["send_authorized"] is False
+    assert proposals[0]["context"]["requires_policy_check"] is True
+    assert not any(record.get("type") == "email_sent" for record in records)
