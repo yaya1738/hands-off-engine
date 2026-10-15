@@ -395,8 +395,12 @@ class CommHub:
         path = self._correlation_path()
         try:
             records = json.loads(path.read_text()) if path.exists() else {}
-        except (OSError, ValueError):
-            records = {}
+        except (OSError, ValueError, TypeError) as exc:
+            # Do not replace an unreadable correlation ledger: that could erase
+            # references needed to authenticate replies to earlier messages.
+            raise RuntimeError("message correlation state unavailable") from exc
+        if not isinstance(records, dict):
+            raise RuntimeError("message correlation state must be an object")
         payload = msg.get("payload", {})
         reference = str(payload.get("correlation_id") or msg.get("id") or "").strip()
         if not reference:
@@ -408,7 +412,10 @@ class CommHub:
             "created_at": msg.get("timestamp"),
             "status": "awaiting_reply",
         }
-        path.write_text(json.dumps(records, indent=2) + "\n")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp = path.with_suffix(path.suffix + ".tmp")
+        temp.write_text(json.dumps(records, indent=2) + "\n")
+        temp.replace(path)
 
     def receive_human_reply(self, sender_id, verified_sender, correlation_id, body,
                             provider_message_id, channel="email"):
