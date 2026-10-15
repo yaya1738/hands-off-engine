@@ -5,6 +5,7 @@ on:
     paths:
       - "messaging/human_participant_router.py"
       - "scripts/continuation.py"
+      - "scripts/task_worker.py"
       - "tests/test_human_participant_router.py"
       - "tests/test_continuation.py"
       - ".github/workflows/human-participant-router-tests.yml"
@@ -13,7 +14,10 @@ on:
       - "feat/human-participant-email-loop"
     paths:
       - "messaging/human_participant_router.py"
+      - "scripts/continuation.py"
+      - "scripts/task_worker.py"
       - "tests/test_human_participant_router.py"
+      - "tests/test_continuation.py"
       - ".github/workflows/human-participant-router-tests.yml"
 
 permissions:
