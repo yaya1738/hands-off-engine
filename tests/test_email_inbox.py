@@ -51,3 +51,9 @@ def test_inbox_polling_disabled_without_credentials(monkeypatch):
         monkeypatch.delenv(key, raising=False)
     result = poll_inbox(_hub())
     assert result["status"] == "disabled"
+
+
+def test_reply_requires_configured_authentication_service(monkeypatch):
+    monkeypatch.setenv("EMAIL_AUTH_SERV_ID", "trusted.example.test")
+    result = ingest_raw_reply(_hub(), _raw_email(), "mail-4")
+    assert result["routed_to"] == "rejected"
