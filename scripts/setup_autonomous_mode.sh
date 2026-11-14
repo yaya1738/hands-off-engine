@@ -201,7 +201,7 @@ python3 -c "
 import requests
 import os
 
-token = os.getenv('TELEGRAM_BOT_TOKEN', '<REVOKED_TELEGRAM_BOT_TOKEN>')
+token = os.getenv('TELEGRAM_BOT_TOKEN')
 chat_id = \1None\2
 
 message = '''🚀 <b>AUTONOMOUS MODE ACTIVATED</b>
