@@ -34,3 +34,11 @@ def test_setpat_never_accepts_credentials_over_telegram(monkeypatch):
 
     assert "disabled" in response
     assert "never send GitHub credentials" in response
+
+
+def test_sensitive_read_only_queries_require_allowlisted_sender(monkeypatch):
+    monkeypatch.setattr(command_module, "ADMIN_USER_IDS", {"12345"})
+    bot = TelegramCommandBot()
+
+    assert "Unauthorized" in bot.process_command("/balance", actor_id=None)
+    assert "Unauthorized" in bot.process_command("/positions", actor_id=67890)
