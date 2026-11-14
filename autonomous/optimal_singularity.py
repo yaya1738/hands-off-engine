@@ -46,20 +46,18 @@ def log(msg: str):
 
 
 def send_telegram(msg: str):
-    try:
-        requests.post(
-            f"https://api.telegram.org/bot{token}/sendMessage",
-            json={
-    import os"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"},
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = os.getenv("TELEGRAM_CHAT_ID")
     if not token or not chat_id:
         return
+    try:
+        requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"},
             timeout=10
         )
-    except:
+    except Exception:
         pass
-
 
 def optimize_path_a():
     """Optimize the waiting path - maximize readiness"""
