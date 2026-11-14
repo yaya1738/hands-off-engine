@@ -40,6 +40,18 @@ from ai.approval_queue import ApprovalQueue
 # Telegram config (from environment or config file)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+ADMIN_USER_IDS = {
+    value.strip()
+    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+    if value.strip()
+}
+
+# Only these commands are read-only. Every other command fails closed unless
+# Telegram supplies a sender ID present in TELEGRAM_ADMIN_USER_IDS.
+READ_ONLY_COMMANDS = {
+    "/status", "/metrics", "/health", "/pending", "/agents", "/help",
+    "/balance", "/positions", "/cluster", "/identity", "/logs", "/dashboard",
+}
 
 
 class TelegramCommandBot:
@@ -68,11 +80,17 @@ class TelegramCommandBot:
             '/fixssh': self.cmd_fixssh,
         }
 
-    def process_command(self, command_text: str) -> str:
-        """Process incoming command and return response text."""
+    def process_command(self, command_text: str, actor_id=None) -> str:
+        """Process a Telegram command with sender-level authorization."""
         parts = command_text.strip().split()
-        cmd = parts[0].lower()
+        if not parts:
+            return "Empty command"
+        cmd = parts[0].split("@", 1)[0].lower()
         args = parts[1:] if len(parts) > 1 else []
+
+        if cmd not in READ_ONLY_COMMANDS:
+            if not ADMIN_USER_IDS or actor_id is None or str(actor_id) not in ADMIN_USER_IDS:
+                return "⛔ Unauthorized: this command requires an allowlisted Telegram user ID."
 
         if cmd in self.commands:
             try:
@@ -684,7 +702,13 @@ Dashboard: http://138.68.103.156:8002"""
             return f"❌ Error: {str(e)}"
 
     def cmd_setpat(self, args) -> str:
-        """Set GitHub Personal Access Token for compute nodes."""
+        """Reject insecure PAT transfer through Telegram messages."""
+        return (
+            "⛔ /setpat is disabled. Never send GitHub credentials in Telegram "
+            "commands or chat history. Use an approved out-of-band secret manager "
+            "and short-lived, least-privilege credentials instead."
+        )
+
         if not args:
             return """🔐 GitHub PAT Configuration
 
