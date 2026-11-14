@@ -201,8 +201,11 @@ python3 -c "
 import requests
 import os
 
-token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
-chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+token = os.getenv('TELEGRAM_BOT_TOKEN')
+chat_id = os.getenv('TELEGRAM_CHAT_ID')
+if not token or not chat_id:
+    print("Telegram notification skipped: credentials are not configured")
+    raise SystemExit(0)
 
 message = '''🚀 <b>AUTONOMOUS MODE ACTIVATED</b>
 
