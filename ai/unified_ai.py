@@ -312,18 +312,24 @@ def optimize_for_master(action: str, options: list) -> str:
 
 def send_master_notification(message: str, priority: str = "normal"):
     """Send notification to Yair Siegel via Telegram."""
+    import os
     import requests
+
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return
 
     prefix = {"critical": "🚨🚨🚨", "high": "⚡", "normal": "📋"}.get(priority, "")
     full_msg = f"{prefix} [UNIFIED AI]\n\n{message}\n\nServing: {MASTER}"
 
     try:
         requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": full_msg, "parse_mode": "Markdown"},
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": full_msg, "parse_mode": "Markdown"},
             timeout=10
         )
-    except:
+    except Exception:
         pass
 
 
