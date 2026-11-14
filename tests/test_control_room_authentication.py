@@ -61,3 +61,34 @@ def test_control_room_rejects_unauthenticated_reads_and_writes(monkeypatch):
         server.server_close()
         thread.join(timeout=3)
         room.Handler.control_room_token = None
+
+
+def test_control_room_refuses_non_loopback_bind_hosts():
+    assert room.is_loopback_host("127.0.0.1")
+    assert room.is_loopback_host("::1")
+    assert room.is_loopback_host("localhost")
+    assert not room.is_loopback_host("0.0.0.0")
+    assert not room.is_loopback_host("192.168.1.20")
+    assert not room.is_loopback_host("example.com")
+
+
+def test_control_room_accepts_valid_basic_auth_for_ui():
+    token = "c" * 48
+    room.Handler.control_room_token = token
+    server = ThreadingHTTPServer(("127.0.0.1", 0), room.Handler)
+    thread = threading.Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        credential = base64.b64encode(f"operator:{token}".encode()).decode()
+        request = urllib.request.Request(
+            f"http://127.0.0.1:{server.server_port}/",
+            headers={"Authorization": f"Basic {credential}"},
+        )
+        with urllib.request.urlopen(request, timeout=3) as response:
+            assert response.status == 200
+            assert b"Yair" in response.read()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=3)
+        room.Handler.control_room_token = None
