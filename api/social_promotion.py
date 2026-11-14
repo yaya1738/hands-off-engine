@@ -290,7 +290,7 @@ def post_to_telegram_groups(content):
     """Post to Telegram groups (use existing bot)"""
 
     token = os.getenv('TELEGRAM_BOT_TOKEN')
-    chat_id = \1None\2
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
 
