@@ -19,6 +19,7 @@ def _command(mode="LIVE", **extra):
 def test_legacy_executor_never_executes_live_even_with_approval(tmp_path, monkeypatch):
     monkeypatch.setattr(executor_module, "EXECUTION_LOG", tmp_path / "execution.jsonl")
     monkeypatch.setattr(executor_module, "RATE_LIMIT_FILE", tmp_path / "rate_limit.json")
+    monkeypatch.setattr(executor_module, "RATE_LIMIT_FILE", tmp_path / "rate_limit.json")
     executor = executor_module.Executor(repo_root=tmp_path)
 
     def forbidden_live_execute(command):
@@ -33,6 +34,7 @@ def test_legacy_executor_never_executes_live_even_with_approval(tmp_path, monkey
 
 def test_legacy_executor_rejects_unknown_mode_instead_of_falling_through(tmp_path, monkeypatch):
     monkeypatch.setattr(executor_module, "EXECUTION_LOG", tmp_path / "execution.jsonl")
+    monkeypatch.setattr(executor_module, "RATE_LIMIT_FILE", tmp_path / "rate_limit.json")
     executor = executor_module.Executor(repo_root=tmp_path)
 
     def forbidden_live_execute(command):
@@ -47,6 +49,7 @@ def test_legacy_executor_rejects_unknown_mode_instead_of_falling_through(tmp_pat
 
 def test_legacy_executor_keeps_dryrun_available(tmp_path, monkeypatch):
     monkeypatch.setattr(executor_module, "EXECUTION_LOG", tmp_path / "execution.jsonl")
+    monkeypatch.setattr(executor_module, "RATE_LIMIT_FILE", tmp_path / "rate_limit.json")
     executor = executor_module.Executor(repo_root=tmp_path)
 
     result = executor.execute_command(_command(mode="DRYRUN"))
