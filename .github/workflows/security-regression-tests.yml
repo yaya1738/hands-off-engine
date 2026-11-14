@@ -1,0 +1,74 @@
+name: Security Regression Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/executor.py"
+      - "scripts/telegram_bridge.py"
+      - "telegram/telegram_command_bot.py"
+      - "ai/approval_queue.py"
+      - "scripts/yair_control_room.py"
+      - "tests/test_executor_authority_boundary.py"
+      - "tests/test_telegram_sender_authorization.py"
+      - "tests/test_telegram_bridge_authorization.py"
+      - "tests/test_approval_queue_security.py"
+      - "tests/test_control_room_authentication.py"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/executor.py"
+      - "scripts/telegram_bridge.py"
+      - "telegram/telegram_command_bot.py"
+      - "ai/approval_queue.py"
+      - "scripts/yair_control_room.py"
+      - "tests/test_executor_authority_boundary.py"
+      - "tests/test_telegram_sender_authorization.py"
+      - "tests/test_telegram_bridge_authorization.py"
+      - "tests/test_approval_queue_security.py"
+      - "tests/test_control_room_authentication.py"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-regressions-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  focused-security-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout tested revision
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Run available security regression tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          tests=()
+          for path in \
+            tests/test_executor_authority_boundary.py \
+            tests/test_telegram_sender_authorization.py \
+            tests/test_telegram_bridge_authorization.py \
+            tests/test_approval_queue_security.py \
+            tests/test_control_room_authentication.py
+          do
+            if [[ -f "$path" ]]; then
+              tests+=("$path")
+            fi
+          done
+          if [[ "${#tests[@]}" -eq 0 ]]; then
+            echo "No focused security regression tests are present in this revision."
+            exit 1
+          fi
+          printf 'Running %s test module(s):\n' "${#tests[@]}"
+          printf ' - %s\n' "${tests[@]}"
+          python -m pytest -q --tb=short "${tests[@]}"
