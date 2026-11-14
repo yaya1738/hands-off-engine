@@ -70,17 +70,31 @@ class Executor:
         cmd_id = cmd.get("id", "unknown")
         action = cmd.get("payload", {}).get("action", "unknown")
         target = cmd.get("target", "system")
-        mode = cmd.get("mode", "DRYRUN")
+        mode = str(cmd.get("mode", "DRYRUN")).upper()
         approval_status = cmd.get("approval_status", "")
 
         log.info(f"Executor: processing {cmd_id[:8]} action={action} mode={mode}")
 
-        # ── safety gate 1: approval freshness ──
+        # Reject unknown modes rather than allowing them to fall through to LIVE.
+        if mode not in {"DRYRUN", "LIVE"}:
+            return self._reject(cmd_id, action, target, f"Unsupported execution mode: {mode}")
+
+        # The legacy executor is not an authority source. The governed authority
+        # contract currently classifies LIVE commands but deliberately never
+        # grants execution_enabled. Keep this backend fail-closed until a
+        # separately reviewed, explicit executor capability exists.
         if mode == "LIVE":
-            if approval_status != "approved":
-                return self._reject(cmd_id, action, target, "LIVE command not approved")
-            if not self._check_approval_freshness(cmd):
-                return self._reject(cmd_id, action, target, "Approval expired (TTL exceeded)")
+            try:
+                from autonomous.governed_authority import authorize
+                decision = authorize(cmd, execution_gate=False)
+            except Exception as exc:
+                return self._reject(cmd_id, action, target, f"Governed authority unavailable: {exc}")
+            if decision.decision != "approved":
+                return self._reject(cmd_id, action, target, decision.reason)
+            return self._reject(
+                cmd_id, action, target,
+                "LIVE execution disabled: governed authority does not grant execution_enabled",
+            )
 
         # ── safety gate 2: sacred target protection ──
         if action in ("modify", "delete", "write") and target in SACRED_FILES:
