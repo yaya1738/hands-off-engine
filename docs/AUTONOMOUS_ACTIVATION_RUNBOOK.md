@@ -160,13 +160,13 @@ tail -f /var/log/hands-off/coordination.log
 ```bash
 # Option A: Environment variables (recommended for services)
 sudo tee -a /etc/environment > /dev/null << 'EOF'
-TELEGRAM_BOT_TOKEN="8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA"
+TELEGRAM_BOT_TOKEN="<REVOKED_TELEGRAM_BOT_TOKEN>"
 TELEGRAM_CHAT_ID="8327766663"
 EOF
 
 # Option B: .env file (for local testing)
 cat > .env.telegram << 'EOF'
-TELEGRAM_BOT_TOKEN=8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA
+TELEGRAM_BOT_TOKEN=<REVOKED_TELEGRAM_BOT_TOKEN>
 TELEGRAM_CHAT_ID=8327766663
 EOF
 
@@ -227,7 +227,7 @@ After=network.target
 Type=simple
 User=root
 WorkingDirectory=/opt/hands-off-engine
-Environment="TELEGRAM_BOT_TOKEN=8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA"
+Environment="TELEGRAM_BOT_TOKEN=<REVOKED_TELEGRAM_BOT_TOKEN>"
 Environment="TELEGRAM_CHAT_ID=8327766663"
 ExecStart=/usr/bin/python3 /opt/hands-off-engine/scripts/telegram_command_bot.py
 Restart=always
