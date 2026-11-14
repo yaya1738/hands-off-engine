@@ -323,7 +323,7 @@ def notify_capital_ready(amount):
     import requests
 
     token = os.getenv('TELEGRAM_BOT_TOKEN')
-    chat_id = \1None\2
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
     message = f'''🎉 <b>CAPITAL ACQUIRED AUTONOMOUSLY</b>
 
