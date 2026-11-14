@@ -53,7 +53,7 @@ def test_approval_queue_rejects_absolute_paths(tmp_path, monkeypatch):
     result = queue.execute_approved(change_id)
 
     assert result["success"] is False
-    assert "repository-relative" in result["error"]
+    assert "escapes the repository root" in result["error"]
     assert not outside.exists()
 
 
