@@ -157,9 +157,14 @@ print(s.check_wallet_balance(0))
 
 # Send Telegram message
 python3 -c "
+import os
 import requests
-requests.post('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage',
-json={'chat_id': '8327766663', 'text': 'Test'})
+token = os.getenv("TELEGRAM_BOT_TOKEN")
+chat_id = os.getenv("TELEGRAM_CHAT_ID")
+if not token or not chat_id:
+    raise SystemExit("Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in your secret environment")
+requests.post(f'https://api.telegram.org/bot{token}/sendMessage',
+json={'chat_id': chat_id, 'text': 'Test'})
 "
 
 # View landing page
