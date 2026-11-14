@@ -46,12 +46,9 @@ ADMIN_USER_IDS = {
     if value.strip()
 }
 
-# Only these commands are read-only. Every other command fails closed unless
-# Telegram supplies a sender ID present in TELEGRAM_ADMIN_USER_IDS.
-READ_ONLY_COMMANDS = {
-    "/status", "/metrics", "/health", "/pending", "/agents", "/help",
-    "/balance", "/positions", "/cluster", "/identity", "/logs", "/dashboard",
-}
+# Help is the only unauthenticated command. Status, balances, positions,
+# logs, and operational metadata are private and require an allowlisted sender.
+READ_ONLY_COMMANDS = {"/help"}
 
 
 class TelegramCommandBot:
