@@ -49,8 +49,8 @@ def send_telegram(msg: str, priority: str = "normal"):
         msg = "🚨🚨🚨\n" + msg
     try:
         requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": msg, "parse_mode": "Markdown"},
+            f"https://api.telegram.org/bot{os.getenv('TELEGRAM_BOT_TOKEN', '')}/sendMessage",
+            json={"chat_id": os.getenv("TELEGRAM_CHAT_ID", ""), "text": msg, "parse_mode": "Markdown"},
             timeout=10
         )
     except:
