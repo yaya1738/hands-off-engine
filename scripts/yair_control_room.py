@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hmac
+import ipaddress
 import json
 import os
 import secrets
@@ -49,6 +50,16 @@ def load_or_create_control_room_token(path: Path = TOKEN_PATH) -> str:
         with os.fdopen(fd, "w", encoding="utf-8") as handle:
             handle.write(token + "\\n")
         return token
+
+
+def is_loopback_host(host: str) -> bool:
+    """Only allow literal loopback addresses or localhost; Basic auth is cleartext HTTP."""
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
 
 
 def authorization_valid(header: str, token: str) -> bool:
@@ -148,6 +159,8 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--host',default='127.0.0.1'); p.add_argument('--port',type=int,default=8787); a=p.parse_args()
+    if not is_loopback_host(a.host):
+        p.error("Control Room accepts loopback hosts only; Basic authentication is not encrypted over the network")
     token = load_or_create_control_room_token()
     Handler.control_room_token = token
     print(f'Yair Control Room: http://{a.host}:{a.port}')
