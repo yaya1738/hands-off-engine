@@ -74,3 +74,8 @@ backups/
 state/
 termux-hands-off/autopilot/*.env
 termux-hands-off/autopilot/*.env.save
+
+# Device-local integration credentials; commit only blank example templates.
+termux-hands-off/state/*.env
+termux-hands-off/state/*.env.*
+!termux-hands-off/state/*.env.example
