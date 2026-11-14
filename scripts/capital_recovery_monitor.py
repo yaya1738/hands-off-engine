@@ -85,8 +85,8 @@ def save_state(state: dict):
 
 def send_telegram(message: str, priority: str = "normal"):
     """Send Telegram notification"""
-    token = os.getenv("TELEGRAM_BOT_TOKEN", "8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA")
-    chat_id = os.getenv("TELEGRAM_CHAT_ID", "8327766663")
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID", None)
 
     # Add priority emoji
     if priority == "high":
