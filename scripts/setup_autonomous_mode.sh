@@ -202,7 +202,7 @@ import requests
 import os
 
 token = os.getenv('TELEGRAM_BOT_TOKEN')
-chat_id = \1None\2
+chat_id = os.getenv("TELEGRAM_CHAT_ID")
 
 message = '''🚀 <b>AUTONOMOUS MODE ACTIVATED</b>
 
