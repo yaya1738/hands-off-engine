@@ -160,10 +160,29 @@ class ApprovalQueue:
 
         return False
 
+    def _resolve_repo_path(self, file_path: str) -> Path:
+        """Resolve a change target while preventing absolute/path traversal writes."""
+        candidate_path = Path(file_path)
+        if candidate_path.is_absolute():
+            raise ValueError("Only repository-relative file paths are permitted")
+
+        root = REPO_ROOT.resolve()
+        target = (root / candidate_path).resolve()
+        if target == root or root not in target.parents:
+            raise ValueError("File path escapes the repository root")
+
+        relative_parts = target.relative_to(root).parts
+        if any(part in {".git", ".ssh", "state", "secrets"} for part in relative_parts):
+            raise ValueError("Protected repository path cannot be modified through approval queue")
+        if any(part == ".env" or part.startswith(".env.") for part in relative_parts):
+            raise ValueError("Environment/credential files cannot be modified through approval queue")
+
+        return target
+
     def execute_approved(self, change_id: str) -> Dict:
         """
-        Execute an approved change.
-        Returns result dict with success status and details.
+        Execute an approved change using restricted repository file operations.
+        Arbitrary shell execution is intentionally disabled.
         """
         change = self.get_change(change_id)
 
@@ -180,7 +199,7 @@ class ApprovalQueue:
         try:
             if action_type == "edit_file":
                 # Edit file
-                file_path = action["file_path"]
+                file_path = self._resolve_repo_path(action["file_path"])
                 old_content = action["old_content"]
                 new_content = action["new_content"]
 
@@ -197,28 +216,18 @@ class ApprovalQueue:
 
             elif action_type == "write_file":
                 # Write new file
-                file_path = action["file_path"]
+                file_path = self._resolve_repo_path(action["file_path"])
                 content = action["content"]
 
+                file_path.parent.mkdir(parents=True, exist_ok=True)
                 with open(file_path, 'w') as f:
                     f.write(content)
                 return {"success": True, "message": f"Created {file_path}"}
 
             elif action_type == "bash_command":
-                # Execute bash command
-                import subprocess
-                cmd = action["command"]
-                result = subprocess.run(
-                    cmd,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    timeout=60
-                )
                 return {
-                    "success": result.returncode == 0,
-                    "message": result.stdout,
-                    "error": result.stderr if result.returncode != 0 else None
+                    "success": False,
+                    "error": "Arbitrary shell execution is disabled in ApprovalQueue; use the separately governed executor",
                 }
 
             else:
