@@ -175,7 +175,7 @@ source /etc/environment
 
 # Verify
 test -n "$TELEGRAM_BOT_TOKEN" && echo "Telegram token configured" || echo "Telegram token missing"
-# Should show token
+# Should confirm configuration without printing the credential
 ```
 
 ### 2.2 Test Telegram Bot
