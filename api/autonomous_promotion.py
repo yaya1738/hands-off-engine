@@ -64,7 +64,7 @@ Track record available on request.</i>
 '''
 
     # Send to Telegram
-    token = os.getenv('TELEGRAM_BOT_TOKEN', '<REVOKED_TELEGRAM_BOT_TOKEN>')
+    token = os.getenv('TELEGRAM_BOT_TOKEN')
     chat_id = \1None\2
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
@@ -121,7 +121,7 @@ API: http://your-server:5000
 Help us reach $100 to activate live trading!</i>
 '''
 
-    token = os.getenv('TELEGRAM_BOT_TOKEN', '<REVOKED_TELEGRAM_BOT_TOKEN>')
+    token = os.getenv('TELEGRAM_BOT_TOKEN')
     chat_id = \1None\2
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
