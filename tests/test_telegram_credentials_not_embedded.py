@@ -6,6 +6,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SCANNED_FILES = (
     ".env.social.template",
     "docs/AUTONOMOUS_ACTIVATION_RUNBOOK.md",
+    "termux-hands-off/state/auto_sources.env.example",
+    "termux-hands-off/state/ifttt.env.example",
     "state/permanent/SYSTEM_TRUTH.md",
     "api/autonomous_promotion.py",
     "api/optimized_marketplace.py",
@@ -50,3 +52,23 @@ def test_telegram_notification_config_uses_environment_without_secret_fallbacks(
             r"os\.getenv\(\s*['\"]TELEGRAM_BOT_TOKEN['\"]\s*,",
             source,
         ), f"Telegram token fallback configured in {relative_path}"
+
+
+def test_device_integration_credentials_are_not_tracked():
+    forbidden = (
+        ROOT / "termux-hands-off/state/auto_sources.env",
+        ROOT / "termux-hands-off/state/auto_sources.env.bak.1762824114",
+        ROOT / "termux-hands-off/state/ifttt.env",
+    )
+    for path in forbidden:
+        assert not path.exists(), f"Device-local credential file must not be committed: {path.name}"
+
+    for relative_path in (
+        "termux-hands-off/state/auto_sources.env.example",
+        "termux-hands-off/state/ifttt.env.example",
+    ):
+        source = (ROOT / relative_path).read_text(encoding="utf-8")
+        for key in ("SHEETS_WEBHOOK", "SHEETS_TOKEN", "IFTTT_WEBHOOK"):
+            for line in source.splitlines():
+                if line.startswith(key + "="):
+                    assert not line.split("=", 1)[1].strip(), f"Non-empty {key} in {relative_path}"
