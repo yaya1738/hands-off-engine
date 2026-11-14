@@ -8,7 +8,13 @@ source of truth.
 from __future__ import annotations
 
 import argparse
+import base64
+import hmac
+import ipaddress
 import json
+import os
+import secrets
+import stat
 import sys
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -17,6 +23,55 @@ from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent.parent
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
+TOKEN_PATH = ROOT / "state" / "control_room.token"
+
+
+def load_or_create_control_room_token(path: Path = TOKEN_PATH) -> str:
+    """Load a private local UI credential, creating it once with owner-only access."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        info = path.lstat()
+        if not stat.S_ISREG(info.st_mode):
+            raise RuntimeError("Control Room token path must be a regular file")
+        os.chmod(path, 0o600)
+        token = path.read_text(encoding="utf-8").strip()
+        if len(token) < 32:
+            raise RuntimeError("Control Room token file is invalid; inspect it before replacing")
+        return token
+    except FileNotFoundError:
+        token = secrets.token_urlsafe(32)
+        flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL
+        if hasattr(os, "O_NOFOLLOW"):
+            flags |= os.O_NOFOLLOW
+        try:
+            fd = os.open(path, flags, 0o600)
+        except FileExistsError:
+            return load_or_create_control_room_token(path)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(token + "\n")
+        return token
+
+
+def is_loopback_host(host: str) -> bool:
+    """Only allow literal loopback addresses or localhost; Basic auth is cleartext HTTP."""
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def authorization_valid(header: str, token: str) -> bool:
+    """Validate HTTP Basic credentials without accepting alternate identities."""
+    if not header or not token or not header.startswith("Basic "):
+        return False
+    try:
+        decoded = base64.b64decode(header[6:], validate=True).decode("utf-8")
+        username, password = decoded.split(":", 1)
+    except (ValueError, UnicodeDecodeError):
+        return False
+    return username == "operator" and hmac.compare_digest(password, token)
 
 HTML = r'''<!doctype html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -55,11 +110,26 @@ def read_events(limit: int = 120):
     return out
 
 class Handler(BaseHTTPRequestHandler):
+    control_room_token = None
+
     def log_message(self, *_): pass
+
+    def require_auth(self):
+        if authorization_valid(self.headers.get("Authorization", ""), self.control_room_token or ""):
+            return True
+        self.send_response(401)
+        self.send_header("WWW-Authenticate", 'Basic realm="Hands-Off Control Room", charset="UTF-8"')
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+        return False
+
     def send_json(self, code, data):
         raw=json.dumps(data, ensure_ascii=False).encode()
         self.send_response(code); self.send_header('Content-Type','application/json'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); self.wfile.write(raw)
     def do_GET(self):
+        if not self.require_auth():
+            return
         path=urlparse(self.path).path
         if path=='/':
             raw=HTML.encode(); self.send_response(200); self.send_header('Content-Type','text/html; charset=utf-8'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); self.wfile.write(raw); return
@@ -74,6 +144,8 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(500,{'error':str(e)}); return
         self.send_json(404,{'error':'not found'})
     def do_POST(self):
+        if not self.require_auth():
+            return
         if urlparse(self.path).path!='/api/send': self.send_json(404,{'error':'not found'}); return
         try: body=json.loads(self.rfile.read(int(self.headers.get('content-length','0'))))
         except Exception: self.send_json(400,{'error':'invalid json'}); return
@@ -87,7 +159,12 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--host',default='127.0.0.1'); p.add_argument('--port',type=int,default=8787); a=p.parse_args()
+    if not is_loopback_host(a.host):
+        p.error("Control Room accepts loopback hosts only; Basic authentication is not encrypted over the network")
+    token = load_or_create_control_room_token()
+    Handler.control_room_token = token
     print(f'Yair Control Room: http://{a.host}:{a.port}')
+    print(f'Control Room credential: username=operator; token stored at {TOKEN_PATH}')
     ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()
 
 if __name__=='__main__': main()
