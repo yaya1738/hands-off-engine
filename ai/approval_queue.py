@@ -163,11 +163,8 @@ class ApprovalQueue:
     def _resolve_repo_path(self, file_path: str) -> Path:
         """Resolve a change target while preventing absolute/path traversal writes."""
         candidate_path = Path(file_path)
-        if candidate_path.is_absolute():
-            raise ValueError("Only repository-relative file paths are permitted")
-
         root = REPO_ROOT.resolve()
-        target = (root / candidate_path).resolve()
+        target = (candidate_path if candidate_path.is_absolute() else root / candidate_path).resolve()
         if target == root or root not in target.parents:
             raise ValueError("File path escapes the repository root")
 
