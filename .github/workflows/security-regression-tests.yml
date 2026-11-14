@@ -37,6 +37,8 @@ on:
       - "api/signal_marketplace.py"
       - "api/optimized_marketplace.py"
       - "api/autonomous_promotion.py"
+      - "termux-hands-off/state/auto_sources.env.example"
+      - "termux-hands-off/state/ifttt.env.example"
   push:
     branches: [main]
     paths:
@@ -50,6 +52,31 @@ on:
       - "tests/test_telegram_bridge_authorization.py"
       - "tests/test_approval_queue_security.py"
       - "tests/test_control_room_authentication.py"
+      - "tests/test_telegram_credentials_not_embedded.py"
+      - "docs/AUTONOMOUS_ACTIVATION_RUNBOOK.md"
+      - ".env.social.template"
+      - "state/permanent/SYSTEM_TRUTH.md"
+      - "autonomous/time_collapse.py"
+      - "autonomous/singularity_trigger.py"
+      - "autonomous/optimal_singularity.py"
+      - "autonomous/moonshot_loop.py"
+      - "autonomous/instant_manifest.py"
+      - "ai/unified_ai.py"
+      - "scripts/snapshot_system_state.py"
+      - "scripts/setup_autonomous_mode.sh"
+      - "scripts/payment_monitor.py"
+      - "scripts/daily_digest.py"
+      - "scripts/coordination_agent.py"
+      - "scripts/capital_recovery_monitor.py"
+      - "scripts/autonomous_phase_manager.py"
+      - "scripts/activate_income_now.py"
+      - "api/viral_promotion.py"
+      - "api/social_promotion.py"
+      - "api/signal_marketplace.py"
+      - "api/optimized_marketplace.py"
+      - "api/autonomous_promotion.py"
+      - "termux-hands-off/state/auto_sources.env.example"
+      - "termux-hands-off/state/ifttt.env.example"
   workflow_dispatch:
 
 permissions:
@@ -82,7 +109,7 @@ jobs:
             tests/test_telegram_sender_authorization.py \
             tests/test_telegram_bridge_authorization.py \
             tests/test_approval_queue_security.py \
-            tests/test_control_room_authentication.py
+            tests/test_control_room_authentication.py \
             tests/test_telegram_credentials_not_embedded.py
           do
             if [[ -f "$path" ]]; then
