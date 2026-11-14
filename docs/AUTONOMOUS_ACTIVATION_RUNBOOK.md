@@ -161,7 +161,7 @@ tail -f /var/log/hands-off/coordination.log
 # Option A: Environment variables (recommended for services)
 sudo tee -a /etc/environment > /dev/null << 'EOF'
 TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"
-TELEGRAM_CHAT_ID="8327766663"
+TELEGRAM_CHAT_ID="YOUR_TELEGRAM_CHAT_ID"
 EOF
 
 # Option B: .env file (for local testing)
