@@ -48,8 +48,13 @@ def log(msg: str):
 def send_telegram(msg: str):
     try:
         requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": msg, "parse_mode": "Markdown"},
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={
+    import os"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"},
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return
             timeout=10
         )
     except:
