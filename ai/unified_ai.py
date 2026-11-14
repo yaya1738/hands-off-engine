@@ -1,4 +1,3 @@
-import os
 #!/usr/bin/env python3
 """
 UNIFIED AI - All Systems in Service of Yair Siegel
@@ -11,6 +10,8 @@ that all agents import and follow.
 Every agent that imports this becomes part of the unified
 AI serving Yair Siegel.
 """
+
+import os
 
 import json
 import sys
