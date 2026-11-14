@@ -56,7 +56,7 @@ def get_api_status():
     # Telegram - test it
     try:
         import requests
-        r = requests.get('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/getMe', timeout=5)
+        r = requests.get(f"https://api.telegram.org/bot{os.getenv('TELEGRAM_BOT_TOKEN', '')}/getMe", timeout=5)
         status['telegram'] = r.json().get('ok', False)
     except:
         status['telegram'] = False
