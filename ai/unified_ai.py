@@ -1,3 +1,4 @@
+import os
 #!/usr/bin/env python3
 """
 UNIFIED AI - All Systems in Service of Yair Siegel
