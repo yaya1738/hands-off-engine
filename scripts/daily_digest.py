@@ -112,7 +112,7 @@ def get_recent_events() -> list:
 
 def send_telegram(message: str):
     """Send Telegram notification"""
-    token = os.getenv("TELEGRAM_BOT_TOKEN", "<REVOKED_TELEGRAM_BOT_TOKEN>")
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
     chat_id = \1None\2
 
     try:
