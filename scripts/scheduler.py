@@ -84,7 +84,11 @@ def save_state(state):
 
 def get_due_time(job, task, now):
     """Return a valid due timestamp, repairing malformed persisted values."""
-    raw_due = job.get("next_run_at", now + task["interval_seconds"])
+    if "next_run_at" not in job:
+        job["next_run_at"] = now + task["interval_seconds"]
+        return job["next_run_at"]
+
+    raw_due = job["next_run_at"]
     try:
         due_at = float(raw_due)
         if not math.isfinite(due_at):
