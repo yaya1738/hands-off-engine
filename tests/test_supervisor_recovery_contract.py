@@ -138,11 +138,15 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
 
         with mock.patch.object(supervisor, "SERVICES", [self.service]):
             restored = supervisor._restore_stats(persisted)
+        self.assertTrue(restored["factory_scheduler"]["completed"])
 
-        self.assertTrue(restored["factory_scheduler"]["completed"])
-        # A restarted supervisor must not reinterpret the completed one-shot
-        # as a daemon that needs to be relaunched.
-        self.assertTrue(restored["factory_scheduler"]["completed"])
+        # Exercise a real second supervisor invocation against persisted state:
+        # it must not launch the already-completed one-shot again.
+        with mock.patch.object(supervisor, "SERVICES", [self.service]), \
+             mock.patch.object(supervisor, "time", clock), \
+             mock.patch.object(supervisor.subprocess, "Popen") as popen:
+            supervisor.run(max_loops=2)
+        popen.assert_not_called()
 
     def test_backoff_ladder_is_bounded(self):
         expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 600]
