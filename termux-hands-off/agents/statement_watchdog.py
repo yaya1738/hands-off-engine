@@ -43,6 +43,8 @@ def load_cards():
             return None, "one or more card values are invalid"
         cards.append({"name": item.get("name") or key, "statement_day": statement_day,
                       "limit": limit, "balance": balance})
+    if not cards:
+        return None, "no measured card records"
     return cards, None
 
 
