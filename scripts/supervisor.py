@@ -210,7 +210,7 @@ def _is_scheduler_process(pid):
     """Verify /proc identifies PID as this repository's scheduler.py process."""
     proc = Path("/proc") / str(pid)
     try:
-        args = (proc / "cmdline").read_bytes().split(b"\\0")
+        args = (proc / "cmdline").read_bytes().split(b"\0")
         cwd = Path(os.readlink(proc / "cwd")).resolve()
     except OSError:
         return False
