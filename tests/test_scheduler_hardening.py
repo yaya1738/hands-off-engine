@@ -33,7 +33,7 @@ class SchedulerHardeningTests(unittest.TestCase):
     def test_initial_schedule_is_staggered(self):
         state = scheduler.initialize_state(now=1000)
         due = [state["jobs"][task["name"]]["next_run_at"] for task in scheduler.TASKS]
-        self.assertEqual(due, [1000, 1010, 1020, 1030])
+        self.assertEqual(due, [1000, 1010, 1020, 1030, 1040])
 
     def test_next_run_survives_restart(self):
         state = scheduler.initialize_state(now=1000)
