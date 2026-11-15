@@ -91,7 +91,11 @@ def get_due_time(job, task, now):
             raise ValueError("non-finite due timestamp")
     except (TypeError, ValueError):
         due_at = now + task["interval_seconds"]
-    if not isinstance(raw_due, (int, float)) or isinstance(raw_due, bool):
+    if (
+        not isinstance(raw_due, (int, float))
+        or isinstance(raw_due, bool)
+        or not math.isfinite(float(raw_due))
+    ):
         job["next_run_at"] = due_at
     return due_at
 
