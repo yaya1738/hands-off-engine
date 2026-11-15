@@ -74,6 +74,38 @@ class SchedulerHardeningTests(unittest.TestCase):
         finally:
             scheduler._RUNNING = previous_running
 
+    def test_boolean_due_times_are_repaired_before_numeric_conversion(self):
+        for raw_due in (True, False):
+            with self.subTest(raw_due=raw_due):
+                job = {"next_run_at": raw_due}
+                due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
+                self.assertEqual(due_at, 400)
+                self.assertEqual(job["next_run_at"], 400)
+                self.assertIs(type(job["next_run_at"]), int)
+
+    def test_boolean_due_time_repair_is_persisted_by_scheduler_loop(self):
+        previous_running = scheduler._RUNNING
+        state = {"jobs": {"health_check": {"next_run_at": True}}}
+        try:
+            with mock.patch.object(scheduler, "TASKS", [scheduler.TASKS[0]]), \
+                 mock.patch.object(scheduler, "acquire_lock", return_value=object()), \
+                 mock.patch.object(scheduler, "release_lock"), \
+                 mock.patch.object(scheduler, "load_state", return_value=state), \
+                 mock.patch.object(scheduler.time, "time", return_value=100), \
+                 mock.patch.object(scheduler.time, "sleep", side_effect=lambda _: setattr(scheduler, "_RUNNING", False)):
+                scheduler.run_forever()
+            saved = json.loads(scheduler.SCHEDULER_STATE.read_text())
+            self.assertEqual(saved["jobs"]["health_check"]["next_run_at"], 400)
+        finally:
+            scheduler._RUNNING = previous_running
+
+    def test_scheduler_is_owned_by_primary_supervisor_only(self):
+        primary = (ROOT / "scripts" / "supervisor.py").read_text()
+        termux = (ROOT / "scripts" / "termux_supervisor.py").read_text()
+        self.assertIn('"name": "factory_scheduler"', primary)
+        self.assertIn('"scheduler.py"', primary)
+        self.assertNotIn('"scheduler.py"', termux)
+
     def test_malformed_due_time_is_recovered_without_crashing(self):
         job = {"next_run_at": "not-a-time"}
         due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
