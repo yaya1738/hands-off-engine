@@ -8,8 +8,10 @@ result/continuation -> Factory intake -> next bounded decision.
 Only existing read-only task actions are dispatched. This module never executes
 arbitrary commands or modifies source code directly.
 """
+import fcntl
 import hashlib
 import json
+import os
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -18,6 +20,7 @@ STATE = ROOT / "state"
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
 IMPROVEMENT_STATE = STATE / "improvement_state.json"
 DISPATCH_STATE = STATE / "improvement_dispatch_state.json"
+DISPATCH_LOCK = STATE / "improvement_dispatch.lock"
 FEEDBACK_FILE = STATE / "improvement_feedback.json"
 
 # These actions already exist in the AnyClaw worker and are deliberately read-only.
@@ -211,28 +214,86 @@ def save_improvements(improvements):
 
 def _load_dispatch_state():
     state = load_json(DISPATCH_STATE)
+    if not isinstance(state, dict):
+        state = {}
+    dispatched = state.get("dispatched", {})
+    pending = state.get("pending", {})
+    history = state.get("history", [])
     return {
-        "dispatched": state.get("dispatched", {}),
-        "history": state.get("history", []),
+        "dispatched": dispatched if isinstance(dispatched, dict) else {},
+        "pending": pending if isinstance(pending, dict) else {},
+        "history": history if isinstance(history, list) else [],
     }
 
 
+def _save_dispatch_state(state):
+    """Atomically persist the dispatch outbox and deduplication ledger."""
+    DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
+    temporary = DISPATCH_STATE.with_suffix(DISPATCH_STATE.suffix + ".tmp")
+    with temporary.open("w", encoding="utf-8") as handle:
+        json.dump(state, handle, indent=2, sort_keys=True)
+        handle.write("\\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    temporary.replace(DISPATCH_STATE)
+
+
+def _bus_contains(msg_id):
+    if not BUS.exists():
+        return False
+    with BUS.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                if json.loads(line).get("msg_id") == msg_id:
+                    return True
+            except (ValueError, AttributeError):
+                continue
+    return False
+
+
 def _append_bus(message):
+    """Append once by msg_id and flush to durable storage before returning."""
     BUS.parent.mkdir(parents=True, exist_ok=True)
+    if _bus_contains(message["msg_id"]):
+        return False
     with BUS.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(message, sort_keys=True) + "\n")
+        handle.write(json.dumps(message, sort_keys=True) + "\\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return True
 
 
-def dispatch_one(improvements):
-    """Dispatch at most one new bounded candidate and persist the decision first."""
+def _finalize_pending(state, candidate_id_value):
+    record = state["pending"].pop(candidate_id_value)
+    dispatched = {
+        "msg_id": record["msg_id"],
+        "task_id": record["task_id"],
+        "action": record["action"],
+        "dispatched_at": record["dispatched_at"],
+    }
+    state["dispatched"][candidate_id_value] = dispatched
+    state["history"].append(dispatched | {"candidate_id": candidate_id_value})
+    _save_dispatch_state(state)
+    return record["message"]
+
+
+def _dispatch_one_locked(improvements):
     state = _load_dispatch_state()
-    now = datetime.now(timezone.utc).isoformat()
 
+    # Recover the one outstanding outbox item before considering new work.
+    # _append_bus is idempotent, covering a crash after append but before finalize.
+    if state["pending"]:
+        candidate_id_value = next(iter(state["pending"]))
+        record = state["pending"][candidate_id_value]
+        _append_bus(record["message"])
+        return _finalize_pending(state, candidate_id_value)
+
+    now = datetime.now(timezone.utc).isoformat()
     for imp in improvements:
-        cid = imp["id"]
-        if cid in state["dispatched"]:
+        cid = imp.get("id")
+        if not isinstance(cid, str) or not cid or cid in state["dispatched"]:
             continue
-        action, target = ACTION_BY_CATEGORY.get(imp["category"], (None, None))
+        action, target = ACTION_BY_CATEGORY.get(imp.get("category"), (None, None))
         if action is None:
             continue
 
@@ -250,30 +311,38 @@ def dispatch_one(improvements):
             "payload": {
                 "candidate_id": cid,
                 "category": imp["category"],
-                "title": imp["title"],
-                "description": imp["description"],
+                "title": imp.get("title", ""),
+                "description": imp.get("description", ""),
             },
             "reply_to": "self_improvement",
         }
 
-        # Record the durable decision before the bus write. If the process dies
-        # after this point, the candidate remains closed rather than duplicating work.
-        state["dispatched"][cid] = {
+        # Write an outbox record first. On restart, pending work is replayed
+        # idempotently and then promoted to dispatched; no task is silently lost.
+        state["pending"][cid] = {
             "msg_id": msg_id,
             "task_id": task_id,
             "action": action,
             "dispatched_at": now,
+            "message": message,
         }
-        state["history"].append(state["dispatched"][cid] | {"candidate_id": cid})
-        DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
-        DISPATCH_STATE.write_text(json.dumps(state, indent=2) + "\n")
+        _save_dispatch_state(state)
         _append_bus(message)
-        return message
+        return _finalize_pending(state, cid)
 
-    DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
-    DISPATCH_STATE.write_text(json.dumps(state, indent=2) + "\n")
+    _save_dispatch_state(state)
     return None
 
+
+def dispatch_one(improvements):
+    """Serialize dispatch and recover at most one durable outbox task."""
+    STATE.mkdir(parents=True, exist_ok=True)
+    with DISPATCH_LOCK.open("a", encoding="utf-8") as lock_handle:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+        try:
+            return _dispatch_one_locked(improvements)
+        finally:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
 
 def run():
     improvements = generate_improvements()
