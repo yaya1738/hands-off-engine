@@ -80,6 +80,16 @@ def save_state(state):
     _atomic_write_json(SCHEDULER_STATE, state)
 
 
+def get_due_time(job, task, now):
+    """Return a valid due timestamp, repairing malformed persisted values."""
+    try:
+        return float(job.get("next_run_at", now + task["interval_seconds"]))
+    except (TypeError, ValueError):
+        due_at = now + task["interval_seconds"]
+        job["next_run_at"] = due_at
+        return due_at
+
+
 def acquire_lock():
     """Return an exclusively locked file handle, or None if already running."""
     STATE.mkdir(parents=True, exist_ok=True)
@@ -183,11 +193,8 @@ def run_forever():
                 if not _RUNNING:
                     break
                 job = state["jobs"].setdefault(task["name"], {})
-                try:
-                    due_at = float(job.get("next_run_at", now + task["interval_seconds"]))
-                except (TypeError, ValueError):
-                    due_at = now + task["interval_seconds"]
-                    job["next_run_at"] = due_at
+                due_at = get_due_time(job, task, now)
+                if "next_run_at" not in job or not isinstance(job["next_run_at"], (int, float)):
                     save_state(state)
                 if now < due_at:
                     continue
