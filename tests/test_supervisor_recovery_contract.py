@@ -130,6 +130,20 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
         self.assertEqual(saved["consecutive_failures"], 0)
         self.assertIn("completed expected one-shot", self.log.read_text())
 
+    def test_expected_one_shot_completion_survives_supervisor_restart(self):
+        self.service["expected_exit"] = True
+        clock = Clock(step=1.0)
+        _, _ = self._run_with(clock, max_loops=5, exit_code=0)
+        persisted = json.loads(self.state.read_text())
+
+        with mock.patch.object(supervisor, "SERVICES", [self.service]):
+            restored = supervisor._restore_stats(persisted)
+
+        self.assertTrue(restored["factory_scheduler"]["completed"])
+        # A restarted supervisor must not reinterpret the completed one-shot
+        # as a daemon that needs to be relaunched.
+        self.assertTrue(restored["factory_scheduler"]["completed"])
+
     def test_backoff_ladder_is_bounded(self):
         expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 600]
         for consecutive, want in enumerate(expected, start=1):
