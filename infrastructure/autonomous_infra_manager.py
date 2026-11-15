@@ -71,11 +71,12 @@ class AutonomousInfraManager:
 
     def __init__(
         self,
-        budget_monthly: float = 500.0,
-        auto_provision: bool = True,
-        auto_upgrade: bool = True,
-        auto_scale: bool = True,
-        dry_run: bool = False
+        budget_monthly: float = 0.0,
+        auto_provision: bool = False,
+        auto_upgrade: bool = False,
+        auto_scale: bool = False,
+        dry_run: bool = True,
+        allow_paid_actions: bool = False
     ):
         """
         Initialize the infrastructure manager.
@@ -97,11 +98,15 @@ class AutonomousInfraManager:
         self.auto_upgrade = auto_upgrade
         self.auto_scale = auto_scale
         self.dry_run = dry_run
+        self.allow_paid_actions = bool(allow_paid_actions)
 
-        # Initialize provisioner
+        # The manager owns per-action decisions; the provisioner must not
+        # independently auto-execute a second copy of those decisions.
         self.provisioner = AutoProvisioner(
             budget=self.budget,
-            dry_run=dry_run
+            dry_run=dry_run,
+            allow_paid_actions=self.allow_paid_actions,
+            auto_execute_enabled=False,
         )
 
         # State
@@ -233,13 +238,13 @@ class AutonomousInfraManager:
         should_execute = False
 
         if decision.action == InfrastructureAction.UPGRADE_SERVER:
-            should_execute = self.auto_upgrade
+            should_execute = self.allow_paid_actions and self.auto_upgrade
 
         elif decision.action == InfrastructureAction.PROVISION_SERVER:
-            should_execute = self.auto_provision
+            should_execute = self.allow_paid_actions and self.auto_provision
 
         elif decision.action == InfrastructureAction.SCALE_HORIZONTALLY:
-            should_execute = self.auto_scale
+            should_execute = self.allow_paid_actions and self.auto_scale
 
         elif decision.action == InfrastructureAction.TERMINATE_SERVER:
             # ABSOLUTE BLOCK: System should never terminate its own infrastructure
@@ -313,7 +318,7 @@ class AutonomousInfraManager:
                 print(f"   Risk: Complete trading halt if primary fails")
                 print()
 
-                if auto_provision and self.auto_provision:
+                if auto_provision and self.auto_provision and self.allow_paid_actions:
                     # Check budget before provisioning
                     if self._within_budget_for_emergency():
                         print("   DECISION: Provision failover server")
