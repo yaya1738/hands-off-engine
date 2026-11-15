@@ -16,6 +16,7 @@ on:
       - "telegram/telegram_bot_listener.py"
       - "scripts/comm_hub.py"
       - "scripts/control_api.py"
+      - "scripts/telegram_bridge.py"
       - "autonomous/governed_authority.py"
       - "executor/**"
       - "scripts/factory_execution_adapter.py"
@@ -24,6 +25,7 @@ on:
       - "tests/test_system_doctor_execution_boundary.py"
       - "tests/test_self_healer_execution_boundary.py"
       - "tests/test_telegram_authenticated_approval.py"
+      - "tests/test_telegram_bridge_sender_auth.py"
       - "tests/test_comm_hub_authenticated_approval.py"
       - "tests/test_claude_optimizer_execution_boundary.py"
       - "tests/test_autopilot_control_server_auth.py"
@@ -58,6 +60,7 @@ jobs:
           tests/test_system_doctor_execution_boundary.py
           tests/test_self_healer_execution_boundary.py
           tests/test_telegram_authenticated_approval.py
+          tests/test_telegram_bridge_sender_auth.py
           tests/test_comm_hub_authenticated_approval.py
           tests/test_claude_optimizer_execution_boundary.py
           tests/test_autopilot_control_server_auth.py
