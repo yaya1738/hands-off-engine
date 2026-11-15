@@ -78,39 +78,109 @@ log = logging.getLogger("Supervisor")
 # ── PID/lock guard: one instance only ──
 
 class SupervisorLock:
-    """File-based lock ensuring only one supervisor instance runs."""
+    """Persistent-inode file lock ensuring only one supervisor instance runs.
+
+    The lock pathname is deliberately never unlinked during normal operation:
+    unlinking a flocked inode can let contenders lock different inodes.
+    """
 
     def __init__(self):
         self.lock_path = SUPERVISOR_LOCK
         self.pid_path = SUPERVISOR_PID
         self.fd = None
+        self.owner_pid = None
+
+    def _clear_owned_records(self, *, allow_partial_lock_record: bool = False):
+        """Clear our owner markers while flock is held.
+
+        A failed owner-PID publication may leave a prefix after a short write.
+        The caller may clear that prefix only on the acquisition failure path,
+        where this process truncated the file immediately before writing it.
+        Normal release remains exact-match-only.
+        """
+        if self.owner_pid is None or self.fd is None:
+            return
+
+        owner = str(self.owner_pid)
+        try:
+            if self.pid_path.read_text(encoding="utf-8").strip() == owner:
+                self.pid_path.unlink(missing_ok=True)
+        except (OSError, UnicodeError):
+            # A marker we cannot verify is not ours to remove.
+            pass
+
+        try:
+            os.lseek(self.fd, 0, os.SEEK_SET)
+            recorded = os.read(self.fd, 128).decode("ascii", errors="strict").strip()
+            is_our_record = recorded == owner
+            is_our_partial_record = (
+                allow_partial_lock_record and owner.startswith(recorded)
+            )
+            if is_our_record or is_our_partial_record:
+                os.ftruncate(self.fd, 0)
+                os.fsync(self.fd)
+        except (OSError, UnicodeError):
+            # Preserve an unexpected record rather than deleting another owner's.
+            pass
 
     def try_acquire(self) -> bool:
-        try:
-            self.fd = open(self.lock_path, "w")
-            fcntl.flock(self.fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            self.fd.write(str(os.getpid()))
-            self.fd.flush()
-            self.pid_path.write_text(str(os.getpid()))
+        """Acquire flock before changing either owner marker."""
+        if self.fd is not None:
             return True
-        except (IOError, OSError):
-            if self.fd:
-                self.fd.close()
+
+        try:
+            self.lock_path.parent.mkdir(parents=True, exist_ok=True)
+            fd = os.open(str(self.lock_path), os.O_RDWR | os.O_CREAT, 0o600)
+        except OSError:
+            return False
+
+        try:
+            fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (BlockingIOError, OSError):
+            os.close(fd)
+            return False
+
+        self.fd = fd
+        self.owner_pid = os.getpid()
+        try:
+            payload = str(self.owner_pid).encode("ascii")
+            os.ftruncate(fd, 0)
+            os.lseek(fd, 0, os.SEEK_SET)
+            written = 0
+            while written < len(payload):
+                count = os.write(fd, payload[written:])
+                if count <= 0:
+                    raise OSError("short write while publishing supervisor lock owner")
+                written += count
+            os.fsync(fd)
+            self.pid_path.parent.mkdir(parents=True, exist_ok=True)
+            self.pid_path.write_text(str(self.owner_pid), encoding="utf-8")
+            return True
+        except (OSError, UnicodeError):
+            self._clear_owned_records(allow_partial_lock_record=True)
+            try:
+                fcntl.flock(fd, fcntl.LOCK_UN)
+            finally:
+                os.close(fd)
                 self.fd = None
+                self.owner_pid = None
             return False
 
     def release(self):
-        if self.fd:
-            try:
-                fcntl.flock(self.fd, fcntl.LOCK_UN)
-                self.fd.close()
-            except Exception:
-                pass
+        """Clear only our markers while locked; keep the lock inode in place."""
+        fd = self.fd
+        if fd is None:
+            return
+
         try:
-            self.lock_path.unlink(missing_ok=True)
-            self.pid_path.unlink(missing_ok=True)
-        except Exception:
-            pass
+            self._clear_owned_records()
+        finally:
+            try:
+                fcntl.flock(fd, fcntl.LOCK_UN)
+            finally:
+                os.close(fd)
+                self.fd = None
+                self.owner_pid = None
 
 
 # ── Durable state: restart counters, timing ──
