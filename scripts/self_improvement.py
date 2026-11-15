@@ -209,7 +209,8 @@ def _load_dispatch_state():
     if not isinstance(state, dict):
         state = {}
     dispatched = state.get("dispatched", {})
-    pending = state.get("pending", {})    history = state.get("history", [])
+    pending = state.get("pending", {})
+    history = state.get("history", [])
     return {
         "dispatched": dispatched if isinstance(dispatched, dict) else {},
         "pending": pending if isinstance(pending, dict) else {},
