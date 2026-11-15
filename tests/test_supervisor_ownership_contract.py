@@ -1,4 +1,5 @@
 """Regression tests for supervisor lock/PID ownership boundaries."""
+import json
 import os
 import tempfile
 import unittest
@@ -75,6 +76,22 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
              mock.patch.object(supervisor, "_lock_is_held", return_value=True), \
              mock.patch.object(supervisor, "_is_supervisor_process", return_value=True):
             self.assertTrue(supervisor._can_signal_supervisor(111))
+
+    def test_heartbeat_verdict_distinguishes_idle_stale_and_hung(self):
+        heartbeat = self.state.parent / "scheduler_heartbeat.json"
+        heartbeat.write_text(json.dumps({
+            "pid": 321, "phase": "idle", "task": None,
+            "task_deadline": None, "updated_at": 990.0,
+        }))
+        self.assertEqual(supervisor._heartbeat_verdict(heartbeat, 1000.0, expected_pid=321), "ok")
+        self.assertEqual(supervisor._heartbeat_verdict(heartbeat, 1200.0, expected_pid=321), "stale")
+
+        heartbeat.write_text(json.dumps({
+            "pid": 321, "phase": "task", "task": "integrity_check",
+            "task_deadline": 1060.0, "updated_at": 1000.0,
+        }))
+        self.assertEqual(supervisor._heartbeat_verdict(heartbeat, 1080.0, expected_pid=321), "ok")
+        self.assertEqual(supervisor._heartbeat_verdict(heartbeat, 1091.0, expected_pid=321), "hung")
 
     def test_state_write_uses_atomic_replacement(self):
         supervisor._save_state({"healthy": True})
