@@ -42,6 +42,8 @@ def load_cards():
         if not math.isfinite(limit) or not math.isfinite(balance) or limit <= 0 or balance < 0:
             return None, "one or more card values are invalid"
         cards.append({"limit": limit, "balance": balance})
+    if not cards:
+        return None, "no measured card records"
     return cards, None
 
 
