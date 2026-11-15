@@ -23,6 +23,39 @@ CYCLE_LOG = STATE / "improvement_cycles.json"
 MAX_SUBPROCESS_OUTPUT_CHARS = 1000
 SUBPROCESS_TIMEOUT_SECONDS = 30
 
+# Fatal failure policy: these cycle outcomes make the whole run exit
+# non-zero, so scheduler.run_task() records the cycle as failed instead of
+# a false green. Fatal:
+#   - improvement: candidate generation failed — the cycle produced nothing.
+#   - applier_apply: the apply step raised an unexpected error (integrity
+#     problem with improvement_state.json / applier), not merely "no
+#     candidates" or "risky actions queued".
+# Non-fatal (observational; approval failures carry their own alert):
+#   - applier_status, feedback, approval — diagnostics with independent
+#     alerting; a failure here must not mark the whole cycle failed.
+FATAL_FIELDS = ("improvement", "applier_apply")
+
+
+def _send_approval_alert():
+    """Best-effort approval-check alert through the real TelegramBridge API.
+
+    The bridge handles not-configured and delivery errors internally; only
+    genuinely unexpected errors are logged here instead of being swallowed.
+    Returns True when an alert was actually dispatched.
+    """
+    try:
+        from scripts.telegram_bridge import TelegramBridge
+        bridge = TelegramBridge()
+        result = bridge.send_alert(
+            "Improvement cycle", "Approval check failed", severity="warning")
+        if isinstance(result, dict) and result.get("status") == "not_configured":
+            print("Telegram not configured; approval-check alert not sent")
+            return False
+        return isinstance(result, dict) and result.get("status") == "sent"
+    except Exception as exc:
+        print(f"Telegram approval alert error: {exc}")
+        return False
+
 
 def _read_subprocess_tail(output_file):
     output_file.seek(0, os.SEEK_END)
@@ -97,6 +130,7 @@ def apply_generated_candidates():
 
 
 def main():
+    """Run one improvement cycle; return a process exit code (0 success, 1 fatal failure)."""
     now = datetime.now(timezone.utc).isoformat()
     print(f"=== IMPROVEMENT CYCLE @ {now} ===")
 
@@ -145,15 +179,18 @@ def main():
     CYCLE_LOG.write_text(json.dumps(history[-50:], indent=2) + "\n")
 
     if not approval["success"]:
-        try:
-            from scripts.telegram_bridge import send_message
-            send_message("⚠️ Improvement cycle approval check failed")
-        except Exception:
-            pass
+        _send_approval_alert()
 
+    print(json.dumps(cycle_result, indent=2, sort_keys=True))
+
+    fatal = [field for field in FATAL_FIELDS if not cycle_result.get(field)]
+    if fatal:
+        print(f"Fatal cycle failures: {', '.join(fatal)}")
     print("Cycle complete")
-    return cycle_result
+    # Fatal failures must propagate to the process exit code; the scheduler
+    # records cycle success from this code and must never see a false green.
+    return 1 if fatal else 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

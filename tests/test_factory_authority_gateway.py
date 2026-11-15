@@ -87,3 +87,31 @@ class FactoryAuthorityGatewayTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class GatewayPermissionTests(unittest.TestCase):
+    """Objective queue and lock must be owner-only regardless of umask."""
+
+    def test_queue_and_lock_are_0600_under_permissive_umask(self):
+        import os
+        old_umask = os.umask(0o000)
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                gateway = FactoryAuthorityGateway(tmp)
+                gateway.submit_goal(
+                    "Owner-only objective", source="test", idempotency_key="perm-goal")
+                for path in (gateway.queue_path, gateway.lock_path):
+                    self.assertTrue(path.exists(), path)
+                    mode = path.stat().st_mode & 0o777
+                    self.assertEqual(mode, 0o600, f"{path.name} must be 0600, got {oct(mode)}")
+        finally:
+            os.umask(old_umask)
+
+    def test_existing_queue_mode_is_preserved_on_append(self):
+        import os
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            gateway.submit_goal("First objective", source="test", idempotency_key="k1")
+            os.chmod(gateway.queue_path, 0o640)
+            gateway.submit_goal("Second objective", source="test", idempotency_key="k2")
+            self.assertEqual(gateway.queue_path.stat().st_mode & 0o777, 0o640)

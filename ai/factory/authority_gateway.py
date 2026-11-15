@@ -19,6 +19,23 @@ from typing import Any
 class FactoryAuthorityGateway:
     """Append-only objective queue; admission never grants execution authority."""
 
+    @staticmethod
+    def _open_private(path: Path, mode: str):
+        """Open (creating if needed) with owner-only permissions.
+
+        Newly created files and locks are 0600 regardless of umask, so
+        objective text and admission metadata are never group/world
+        readable. Existing files keep their current mode (safe replacement).
+        """
+        flags = {
+            "a": os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+            "a+": os.O_RDWR | os.O_CREAT | os.O_APPEND,
+        }.get(mode)
+        if flags is None:
+            raise ValueError(f"unsupported private-open mode: {mode}")
+        descriptor = os.open(path, flags, 0o600)
+        return os.fdopen(descriptor, mode, encoding="utf-8")
+
     def __init__(self, repo_root: Path | str | None = None):
         self.repo_root = Path(repo_root) if repo_root else Path(__file__).resolve().parents[2]
         self.state_dir = self.repo_root / "state"
@@ -76,7 +93,7 @@ class FactoryAuthorityGateway:
         }
 
         self.state_dir.mkdir(parents=True, exist_ok=True)
-        with self.lock_path.open("a+", encoding="utf-8") as lock:
+        with self._open_private(self.lock_path, "a+") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:
                 if self.queue_path.exists():
@@ -96,7 +113,7 @@ class FactoryAuthorityGateway:
                                     "goal_id": existing.get("goal_id", goal_id),
                                     "execution_enabled": False,
                                 }
-                with self.queue_path.open("a", encoding="utf-8") as queue:
+                with self._open_private(self.queue_path, "a") as queue:
                     queue.write(json.dumps(record, sort_keys=True) + "\n")
                     queue.flush()
                     os.fsync(queue.fileno())

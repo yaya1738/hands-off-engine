@@ -51,7 +51,31 @@ class FactoryObjectiveReview:
         return actor_id
 
     @staticmethod
+    def _open_private(path: Path, mode: str):
+        """Open (creating if needed) with owner-only permissions.
+
+        Newly created ledgers and locks are 0600 regardless of umask, so
+        review decisions and Telegram actor IDs are never group/world
+        readable. Existing files keep their current mode (safe replacement).
+        """
+        flags = {
+            "a": os.O_WRONLY | os.O_CREAT | os.O_APPEND,
+            "a+": os.O_RDWR | os.O_CREAT | os.O_APPEND,
+        }.get(mode)
+        if flags is None:
+            raise ValueError(f"unsupported private-open mode: {mode}")
+        descriptor = os.open(path, flags, 0o600)
+        return os.fdopen(descriptor, mode, encoding="utf-8")
+
+    @staticmethod
     def _read_jsonl(path: Path) -> list[dict]:
+        """Read an append-only authorization ledger, failing closed.
+
+        This is an authorization ledger, not a best-effort log: a malformed
+        nonblank record could hide a prior terminal decision, allowing a
+        second, conflicting decision for the same goal. Malformed records
+        therefore raise instead of being skipped.
+        """
         records = []
         if not path.exists():
             return records
@@ -61,15 +85,22 @@ class FactoryObjectiveReview:
                     continue
                 try:
                     item = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if isinstance(item, dict):
-                    records.append(item)
+                except json.JSONDecodeError as exc:
+                    raise ObjectiveReviewError(
+                        f"corrupt review ledger record in {path.name}; "
+                        "refusing further review decisions"
+                    ) from exc
+                if not isinstance(item, dict):
+                    raise ObjectiveReviewError(
+                        f"non-object review ledger record in {path.name}; "
+                        "refusing further review decisions"
+                    )
+                records.append(item)
         return records
 
-    @staticmethod
-    def _append(path: Path, record: dict) -> None:
-        with path.open("a", encoding="utf-8") as stream:
+    @classmethod
+    def _append(cls, path: Path, record: dict) -> None:
+        with cls._open_private(path, "a") as stream:
             stream.write(json.dumps(record, sort_keys=True) + "\n")
             stream.flush()
             os.fsync(stream.fileno())
@@ -102,7 +133,7 @@ class FactoryObjectiveReview:
             raise ObjectiveReviewError("correlation_id must be 1..200 characters")
 
         self.state_dir.mkdir(parents=True, exist_ok=True)
-        with self.lock_path.open("a+", encoding="utf-8") as lock:
+        with self._open_private(self.lock_path, "a+") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:
                 goal = self.gateway.get_goal(goal_id)

@@ -20,6 +20,9 @@ on:
       - "tests/test_github_governance_monitor.py"
       - "scripts/improvement_applier.py"
       - "tests/test_improvement_applier_safety.py"
+      - "tests/test_improvement_applier.py"
+      - "scripts/improvement_cycle.py"
+      - "tests/test_improvement_cycle_exit.py"
       - "scripts/task_worker.py"
       - "tests/test_scheduler_hardening.py"
       - "tests/test_self_improvement_dispatch.py"
@@ -41,6 +44,8 @@ jobs:
           python -m unittest tests/test_scheduler_hardening.py -v
           python -m unittest tests/test_self_improvement_dispatch.py -v
           python -m unittest tests/test_improvement_applier_safety.py -v
+          python -m unittest tests/test_improvement_applier.py -v
+          python -m unittest tests/test_improvement_cycle_exit.py -v
           python -m unittest tests/test_github_governance_monitor.py -v
           python -m unittest tests/test_factory_authority_gateway.py -v
           python -m unittest tests/test_factory_objective_review.py -v

@@ -142,3 +142,68 @@ class DurableImprovementDispatchTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+class DispatchStatePermissionTests(unittest.TestCase):
+    """Dispatch state, lock, and a newly created bus must be owner-only."""
+
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.old = {
+            "STATE": self_improvement.STATE,
+            "BUS": self_improvement.BUS,
+            "DISPATCH_STATE": self_improvement.DISPATCH_STATE,
+            "DISPATCH_LOCK": self_improvement.DISPATCH_LOCK,
+        }
+        self_improvement.STATE = self.root / "state"
+        self_improvement.BUS = self.root / "ai" / "coordination" / "messages.jsonl"
+        self_improvement.DISPATCH_STATE = self.root / "state" / "dispatch.json"
+        self_improvement.DISPATCH_LOCK = self.root / "state" / "dispatch.lock"
+
+    def tearDown(self):
+        for name, value in self.old.items():
+            setattr(self_improvement, name, value)
+        self.temp.cleanup()
+
+    def test_dispatch_files_are_0600_under_permissive_umask(self):
+        import os
+        old_umask = os.umask(0o000)
+        try:
+            message = {
+                "msg_id": "perm-msg-1",
+                "from": "factory",
+                "to": "anyclaw",
+                "type": "task_assignment",
+                "context": {"task_id": "t-perm", "action": "system_status", "params": {}},
+            }
+            self.assertTrue(self_improvement._append_bus(message))
+            self_improvement._save_dispatch_state({"dispatched": {}, "pending": {}, "history": []})
+            with self_improvement._open_private(
+                    self_improvement.DISPATCH_LOCK,
+                    os.O_WRONLY | os.O_CREAT | os.O_APPEND, "a"):
+                pass
+            for path in (
+                self_improvement.BUS,
+                self_improvement.DISPATCH_STATE,
+                self_improvement.DISPATCH_LOCK,
+            ):
+                self.assertTrue(path.exists(), path)
+                mode = path.stat().st_mode & 0o777
+                self.assertEqual(mode, 0o600, f"{path.name} must be 0600, got {oct(mode)}")
+        finally:
+            os.umask(old_umask)
+
+    def test_existing_bus_mode_is_preserved_on_append(self):
+        import os
+        self_improvement.BUS.parent.mkdir(parents=True, exist_ok=True)
+        self_improvement.BUS.write_text("")
+        os.chmod(self_improvement.BUS, 0o644)
+        message = {
+            "msg_id": "perm-msg-2",
+            "from": "factory",
+            "to": "anyclaw",
+            "type": "task_assignment",
+            "context": {"task_id": "t-perm2", "action": "system_status", "params": {}},
+        }
+        self.assertTrue(self_improvement._append_bus(message))
+        self.assertEqual(self_improvement.BUS.stat().st_mode & 0o777, 0o644)

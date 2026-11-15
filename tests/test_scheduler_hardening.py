@@ -264,8 +264,110 @@ class SchedulerHardeningTests(unittest.TestCase):
             result = improvement_cycle.main()
 
         apply.assert_not_called()
-        self.assertFalse(result["applier_apply"])
-        self.assertEqual(result["applied_count"], 0)
+        # Generation failure is fatal: the cycle must exit nonzero so the
+        # scheduler never records a failed cycle as a green task.
+        self.assertEqual(result, 1)
+
+    def test_run_once_aggregates_failures_and_exits_nonzero(self):
+        # One failed task among several must produce a failing exit status.
+        def fake_run_task(task):
+            if task["name"] == "bad_task":
+                return {"name": "bad_task", "success": False, "output": "boom"}
+            return {"name": task["name"], "success": True, "output": "ok"}
+
+        with mock.patch.object(scheduler, "TASKS", [
+            {"name": "ok_task", "script": "health_monitor.py", "interval_seconds": 300},
+            {"name": "bad_task", "script": "definitely_missing_script.py", "interval_seconds": 300},
+        ]), mock.patch.object(scheduler, "acquire_lock", return_value=object()), \
+             mock.patch.object(scheduler, "release_lock"), \
+             mock.patch.object(scheduler, "run_task", side_effect=fake_run_task), \
+             mock.patch.object(scheduler, "append_log"):
+            self.assertFalse(scheduler.run_once())
+            self.assertEqual(scheduler.main(["--once"]), 1)
+
+    def test_run_once_all_success_exits_zero(self):
+        with mock.patch.object(scheduler, "TASKS", [
+            {"name": "ok_task", "script": "health_monitor.py", "interval_seconds": 300},
+        ]), mock.patch.object(scheduler, "acquire_lock", return_value=object()), \
+             mock.patch.object(scheduler, "release_lock"), \
+             mock.patch.object(scheduler, "run_task", return_value={"name": "ok_task", "success": True, "output": "ok"}), \
+             mock.patch.object(scheduler, "append_log"):
+            self.assertTrue(scheduler.run_once())
+            self.assertEqual(scheduler.main(["--once"]), 0)
+
+    def test_run_once_lock_conflict_exits_nonzero(self):
+        # Singleton exclusion is preserved: no lock -> no run -> nonzero.
+        with mock.patch.object(scheduler, "acquire_lock", return_value=None):
+            self.assertFalse(scheduler.run_once())
+            self.assertEqual(scheduler.main(["--once"]), 1)
+
+    def _run_forever_once(self, task, result):
+        """Drive one iteration of run_forever with the given single task/result."""
+        state = {"jobs": {task["name"]: {"next_run_at": 0}}}
+        previous_running = scheduler._RUNNING
+        try:
+            with mock.patch.object(scheduler, "TASKS", [task]), \
+                 mock.patch.object(scheduler, "acquire_lock", return_value=object()), \
+                 mock.patch.object(scheduler, "release_lock"), \
+                 mock.patch.object(scheduler, "load_state", return_value=state), \
+                 mock.patch.object(scheduler, "save_state"), \
+                 mock.patch.object(scheduler, "append_log"), \
+                 mock.patch.object(scheduler, "run_task", return_value=result), \
+                 mock.patch.object(scheduler.time, "time", return_value=100), \
+                 mock.patch.object(scheduler.time, "sleep", side_effect=lambda _: setattr(scheduler, "_RUNNING", False)):
+                scheduler.run_forever()
+        finally:
+            scheduler._RUNNING = previous_running
+
+    def test_failed_health_check_sends_alert_via_real_bridge_api(self):
+        # The alert call site must use the real TelegramBridge instance API,
+        # not a nonexistent module-level send_message.
+        import scripts.telegram_bridge as telegram_bridge
+        alerts = []
+
+        class FakeBridge:
+            def __init__(self):
+                pass
+
+            def send_alert(self, title, body, severity="normal"):
+                alerts.append((title, body, severity))
+                return {"status": "sent"}
+
+        task = {"name": "health_check", "script": "health_monitor.py", "interval_seconds": 300}
+        with mock.patch.object(telegram_bridge, "TelegramBridge", FakeBridge):
+            self._run_forever_once(task, {"name": "health_check", "success": False,
+                                          "output": "probe failed", "timestamp": "2026-11-15T00:00:00Z"})
+        self.assertEqual(len(alerts), 1)
+        self.assertEqual(alerts[0][0], "Scheduled job failed")
+        self.assertIn("health monitor", alerts[0][1])
+        self.assertEqual(alerts[0][2], "error")
+
+    def test_failure_alert_handles_not_configured_explicitly(self):
+        # Not-configured is an expected bridge outcome, never a silent crash.
+        import scripts.telegram_bridge as telegram_bridge
+
+        class NotConfiguredBridge:
+            def __init__(self):
+                pass
+
+            def send_alert(self, title, body, severity="normal"):
+                return {"status": "not_configured"}
+
+        with mock.patch.object(telegram_bridge, "TelegramBridge", NotConfiguredBridge):
+            sent = scheduler._send_failure_alert("health monitor", "probe failed")
+        self.assertFalse(sent)
+
+    def test_failure_alert_logs_unexpected_errors(self):
+        # Unexpected bridge errors must be reported, not swallowed.
+        import scripts.telegram_bridge as telegram_bridge
+
+        class BrokenBridge:
+            def __init__(self):
+                raise RuntimeError("bridge exploded")
+
+        with mock.patch.object(telegram_bridge, "TelegramBridge", BrokenBridge):
+            sent = scheduler._send_failure_alert("health monitor", "probe failed")
+        self.assertFalse(sent)
 
     def test_periodic_operations_have_one_declared_owner(self):
         node1 = (ROOT / "scripts" / "node1_runtime.py").read_text()

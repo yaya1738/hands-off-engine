@@ -218,11 +218,22 @@ def _load_dispatch_state():
     }
 
 
+def _open_private(path, flags, file_mode):
+    """Open (creating if needed) with owner-only permissions (0600).
+
+    Newly created files are 0600 regardless of umask; existing files keep
+    their current mode (safe replacement).
+    """
+    descriptor = os.open(path, flags, 0o600)
+    return os.fdopen(descriptor, file_mode, encoding="utf-8")
+
+
 def _save_dispatch_state(state):
     """Atomically persist the dispatch outbox and deduplication ledger."""
     DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
     temporary = DISPATCH_STATE.with_suffix(DISPATCH_STATE.suffix + ".tmp")
-    with temporary.open("w", encoding="utf-8") as handle:
+    # 0600 regardless of umask: dispatch metadata stays owner-only.
+    with _open_private(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, "w") as handle:
         json.dump(state, handle, indent=2, sort_keys=True)
         handle.write("\n")
         handle.flush()
@@ -244,11 +255,15 @@ def _bus_contains(msg_id):
 
 
 def _append_bus(message):
-    """Append once by msg_id and flush to durable storage before returning."""
+    """Append once by msg_id and flush to durable storage before returning.
+
+    A newly created bus file is 0600 regardless of umask; an existing bus
+    file keeps its current mode.
+    """
     BUS.parent.mkdir(parents=True, exist_ok=True)
     if _bus_contains(message["msg_id"]):
         return False
-    with BUS.open("a", encoding="utf-8") as handle:
+    with _open_private(BUS, os.O_WRONLY | os.O_CREAT | os.O_APPEND, "a") as handle:
         handle.write(json.dumps(message, sort_keys=True) + "\n")
         handle.flush()
         os.fsync(handle.fileno())
@@ -332,7 +347,8 @@ def _dispatch_one_locked(improvements):
 def dispatch_one(improvements):
     """Serialize dispatch and recover at most one durable outbox task."""
     STATE.mkdir(parents=True, exist_ok=True)
-    with DISPATCH_LOCK.open("a", encoding="utf-8") as lock_handle:
+    # 0600 lock regardless of umask; existing locks keep their mode.
+    with _open_private(DISPATCH_LOCK, os.O_WRONLY | os.O_CREAT | os.O_APPEND, "a") as lock_handle:
         fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
         try:
             return _dispatch_one_locked(improvements)

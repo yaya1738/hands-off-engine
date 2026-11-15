@@ -269,12 +269,8 @@ def run_forever():
                 save_state(state)
                 append_log(result)
                 if task["name"] in ("health_check", "integrity_check") and not result["success"]:
-                    try:
-                        from scripts.telegram_bridge import send_message
-                        label = "health monitor" if task["name"] == "health_check" else "state integrity check"
-                        send_message(f"⚠️ Scheduled {label} failed")
-                    except Exception:
-                        pass
+                    label = "health monitor" if task["name"] == "health_check" else "state integrity check"
+                    _send_failure_alert(label, result.get("output", "")[:200])
                 status = "OK" if result["success"] else "FAIL"
                 print(f"[{result['timestamp'][:19]}] {status} {task['name']}")
 
@@ -287,19 +283,49 @@ def run_forever():
         release_lock(lock)
 
 
+def _send_failure_alert(label, detail):
+    """Best-effort outbound failure alert through the real TelegramBridge API.
+
+    The bridge itself handles the not-configured case (logged warning,
+    ``{"status": "not_configured"}`` result) and Telegram delivery errors
+    (logged, error result). Only genuinely unexpected errors reach this
+    helper's handler, which logs instead of silently discarding them.
+
+    Returns True when an alert was actually dispatched.
+    """
+    try:
+        from scripts.telegram_bridge import TelegramBridge
+        bridge = TelegramBridge()
+        result = bridge.send_alert("Scheduled job failed", f"{label}: {detail}", severity="error")
+        if isinstance(result, dict) and result.get("status") == "not_configured":
+            print(f"Telegram not configured; failure alert for {label} not sent")
+            return False
+        return isinstance(result, dict) and result.get("status") == "sent"
+    except Exception as exc:
+        print(f"Telegram alert error for {label}: {exc}")
+        return False
+
+
 def run_once():
-    """Run each configured job once for explicit diagnostics."""
+    """Run each configured job once for explicit diagnostics.
+
+    Returns False when any job failed (or ownership could not be acquired),
+    so callers receive a failing exit status instead of a false green.
+    """
     lock = acquire_lock()
     if lock is None:
         print("Scheduler already running; refusing duplicate instance")
         return False
     try:
+        any_failed = False
         for task in TASKS:
             result = run_task(task)
             append_log(result)
             status = "OK" if result["success"] else "FAIL"
             print(f"{status} {task['name']}: {result['output'][:100]}")
-        return True
+            if not result["success"]:
+                any_failed = True
+        return not any_failed
     finally:
         release_lock(lock)
 
