@@ -145,3 +145,53 @@ def test_unified_cli_explicit_spend_flag_is_visible_and_bounded(monkeypatch):
     assert calls[-1]["auto_upgrade"] is True
     assert calls[-1]["dry_run"] is False
     assert calls[-1]["allow_paid_actions"] is True
+
+
+def test_internal_provisioner_execution_cannot_bypass_paid_authority(monkeypatch, tmp_path):
+    instance, _ = _provisioner(monkeypatch, tmp_path, dry_run=False, allow_paid_actions=False)
+    decision = SimpleNamespace(
+        executed=False, requires_approval=False, execution_result="", cost_change=1.0
+    )
+    assert instance._execute_decision(decision) is False
+    assert decision.executed is False
+    assert decision.requires_approval is True
+    assert "not authorized" in decision.execution_result
+
+
+def test_infrastructure_manager_flags_alone_do_not_authorize_spend():
+    manager = object.__new__(AutonomousInfraManager)
+    manager.auto_provision = True
+    manager.auto_upgrade = True
+    manager.auto_scale = True
+    manager.allow_paid_actions = False
+    manager.dry_run = False
+    manager._within_budget = lambda _decision: True
+    calls = []
+    manager.provisioner = SimpleNamespace(_execute_decision=lambda decision: calls.append(decision) or True)
+    decision = SimpleNamespace(
+        action=provisioner_module.InfrastructureAction.PROVISION_SERVER,
+        executed=False, cost_change=1.0, execution_result=""
+    )
+    manager._handle_decision(decision)
+    assert calls == []
+
+
+def test_unified_warning_upgrade_queues_without_spend_authority():
+    system = object.__new__(unified.UnifiedAutonomousSystem)
+    system.auto_upgrade = True
+    system.allow_paid_actions = False
+    system._within_auto_approve_budget = lambda: True
+    system._create_infra_decision = lambda **kwargs: {
+        "id": "infra-warning", "action": kwargs["action"], "reason": kwargs["reason"],
+        "auto_approve": kwargs["auto_approve"], "executed": False,
+    }
+    queued, executed = [], []
+    system._queue_infra_for_approval = lambda decision: queued.append(decision)
+    system._execute_infra_decision = lambda decision: executed.append(decision)
+    health = SimpleNamespace(overall_status=unified.HealthStatus.WARNING, overall_score=60)
+    decisions = system._make_infrastructure_decisions(health)
+    assert len(decisions) == 1
+    assert len(queued) == 1
+    assert executed == []
+    assert decisions[0]["auto_approve"] is False
+
