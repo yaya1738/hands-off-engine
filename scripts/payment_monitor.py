@@ -60,7 +60,10 @@ def get_token_balance(wallet: str, contract: str) -> float:
 def send_telegram(message: str):
     """Send Telegram notification"""
     token = os.getenv("TELEGRAM_BOT_TOKEN")
-    chat_id = \1None\2
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        print("Telegram notification skipped: credentials are not configured.")
+        return
 
     try:
         requests.post(
