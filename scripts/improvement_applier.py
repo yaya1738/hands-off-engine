@@ -12,6 +12,8 @@ Safe actions (auto-execute):
   - generate_report: create analysis report files
   - fix_config: update configuration based on detected issues
 
+Actions that write to tests/ or source-controlled paths require explicit approval.
+
 Risky actions (queue for operator approval):
   - code_change: modify source code
   - add_dependency: add new dependencies
@@ -48,7 +50,6 @@ SAFE_ACTIONS = {
     "fix_config",
     "clean_bus",
     "log_analysis",
-    "add_test",
 }
 
 # Actions that require operator approval
@@ -57,6 +58,7 @@ RISKY_ACTIONS = {
     "add_dependency",
     "network_action",
     "delete_file",
+    "add_test",
 }
 
 # Directories the applier may write to
