@@ -113,7 +113,7 @@ def record_decisions():
         command_id = str(command.get("id") or command.get("command_id") or "")
         if not command_id:
             continue
-        decision = authorize(command).to_dict()
+        decision = authorize(command, approval_file=_resolve_approvals()).to_dict()
         fingerprint = {
             "command_id": decision["command_id"],
             "decision": decision["decision"],
