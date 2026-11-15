@@ -214,10 +214,11 @@ def run_forever():
                 job["last_result"] = result
                 save_state(state)
                 append_log(result)
-                if task["name"] == "integrity_check" and not result["success"]:
+                if task["name"] in ("health_check", "integrity_check") and not result["success"]:
                     try:
                         from scripts.telegram_bridge import send_message
-                        send_message("⚠️ Scheduled state integrity check failed")
+                        label = "health monitor" if task["name"] == "health_check" else "state integrity check"
+                        send_message(f"⚠️ Scheduled {label} failed")
                     except Exception:
                         pass
                 status = "OK" if result["success"] else "FAIL"
