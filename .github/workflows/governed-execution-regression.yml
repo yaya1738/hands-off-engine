@@ -12,6 +12,8 @@ on:
       - "autonomous/claude_optimizer.py"
       - "infrastructure/selfheal.py"
       - "termux-hands-off/autopilot/control_server.py"
+      - "telegram/telegram_command_bot.py"
+      - "telegram/telegram_bot_listener.py"
       - "autonomous/governed_authority.py"
       - "executor/**"
       - "scripts/factory_execution_adapter.py"
@@ -19,6 +21,7 @@ on:
       - "tests/test_ai_runner_execution_boundary.py"
       - "tests/test_system_doctor_execution_boundary.py"
       - "tests/test_self_healer_execution_boundary.py"
+      - "tests/test_telegram_authenticated_approval.py"
       - "tests/test_claude_optimizer_execution_boundary.py"
       - "tests/test_autopilot_control_server_auth.py"
       - "tests/test_selfheal_execution_boundary.py"
@@ -51,6 +54,7 @@ jobs:
           tests/test_ai_runner_execution_boundary.py
           tests/test_system_doctor_execution_boundary.py
           tests/test_self_healer_execution_boundary.py
+          tests/test_telegram_authenticated_approval.py
           tests/test_claude_optimizer_execution_boundary.py
           tests/test_autopilot_control_server_auth.py
           tests/test_selfheal_execution_boundary.py
