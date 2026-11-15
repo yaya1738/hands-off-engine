@@ -87,7 +87,7 @@ class FactoryAuthorityGatewayTests(unittest.TestCase):
     def _append_corruption(self, gateway, content):
         gateway.queue_path.parent.mkdir(parents=True, exist_ok=True)
         with gateway.queue_path.open("a", encoding="utf-8") as queue:
-            queue.write(content + "\\n")
+            queue.write(content + "\n")
 
     def test_submit_goal_fails_closed_on_corrupt_history_even_after_match(self):
         for corrupt_record in ("{not-json", "[]"):
