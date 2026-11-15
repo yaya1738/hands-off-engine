@@ -31,7 +31,11 @@ except ModuleNotFoundError:
 # Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
-ALLOWED_USER_ID = os.getenv("TELEGRAM_USER_ID")
+ADMIN_USER_IDS = {
+    value.strip()
+    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+    if value.strip()
+}
 POLL_INTERVAL = 2  # seconds
 LOG_FILE = "/var/log/telegram-bot.log"
 
@@ -118,16 +122,19 @@ class SimpleTelegramBot:
             sender_id = sender.get("id")
             username = sender.get("username", "unknown")
 
-            # Both a private chat and a distinct user identity must be
-            # configured. Never treat a group chat ID or username as identity.
-            if not ALLOWED_CHAT_ID or not ALLOWED_USER_ID:
-                logger.error("Telegram command denied: TELEGRAM_CHAT_ID and TELEGRAM_USER_ID must both be configured")
+            # A private chat and numeric sender allowlist are mandatory.
+            # TELEGRAM_CHAT_ID is an optional additional restriction, never identity.
+            if not ADMIN_USER_IDS:
+                logger.error("Telegram command denied: TELEGRAM_ADMIN_USER_IDS is not configured")
                 return
             if chat.get("type") != "private":
                 logger.warning("Ignoring Telegram command outside a private chat")
                 return
-            if str(chat_id) != str(ALLOWED_CHAT_ID) or str(sender_id) != str(ALLOWED_USER_ID):
-                logger.warning("Ignoring Telegram command from unauthorized chat/user")
+            if str(sender_id) not in ADMIN_USER_IDS:
+                logger.warning("Ignoring Telegram command from unauthorized user")
+                return
+            if ALLOWED_CHAT_ID and str(chat_id) != str(ALLOWED_CHAT_ID):
+                logger.warning("Ignoring Telegram command from unauthorized chat")
                 return
 
             # Only process commands (start with /)
@@ -151,13 +158,12 @@ class SimpleTelegramBot:
         logger.info("Telegram Bot Listener starting...")
         logger.info(f"Poll interval: {POLL_INTERVAL}s")
 
-        if not ALLOWED_CHAT_ID or not ALLOWED_USER_ID:
-            raise RuntimeError("TELEGRAM_CHAT_ID and TELEGRAM_USER_ID are required; refusing unauthenticated command service")
+        if not ADMIN_USER_IDS:
+            raise RuntimeError("TELEGRAM_ADMIN_USER_IDS is required; refusing unauthenticated command service")
 
         if ALLOWED_CHAT_ID:
-            logger.info(f"Restricted to chat ID: {ALLOWED_CHAT_ID}")
-        else:
-            logger.warning("No ALLOWED_CHAT_ID set - bot will respond to any user!")
+            logger.info(f"Additional chat restriction enabled: {ALLOWED_CHAT_ID}")
+        logger.info("Telegram commands restricted to configured numeric admin user IDs")
 
         while True:
             try:
