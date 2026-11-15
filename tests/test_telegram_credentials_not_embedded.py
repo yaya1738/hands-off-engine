@@ -28,6 +28,8 @@ SCANNED_PATHS = (
     "scripts/daily_digest.py",
     "scripts/payment_monitor.py",
     "scripts/setup_autonomous_mode.sh",
+    "scripts/setup_telegram.sh",
+    "termux-hands-off/autopilot/telegram_setup.sh",
     "scripts/snapshot_system_state.py",
 )
 PYTHON_PATHS = tuple(path for path in SCANNED_PATHS if path.endswith(".py"))
