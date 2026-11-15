@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Periodic improvement workflow.
 
-The scheduler owns the cadence for health, learning, and integrity jobs.
-Node 1 owns lifecycle projection and safe improvement application.
-This workflow owns candidate generation/one bounded dispatch, feedback
-analysis, and approval notification checks.
+The scheduler owns periodic cadence. Node 1 owns event-driven runtime work
+and lifecycle projection only. This workflow is the sole owner of candidate
+generation/dispatch and safe improvement application, plus feedback and
+approval checks.
 """
 import json
 import subprocess
@@ -37,6 +37,32 @@ def run_subprocess(script):
         return {"success": False, "output": str(exc)[:1000]}
 
 
+def apply_generated_candidates():
+    """Apply the latest candidates after successful generation.
+
+    The applier itself is the policy boundary: only SAFE_ACTIONS execute;
+    RISKY_ACTIONS are queued for explicit operator approval.
+    """
+    candidate_file = STATE / "improvement_state.json"
+    if not candidate_file.exists():
+        return []
+
+    candidate_state = json.loads(candidate_file.read_text())
+    if not isinstance(candidate_state, dict):
+        raise ValueError("improvement candidate state must be an object")
+    candidates = candidate_state.get("improvements", [])
+    if not isinstance(candidates, list):
+        raise ValueError("improvement candidates must be a list")
+    candidates = [
+        item for item in candidates
+        if isinstance(item, dict) and isinstance(item.get("id"), str) and item["id"]
+    ]
+
+    from scripts.improvement_applier import ImprovementApplier
+    applier = ImprovementApplier(repo_root=ROOT)
+    return applier.apply_batch(candidates)
+
+
 def main():
     now = datetime.now(timezone.utc).isoformat()
     print(f"=== IMPROVEMENT CYCLE @ {now} ===")
@@ -44,7 +70,19 @@ def main():
     # Sole owner of candidate generation, durable dedup, and one bus dispatch.
     improvement = run_subprocess("self_improvement.py")
 
-    # Status is observational; Node 1 is the sole apply_batch owner.
+    # Apply only after this cycle generated a fresh candidate snapshot.
+    # ImprovementApplier enforces its SAFE_ACTIONS / RISKY_ACTIONS policy:
+    # safe actions may run; risky actions remain queued for operator approval.
+    apply_success = False
+    apply_results = []
+    if improvement["success"]:
+        try:
+            apply_results = apply_generated_candidates()
+            apply_success = True
+        except Exception as exc:
+            print(f"Improvement apply failed: {exc}")
+
+    # Status is observational; this cycle is the only apply_batch owner.
     applier = run_subprocess("improvement_applier.py status")
 
     # Feedback and approval checks are periodic workflow responsibilities.
@@ -54,6 +92,8 @@ def main():
     cycle_result = {
         "timestamp": now,
         "improvement": improvement["success"],
+        "applier_apply": apply_success,
+        "applied_count": sum(1 for result in apply_results if result.get("applied")),
         "applier_status": applier["success"],
         "feedback": feedback["success"],
         "approval": approval["success"],
