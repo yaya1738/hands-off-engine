@@ -135,7 +135,10 @@ def test_dryrun_needs_no_approval():
 
 
 def test_reject_sacred_file(tmp_path, monkeypatch):
-    _patch_module_paths(tmp_path)
+    (tmp_path / "state").mkdir()
+    import scripts.executor as exec_mod
+    monkeypatch.setattr(exec_mod, "EXECUTION_LOG", tmp_path / "state" / "execution_log.jsonl")
+    monkeypatch.setattr(exec_mod, "RATE_LIMIT_FILE", tmp_path / "state" / "rate_limit_state.json")
     command = {
         "id": "sacred-1", "action": "execute", "mode": "LIVE",
         "payload": {"action": "modify_file", "params": {"path": ".env.polymarket"}},
