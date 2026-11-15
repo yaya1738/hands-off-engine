@@ -66,6 +66,12 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertEqual(due_at, 123)
         self.assertEqual(job["next_run_at"], 123)
 
+    def test_non_finite_due_time_is_recovered(self):
+        job = {"next_run_at": "nan"}
+        due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
+        self.assertEqual(due_at, 400)
+        self.assertEqual(job["next_run_at"], 400)
+
     def test_lock_rejects_second_scheduler_instance(self):
         first = scheduler.acquire_lock()
         self.assertIsNotNone(first)
