@@ -39,7 +39,10 @@ class GitHubGovernanceMonitorTests(unittest.TestCase):
                 if "/pulls/1/reviews" in path:
                     return [{"user": {"login": "reviewer"}, "state": "APPROVED"}]
                 if "/pulls/2/reviews" in path:
-                    return [{"user": {"login": "reviewer"}, "state": "CHANGES_REQUESTED"}]
+                    return [
+                        {"user": {"login": "reviewer"}, "state": "CHANGES_REQUESTED", "submitted_at": "2026-11-01T00:00:00Z"},
+                        {"user": {"login": "reviewer"}, "state": "COMMENTED", "submitted_at": "2026-11-02T00:00:00Z"},
+                    ]
                 if "/issues/374/comments" in path:
                     return [{"id": 99, "body": "secret text must not be copied"}]
                 raise AssertionError(path)
@@ -47,7 +50,7 @@ class GitHubGovernanceMonitorTests(unittest.TestCase):
             first = monitor_once(fetch, root=root, now=now)
             bus = root / "ai" / "coordination" / "messages.jsonl"
             first_lines = bus.read_text().splitlines()
-            second = monitor_once(fetch, root=root, now=now)
+            second = monitor_once(fetch, root=root, now=now + timedelta(hours=6))
             second_lines = bus.read_text().splitlines()
 
             categories = {item["category"] for item in first["findings"]}
