@@ -76,3 +76,72 @@ def test_receive_requires_central_telegram_allowlist_even_when_caller_sets_authe
     assert result["routed_to"] == "rejected"
     assert not hub.messages_file.exists()
     assert not hub.comm_log.exists()
+
+def test_objective_review_requires_allowlisted_authenticated_telegram_before_bus_write(tmp_path, monkeypatch):
+    monkeypatch.setenv("TELEGRAM_ADMIN_USER_IDS", "77123")
+    hub = comm_hub.CommHub(repo_root=tmp_path)
+
+    denied = hub.receive(
+        "operator",
+        "objective_review",
+        {"goal_id": "a" * 64, "decision": "accept_for_planning"},
+        channel="telegram",
+        authenticated=True,
+        authenticated_actor_id="99999",
+    )
+    assert denied["routed_to"] == "rejected"
+    assert not hub.messages_file.exists()
+    assert not hub.comm_log.exists()
+
+    wrong_channel = hub.receive(
+        "operator",
+        "objective_review",
+        {"goal_id": "a" * 64, "decision": "accept_for_planning"},
+        channel="webhook",
+        authenticated=True,
+        authenticated_actor_id="77123",
+    )
+    assert wrong_channel["routed_to"] == "rejected"
+
+
+def test_objective_review_routes_verified_identity_to_factory_service(tmp_path, monkeypatch):
+    import sys
+    import types
+
+    monkeypatch.setenv("TELEGRAM_ADMIN_USER_IDS", "77123")
+    received = {}
+
+    class ReviewService:
+        def __init__(self, repo_root):
+            received["repo_root"] = repo_root
+
+        def review(self, goal_id, decision, **kwargs):
+            received.update({"goal_id": goal_id, "decision": decision, **kwargs})
+            return {
+                "status": "accepted_for_planning",
+                "planning_only": True,
+                "execution_enabled": False,
+            }
+
+    module = types.ModuleType("ai.factory.objective_review")
+    module.FactoryObjectiveReview = ReviewService
+    monkeypatch.setitem(sys.modules, "ai.factory.objective_review", module)
+    hub = comm_hub.CommHub(repo_root=tmp_path)
+
+    result = hub.receive(
+        "operator",
+        "objective_review",
+        {"goal_id": "b" * 64, "decision": "accept_for_planning"},
+        channel="telegram",
+        authenticated=True,
+        authenticated_actor_id="77123",
+    )
+
+    assert result["routed_to"] == "factory_objective_review"
+    assert result["result"]["execution_enabled"] is False
+    assert received["goal_id"] == "b" * 64
+    assert received["decision"] == "accept_for_planning"
+    assert received["authenticated"] is True
+    assert received["authenticated_actor_id"] == "77123"
+    assert received["channel"] == "telegram"
+    assert received["correlation_id"]
