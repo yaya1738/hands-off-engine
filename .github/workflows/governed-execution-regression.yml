@@ -9,6 +9,7 @@ on:
       - "ai/ai_runner.py"
       - "autonomous/system_doctor.py"
       - "autonomous/claude_optimizer.py"
+      - "termux-hands-off/autopilot/control_server.py"
       - "autonomous/governed_authority.py"
       - "executor/**"
       - "scripts/factory_execution_adapter.py"
@@ -16,6 +17,7 @@ on:
       - "tests/test_ai_runner_execution_boundary.py"
       - "tests/test_system_doctor_execution_boundary.py"
       - "tests/test_claude_optimizer_execution_boundary.py"
+      - "tests/test_autopilot_control_server_auth.py"
       - "tests/test_approval_queue_execution_boundary.py"
       - "tests/test_autonomous_change_execution_status.py"
       - "tests/test_factory_execution_adapter.py"
@@ -45,6 +47,7 @@ jobs:
           tests/test_ai_runner_execution_boundary.py
           tests/test_system_doctor_execution_boundary.py
           tests/test_claude_optimizer_execution_boundary.py
+          tests/test_autopilot_control_server_auth.py
           tests/test_approval_queue_execution_boundary.py
           tests/test_autonomous_change_execution_status.py
           tests/test_factory_execution_adapter.py
