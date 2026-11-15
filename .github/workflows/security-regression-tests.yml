@@ -2,16 +2,6 @@ name: Security Regression Tests
 
 on:
   pull_request:
-    paths:
-      - "ai/memory/kernels/system_bootstrap.json"
-      - "api/**"
-      - "autonomous/**"
-      - "scripts/**"
-      - "termux-hands-off/agents/**"
-      - "tests/test_no_embedded_telegram_credentials.py"
-      - "tests/test_finance_redaction_safety.py"
-      - ".env*"
-      - ".github/workflows/security-regression-tests.yml"
 
 permissions:
   contents: read
