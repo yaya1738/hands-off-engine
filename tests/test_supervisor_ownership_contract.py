@@ -93,6 +93,22 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
         self.assertEqual(supervisor._heartbeat_verdict(heartbeat, 1080.0, expected_pid=321), "ok")
         self.assertEqual(supervisor._heartbeat_verdict(heartbeat, 1091.0, expected_pid=321), "hung")
 
+    def test_exit_75_requires_verified_scheduler_process_owner(self):
+        heartbeat = self.state.parent / "scheduler_heartbeat.json"
+        heartbeat.write_text(json.dumps({
+            "pid": 321, "phase": "idle", "task": None,
+            "task_deadline": None, "updated_at": 1000.0,
+        }))
+        service = {"singleton_lock": self.lock, "heartbeat": heartbeat}
+        with mock.patch.object(supervisor, "_lock_is_held", return_value=True), \
+             mock.patch.object(supervisor, "_is_process_alive", return_value=True), \
+             mock.patch.object(supervisor, "_is_scheduler_process", return_value=False):
+            self.assertFalse(supervisor._external_owner_healthy(service, 1001.0))
+        with mock.patch.object(supervisor, "_lock_is_held", return_value=True), \
+             mock.patch.object(supervisor, "_is_process_alive", return_value=True), \
+             mock.patch.object(supervisor, "_is_scheduler_process", return_value=True):
+            self.assertTrue(supervisor._external_owner_healthy(service, 1001.0))
+
     def test_state_write_uses_atomic_replacement(self):
         supervisor._save_state({"healthy": True})
         self.assertEqual(supervisor._load_state(), {"healthy": True})
