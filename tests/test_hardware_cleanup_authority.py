@@ -118,3 +118,19 @@ def test_unified_approval_queue_does_not_mark_missing_hardware_action_executed()
     change = system.approval_queue.data["approved"][0]
     assert change["executed"] is False
     assert "No matching" in change["execution_error"]
+
+def test_unified_cli_requires_hardware_auto_action_opt_in(monkeypatch):
+    calls = []
+    monkeypatch.setattr(unified, "start_live_system", lambda **kwargs: calls.append(kwargs))
+    monkeypatch.setattr("sys.argv", ["unified_system.py"])
+    unified.main()
+    assert calls[-1]["auto_hardware_actions"] is False
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["unified_system.py", "--enable-hardware-auto-actions"],
+    )
+    unified.main()
+    assert calls[-1]["auto_hardware_actions"] is True
+    assert calls[-1]["allow_paid_actions"] is False
+    assert calls[-1]["dry_run"] is True
