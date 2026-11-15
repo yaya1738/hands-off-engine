@@ -138,6 +138,22 @@ def test_approved_action_tampering_fails_closed(tmp_path):
     assert target.read_text() == '{"limit": 10}'
 
 
+def test_stale_approval_expires_without_executing(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    target.write_text('{"limit": 10}')
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    persisted = json.loads(queue.queue_file.read_text())
+    persisted["approved"][0]["approved_at"] = "2000-01-01T00:00:00"
+    queue.queue_file.write_text(json.dumps(persisted))
+    result = queue.execute_approved(change_id)
+    assert not result["success"]
+    assert "expired" in result["error"]
+    assert target.read_text() == '{"limit": 10}'
+
 def test_approval_is_one_shot_even_if_file_is_restored(tmp_path):
     queue, root = make_queue(tmp_path)
     target = root / "config.json"
