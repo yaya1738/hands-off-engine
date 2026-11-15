@@ -308,6 +308,19 @@ class CommHub:
             return {"routed_to": "rejected", "error": f"Unknown sender: {sender_id}"}
         sender = self.parties[sender_id]
 
+        if msg_type in ("approve", "reject", "trade_command", "execute_command"):
+            if authenticated is not True or sender.get("role") != "owner":
+                return {"routed_to": "rejected", "error": "Authenticated owner identity required"}
+            if channel == "telegram":
+                allowed_ids = {
+                    value.strip()
+                    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+                    if value.strip()
+                }
+                actor_id = str(authenticated_actor_id) if authenticated_actor_id is not None else ""
+                if not allowed_ids or actor_id not in allowed_ids:
+                    return {"routed_to": "rejected", "error": "Telegram sender is not in TELEGRAM_ADMIN_USER_IDS"}
+
         msg = {
             "id": str(uuid.uuid4()),
             "from": sender_id,
@@ -349,6 +362,15 @@ class CommHub:
                 return {"routed_to": "rejected", "error": "Authenticated operator identity required"}
             if msg.get("sender_role") != "owner":
                 return {"routed_to": "rejected", "error": "Only the authenticated owner may request privileged actions"}
+            if msg.get("channel") == "telegram":
+                allowed_ids = {
+                    value.strip()
+                    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+                    if value.strip()
+                }
+                actor_id = str(msg.get("authenticated_actor_id") or "")
+                if not allowed_ids or actor_id not in allowed_ids:
+                    return {"routed_to": "rejected", "error": "Telegram sender is not in TELEGRAM_ADMIN_USER_IDS"}
 
         # Approval responses
         if msg_type in ("approve", "reject"):
