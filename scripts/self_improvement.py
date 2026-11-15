@@ -74,7 +74,7 @@ def candidate_id(category, title, description):
 ACTION_MAP = {
     "reliability": "log_analysis",
     "quality": "add_test",
-    "maintenance": "clean_bus",
+    "maintenance": "log_analysis",
     "usability": "fix_config",
     "security": "log_analysis",
     "expansion": "generate_report",
@@ -160,8 +160,8 @@ def generate_improvements():
         lines = len(BUS.read_text().splitlines())
         if lines > 200:
             improvements.append(_candidate(
-                "maintenance", "Clean up bus messages",
-                f"Bus has {lines} lines. Archive old continuation events, keep task_assignments and results.",
+                "maintenance", "Analyze coordination bus growth",
+                f"Bus has {lines} lines. Generate a read-only message-type summary; do not prune canonical messages automatically.",
                 "medium"))
 
     if "Add Termux boot launcher" not in applied:
@@ -181,14 +181,6 @@ def generate_improvements():
             "expansion", "Expand autonomous task scope",
             f"System is stable ({rate:.0%} over {patterns['total_tasks']} tasks). Consider enabling autonomous web research, file analysis, or monitoring tasks.",
             "low"))
-
-    # Feedback-driven: add improvement applier cycle if not yet running
-    applier_state = STATE / "improvement_applier_state.json"
-    if not applier_state.exists() or json.loads(applier_state.read_text() if applier_state.exists() else "{}").get("applied_ids", []) == []:
-        improvements.append(_candidate(
-            "maintenance", "Initialize improvement applier",
-            "Run the improvement applier to start the observe→act→measure loop.",
-            "high"))
 
     # Feedback-driven: prefer categories that historically helped
     for cat, info in feedback_cats.items():
@@ -217,8 +209,7 @@ def _load_dispatch_state():
     if not isinstance(state, dict):
         state = {}
     dispatched = state.get("dispatched", {})
-    pending = state.get("pending", {})
-    history = state.get("history", [])
+    pending = state.get("pending", {})    history = state.get("history", [])
     return {
         "dispatched": dispatched if isinstance(dispatched, dict) else {},
         "pending": pending if isinstance(pending, dict) else {},
