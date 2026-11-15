@@ -128,6 +128,38 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertEqual(len(rows), 100)
         self.assertEqual(rows[-1]["n"], 100)
 
+    def test_improvement_cycle_subprocess_output_is_file_backed_and_bounded(self):
+        process = mock.Mock(pid=789, returncode=0)
+        process.wait.return_value = 0
+
+        def fake_popen(*args, **kwargs):
+            kwargs["stdout"].write(b"z" * (improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS * 100))
+            return process
+
+        with mock.patch.object(improvement_cycle.subprocess, "Popen", side_effect=fake_popen) as popen:
+            result = improvement_cycle.run_subprocess("sample.py")
+
+        self.assertTrue(result["success"])
+        self.assertEqual(len(result["output"]), improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS)
+        self.assertNotEqual(popen.call_args.kwargs["stdout"], improvement_cycle.subprocess.PIPE)
+        self.assertTrue(popen.call_args.kwargs["start_new_session"])
+        self.assertTrue(popen.call_args.kwargs["stdout"].closed)
+
+    def test_improvement_cycle_subprocess_kills_process_group_on_timeout(self):
+        process = mock.Mock(pid=987, returncode=-9)
+        process.wait.side_effect = [
+            improvement_cycle.subprocess.TimeoutExpired("sample", improvement_cycle.SUBPROCESS_TIMEOUT_SECONDS),
+            -9,
+        ]
+
+        with mock.patch.object(improvement_cycle.subprocess, "Popen", return_value=process), \
+             mock.patch.object(improvement_cycle.os, "killpg") as killpg:
+            result = improvement_cycle.run_subprocess("sample.py")
+
+        self.assertFalse(result["success"])
+        killpg.assert_called_once_with(987, improvement_cycle.signal.SIGKILL)
+        self.assertEqual(process.wait.call_count, 2)
+
     def test_apply_generated_candidates_reads_snapshot_and_calls_applier_once(self):
         candidate = {"id": "imp-123", "action": "update_documentation"}
         snapshot = self.state_dir / "improvement_state.json"
