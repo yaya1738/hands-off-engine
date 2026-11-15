@@ -106,6 +106,17 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertIn('"scheduler.py"', primary)
         self.assertNotIn('"scheduler.py"', termux)
 
+    def test_event_router_and_control_room_have_single_owners(self):
+        from scripts import termux_supervisor
+
+        node1 = (ROOT / "scripts" / "node1_runtime.py").read_text()
+        primary = (ROOT / "scripts" / "supervisor.py").read_text()
+        self.assertIn("from scripts.event_router import EventRouter", node1)
+        self.assertIn("router.process_once()", node1)
+        self.assertIn('"name": "control_room"', primary)
+        self.assertNotIn("event_router", termux_supervisor.DAEMONS)
+        self.assertNotIn("control_room", termux_supervisor.DAEMONS)
+
     def test_malformed_due_time_is_recovered_without_crashing(self):
         job = {"next_run_at": "not-a-time"}
         due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
