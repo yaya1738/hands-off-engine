@@ -1,4 +1,5 @@
 """ApprovalQueue must not turn an approval ID into arbitrary host execution."""
+import json
 import subprocess
 from pathlib import Path
 from unittest.mock import patch
@@ -119,6 +120,41 @@ def test_edit_file_refuses_ambiguous_multiple_matches(tmp_path):
     assert not result["success"]
     assert "match exactly once" in result["error"]
     assert target.read_text() == '{"limit": 10, "backup_limit": 10}'
+
+def test_approved_action_tampering_fails_closed(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    target.write_text('{"limit": 10}')
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    persisted = json.loads(queue.queue_file.read_text())
+    persisted["approved"][0]["proposed_action"]["new_content"] = '"limit": 999'
+    queue.queue_file.write_text(json.dumps(persisted))
+    result = queue.execute_approved(change_id)
+    assert not result["success"]
+    assert "changed after approval" in result["error"]
+    assert target.read_text() == '{"limit": 10}'
+
+
+def test_approval_is_one_shot_even_if_file_is_restored(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    original = '{"limit": 10}'
+    target.write_text(original)
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    first = queue.execute_approved(change_id)
+    assert first["success"]
+    assert target.read_text() == '{"limit": 20}'
+    target.write_text(original)
+    second = queue.execute_approved(change_id)
+    assert not second["success"]
+    assert "not executable" in second["error"]
+    assert target.read_text() == original
 
 def test_write_file_is_create_only_inside_repo(tmp_path):
     queue, root = make_queue(tmp_path)
