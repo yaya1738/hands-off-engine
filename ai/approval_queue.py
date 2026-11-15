@@ -28,6 +28,7 @@ import fcntl
 
 REPO_ROOT = Path(__file__).parent.parent
 QUEUE_FILE = REPO_ROOT / "state" / "approval_queue.json"
+APPROVAL_MAX_AGE_SECONDS = 24 * 60 * 60
 
 
 class ApprovalQueue:
@@ -215,6 +216,14 @@ class ApprovalQueue:
                 return {"success": False, "error": "Change not found"}
             if change.get("status") != "approved":
                 return {"success": False, "error": f"Approval is not executable (status={change.get('status')})"}
+            try:
+                approved_at = datetime.fromisoformat(change["approved_at"])
+                now = datetime.now(approved_at.tzinfo) if approved_at.tzinfo else datetime.now()
+                approval_age = (now - approved_at).total_seconds()
+            except (KeyError, TypeError, ValueError):
+                return {"success": False, "error": "Approval timestamp missing or invalid; create a new proposal"}
+            if approval_age < 0 or approval_age > APPROVAL_MAX_AGE_SECONDS:
+                return {"success": False, "error": "Approval expired; create a new proposal"}
             action = change.get("proposed_action", {})
             action_bytes = json.dumps(action, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
             current_digest = hashlib.sha256(action_bytes).hexdigest()
