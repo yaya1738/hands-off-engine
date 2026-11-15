@@ -52,6 +52,9 @@ jobs:
           if [ -f tests/test_termux_supervisor_lock_ownership.py ]; then
             python -m unittest tests/test_termux_supervisor_lock_ownership.py -v
           fi
+          if [ -f tests/test_termux_supervisor_output_drain.py ]; then
+            python -m unittest tests/test_termux_supervisor_output_drain.py -v
+          fi
           python -m unittest tests/test_self_improvement_dispatch.py -v
           python -m unittest tests/test_improvement_applier_safety.py -v
           python -m unittest tests/test_improvement_applier.py -v
