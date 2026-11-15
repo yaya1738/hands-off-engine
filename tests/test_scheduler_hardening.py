@@ -85,22 +85,41 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertIsNotNone(third)
         scheduler.release_lock(third)
 
-    def test_run_task_uses_timeout_and_bounds_output(self):
+    def test_run_task_uses_file_backed_bounded_output(self):
         task = {"name": "sample", "script": "sample.py"}
-        fake = mock.Mock(returncode=0, stdout="x" * 1000, stderr="")
-        with mock.patch.object(scheduler.subprocess, "run", return_value=fake) as run:
+        process = mock.Mock(pid=123, returncode=0)
+        process.wait.return_value = 0
+
+        def fake_popen(*args, **kwargs):
+            # Simulate output far beyond the retained tail limit.
+            kwargs["stdout"].write(b"x" * (scheduler.MAX_OUTPUT_CHARS * 100))
+            return process
+
+        with mock.patch.object(scheduler.subprocess, "Popen", side_effect=fake_popen) as popen:
             result = scheduler.run_task(task)
+
         self.assertTrue(result["success"])
         self.assertEqual(len(result["output"]), scheduler.MAX_OUTPUT_CHARS)
-        self.assertEqual(run.call_args.kwargs["timeout"], scheduler.TASK_TIMEOUT_SECONDS)
+        self.assertTrue(popen.call_args.kwargs["start_new_session"])
+        self.assertNotEqual(popen.call_args.kwargs["stdout"], scheduler.subprocess.PIPE)
+        self.assertTrue(popen.call_args.kwargs["stdout"].closed)
 
-    def test_run_task_records_timeout_as_failure(self):
+    def test_run_task_kills_process_group_on_timeout(self):
         task = {"name": "sample", "script": "sample.py"}
-        error = scheduler.subprocess.TimeoutExpired("sample", 60)
-        with mock.patch.object(scheduler.subprocess, "run", side_effect=error):
+        process = mock.Mock(pid=456, returncode=None)
+        process.wait.side_effect = [
+            scheduler.subprocess.TimeoutExpired("sample", scheduler.TASK_TIMEOUT_SECONDS),
+            -9,
+        ]
+        process.returncode = -9
+
+        with mock.patch.object(scheduler.subprocess, "Popen", return_value=process), \
+             mock.patch.object(scheduler.os, "killpg") as killpg:
             result = scheduler.run_task(task)
+
         self.assertFalse(result["success"])
-        self.assertIsNone(result["returncode"])
+        killpg.assert_called_once_with(456, scheduler.signal.SIGKILL)
+        self.assertEqual(process.wait.call_count, 2)
 
     def test_scheduler_log_is_bounded(self):
         scheduler.SCHEDULER_LOG.write_text(json.dumps([{"n": i} for i in range(100)]))
