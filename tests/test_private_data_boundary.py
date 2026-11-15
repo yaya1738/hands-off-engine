@@ -55,7 +55,7 @@ def test_identity_allowlists_are_not_hardcoded():
         assert not re.search(
             r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", source, re.I
         )
-        assert not __import__("re").search(
+        assert not re.search(
             r"\b\d{1,3}(?:\.\d{1,3}){3}\b", source
         )
         assert not __import__("re").search(r"SHA256:[A-Za-z0-9+/=]{20,}", source)
