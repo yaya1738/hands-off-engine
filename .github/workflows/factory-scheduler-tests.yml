@@ -2,7 +2,7 @@ name: Factory scheduler contract tests
 
 on:
   pull_request:
-    branches: [main, factory/scheduler-single-owner-hardening-20261115]
+    branches: [main, factory/scheduler-single-owner-hardening-20261115, fix/381-termux-supervisor-persistent-lock]
     paths:
       - "scripts/scheduler.py"
       - "scripts/self_improvement.py"
