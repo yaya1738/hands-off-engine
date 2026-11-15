@@ -3,7 +3,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from ai.factory.authority_gateway import FactoryAuthorityGateway
+from ai.factory.authority_gateway import FactoryAuthorityGateway, ObjectiveQueueIntegrityError
 
 
 class FactoryAuthorityGatewayTests(unittest.TestCase):
@@ -83,6 +83,40 @@ class FactoryAuthorityGatewayTests(unittest.TestCase):
             gateway = FactoryAuthorityGateway(tmp)
             with self.assertRaises(ValueError):
                 gateway.get_goal("../state")
+
+    def _append_corruption(self, gateway, content):
+        gateway.queue_path.parent.mkdir(parents=True, exist_ok=True)
+        with gateway.queue_path.open("a", encoding="utf-8") as queue:
+            queue.write(content + "\\n")
+
+    def test_submit_goal_fails_closed_on_corrupt_history_even_after_match(self):
+        for corrupt_record in ("{not-json", "[]"):
+            with self.subTest(corrupt_record=corrupt_record), tempfile.TemporaryDirectory() as tmp:
+                gateway = FactoryAuthorityGateway(tmp)
+                gateway.submit_goal("Existing objective", idempotency_key="same-key")
+                self._append_corruption(gateway, corrupt_record)
+                before = gateway.queue_path.read_text(encoding="utf-8")
+                with self.assertRaises(ObjectiveQueueIntegrityError):
+                    gateway.submit_goal("Existing objective", idempotency_key="same-key")
+                self.assertEqual(gateway.queue_path.read_text(encoding="utf-8"), before)
+
+    def test_list_goals_fails_closed_on_malformed_and_non_object_records(self):
+        for corrupt_record in ("{not-json", "null", "[]"):
+            with self.subTest(corrupt_record=corrupt_record), tempfile.TemporaryDirectory() as tmp:
+                gateway = FactoryAuthorityGateway(tmp)
+                gateway.submit_goal("Valid objective", idempotency_key="valid")
+                self._append_corruption(gateway, corrupt_record)
+                with self.assertRaises(ObjectiveQueueIntegrityError):
+                    gateway.list_goals(limit=1)
+
+    def test_get_goal_fails_closed_on_malformed_and_non_object_records(self):
+        for corrupt_record in ("{not-json", "null", "[]"):
+            with self.subTest(corrupt_record=corrupt_record), tempfile.TemporaryDirectory() as tmp:
+                gateway = FactoryAuthorityGateway(tmp)
+                existing = gateway.submit_goal("Valid objective", idempotency_key="valid")
+                self._append_corruption(gateway, corrupt_record)
+                with self.assertRaises(ObjectiveQueueIntegrityError):
+                    gateway.get_goal(existing["goal_id"])
 
 
 if __name__ == "__main__":
