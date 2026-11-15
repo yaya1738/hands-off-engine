@@ -57,15 +57,42 @@ def execute_factory_command(
             "correlation_id": correlation_id,
         }
 
-    # The current Factory gateway is deliberately queue-only. Do not call an
-    # execution method or imply that approval alone creates an executable path.
-    return {
-        "status": "blocked",
-        "reason": "Factory gateway is queue-only; governed execution is not implemented",
-        "command_id": decision.command_id,
-        "correlation_id": correlation_id,
-        "execution_enabled": False,
-    }
+    try:
+        from ai.factory.authority_gateway import FactoryAuthorityGateway
+    except ImportError as exc:
+        return {
+            "status": "blocked",
+            "reason": "Factory authority gateway unavailable",
+            "command_id": decision.command_id,
+            "correlation_id": correlation_id,
+            "error": str(exc),
+        }
+
+    try:
+        gateway = FactoryAuthorityGateway()
+        result = gateway.execute_autonomous(
+            objective.strip(),
+            idempotency_key=decision.command_id,
+        )
+        factory_status = result.get("status") if isinstance(result, dict) else None
+        adapter_status = (
+            "completed"
+            if factory_status in {"verified", "completed", "idempotent_replay"}
+            else factory_status or "completed"
+        )
+        return {
+            "status": adapter_status,
+            "command_id": decision.command_id,
+            "correlation_id": correlation_id,
+            "factory": result,
+        }
+    except Exception as exc:
+        return {
+            "status": "error",
+            "command_id": decision.command_id,
+            "correlation_id": correlation_id,
+            "error": str(exc),
+        }
 
 
 __all__ = ["execute_factory_command"]
