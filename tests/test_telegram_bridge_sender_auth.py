@@ -3,7 +3,8 @@ import scripts.telegram_bridge as bridge_module
 
 def test_telegram_bridge_rejects_unlisted_users_and_non_private_chats(monkeypatch):
     bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
-    bridge.config = {"user_ids": ["77123"]}
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", {"77123"})
     sent = []
     bridge.send = lambda text, chat_id=None: sent.append((text, chat_id))
     calls = []
@@ -13,7 +14,6 @@ def test_telegram_bridge_rejects_unlisted_users_and_non_private_chats(monkeypatc
             calls.append((args, kwargs))
             return {"routed_to": "logged"}
 
-    monkeypatch.setattr(bridge_module, "load_config", lambda: bridge.config)
     monkeypatch.setattr("scripts.comm_hub.CommHub", lambda: Hub())
 
     bridge.process_inbound([
@@ -27,7 +27,8 @@ def test_telegram_bridge_rejects_unlisted_users_and_non_private_chats(monkeypatc
 
 def test_telegram_bridge_passes_verified_actor_identity(monkeypatch):
     bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
-    bridge.config = {"user_ids": ["77123"]}
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", {"77123"})
     bridge.send = lambda *args, **kwargs: None
     calls = []
 
@@ -47,26 +48,20 @@ def test_telegram_bridge_passes_verified_actor_identity(monkeypatch):
     assert calls[0][1]["authenticated"] is True
     assert calls[0][1]["authenticated_actor_id"] == "77123"
 
-    
-def test_telegram_bridge_passes_verified_actor_identity_for_trade(monkeypatch):
+
+def test_telegram_bridge_help_is_the_only_public_private_chat_command(monkeypatch):
     bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
-    bridge.config = {"user_ids": ["77123"]}
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", set())
     bridge.send = lambda *args, **kwargs: None
-    calls = []
 
     class Hub:
         def receive(self, *args, **kwargs):
-            calls.append((args, kwargs))
-            return {"routed_to": "rejected", "error": "execution remains governed"}
+            raise AssertionError("help must not route through privileged CommHub")
 
     monkeypatch.setattr("scripts.comm_hub.CommHub", lambda: Hub())
-
     bridge.process_inbound([
-        {"text": "/trade buy BTC-USD 10", "chat_id": 77123,
-         "chat_type": "private", "user_id": 77123}
+        {"text": "/help", "chat_id": 77123, "chat_type": "private", "user_id": 99999}
     ])
 
-    assert len(calls) == 1
-    assert calls[0][0][0:2] == ("operator", "trade_command")
-    assert calls[0][1]["authenticated"] is True
-    assert calls[0][1]["authenticated_actor_id"] == "77123"
+
