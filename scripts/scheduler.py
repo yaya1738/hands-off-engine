@@ -82,12 +82,14 @@ def save_state(state):
 
 def get_due_time(job, task, now):
     """Return a valid due timestamp, repairing malformed persisted values."""
+    raw_due = job.get("next_run_at", now + task["interval_seconds"])
     try:
-        return float(job.get("next_run_at", now + task["interval_seconds"]))
+        due_at = float(raw_due)
     except (TypeError, ValueError):
         due_at = now + task["interval_seconds"]
+    if not isinstance(raw_due, (int, float)) or isinstance(raw_due, bool):
         job["next_run_at"] = due_at
-        return due_at
+    return due_at
 
 
 def acquire_lock():
@@ -194,7 +196,7 @@ def run_forever():
                     break
                 job = state["jobs"].setdefault(task["name"], {})
                 due_at = get_due_time(job, task, now)
-                if "next_run_at" not in job or not isinstance(job["next_run_at"], (int, float)):
+                if job.get("next_run_at") != due_at:
                     save_state(state)
                 if now < due_at:
                     continue
