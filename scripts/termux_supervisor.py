@@ -136,7 +136,12 @@ class SupervisorLock:
             payload = str(self.owner_pid).encode("ascii")
             os.ftruncate(fd, 0)
             os.lseek(fd, 0, os.SEEK_SET)
-            os.write(fd, payload)
+            written = 0
+            while written < len(payload):
+                count = os.write(fd, payload[written:])
+                if count <= 0:
+                    raise OSError("short write while publishing supervisor lock owner")
+                written += count
             os.fsync(fd)
             self.pid_path.parent.mkdir(parents=True, exist_ok=True)
             self.pid_path.write_text(str(self.owner_pid), encoding="utf-8")
