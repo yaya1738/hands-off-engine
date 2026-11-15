@@ -89,17 +89,21 @@ def get_due_time(job, task, now):
         return job["next_run_at"]
 
     raw_due = job["next_run_at"]
+    # bool is an int subclass in Python; reject it before float conversion.
+    # JSON true/false must never become Unix timestamps 1.0/0.0.
+    if isinstance(raw_due, bool):
+        due_at = now + task["interval_seconds"]
+        job["next_run_at"] = due_at
+        return due_at
+
     try:
         due_at = float(raw_due)
         if not math.isfinite(due_at):
             raise ValueError("non-finite due timestamp")
     except (TypeError, ValueError):
         due_at = now + task["interval_seconds"]
-    if (
-        not isinstance(raw_due, (int, float))
-        or isinstance(raw_due, bool)
-        or not math.isfinite(float(raw_due))
-    ):
+
+    if not isinstance(raw_due, (int, float)):
         job["next_run_at"] = due_at
     return due_at
 
