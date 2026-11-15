@@ -206,6 +206,29 @@ def _is_supervisor_process(pid):
     return False
 
 
+def _is_scheduler_process(pid):
+    """Verify /proc identifies PID as this repository's scheduler.py process."""
+    proc = Path("/proc") / str(pid)
+    try:
+        args = (proc / "cmdline").read_bytes().split(b"\\0")
+        cwd = Path(os.readlink(proc / "cwd")).resolve()
+    except OSError:
+        return False
+    expected = (ROOT / "scripts" / "scheduler.py").resolve()
+    for arg in args[1:]:
+        if not arg or not arg.endswith(b"scheduler.py"):
+            continue
+        candidate = Path(os.fsdecode(arg))
+        if not candidate.is_absolute():
+            candidate = cwd / candidate
+        try:
+            if candidate.resolve() == expected:
+                return True
+        except OSError:
+            continue
+    return False
+
+
 def _can_signal_supervisor(pid):
     """Only signal a live process matching this repo's supervisor while lock is held."""
     try:
@@ -275,7 +298,8 @@ def _external_owner_healthy(svc, now):
     if not isinstance(data, dict):
         return False
     pid = data.get("pid")
-    if not isinstance(pid, int) or pid <= 0 or pid == os.getpid() or not _is_process_alive(pid):
+    if (type(pid) is not int or pid <= 0 or pid == os.getpid()
+            or not _is_process_alive(pid) or not _is_scheduler_process(pid)):
         return False
     return _heartbeat_verdict(hb, now, expected_pid=pid) == "ok"
 
