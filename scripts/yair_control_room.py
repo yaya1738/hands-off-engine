@@ -15,9 +15,12 @@ from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse, urlsplit
+import socket
 
 ROOT = Path(__file__).resolve().parent.parent
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
+MAX_OPERATOR_BODY_BYTES = 16 * 1024
+OPERATOR_READ_TIMEOUT_SECONDS = 5
 
 HTML = r'''<!doctype html>
 <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -120,9 +123,25 @@ class Handler(BaseHTTPRequestHandler):
             self.send_json(403, {"error": "loopback requests only"})
             return
         if urlparse(self.path).path!='/api/send': self.send_json(404,{'error':'not found'}); return
-        try: body=json.loads(self.rfile.read(int(self.headers.get('content-length','0'))))
-        except Exception: self.send_json(400,{'error':'invalid json'}); return
-        text=str(body.get('message','')).strip()
+        try:
+            content_length = int(self.headers.get('Content-Length', '0'))
+            if content_length <= 0:
+                self.send_json(400, {'error': 'Content-Length must be positive'}); return
+            if content_length > MAX_OPERATOR_BODY_BYTES:
+                self.send_json(413, {'error': 'request body exceeds size limit'}); return
+            self.connection.settimeout(OPERATOR_READ_TIMEOUT_SECONDS)
+            raw_body = self.rfile.read(content_length)
+            if len(raw_body) != content_length:
+                self.send_json(400, {'error': 'incomplete request body'}); return
+            body = json.loads(raw_body.decode('utf-8'))
+        except (ValueError, UnicodeDecodeError, json.JSONDecodeError, socket.timeout):
+            self.send_json(400, {'error': 'invalid or incomplete JSON body'}); return
+        if not isinstance(body, dict):
+            self.send_json(400, {'error': 'JSON body must be an object'}); return
+        message = body.get('message')
+        if not isinstance(message, str):
+            self.send_json(400, {'error': 'message must be a string'}); return
+        text = message.strip()
         if not text or len(text)>4000: self.send_json(400,{'error':'message must be 1-4000 characters'}); return
         try:
             sys.path.insert(0,str(ROOT)); from scripts.comm_hub import CommHub
