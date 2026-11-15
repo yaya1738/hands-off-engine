@@ -249,7 +249,7 @@ While waiting for first organic sale, can stack capital manually:
 ## 📞 NOTIFICATIONS
 
 **Telegram Bot**: Active
-**Chat ID**: 8327766663
+**Chat ID**: your_telegram_chat_id_here
 
 **Notifications Configured**:
 - ✅ First dollar earned

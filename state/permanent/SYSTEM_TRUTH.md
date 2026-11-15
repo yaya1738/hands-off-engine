@@ -158,8 +158,8 @@ print(s.check_wallet_balance(0))
 # Send Telegram message
 python3 -c "
 import requests
-requests.post('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage',
-json={'chat_id': '8327766663', 'text': 'Test'})
+requests.post('https://api.telegram.org/botyour_telegram_bot_token_here/sendMessage',
+json={'chat_id': 'your_telegram_chat_id_here', 'text': 'Test'})
 "
 
 # View landing page

@@ -1,40 +1,61 @@
 #!/usr/bin/env python3
-import json, pathlib, datetime
+"""Interactive editor for explicitly supplied card data; never invent defaults."""
+import json
+import math
+import pathlib
 
 HOME = pathlib.Path.home()
-CARDS = HOME/"hands-off"/"agents"/"cards.json"
+CARDS = HOME / "hands-off" / "agents" / "cards.json"
 
-# Default template if file missing
-default_cards = [
-  {"name":"Capital One",       "limit": 10000.0, "balance": 6234.0, "apr_pct": 24.99, "statement_day": 14},
-  {"name":"PayPal Cashback",   "limit":  8000.0, "balance": 7853.0, "apr_pct": 25.99, "statement_day": 12},
-  {"name":"PayPal Credit",     "limit":  5000.0, "balance": 4879.0, "apr_pct": 28.99, "statement_day": 10},
-  {"name":"Avant",             "limit":  2000.0, "balance":    0.0, "apr_pct": 29.99, "statement_day": 18}
-]
 
 def load_cards():
-    if CARDS.exists():
-        try: return json.loads(CARDS.read_text())
-        except: pass
-    return default_cards
-
-def ask(prompt, cur, cast=float):
-    s = input(f"{prompt} [{cur}]: ").strip()
-    if s=="":
-        return cur
+    if not CARDS.is_file():
+        raise SystemExit(f"[blocked] {CARDS} is missing; refusing to create guessed financial data")
     try:
-        return cast(s)
-    except:
-        return cur
+        data = json.loads(CARDS.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"[blocked] Cannot read card data: {exc}")
+    if not isinstance(data, dict) or not data:
+        raise SystemExit("[blocked] Card data must be a non-empty JSON object")
+    return data
 
-cards = load_cards()
-print("\n[Cards quick editor] (Enter keeps current)\n")
-for c in cards:
-    print(f"--- {c.get('name','(card)')} ---")
-    c["limit"]   = ask("Limit",   c.get("limit",0.0))
-    c["balance"] = ask("Balance", c.get("balance",0.0))
-    c["apr_pct"] = ask("APR %",   c.get("apr_pct",0.0))
-    c["statement_day"] = int(ask("Statement day (1-28)", c.get("statement_day",10), int))
 
-CARDS.write_text(json.dumps(cards, indent=2), encoding="utf-8")
-print(f"[ok] wrote {CARDS}")
+def ask(prompt, current, cast=float):
+    shown = "unknown" if current is None else str(current)
+    raw = input(f"{prompt} [{shown}]: ").strip()
+    if not raw:
+        return current
+    try:
+        value = cast(raw)
+        if isinstance(value, float) and (not math.isfinite(value) or value < 0):
+            raise ValueError("value must be finite and non-negative")
+        return value
+    except (TypeError, ValueError):
+        print("[warning] Invalid value; retaining the current value")
+        return current
+
+
+def main():
+    cards = load_cards()
+    print("\n[Cards quick editor] Blank keeps the current value; unknown remains unknown.\n")
+    for key, card in cards.items():
+        if key.startswith("_"):
+            continue
+        if not isinstance(card, dict):
+            print(f"--- {key}: invalid record; skipped ---")
+            continue
+        print(f"--- {card.get('name') or key} ---")
+        card["limit"] = ask("Limit", card.get("limit"))
+        card["balance"] = ask("Balance", card.get("balance"))
+        card["apr_pct"] = ask("APR %", card.get("apr_pct"))
+        card["statement_day"] = ask("Statement day (1-28)", card.get("statement_day"), int)
+    
+    CARDS.parent.mkdir(parents=True, exist_ok=True)
+    temporary = CARDS.with_suffix(CARDS.suffix + ".tmp")
+    temporary.write_text(json.dumps(cards, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(CARDS)
+    print(f"[ok] wrote {CARDS}")
+    
+
+if __name__ == "__main__":
+    main()
