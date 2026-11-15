@@ -9,9 +9,11 @@ on:
       - "autonomous/governed_authority.py"
       - "executor/**"
       - "scripts/factory_execution_adapter.py"
+      - "scripts/executor.py"
       - "tests/test_approval_queue_execution_boundary.py"
       - "tests/test_autonomous_change_execution_status.py"
       - "tests/test_factory_execution_adapter.py"
+      - "tests/test_executor_governed_authority.py"
       - "tests/executor/**"
       - ".github/workflows/governed-execution-regression.yml"
   push:
@@ -37,4 +39,5 @@ jobs:
           tests/test_approval_queue_execution_boundary.py
           tests/test_autonomous_change_execution_status.py
           tests/test_factory_execution_adapter.py
+          tests/test_executor_governed_authority.py
           tests/executor/test_basic_flow.py
