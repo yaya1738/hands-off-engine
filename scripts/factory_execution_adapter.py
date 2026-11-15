@@ -37,6 +37,17 @@ def execute_factory_command(
             "correlation_id": correlation_id,
         }
 
+    # The authority contract currently never grants execution_enabled.
+    # A caller-supplied gate is not a substitute for an affirmative authority
+    # decision and must never promote an approved classification into execution.
+    if decision.execution_enabled is not True:
+        return {
+            "status": "blocked",
+            "reason": "authority decision does not grant execution",
+            "command_id": decision.command_id,
+            "correlation_id": correlation_id,
+        }
+
     if not execution_gate:
         return {
             "status": "awaiting_executor_gate",
