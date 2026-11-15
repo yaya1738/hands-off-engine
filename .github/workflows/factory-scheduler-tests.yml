@@ -9,6 +9,8 @@ on:
       - "scripts/improvement_cycle.py"
       - "scripts/supervisor.py"
       - "scripts/termux_supervisor.py"
+      - "scripts/improvement_applier.py"
+      - "tests/test_improvement_applier_safety.py"
       - "scripts/task_worker.py"
       - "tests/test_scheduler_hardening.py"
       - "tests/test_self_improvement_dispatch.py"
@@ -29,3 +31,4 @@ jobs:
         run: |
           python -m unittest tests/test_scheduler_hardening.py -v
           python -m unittest tests/test_self_improvement_dispatch.py -v
+          python -m unittest tests/test_improvement_applier_safety.py -v
