@@ -24,7 +24,7 @@ API_ROOT = os.getenv("FACTORY_GITHUB_API_URL", "https://api.github.com").rstrip(
 STATE_FILE = ROOT / "state" / "github_governance_monitor_state.json"
 REPORT_FILE = ROOT / "state" / "github_governance_report.json"
 BUS_FILE = ROOT / "ai" / "coordination" / "messages.jsonl"
-MAX_PRS = 20
+MAX_PRS = 10
 STALE_DAYS = 14
 SUCCESS_CONCLUSIONS = {"success", "neutral", "skipped"}
 FAILURE_CONCLUSIONS = {"failure", "cancelled", "timed_out", "action_required", "startup_failure"}
@@ -88,7 +88,13 @@ def _runtime_evidence(root: Path, now: datetime) -> dict:
         return {"available": False, "age_seconds": None, "source": None}
     path, mtime = max(existing, key=lambda item: item[1])
     age = max(0, int(now.timestamp() - mtime))
-    return {"available": True, "age_seconds": age, "source": str(path.relative_to(root))}
+    modified_at = datetime.fromtimestamp(mtime, timezone.utc).isoformat()
+    return {
+        "available": True,
+        "age_seconds": age,
+        "source": str(path.relative_to(root)),
+        "modified_at": modified_at,
+    }
 
 
 def monitor_once(
@@ -110,6 +116,7 @@ def monitor_once(
     findings: list[dict] = []
     status_counts = {"passed": 0, "failed": 0, "pending": 0, "missing": 0, "unknown": 0}
     draft_count = 0
+    review_status_counts = {"changes_requested": 0, "approved": 0, "commented": 0, "unknown": 0}
 
     try:
         pull_requests = fetch(f"/repos/{REPO}/pulls?state=open&per_page=100&sort=updated&direction=desc")
@@ -136,6 +143,31 @@ def monitor_once(
                 errors.append(f"checks:{number}:{type(exc).__name__}")
         status_counts[checks_status] = status_counts.get(checks_status, 0) + 1
 
+        review_status = "unknown"
+        if number is not None:
+            try:
+                reviews = fetch(f"/repos/{REPO}/pulls/{number}/reviews")
+                if isinstance(reviews, list):
+                    latest_by_reviewer = {}
+                    for review in reviews:
+                        if not isinstance(review, dict):
+                            continue
+                        reviewer = (review.get("user") or {}).get("login")
+                        if reviewer:
+                            latest_by_reviewer[reviewer] = review.get("state")
+                    states = set(latest_by_reviewer.values())
+                    if "CHANGES_REQUESTED" in states:
+                        review_status = "changes_requested"
+                    elif "APPROVED" in states:
+                        review_status = "approved"
+                    elif "COMMENTED" in states:
+                        review_status = "commented"
+                    else:
+                        review_status = "unknown"
+            except Exception as exc:
+                errors.append(f"reviews:{number}:{type(exc).__name__}")
+        review_status_counts[review_status] = review_status_counts.get(review_status, 0) + 1
+
         def add(category: str, detail: str):
             findings.append({
                 "id": f"pr:{number}:{category}:{str(sha or 'no-sha')[:12]}",
@@ -149,6 +181,8 @@ def monitor_once(
                 "html_url": pr.get("html_url"),
             })
 
+        if review_status == "changes_requested":
+            add("review_changes_requested", "The latest review state includes a changes-requested review.")
         if checks_status == "failed":
             add("ci_failed", "One or more latest-head checks failed.")
         elif checks_status == "missing":
@@ -163,7 +197,7 @@ def monitor_once(
             add("stale_pr", f"Open PR has not been updated for more than {STALE_DAYS} days.")
 
         mergeable_state = str(pr.get("mergeable_state") or "").lower()
-        if pr.get("mergeable") is False or mergeable_state in {"dirty", "behind"}:
+        if pr.get("mergeable") is False or mergeable_state in {"dirty", "behind", "blocked"}:
             add("merge_blocked", f"GitHub reports mergeable={pr.get('mergeable')} state={mergeable_state or 'unknown'}.")
 
     try:
@@ -188,6 +222,7 @@ def monitor_once(
         "monitored_pr_count": len(selected),
         "draft_pr_count": draft_count,
         "check_status_counts": status_counts,
+        "review_status_counts": review_status_counts,
         "finding_count": len(findings),
         "findings": findings[:100],
         "new_coordination_comments": new_comment_count,
@@ -196,7 +231,25 @@ def monitor_once(
         "errors": errors[:20],
         "mode": "read_only",
     }
-    canonical = json.dumps(report, sort_keys=True, separators=(",", ":"))
+    signature_material = {
+        "repository": REPO,
+        "coordination_issue": COORDINATION_ISSUE,
+        "api_status": report["api_status"],
+        "open_pr_count": report["open_pr_count"],
+        "monitored_pr_count": report["monitored_pr_count"],
+        "draft_pr_count": report["draft_pr_count"],
+        "check_status_counts": status_counts,
+        "review_status_counts": review_status_counts,
+        "findings": findings,
+        "runtime_evidence": {
+            "available": runtime["available"],
+            "source": runtime["source"],
+            "modified_at": runtime.get("modified_at"),
+        },
+        "latest_coordination_comment_id": current_ids[0] if current_ids else None,
+        "errors": errors[:20],
+    }
+    canonical = json.dumps(signature_material, sort_keys=True, separators=(",", ":"))
     signature = hashlib.sha256(canonical.encode("utf-8")).hexdigest()
     report["signature"] = signature
 
