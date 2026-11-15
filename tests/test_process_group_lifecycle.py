@@ -18,7 +18,7 @@ def _pid_is_running(pid):
     stat = Path(f"/proc/{pid}/stat")
     try:
         raw = stat.read_text()
-    except FileNotFoundError:
+    except (FileNotFoundError, ProcessLookupError):
         return False
     state = raw[raw.rfind(")") + 2:].split()[0]
     return state != "Z"
