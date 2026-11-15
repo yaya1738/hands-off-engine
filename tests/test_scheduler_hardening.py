@@ -7,7 +7,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts import scheduler
+from scripts import scheduler, improvement_cycle
 
 
 class SchedulerHardeningTests(unittest.TestCase):
@@ -109,16 +109,48 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertEqual(len(rows), 100)
         self.assertEqual(rows[-1]["n"], 100)
 
+    def test_apply_generated_candidates_reads_snapshot_and_calls_applier_once(self):
+        candidate = {"id": "imp-123", "action": "update_documentation"}
+        snapshot = self.state_dir / "improvement_state.json"
+        snapshot.write_text(json.dumps({"improvements": [candidate]}))
+        fake_applier = mock.Mock()
+        fake_applier.apply_batch.return_value = [{"applied": True, "id": "imp-123"}]
+
+        with mock.patch.object(improvement_cycle, "STATE", self.state_dir), \
+             mock.patch.object(improvement_cycle, "ROOT", ROOT), \
+             mock.patch("scripts.improvement_applier.ImprovementApplier", return_value=fake_applier):
+            result = improvement_cycle.apply_generated_candidates()
+
+        self.assertEqual(result, [{"applied": True, "id": "imp-123"}])
+        fake_applier.apply_batch.assert_called_once_with([candidate])
+
+    def test_cycle_does_not_apply_when_candidate_generation_fails(self):
+        fake_results = [
+            {"success": False, "output": "generation failed"},
+            {"success": True, "output": "status ok"},
+            {"success": True, "output": "feedback ok"},
+            {"success": True, "output": "approval ok"},
+        ]
+        with mock.patch.object(improvement_cycle, "STATE", self.state_dir), \
+             mock.patch.object(improvement_cycle, "CYCLE_LOG", self.state_dir / "cycles.json"), \
+             mock.patch.object(improvement_cycle, "run_subprocess", side_effect=fake_results), \
+             mock.patch.object(improvement_cycle, "apply_generated_candidates") as apply:
+            result = improvement_cycle.main()
+
+        apply.assert_not_called()
+        self.assertFalse(result["applier_apply"])
+        self.assertEqual(result["applied_count"], 0)
+
     def test_periodic_operations_have_one_declared_owner(self):
         node1 = (ROOT / "scripts" / "node1_runtime.py").read_text()
         cycle = (ROOT / "scripts" / "improvement_cycle.py").read_text()
         scheduler_source = (ROOT / "scripts" / "scheduler.py").read_text()
 
-        # Node 1 consumes generated candidates and owns safe application only.
+        # Candidate generation/dispatch and apply have one periodic owner.
         self.assertNotIn("generate_improvements", node1)
-        self.assertIn("applier.apply_batch(candidates)", node1)
-        self.assertIn('"improvement_state.json"', node1)
-        self.assertNotIn("apply_batch(", cycle)
+        self.assertNotIn("apply_batch(", node1)
+        self.assertIn("apply_batch(candidates)", cycle)
+        self.assertIn("apply_generated_candidates()", cycle)
 
         # The improvement cycle no longer duplicates scheduler/Node 1 jobs.
         for duplicate in (
