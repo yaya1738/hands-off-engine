@@ -26,19 +26,22 @@ def test_supervisor_loads_save_state(tmp_path):
 def test_backoff_bounded():
     from scripts.supervisor import _get_backoff, MAX_BACKOFF, COOLDOWN_DURATION
     # Normal backoff
-    b = _get_backoff(0, 5)
+    b = _get_backoff(0)
     assert b == 5
-    
-    b = _get_backoff(3, 5)
+
+    b = _get_backoff(3)
     assert b == 40  # 5 * 2^3
-    
-    # Cooldown at max failures
-    b = _get_backoff(10, 5)
+
+    # Cooldown at max failures — cooldown (600) is a distinct bound from the
+    # restart backoff cap (300); the two must not be conflated.
+    b = _get_backoff(10)
     assert b == COOLDOWN_DURATION
-    
+    assert MAX_BACKOFF == 300
+    assert COOLDOWN_DURATION == 600
+
     # Normal backoff is bounded
     for i in range(10):
-        b = _get_backoff(i, 5)
+        b = _get_backoff(i)
         assert b <= MAX_BACKOFF
 
 

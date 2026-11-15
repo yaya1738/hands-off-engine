@@ -79,11 +79,28 @@ def run_forever():
         time.sleep(30)
 
 
+def run_once():
+    """Run every task once. Returns the number of failed tasks."""
+    failures = 0
+    for task in TASKS:
+        result = run_task(task)
+        status = "✅" if result["success"] else "❌"
+        print(f"{status} {task['name']}: {result['output'][:100]}")
+        if not result["success"]:
+            failures += 1
+    return failures
+
+
+def main(argv=None):
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if "--once" in argv:
+        # Exit non-zero when any scheduled task fails, so callers
+        # (supervisor, CI, cron) can detect failure instead of a
+        # silently green run.
+        failures = run_once()
+        sys.exit(1 if failures else 0)
+    run_forever()
+
+
 if __name__ == "__main__":
-    if "--once" in sys.argv:
-        for task in TASKS:
-            result = run_task(task)
-            status = "✅" if result["success"] else "❌"
-            print(f"{status} {task['name']}: {result['output'][:100]}")
-    else:
-        run_forever()
+    main()
