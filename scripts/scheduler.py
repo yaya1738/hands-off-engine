@@ -183,7 +183,12 @@ def run_forever():
                 if not _RUNNING:
                     break
                 job = state["jobs"].setdefault(task["name"], {})
-                due_at = float(job.get("next_run_at", now + task["interval_seconds"]))
+                try:
+                    due_at = float(job.get("next_run_at", now + task["interval_seconds"]))
+                except (TypeError, ValueError):
+                    due_at = now + task["interval_seconds"]
+                    job["next_run_at"] = due_at
+                    save_state(state)
                 if now < due_at:
                     continue
 
@@ -197,6 +202,12 @@ def run_forever():
                 job["last_result"] = result
                 save_state(state)
                 append_log(result)
+                if task["name"] == "integrity_check" and not result["success"]:
+                    try:
+                        from scripts.telegram_bridge import send_message
+                        send_message("⚠️ Scheduled state integrity check failed")
+                    except Exception:
+                        pass
                 status = "OK" if result["success"] else "FAIL"
                 print(f"[{result['timestamp'][:19]}] {status} {task['name']}")
 
