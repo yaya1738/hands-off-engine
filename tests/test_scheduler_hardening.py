@@ -164,7 +164,8 @@ class SchedulerHardeningTests(unittest.TestCase):
             kwargs["stdout"].write(b"x" * (scheduler.MAX_OUTPUT_CHARS * 100))
             return process
 
-        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen, \
+        with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
+             mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen, \
              mock.patch("scripts.process_group._wait_for_exit_without_reaping"):
             result = scheduler.run_task(task)
 
@@ -183,7 +184,8 @@ class SchedulerHardeningTests(unittest.TestCase):
         ]
         process.returncode = -9
 
-        with mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
+        with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
+             mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
              mock.patch("scripts.process_group._wait_for_exit_without_reaping", side_effect=TimeoutError("timeout")), \
              mock.patch.object(process_group.os, "killpg") as killpg:
             result = scheduler.run_task(task)
@@ -213,7 +215,8 @@ class SchedulerHardeningTests(unittest.TestCase):
             kwargs["stdout"].write(b"z" * (improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS * 100))
             return process
 
-        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen, \
+        with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
+             mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen, \
              mock.patch("scripts.process_group._wait_for_exit_without_reaping"):
             result = improvement_cycle.run_subprocess("sample.py")
 
@@ -230,7 +233,8 @@ class SchedulerHardeningTests(unittest.TestCase):
             -9,
         ]
 
-        with mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
+        with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
+             mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
              mock.patch("scripts.process_group._wait_for_exit_without_reaping", side_effect=TimeoutError("timeout")), \
              mock.patch.object(process_group.os, "killpg") as killpg:
             result = improvement_cycle.run_subprocess("sample.py")

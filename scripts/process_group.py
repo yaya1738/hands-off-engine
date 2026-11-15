@@ -7,12 +7,66 @@ group is terminated before the leader is reaped, preventing orphan descendants.
 """
 import os
 import signal
+from functools import lru_cache
 import subprocess
+import sys
 import tempfile
 import time
 
 
 POLL_SECONDS = 0.01
+
+
+@lru_cache(maxsize=1)
+def supports_waitid_wnowait():
+    """Verify WNOWAIT against a disposable child before launching real work."""
+    required = ("waitid", "P_PID", "WEXITED", "WNOHANG", "WNOWAIT")
+    if not all(hasattr(os, name) for name in required):
+        return False
+
+    child = None
+    reaped = False
+    try:
+        child = subprocess.Popen(
+            [sys.executable, "-c", "pass"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            close_fds=True,
+            start_new_session=True,
+        )
+        flags = os.WEXITED | os.WNOHANG | os.WNOWAIT
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline:
+            observed = os.waitid(os.P_PID, child.pid, flags)
+            if observed is not None and observed.si_pid == child.pid:
+                break
+            time.sleep(POLL_SECONDS)
+        else:
+            return False
+
+        repeated = os.waitid(os.P_PID, child.pid, flags)
+        if repeated is None or repeated.si_pid != child.pid:
+            return False
+
+        waited_pid, status = os.waitpid(child.pid, 0)
+        reaped = True
+        child.returncode = os.waitstatus_to_exitcode(status)
+        return waited_pid == child.pid and child.returncode == 0
+    except (OSError, AttributeError, NotImplementedError, ChildProcessError,
+            subprocess.SubprocessError):
+        return False
+    finally:
+        if child is not None and not reaped and child.returncode is None:
+            try:
+                child.wait(timeout=2.0)
+            except subprocess.TimeoutExpired:
+                child.terminate()
+                try:
+                    child.wait(timeout=2.0)
+                except subprocess.TimeoutExpired:
+                    child.kill()
+                    child.wait(timeout=2.0)
 
 
 def _wait_for_exit_without_reaping(pid, timeout):
@@ -60,6 +114,10 @@ def run_process(command, *, cwd, timeout, max_output_chars):
     process = None
     output = ""
     group_identity_pinned = False
+    if not supports_waitid_wnowait():
+        return {"success": False, "returncode": None,
+                "output": "unsupported waitid(WNOWAIT); refusing to launch subprocess",
+                "timed_out": False}
     try:
         with tempfile.TemporaryFile(mode="w+b") as output_file:
             process = subprocess.Popen(

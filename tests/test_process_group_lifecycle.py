@@ -161,7 +161,8 @@ print('leader exits now')
         for error in (ChildProcessError("externally reaped"), OSError("WNOWAIT unsupported")):
             with self.subTest(error=type(error).__name__):
                 process = mock.Mock(pid=987654, returncode=None)
-                with mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
+                with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
+                     mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
                      mock.patch.object(process_group, "_wait_for_exit_without_reaping", side_effect=error), \
                      mock.patch.object(process_group.os, "killpg") as killpg:
                     result = process_group.run_process(
@@ -170,6 +171,17 @@ print('leader exits now')
                 self.assertFalse(result["success"])
                 killpg.assert_not_called()
                 process.wait.assert_not_called()
+
+    def test_unsupported_wnowait_refuses_before_launching_real_subprocess(self):
+        with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=False), \
+             mock.patch.object(process_group.subprocess, "Popen") as popen:
+            result = process_group.run_process(
+                ["unused"], cwd=".", timeout=0.1, max_output_chars=100,
+            )
+        self.assertFalse(result["success"])
+        self.assertIn("refusing to launch subprocess", result["output"])
+        popen.assert_not_called()
+
 
 
 if __name__ == "__main__":
