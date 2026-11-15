@@ -8,6 +8,8 @@ Sends outbound alerts from CommHub through the bot API.
 
 Token file format:
     {"botToken": "123456:ABC...", "chatIds": [123456789]}
+For group chats, also set "userIds": [123456789] to authorize individual senders.
+Private chats require the configured chat ID to match the sender's Telegram user ID.
 
 When no token is configured, the bridge is silent (no errors, no polling).
 It silently starts and waits — the moment the token file appears, it works.
@@ -53,8 +55,9 @@ def load_config():
         cfg = json.loads(TOKEN_FILE.read_text())
         token = cfg.get("botToken", "")
         chat_ids = cfg.get("chatIds", [])
+        user_ids = cfg.get("userIds", [])
         if token and chat_ids:
-            return {"token": token, "chat_ids": chat_ids}
+            return {"token": token, "chat_ids": chat_ids, "user_ids": user_ids}
     except Exception:
         pass
     return None
@@ -80,6 +83,28 @@ class TelegramBridge:
         self.config = load_config()
         self.state = load_state()
         self.available = self.config is not None
+
+    def is_authorized_message(self, message):
+        """Authorize inbound commands against configured chat and user allowlists.
+
+        Private chats are authorized when the Telegram chat ID is explicitly
+        configured and matches the sender's user ID. Group chats additionally
+        require an explicit userIds entry; membership in an allowed group is
+        not sufficient authority to act as the owner.
+        """
+        if not self.config or not isinstance(message, dict):
+            return False
+        chat_id = message.get("chat_id")
+        user_id = message.get("user_id")
+        if chat_id is None or user_id is None:
+            return False
+        allowed_chats = {str(value) for value in self.config.get("chat_ids", [])}
+        if str(chat_id) not in allowed_chats:
+            return False
+        if str(chat_id) == str(user_id):
+            return True
+        allowed_users = {str(value) for value in self.config.get("user_ids", [])}
+        return str(user_id) in allowed_users
 
     # ── outbound: system → Telegram ──
 
@@ -128,15 +153,23 @@ class TelegramBridge:
             self.state["last_update_id"] = update.get("update_id", self.state["last_update_id"])
             msg = update.get("message", {})
             if msg and "text" in msg:
-                messages.append({
+                inbound = {
                     "update_id": update["update_id"],
-                    "chat_id": msg["chat"]["id"],
+                    "chat_id": msg.get("chat", {}).get("id"),
                     "user_id": msg.get("from", {}).get("id"),
                     "username": msg.get("from", {}).get("username", ""),
                     "text": msg["text"],
                     "timestamp": msg.get("date"),
-                })
-                self.state["messages_received"] = self.state.get("messages_received", 0) + 1
+                }
+                if self.is_authorized_message(inbound):
+                    messages.append(inbound)
+                    self.state["messages_received"] = self.state.get("messages_received", 0) + 1
+                else:
+                    self.state["messages_rejected"] = self.state.get("messages_rejected", 0) + 1
+                    log.warning(
+                        "Rejected unauthorized Telegram update %s (chat=%s user=%s)",
+                        inbound["update_id"], inbound["chat_id"], inbound["user_id"],
+                    )
 
         save_state(self.state)
         return messages
@@ -147,6 +180,16 @@ class TelegramBridge:
         hub = CommHub()
 
         for msg in messages:
+            # Defense in depth: never trust callers to have pre-filtered updates.
+            if not self.is_authorized_message(msg):
+                self.state["messages_rejected"] = self.state.get("messages_rejected", 0) + 1
+                log.warning(
+                    "Rejected unauthorized Telegram message at dispatch (chat=%s user=%s)",
+                    msg.get("chat_id"), msg.get("user_id"),
+                )
+                save_state(self.state)
+                continue
+
             text = msg["text"].strip()
 
             # Parse command-style messages
