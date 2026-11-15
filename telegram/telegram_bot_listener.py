@@ -27,7 +27,8 @@ from telegram_command_bot import TelegramCommandBot
 
 # Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional - restrict to specific user
+ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+ALLOWED_USER_ID = os.getenv("TELEGRAM_USER_ID")
 POLL_INTERVAL = 2  # seconds
 LOG_FILE = "/var/log/telegram-bot.log"
 
@@ -46,11 +47,29 @@ logger = logging.getLogger(__name__)
 class SimpleTelegramBot:
     """Simple polling-based Telegram bot using requests library."""
 
-    def __init__(self, token: str):
+    def __init__(self, token: str, allowed_chat_id=None, allowed_user_id=None):
         self.token = token
         self.base_url = f"https://api.telegram.org/bot{token}"
         self.offset = 0
+        self.allowed_chat_id = str(allowed_chat_id) if allowed_chat_id is not None else None
+        self.allowed_user_id = str(allowed_user_id) if allowed_user_id is not None else None
         self.command_bot = TelegramCommandBot()
+
+    def is_authorized_message(self, message):
+        """Fail closed unless chat is allowlisted and sender is individually authorized."""
+        if not self.allowed_chat_id or not isinstance(message, dict):
+            return False
+        chat_id = message.get("chat", {}).get("id")
+        user_id = message.get("from", {}).get("id")
+        if chat_id is None or user_id is None:
+            return False
+        if str(chat_id) != self.allowed_chat_id:
+            return False
+        # Private chats have chat_id == user_id. Group chats need a separate
+        # explicit TELEGRAM_USER_ID; allowlisting a group alone is insufficient.
+        if str(chat_id) == str(user_id):
+            return True
+        return self.allowed_user_id is not None and str(user_id) == self.allowed_user_id
 
         # Check if requests is available
         try:
@@ -114,9 +133,11 @@ class SimpleTelegramBot:
             text = message.get("text", "")
             username = message.get("from", {}).get("username", "unknown")
 
-            # Check if chat is allowed (if ALLOWED_CHAT_ID is set)
-            if ALLOWED_CHAT_ID and str(chat_id) != ALLOWED_CHAT_ID:
-                logger.warning(f"Ignoring message from unauthorized chat: {chat_id}")
+            if not self.is_authorized_message(message):
+                logger.warning(
+                    "Ignoring unauthorized Telegram sender (chat=%s user=%s)",
+                    chat_id, message.get("from", {}).get("id"),
+                )
                 return
 
             # Only process commands (start with /)
@@ -140,10 +161,9 @@ class SimpleTelegramBot:
         logger.info("Telegram Bot Listener starting...")
         logger.info(f"Poll interval: {POLL_INTERVAL}s")
 
-        if ALLOWED_CHAT_ID:
-            logger.info(f"Restricted to chat ID: {ALLOWED_CHAT_ID}")
-        else:
-            logger.warning("No ALLOWED_CHAT_ID set - bot will respond to any user!")
+        if not self.allowed_chat_id:
+            raise RuntimeError("TELEGRAM_CHAT_ID is required; refusing to poll without an inbound allowlist")
+        logger.info("Restricted to configured Telegram chat ID")
 
         while True:
             try:
@@ -210,15 +230,16 @@ def main():
         print("2. Get bot token")
         print("3. Set environment variable:")
         print("   export TELEGRAM_BOT_TOKEN='your-token-here'")
-        print("\nOptionally set TELEGRAM_CHAT_ID to restrict to specific user")
+        print("\nSet TELEGRAM_CHAT_ID to the only permitted chat")
         print("   export TELEGRAM_CHAT_ID='your-chat-id'")
+        print("For group chats, also set TELEGRAM_USER_ID to the permitted sender's numeric ID")
         print("\nThen run: python3 telegram_bot_listener.py")
         print("\nOr test without Telegram: python3 telegram_bot_listener.py --test")
         return 1
 
     # Create and run bot
     try:
-        bot = SimpleTelegramBot(BOT_TOKEN)
+        bot = SimpleTelegramBot(BOT_TOKEN, ALLOWED_CHAT_ID, ALLOWED_USER_ID)
         bot.run()
         return 0
     except Exception as e:
