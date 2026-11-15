@@ -1,4 +1,4 @@
-import os, json, subprocess, urllib.parse
+import os, json, subprocess, urllib.parse, hmac, math
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 HOST, PORT = "0.0.0.0", 8765
@@ -23,8 +23,22 @@ class H(BaseHTTPRequestHandler):
             key = data.get('key'); pf=data.get('p_fair'); pm=data.get('p_mkt'); note=data.get('note','')
             if not (key and pf and pm):
                 return self._ok('missing fields', 400)
-            line = '{"key":"%s","p_fair":%s,"p_mkt":%s,"note":"%s"}\n' % (key, pf, pm, note)
-            with open(os.path.expanduser('~/hands-off/autopilot/candidates.jsonl'),'a') as f: f.write(line)
+            try:
+                p_fair = float(pf)
+                p_mkt = float(pm)
+                if not (math.isfinite(p_fair) and math.isfinite(p_mkt)):
+                    raise ValueError("probabilities must be finite")
+                if not (0 <= p_fair <= 1 and 0 <= p_mkt <= 1):
+                    raise ValueError("probabilities must be between 0 and 1")
+                if not isinstance(key, str) or not key or len(key) > 200:
+                    raise ValueError("invalid candidate key")
+                if not isinstance(note, str) or len(note) > 2000:
+                    raise ValueError("invalid note")
+            except (TypeError, ValueError) as exc:
+                return self._ok(str(exc), 400)
+            line = json.dumps({"key": key, "p_fair": p_fair, "p_mkt": p_mkt, "note": note}) + "\\n"
+            with open(os.path.expanduser('~/hands-off/autopilot/candidates.jsonl'),'a') as f:
+                f.write(line)
             return self._ok('ok')
         return self._ok('not found', 404)
 
@@ -42,7 +56,8 @@ class H(BaseHTTPRequestHandler):
         self.wfile.write(b)
 
     def _auth(self):
-        return self.headers.get("X-Token","") == TOKEN
+        supplied = self.headers.get("X-Token", "")
+        return bool(TOKEN) and bool(supplied) and hmac.compare_digest(supplied, TOKEN)
 
     def do_GET(self):
         if not self._auth():
@@ -55,14 +70,20 @@ class H(BaseHTTPRequestHandler):
 
         if path == "/run/notify_once":
             thr = q.get("v") or ""
-            # Run under bash -lc so "source" works; pass EDGE_THRESHOLD if provided
-            cmd = (
-                'bash -lc \'cd "$HOME/hands-off/autopilot"; '
-                'source ../.venv/bin/activate; '
-                + (f'EDGE_THRESHOLD="{thr}" ' if thr else '')
-                + './notify_once.sh\''
-            )
-            r = run(cmd)
+            env = os.environ.copy()
+            if thr:
+                try:
+                    value = float(thr)
+                    if not math.isfinite(value) or not 0 <= value <= 1:
+                        raise ValueError
+                except ValueError:
+                    return self._ok("threshold must be a finite number between 0 and 1", 400)
+                env["EDGE_THRESHOLD"] = str(value)
+            cmd = [
+                "bash", "-lc",
+                'cd "$HOME/hands-off/autopilot" && source ../.venv/bin/activate && ./notify_once.sh'
+            ]
+            r = subprocess.run(cmd, env=env, capture_output=True, text=True, timeout=120)
             return self._ok(r.stdout or r.stderr, 200 if r.returncode==0 else 500)
 
         if path == "/run/restart_loop":
@@ -77,8 +98,16 @@ class H(BaseHTTPRequestHandler):
             return self._ok(r.stdout or r.stderr, 200 if r.returncode==0 else 500)
 
         if path == "/logs/tail":
-            n = int(q.get("n","120"))
-            r = run('cd "$HOME/hands-off/autopilot" && tail -n {} edges-$(date -u +%Y%m%d).log || true'.format(n))
+            try:
+                n = int(q.get("n", "120"))
+                if not 1 <= n <= 500:
+                    raise ValueError
+            except ValueError:
+                return self._ok("n must be an integer between 1 and 500", 400)
+            log_path = os.path.expanduser(
+                "~/hands-off/autopilot/edges-" + __import__("datetime").datetime.utcnow().strftime("%Y%m%d") + ".log"
+            )
+            r = subprocess.run(["tail", "-n", str(n), log_path], capture_output=True, text=True, timeout=10)
             return self._ok(r.stdout or r.stderr)
 
         if path == "/set/threshold":
@@ -88,5 +117,7 @@ class H(BaseHTTPRequestHandler):
         return self._ok("not found", 404)
 
 if __name__ == "__main__":
+    if not TOKEN:
+        raise SystemExit("CONTROL_TOKEN must be configured; refusing to start unauthenticated")
     print(f"Listening on http://{HOST}:{PORT}")
     HTTPServer((HOST, PORT), H).serve_forever()
