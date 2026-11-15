@@ -249,5 +249,55 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
         self.assertEqual(process.returncode, -signal.SIGKILL)
 
 
+    def test_stability_pass_does_not_reap_managed_child(self):
+        process = mock.Mock(pid=12345)
+        process.poll.side_effect = AssertionError("stability pass must not call Popen.poll")
+        daemon = mock.Mock()
+        daemon.process = process
+        daemon.timeout = None
+        daemon.start_time = time.time() - supervisor.WINDOW_RESET_SECONDS - 1
+        daemon.state = {"total_restarts": 0}
+        daemon.poll.return_value = None
+        daemon.record_stable = mock.Mock()
+
+        runner = supervisor.TermuxSupervisor.__new__(supervisor.TermuxSupervisor)
+        runner.running = True
+        runner.daemons = {"child": daemon}
+        runner.state = {"supervisor": {}}
+
+        def stop_after_one_iteration(_seconds):
+            runner.running = False
+
+        with mock.patch.object(supervisor, "save_state"), \
+             mock.patch.object(supervisor.time, "sleep", side_effect=stop_after_one_iteration):
+            runner._loop()
+
+        daemon.poll.assert_called_once_with()
+        daemon.record_stable.assert_called_once_with()
+        process.poll.assert_not_called()
+
+    def test_status_observation_does_not_reap_managed_child(self):
+        process = mock.Mock(pid=23456)
+        process.poll.side_effect = AssertionError("status must not call Popen.poll")
+        daemon = mock.Mock()
+        daemon.process = process
+        daemon.state = {
+            "restart_count": 0,
+            "total_restarts": 0,
+            "last_exit_code": None,
+            "last_start": None,
+            "last_exit": None,
+        }
+        runner = supervisor.TermuxSupervisor.__new__(supervisor.TermuxSupervisor)
+        runner.daemons = {"child": daemon}
+
+        with mock.patch.object(supervisor, "_observe_exit_without_reaping", return_value=(False, True)):
+            status = runner.get_status()
+
+        self.assertTrue(status["daemons"]["child"]["running"])
+        self.assertEqual(status["daemons"]["child"]["pid"], 23456)
+        process.poll.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()
