@@ -99,7 +99,7 @@ class DurableImprovementDispatchTests(unittest.TestCase):
     def test_recovery_does_not_duplicate_message_already_on_bus(self):
         message = self._write_pending()
         self_improvement.BUS.parent.mkdir(parents=True, exist_ok=True)
-        self_improvement.BUS.write_text(json.dumps(message) + "\\n")
+        self_improvement.BUS.write_text(json.dumps(message) + "\n")
         self_improvement.dispatch_one([])
         self.assertEqual(len(self._bus_messages()), 1)
         state = self_improvement._load_dispatch_state()
