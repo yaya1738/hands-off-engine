@@ -29,6 +29,7 @@ from typing import List, Dict, Optional
 # UNIFIED AI - All systems serve Yair Siegel
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from ai.unified_ai import announce_agent, get_master, should_execute, log_action, MASTER
+from scripts.merge_authority import evaluate_merge_request
 
 # Configuration
 REPO_ROOT = Path(__file__).parent.parent
@@ -259,91 +260,43 @@ class CoordinationAgent:
         return False
 
     def handle_pr_merge_request(self, pr_num: int, from_agent: str) -> bool:
-        """Handle request to merge a PR."""
-        logger.info(f"PR merge requested by {from_agent}: #{pr_num}")
-
-        # Check if PR is safe to merge (has tests passing, no conflicts, etc.)
-        is_safe = self.assess_pr_safety(pr_num)
-
-        if is_safe:
-            # Auto-merge
-            logger.info(f"PR #{pr_num} assessed as safe - auto-merging")
-            merge_result = self.execute_pr_merge(pr_num)
-
-            if merge_result:
-                self.respond_to_agent(
-                    to=from_agent,
-                    message=f"PR #{pr_num} auto-merged successfully",
-                    msg_type="response"
-                )
-                return True
-            else:
-                self.respond_to_agent(
-                    to=from_agent,
-                    message=f"PR #{pr_num} merge failed - manual review needed",
-                    msg_type="response"
-                )
-                return False
-        else:
-            # Request user approval via Telegram
-            logger.info(f"PR #{pr_num} requires user approval")
-            self.request_telegram_approval(pr_num, from_agent)
-            self.respond_to_agent(
-                to=from_agent,
-                message=f"PR #{pr_num} requires user approval - request sent to Telegram",
-                msg_type="response"
-            )
-            return False
-
-    def execute_pr_merge(self, pr_num: int) -> bool:
-        """Execute the actual PR merge via gh CLI."""
-        try:
-            result = subprocess.run(
-                ["gh", "pr", "merge", str(pr_num), "--squash", "--auto"],
-                capture_output=True, text=True, timeout=60,
-                cwd=str(REPO_ROOT)
-            )
-
-            if result.returncode == 0:
-                logger.info(f"PR #{pr_num} merged successfully")
-                return True
-            else:
-                logger.error(f"PR #{pr_num} merge failed: {result.stderr}")
-                return False
-
-        except Exception as e:
-            logger.error(f"Error merging PR #{pr_num}: {e}")
-            return False
+        """Record a merge proposal; coordination messages never authorize merges."""
+        decision = evaluate_merge_request(pr_num, from_agent)
+        logger.warning("PR #%s requires independent human merge authorization", pr_num)
+        self.respond_to_agent(
+            to=from_agent,
+            message=f"PR #{pr_num} recorded for human review. Automated merge is disabled; CI and agent assessment are not merge authorization.",
+            msg_type="response"
+        )
+        self.request_telegram_approval(pr_num, from_agent)
+        return False
 
     def request_telegram_approval(self, pr_num: int, from_agent: str):
-        """Send Telegram message requesting PR approval."""
-        import requests
-
-        token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
-        chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
-
-        message = f'''🔔 <b>PR Approval Required</b>
-
-PR #{pr_num} needs manual approval.
-Requested by: {from_agent}
-
-<b>Actions:</b>
-• /approve_pr {pr_num} - Merge the PR
-• /reject_pr {pr_num} - Decline merge
-
-Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
-'''
+        """Send a review notification using environment-only Telegram credentials."""
+        token = os.getenv("TELEGRAM_BOT_TOKEN")
+        chat_id = os.getenv("TELEGRAM_CHAT_ID")
+        if not token or not chat_id:
+            logger.info("Telegram review notification skipped: credentials are not configured")
+            return False
 
         try:
-            url = f'https://api.telegram.org/bot{token}/sendMessage'
-            requests.post(url, json={
-                'chat_id': chat_id,
-                'text': message,
-                'parse_mode': 'HTML'
-            }, timeout=10)
-            logger.info(f"Telegram approval request sent for PR #{pr_num}")
-        except Exception as e:
-            logger.error(f"Failed to send Telegram notification: {e}")
+            import requests
+            message = (
+                f"PR #{pr_num} needs independent human review. "
+                f"Requested by: {from_agent}. "
+                f"https://github.com/yaya1738/hands-off-engine/pull/{pr_num}"
+            )
+            response = requests.post(
+                f"https://api.telegram.org/bot{token}/sendMessage",
+                json={"chat_id": chat_id, "text": message},
+                timeout=10
+            )
+            response.raise_for_status()
+            logger.info("Telegram review notification sent for PR #%s", pr_num)
+            return True
+        except Exception as exc:
+            logger.error("Failed to send Telegram review notification: %s", exc)
+            return False
 
     def handle_review_request(self, msg: Dict) -> bool:
         """Handle code review request."""
@@ -393,66 +346,6 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
 
         logger.info(f"Responded to {to}: {message[:100]}")
 
-    def assess_pr_safety(self, pr_num: int) -> bool:
-        """Assess if a PR is safe to auto-merge."""
-        try:
-            # Get PR status from GitHub CLI
-            result = subprocess.run(
-                ["gh", "pr", "view", str(pr_num), "--json",
-                 "state,mergeable,reviewDecision,statusCheckRollup,additions,deletions,changedFiles"],
-                capture_output=True, text=True, timeout=30,
-                cwd=str(REPO_ROOT)
-            )
-
-            if result.returncode != 0:
-                logger.warning(f"Failed to fetch PR #{pr_num}: {result.stderr}")
-                return False
-
-            pr_data = json.loads(result.stdout)
-
-            # Check basic conditions
-            if pr_data.get('state') != 'OPEN':
-                logger.info(f"PR #{pr_num} is not open")
-                return False
-
-            if pr_data.get('mergeable') != 'MERGEABLE':
-                logger.info(f"PR #{pr_num} has merge conflicts")
-                return False
-
-            # Check status checks (CI)
-            status_checks = pr_data.get('statusCheckRollup', [])
-            if status_checks:
-                for check in status_checks:
-                    if check.get('conclusion') not in ['SUCCESS', 'NEUTRAL', 'SKIPPED']:
-                        logger.info(f"PR #{pr_num} has failing checks")
-                        return False
-
-            # Safety bounds: auto-merge small changes only
-            additions = pr_data.get('additions', 0)
-            deletions = pr_data.get('deletions', 0)
-            changed_files = pr_data.get('changedFiles', 0)
-
-            # Auto-merge if:
-            # - Less than 200 lines changed total
-            # - Less than 5 files changed
-            # - OR has approved review
-            is_small_change = (additions + deletions) < 200 and changed_files < 5
-            has_approval = pr_data.get('reviewDecision') == 'APPROVED'
-
-            if is_small_change or has_approval:
-                logger.info(f"PR #{pr_num} is safe to auto-merge (small={is_small_change}, approved={has_approval})")
-                return True
-            else:
-                logger.info(f"PR #{pr_num} too large for auto-merge: +{additions}/-{deletions}, {changed_files} files")
-                return False
-
-        except subprocess.TimeoutExpired:
-            logger.error(f"Timeout checking PR #{pr_num}")
-            return False
-        except Exception as e:
-            logger.error(f"Error assessing PR #{pr_num}: {e}")
-            return False
-
     def extract_pr_number(self, context: Dict) -> Optional[int]:
         """Extract PR number from message context."""
         pr = context.get("pr")
@@ -493,41 +386,6 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
             json.dump(status, f, indent=2)
 
         logger.info(f"Task {task_id} status → {new_status}")
-
-    def check_draft_pr_buildup(self):
-        """Check for draft PRs from trusted authors and trigger mark-ready workflow if needed."""
-        try:
-            # Get draft PRs from trusted authors (copilot)
-            result = subprocess.run(
-                ["gh", "pr", "list", "--state", "open", "--draft",
-                 "--json", "number,author,isDraft", "--limit", "50"],
-                capture_output=True, text=True, timeout=30,
-                cwd=str(REPO_ROOT)
-            )
-
-            if result.returncode != 0:
-                return
-
-            prs = json.loads(result.stdout)
-
-            # Filter for trusted bot authors
-            trusted_authors = ['copilot', 'copilot-swe-agent', 'github-actions[bot]', 'dependabot[bot]', 'app/copilot-swe-agent']
-            draft_prs = [
-                p for p in prs
-                if p.get('isDraft') and
-                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
-            ]
-
-            if len(draft_prs) >= 3:  # Trigger if 3+ drafts from bots
-                logger.info(f"Found {len(draft_prs)} draft PRs from trusted authors - triggering mark-ready workflow")
-                subprocess.run(
-                    ["gh", "workflow", "run", "Mark Copilot PRs Ready for Review"],
-                    capture_output=True, timeout=30,
-                    cwd=str(REPO_ROOT)
-                )
-
-        except Exception as e:
-            logger.debug(f"Draft PR check skipped: {e}")
 
     def check_conflicting_prs(self):
         """Check for PRs with merge conflicts and request Copilot to fix them immediately."""
@@ -602,9 +460,6 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
                 self.process_task(task)
             except Exception as e:
                 logger.error(f"Error processing task: {e}")
-
-        # Proactively check for draft PR buildup from trusted bots
-        self.check_draft_pr_buildup()
 
         # Check for conflicting PRs and request fixes
         self.check_conflicting_prs()
