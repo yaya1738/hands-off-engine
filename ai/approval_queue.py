@@ -25,11 +25,23 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import hashlib
 import fcntl
+from functools import wraps
 
 REPO_ROOT = Path(__file__).parent.parent
 QUEUE_FILE = REPO_ROOT / "state" / "approval_queue.json"
 APPROVAL_MAX_AGE_SECONDS = 24 * 60 * 60
 
+
+def _queue_locked(method):
+    """Serialize queue mutations across processes using an advisory file lock."""
+    @wraps(method)
+    def wrapper(self, *args, **kwargs):
+        lock_path = self.queue_file.with_name(self.queue_file.name + ".lock")
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(lock_path, "a+") as lock_file:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+            return method(self, *args, **kwargs)
+    return wrapper
 
 class ApprovalQueue:
     """Manages pending changes requiring user approval."""
@@ -71,6 +83,7 @@ class ApprovalQueue:
         with open(self.queue_file, 'w') as f:
             json.dump(queue, f, indent=2)
 
+    @_queue_locked
     def add_change(
         self,
         title: str,
@@ -159,6 +172,7 @@ class ApprovalQueue:
 
         return None
 
+    @_queue_locked
     def approve(self, change_id: str) -> bool:
         """
         Approve a change and move it to approved queue.
@@ -181,6 +195,7 @@ class ApprovalQueue:
 
         return False
 
+    @_queue_locked
     def reject(self, change_id: str, reason: str = "") -> bool:
         """
         Reject a change and move it to rejected queue.
