@@ -1,0 +1,40 @@
+name: Governed execution regression tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "ai/approval_queue.py"
+      - "ai/autonomous_change.py"
+      - "autonomous/governed_authority.py"
+      - "executor/**"
+      - "scripts/factory_execution_adapter.py"
+      - "tests/test_approval_queue_execution_boundary.py"
+      - "tests/test_autonomous_change_execution_status.py"
+      - "tests/test_factory_execution_adapter.py"
+      - "tests/executor/**"
+      - ".github/workflows/governed-execution-regression.yml"
+  push:
+    branches: [main, "security/**"]
+
+permissions:
+  contents: read
+
+jobs:
+  focused-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install --disable-pip-version-check pytest
+      - name: Run governed execution regressions
+        run: >-
+          python -m pytest -q
+          tests/test_approval_queue_execution_boundary.py
+          tests/test_autonomous_change_execution_status.py
+          tests/test_factory_execution_adapter.py
+          tests/executor/test_basic_flow.py
