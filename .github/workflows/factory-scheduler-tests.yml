@@ -29,6 +29,8 @@ on:
       - "tests/test_scheduler_heartbeat_contract.py"
       - "tests/test_supervisor_recovery_contract.py"
       - "tests/test_termux_supervisor_lock_ownership.py"
+      - "tests/test_termux_supervisor_output_drain.py"
+      - "tests/test_termux_supervisor_shutdown.py"
       - "tests/test_self_improvement_dispatch.py"
       - ".github/workflows/factory-scheduler-tests.yml"
   workflow_dispatch:
@@ -54,6 +56,9 @@ jobs:
           fi
           if [ -f tests/test_termux_supervisor_output_drain.py ]; then
             python -m unittest tests/test_termux_supervisor_output_drain.py -v
+          fi
+          if [ -f tests/test_termux_supervisor_shutdown.py ]; then
+            python -m unittest tests/test_termux_supervisor_shutdown.py -v
           fi
           python -m unittest tests/test_self_improvement_dispatch.py -v
           python -m unittest tests/test_improvement_applier_safety.py -v
