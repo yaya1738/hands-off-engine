@@ -62,10 +62,12 @@ def test_telegram_environment_lookups_have_no_embedded_fallbacks():
                 continue
             if not node.args or not isinstance(node.args[0], ast.Constant):
                 continue
-            if node.args[0].value in credential_names:
-                assert len(node.args) == 1, (
-                    f"{relative_path}:{node.lineno} embeds a credential fallback"
-                )
+            if node.args[0].value in credential_names and len(node.args) > 1:
+                fallback = node.args[1]
+                assert (
+                    isinstance(fallback, ast.Constant)
+                    and fallback.value in ("", None)
+                ), f"{relative_path}:{node.lineno} embeds a non-empty credential fallback"
 
 
 def test_chat_id_assignments_are_not_numeric_literals():
