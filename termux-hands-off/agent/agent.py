@@ -104,7 +104,8 @@ def main():
         t=src["type"]
         if t=="manual_file":
             if not os.path.isfile(src["path"]):
-                notes.append(f"Manual finance source unavailable (local-only file missing): {src[\"path\"]}")
+                manual_path = src["path"]
+                notes.append(f"Manual finance source unavailable (local-only file missing): {manual_path}")
                 continue
             d=read_manual(src["path"]); s=compute_totals(d)
             for k in total: total[k]+=s[k]
