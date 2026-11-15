@@ -6,7 +6,7 @@ import json
 # intentionally excluded; the approval timestamp is checked separately.
 APPROVED_COMMAND_FIELDS = (
     "id", "source", "action", "target", "payload", "mode", "timestamp",
-    "priority", "sync", "timeout_seconds", "queued_at",
+    "priority", "sync", "timeout_seconds", "queued_at", "objective",
 )
 
 
