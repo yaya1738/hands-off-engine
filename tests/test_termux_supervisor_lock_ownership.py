@@ -97,6 +97,22 @@ class SupervisorLockOwnershipTests(unittest.TestCase):
         self.assertFalse(self.pid_path.exists())
         self.assertTrue(self.lock_path.exists())
 
+    def test_partial_lock_record_writes_are_completed(self):
+        owner = self.new_lock()
+        original_write = os.write
+
+        def write_one_byte(fd, data):
+            return original_write(fd, data[:1])
+
+        with mock.patch.object(supervisor.os, "write", side_effect=write_one_byte):
+            self.assertTrue(owner.try_acquire())
+
+        self.assertEqual(self.lock_path.read_text(), str(os.getpid()))
+        self.assertEqual(self.pid_path.read_text(), str(os.getpid()))
+        owner.release()
+        self.assertFalse(self.pid_path.exists())
+        self.assertEqual(self.lock_path.read_text(), "")
+
     def test_pid_marker_write_failure_releases_only_our_lock(self):
         owner = self.new_lock()
         original_write_text = Path.write_text
