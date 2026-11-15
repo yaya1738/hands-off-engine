@@ -2,6 +2,7 @@
 
 from pathlib import Path
 import ast
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 PRIVATE_PATHS = (
@@ -51,11 +52,11 @@ def test_identity_allowlists_are_not_hardcoded():
         assert "HANDS_OFF_MASTER_DEVICES" in source
         assert "HANDS_OFF_MASTER_SSH_FINGERPRINTS" in source
         assert "HANDS_OFF_TRUSTED_IPS" in source
-        assert not __import__("re").search(
-            r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}", source, __import__("re").I
+        assert not re.search(
+            r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", source, re.I
         )
         assert not __import__("re").search(
-            r"\\b\\d{1,3}(?:\\.\\d{1,3}){3}\\b", source
+            r"\b\d{1,3}(?:\.\d{1,3}){3}\b", source
         )
         assert not __import__("re").search(r"SHA256:[A-Za-z0-9+/=]{20,}", source)
 
