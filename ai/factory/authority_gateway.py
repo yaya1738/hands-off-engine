@@ -10,6 +10,8 @@ import fcntl
 import hashlib
 import json
 import os
+from collections import deque
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -70,6 +72,7 @@ class FactoryAuthorityGateway:
             "approval_required": True,
             "execution_enabled": False,
             "metadata": metadata,
+            "created_at": datetime.now(timezone.utc).isoformat(),
         }
 
         self.state_dir.mkdir(parents=True, exist_ok=True)
@@ -105,6 +108,54 @@ class FactoryAuthorityGateway:
             "goal_id": goal_id,
             "execution_enabled": False,
         }
+
+    def list_goals(self, *, limit: int = 50, status: str | None = None) -> list[dict]:
+        """Return a bounded newest-first view of queued objectives (read-only)."""
+        if isinstance(limit, bool) or not isinstance(limit, int) or not 1 <= limit <= 200:
+            raise ValueError("limit must be an integer from 1 to 200")
+        if status is not None:
+            status = self._validate_text(status, "status", 40)
+        if not self.queue_path.exists():
+            return []
+        tail = deque(maxlen=2000)
+        with self.queue_path.open("r", encoding="utf-8") as queue:
+            for line in queue:
+                tail.append(line)
+        records = []
+        for line in reversed(tail):
+            if not line.strip():
+                continue
+            try:
+                record = json.loads(line)
+            except json.JSONDecodeError:
+                continue
+            if not isinstance(record, dict):
+                continue
+            if status is not None and record.get("status") != status:
+                continue
+            records.append(record)
+            if len(records) >= limit:
+                break
+        return records
+
+    def get_goal(self, goal_id: str) -> dict | None:
+        """Find one objective by stable ID without modifying queue state."""
+        goal_id = self._validate_text(goal_id, "goal_id", 64)
+        if len(goal_id) != 64 or any(ch not in "0123456789abcdef" for ch in goal_id.lower()):
+            raise ValueError("goal_id must be a 64-character hexadecimal ID")
+        if not self.queue_path.exists():
+            return None
+        with self.queue_path.open("r", encoding="utf-8") as queue:
+            for line in queue:
+                if not line.strip():
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if isinstance(record, dict) and record.get("goal_id") == goal_id:
+                    return record
+        return None
 
 
 __all__ = ["FactoryAuthorityGateway"]
