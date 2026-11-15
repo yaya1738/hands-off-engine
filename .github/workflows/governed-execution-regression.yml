@@ -7,11 +7,13 @@ on:
       - "ai/approval_queue.py"
       - "ai/autonomous_change.py"
       - "ai/ai_runner.py"
+      - "autonomous/system_doctor.py"
       - "autonomous/governed_authority.py"
       - "executor/**"
       - "scripts/factory_execution_adapter.py"
       - "scripts/executor.py"
       - "tests/test_ai_runner_execution_boundary.py"
+      - "tests/test_system_doctor_execution_boundary.py"
       - "tests/test_approval_queue_execution_boundary.py"
       - "tests/test_autonomous_change_execution_status.py"
       - "tests/test_factory_execution_adapter.py"
@@ -39,6 +41,7 @@ jobs:
         run: >-
           python -m pytest -q
           tests/test_ai_runner_execution_boundary.py
+          tests/test_system_doctor_execution_boundary.py
           tests/test_approval_queue_execution_boundary.py
           tests/test_autonomous_change_execution_status.py
           tests/test_factory_execution_adapter.py
