@@ -50,11 +50,16 @@ class ManagedDaemonOutputDrainTests(unittest.TestCase):
 
     def stop_child(self, daemon):
         process = daemon.process
-        if process is not None and process.poll() is None:
-            process.kill()
-            process.wait(timeout=3)
-        if daemon.process is not None:
-            daemon.poll()
+        if process is not None and process.returncode is None:
+            try:
+                process.kill()
+            except ProcessLookupError:
+                pass
+        deadline = time.monotonic() + 3
+        while daemon.process is not None and time.monotonic() < deadline:
+            daemon.poll()  # Uses WNOWAIT; do not reap the leader before group cleanup.
+            if daemon.process is not None:
+                time.sleep(0.01)
         if daemon.output_thread is not None:
             daemon.output_thread.join(timeout=2)
 
@@ -78,6 +83,29 @@ time.sleep(10)
             self.assertIn("O", output)
             self.assertIn("E", output)
             self.assertIsNone(daemon.poll())
+        finally:
+            self.stop_child(daemon)
+
+    def test_small_output_is_persisted_before_child_exits(self):
+        script = """
+import sys, time
+sys.stdout.write('small-output\\n')
+sys.stdout.flush()
+open(__MARKER__, 'w').write('written')
+time.sleep(10)
+"""
+        daemon, marker = self.start_child(script)
+        try:
+            self.assertTrue(self.wait_for_marker(marker), "child did not publish output marker")
+            log_path = supervisor.LOG_DIR / "noisy.log"
+            deadline = time.monotonic() + 1
+            while time.monotonic() < deadline:
+                if log_path.exists() and "small-output" in log_path.read_text():
+                    break
+                time.sleep(0.01)
+            else:
+                self.fail("small output remained buffered until child exit")
+            self.assertIsNone(daemon.process.poll())
         finally:
             self.stop_child(daemon)
 
@@ -116,11 +144,8 @@ sys.stderr.flush()
 open(__MARKER__, 'w').write('continued')
 time.sleep(10)
 """
-        with mock.patch.object(
-            supervisor.RotatingLog,
-            "write",
-            side_effect=OSError("simulated disk full"),
-        ), mock.patch.object(supervisor.log, "warning") as warning:
+        with mock.patch("builtins.open", side_effect=OSError("simulated disk full")), \
+             mock.patch.object(supervisor.log, "warning") as warning:
             daemon, marker = self.start_child(script)
             try:
                 self.assertTrue(

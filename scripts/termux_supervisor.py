@@ -26,6 +26,7 @@ import signal
 import logging
 import subprocess
 import threading
+import codecs
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
@@ -44,6 +45,7 @@ MIN_BACKOFF = 2       # seconds
 MAX_BACKOFF = 300     # 5 minutes
 MAX_RESTARTS_WINDOW = 10  # resets after this many successful seconds
 WINDOW_RESET_SECONDS = 600  # 10 minutes of stability resets restart counter
+SHUTDOWN_GRACE_SECONDS = 5.0
 
 # Daemons to supervise
 DAEMONS = {
@@ -231,13 +233,42 @@ class RotatingLog:
 
     def write(self, data: str):
         self._rotate()
-        try:
-            with open(self.log_path, "a") as f:
-                f.write(data)
-        except Exception:
-            pass
+        with open(self.log_path, "a") as f:
+            f.write(data)
 
 # ── Daemon management ──
+
+def _observe_exit_without_reaping(process, timeout: float = 0.0):
+    """Return (exited, pgid_pinned) without freeing the leader PID/PGID.
+
+    waitid(..., WNOWAIT) observes exit while leaving the child waitable. That
+    keeps its PID (and the session/process-group ID created from it) reserved
+    until descendants have been signalled. Calling Popen.poll()/wait() first
+    would reap the leader and open a small PID/PGID-reuse race.
+    """
+    if process.returncode is not None:
+        return True, False
+    if not all(hasattr(os, attr) for attr in ("waitid", "P_PID", "WNOWAIT")):
+        return False, False
+    deadline = time.monotonic() + max(0.0, timeout)
+    while True:
+        try:
+            result = os.waitid(
+                os.P_PID,
+                process.pid,
+                os.WEXITED | os.WNOHANG | os.WNOWAIT,
+            )
+        except ChildProcessError:
+            return True, False
+        except InterruptedError:
+            continue
+        if result is not None and result.si_pid:
+            return True, True
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            return False, True
+        time.sleep(min(0.01, remaining))
+
 
 class ManagedDaemon:
     """One daemon: start, monitor, backoff, restart."""
@@ -265,13 +296,18 @@ class ManagedDaemon:
     def _drain_output(self, stream):
         """Continuously drain merged stdout/stderr into bounded rotating logs."""
         log_write_error_reported = False
+        decoder = codecs.getincrementaldecoder("utf-8")(errors="replace")
         try:
             while True:
-                chunk = stream.read(4096)
+                # Binary BufferedReader.read1 returns currently available pipe
+                # bytes instead of waiting to fill the requested chunk size.
+                chunk = stream.read1(4096)
                 if not chunk:
                     break
                 try:
-                    self.log.write(chunk)
+                    decoded = decoder.decode(chunk)
+                    if decoded:
+                        self.log.write(decoded)
                 except Exception as exc:
                     # A full/unavailable log disk must not stop pipe draining
                     # and deadlock the child. Report once, then keep consuming.
@@ -286,6 +322,13 @@ class ManagedDaemon:
             log.debug("%s: output drain stopped: %s", self.name, exc)
         finally:
             try:
+                tail = decoder.decode(b"", final=True)
+                if tail:
+                    self.log.write(tail)
+            except Exception as exc:
+                if not log_write_error_reported:
+                    log.warning("%s: unable to persist final child output: %s", self.name, exc)
+            try:
                 stream.close()
             except Exception:
                 pass
@@ -299,7 +342,7 @@ class ManagedDaemon:
             self.process = subprocess.Popen(
                 cmd, cwd=REPO_ROOT,
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                text=True, bufsize=1,
+                text=False, bufsize=-1, start_new_session=True,
             )
             self.output_thread = threading.Thread(
                 target=self._drain_output,
@@ -315,22 +358,48 @@ class ManagedDaemon:
             log.error(f"Failed to start {self.name}: {e}")
 
     def poll(self) -> Optional[int]:
-        """Poll for exit. Returns returncode or None if still running."""
+        """Poll for exit and clean the owned group before reaping its leader."""
         if self.process is None:
             return None
-        returncode = self.process.poll()
-        if returncode is not None:
-            self.state["last_exit"] = datetime.now(timezone.utc).isoformat()
-            self.state["last_exit_code"] = returncode
-            # The reader drains concurrently while the child runs. On exit,
-            # allow it to consume the final buffered bytes without blocking
-            # the supervisor indefinitely if a descendant inherited the pipe.
+        exited, pgid_pinned = _observe_exit_without_reaping(self.process)
+        if not exited:
+            return None
+        if not pgid_pinned:
+            # The leader was already reaped elsewhere (or waitid is unavailable).
+            # Do not signal a numeric PGID that may now belong to another process.
+            log.error("%s leader exit observed after reaping; refusing unsafe process-group signal", self.name)
+            returncode = self.process.poll()
             if self.output_thread is not None:
                 self.output_thread.join(timeout=1.0)
-                if not self.output_thread.is_alive():
+                if self.output_thread.is_alive():
+                    log.error("%s output reader remains active after unsafe exit observation", self.name)
+                else:
                     self.output_thread = None
-            self.process = None
-            self.start_time = None
+        else:
+            try:
+                os.killpg(self.process.pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+            if self.output_thread is not None:
+                self.output_thread.join(timeout=0.5)
+            # The unreaped leader pins its PID/PGID, so this cannot hit a newly
+            # allocated unrelated process group. SIGKILL also catches descendants
+            # that ignore SIGTERM or have redirected their output.
+            try:
+                os.killpg(self.process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            if self.output_thread is not None:
+                self.output_thread.join(timeout=1.0)
+                if self.output_thread.is_alive():
+                    log.error("%s output reader remains active after descendant cleanup", self.name)
+                else:
+                    self.output_thread = None
+            returncode = self.process.wait()
+        self.state["last_exit"] = datetime.now(timezone.utc).isoformat()
+        self.state["last_exit_code"] = returncode
+        self.process = None
+        self.start_time = None
         return returncode
 
     def backoff_seconds(self) -> float:
@@ -388,19 +457,92 @@ class TermuxSupervisor:
         try:
             self._loop()
         finally:
-            self.lock.release()
-            save_state(self.state)
-            log.info("Supervisor shut down")
+            try:
+                self._shutdown_daemons()
+            finally:
+                self.lock.release()
+                save_state(self.state)
+                log.info("Supervisor shut down")
 
         return True
 
     def _handle_signal(self, signum, frame):
         log.info(f"Signal {signum} received, shutting down gracefully")
+        # Keep signal handling non-blocking. The run() finally block owns the
+        # bounded terminate/wait/kill sequence before releasing the supervisor lock.
         self.running = False
+
+    def _shutdown_daemons(self, grace: float = SHUTDOWN_GRACE_SECONDS):
+        """Stop owned process groups before releasing the singleton lock.
+
+        Keep each child leader unreaped until its process group has received
+        SIGKILL. This pins the numeric PGID and prevents PID/PGID reuse from
+        redirecting cleanup signals to an unrelated process.
+        """
+        owned = []
         for name, daemon in self.daemons.items():
-            if daemon.process and daemon.process.poll() is None:
-                log.info(f"Terminating {name}")
-                daemon.process.terminate()
+            process = daemon.process
+            if process is None:
+                continue
+            exited, pgid_pinned = _observe_exit_without_reaping(process)
+            if not pgid_pinned:
+                log.error("Unable to pin %s process-group identity; refusing group signal", name)
+                owned.append((name, daemon, process, False))
+                continue
+            owned.append((name, daemon, process, True))
+            try:
+                os.killpg(process.pid, signal.SIGTERM)
+                log.info("Terminating process group for %s", name)
+            except ProcessLookupError:
+                pass
+            except OSError as exc:
+                log.warning("Unable to terminate process group for %s: %s", name, exc)
+
+        deadline = time.monotonic() + max(0.0, grace)
+        for name, daemon, process, pgid_pinned in owned:
+            if pgid_pinned:
+                _observe_exit_without_reaping(
+                    process,
+                    timeout=max(0.0, deadline - time.monotonic()),
+                )
+                # Do this even if the leader exited promptly: an unreaped zombie
+                # keeps the PGID reserved while remaining descendants are killed.
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                except OSError as exc:
+                    log.warning("Unable to kill remaining process group for %s: %s", name, exc)
+            else:
+                # No safe PGID identity is available. Reap/stop only the exact
+                # Popen leader; never risk signalling a recycled process group.
+                try:
+                    if process.poll() is None:
+                        process.terminate()
+                except ProcessLookupError:
+                    pass
+
+            if daemon.output_thread is not None:
+                daemon.output_thread.join(timeout=1.0)
+                if daemon.output_thread.is_alive():
+                    log.error("%s output reader remains active after process-group cleanup", name)
+                else:
+                    daemon.output_thread = None
+
+            try:
+                process.wait(timeout=1.0)
+            except subprocess.TimeoutExpired:
+                log.error("%s leader survived shutdown; killing exact process", name)
+                try:
+                    process.kill()
+                except ProcessLookupError:
+                    pass
+                try:
+                    process.wait(timeout=1.0)
+                except subprocess.TimeoutExpired:
+                    log.error("%s leader could not be reaped during shutdown", name)
+            daemon.process = None
+            daemon.start_time = None
 
     def _loop(self):
         while self.running:
