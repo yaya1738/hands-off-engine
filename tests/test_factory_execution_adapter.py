@@ -63,10 +63,10 @@ def test_factory_live_preserves_correlation(monkeypatch):
         execution_gate=True,
     )
 
-    assert result["status"] == "completed"
+    assert result["status"] == "blocked"
     assert result["command_id"] == "fx-5"
     assert result["correlation_id"] == "mailbox-42"
-    assert result["factory"] == {"decision": "accepted"}
+    assert result["execution_enabled"] is False
 
 
 def test_system_listener_routes_approved_factory_command(monkeypatch):
@@ -169,8 +169,9 @@ def test_factory_adapter_maps_verified_to_completed(monkeypatch):
         "objective": "inspect runtime",
     }, execution_gate=True)
 
-    assert result["status"] == "completed"
-    assert result["factory"]["status"] == "verified"
+    assert result["status"] == "blocked"
+    assert result["execution_enabled"] is False
+    assert "queue-only" in result["reason"]
 
 
 def test_factory_adapter_rejects_action_as_objective(monkeypatch):
