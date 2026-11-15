@@ -48,7 +48,7 @@ def load_or_create_control_room_token(path: Path = TOKEN_PATH) -> str:
         except FileExistsError:
             return load_or_create_control_room_token(path)
         with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            handle.write(token + "\\n")
+            handle.write(token + "\n")
         return token
 
 
