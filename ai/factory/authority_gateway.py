@@ -170,10 +170,11 @@ class FactoryAuthorityGateway:
         goal_id = self._validate_text(goal_id, "goal_id", 64)
         if len(goal_id) != 64 or any(ch not in "0123456789abcdef" for ch in goal_id.lower()):
             raise ValueError("goal_id must be a 64-character hexadecimal ID")
+        matching_record = None
         for record in self._iter_queue_records():
-            if record.get("goal_id") == goal_id:
-                return record
-        return None
+            if record.get("goal_id") == goal_id and matching_record is None:
+                matching_record = record
+        return matching_record
 
 
 __all__ = ["FactoryAuthorityGateway", "ObjectiveQueueIntegrityError"]
