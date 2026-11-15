@@ -303,8 +303,12 @@ def run_once():
         release_lock(lock)
 
 
+def main(argv=None):
+    """Return a failing exit status when the scheduler cannot acquire ownership."""
+    args = sys.argv[1:] if argv is None else list(argv)
+    success = run_once() if "--once" in args else run_forever()
+    return 0 if success else 1
+
+
 if __name__ == "__main__":
-    if "--once" in sys.argv:
-        run_once()
-    else:
-        run_forever()
+    raise SystemExit(main())
