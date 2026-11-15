@@ -122,6 +122,7 @@ def _atomic_write_text(path, text):
     tmp = path.with_name(f"{path.name}.{os.getpid()}.tmp")
     try:
         fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        os.fchmod(fd, 0o600)
         with os.fdopen(fd, "w") as f:
             f.write(text)
             f.flush()
@@ -147,6 +148,7 @@ def _acquire_lock(path):
     except (IOError, OSError):
         os.close(fd)
         return None
+    os.fchmod(fd, 0o600)
     return fd
 
 
