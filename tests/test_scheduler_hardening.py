@@ -118,6 +118,7 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertNotIn("generate_improvements", node1)
         self.assertIn("applier.apply_batch(candidates)", node1)
         self.assertIn('"improvement_state.json"', node1)
+        self.assertNotIn("apply_batch(", cycle)
 
         # The improvement cycle no longer duplicates scheduler/Node 1 jobs.
         for duplicate in (
