@@ -11,17 +11,15 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 
+def _env_list(name: str) -> list:
+    return [value.strip() for value in os.environ.get(name, "").split(",") if value.strip()]
+
+
 MASTER_IDENTITY = {
-    "name": "Yair Siegel",
-    "email": "siegel.yaz@gmail.com",
-    "devices": [
-        "termux@handsoff",  # Phone
-        "pm-agent@206.189.60.125",  # Termux agent
-        "handsoff-do138",  # Server
-    ],
-    "ssh_key_fingerprints": [
-        # Your keys - SHA256 fingerprints
-    ]
+    "name": os.environ.get("HANDS_OFF_MASTER_NAME", "Master operator"),
+    "email": os.environ.get("HANDS_OFF_MASTER_EMAIL", ""),
+    "devices": _env_list("HANDS_OFF_MASTER_DEVICES"),
+    "ssh_key_fingerprints": _env_list("HANDS_OFF_MASTER_SSH_FINGERPRINTS"),
 }
 
 APPROVAL_QUEUE = Path("/root/hands-off-engine/security/approval_queue.json")

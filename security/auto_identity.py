@@ -16,40 +16,17 @@ import hashlib
 from pathlib import Path
 from datetime import datetime
 
+def _env_list(name: str) -> list:
+    return [value.strip() for value in os.environ.get(name, "").split(",") if value.strip()]
+
+
 MASTER_IDENTITY = {
-    "name": "Yair Siegel",
-    "email": "siegel.yaz@gmail.com",
-
-    # SSH key fingerprints (SHA256)
-    "key_fingerprints": [
-        "SHA256:oIAeGFrxTHyg4Tjat9u1Q05lEdy823nqxhfWuU/t7ro",  # handsoff-do138
-        "SHA256:g71K8Lk8TYFDEQCj/vmD1jjHls1GPjqyjkA7Ke7yVk4",  # pm-agent
-        "SHA256:vTfnGmsuPm8guKkew31xyAl63XMM2GspeugpFR5HyfY",  # termux@handsoff
-    ],
-
-    # Known device identifiers
-    "devices": [
-        "termux@handsoff",
-        "pm-agent@206.189.60.125",
-        "handsoff-do138",
-    ],
-
-    # Known source IPs (your phone, your servers)
-    "trusted_ips": [
-        "127.0.0.1",        # Local
-        "138.68.103.156",   # pm-helper
-        "167.172.132.72",   # ho-cli-main
-        "167.172.155.42",   # ho-compute-1
-        "178.128.155.150",  # ho-compute-2
-        "64.227.26.112",    # ho-scale
-        "157.230.221.18",   # ho-topdawg-4
-    ],
-
-    # Environment markers
-    "env_markers": [
-        ("USER", "root"),
-        ("HOME", "/root"),
-    ]
+    "name": os.environ.get("HANDS_OFF_MASTER_NAME", "Master operator"),
+    "email": os.environ.get("HANDS_OFF_MASTER_EMAIL", ""),
+    "key_fingerprints": _env_list("HANDS_OFF_MASTER_SSH_FINGERPRINTS"),
+    "devices": _env_list("HANDS_OFF_MASTER_DEVICES"),
+    "trusted_ips": _env_list("HANDS_OFF_TRUSTED_IPS"),
+    "env_markers": [],
 }
 
 IDENTITY_LOG = Path("/root/hands-off-engine/security/identity_checks.jsonl")

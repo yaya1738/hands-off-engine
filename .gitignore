@@ -74,3 +74,16 @@ backups/
 state/
 termux-hands-off/autopilot/*.env
 termux-hands-off/autopilot/*.env.save
+
+# Private local-only user data (never commit)
+security/yair_identity_profile.json
+security/yair_human_identity.json
+security/verification_audit.jsonl
+finance/yair_finance_hub.json
+state/doctor_meetings.jsonl
+termux-hands-off/agents/emergency_info.json
+termux-hands-off/agents/external_accounts.json
+termux-hands-off/agents/cards.json
+termux-hands-off/agent/balances_manual.yaml
+termux-hands-off/agent/balances_manual.yaml.bak
+termux-hands-off/agent/addresses_eth.yaml
