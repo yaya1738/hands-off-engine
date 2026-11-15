@@ -85,15 +85,15 @@ def _runtime_evidence(root: Path, now: datetime) -> dict:
     ]
     existing = [(path, path.stat().st_mtime) for path in candidates if path.exists()]
     if not existing:
-        return {"available": False, "age_seconds": None, "source": None}
+        return {"available": False, "age_seconds": None, "source": None, "freshness": "unknown"}
     path, mtime = max(existing, key=lambda item: item[1])
     age = max(0, int(now.timestamp() - mtime))
-    modified_at = datetime.fromtimestamp(mtime, timezone.utc).isoformat()
+    freshness = "fresh" if age < 3600 else "stale"
     return {
         "available": True,
         "age_seconds": age,
         "source": str(path.relative_to(root)),
-        "modified_at": modified_at,
+        "freshness": freshness,
     }
 
 
@@ -163,19 +163,27 @@ def monitor_once(
             try:
                 reviews = fetch(f"/repos/{REPO}/pulls/{number}/reviews")
                 if isinstance(reviews, list):
-                    latest_by_reviewer = {}
-                    for review in reviews:
-                        if not isinstance(review, dict):
-                            continue
+                    ordered_reviews = sorted(
+                        (item for item in reviews if isinstance(item, dict)),
+                        key=lambda item: item.get("submitted_at") or "",
+                    )
+                    pending_change_requests = set()
+                    latest_states = {}
+                    for review in ordered_reviews:
                         reviewer = (review.get("user") or {}).get("login")
-                        if reviewer:
-                            latest_by_reviewer[reviewer] = review.get("state")
-                    states = set(latest_by_reviewer.values())
-                    if "CHANGES_REQUESTED" in states:
+                        if not reviewer:
+                            continue
+                        state_value = review.get("state")
+                        latest_states[reviewer] = state_value
+                        if state_value == "CHANGES_REQUESTED":
+                            pending_change_requests.add(reviewer)
+                        elif state_value in {"APPROVED", "DISMISSED"}:
+                            pending_change_requests.discard(reviewer)
+                    if pending_change_requests:
                         review_status = "changes_requested"
-                    elif "APPROVED" in states:
+                    elif "APPROVED" in latest_states.values():
                         review_status = "approved"
-                    elif "COMMENTED" in states:
+                    elif "COMMENTED" in latest_states.values():
                         review_status = "commented"
                     else:
                         review_status = "unknown"
@@ -259,7 +267,7 @@ def monitor_once(
         "runtime_evidence": {
             "available": runtime["available"],
             "source": runtime["source"],
-            "modified_at": runtime.get("modified_at"),
+            "freshness": runtime.get("freshness", "unknown"),
         },
         "latest_coordination_comment_id": current_ids[0] if current_ids else None,
         "errors": errors[:20],
