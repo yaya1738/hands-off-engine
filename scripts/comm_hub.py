@@ -299,7 +299,7 @@ class CommHub:
 
     # ── inbound: party → system ──
 
-    def receive(self, sender_id, msg_type, payload, channel="webhook"):
+    def receive(self, sender_id, msg_type, payload, channel="webhook", *, authenticated=False, authenticated_actor_id=None):
         """Process an inbound message from a party.
 
         Rejects unregistered sender_ids to prevent bus poisoning.
@@ -318,6 +318,8 @@ class CommHub:
             "payload": payload,
             "sender_trust": sender.get("trust_level", 0),
             "sender_role": sender.get("role", "unknown"),
+            "authenticated": authenticated is True,
+            "authenticated_actor_id": str(authenticated_actor_id) if authenticated_actor_id is not None else None,
         }
 
         # Log inbound
@@ -339,6 +341,14 @@ class CommHub:
         """Route an inbound message to the appropriate handler."""
         msg_type = msg.get("type", "")
         sender_trust = msg.get("sender_trust", 0)
+
+        # Registry membership and trust scores are not authentication.
+        # Privileged inbound messages require a verified channel identity.
+        if msg_type in ("approve", "reject", "trade_command", "execute_command"):
+            if msg.get("authenticated") is not True:
+                return {"routed_to": "rejected", "error": "Authenticated operator identity required"}
+            if msg.get("sender_role") != "owner":
+                return {"routed_to": "rejected", "error": "Only the authenticated owner may request privileged actions"}
 
         # Approval responses
         if msg_type in ("approve", "reject"):
@@ -497,9 +507,9 @@ class CommHub:
             from scripts.control_api import SystemControl
             sc = SystemControl(repo_root=self.repo_root)
             if action == "approve":
-                result = sc.approve(cmd_id)
+                result = sc.approve(cmd_id, actor_id=msg.get("authenticated_actor_id"))
             else:
-                result = sc.reject(cmd_id)
+                result = sc.reject(cmd_id, actor_id=msg.get("authenticated_actor_id"))
             return {"routed_to": "approval_workflow", "result": result}
         except Exception as e:
             return {"routed_to": "error", "error": str(e)}
