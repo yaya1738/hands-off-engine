@@ -274,7 +274,8 @@ def run_forever():
                 due_at = get_due_time(job, task, now)
                 # Persist newly initialized or repaired deadlines. Comparing
                 # only the post-repair value to due_at misses both cases.
-                if previous_due != job.get("next_run_at"):                    save_state(state)
+                if previous_due != job.get("next_run_at"):
+                    save_state(state)
                 if now < due_at:
                     continue
 
