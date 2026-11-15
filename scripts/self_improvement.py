@@ -232,7 +232,7 @@ def _save_dispatch_state(state):
     temporary = DISPATCH_STATE.with_suffix(DISPATCH_STATE.suffix + ".tmp")
     with temporary.open("w", encoding="utf-8") as handle:
         json.dump(state, handle, indent=2, sort_keys=True)
-        handle.write("\\n")
+        handle.write("\n")
         handle.flush()
         os.fsync(handle.fileno())
     temporary.replace(DISPATCH_STATE)
@@ -257,7 +257,7 @@ def _append_bus(message):
     if _bus_contains(message["msg_id"]):
         return False
     with BUS.open("a", encoding="utf-8") as handle:
-        handle.write(json.dumps(message, sort_keys=True) + "\\n")
+        handle.write(json.dumps(message, sort_keys=True) + "\n")
         handle.flush()
         os.fsync(handle.fileno())
     return True
