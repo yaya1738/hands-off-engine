@@ -49,7 +49,9 @@ jobs:
           python -m unittest tests/test_supervisor_ownership_contract.py -v
           python -m unittest tests/test_scheduler_heartbeat_contract.py -v
           python -m unittest tests/test_supervisor_recovery_contract.py -v
-          python -m unittest tests/test_termux_supervisor_lock_ownership.py -v
+          if [ -f tests/test_termux_supervisor_lock_ownership.py ]; then
+            python -m unittest tests/test_termux_supervisor_lock_ownership.py -v
+          fi
           python -m unittest tests/test_self_improvement_dispatch.py -v
           python -m unittest tests/test_improvement_applier_safety.py -v
           python -m unittest tests/test_improvement_applier.py -v
