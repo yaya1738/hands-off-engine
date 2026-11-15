@@ -38,6 +38,7 @@ COORDINATION_FILE = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
 WEBHOOK_HOST = "127.0.0.1"
 WEBHOOK_PORT = 8888
 MAX_WEBHOOK_BODY_BYTES = 64 * 1024
+WEBHOOK_READ_TIMEOUT_SECONDS = 5
 DEFAULT_ALLOWED_SENDERS = {
     "claude-code", "copilot", "chatgpt", "anyclaw",
     "factory", "openclaw", "grok",
@@ -164,13 +165,30 @@ class CoordinationWebhook(BaseHTTPRequestHandler):
             self.end_headers()
             return
         try:
-            content_length = int(self.headers.get("Content-Length", "0"))
+            try:
+                content_length = int(self.headers.get("Content-Length", "0"))
+            except (TypeError, ValueError):
+                self.send_response(400)
+                self.end_headers()
+                return
             if content_length <= 0 or content_length > MAX_WEBHOOK_BODY_BYTES:
                 self.send_response(413 if content_length > MAX_WEBHOOK_BODY_BYTES else 400)
                 self.end_headers()
                 return
+            # HTTPServer is single-threaded: bound body-read time so a local
+            # client cannot hold the only request handler indefinitely.
+            self.connection.settimeout(WEBHOOK_READ_TIMEOUT_SECONDS)
             post_data = self.rfile.read(content_length)
-            message = json.loads(post_data.decode("utf-8"))
+            if len(post_data) != content_length:
+                self.send_response(400)
+                self.end_headers()
+                return
+            try:
+                message = json.loads(post_data.decode("utf-8"))
+            except (UnicodeDecodeError, json.JSONDecodeError):
+                self.send_response(400)
+                self.end_headers()
+                return
             valid, reason = validate_webhook_message(message)
             if not valid:
                 self.send_response(403 if reason == "sender is not allowlisted" else 400)
@@ -180,13 +198,18 @@ class CoordinationWebhook(BaseHTTPRequestHandler):
             if "timestamp" not in message:
                 message["timestamp"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
 
-            # Webhook input is untrusted. Persist the event only; a separate
-            # governed workflow owns review and any repository mutation.
+            # Persist first. Once the event is recorded, callback failures must
+            # not turn the acknowledgement into a retry-inducing 500.
             with open(COORDINATION_FILE, "a", encoding="utf-8") as f:
                 f.write(json.dumps(message) + "\n")
+                f.flush()
+                os.fsync(f.fileno())
 
             if self.message_callback:
-                self.message_callback(message)
+                try:
+                    self.message_callback(message)
+                except Exception as callback_error:
+                    print(f"Coordination callback failed after persistence: {callback_error}")
 
             self.send_response(200)
             self.send_header("Content-type", "application/json")
@@ -194,8 +217,11 @@ class CoordinationWebhook(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps({"status": "received"}).encode())
         except Exception as e:
             print(f"Error processing message: {e}")
-            self.send_response(500)
-            self.end_headers()
+            try:
+                self.send_response(500)
+                self.end_headers()
+            except Exception:
+                pass
 
     def do_GET(self):
         """Read-only local health and message endpoints."""
