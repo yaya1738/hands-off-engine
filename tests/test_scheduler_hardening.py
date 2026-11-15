@@ -46,6 +46,14 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertEqual(restored["jobs"][scheduler.TASKS[0]["name"]]["next_run_at"], 1300)
         self.assertEqual(restored["jobs"][scheduler.TASKS[0]["name"]]["last_started_at"], 1000)
 
+    def test_malformed_job_entries_are_ignored(self):
+        scheduler.SCHEDULER_STATE.write_text(json.dumps({
+            "jobs": {"health_check": "invalid", "integrity_check": {"next_run_at": 123}}
+        }))
+        restored = scheduler.load_state()
+        self.assertNotIn("health_check", restored["jobs"])
+        self.assertEqual(restored["jobs"]["integrity_check"]["next_run_at"], 123)
+
     def test_lock_rejects_second_scheduler_instance(self):
         first = scheduler.acquire_lock()
         self.assertIsNotNone(first)
