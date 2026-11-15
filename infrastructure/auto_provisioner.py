@@ -80,7 +80,9 @@ class AutoProvisioner:
         provider: Optional[CloudProvider] = None,
         budget: Optional[InfrastructureBudget] = None,
         state_path: Optional[Path] = None,
-        dry_run: bool = False
+        dry_run: bool = True,
+        allow_paid_actions: bool = False,
+        auto_execute_enabled: bool = False,
     ):
         """
         Initialize the auto-provisioner.
@@ -99,12 +101,14 @@ class AutoProvisioner:
             self.api, self.provider = get_best_available_provider()
 
         self.dry_run = dry_run
+        self.allow_paid_actions = bool(allow_paid_actions)
+        self.auto_execute_enabled = bool(auto_execute_enabled)
         self.state_path = state_path or Path("state/infrastructure")
         self.state_path.mkdir(parents=True, exist_ok=True)
 
         # Budget management
         self.budget = budget or InfrastructureBudget(
-            monthly_limit=500.0,        # $500/month default
+            monthly_limit=0.0,          # No spend authorization by default
             auto_approve_hourly_increase=0.05,
             auto_approve_monthly_increase=50.0
         )
@@ -225,14 +229,19 @@ class AutoProvisioner:
         # Only upgrades and provisions can be auto-executed (they add resources, don't remove)
         for decision in decisions:
             if decision.auto_approved and not decision.requires_approval:
-                # Block auto-execution of destructive actions
+                # Paid actions require explicit spend authority and a separate
+                # auto-execution opt-in. Otherwise preserve the decision for review.
                 if decision.action in [InfrastructureAction.DOWNGRADE_SERVER,
                                        InfrastructureAction.TERMINATE_SERVER]:
                     decision.auto_approved = False
                     decision.requires_approval = True
                     decision.execution_result = "SAFETY: Destructive actions require human approval"
-                else:
+                elif self.auto_execute_enabled and self.allow_paid_actions:
                     self._execute_decision(decision)
+                else:
+                    decision.auto_approved = False
+                    decision.requires_approval = True
+                    decision.execution_result = "SAFETY: paid auto-execution is disabled; approval required"
 
         self.pending_decisions.extend(
             d for d in decisions if not d.executed and d.requires_approval
@@ -547,13 +556,24 @@ class AutoProvisioner:
 
         return None
 
-    def _execute_decision(self, decision: ScalingDecision) -> bool:
+    def _execute_decision(self, decision: ScalingDecision, *, approved: bool = False) -> bool:
         """Execute a scaling decision."""
         if self.dry_run:
             decision.executed = True
             decision.executed_at = datetime.utcnow()
             decision.execution_result = "DRY RUN - would have executed"
             return True
+        if not (self.allow_paid_actions or approved):
+            decision.executed = False
+            decision.requires_approval = True
+            decision.execution_result = "SAFETY: paid infrastructure actions are not authorized"
+            return False
+        projected = self.get_current_spend() + max(0.0, float(decision.cost_change or 0.0))
+        if projected > self.budget.monthly_limit:
+            decision.executed = False
+            decision.requires_approval = True
+            decision.execution_result = "SAFETY: monthly budget exceeded ($" + f"{projected:.2f}" + " > $" + f"{self.budget.monthly_limit:.2f}" + ")"
+            return False
 
         # 4D GATE: All infrastructure decisions must pass through 4D imagination
         # This is the ENTRY POINT check - defense in depth
@@ -843,7 +863,7 @@ echo "Hands-Off Engine setup complete"
                 decision.approval_status = "approved"
                 decision.requires_approval = False
 
-                success = self._execute_decision(decision)
+                success = self._execute_decision(decision, approved=True)
                 self.pending_decisions.remove(decision)
 
                 return success
@@ -865,7 +885,9 @@ echo "Hands-Off Engine setup complete"
         self,
         role: ServerRole,
         size: InstanceSize = InstanceSize.SMALL,
-        region: str = "nyc1"
+        region: str = "nyc1",
+        *,
+        approved: bool = False,
     ) -> Tuple[bool, Optional[Server], str]:
         """
         Manually provision a new server.
@@ -894,6 +916,14 @@ echo "Hands-Off Engine setup complete"
 
         if self.dry_run:
             return True, None, "DRY RUN - would provision"
+        if not (self.allow_paid_actions or approved):
+            return False, None, "Paid provisioning is disabled; explicit spend authorization or approval is required"
+        instance = DIGITALOCEAN_INSTANCES.get(instance_type)
+        if instance is None:
+            return False, None, "Unknown instance price for " + str(instance_type) + "; refusing paid provisioning"
+        projected = self.get_current_spend() + float(instance.monthly_cost)
+        if projected > self.budget.monthly_limit:
+            return False, None, "Monthly budget exceeded ($" + f"{projected:.2f}" + " > $" + f"{self.budget.monthly_limit:.2f}" + ")"
 
         return self.api.create_server(request)
 
@@ -928,9 +958,20 @@ echo "Hands-Off Engine setup complete"
         }
 
 
-def get_auto_provisioner(dry_run: bool = False) -> AutoProvisioner:
-    """Get the auto-provisioner instance."""
-    return AutoProvisioner(dry_run=dry_run)
+def get_auto_provisioner(
+    dry_run: bool = True,
+    *,
+    allow_paid_actions: bool = False,
+    auto_execute_enabled: bool = False,
+    budget: Optional[InfrastructureBudget] = None,
+) -> AutoProvisioner:
+    """Get a fail-closed provisioner; paid actions require explicit opt-in."""
+    return AutoProvisioner(
+        dry_run=dry_run,
+        allow_paid_actions=allow_paid_actions,
+        auto_execute_enabled=auto_execute_enabled,
+        budget=budget,
+    )
 
 
 if __name__ == "__main__":
@@ -938,13 +979,21 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Autonomous Infrastructure Provisioner")
     parser.add_argument("--dry-run", action="store_true", help="Don't actually provision")
+    parser.add_argument("--live", action="store_true", help="Explicitly authorize paid infrastructure actions")
+    parser.add_argument("--enable-auto-execution", action="store_true", help="Also auto-execute eligible paid decisions")
+    parser.add_argument("--budget", type=float, default=0.0, help="Explicit monthly spend cap in USD")
     parser.add_argument("--status", action="store_true", help="Show infrastructure status")
     parser.add_argument("--analyze", action="store_true", help="Analyze and make decisions")
     parser.add_argument("--provision", metavar="SIZE", help="Provision new server")
 
     args = parser.parse_args()
 
-    provisioner = get_auto_provisioner(dry_run=args.dry_run)
+    provisioner = get_auto_provisioner(
+        dry_run=not args.live or args.dry_run,
+        allow_paid_actions=args.live,
+        auto_execute_enabled=args.live and args.enable_auto_execution,
+        budget=InfrastructureBudget(monthly_limit=max(0.0, args.budget)),
+    )
 
     if args.status:
         status = provisioner.get_infrastructure_status()

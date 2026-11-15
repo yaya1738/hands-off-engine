@@ -88,11 +88,12 @@ class UnifiedAutonomousSystem:
 
     def __init__(
         self,
-        infrastructure_budget: float = 500.0,
-        auto_provision: bool = True,
-        auto_upgrade: bool = True,
-        dry_run: bool = False,
-        node_id: Optional[str] = None
+        infrastructure_budget: float = 0.0,
+        auto_provision: bool = False,
+        auto_upgrade: bool = False,
+        dry_run: bool = True,
+        node_id: Optional[str] = None,
+        allow_paid_actions: bool = False
     ):
         """
         Initialize the unified autonomous system.
@@ -109,6 +110,7 @@ class UnifiedAutonomousSystem:
         self.infrastructure_budget = infrastructure_budget
         self.auto_provision = auto_provision
         self.auto_upgrade = auto_upgrade
+        self.allow_paid_actions = bool(allow_paid_actions)
 
         # Initialize hardware monitoring
         self.hw_collector = HardwareCollector(node_id=self.node_id)
@@ -122,7 +124,11 @@ class UnifiedAutonomousSystem:
         self.hw_audit = HardwareAuditLogger()
 
         # Initialize infrastructure management
-        self.infra_provisioner = get_auto_provisioner(dry_run=dry_run)
+        self.infra_provisioner = get_auto_provisioner(
+            dry_run=dry_run,
+            allow_paid_actions=self.allow_paid_actions,
+            auto_execute_enabled=False,
+        )
         self.infra_provisioner.budget.monthly_limit = infrastructure_budget
 
         # Business integration
@@ -396,11 +402,18 @@ class UnifiedAutonomousSystem:
             decision = self._create_infra_decision(
                 action="provision_emergency",
                 reason=f"Critical health state ({health.overall_score})",
-                auto_approve=True  # Emergency
+                auto_approve=(
+                    self.allow_paid_actions
+                    and self.auto_provision
+                    and self._within_auto_approve_budget()
+                )
             )
             if decision:
                 decisions.append(decision)
-                self._execute_infra_decision(decision)
+                if decision.get("auto_approve"):
+                    self._execute_infra_decision(decision)
+                else:
+                    self._queue_infra_for_approval(decision)
 
         elif health.overall_status == HealthStatus.WARNING:
             # Warning - consider upgrade
@@ -408,7 +421,7 @@ class UnifiedAutonomousSystem:
                 decision = self._create_infra_decision(
                     action="upgrade_server",
                     reason=f"Warning health state ({health.overall_score})",
-                    auto_approve=self._within_auto_approve_budget()
+                    auto_approve=(self.allow_paid_actions and self._within_auto_approve_budget())
                 )
                 if decision:
                     decisions.append(decision)
@@ -485,9 +498,19 @@ class UnifiedAutonomousSystem:
             "executed": False
         }
 
-    def _execute_infra_decision(self, decision: Dict):
-        """Execute an infrastructure decision."""
+    def _execute_infra_decision(self, decision: Dict, *, approved: bool = False):
+        """Execute an infrastructure decision under explicit spend authority."""
         action = decision.get("action")
+
+        if not self.dry_run:
+            if not (self.allow_paid_actions or approved):
+                decision["executed"] = False
+                decision["result"] = "SAFETY: paid infrastructure action is not authorized"
+                return
+            if not self._within_auto_approve_budget():
+                decision["executed"] = False
+                decision["result"] = "SAFETY: infrastructure budget does not cover the approved action"
+                return
 
         if self.dry_run:
             decision["executed"] = True
@@ -498,7 +521,8 @@ class UnifiedAutonomousSystem:
             # Provision emergency server
             success, server, message = self.infra_provisioner.provision_new_server(
                 role=ServerRole.TRADING_BACKUP,
-                size=InstanceSize.MEDIUM
+                size=InstanceSize.MEDIUM,
+                approved=approved,
             )
             decision["executed"] = True
             decision["result"] = message
@@ -620,7 +644,7 @@ class UnifiedAutonomousSystem:
                 print(f"   Risk: Complete trading halt if primary fails")
                 print()
 
-                if auto_provision and self.auto_provision:
+                if auto_provision and self.auto_provision and self.allow_paid_actions and self._within_auto_approve_budget():
                     current_spend = self.infra_provisioner.get_current_spend()
                     budget_available = self.infrastructure_budget - current_spend
 
@@ -741,9 +765,10 @@ class UnifiedAutonomousSystem:
 
             if action_type == "infrastructure_decision":
                 decision = action.get("decision", {})
-                self._execute_infra_decision(decision)
-                change["executed"] = True
-                change["executed_at"] = datetime.utcnow().isoformat()
+                self._execute_infra_decision(decision, approved=True)
+                change["executed"] = bool(decision.get("executed"))
+                if change["executed"]:
+                    change["executed_at"] = datetime.utcnow().isoformat()
 
             elif action_type == "hardware_decision":
                 # Hardware decisions are handled by the decision engine
@@ -843,10 +868,11 @@ class UnifiedAutonomousSystem:
 
 
 def start_live_system(
-    budget: float = 500.0,
-    auto_provision: bool = True,
-    auto_upgrade: bool = True,
-    dry_run: bool = False
+    budget: float = 0.0,
+    auto_provision: bool = False,
+    auto_upgrade: bool = False,
+    dry_run: bool = True,
+    allow_paid_actions: bool = False,
 ):
     """
     Start the unified autonomous system.
@@ -863,7 +889,8 @@ def start_live_system(
         infrastructure_budget=budget,
         auto_provision=auto_provision,
         auto_upgrade=auto_upgrade,
-        dry_run=dry_run
+        dry_run=dry_run,
+        allow_paid_actions=allow_paid_actions,
     )
     system.start()
 
@@ -879,7 +906,7 @@ def main():
     parser.add_argument(
         "--budget",
         type=float,
-        default=500.0,
+        default=0.0,
         help="Monthly infrastructure budget in USD"
     )
     parser.add_argument(
@@ -898,6 +925,11 @@ def main():
         help="Don't actually provision (testing)"
     )
     parser.add_argument(
+        "--enable-spend",
+        action="store_true",
+        help="Explicitly authorize paid infrastructure actions; requires a positive --budget"
+    )
+    parser.add_argument(
         "--status",
         action="store_true",
         help="Show status and exit"
@@ -912,9 +944,10 @@ def main():
     else:
         start_live_system(
             budget=args.budget,
-            auto_provision=not args.no_provision,
-            auto_upgrade=not args.no_upgrade,
-            dry_run=args.dry_run
+            auto_provision=args.enable_spend and not args.no_provision,
+            auto_upgrade=args.enable_spend and not args.no_upgrade,
+            dry_run=args.dry_run or not args.enable_spend,
+            allow_paid_actions=args.enable_spend,
         )
 
 
