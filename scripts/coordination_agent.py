@@ -261,10 +261,11 @@ class CoordinationAgent:
 
     def handle_pr_merge_request(self, pr_num: int, from_agent: str) -> bool:
         """Record a merge proposal; coordination messages never authorize merges."""
-        decision = evaluate_merge_request(pr_num, from_agent)
-        logger.warning("PR #%s requires independent human merge authorization", pr_num)
+        requester = from_agent if isinstance(from_agent, str) and from_agent.strip() else "unknown-agent"
+        decision = evaluate_merge_request(pr_num, requester)
+        logger.warning("PR #%s requires independent human merge authorization: %s", pr_num, decision["reason"])
         self.respond_to_agent(
-            to=from_agent,
+            to=requester,
             message=f"PR #{pr_num} recorded for human review. Automated merge is disabled; CI and agent assessment are not merge authorization.",
             msg_type="response"
         )
