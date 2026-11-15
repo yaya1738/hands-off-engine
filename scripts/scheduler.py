@@ -8,6 +8,7 @@ their next scheduled interval.
 """
 import fcntl
 import json
+import os
 import signal
 import subprocess
 import sys
@@ -51,6 +52,10 @@ def load_state():
         try:
             data = json.loads(SCHEDULER_STATE.read_text())
             if isinstance(data, dict) and isinstance(data.get("jobs"), dict):
+                data["jobs"] = {
+                    name: job for name, job in data["jobs"].items()
+                    if isinstance(name, str) and isinstance(job, dict)
+                }
                 return data
         except (OSError, ValueError, TypeError):
             pass
@@ -86,7 +91,7 @@ def acquire_lock():
         return None
     handle.seek(0)
     handle.truncate()
-    handle.write(str(__import__("os").getpid()))
+    handle.write(str(os.getpid()))
     handle.flush()
     return handle
 
