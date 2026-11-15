@@ -91,3 +91,27 @@ def test_approval_requires_exactly_one_matching_command(tmp_path):
     result = control.approve(command_id)
     assert result["status"] == "error"
     assert "exactly one" in result["error"]
+
+
+def test_two_executor_instances_cannot_claim_same_live_approval(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    import threading
+    import time
+    _patch_executor_logs(tmp_path, monkeypatch)
+    _, command = _approved_command(tmp_path)
+    first_executor = Executor(repo_root=tmp_path)
+    second_executor = Executor(repo_root=tmp_path)
+    calls = []
+    calls_lock = threading.Lock()
+    def perform(_cmd):
+        with calls_lock:
+            calls.append(1)
+        time.sleep(0.05)
+        return first_executor._dryrun_execute(_cmd)
+    first_executor._live_execute = perform
+    second_executor._live_execute = perform
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(lambda ex: ex.execute_command(command), [first_executor, second_executor]))
+    assert len(calls) == 1
+    assert sum(result.status == "dryrun" for result in results) == 1
+    assert sum(result.status == "rejected" for result in results) == 1
