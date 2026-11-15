@@ -55,11 +55,26 @@ def test_self_improvement_generates_tasks(tmp_path, monkeypatch):
     from scripts import self_improvement
     monkeypatch.setattr(self_improvement, "ROOT", tmp_path)
     monkeypatch.setattr(self_improvement, "STATE", tmp_path / "state")
-    monkeypatch.setattr(self_improvement, "BUS", tmp_path / "no_bus")
+    monkeypatch.setattr(self_improvement, "BUS", tmp_path / "bus.jsonl")
+    monkeypatch.setattr(self_improvement, "IMPROVEMENT_STATE", tmp_path / "state" / "improvement_state.json")
+    monkeypatch.setattr(self_improvement, "DISPATCH_STATE", tmp_path / "state" / "improvement_dispatch_state.json")
+    monkeypatch.setattr(self_improvement, "DISPATCH_LOCK", tmp_path / "state" / "improvement_dispatch.lock")
+    monkeypatch.setattr(self_improvement, "FEEDBACK_FILE", tmp_path / "state" / "improvement_feedback.json")
+    monkeypatch.setattr(self_improvement, "generate_improvements", lambda: [{
+        "id": "imp-dashboard-contract",
+        "category": "reliability",
+        "title": "Dashboard dispatch contract",
+        "description": "Verify the durable task message envelope",
+        "priority": "medium",
+    }])
     (tmp_path / "state").mkdir(parents=True, exist_ok=True)
     state = self_improvement.run()
     assert state["total"] >= 1
     assert all("title" in imp for imp in state["improvements"])
+    dispatched = state["dispatched"]
+    assert dispatched["type"] == "task_assignment"
+    assert dispatched["context"]["task_id"] == "task-imp-dashboard-contract"
+    assert "task_id" not in dispatched  # Task Worker contract nests metadata in context
 
 
 def test_sender_validation_rejects_unknown(tmp_path):
