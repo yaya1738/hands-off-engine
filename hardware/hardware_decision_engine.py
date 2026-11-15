@@ -298,8 +298,8 @@ class HardwareDecisionEngine:
                     triggered_by="memory_critical",
                     ai_reasoning="System at risk of OOM - emergency cleanup required",
                     confidence=DecisionConfidence.CERTAIN,
-                    auto_executed=True,
-                    requires_approval=False
+                    auto_executed=self.auto_execute_enabled,
+                    requires_approval=not self.auto_execute_enabled
                 )
                 decisions.append(decision)
 
@@ -314,8 +314,8 @@ class HardwareDecisionEngine:
                         triggered_by="disk_critical",
                         ai_reasoning="Disk nearly full - immediate cleanup required",
                         confidence=DecisionConfidence.CERTAIN,
-                        auto_executed=True,
-                        requires_approval=False
+                        auto_executed=self.auto_execute_enabled,
+                        requires_approval=not self.auto_execute_enabled
                     )
                     decisions.append(decision)
 
@@ -329,8 +329,8 @@ class HardwareDecisionEngine:
                     triggered_by="thermal_critical",
                     ai_reasoning="Reducing workload to prevent thermal damage",
                     confidence=DecisionConfidence.HIGH,
-                    auto_executed=True,
-                    requires_approval=False
+                    auto_executed=self.auto_execute_enabled,
+                    requires_approval=not self.auto_execute_enabled
                 )
                 decisions.append(decision)
 
@@ -498,11 +498,11 @@ class HardwareDecisionEngine:
                 success = self._execute_thermal_mitigation(decision)
                 outcome = "Thermal mitigation applied"
             elif decision.action == "increase_monitoring_frequency":
-                success = True
-                outcome = "Monitoring frequency increased"
+                success = False
+                outcome = "Monitoring frequency actuator is not implemented"
             else:
-                success = True
-                outcome = "Decision logged for manual review"
+                success = False
+                outcome = "No execution handler is registered for this action"
         except Exception as e:
             success = False
             outcome = f"Execution failed: {str(e)}"
@@ -515,6 +515,7 @@ class HardwareDecisionEngine:
 
         self.executed_decisions.append(decision)
         self.kernel.record_decision(decision, success, outcome)
+        return success
 
     def _execute_alert(self, decision: HardwareDecision) -> bool:
         """Execute alert action."""
@@ -544,25 +545,8 @@ class HardwareDecisionEngine:
             gc.collect()
             cleanup_actions.append("Python GC collected")
 
-            # 3. Clear old log files
-            log_dir = Path("/var/log/hands-off")
-            if log_dir.exists():
-                import time
-                cutoff = time.time() - 86400 * 3  # 3 days
-                for log_file in log_dir.glob("*.log.*"):
-                    if log_file.stat().st_mtime < cutoff:
-                        log_file.unlink()
-                        cleanup_actions.append(f"Removed old log: {log_file.name}")
-
-            # 4. Clear Python bytecode cache
-            pycache_dirs = list(Path("/root/hands-off-engine").rglob("__pycache__"))
-            for pycache in pycache_dirs[:5]:  # Limit to prevent long runs
-                import shutil
-                try:
-                    shutil.rmtree(pycache)
-                    cleanup_actions.append(f"Cleared pycache: {pycache}")
-                except:
-                    pass
+            # Logs and bytecode caches are intentionally preserved. They can
+            # contain forensic evidence and removing them is not memory recovery.
 
             decision.outcome = f"Memory cleanup: {', '.join(cleanup_actions[:5])}"
             return True
@@ -571,19 +555,14 @@ class HardwareDecisionEngine:
             return False
 
     def _execute_disk_cleanup(self, decision: HardwareDecision) -> bool:
-        """Execute emergency disk cleanup."""
-        # Clean common locations
-        cleanup_paths = [
-            "/tmp",
-            "/var/log/*.gz",
-            "/var/cache/apt/archives"
-        ]
-        return True
+        """Fail closed until a bounded, non-destructive disk cleanup exists."""
+        decision.outcome = "Disk cleanup is not implemented; no files were deleted"
+        return False
 
     def _execute_thermal_mitigation(self, decision: HardwareDecision) -> bool:
-        """Execute thermal mitigation."""
-        # Would reduce CPU frequency or workload
-        return True
+        """Fail closed until a supported thermal actuator is configured."""
+        decision.outcome = "Thermal mitigation actuator is not configured"
+        return False
 
     def approve_decision(self, decision_id: str) -> bool:
         """
@@ -602,10 +581,10 @@ class HardwareDecisionEngine:
                 decision.approved_by = "user"
                 decision.add_audit_entry("approved", {})
 
-                self._execute_decision(decision)
+                success = self._execute_decision(decision)
                 self.pending_decisions.remove(decision)
                 self._save_decisions()
-                return True
+                return bool(success)
 
         return False
 
