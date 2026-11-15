@@ -19,10 +19,14 @@ Lifecycle:
 import json
 import time
 import logging
+import os
+import hashlib
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional
 from dataclasses import dataclass, asdict
+
+from scripts.command_approval import command_fingerprint
 
 log = logging.getLogger("Executor")
 
@@ -79,6 +83,8 @@ class Executor:
         if mode == "LIVE":
             if approval_status != "approved":
                 return self._reject(cmd_id, action, target, "LIVE command not approved")
+            if not self._check_approval_binding(cmd):
+                return self._reject(cmd_id, action, target, "Approval missing, mismatched, or command changed after approval")
             if not self._check_approval_freshness(cmd):
                 return self._reject(cmd_id, action, target, "Approval expired (TTL exceeded)")
 
@@ -109,13 +115,53 @@ class Executor:
             self._log_execution(result)
             return result
 
-        # LIVE execution
+        # Claim LIVE approval exactly once before any side effect. O_EXCL is
+        # atomic across processes; a crash leaves the claim in place (fail closed).
+        if mode == "LIVE" and not self._claim_live_execution(cmd):
+            return self._reject(cmd_id, action, target, "LIVE approval already claimed or claim could not be created")
         result = self._live_execute(cmd)
         self._record_rate()
         self._log_execution(result)
         return result
 
     # ── safety checks ──
+
+    def _check_approval_binding(self, cmd):
+        """Require a separate approved record matching the exact command."""
+        approval_file = self.state_dir / "approval_queue.json"
+        if not approval_file.exists():
+            return False
+        try:
+            queue = json.loads(approval_file.read_text(encoding="utf-8"))
+            matches = [entry for entry in queue.get("approved", []) if entry.get("id") == cmd.get("id")]
+            if len(matches) != 1:
+                return False
+            digest = command_fingerprint(cmd)
+            return bool(digest) and digest == cmd.get("approval_fingerprint") == matches[0].get("fingerprint")
+        except (OSError, ValueError, TypeError, AttributeError):
+            return False
+
+    def _claim_live_execution(self, cmd):
+        """Persist a one-shot claim before LIVE side effects; never auto-reclaim."""
+        command_id = str(cmd.get("id", ""))
+        if not command_id:
+            return False
+        claim_dir = self.state_dir / "execution_claims"
+        try:
+            claim_dir.mkdir(parents=True, exist_ok=True)
+            name = hashlib.sha256(command_id.encode("utf-8")).hexdigest() + ".json"
+            claim_path = claim_dir / name
+            fd = os.open(str(claim_path), os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+            with os.fdopen(fd, "w", encoding="utf-8") as handle:
+                json.dump({"command_id": command_id, "claimed_at": datetime.now(timezone.utc).isoformat()}, handle)
+                handle.flush()
+                os.fsync(handle.fileno())
+            return True
+        except FileExistsError:
+            return False
+        except OSError as exc:
+            log.error("Unable to persist LIVE execution claim: %s", exc)
+            return False
 
     def _check_approval_freshness(self, cmd):
         """Ensure approval hasn't expired."""
