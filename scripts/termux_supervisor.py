@@ -576,9 +576,11 @@ class TermuxSupervisor:
                         log.warning(f"{name} exited with code {rc}")
                         daemon.record_crash()
 
-            # Check stability for all running daemons
+            # Check stability from supervisor-owned lifecycle state only.
+            # Popen.poll() reaps an exited child and can release its PGID before
+            # ManagedDaemon.poll() has pinned it with WNOWAIT for group cleanup.
             for name, daemon in self.daemons.items():
-                if daemon.process and daemon.process.poll() is None:
+                if daemon.process is not None:
                     if daemon.start_time and (time.time() - daemon.start_time) > WINDOW_RESET_SECONDS:
                         daemon.record_stable()
 
@@ -593,10 +595,17 @@ class TermuxSupervisor:
     def get_status(self) -> dict:
         daemon_status = {}
         for name, daemon in self.daemons.items():
-            running = daemon.process is not None and daemon.process.poll() is None
+            # Status inspection must never reap a managed child. The managed
+            # poller owns exit observation and process-group cleanup.
+            process = daemon.process
+            if process is None:
+                running = False
+            else:
+                exited, _pgid_pinned = _observe_exit_without_reaping(process)
+                running = not exited
             daemon_status[name] = {
                 "running": running,
-                "pid": daemon.process.pid if running else None,
+                "pid": process.pid if running else None,
                 "restart_count": daemon.state.get("restart_count", 0),
                 "total_restarts": daemon.state.get("total_restarts", 0),
                 "last_exit_code": daemon.state.get("last_exit_code"),
