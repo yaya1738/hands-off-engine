@@ -1,4 +1,4 @@
-import os, json, subprocess, urllib.parse, hmac, math
+import os, json, subprocess, urllib.parse, hmac, math\nfrom datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
 HOST, PORT = "0.0.0.0", 8765
@@ -11,8 +11,13 @@ class H(BaseHTTPRequestHandler):
     def do_POST(self):
         if not self._auth():
             return self._ok('unauthorized', 401)
-        ln = int(self.headers.get('Content-Length','0') or 0)
-        body = self.rfile.read(ln).decode() if ln>0 else ''
+        try:
+            ln = int(self.headers.get("Content-Length", "0") or 0)
+            if not 0 <= ln <= 16384:
+                return self._ok("invalid request size", 413)
+        except ValueError:
+            return self._ok("invalid content length", 400)
+        body = self.rfile.read(ln).decode("utf-8") if ln > 0 else ""
         import json, urllib.parse, os
         try:
             data = json.loads(body) if body and body.strip().startswith('{') else dict(urllib.parse.parse_qsl(body))
@@ -36,7 +41,7 @@ class H(BaseHTTPRequestHandler):
                     raise ValueError("invalid note")
             except (TypeError, ValueError) as exc:
                 return self._ok(str(exc), 400)
-            line = json.dumps({"key": key, "p_fair": p_fair, "p_mkt": p_mkt, "note": note}) + "\\n"
+            line = json.dumps({"key": key, "p_fair": p_fair, "p_mkt": p_mkt, "note": note}) + "\n"
             with open(os.path.expanduser('~/hands-off/autopilot/candidates.jsonl'),'a') as f:
                 f.write(line)
             return self._ok('ok')
@@ -105,7 +110,7 @@ class H(BaseHTTPRequestHandler):
             except ValueError:
                 return self._ok("n must be an integer between 1 and 500", 400)
             log_path = os.path.expanduser(
-                "~/hands-off/autopilot/edges-" + __import__("datetime").datetime.utcnow().strftime("%Y%m%d") + ".log"
+                "~/hands-off/autopilot/edges-" + datetime.utcnow().strftime("%Y%m%d") + ".log"
             )
             r = subprocess.run(["tail", "-n", str(n), log_path], capture_output=True, text=True, timeout=10)
             return self._ok(r.stdout or r.stderr)
