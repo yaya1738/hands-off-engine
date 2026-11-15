@@ -8,12 +8,13 @@ source of truth.
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import sys
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlsplit
 
 ROOT = Path(__file__).resolve().parent.parent
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
@@ -44,6 +45,36 @@ document.querySelector('#send').onsubmit=async e=>{e.preventDefault();let i=docu
 </script></body></html>'''
 
 
+def is_loopback_host(host: str) -> bool:
+    """Accept only literal loopback addresses or localhost; reject DNS names."""
+    if not isinstance(host, str):
+        return False
+    host = host.strip().lower()
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def is_local_request(host_header: str, origin_header: str | None, server_port: int) -> bool:
+    """Reject DNS-rebinding and cross-origin browser requests to the local API."""
+    try:
+        host = urlsplit("//" + (host_header or ""))
+        if not is_loopback_host(host.hostname or "") or host.port != server_port:
+            return False
+        if origin_header:
+            origin = urlsplit(origin_header)
+            if origin.scheme != "http" or not is_loopback_host(origin.hostname or ""):
+                return False
+            if origin.port != server_port:
+                return False
+        return True
+    except ValueError:
+        return False
+
+
 def read_events(limit: int = 120):
     if not BUS.exists():
         return []
@@ -60,6 +91,13 @@ class Handler(BaseHTTPRequestHandler):
         raw=json.dumps(data, ensure_ascii=False).encode()
         self.send_response(code); self.send_header('Content-Type','application/json'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); self.wfile.write(raw)
     def do_GET(self):
+        if not is_local_request(
+            self.headers.get("Host", ""),
+            self.headers.get("Origin"),
+            self.server.server_port,
+        ):
+            self.send_json(403, {"error": "loopback requests only"})
+            return
         path=urlparse(self.path).path
         if path=='/':
             raw=HTML.encode(); self.send_response(200); self.send_header('Content-Type','text/html; charset=utf-8'); self.send_header('Content-Length',str(len(raw))); self.end_headers(); self.wfile.write(raw); return
@@ -74,6 +112,13 @@ class Handler(BaseHTTPRequestHandler):
                 self.send_json(500,{'error':str(e)}); return
         self.send_json(404,{'error':'not found'})
     def do_POST(self):
+        if not is_local_request(
+            self.headers.get("Host", ""),
+            self.headers.get("Origin"),
+            self.server.server_port,
+        ):
+            self.send_json(403, {"error": "loopback requests only"})
+            return
         if urlparse(self.path).path!='/api/send': self.send_json(404,{'error':'not found'}); return
         try: body=json.loads(self.rfile.read(int(self.headers.get('content-length','0'))))
         except Exception: self.send_json(400,{'error':'invalid json'}); return
@@ -87,6 +132,8 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--host',default='127.0.0.1'); p.add_argument('--port',type=int,default=8787); a=p.parse_args()
+    if not is_loopback_host(a.host):
+        p.error("non-loopback binding is disabled; the control room has no remote authentication")
     print(f'Yair Control Room: http://{a.host}:{a.port}')
     ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()
 
