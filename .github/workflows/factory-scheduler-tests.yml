@@ -1,0 +1,31 @@
+name: Factory scheduler contract tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "scripts/scheduler.py"
+      - "scripts/self_improvement.py"
+      - "scripts/improvement_cycle.py"
+      - "scripts/supervisor.py"
+      - "scripts/termux_supervisor.py"
+      - "scripts/task_worker.py"
+      - "tests/test_scheduler_hardening.py"
+      - "tests/test_self_improvement_dispatch.py"
+      - ".github/workflows/factory-scheduler-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Run scheduler and worker contract tests
+        run: |
+          python -m unittest tests/test_scheduler_hardening.py -v
+          python -m unittest tests/test_self_improvement_dispatch.py -v
