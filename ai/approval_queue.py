@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import Dict, List, Optional
 import hashlib
 import fcntl
+import tempfile
 from functools import wraps
 
 REPO_ROOT = Path(__file__).parent.parent
@@ -79,9 +80,26 @@ class ApprovalQueue:
             return json.load(f)
 
     def _save_queue(self, queue: Dict):
-        """Save approval queue to disk."""
-        with open(self.queue_file, 'w') as f:
-            json.dump(queue, f, indent=2)
+        """Atomically persist queue state so a crash cannot leave truncated JSON."""
+        temp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w", encoding="utf-8", dir=str(self.queue_file.parent),
+                prefix=".approval-queue-", suffix=".tmp", delete=False
+            ) as handle:
+                temp_path = Path(handle.name)
+                json.dump(queue, handle, indent=2)
+                handle.flush()
+                os.fsync(handle.fileno())
+            os.replace(str(temp_path), str(self.queue_file))
+            directory_fd = os.open(str(self.queue_file.parent), os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+        finally:
+            if temp_path is not None and temp_path.exists():
+                temp_path.unlink()
 
     @_queue_locked
     def add_change(
@@ -149,11 +167,13 @@ class ApprovalQueue:
             lines.append("Execution boundary: repository-local file change only")
         return "\n".join(lines)
 
+    @_queue_locked
     def get_pending(self) -> List[Dict]:
         """Get all pending changes."""
         queue = self._load_queue()
         return queue.get("pending", [])
 
+    @_queue_locked
     def get_change(self, change_id: str) -> Optional[Dict]:
         """Get specific change by ID."""
         queue = self._load_queue()
