@@ -35,22 +35,27 @@ def ask(prompt, current, cast=float):
         return current
 
 
-cards = load_cards()
-print("\n[Cards quick editor] Blank keeps the current value; unknown remains unknown.\n")
-for key, card in cards.items():
-    if key.startswith("_"):
-        continue
-    if not isinstance(card, dict):
-        print(f"--- {key}: invalid record; skipped ---")
-        continue
-    print(f"--- {card.get('name') or key} ---")
-    card["limit"] = ask("Limit", card.get("limit"))
-    card["balance"] = ask("Balance", card.get("balance"))
-    card["apr_pct"] = ask("APR %", card.get("apr_pct"))
-    card["statement_day"] = ask("Statement day (1-28)", card.get("statement_day"), int)
+def main():
+    cards = load_cards()
+    print("\n[Cards quick editor] Blank keeps the current value; unknown remains unknown.\n")
+    for key, card in cards.items():
+        if key.startswith("_"):
+            continue
+        if not isinstance(card, dict):
+            print(f"--- {key}: invalid record; skipped ---")
+            continue
+        print(f"--- {card.get('name') or key} ---")
+        card["limit"] = ask("Limit", card.get("limit"))
+        card["balance"] = ask("Balance", card.get("balance"))
+        card["apr_pct"] = ask("APR %", card.get("apr_pct"))
+        card["statement_day"] = ask("Statement day (1-28)", card.get("statement_day"), int)
+    
+    CARDS.parent.mkdir(parents=True, exist_ok=True)
+    temporary = CARDS.with_suffix(CARDS.suffix + ".tmp")
+    temporary.write_text(json.dumps(cards, indent=2) + "\n", encoding="utf-8")
+    temporary.replace(CARDS)
+    print(f"[ok] wrote {CARDS}")
+    
 
-CARDS.parent.mkdir(parents=True, exist_ok=True)
-temporary = CARDS.with_suffix(CARDS.suffix + ".tmp")
-temporary.write_text(json.dumps(cards, indent=2) + "\n", encoding="utf-8")
-temporary.replace(CARDS)
-print(f"[ok] wrote {CARDS}")
+if __name__ == "__main__":
+    main()
