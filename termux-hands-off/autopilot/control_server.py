@@ -1,8 +1,21 @@
-import os, json, subprocess, urllib.parse, hmac, math
+import os, json, subprocess, urllib.parse, hmac, math, ipaddress
 from datetime import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
 
-HOST, PORT = "0.0.0.0", 8765
+def validate_bind_host(host):
+    """Refuse cleartext control-plane exposure beyond the local device."""
+    if host == "localhost":
+        return host
+    try:
+        if ipaddress.ip_address(host).is_loopback:
+            return host
+    except ValueError:
+        pass
+    raise ValueError("CONTROL_HOST must be a loopback address; remote access requires a separately authenticated TLS boundary")
+
+
+HOST = validate_bind_host(os.environ.get("CONTROL_HOST", "127.0.0.1"))
+PORT = 8765
 TOKEN = os.environ.get("CONTROL_TOKEN", "")
 
 def run(cmd):
