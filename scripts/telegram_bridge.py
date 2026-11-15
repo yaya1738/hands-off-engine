@@ -175,7 +175,7 @@ class TelegramBridge:
                 response = hub.receive("operator", "approve", {"command_id": cmd_id}, channel="telegram", **authenticated_args)
             elif text.startswith("/reject "):
                 cmd_id = text.split(" ", 1)[1].strip()
-                response = hub.receive("operator", "reject", {"command_id": cmd_id}, channel="telegram")
+                response = hub.receive("operator", "reject", {"command_id": cmd_id}, channel="telegram", **authenticated_args)
             elif text.startswith("/status"):
                 response = hub.receive("operator", "status_query", {"query": "full"}, channel="telegram")
             elif text.startswith("/trade "):
