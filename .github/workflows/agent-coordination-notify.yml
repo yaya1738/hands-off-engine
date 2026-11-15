@@ -35,7 +35,7 @@ jobs:
 
       - name: Create notification issue if urgent
         if: steps.check_urgent.outputs.urgent == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');

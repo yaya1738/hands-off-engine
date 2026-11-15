@@ -47,7 +47,7 @@ jobs:
           git push
       
       - name: Add comment to issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             github.rest.issues.createComment({
