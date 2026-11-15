@@ -308,9 +308,11 @@ class CommHub:
             return {"routed_to": "rejected", "error": f"Unknown sender: {sender_id}"}
         sender = self.parties[sender_id]
 
-        if msg_type in ("approve", "reject", "trade_command", "execute_command"):
+        if msg_type in ("approve", "reject", "trade_command", "execute_command", "objective_review"):
             if authenticated is not True or sender.get("role") != "owner":
                 return {"routed_to": "rejected", "error": "Authenticated owner identity required"}
+            if msg_type == "objective_review" and channel != "telegram":
+                return {"routed_to": "rejected", "error": "Objective review is only supported through authenticated Telegram"}
             if channel == "telegram":
                 allowed_ids = {
                     value.strip()
@@ -357,11 +359,13 @@ class CommHub:
 
         # Registry membership and trust scores are not authentication.
         # Privileged inbound messages require a verified channel identity.
-        if msg_type in ("approve", "reject", "trade_command", "execute_command"):
+        if msg_type in ("approve", "reject", "trade_command", "execute_command", "objective_review"):
             if msg.get("authenticated") is not True:
                 return {"routed_to": "rejected", "error": "Authenticated operator identity required"}
             if msg.get("sender_role") != "owner":
                 return {"routed_to": "rejected", "error": "Only the authenticated owner may request privileged actions"}
+            if msg_type == "objective_review" and msg.get("channel") != "telegram":
+                return {"routed_to": "rejected", "error": "Objective review is only supported through authenticated Telegram"}
             if msg.get("channel") == "telegram":
                 allowed_ids = {
                     value.strip()
@@ -371,6 +375,9 @@ class CommHub:
                 actor_id = str(msg.get("authenticated_actor_id") or "")
                 if not allowed_ids or actor_id not in allowed_ids:
                     return {"routed_to": "rejected", "error": "Telegram sender is not in TELEGRAM_ADMIN_USER_IDS"}
+
+        if msg_type == "objective_review":
+            return self._handle_objective_review(msg)
 
         # Approval responses
         if msg_type in ("approve", "reject"):
@@ -535,6 +542,34 @@ class CommHub:
             return {"routed_to": "approval_workflow", "result": result}
         except Exception as e:
             return {"routed_to": "error", "error": str(e)}
+
+    def _handle_objective_review(self, msg):
+        """Record an authenticated objective decision for planning only."""
+        payload = msg.get("payload", {})
+        if not isinstance(payload, dict):
+            return {"routed_to": "rejected", "error": "Objective review payload must be an object"}
+        goal_id = payload.get("goal_id")
+        decision = payload.get("decision")
+        if not isinstance(goal_id, str) or decision not in ("accept_for_planning", "reject"):
+            return {"routed_to": "rejected", "error": "Expected goal_id and decision accept_for_planning|reject"}
+        try:
+            # This module is introduced by the paired Factory scheduler PR.
+            # Until both PRs are present, fail closed and report unavailable.
+            from ai.factory.objective_review import FactoryObjectiveReview
+            service = FactoryObjectiveReview(self.repo_root)
+            result = service.review(
+                goal_id,
+                decision,
+                authenticated=msg.get("authenticated") is True,
+                authenticated_actor_id=msg.get("authenticated_actor_id"),
+                channel=msg.get("channel", ""),
+                correlation_id=msg.get("id"),
+            )
+            return {"routed_to": "factory_objective_review", "result": result}
+        except ImportError:
+            return {"routed_to": "unavailable", "error": "Factory objective review service is not installed"}
+        except Exception as exc:
+            return {"routed_to": "error", "error": str(exc)}
 
     def _handle_status_query(self, msg):
         """Return system status to the requesting party."""
