@@ -193,16 +193,6 @@ class Node1Runtime:
         except ImportError:
             req_intake = None
             log.warning("factory_request_intake not available")
-        try:
-            from scripts.improvement_applier import ImprovementApplier
-            applier = ImprovementApplier(repo_root=REPO_ROOT)
-        except ImportError:
-            applier = None
-            log.warning("improvement_applier not available")
-        
-        # Candidate generation and bounded bus dispatch have one owner:
-        # self_improvement.py, invoked by the periodic scheduler. Node 1 only
-        # consumes the durable candidate snapshot and owns safe application.
 
         try:
             from scripts.continuation import ContinuationEmitter
@@ -288,32 +278,6 @@ class Node1Runtime:
                             )
                     except Exception as e:
                         log.error(f"Request intake error: {e}")
-
-                # 3c. Apply the latest durable candidates (every 5 minutes).
-                # Candidate generation/dispatch belongs exclusively to the
-                # periodic self_improvement workflow; this process owns apply.
-                if applier and tick % 30 == 0:
-                    try:
-                        candidate_file = STATE_DIR / "improvement_state.json"
-                        candidates = []
-                        if candidate_file.exists():
-                            candidate_state = json.loads(candidate_file.read_text())
-                            if isinstance(candidate_state, dict):
-                                raw_candidates = candidate_state.get("improvements", [])
-                                if isinstance(raw_candidates, list):
-                                    candidates = [
-                                        item for item in raw_candidates
-                                        if isinstance(item, dict) and item.get("id")
-                                    ]
-                        results = applier.apply_batch(candidates)
-                        applied = sum(1 for result in results if result.get("applied"))
-                        if applied:
-                            log.info(f"Improvement applier: {applied} improvements applied")
-                            self.state.data["improvements_applied"] = (
-                                self.state.data.get("improvements_applied", 0) + applied
-                            )
-                    except Exception as e:
-                        log.error(f"Improvement applier error: {e}")
 
                 # 4. Heartbeat (every 60s)
                 if time.time() - self.last_heartbeat >= 60:
