@@ -11,9 +11,7 @@ import json
 import math
 import os
 import signal
-import subprocess
 import sys
-import tempfile
 import time
 from pathlib import Path
 from datetime import datetime, timezone
@@ -154,71 +152,25 @@ def release_lock(handle):
         handle.close()
 
 
-def _read_output_tail(output_file):
-    """Read at most MAX_OUTPUT_CHARS from a file-backed child output stream."""
-    output_file.seek(0, os.SEEK_END)
-    size = output_file.tell()
-    output_file.seek(max(0, size - MAX_OUTPUT_CHARS), os.SEEK_SET)
-    return output_file.read(MAX_OUTPUT_CHARS).decode("utf-8", errors="replace").strip()
-
-
 def run_task(task):
-    """Run one child with file-backed bounded output and process-group timeout cleanup."""
-    started = _timestamp()
-    process = None
-    try:
-        # File-backed capture avoids buffering arbitrary child output in RAM.
-        with tempfile.TemporaryFile(mode="w+b") as output_file:
-            process = subprocess.Popen(
-                [sys.executable, str(ROOT / "scripts" / task["script"])],
-                stdout=output_file,
-                stderr=subprocess.STDOUT,
-                cwd=str(ROOT),
-                start_new_session=True,
-            )
-            try:
-                returncode = process.wait(timeout=TASK_TIMEOUT_SECONDS)
-            except subprocess.TimeoutExpired as exc:
-                # Kill the whole child session, not just its direct parent.
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-                process.wait()
-                tail = _read_output_tail(output_file)
-                detail = (tail + "\n" + str(exc)).strip()
-                return {
-                    "name": task["name"],
-                    "success": False,
-                    "returncode": process.returncode,
-                    "output": detail[-MAX_OUTPUT_CHARS:],
-                    "started_at": started,
-                    "timestamp": _timestamp(),
-                }
+    """Run one child with bounded output and owned process-group cleanup."""
+    from scripts.process_group import run_process
 
-            return {
-                "name": task["name"],
-                "success": returncode == 0,
-                "returncode": returncode,
-                "output": _read_output_tail(output_file),
-                "started_at": started,
-                "timestamp": _timestamp(),
-            }
-    except Exception as exc:
-        if process is not None and process.poll() is None:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            process.wait()
-        return {
-            "name": task["name"],
-            "success": False,
-            "returncode": process.returncode if process is not None else None,
-            "output": str(exc)[-MAX_OUTPUT_CHARS:],
-            "started_at": started,
-            "timestamp": _timestamp(),
-        }
+    started = _timestamp()
+    outcome = run_process(
+        [sys.executable, str(ROOT / "scripts" / task["script"])],
+        cwd=ROOT,
+        timeout=TASK_TIMEOUT_SECONDS,
+        max_output_chars=MAX_OUTPUT_CHARS,
+    )
+    return {
+        "name": task["name"],
+        "success": outcome["success"],
+        "returncode": outcome["returncode"],
+        "output": outcome["output"],
+        "started_at": started,
+        "timestamp": _timestamp(),
+    }
 
 
 def append_log(result):

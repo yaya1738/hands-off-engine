@@ -7,7 +7,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts import scheduler, improvement_cycle
+from scripts import scheduler, improvement_cycle, process_group
 
 
 class SchedulerHardeningTests(unittest.TestCase):
@@ -164,31 +164,32 @@ class SchedulerHardeningTests(unittest.TestCase):
             kwargs["stdout"].write(b"x" * (scheduler.MAX_OUTPUT_CHARS * 100))
             return process
 
-        with mock.patch.object(scheduler.subprocess, "Popen", side_effect=fake_popen) as popen:
+        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen:
             result = scheduler.run_task(task)
 
         self.assertTrue(result["success"])
         self.assertEqual(len(result["output"]), scheduler.MAX_OUTPUT_CHARS)
         self.assertTrue(popen.call_args.kwargs["start_new_session"])
-        self.assertNotEqual(popen.call_args.kwargs["stdout"], scheduler.subprocess.PIPE)
+        self.assertNotEqual(popen.call_args.kwargs["stdout"], process_group.subprocess.PIPE)
         self.assertTrue(popen.call_args.kwargs["stdout"].closed)
 
     def test_run_task_kills_process_group_on_timeout(self):
         task = {"name": "sample", "script": "sample.py"}
         process = mock.Mock(pid=456, returncode=None)
         process.wait.side_effect = [
-            scheduler.subprocess.TimeoutExpired("sample", scheduler.TASK_TIMEOUT_SECONDS),
+            process_group.subprocess.TimeoutExpired("sample", scheduler.TASK_TIMEOUT_SECONDS),
             -9,
         ]
         process.returncode = -9
 
-        with mock.patch.object(scheduler.subprocess, "Popen", return_value=process), \
-             mock.patch.object(scheduler.os, "killpg") as killpg:
+        with mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
+             mock.patch("scripts.process_group._wait_for_exit_without_reaping", side_effect=TimeoutError("timeout")), \
+             mock.patch.object(process_group.os, "killpg") as killpg:
             result = scheduler.run_task(task)
 
         self.assertFalse(result["success"])
         killpg.assert_called_once_with(456, scheduler.signal.SIGKILL)
-        self.assertEqual(process.wait.call_count, 2)
+        self.assertEqual(process.wait.call_count, 1)
 
     def test_scheduler_lock_conflict_returns_nonzero_entrypoint_status(self):
         with mock.patch.object(scheduler, "run_forever", return_value=False):
@@ -211,29 +212,30 @@ class SchedulerHardeningTests(unittest.TestCase):
             kwargs["stdout"].write(b"z" * (improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS * 100))
             return process
 
-        with mock.patch.object(improvement_cycle.subprocess, "Popen", side_effect=fake_popen) as popen:
+        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen:
             result = improvement_cycle.run_subprocess("sample.py")
 
         self.assertTrue(result["success"])
         self.assertEqual(len(result["output"]), improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS)
-        self.assertNotEqual(popen.call_args.kwargs["stdout"], improvement_cycle.subprocess.PIPE)
+        self.assertNotEqual(popen.call_args.kwargs["stdout"], process_group.subprocess.PIPE)
         self.assertTrue(popen.call_args.kwargs["start_new_session"])
         self.assertTrue(popen.call_args.kwargs["stdout"].closed)
 
     def test_improvement_cycle_subprocess_kills_process_group_on_timeout(self):
         process = mock.Mock(pid=987, returncode=-9)
         process.wait.side_effect = [
-            improvement_cycle.subprocess.TimeoutExpired("sample", improvement_cycle.SUBPROCESS_TIMEOUT_SECONDS),
+            process_group.subprocess.TimeoutExpired("sample", improvement_cycle.SUBPROCESS_TIMEOUT_SECONDS),
             -9,
         ]
 
-        with mock.patch.object(improvement_cycle.subprocess, "Popen", return_value=process), \
-             mock.patch.object(improvement_cycle.os, "killpg") as killpg:
+        with mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
+             mock.patch("scripts.process_group._wait_for_exit_without_reaping", side_effect=TimeoutError("timeout")), \
+             mock.patch.object(process_group.os, "killpg") as killpg:
             result = improvement_cycle.run_subprocess("sample.py")
 
         self.assertFalse(result["success"])
-        killpg.assert_called_once_with(987, improvement_cycle.signal.SIGKILL)
-        self.assertEqual(process.wait.call_count, 2)
+        killpg.assert_called_once_with(987, process_group.signal.SIGKILL)
+        self.assertEqual(process.wait.call_count, 1)
 
     def test_apply_generated_candidates_reads_snapshot_and_calls_applier_once(self):
         candidate = {"id": "imp-123", "action": "update_documentation"}

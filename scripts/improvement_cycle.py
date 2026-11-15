@@ -7,11 +7,7 @@ generation/dispatch and safe improvement application, plus feedback and
 approval checks.
 """
 import json
-import os
-import signal
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -57,50 +53,19 @@ def _send_approval_alert():
         return False
 
 
-def _read_subprocess_tail(output_file):
-    output_file.seek(0, os.SEEK_END)
-    size = output_file.tell()
-    output_file.seek(max(0, size - MAX_SUBPROCESS_OUTPUT_CHARS), os.SEEK_SET)
-    return output_file.read(MAX_SUBPROCESS_OUTPUT_CHARS).decode("utf-8", errors="replace").strip()
-
-
 def run_subprocess(script):
-    """Run a workflow child with file-backed output and process-group timeout cleanup."""
-    parts = script.split()
-    process = None
-    try:
-        cmd = [sys.executable, str(ROOT / "scripts" / parts[0])] + parts[1:]
-        with tempfile.TemporaryFile(mode="w+b") as output_file:
-            process = subprocess.Popen(
-                cmd,
-                stdout=output_file,
-                stderr=subprocess.STDOUT,
-                cwd=str(ROOT),
-                start_new_session=True,
-            )
-            try:
-                returncode = process.wait(timeout=SUBPROCESS_TIMEOUT_SECONDS)
-            except subprocess.TimeoutExpired as exc:
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-                process.wait()
-                detail = (_read_subprocess_tail(output_file) + "\\n" + str(exc)).strip()
-                return {"success": False, "output": detail[-MAX_SUBPROCESS_OUTPUT_CHARS:]}
+    """Run a workflow child with bounded output and owned group cleanup."""
+    from scripts.process_group import run_process
 
-            return {
-                "success": returncode == 0,
-                "output": _read_subprocess_tail(output_file),
-            }
-    except Exception as exc:
-        if process is not None and process.poll() is None:
-            try:
-                os.killpg(process.pid, signal.SIGKILL)
-            except ProcessLookupError:
-                pass
-            process.wait()
-        return {"success": False, "output": str(exc)[-MAX_SUBPROCESS_OUTPUT_CHARS:]}
+    parts = script.split()
+    cmd = [sys.executable, str(ROOT / "scripts" / parts[0])] + parts[1:]
+    outcome = run_process(
+        cmd,
+        cwd=ROOT,
+        timeout=SUBPROCESS_TIMEOUT_SECONDS,
+        max_output_chars=MAX_SUBPROCESS_OUTPUT_CHARS,
+    )
+    return {"success": outcome["success"], "output": outcome["output"]}
 
 
 def apply_generated_candidates():
