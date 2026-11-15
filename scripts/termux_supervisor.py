@@ -264,14 +264,26 @@ class ManagedDaemon:
 
     def _drain_output(self, stream):
         """Continuously drain merged stdout/stderr into bounded rotating logs."""
+        log_write_error_reported = False
         try:
             while True:
                 chunk = stream.read(4096)
                 if not chunk:
                     break
-                self.log.write(chunk)
-        except (OSError, ValueError) as e:
-            log.debug("%s: output drain stopped: %s", self.name, e)
+                try:
+                    self.log.write(chunk)
+                except Exception as exc:
+                    # A full/unavailable log disk must not stop pipe draining
+                    # and deadlock the child. Report once, then keep consuming.
+                    if not log_write_error_reported:
+                        log.warning(
+                            "%s: unable to persist child output: %s",
+                            self.name,
+                            exc,
+                        )
+                        log_write_error_reported = True
+        except (OSError, ValueError) as exc:
+            log.debug("%s: output drain stopped: %s", self.name, exc)
         finally:
             try:
                 stream.close()

@@ -106,5 +106,33 @@ time.sleep(10)
         self.assertTrue(all(path.stat().st_size <= 256 * 1024 + 4096 for path in files))
 
 
+    def test_log_write_failure_does_not_stop_pipe_draining(self):
+        script = """
+import sys, time
+sys.stdout.write('X' * (2 * 1024 * 1024))
+sys.stdout.flush()
+sys.stderr.write('Y' * (2 * 1024 * 1024))
+sys.stderr.flush()
+open(__MARKER__, 'w').write('continued')
+time.sleep(10)
+"""
+        with mock.patch.object(
+            supervisor.RotatingLog,
+            "write",
+            side_effect=OSError("simulated disk full"),
+        ), mock.patch.object(supervisor.log, "warning") as warning:
+            daemon, marker = self.start_child(script)
+            try:
+                self.assertTrue(
+                    self.wait_for_marker(marker),
+                    "child blocked because log persistence failure stopped pipe draining",
+                )
+                self.assertIsNone(daemon.process.poll())
+                self.assertTrue(daemon.output_thread.is_alive())
+                warning.assert_called_once()
+            finally:
+                self.stop_child(daemon)
+
+
 if __name__ == "__main__":
     unittest.main()
