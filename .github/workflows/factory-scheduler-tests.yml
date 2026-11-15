@@ -26,6 +26,7 @@ on:
       - "scripts/task_worker.py"
       - "tests/test_scheduler_hardening.py"
       - "tests/test_supervisor_ownership_contract.py"
+      - "tests/test_scheduler_heartbeat_contract.py"
       - "tests/test_self_improvement_dispatch.py"
       - ".github/workflows/factory-scheduler-tests.yml"
   workflow_dispatch:
@@ -44,6 +45,7 @@ jobs:
         run: |
           python -m unittest tests/test_scheduler_hardening.py -v
           python -m unittest tests/test_supervisor_ownership_contract.py -v
+          python -m unittest tests/test_scheduler_heartbeat_contract.py -v
           python -m unittest tests/test_self_improvement_dispatch.py -v
           python -m unittest tests/test_improvement_applier_safety.py -v
           python -m unittest tests/test_improvement_applier.py -v
