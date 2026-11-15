@@ -11,8 +11,9 @@ Safe actions (auto-execute):
   - update_readme: add/update README sections
   - generate_report: create analysis report files
   - fix_config: update configuration based on detected issues
+  - log_analysis: write bounded observational summaries
 
-Actions that write to tests/ or source-controlled paths require explicit approval.
+Actions that write to tests/ require explicit approval; canonical bus pruning is disabled and must use a separately reviewed archival procedure.
 
 Risky actions (queue for operator approval):
   - code_change: modify source code
@@ -48,7 +49,6 @@ SAFE_ACTIONS = {
     "update_readme",
     "generate_report",
     "fix_config",
-    "clean_bus",
     "log_analysis",
 }
 
@@ -59,6 +59,7 @@ RISKY_ACTIONS = {
     "network_action",
     "delete_file",
     "add_test",
+    "clean_bus",
 }
 
 # Directories the applier may write to
@@ -173,6 +174,13 @@ class ImprovementApplier:
         # Dedup
         if imp_id in self.applied_ids:
             return {"applied": False, "id": imp_id, "reason": "already_applied"}
+        if any(item.get("id") == imp_id for item in self.state.get("queued", [])):
+            return {
+                "applied": False,
+                "id": imp_id,
+                "needs_approval": True,
+                "reason": "already_queued",
+            }
 
         # Classify as safe or risky
         if action in RISKY_ACTIONS:
@@ -249,22 +257,6 @@ class ImprovementApplier:
             report_file.write_text(json.dumps(report, indent=2) + "\n")
             return f"Report saved to {report_file.relative_to(self.repo_root)}"
 
-        elif action == "clean_bus":
-            bus_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
-            if not bus_file.exists():
-                return "No bus file to clean"
-            lines = bus_file.read_text().splitlines()
-            before = len(lines)
-            # Keep only last 500 lines, archive the rest
-            if before > 500:
-                archive = self.repo_root / "ai" / "coordination" / "archive"
-                archive.mkdir(parents=True, exist_ok=True)
-                archive_file = archive / f"messages_{now[:10]}_{now[11:19].replace(':', '')}.jsonl"
-                archive_file.write_text("\n".join(lines[:-500]) + "\n")
-                bus_file.write_text("\n".join(lines[-500:]) + "\n")
-                return f"Archived {before - 500} lines, kept 500"
-            return f"Bus has {before} lines, no cleanup needed"
-
         elif action == "fix_config":
             # Check and fix missing config entries
             config_file = self.repo_root / "config" / "system.json"
@@ -297,8 +289,7 @@ class ImprovementApplier:
             summary_file = self.state_dir / "analysis_summary.json"
             analysis = {
                 "analyzed_at": now,
-                "improvements_applied": len(self.applied_ids),
-                "improvements_queued": len(self.state.get("queued", [])),
+                "improvements_applied": len(self.applied_ids),                "improvements_queued": len(self.state.get("queued", [])),
             }
             # Count bus message types
             bus_file = self.repo_root / "ai" / "coordination" / "messages.jsonl"
@@ -382,15 +373,25 @@ class ImprovementApplier:
         return self.state.get("queued", [])
 
     def approve_improvement(self, imp_id: str) -> Optional[dict]:
-        """Approve and execute a queued improvement."""
+        """Execute only explicitly supported approval actions.
+
+        Other risky actions remain queued for the separately governed executor;
+        an approval must never be recorded as successful when no handler exists.
+        """
         queued = self.state.get("queued", [])
         for item in queued:
             if item["id"] == imp_id:
-                queued.remove(item)
+                if item.get("action") != "add_test":
+                    return {
+                        "approved": False,
+                        "id": imp_id,
+                        "reason": "requires_separate_governed_executor",
+                    }
                 result = self._execute_safe(
                     item["action"], item["category"], item["title"],
                     f"Approved improvement: {item['title']}", item
                 )
+                queued.remove(item)
                 self._record_improvement(imp_id, item["category"], item["title"], item["action"], result)
                 self._persist()
                 return {"approved": True, "id": imp_id, "result": result}
