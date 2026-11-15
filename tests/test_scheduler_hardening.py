@@ -141,6 +141,21 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertEqual(due_at, 400)
         self.assertEqual(job["next_run_at"], 400)
 
+    def test_scheduler_state_write_fsyncs_file_and_parent_directory(self):
+        with mock.patch.object(
+            scheduler.os, "fsync", wraps=scheduler.os.fsync
+        ) as fsync:
+            scheduler.save_state({"jobs": {"health_check": {"next_run_at": 123}}})
+        saved = json.loads(scheduler.SCHEDULER_STATE.read_text())
+        self.assertEqual(saved["jobs"]["health_check"]["next_run_at"], 123)
+        self.assertEqual(fsync.call_count, 2)
+
+    def test_scheduler_heartbeat_uses_atomic_write_without_forcing_storage(self):
+        with mock.patch.object(scheduler, "_atomic_write_json") as write_json:
+            self.assertTrue(scheduler.write_heartbeat())
+        write_json.assert_called_once()
+        self.assertIs(write_json.call_args.kwargs["durable"], False)
+
     def test_lock_rejects_second_scheduler_instance(self):
         first = scheduler.acquire_lock()
         self.assertIsNotNone(first)

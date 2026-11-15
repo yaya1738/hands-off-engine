@@ -41,11 +41,36 @@ def _timestamp():
     return datetime.now(timezone.utc).isoformat()
 
 
-def _atomic_write_json(path, data):
+def _atomic_write_json(path, data, *, durable=True):
+    """Atomically publish JSON; fsync durable state before reporting success."""
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
-    temporary.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
-    temporary.replace(path)
+    temporary = path.with_name(f"{path.name}.{os.getpid()}.tmp")
+    fd = os.open(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    try:
+        os.fchmod(fd, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as stream:
+            fd = None
+            stream.write(json.dumps(data, indent=2, sort_keys=True) + "\n")
+            stream.flush()
+            if durable:
+                os.fsync(stream.fileno())
+        os.replace(temporary, path)
+        if durable:
+            directory_fd = os.open(
+                path.parent, os.O_RDONLY | getattr(os, "O_DIRECTORY", 0)
+            )
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
+    except BaseException:
+        if fd is not None:
+            os.close(fd)
+        try:
+            temporary.unlink()
+        except OSError:
+            pass
+        raise
 
 
 def load_state():
@@ -93,7 +118,7 @@ def write_heartbeat(phase="idle", task=None, task_deadline=None):
         "timestamp": _timestamp(),
     }
     try:
-        _atomic_write_json(SCHEDULER_HEARTBEAT, payload)
+        _atomic_write_json(SCHEDULER_HEARTBEAT, payload, durable=False)
         return True
     except OSError:
         return False
