@@ -29,3 +29,15 @@ Some finance and identity features will be unavailable until the relevant local-
 ## Repository history
 
 This change removes the files from the current tree only. Previous commits may still contain their contents. History rewriting and credential revocation are separate operations and must be planned explicitly; deleting a file in a later commit does not erase historical copies.
+
+## Identity allowlists
+
+Identity and infrastructure allowlists are now read from local environment variables, not committed source:
+
+- `HANDS_OFF_MASTER_NAME`
+- `HANDS_OFF_MASTER_EMAIL`
+- `HANDS_OFF_MASTER_DEVICES` (comma-separated)
+- `HANDS_OFF_MASTER_SSH_FINGERPRINTS` (comma-separated)
+- `HANDS_OFF_TRUSTED_IPS` (comma-separated)
+
+The allowlists default to empty, so identity checks fail closed until configured locally. Do not commit their values. The public bootstrap kernel retains its structure but has private contact, infrastructure, and financial snapshot fields blanked or marked unavailable.
