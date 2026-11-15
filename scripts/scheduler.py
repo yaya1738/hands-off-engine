@@ -153,7 +153,7 @@ def run_task(task):
                     pass
                 process.wait()
                 tail = _read_output_tail(output_file)
-                detail = (tail + "\\n" + str(exc)).strip()
+                detail = (tail + "\n" + str(exc)).strip()
                 return {
                     "name": task["name"],
                     "success": False,
