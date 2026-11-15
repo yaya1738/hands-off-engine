@@ -16,6 +16,10 @@ from pathlib import Path
 from typing import Any
 
 
+class ObjectiveQueueIntegrityError(RuntimeError):
+    """Raised when the durable objective queue cannot be trusted."""
+
+
 class FactoryAuthorityGateway:
     """Append-only objective queue; admission never grants execution authority."""
 
@@ -50,6 +54,26 @@ class FactoryAuthorityGateway:
         if len(value) > limit:
             raise ValueError(f"{name} exceeds {limit} characters")
         return value
+
+    def _iter_queue_records(self):
+        """Yield the complete queue, rejecting corruption instead of hiding it."""
+        if not self.queue_path.exists():
+            return
+        with self.queue_path.open("r", encoding="utf-8") as queue:
+            for line_number, line in enumerate(queue, start=1):
+                if not line.strip():
+                    continue
+                try:
+                    record = json.loads(line)
+                except json.JSONDecodeError as exc:
+                    raise ObjectiveQueueIntegrityError(
+                        f"objective queue contains invalid JSON on line {line_number}"
+                    ) from exc
+                if not isinstance(record, dict):
+                    raise ObjectiveQueueIntegrityError(
+                        f"objective queue record on line {line_number} must be a JSON object"
+                    )
+                yield record
 
     def submit_goal(
         self,
@@ -96,23 +120,15 @@ class FactoryAuthorityGateway:
         with self._open_private(self.lock_path, "a+") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:
-                if self.queue_path.exists():
-                    with self.queue_path.open("r", encoding="utf-8") as queue:
-                        for line in queue:
-                            if not line.strip():
-                                continue
-                            try:
-                                existing = json.loads(line)
-                            except json.JSONDecodeError:
-                                continue
-                            if existing.get("idempotency_key") == key:
-                                if existing.get("objective") != objective:
-                                    raise ValueError("idempotency key already belongs to a different objective")
-                                return {
-                                    "status": "idempotent_replay",
-                                    "goal_id": existing.get("goal_id", goal_id),
-                                    "execution_enabled": False,
-                                }
+                for existing in self._iter_queue_records():
+                    if existing.get("idempotency_key") == key:
+                        if existing.get("objective") != objective:
+                            raise ValueError("idempotency key already belongs to a different objective")
+                        return {
+                            "status": "idempotent_replay",
+                            "goal_id": existing.get("goal_id", goal_id),
+                            "execution_enabled": False,
+                        }
                 with self._open_private(self.queue_path, "a") as queue:
                     queue.write(json.dumps(record, sort_keys=True) + "\n")
                     queue.flush()
@@ -132,22 +148,9 @@ class FactoryAuthorityGateway:
             raise ValueError("limit must be an integer from 1 to 200")
         if status is not None:
             status = self._validate_text(status, "status", 40)
-        if not self.queue_path.exists():
-            return []
-        tail = deque(maxlen=2000)
-        with self.queue_path.open("r", encoding="utf-8") as queue:
-            for line in queue:
-                tail.append(line)
+        tail = deque(self._iter_queue_records(), maxlen=2000)
         records = []
-        for line in reversed(tail):
-            if not line.strip():
-                continue
-            try:
-                record = json.loads(line)
-            except json.JSONDecodeError:
-                continue
-            if not isinstance(record, dict):
-                continue
+        for record in reversed(tail):
             if status is not None and record.get("status") != status:
                 continue
             records.append(record)
@@ -160,19 +163,10 @@ class FactoryAuthorityGateway:
         goal_id = self._validate_text(goal_id, "goal_id", 64)
         if len(goal_id) != 64 or any(ch not in "0123456789abcdef" for ch in goal_id.lower()):
             raise ValueError("goal_id must be a 64-character hexadecimal ID")
-        if not self.queue_path.exists():
-            return None
-        with self.queue_path.open("r", encoding="utf-8") as queue:
-            for line in queue:
-                if not line.strip():
-                    continue
-                try:
-                    record = json.loads(line)
-                except json.JSONDecodeError:
-                    continue
-                if isinstance(record, dict) and record.get("goal_id") == goal_id:
-                    return record
+        for record in self._iter_queue_records():
+            if record.get("goal_id") == goal_id:
+                return record
         return None
 
 
-__all__ = ["FactoryAuthorityGateway"]
+__all__ = ["FactoryAuthorityGateway", "ObjectiveQueueIntegrityError"]
