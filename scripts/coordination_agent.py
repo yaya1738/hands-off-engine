@@ -495,39 +495,73 @@ Or review at: https://github.com/hands-off-engine/hands-off-engine/pull/{pr_num}
         logger.info(f"Task {task_id} status → {new_status}")
 
     def check_draft_pr_buildup(self):
-        """Check for draft PRs from trusted authors and trigger mark-ready workflow if needed."""
+        """Record exact draft PRs for human review; never promote or dispatch workflows."""
         try:
-            # Get draft PRs from trusted authors (copilot)
             result = subprocess.run(
                 ["gh", "pr", "list", "--state", "open", "--draft",
-                 "--json", "number,author,isDraft", "--limit", "50"],
+                 "--json", "number,author,isDraft,title,headRefOid,url", "--limit", "50"],
                 capture_output=True, text=True, timeout=30,
                 cwd=str(REPO_ROOT)
             )
-
             if result.returncode != 0:
-                return
+                return []
 
             prs = json.loads(result.stdout)
-
-            # Filter for trusted bot authors
-            trusted_authors = ['copilot', 'copilot-swe-agent', 'github-actions[bot]', 'dependabot[bot]', 'app/copilot-swe-agent']
-            draft_prs = [
-                p for p in prs
-                if p.get('isDraft') and
-                p.get('author', {}).get('login', '').lower() in [a.lower() for a in trusted_authors]
+            trusted_authors = {
+                "copilot", "copilot-swe-agent", "github-actions[bot]",
+                "dependabot[bot]", "app/copilot-swe-agent",
+            }
+            candidates = [
+                {
+                    "pr_number": pr.get("number"),
+                    "author": pr.get("author", {}).get("login", ""),
+                    "title": pr.get("title", ""),
+                    "head_sha": pr.get("headRefOid", ""),
+                    "url": pr.get("url", ""),
+                    "status": "pending_human_review",
+                    "created_at": datetime.now().isoformat(),
+                }
+                for pr in prs
+                if pr.get("isDraft") is True
+                and pr.get("author", {}).get("login", "").lower() in trusted_authors
             ]
+            if len(candidates) < 3:
+                return []
 
-            if len(draft_prs) >= 3:  # Trigger if 3+ drafts from bots
-                logger.info(f"Found {len(draft_prs)} draft PRs from trusted authors - triggering mark-ready workflow")
-                subprocess.run(
-                    ["gh", "workflow", "run", "Mark Copilot PRs Ready for Review"],
-                    capture_output=True, timeout=30,
-                    cwd=str(REPO_ROOT)
+            queue_file = AI_COORD_DIR / "promotion_review_queue.json"
+            queue_file.parent.mkdir(parents=True, exist_ok=True)
+            try:
+                queue = json.loads(queue_file.read_text(encoding="utf-8"))
+            except FileNotFoundError:
+                queue = {"pending": []}
+
+            pending = queue.setdefault("pending", [])
+            existing = {
+                (item.get("pr_number"), item.get("head_sha"))
+                for item in pending
+                if item.get("status") == "pending_human_review"
+            }
+            added = []
+            for candidate in candidates:
+                key = (candidate["pr_number"], candidate["head_sha"])
+                if key not in existing:
+                    pending.append(candidate)
+                    existing.add(key)
+                    added.append(candidate)
+
+            if added:
+                temp_file = queue_file.with_suffix(".json.tmp")
+                temp_file.write_text(json.dumps(queue, indent=2) + "\n", encoding="utf-8")
+                temp_file.replace(queue_file)
+                logger.info(
+                    "Recorded %s draft PR review proposals; no PR state changed",
+                    len(added),
                 )
+            return added
 
         except Exception as e:
-            logger.debug(f"Draft PR check skipped: {e}")
+            logger.debug(f"Draft PR review proposal check skipped: {e}")
+            return []
 
     def check_conflicting_prs(self):
         """Check for PRs with merge conflicts and request Copilot to fix them immediately."""
