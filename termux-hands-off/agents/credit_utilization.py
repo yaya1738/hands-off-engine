@@ -1,81 +1,71 @@
 #!/usr/bin/env python3
-import json, pathlib, time, math, os, datetime
+"""Credit utilization reporting that never treats redaction as a zero balance."""
+import datetime
+import json
+import math
+import os
+import pathlib
 
 HOME = pathlib.Path.home()
-CARDS = HOME/"hands-off"/"agents"/"cards.json"
-LOG   = HOME/"hands-off"/"logs"/"finance_credit.log"
+CARDS = HOME / "hands-off" / "agents" / "cards.json"
+LOG = HOME / "hands-off" / "logs" / "finance_credit.log"
+ALERT_WARN = 0.45
+ALERT_HARD = 0.50
 
-# --------- Tunables ---------
-ALERT_WARN = 0.45   # 45% = heads up
-ALERT_HARD = 0.50   # 50% = stop line
-
-# Cash-cycling assumptions (edit if needed)
-PP_BIZ_FEE = 0.03        # 3% merchant fee to cash out to PayPal Business
-PP_PAYPAL_REWARD = 0.03  # 3% at PayPal on PayPal Cashback card
-PP_GENERAL_REWARD = 0.015# 1.5% general
-# ---------------------------
 
 def notify(title, text):
     os.system(f'termux-notification --title "{title}" --content "{text}" >/dev/null 2>&1')
 
-def load_cards():
-    d = json.loads(CARDS.read_text()) if CARDS.exists() else {}
-    # sanitize
-    out = {}
-    for k,v in d.items():
-        try:
-            lim = float(v.get("limit",0))
-            bal = float(v.get("balance",0))
-            nm = v.get("name", k)
-            if lim > 0:
-                out[k] = {"limit": lim, "balance": bal, "name": nm}
-        except:
-            pass
-    return out
 
-def cycle_effective_cost():
-    """
-    Simple net fee estimate when cycling via PP Biz:
-    net_fee ≈ PP_BIZ_FEE - reward_rate
-    If spend posts as 'PayPal' (3%), net ~ 0%.
-    If only 1.5% applies, net ≈ 1.5%.
-    """
-    net_at_paypal = PP_BIZ_FEE - PP_PAYPAL_REWARD
-    net_general   = PP_BIZ_FEE - PP_GENERAL_REWARD
-    return {
-        "net_fee_at_paypal": round(net_at_paypal*100, 2),   # %
-        "net_fee_general":   round(net_general*100, 2)      # %
-    }
+def load_cards():
+    if not CARDS.is_file():
+        return None, "cards file missing"
+    try:
+        data = json.loads(CARDS.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return None, "cards file unreadable or malformed"
+    if not isinstance(data, dict) or not data:
+        return None, "card data absent"
+    cards = []
+    for key, item in data.items():
+        if not isinstance(item, dict):
+            return None, f"invalid card record: {key}"
+        limit, balance = item.get("limit"), item.get("balance")
+        if limit is None or balance is None:
+            return None, "one or more card values are redacted or unknown"
+        try:
+            limit, balance = float(limit), float(balance)
+        except (TypeError, ValueError):
+            return None, "one or more card values are not numeric"
+        if not math.isfinite(limit) or not math.isfinite(balance) or limit <= 0 or balance < 0:
+            return None, "one or more card values are invalid"
+        cards.append({"limit": limit, "balance": balance})
+    return cards, None
+
 
 def main():
-    cards = load_cards()
-    tot_lim = sum(c["limit"] for c in cards.values())
-    tot_bal = sum(c["balance"] for c in cards.values())
-    util = (tot_bal / tot_lim) if tot_lim > 0 else 0.0
-
-    est = cycle_effective_cost()
-    row = {
-        "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
-        "total_limit": round(tot_lim,2),
-        "total_balance": round(tot_bal,2),
-        "utilization": round(util,4),
-        "warn": ALERT_WARN,
-        "hard": ALERT_HARD,
-        "cycle_cost_pct_at_paypal": est["net_fee_at_paypal"],
-        "cycle_cost_pct_general": est["net_fee_general"]
-    }
-
+    cards, reason = load_cards()
+    row = {"ts": datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0).isoformat(),
+           "data_status": "unknown" if cards is None else "measured"}
+    if cards is None:
+        row["reason"] = reason
+    else:
+        total_limit = sum(card["limit"] for card in cards)
+        total_balance = sum(card["balance"] for card in cards)
+        utilization = total_balance / total_limit
+        row.update({"total_limit": round(total_limit, 2),
+                    "total_balance": round(total_balance, 2),
+                    "utilization": round(utilization, 4),
+                    "warn": ALERT_WARN, "hard": ALERT_HARD})
+        if utilization >= ALERT_HARD:
+            notify("CREDIT UTILIZATION — HARD", f"{round(utilization * 100, 1)}% (≥ {int(ALERT_HARD * 100)}%).")
+        elif utilization >= ALERT_WARN:
+            notify("CREDIT UTILIZATION — WARN", f"{round(utilization * 100, 1)}% (≥ {int(ALERT_WARN * 100)}%).")
     LOG.parent.mkdir(parents=True, exist_ok=True)
-    with open(LOG, "a", encoding="utf-8") as f:
-        f.write(json.dumps(row)+"\n")
-
-    # Alerts
-    if util >= ALERT_HARD:
-        notify("CREDIT UTILIZATION — HARD", f"{round(util*100,1)}% (≥ {int(ALERT_HARD*100)}%). Reduce balance now.")
-    elif util >= ALERT_WARN:
-        notify("CREDIT UTILIZATION — WARN", f"{round(util*100,1)}% (≥ {int(ALERT_WARN*100)}%). Consider paying down.")
-
+    with LOG.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(row) + "\n")
     print(json.dumps(row, indent=2))
+
 
 if __name__ == "__main__":
     main()
