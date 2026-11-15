@@ -1,4 +1,4 @@
-import json, uuid, time
+import json, uuid, time, os, hmac
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -90,8 +90,11 @@ class SystemControl:
         q = self._load_approval_queue()
         return q.get("pending", [])
 
-    def approve(self, command_id):
-        """Approve a pending command so the listener can process it."""
+    def approve(self, command_id, actor_id=None):
+        """Approve only for the explicitly configured authenticated operator."""
+        expected_actor = os.getenv("HANDS_OFF_OPERATOR_ID", "")
+        if not expected_actor or actor_id is None or not hmac.compare_digest(str(actor_id), expected_actor):
+            return {"status": "denied", "error": "Authenticated operator identity required"}
         q = self._load_approval_queue()
         found = None
         for p in q.get("pending", []):
@@ -117,8 +120,11 @@ class SystemControl:
         self._stamp_command_approval(command_id, "approved", queued_at=queued_at)
         return {"status": "approved", "id": command_id}
 
-    def reject(self, command_id):
-        """Reject a pending command."""
+    def reject(self, command_id, actor_id=None):
+        """Reject only for the explicitly configured authenticated operator."""
+        expected_actor = os.getenv("HANDS_OFF_OPERATOR_ID", "")
+        if not expected_actor or actor_id is None or not hmac.compare_digest(str(actor_id), expected_actor):
+            return {"status": "denied", "error": "Authenticated operator identity required"}
         q = self._load_approval_queue()
         found = None
         for p in q.get("pending", []):
