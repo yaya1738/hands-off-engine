@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
-"""Scheduler — runs periodic tasks in the background.
+"""Single-instance periodic scheduler with durable per-job due times.
 
-Replaces ad-hoc cron with a proper scheduler that respects the system's
-own improvement cycle. Runs improvement_cycle.py periodically and
-health checks more frequently.
+The scheduler is the sole cadence owner for periodic jobs. It persists each
+next-run timestamp before launching a child, so a restart cannot replay a
+burst of already-started jobs. Failed jobs are recorded and retried only at
+their next scheduled interval.
 """
+import fcntl
 import json
+import signal
 import subprocess
 import sys
 import time
@@ -15,6 +18,11 @@ from datetime import datetime, timezone
 ROOT = Path(__file__).resolve().parent.parent
 STATE = ROOT / "state"
 SCHEDULER_LOG = STATE / "scheduler_log.json"
+SCHEDULER_STATE = STATE / "scheduler_state.json"
+SCHEDULER_LOCK = STATE / "scheduler.lock"
+POLL_SECONDS = 10
+TASK_TIMEOUT_SECONDS = 60
+MAX_OUTPUT_CHARS = 500
 
 TASKS = [
     {"name": "health_check", "script": "health_monitor.py", "interval_seconds": 300},
@@ -23,67 +31,198 @@ TASKS = [
     {"name": "learning_analysis", "script": "learning_loop.py", "interval_seconds": 900},
 ]
 
+_RUNNING = True
+
+
+def _timestamp():
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _atomic_write_json(path, data):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary.write_text(json.dumps(data, indent=2, sort_keys=True) + "\n")
+    temporary.replace(path)
+
+
+def load_state():
+    """Load durable job schedule, falling back safely on malformed state."""
+    if SCHEDULER_STATE.exists():
+        try:
+            data = json.loads(SCHEDULER_STATE.read_text())
+            if isinstance(data, dict) and isinstance(data.get("jobs"), dict):
+                return data
+        except (OSError, ValueError, TypeError):
+            pass
+    return {"jobs": {}}
+
+
+def initialize_state(now=None):
+    """Stagger first-run jobs; later restarts reuse persisted due times."""
+    now = time.time() if now is None else float(now)
+    jobs = {}
+    for index, task in enumerate(TASKS):
+        jobs[task["name"]] = {
+            "next_run_at": now + index * POLL_SECONDS,
+            "last_started_at": None,
+            "last_result": None,
+        }
+    return {"jobs": jobs, "updated_at": _timestamp()}
+
+
+def save_state(state):
+    state["updated_at"] = _timestamp()
+    _atomic_write_json(SCHEDULER_STATE, state)
+
+
+def acquire_lock():
+    """Return an exclusively locked file handle, or None if already running."""
+    STATE.mkdir(parents=True, exist_ok=True)
+    handle = SCHEDULER_LOCK.open("a+")
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+    except (BlockingIOError, OSError):
+        handle.close()
+        return None
+    handle.seek(0)
+    handle.truncate()
+    handle.write(str(__import__("os").getpid()))
+    handle.flush()
+    return handle
+
+
+def release_lock(handle):
+    if handle is None:
+        return
+    try:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+    finally:
+        handle.close()
+
 
 def run_task(task):
-    """Run a scheduled task."""
+    """Run one bounded child and return a structured result."""
+    started = _timestamp()
     try:
-        r = subprocess.run(
+        result = subprocess.run(
             [sys.executable, str(ROOT / "scripts" / task["script"])],
-            capture_output=True, text=True, cwd=str(ROOT), timeout=60
+            capture_output=True,
+            text=True,
+            cwd=str(ROOT),
+            timeout=TASK_TIMEOUT_SECONDS,
         )
+        output = (result.stdout + result.stderr).strip()
         return {
             "name": task["name"],
-            "success": r.returncode == 0,
-            "output": (r.stdout + r.stderr).strip()[-200:],
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "success": result.returncode == 0,
+            "returncode": result.returncode,
+            "output": output[-MAX_OUTPUT_CHARS:],
+            "started_at": started,
+            "timestamp": _timestamp(),
         }
-    except Exception as e:
+    except Exception as exc:
         return {
             "name": task["name"],
             "success": False,
-            "output": str(e),
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "returncode": None,
+            "output": str(exc)[-MAX_OUTPUT_CHARS:],
+            "started_at": started,
+            "timestamp": _timestamp(),
         }
 
 
+def append_log(result):
+    STATE.mkdir(parents=True, exist_ok=True)
+    entries = []
+    if SCHEDULER_LOG.exists():
+        try:
+            loaded = json.loads(SCHEDULER_LOG.read_text())
+            if isinstance(loaded, list):
+                entries = loaded
+        except (OSError, ValueError, TypeError):
+            pass
+    entries.append(result)
+    _atomic_write_json(SCHEDULER_LOG, entries[-100:])
+
+
+def _handle_signal(signum, frame):
+    global _RUNNING
+    _RUNNING = False
+
+
 def run_forever():
-    """Run the scheduler forever."""
-    print(f"Scheduler started at {datetime.now(timezone.utc).isoformat()}")
-    print(f"Tasks: {', '.join(t['name'] for t in TASKS)}")
-    
-    last_run = {t["name"]: 0 for t in TASKS}
-    
-    while True:
-        now = time.time()
-        for task in TASKS:
-            if now - last_run[task["name"]] >= task["interval_seconds"]:
+    """Run periodic jobs until signalled; one process owns the schedule."""
+    global _RUNNING
+    lock = acquire_lock()
+    if lock is None:
+        print("Scheduler already running; refusing duplicate instance")
+        return False
+
+    previous_handlers = {}
+    try:
+        for sig in (signal.SIGTERM, signal.SIGINT):
+            previous_handlers[sig] = signal.signal(sig, _handle_signal)
+
+        state = load_state()
+        if not state["jobs"]:
+            state = initialize_state()
+            save_state(state)
+
+        print(f"Scheduler started at {_timestamp()}")
+        print(f"Tasks: {', '.join(task['name'] for task in TASKS)}")
+        _RUNNING = True
+
+        while _RUNNING:
+            now = time.time()
+            for task in TASKS:
+                if not _RUNNING:
+                    break
+                job = state["jobs"].setdefault(task["name"], {})
+                due_at = float(job.get("next_run_at", now + task["interval_seconds"]))
+                if now < due_at:
+                    continue
+
+                # Persist the next due time before launch (at-most-once per
+                # interval across crashes; a failed job is not tight-looped).
+                job["last_started_at"] = now
+                job["next_run_at"] = now + task["interval_seconds"]
+                save_state(state)
+
                 result = run_task(task)
-                last_run[task["name"]] = now
-                
-                # Log
-                STATE.mkdir(parents=True, exist_ok=True)
-                log = []
-                if SCHEDULER_LOG.exists():
-                    try:
-                        log = json.loads(SCHEDULER_LOG.read_text())
-                    except Exception:
-                        pass
-                log.append(result)
-                if len(log) > 100:
-                    log = log[-100:]
-                SCHEDULER_LOG.write_text(json.dumps(log, indent=2))
-                
-                status = "✅" if result["success"] else "❌"
+                job["last_result"] = result
+                save_state(state)
+                append_log(result)
+                status = "OK" if result["success"] else "FAIL"
                 print(f"[{result['timestamp'][:19]}] {status} {task['name']}")
-        
-        time.sleep(30)
+
+            if _RUNNING:
+                time.sleep(POLL_SECONDS)
+        return True
+    finally:
+        for sig, handler in previous_handlers.items():
+            signal.signal(sig, handler)
+        release_lock(lock)
+
+
+def run_once():
+    """Run each configured job once for explicit diagnostics."""
+    lock = acquire_lock()
+    if lock is None:
+        print("Scheduler already running; refusing duplicate instance")
+        return False
+    try:
+        for task in TASKS:
+            result = run_task(task)
+            append_log(result)
+            status = "OK" if result["success"] else "FAIL"
+            print(f"{status} {task['name']}: {result['output'][:100]}")
+        return True
+    finally:
+        release_lock(lock)
 
 
 if __name__ == "__main__":
     if "--once" in sys.argv:
-        for task in TASKS:
-            result = run_task(task)
-            status = "✅" if result["success"] else "❌"
-            print(f"{status} {task['name']}: {result['output'][:100]}")
+        run_once()
     else:
         run_forever()
