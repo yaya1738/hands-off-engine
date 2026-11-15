@@ -22,10 +22,12 @@ def _wait_for_exit_without_reaping(pid, timeout):
     while True:
         try:
             info = os.waitid(os.P_PID, pid, flags)
-        except ChildProcessError:
-            # Another component already reaped the leader. The process group
-            # may still contain descendants and remains subject to cleanup.
-            return
+        except ChildProcessError as exc:
+            # The leader is no longer waitable by this owner. Its PID/PGID may
+            # already have been reused, so signalling that group is unsafe.
+            raise ChildProcessError(
+                f"cannot prove process-group ownership for reaped leader {pid}"
+            ) from exc
         if info is not None and info.si_pid:
             return
         remaining = deadline - time.monotonic()
@@ -57,6 +59,7 @@ def run_process(command, *, cwd, timeout, max_output_chars):
     """
     process = None
     output = ""
+    group_identity_pinned = False
     try:
         with tempfile.TemporaryFile(mode="w+b") as output_file:
             process = subprocess.Popen(
@@ -82,6 +85,7 @@ def run_process(command, *, cwd, timeout, max_output_chars):
             # The leader has exited but remains unreaped, so its PID still
             # pins the original process-group identity. Remove any descendants
             # it left behind before output capture and before releasing that ID.
+            group_identity_pinned = True
             _kill_group(process.pid)
 
             # Deliberately perform fallible output capture before wait()/reap.
@@ -90,9 +94,9 @@ def run_process(command, *, cwd, timeout, max_output_chars):
             return {"success": returncode == 0, "returncode": returncode,
                     "output": output, "timed_out": False}
     except Exception as exc:
-        if process is not None:
-            # This must run even when the leader has exited but has not yet
-            # been reaped: its PID still anchors the process-group identity.
+        if process is not None and group_identity_pinned:
+            # Only signal/reap after WNOWAIT proved that this owner still has
+            # the unreaped leader anchoring the original process-group ID.
             _kill_group(process.pid)
             try:
                 process.wait()

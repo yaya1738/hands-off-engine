@@ -11,7 +11,7 @@ from unittest import mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from scripts import process_group
+from scripts import process_group, scheduler, improvement_cycle
 
 
 def _pid_is_running(pid):
@@ -112,10 +112,64 @@ print('leader exits now')
         self.assertIn("injected output-capture failure", result["output"])
         self.assertTrue(_wait_stopped(child_pid), f"descendant {child_pid} survived post-exit exception")
 
-    def test_waitid_accepts_already_reaped_leader(self):
+
+    def _assert_wrapper_cleans_descendant_after_output_failure(self, wrapper):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            scripts = root / "scripts"
+            scripts.mkdir()
+            pid_file = root / "descendant.pid"
+            script = scripts / "child.py"
+            script.write_text(
+                "import subprocess, sys\n"
+                "from pathlib import Path\n"
+                "child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])\n"
+                f"Path({str(pid_file)!r}).write_text(str(child.pid))\n"
+                "print('leader exited')\n"
+            )
+
+            def fail_output(stream, limit):
+                raise OSError("injected wrapper output failure")
+
+            with mock.patch.object(process_group, "_read_tail", side_effect=fail_output):
+                if wrapper == "scheduler":
+                    with mock.patch.object(scheduler, "ROOT", root):
+                        result = scheduler.run_task({"name": "process-group-test", "script": "child.py"})
+                else:
+                    with mock.patch.object(improvement_cycle, "ROOT", root):
+                        result = improvement_cycle.run_subprocess("child.py")
+
+            child_pid = int(pid_file.read_text())
+        self.assertFalse(result["success"])
+        self.assertTrue(
+            _wait_stopped(child_pid),
+            f"{wrapper} wrapper left descendant {child_pid} alive after output failure",
+        )
+
+    def test_scheduler_wrapper_cleans_descendant_after_post_exit_exception(self):
+        self._assert_wrapper_cleans_descendant_after_output_failure("scheduler")
+
+    def test_improvement_cycle_wrapper_cleans_descendant_after_post_exit_exception(self):
+        self._assert_wrapper_cleans_descendant_after_output_failure("improvement_cycle")
+
+    def test_waitid_fails_closed_for_already_reaped_leader(self):
         with mock.patch.object(process_group.os, "waitid", side_effect=ChildProcessError):
-            # An external reaper means there is no wait status left to observe.
-            process_group._wait_for_exit_without_reaping(987654, 0.1)
+            with self.assertRaises(ChildProcessError):
+                process_group._wait_for_exit_without_reaping(987654, 0.1)
+
+    def test_unsupported_wnowait_fails_closed_without_signalling_group(self):
+        for error in (ChildProcessError("externally reaped"), OSError("WNOWAIT unsupported")):
+            with self.subTest(error=type(error).__name__):
+                process = mock.Mock(pid=987654, returncode=None)
+                with mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
+                     mock.patch.object(process_group, "_wait_for_exit_without_reaping", side_effect=error), \
+                     mock.patch.object(process_group.os, "killpg") as killpg:
+                    result = process_group.run_process(
+                        ["unused"], cwd=".", timeout=0.1, max_output_chars=100,
+                    )
+                self.assertFalse(result["success"])
+                killpg.assert_not_called()
+                process.wait.assert_not_called()
 
 
 if __name__ == "__main__":

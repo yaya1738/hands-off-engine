@@ -164,7 +164,8 @@ class SchedulerHardeningTests(unittest.TestCase):
             kwargs["stdout"].write(b"x" * (scheduler.MAX_OUTPUT_CHARS * 100))
             return process
 
-        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen:
+        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen, \
+             mock.patch("scripts.process_group._wait_for_exit_without_reaping"):
             result = scheduler.run_task(task)
 
         self.assertTrue(result["success"])
@@ -212,7 +213,8 @@ class SchedulerHardeningTests(unittest.TestCase):
             kwargs["stdout"].write(b"z" * (improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS * 100))
             return process
 
-        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen:
+        with mock.patch.object(process_group.subprocess, "Popen", side_effect=fake_popen) as popen, \
+             mock.patch("scripts.process_group._wait_for_exit_without_reaping"):
             result = improvement_cycle.run_subprocess("sample.py")
 
         self.assertTrue(result["success"])
