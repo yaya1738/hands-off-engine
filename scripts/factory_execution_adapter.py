@@ -13,7 +13,6 @@ result instead of falling back to legacy execution.
 from __future__ import annotations
 
 from typing import Any, Dict
-from pathlib import Path
 
 from autonomous.governed_authority import authorize
 
