@@ -11,6 +11,7 @@ Every agent that imports this becomes part of the unified
 AI serving Yair Siegel.
 """
 
+import os
 import json
 import sys
 from pathlib import Path
@@ -318,9 +319,13 @@ def send_master_notification(message: str, priority: str = "normal"):
     full_msg = f"{prefix} [UNIFIED AI]\n\n{message}\n\nServing: {MASTER}"
 
     try:
+        token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+        chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+        if not token or not chat_id:
+            return
         requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": full_msg, "parse_mode": "Markdown"},
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": full_msg, "parse_mode": "Markdown"},
             timeout=10
         )
     except:

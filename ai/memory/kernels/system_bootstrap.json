@@ -40,7 +40,7 @@
     },
     "telegram_bot": {
       "username": "@pm_alerts_autobot",
-      "chat_id": "8327766663",
+      "chat_id": "your_telegram_chat_id_here",
       "status": "working"
     },
     "position_monitor": {
