@@ -210,7 +210,9 @@ class ApprovalQueue:
             queue = self._load_queue()
             change = next((item for item in queue.get("approved", []) if item.get("id") == change_id), None)
             if change is None:
-                return {"success": False, "error": "Change not found in approved queue"}
+                if any(item.get("id") == change_id for item in queue.get("pending", [])):
+                    return {"success": False, "error": "Change not approved"}
+                return {"success": False, "error": "Change not found"}
             if change.get("status") != "approved":
                 return {"success": False, "error": f"Approval is not executable (status={change.get('status')})"}
             action = change.get("proposed_action", {})
