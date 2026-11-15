@@ -92,8 +92,11 @@ def test_receive_approval():
 
     cmd_id = sc.execute(action="trade", params={"market": "ETH"}, mode="LIVE", sync=False)
 
-    # Seed approval queue
-    q = {"pending": [{"id": cmd_id, "action": "execute", "mode": "LIVE"}], "approved": [], "rejected": []}
+    # Seed the same pending metadata emitted by the listener.
+    from datetime import datetime, timezone
+    queued_at = datetime.now(timezone.utc).isoformat()
+    q = {"pending": [{"id": cmd_id, "action": "execute", "mode": "LIVE", "queued_at": queued_at}],
+         "approved": [], "rejected": []}
     sc.approval_file.write_text(json.dumps(q, indent=2) + "\n")
 
     # Receive approve
