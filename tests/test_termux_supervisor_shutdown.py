@@ -196,6 +196,38 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
         else:
             self.fail("redirected descendant survived natural daemon-exit cleanup")
 
+    def test_already_reaped_child_is_never_signalled_by_recycled_pid(self):
+        daemon = self.start_child("pass\\n")
+        process = daemon.process
+        deadline = time.monotonic() + 2
+        while time.monotonic() < deadline:
+            try:
+                waited_pid, _ = __import__("os").waitpid(process.pid, __import__("os").WNOHANG)
+            except ChildProcessError:
+                waited_pid = process.pid
+            if waited_pid == process.pid:
+                break
+            time.sleep(0.01)
+        else:
+            self.fail("child did not exit for external-reap simulation")
+
+        self.assertIsNone(process.returncode, "Popen should not know about the external reap")
+        runner = supervisor.TermuxSupervisor.__new__(supervisor.TermuxSupervisor)
+        runner.daemons = {"child": daemon}
+
+        with mock.patch.object(supervisor, "_observe_exit_without_reaping", return_value=(True, False)), \\
+             mock.patch.object(process, "poll", return_value=None), \\
+             mock.patch.object(process, "terminate") as terminate, \\
+             mock.patch.object(process, "kill") as kill, \\
+             mock.patch.object(supervisor.os, "killpg") as killpg:
+            runner._shutdown_daemons(grace=0.0)
+
+        terminate.assert_not_called()
+        kill.assert_not_called()
+        killpg.assert_not_called()
+        self.assertIsNone(daemon.process)
+        self.assertIsNone(daemon.output_thread)
+
     def test_shutdown_kills_child_that_ignores_terminate(self):
         marker = self.root / "ready.marker"
         daemon = self.start_child(
