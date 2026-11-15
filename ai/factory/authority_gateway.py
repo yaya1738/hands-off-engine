@@ -120,15 +120,22 @@ class FactoryAuthorityGateway:
         with self._open_private(self.lock_path, "a+") as lock:
             fcntl.flock(lock.fileno(), fcntl.LOCK_EX)
             try:
+                matching_record = None
+                conflicting_reuse = False
                 for existing in self._iter_queue_records():
                     if existing.get("idempotency_key") == key:
                         if existing.get("objective") != objective:
-                            raise ValueError("idempotency key already belongs to a different objective")
-                        return {
-                            "status": "idempotent_replay",
-                            "goal_id": existing.get("goal_id", goal_id),
-                            "execution_enabled": False,
-                        }
+                            conflicting_reuse = True
+                        elif matching_record is None:
+                            matching_record = existing
+                if conflicting_reuse:
+                    raise ValueError("idempotency key already belongs to a different objective")
+                if matching_record is not None:
+                    return {
+                        "status": "idempotent_replay",
+                        "goal_id": matching_record.get("goal_id", goal_id),
+                        "execution_enabled": False,
+                    }
                 with self._open_private(self.queue_path, "a") as queue:
                     queue.write(json.dumps(record, sort_keys=True) + "\n")
                     queue.flush()
