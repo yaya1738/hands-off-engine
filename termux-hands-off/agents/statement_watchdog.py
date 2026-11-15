@@ -27,6 +27,8 @@ def load_cards():
         return None, "card data absent"
     cards = []
     for key, item in data.items():
+        if key.startswith("_"):
+            continue
         if not isinstance(item, dict):
             return None, f"invalid card record: {key}"
         limit, balance, statement_day = item.get("limit"), item.get("balance"), item.get("statement_day")
