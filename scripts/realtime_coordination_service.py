@@ -28,6 +28,37 @@ import subprocess
 REPO_ROOT = Path(__file__).parent.parent
 COORDINATION_FILE = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
 WEBHOOK_PORT = 8888
+WEBHOOK_HOST = "127.0.0.1"
+MAX_WEBHOOK_BYTES = 8192
+
+
+def read_webhook_message(headers, stream):
+    """Parse bounded coordination data; sender fields are claims, not identity."""
+    if headers.get("Transfer-Encoding") or headers.get("transfer-encoding"):
+        return 400, None
+    raw_length = headers.get("Content-Length") or headers.get("content-length")
+    try:
+        length = int(raw_length)
+    except (TypeError, ValueError):
+        return 400, None
+    if length <= 0:
+        return 400, None
+    if length > MAX_WEBHOOK_BYTES:
+        return 413, None
+    try:
+        message = json.loads(stream.read(length).decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError, AttributeError):
+        return 400, None
+    if not isinstance(message, dict):
+        return 400, None
+    required = ("from", "to", "type", "message")
+    if any(not isinstance(message.get(key), str) or not message[key].strip() for key in required):
+        return 400, None
+    if any(len(message[key]) > limit for key, limit in (("from", 100), ("to", 100), ("type", 100), ("message", 4000))):
+        return 400, None
+    if "timestamp" in message and not isinstance(message["timestamp"], str):
+        return 400, None
+    return 200, message
 
 class CoordinationFileWatcher(FileSystemEventHandler):
     """Watches coordination file for new messages"""
@@ -73,48 +104,26 @@ class CoordinationWebhook(BaseHTTPRequestHandler):
     def do_POST(self):
         """Handle incoming message from another agent"""
         if self.path == '/coordination/message':
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-
-            try:
-                message = json.loads(post_data.decode('utf-8'))
-
-                # Validate message format
-                required_fields = ['from', 'to', 'type', 'message']
-                if all(field in message for field in required_fields):
-                    # Add timestamp if not present
-                    if 'timestamp' not in message:
-                        message['timestamp'] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-
-                    # Write to coordination file
-                    with open(COORDINATION_FILE, 'a') as f:
-                        f.write(json.dumps(message) + '\n')
-
-                    # Notify
-                    if self.message_callback:
-                        self.message_callback(message)
-
-                    # Commit to git
-                    subprocess.run(['git', 'add', str(COORDINATION_FILE)],
-                                 cwd=REPO_ROOT, capture_output=True)
-                    subprocess.run(['git', 'commit', '-m',
-                                  f'coord: message from {message["from"]} via webhook'],
-                                 cwd=REPO_ROOT, capture_output=True)
-                    subprocess.run(['git', 'push'],
-                                 cwd=REPO_ROOT, capture_output=True)
-
-                    self.send_response(200)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({'status': 'received'}).encode())
-                else:
-                    self.send_response(400)
-                    self.end_headers()
-
-            except Exception as e:
-                print(f"Error processing message: {e}")
-                self.send_response(500)
+            status, message = read_webhook_message(self.headers, self.rfile)
+            if status != 200:
+                self.send_response(status)
                 self.end_headers()
+                return
+
+            if 'timestamp' not in message:
+                message['timestamp'] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+            # Untrusted inbound data is never committed or pushed automatically.
+            with open(COORDINATION_FILE, 'a') as f:
+                f.write(json.dumps(message) + '\\n')
+
+            if self.message_callback:
+                self.message_callback(message)
+
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({'status': 'received'}).encode())
         else:
             self.send_response(404)
             self.end_headers()
@@ -196,7 +205,7 @@ class RealtimeCoordinationService:
 
         # Start webhook server
         CoordinationWebhook.message_callback = self.on_new_message
-        self.webhook_server = HTTPServer(('', WEBHOOK_PORT), CoordinationWebhook)
+        self.webhook_server = HTTPServer((WEBHOOK_HOST, WEBHOOK_PORT), CoordinationWebhook)
 
         # Run webhook in thread
         webhook_thread = threading.Thread(
