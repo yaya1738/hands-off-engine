@@ -29,6 +29,7 @@ on:
       - "tests/test_telegram_authenticated_approval.py"
       - "tests/test_telegram_bridge_sender_auth.py"
       - "tests/test_yair_control_room_http_boundary.py"
+      - "tests/test_control_room_authentication.py"
       - "tests/test_realtime_coordination_http_boundary.py"
       - "tests/test_comm_hub_authenticated_approval.py"
       - "tests/test_claude_optimizer_execution_boundary.py"
@@ -66,6 +67,7 @@ jobs:
           tests/test_telegram_authenticated_approval.py
           tests/test_telegram_bridge_sender_auth.py
           tests/test_yair_control_room_http_boundary.py
+          tests/test_control_room_authentication.py
           tests/test_realtime_coordination_http_boundary.py
           tests/test_comm_hub_authenticated_approval.py
           tests/test_claude_optimizer_execution_boundary.py
