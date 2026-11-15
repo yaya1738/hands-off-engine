@@ -93,7 +93,8 @@ class UnifiedAutonomousSystem:
         auto_upgrade: bool = False,
         dry_run: bool = True,
         node_id: Optional[str] = None,
-        allow_paid_actions: bool = False
+        allow_paid_actions: bool = False,
+        auto_hardware_actions: bool = False
     ):
         """
         Initialize the unified autonomous system.
@@ -111,6 +112,7 @@ class UnifiedAutonomousSystem:
         self.auto_provision = auto_provision
         self.auto_upgrade = auto_upgrade
         self.allow_paid_actions = bool(allow_paid_actions)
+        self.auto_hardware_actions = bool(auto_hardware_actions)
 
         # Initialize hardware monitoring
         self.hw_collector = HardwareCollector(node_id=self.node_id)
@@ -118,7 +120,7 @@ class UnifiedAutonomousSystem:
         self.hw_kernel = HardwareKernel(node_id=self.node_id)
         self.hw_decision_engine = HardwareDecisionEngine(
             kernel=self.hw_kernel,
-            auto_execute_enabled=True
+            auto_execute_enabled=self.auto_hardware_actions
         )
         self.trading_protection = TradingProtectionManager()
         self.hw_audit = HardwareAuditLogger()
@@ -358,39 +360,11 @@ class UnifiedAutonomousSystem:
             )
 
     def _can_auto_approve_hw_decision(self, decision, health) -> bool:
-        """Determine if a hardware decision can be auto-approved."""
-        # Emergency decisions are always auto-approved
-        if decision.decision_type == "emergency":
-            return True
-
-        # High confidence decisions for non-critical operations
-        # Include alert_response to handle memory/cpu/disk alerts automatically
-        if decision.confidence.value in ["certain", "high"]:
-            if decision.decision_type in ["alert", "monitoring", "alert_response"]:
-                return True
-
-        # Auto-approve upgrade recommendations with high confidence
-        # EXCEPT for self-upgrade (would kill this process)
-        if decision.decision_type == "upgrade_recommendation":
-            if decision.confidence.value in ["certain", "high"]:
-                # SELF-PROTECTION: Don't auto-approve upgrades targeting self
-                if decision.node_id == self.node_id:
-                    return False  # Queue for manual approval
-                return True
-
-        # For infrastructure decisions, still allow auto-approval even during
-        # high trading risk IF this is an upgrade that would FIX the issue
-        # BUT NEVER auto-approve self-upgrades
-        if health.trading_impact_risk in ["high", "critical"]:
-            # SELF-PROTECTION: Never auto-approve self-upgrades regardless of risk
-            if decision.node_id == self.node_id and decision.decision_type == "upgrade_recommendation":
-                return False  # Queue for manual approval
-            # Allow upgrades/fixes to proceed - they're meant to resolve the risk
-            if decision.decision_type in ["emergency", "upgrade_recommendation", "alert_response"]:
-                return True
-            return False
-
-        return decision.auto_executed
+        """Only treat hardware actions as auto-approved after real successful execution."""
+        return bool(
+            getattr(decision, "executed", False)
+            and getattr(decision, "success", False)
+        )
 
     def _make_infrastructure_decisions(self, health) -> List:
         """Make infrastructure decisions based on health."""
@@ -771,9 +745,23 @@ class UnifiedAutonomousSystem:
                     change["executed_at"] = datetime.utcnow().isoformat()
 
             elif action_type == "hardware_decision":
-                # Hardware decisions are handled by the decision engine
-                change["executed"] = True
-                change["executed_at"] = datetime.utcnow().isoformat()
+                decision_id = action.get("decision_id")
+                pending = next(
+                    (
+                        item for item in self.hw_decision_engine.pending_decisions
+                        if item.decision_id == decision_id
+                    ),
+                    None,
+                )
+                if pending is None:
+                    change["execution_error"] = "No matching pending hardware decision"
+                    continue
+                success = self.hw_decision_engine.approve_decision(decision_id)
+                change["executed"] = bool(pending.executed)
+                change["execution_success"] = bool(success)
+                change["execution_result"] = pending.outcome
+                if change["executed"]:
+                    change["executed_at"] = datetime.utcnow().isoformat()
 
         # Save updated queue
         self.approval_queue._save_queue(queue)
@@ -873,6 +861,7 @@ def start_live_system(
     auto_upgrade: bool = False,
     dry_run: bool = True,
     allow_paid_actions: bool = False,
+    auto_hardware_actions: bool = False,
 ):
     """
     Start the unified autonomous system.
@@ -891,6 +880,7 @@ def start_live_system(
         auto_upgrade=auto_upgrade,
         dry_run=dry_run,
         allow_paid_actions=allow_paid_actions,
+        auto_hardware_actions=auto_hardware_actions,
     )
     system.start()
 
@@ -930,6 +920,11 @@ def main():
         help="Explicitly authorize paid infrastructure actions; requires a positive --budget"
     )
     parser.add_argument(
+        "--enable-hardware-auto-actions",
+        action="store_true",
+        help="Allow configured emergency hardware actions to run automatically"
+    )
+    parser.add_argument(
         "--status",
         action="store_true",
         help="Show status and exit"
@@ -948,6 +943,7 @@ def main():
             auto_upgrade=args.enable_spend and not args.no_upgrade,
             dry_run=args.dry_run or not args.enable_spend,
             allow_paid_actions=args.enable_spend,
+            auto_hardware_actions=args.enable_hardware_auto_actions,
         )
 
 
