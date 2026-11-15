@@ -12,7 +12,10 @@ bounds) plus the future-timestamp case of item 4 (heartbeat freshness):
 - a heartbeat timestamp in the future is classified stale (fail closed).
 """
 import json
+import os
 import re
+import signal
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -70,6 +73,33 @@ class CleanExitChild:
 
     def kill(self):
         self.returncode = -9
+
+
+class ShutdownChild:
+    pid = 45680
+
+    def __init__(self, ignore_term=False):
+        self.ignore_term = ignore_term
+        self.returncode = None
+        self.events = []
+
+    def poll(self):
+        return self.returncode
+
+    def terminate(self):
+        self.events.append("terminate")
+        if not self.ignore_term:
+            self.returncode = -signal.SIGTERM
+
+    def wait(self, timeout=None):
+        self.events.append("wait")
+        if self.returncode is None:
+            raise subprocess.TimeoutExpired("fake-child", timeout)
+        return self.returncode
+
+    def kill(self):
+        self.events.append("kill")
+        self.returncode = -signal.SIGKILL
 
 
 class Clock:
@@ -291,6 +321,66 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
         with mock.patch.object(supervisor, "SERVICES", [self.service]):
             restored = supervisor._restore_stats({
                 "services": {name: {"completed": "false"}}
+            })
+        self.assertFalse(restored[name]["completed"])
+
+    def test_shutdown_waits_then_kills_only_children_that_ignore_terminate(self):
+        polite = ShutdownChild(ignore_term=False)
+        stubborn = ShutdownChild(ignore_term=True)
+        procs = {"polite": polite, "stubborn": stubborn}
+
+        killed = supervisor._shutdown_children(procs, grace=0.01)
+
+        self.assertEqual(killed, ["stubborn"])
+        self.assertEqual(polite.events, ["terminate", "wait"])
+        self.assertEqual(stubborn.events, ["terminate", "wait", "kill", "wait"])
+        self.assertEqual(procs, {})
+
+    def test_signal_shutdown_cleans_up_owned_resources(self):
+        before = {sig: signal.getsignal(sig) for sig in (signal.SIGTERM, signal.SIGINT)}
+        clock = Clock(step=1.0)
+        clock.sleep = lambda _seconds: os.kill(os.getpid(), signal.SIGTERM)
+        child = ShutdownChild()
+
+        with mock.patch.object(supervisor, "SERVICES", [self.service]), \
+             mock.patch.object(supervisor, "time", clock), \
+             mock.patch.object(supervisor.subprocess, "Popen", return_value=child):
+            with self.assertRaises(SystemExit) as raised:
+                supervisor.run()
+
+        self.assertEqual(raised.exception.code, 0)
+        self.assertEqual(child.events[:2], ["terminate", "wait"])
+        self.assertFalse((self.state.parent / "supervisor.pid").exists())
+        self.assertFalse(supervisor._lock_is_held(self.state.parent / "supervisor.lock"))
+        saved = json.loads(self.state.read_text())["services"]["factory_scheduler"]
+        self.assertIsNone(saved["pid"])
+        self.assertEqual(
+            {sig: signal.getsignal(sig) for sig in before},
+            before,
+        )
+
+    def test_unexpected_exception_still_cleans_up_owned_resources(self):
+        clock = Clock(step=1.0)
+        def boom(_seconds):
+            raise RuntimeError("injected sleep failure")
+        clock.sleep = boom
+        child = ShutdownChild()
+
+        with mock.patch.object(supervisor, "SERVICES", [self.service]), \
+             mock.patch.object(supervisor, "time", clock), \
+             mock.patch.object(supervisor.subprocess, "Popen", return_value=child):
+            with self.assertRaisesRegex(RuntimeError, "injected sleep failure"):
+                supervisor.run()
+
+        self.assertEqual(child.events[:2], ["terminate", "wait"])
+        self.assertFalse((self.state.parent / "supervisor.pid").exists())
+        self.assertFalse(supervisor._lock_is_held(self.state.parent / "supervisor.lock"))
+
+    def test_completed_marker_is_ignored_when_service_is_no_longer_one_shot(self):
+        name = "factory_scheduler"
+        with mock.patch.object(supervisor, "SERVICES", [self.service]):
+            restored = supervisor._restore_stats({
+                "services": {name: {"completed": True}}
             })
         self.assertFalse(restored[name]["completed"])
 

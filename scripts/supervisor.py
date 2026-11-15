@@ -408,7 +408,7 @@ def _restore_stats(state):
         except (TypeError, ValueError):
             st = _new_stats()
         st["last_success"] = saved.get("last_success")
-        st["completed"] = saved.get("completed") is True
+        st["completed"] = svc.get("expected_exit") is True and saved.get("completed") is True
         stats[svc["name"]] = st
     return stats
 
