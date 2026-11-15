@@ -270,6 +270,61 @@ def _observe_exit_without_reaping(process, timeout: float = 0.0):
         time.sleep(min(0.01, remaining))
 
 
+def _supports_waitid_wnowait() -> bool:
+    """Exercise WNOWAIT on a disposable child before starting managed daemons.
+
+    Merely checking that os.waitid constants exist is insufficient: Android's
+    runtime may expose the API while the underlying operation is unsupported.
+    This probe owns only its disposable child and never touches daemon PIDs.
+    """
+    required = ("waitid", "P_PID", "WEXITED", "WNOHANG", "WNOWAIT")
+    if not all(hasattr(os, name) for name in required):
+        return False
+
+    child = None
+    reaped = False
+    try:
+        child = subprocess.Popen(
+            [sys.executable, "-c", "pass"],
+            stdin=subprocess.DEVNULL,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            close_fds=True,
+            start_new_session=True,
+        )
+        flags = os.WEXITED | os.WNOHANG | os.WNOWAIT
+        deadline = time.monotonic() + 5.0
+        while time.monotonic() < deadline:
+            observed = os.waitid(os.P_PID, child.pid, flags)
+            if observed is not None and observed.si_pid == child.pid:
+                break
+            time.sleep(0.01)
+        else:
+            return False
+
+        repeated = os.waitid(os.P_PID, child.pid, flags)
+        if repeated is None or repeated.si_pid != child.pid:
+            return False
+
+        waited_pid, status = os.waitpid(child.pid, 0)
+        reaped = True
+        child.returncode = os.waitstatus_to_exitcode(status)
+        return waited_pid == child.pid and child.returncode == 0
+    except (OSError, AttributeError, NotImplementedError, ChildProcessError, subprocess.SubprocessError):
+        return False
+    finally:
+        if child is not None and not reaped and child.returncode is None:
+            try:
+                child.wait(timeout=2.0)
+            except subprocess.TimeoutExpired:
+                child.terminate()
+                try:
+                    child.wait(timeout=2.0)
+                except subprocess.TimeoutExpired:
+                    child.kill()
+                    child.wait(timeout=2.0)
+
+
 class ManagedDaemon:
     """One daemon: start, monitor, backoff, restart."""
 
@@ -443,6 +498,13 @@ class TermuxSupervisor:
             self.daemons[name] = ManagedDaemon(name, config, daemon_state)
 
     def run(self):
+        if not _supports_waitid_wnowait():
+            log.critical(
+                "Unsupported process-group safety primitive: waitid(WNOWAIT) "
+                "probe failed; refusing to launch managed daemons"
+            )
+            return False
+
         if not self.lock.try_acquire():
             existing_pid = SUPERVISOR_PID.read_text().strip() if SUPERVISOR_PID.exists() else "?"
             log.error(f"Supervisor already running (pid={existing_pid}). Exiting.")

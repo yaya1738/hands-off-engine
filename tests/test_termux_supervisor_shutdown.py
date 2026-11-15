@@ -326,6 +326,42 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
         process.kill.assert_not_called()
         process.poll.assert_not_called()
         daemon.poll.assert_called_once_with()
+class WaitidCapabilityGateTests(unittest.TestCase):
+    def test_capability_probe_succeeds_on_supported_runtime(self):
+        self.assertTrue(supervisor._supports_waitid_wnowait())
+
+    def test_capability_probe_rejects_missing_wnowait_attribute(self):
+        real_hasattr = hasattr
+
+        def missing_wnowait(obj, name):
+            if obj is supervisor.os and name == "WNOWAIT":
+                return False
+            return real_hasattr(obj, name)
+
+        with mock.patch("builtins.hasattr", side_effect=missing_wnowait):
+            self.assertFalse(supervisor._supports_waitid_wnowait())
+
+    def test_capability_probe_rejects_runtime_not_implemented(self):
+        with mock.patch.object(supervisor.os, "waitid", side_effect=NotImplementedError):
+            self.assertFalse(supervisor._supports_waitid_wnowait())
+
+    def test_capability_probe_rejects_runtime_os_error(self):
+        with mock.patch.object(supervisor.os, "waitid", side_effect=OSError("unsupported")):
+            self.assertFalse(supervisor._supports_waitid_wnowait())
+
+    def test_supervisor_fails_closed_before_lock_or_daemon_start(self):
+        runner = supervisor.TermuxSupervisor.__new__(supervisor.TermuxSupervisor)
+        runner.lock = mock.Mock()
+        daemon = mock.Mock()
+        runner.daemons = {"must_not_start": daemon}
+        runner._loop = mock.Mock()
+
+        with mock.patch.object(supervisor, "_supports_waitid_wnowait", return_value=False):
+            self.assertFalse(runner.run())
+
+        runner.lock.try_acquire.assert_not_called()
+        runner._loop.assert_not_called()
+        daemon.start.assert_not_called()
 
 
 if __name__ == "__main__":
