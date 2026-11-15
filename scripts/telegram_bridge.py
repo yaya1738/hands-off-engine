@@ -183,6 +183,21 @@ class TelegramBridge:
             elif text.startswith("/reject "):
                 cmd_id = text.split(" ", 1)[1].strip()
                 response = hub.receive("operator", "reject", {"command_id": cmd_id}, channel="telegram", **authenticated_args)
+            elif text.startswith("/review "):
+                parts = text.split()
+                if len(parts) == 3 and parts[2].lower() in ("accept", "reject"):
+                    response = hub.receive(
+                        "operator",
+                        "objective_review",
+                        {
+                            "goal_id": parts[1],
+                            "decision": "accept_for_planning" if parts[2].lower() == "accept" else "reject",
+                        },
+                        channel="telegram",
+                        **authenticated_args,
+                    )
+                else:
+                    response = {"routed_to": "error", "error": "Usage: /review <goal_id> <accept|reject>"}
             elif text.startswith("/status"):
                 response = hub.receive("operator", "status_query", {"query": "full"}, channel="telegram")
             elif text.startswith("/trade "):
@@ -222,6 +237,7 @@ class TelegramBridge:
 /trade <buy|sell> <market> [amount] — Execute trade (LIVE)
 /approve <id> — Approve pending command
 /reject <id> — Reject pending command
+/review <goal_id> <accept|reject> — Review a Factory objective (accept means planning only)
 /help — This message"""
 
     # ── Telegram Bot API ──
