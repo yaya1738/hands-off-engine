@@ -38,6 +38,8 @@ def ask(prompt, current, cast=float):
 cards = load_cards()
 print("\n[Cards quick editor] Blank keeps the current value; unknown remains unknown.\n")
 for key, card in cards.items():
+    if key.startswith("_"):
+        continue
     if not isinstance(card, dict):
         print(f"--- {key}: invalid record; skipped ---")
         continue
