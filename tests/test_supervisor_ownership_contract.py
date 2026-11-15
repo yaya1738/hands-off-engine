@@ -37,9 +37,11 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
         self.lock.write_text("owner-record")
         owner = supervisor._acquire_lock(self.lock)
         self.assertIsNotNone(owner)
+        owner_record = self.lock.read_text()
+        self.assertEqual(owner_record, str(os.getpid()))
         try:
             self.assertIsNone(supervisor._acquire_lock(self.lock))
-            self.assertEqual(self.lock.read_text(), "owner-record")
+            self.assertEqual(self.lock.read_text(), owner_record)
         finally:
             os.close(owner)
 
@@ -74,8 +76,17 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
         self.pid.write_text("111")
         with mock.patch.object(supervisor, "_is_process_alive", return_value=True), \
              mock.patch.object(supervisor, "_lock_is_held", return_value=True), \
-             mock.patch.object(supervisor, "_is_supervisor_process", return_value=True):
+             mock.patch.object(supervisor, "_is_supervisor_process", return_value=True), \
+             mock.patch.object(supervisor, "_lock_owner_pid", return_value=111):
             self.assertTrue(supervisor._can_signal_supervisor(111))
+
+    def test_stop_refuses_registered_process_that_does_not_own_lock(self):
+        self.pid.write_text("111")
+        with mock.patch.object(supervisor, "_is_process_alive", return_value=True), \
+             mock.patch.object(supervisor, "_lock_is_held", return_value=True), \
+             mock.patch.object(supervisor, "_is_supervisor_process", return_value=True), \
+             mock.patch.object(supervisor, "_lock_owner_pid", return_value=222):
+            self.assertFalse(supervisor._can_signal_supervisor(111))
 
     def test_heartbeat_verdict_distinguishes_idle_stale_and_hung(self):
         heartbeat = self.state.parent / "scheduler_heartbeat.json"
@@ -105,9 +116,15 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
              mock.patch.object(supervisor, "_is_scheduler_process", return_value=False):
             self.assertFalse(supervisor._external_owner_healthy(service, 1001.0))
         with mock.patch.object(supervisor, "_lock_is_held", return_value=True), \
+             mock.patch.object(supervisor, "_lock_owner_pid", return_value=321), \
              mock.patch.object(supervisor, "_is_process_alive", return_value=True), \
              mock.patch.object(supervisor, "_is_scheduler_process", return_value=True):
             self.assertTrue(supervisor._external_owner_healthy(service, 1001.0))
+        with mock.patch.object(supervisor, "_lock_is_held", return_value=True), \
+             mock.patch.object(supervisor, "_lock_owner_pid", return_value=999), \
+             mock.patch.object(supervisor, "_is_process_alive", return_value=True), \
+             mock.patch.object(supervisor, "_is_scheduler_process", return_value=True):
+            self.assertFalse(supervisor._external_owner_healthy(service, 1001.0))
 
     def test_supervisor_restarts_service_after_startup_heartbeat_grace_expires(self):
         class Clock:
