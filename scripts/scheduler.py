@@ -22,6 +22,7 @@ ROOT = Path(__file__).resolve().parent.parent
 STATE = ROOT / "state"
 SCHEDULER_LOG = STATE / "scheduler_log.json"
 SCHEDULER_STATE = STATE / "scheduler_state.json"
+SCHEDULER_HEARTBEAT = STATE / "scheduler_heartbeat.json"
 SCHEDULER_LOCK = STATE / "scheduler.lock"
 POLL_SECONDS = 10
 TASK_TIMEOUT_SECONDS = 60
@@ -81,6 +82,23 @@ def initialize_state(now=None):
 def save_state(state):
     state["updated_at"] = _timestamp()
     _atomic_write_json(SCHEDULER_STATE, state)
+
+
+def write_heartbeat(phase="idle", task=None, task_deadline=None):
+    """Publish scheduler liveness for the supervisor watchdog; never break jobs."""
+    payload = {
+        "pid": os.getpid(),
+        "phase": phase,
+        "task": task,
+        "task_deadline": task_deadline,
+        "updated_at": time.time(),
+        "timestamp": _timestamp(),
+    }
+    try:
+        _atomic_write_json(SCHEDULER_HEARTBEAT, payload)
+        return True
+    except OSError:
+        return False
 
 
 def get_due_time(job, task, now):
@@ -243,8 +261,10 @@ def run_forever():
         print(f"Scheduler started at {_timestamp()}")
         print(f"Tasks: {', '.join(task['name'] for task in TASKS)}")
         _RUNNING = True
+        write_heartbeat()
 
         while _RUNNING:
+            write_heartbeat()
             now = time.time()
             for task in TASKS:
                 if not _RUNNING:
@@ -264,7 +284,12 @@ def run_forever():
                 job["next_run_at"] = now + task["interval_seconds"]
                 save_state(state)
 
+                write_heartbeat(
+                    phase="task", task=task["name"],
+                    task_deadline=time.time() + TASK_TIMEOUT_SECONDS,
+                )
                 result = run_task(task)
+                write_heartbeat()
                 job["last_result"] = result
                 save_state(state)
                 append_log(result)
