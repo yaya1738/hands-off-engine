@@ -85,7 +85,7 @@ def process_command(cmd):
 
             if Executor is not None:
                 try:
-                    executor = Executor()
+                    executor = Executor(repo_root=STATE_DIR.parent)
                     exec_result = executor.execute_command(cmd)
                     status = exec_result.status
                     return {"action": "execute", "execution_result": exec_result.to_dict(), "command_status": status, "timestamp": datetime.now(timezone.utc).isoformat()}
