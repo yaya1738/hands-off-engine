@@ -60,6 +60,30 @@ class FactoryAuthorityGatewayTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "exceeds 4096"):
                 gateway.submit_goal("Objective", metadata={"payload": "x" * 5000})
 
+    def test_list_goals_is_bounded_newest_first_and_read_only(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            first = gateway.submit_goal("First objective", idempotency_key="first")
+            second = gateway.submit_goal("Second objective", idempotency_key="second")
+            rows = gateway.list_goals(limit=1)
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["goal_id"], second["goal_id"])
+            self.assertEqual(rows[0]["status"], "pending_review")
+            self.assertEqual(gateway.get_goal(first["goal_id"])["objective"], "First objective")
+
+    def test_list_goals_rejects_unbounded_or_boolean_limit(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            for limit in (True, 0, 201, 1.5):
+                with self.subTest(limit=limit), self.assertRaises(ValueError):
+                    gateway.list_goals(limit=limit)
+
+    def test_get_goal_rejects_malformed_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            with self.assertRaises(ValueError):
+                gateway.get_goal("../state")
+
 
 if __name__ == "__main__":
     unittest.main()
