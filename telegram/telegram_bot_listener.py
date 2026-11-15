@@ -23,7 +23,10 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from telegram_command_bot import TelegramCommandBot
+try:
+    from telegram_command_bot import TelegramCommandBot
+except ModuleNotFoundError:
+    from .telegram_command_bot import TelegramCommandBot
 
 # Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
