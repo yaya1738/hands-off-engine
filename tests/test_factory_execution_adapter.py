@@ -87,7 +87,7 @@ def test_system_listener_routes_approved_factory_command(monkeypatch, tmp_path):
 
     calls = {}
 
-    def fake_execute(command, execution_gate=False):
+    def fake_execute(command, execution_gate=False, **kwargs):
         calls["command"] = command
         calls["execution_gate"] = execution_gate
         return {
@@ -113,7 +113,7 @@ def test_system_listener_routes_approved_factory_command(monkeypatch, tmp_path):
     assert calls["command"]["objective"] == "inspect runtime"
 
 
-def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
+def test_system_listener_rejects_factory_command_without_objective(monkeypatch, tmp_path):
     import scripts.system_listener_inline as listener
 
     calls = []
@@ -123,6 +123,7 @@ def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
         return {"status": "completed"}
 
     monkeypatch.setattr(listener, "execute_factory_command", fake_execute)
+    monkeypatch.setattr(listener, "APPROVAL_FILE", tmp_path / "approval_queue.json")
 
     result = listener.process_command({
         "id": "fx-listener-missing-objective",
