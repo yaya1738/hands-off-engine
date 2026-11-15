@@ -124,9 +124,24 @@ def monitor_once(
             raise ValueError("pull request response was not a list")
     except Exception as exc:
         pull_requests = []
-        errors.append(f"pulls:{type(exc).__name__}")
+        errors.append(f"pulls_newest:{type(exc).__name__}")
 
-    selected = pull_requests[: max(1, min(int(max_prs), 30))]
+    try:
+        oldest_pull_requests = fetch(f"/repos/{REPO}/pulls?state=open&per_page=100&sort=updated&direction=asc")
+        if not isinstance(oldest_pull_requests, list):
+            raise ValueError("oldest pull request response was not a list")
+    except Exception as exc:
+        oldest_pull_requests = []
+        errors.append("pulls_oldest:unavailable")
+
+    limit = max(1, min(int(max_prs), 20))
+    half = max(1, limit // 2)
+    candidates = pull_requests[:half] + oldest_pull_requests[:half] + pull_requests[half:limit]
+    selected_by_number = {}
+    for item in candidates:
+        if isinstance(item, dict) and item.get("number") is not None:
+            selected_by_number[item["number"]] = item
+    selected = list(selected_by_number.values())[:limit]
     for pr in selected:
         if not isinstance(pr, dict):
             continue
