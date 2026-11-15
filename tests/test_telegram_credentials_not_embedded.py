@@ -19,6 +19,8 @@ SCANNED_PATHS = (
     "autonomous/singularity_trigger.py",
     "autonomous/time_collapse.py",
     "docs/AUTONOMOUS_ACTIVATION_RUNBOOK.md",
+    "telegram/TELEGRAM_SETUP.md",
+    "SETUP_TELEGRAM_STEP_BY_STEP.md",
     "scripts/activate_income_now.py",
     "scripts/autonomous_phase_manager.py",
     "scripts/capital_recovery_monitor.py",
