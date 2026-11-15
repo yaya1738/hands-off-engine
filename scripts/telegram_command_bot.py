@@ -235,6 +235,7 @@ System is operating normally."""
                 msg += f"""{emoji} **{change['id']}**: {change['title']}
 Type: {change['change_type']}
 Risk: {change['risk_level']}
+{queue.format_change_preview(change)}
 
 """
 
