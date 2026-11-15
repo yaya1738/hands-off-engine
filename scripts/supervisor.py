@@ -60,6 +60,8 @@ SERVICES = [
         "cmd": [sys.executable, str(ROOT / "scripts" / "scheduler.py")],
         "cwd": str(ROOT),
         "log": LOG_DIR / "factory_scheduler_supervised.log",
+        "heartbeat": STATE / "scheduler_heartbeat.json",
+        "singleton_lock": STATE / "scheduler.lock",
     },
 ]
 
