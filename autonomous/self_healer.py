@@ -38,7 +38,6 @@ STATE_DIR = BASE_DIR / 'state'
 LOG_DIR = Path('/var/log/hands-off')
 
 STATE_DIR.mkdir(parents=True, exist_ok=True)
-LOG_DIR.mkdir(parents=True, exist_ok=True)
 
 
 @dataclass
