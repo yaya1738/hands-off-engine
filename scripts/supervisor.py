@@ -2,8 +2,9 @@
 """Process Supervisor — keeps all runtime services alive with bounded backoff.
 
 Supervises:
-- node1_runtime.py (task worker + event router + intake + improvements)
+- node1_runtime.py (task worker + event router + intake)
 - yair_control_room.py (Control Room API on port 8787)
+- scheduler.py (single owner of periodic health, improvement, integrity and learning jobs)
 
 Design:
 - Bounded exponential backoff (max 5 min)
@@ -42,6 +43,12 @@ SERVICES = [
         "cmd": [sys.executable, str(ROOT / "scripts" / "yair_control_room.py")],
         "cwd": str(ROOT),
         "log": LOG_DIR / "control_room_supervised.log",
+    },
+    {
+        "name": "factory_scheduler",
+        "cmd": [sys.executable, str(ROOT / "scripts" / "scheduler.py")],
+        "cwd": str(ROOT),
+        "log": LOG_DIR / "factory_scheduler_supervised.log",
     },
 ]
 
