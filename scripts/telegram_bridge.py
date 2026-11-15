@@ -217,7 +217,7 @@ class TelegramBridge:
 
             # Send response back
             if isinstance(response, dict):
-                reply = response.get("response", response.get("data", response.get("result", "")))
+                reply = response.get("response", response.get("data", response.get("result", response.get("error", ""))))
             else:
                 reply = response
             if isinstance(reply, dict):
