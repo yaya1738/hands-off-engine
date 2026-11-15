@@ -56,8 +56,8 @@ def test_receive_rejects_unauthorized_telegram_before_bus_or_log_write(tmp_path,
     )
 
     assert result["routed_to"] == "rejected"
-    assert hub.messages_file.read_text() == ""
-    assert hub.comm_log.read_text() == ""
+    assert not hub.messages_file.exists()
+    assert not hub.comm_log.exists()
 
 
 def test_receive_requires_central_telegram_allowlist_even_when_caller_sets_authenticated(tmp_path, monkeypatch):
