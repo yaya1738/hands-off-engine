@@ -103,6 +103,9 @@ def main():
     for src in cfg.get("sources",[]):
         t=src["type"]
         if t=="manual_file":
+            if not os.path.isfile(src["path"]):
+                notes.append(f"Manual finance source unavailable (local-only file missing): {src[\"path\"]}")
+                continue
             d=read_manual(src["path"]); s=compute_totals(d)
             for k in total: total[k]+=s[k]
             breakdown.append(("Manual",s["cash"],s["crypto"],s["securities"],s["liabilities"],s["net"]))
