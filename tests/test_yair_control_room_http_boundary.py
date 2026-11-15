@@ -17,7 +17,7 @@ def test_control_room_rejects_non_loopback_bind_hosts():
 
 def test_control_room_reads_valid_bounded_json_object():
     code, body, error = read_json_request(
-        {"content-length": "18"}, io.BytesIO(b'{"message":"hello"}')
+        {"content-length": "19"}, io.BytesIO(b'{"message":"hello"}')
     )
     assert code == 200
     assert body == {"message": "hello"}
