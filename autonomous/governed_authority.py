@@ -1,12 +1,14 @@
 #!/usr/bin/env python3
-"""Fail-closed authority seam between autonomous coordination and execution.
-
-This module deliberately authorizes nothing by default.  It provides a stable,
-reusable contract for the governed root to classify queued work and require an
-explicit approval record before any LIVE execution can be considered.
-"""
+"""Fail-closed authority seam for autonomous coordination and execution."""
 from dataclasses import dataclass, asdict
+from datetime import datetime, timezone, timedelta
+from pathlib import Path
 from typing import Any, Dict
+import json
+
+from scripts.command_approval import command_fingerprint
+
+APPROVAL_TTL = timedelta(hours=24)
 
 
 @dataclass(frozen=True)
@@ -21,23 +23,51 @@ class AuthorityDecision:
         return asdict(self)
 
 
-def authorize(command: Dict[str, Any], *, execution_gate: bool | None = None) -> AuthorityDecision:
-    """Return a fail-closed decision for a queued command.
+def _verify_durable_approval(command: Dict[str, Any], approval_file=None):
+    """Verify the independent approval record and exact approved command snapshot."""
+    if approval_file is None:
+        approval_file = Path(__file__).resolve().parents[1] / "state" / "approval_queue.json"
+    path = Path(approval_file)
+    if not path.is_file():
+        return False, "durable approval record unavailable"
+    try:
+        queue = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(queue, dict):
+            return False, "approval queue malformed"
+        matches = [
+            item for item in queue.get("approved", [])
+            if isinstance(item, dict) and item.get("id") == command.get("id")
+        ]
+        if len(matches) != 1:
+            return False, "approval record missing or ambiguous"
+        record = matches[0]
+        fingerprint = command_fingerprint(command)
+        if not fingerprint or fingerprint != command.get("approval_fingerprint") or fingerprint != record.get("fingerprint"):
+            return False, "approved command snapshot mismatch"
+        approved_at = datetime.fromisoformat(str(record.get("approved_at", "")).replace("Z", "+00:00"))
+        if approved_at.tzinfo is None:
+            return False, "approval timestamp has no timezone"
+        age = datetime.now(timezone.utc) - approved_at.astimezone(timezone.utc)
+        if age < timedelta(0) or age > APPROVAL_TTL:
+            return False, "approval expired or timestamp is in the future"
+        return True, "durable approval verified"
+    except (OSError, ValueError, TypeError, AttributeError):
+        return False, "approval record unreadable or malformed"
 
-    No command becomes executable merely by entering the queue.  LIVE work
-    always requires an explicit approval state; unknown or malformed commands
-    are rejected rather than inferred.
 
-    The ``execution_gate`` parameter is an additional safety control.  When
-    set to ``True`` the executor explicitly opts in; when ``False`` or
-    ``None`` (the default) the gate remains closed.  This ensures that
-    even an approved LIVE command cannot execute unless an external gate
-    is explicitly opened — a defense-in-depth measure against accidental
-    or compromised approval records.
+def authorize(
+    command: Dict[str, Any],
+    *,
+    execution_gate: bool | None = None,
+    approval_file=None,
+) -> AuthorityDecision:
+    """Classify work; LIVE approval requires a durable, exact, unexpired record.
 
-    ``execution_enabled`` is **always** ``False`` in this module.  The
-    authority layer classifies work but never grants execution rights.
+    The executor gate is additional defense in depth. This authority module
+    never itself grants execution rights.
     """
+    if not isinstance(command, dict):
+        return AuthorityDecision("", "rejected", "command must be a dict")
     command_id = str(command.get("id") or command.get("command_id") or "")
     if not command_id:
         return AuthorityDecision("", "rejected", "missing command id")
@@ -48,22 +78,16 @@ def authorize(command: Dict[str, Any], *, execution_gate: bool | None = None) ->
 
     if mode == "LIVE":
         if command.get("approval_status") != "approved":
-            return AuthorityDecision(
-                command_id,
-                "approval_required",
-                "LIVE execution requires explicit approval",
-            )
-        # Even with approval, execution_enabled is always False.
-        # The execution_gate provides an additional opt-in layer.
+            return AuthorityDecision(command_id, "approval_required", "LIVE execution requires explicit approval")
+        verified, reason = _verify_durable_approval(command, approval_file)
+        if not verified:
+            return AuthorityDecision(command_id, "approval_required", reason)
         gate_active = execution_gate is True
-        reason = (
-            "LIVE approved; executor gate active" if gate_active
-            else "LIVE approved but executor gate absent"
-        )
         return AuthorityDecision(
             command_id,
             "approved",
-            reason,
+            "LIVE durable approval verified; executor gate active" if gate_active
+            else "LIVE durable approval verified; executor gate absent",
             execution_enabled=False,
             approval_required=True,
         )

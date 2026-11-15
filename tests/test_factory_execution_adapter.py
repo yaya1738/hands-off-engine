@@ -4,6 +4,28 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from scripts.factory_execution_adapter import execute_factory_command
+from scripts.command_approval import command_fingerprint
+from datetime import datetime, timezone
+import json
+
+
+def _approved(command, tmp_path):
+    command = dict(command)
+    command.setdefault("source", "test")
+    command.setdefault("action", "execute")
+    command.setdefault("target", "factory")
+    command.setdefault("timestamp", datetime.now(timezone.utc).isoformat())
+    command.setdefault("priority", 5)
+    command.setdefault("sync", False)
+    command.setdefault("timeout_seconds", 300)
+    command.setdefault("queued_at", datetime.now(timezone.utc).isoformat())
+    command["approval_status"] = "approved"
+    fingerprint = command_fingerprint(command)
+    command["approval_fingerprint"] = fingerprint
+    approval_file = tmp_path / "approval_queue.json"
+    approval_file.write_text(json.dumps({"pending": [], "approved": [{"id": command["id"],
+        "approved_at": datetime.now(timezone.utc).isoformat(), "fingerprint": fingerprint}], "rejected": []}))
+    return command, approval_file
 
 
 def test_factory_live_requires_approval():
@@ -14,11 +36,9 @@ def test_factory_live_requires_approval():
     assert result["status"] == "approval_required"
 
 
-def test_factory_live_requires_explicit_executor_gate():
-    result = execute_factory_command(
-        {"id": "fx-2", "mode": "LIVE", "approval_status": "approved", "objective": "inspect runtime"},
-        execution_gate=False,
-    )
+def test_factory_live_requires_explicit_executor_gate(tmp_path):
+    command, approval_file = _approved({"id": "fx-2", "mode": "LIVE", "objective": "inspect runtime"}, tmp_path)
+    result = execute_factory_command(command, execution_gate=False, approval_file=approval_file)
     assert result["status"] == "awaiting_executor_gate"
 
 
@@ -30,15 +50,13 @@ def test_factory_dryrun_never_requires_execution_gate():
     assert result["status"] == "dryrun_only"
 
 
-def test_factory_missing_objective_fails_closed():
-    result = execute_factory_command(
-        {"id": "fx-4", "mode": "LIVE", "approval_status": "approved"},
-        execution_gate=True,
-    )
+def test_factory_missing_objective_fails_closed(tmp_path):
+    command, approval_file = _approved({"id": "fx-4", "mode": "LIVE"}, tmp_path)
+    result = execute_factory_command(command, execution_gate=True, approval_file=approval_file)
     assert result["status"] == "rejected"
 
 
-def test_factory_live_preserves_correlation(monkeypatch):
+def test_factory_live_preserves_correlation(monkeypatch, tmp_path):
     import types
     import sys
 
@@ -52,16 +70,11 @@ def test_factory_live_preserves_correlation(monkeypatch):
     fake_module.FactoryAuthorityGateway = FakeGateway
     monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
 
-    result = execute_factory_command(
-        {
-            "id": "fx-5",
-            "mode": "LIVE",
-            "approval_status": "approved",
-            "objective": "inspect runtime",
-            "reply_to": "mailbox-42",
-        },
-        execution_gate=True,
-    )
+    command, approval_file = _approved({
+        "id": "fx-5", "mode": "LIVE", "objective": "inspect runtime",
+        "reply_to": "mailbox-42",
+    }, tmp_path)
+    result = execute_factory_command(command, execution_gate=True, approval_file=approval_file)
 
     assert result["status"] == "completed"
     assert result["command_id"] == "fx-5"
@@ -69,12 +82,12 @@ def test_factory_live_preserves_correlation(monkeypatch):
     assert result["factory"] == {"decision": "accepted"}
 
 
-def test_system_listener_routes_approved_factory_command(monkeypatch):
+def test_system_listener_routes_approved_factory_command(monkeypatch, tmp_path):
     import scripts.system_listener_inline as listener
 
     calls = {}
 
-    def fake_execute(command, execution_gate=False):
+    def fake_execute(command, execution_gate=False, **kwargs):
         calls["command"] = command
         calls["execution_gate"] = execution_gate
         return {
@@ -86,16 +99,13 @@ def test_system_listener_routes_approved_factory_command(monkeypatch):
 
     monkeypatch.setattr(listener, "execute_factory_command", fake_execute)
 
-    result = listener.process_command({
-        "id": "fx-listener-1",
-        "action": "execute",
-        "target": "factory",
-        "mode": "LIVE",
-        "approval_status": "approved",
-        "objective": "inspect runtime",
-        "reply_to": "mailbox-77",
+    command, approval_file = _approved({
+        "id": "fx-listener-1", "action": "execute", "target": "factory",
+        "mode": "LIVE", "objective": "inspect runtime", "reply_to": "mailbox-77",
         "payload": {"objective": "inspect runtime"},
-    })
+    }, tmp_path)
+    monkeypatch.setattr(listener, "APPROVAL_FILE", approval_file)
+    result = listener.process_command(command)
 
     assert result["command_status"] == "completed"
     assert result["execution_result"]["correlation_id"] == "mailbox-77"
@@ -103,7 +113,7 @@ def test_system_listener_routes_approved_factory_command(monkeypatch):
     assert calls["command"]["objective"] == "inspect runtime"
 
 
-def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
+def test_system_listener_rejects_factory_command_without_objective(monkeypatch, tmp_path):
     import scripts.system_listener_inline as listener
 
     calls = []
@@ -113,6 +123,7 @@ def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
         return {"status": "completed"}
 
     monkeypatch.setattr(listener, "execute_factory_command", fake_execute)
+    monkeypatch.setattr(listener, "APPROVAL_FILE", tmp_path / "approval_queue.json")
 
     result = listener.process_command({
         "id": "fx-listener-missing-objective",
@@ -123,11 +134,11 @@ def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
         "payload": {"action": "factory_execute"},
     })
 
-    assert result["command_status"] == "rejected"
+    assert result["command_status"] == "awaiting_approval"
     assert calls == []
 
 
-def test_factory_adapter_preserves_terminal_status(monkeypatch):
+def test_factory_adapter_preserves_terminal_status(monkeypatch, tmp_path):
     import types
     import sys
 
@@ -139,18 +150,16 @@ def test_factory_adapter_preserves_terminal_status(monkeypatch):
     fake_module.FactoryAuthorityGateway = FakeGateway
     monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
 
-    result = execute_factory_command({
-        "id": "fx-status-1",
-        "mode": "LIVE",
-        "approval_status": "approved",
-        "objective": "inspect runtime",
-    }, execution_gate=True)
+    command, approval_file = _approved({
+        "id": "fx-status-1", "mode": "LIVE", "objective": "inspect runtime",
+    }, tmp_path)
+    result = execute_factory_command(command, execution_gate=True, approval_file=approval_file)
 
     assert result["status"] == "blocked"
     assert result["factory"]["status"] == "blocked"
 
 
-def test_factory_adapter_maps_verified_to_completed(monkeypatch):
+def test_factory_adapter_maps_verified_to_completed(monkeypatch, tmp_path):
     import types
     import sys
 
@@ -162,18 +171,16 @@ def test_factory_adapter_maps_verified_to_completed(monkeypatch):
     fake_module.FactoryAuthorityGateway = FakeGateway
     monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
 
-    result = execute_factory_command({
-        "id": "fx-status-verified",
-        "mode": "LIVE",
-        "approval_status": "approved",
-        "objective": "inspect runtime",
-    }, execution_gate=True)
+    command, approval_file = _approved({
+        "id": "fx-status-verified", "mode": "LIVE", "objective": "inspect runtime",
+    }, tmp_path)
+    result = execute_factory_command(command, execution_gate=True, approval_file=approval_file)
 
     assert result["status"] == "completed"
     assert result["factory"]["status"] == "verified"
 
 
-def test_factory_adapter_rejects_action_as_objective(monkeypatch):
+def test_factory_adapter_rejects_action_as_objective(monkeypatch, tmp_path):
     import types
     import sys
 
@@ -185,12 +192,11 @@ def test_factory_adapter_rejects_action_as_objective(monkeypatch):
     fake_module.FactoryAuthorityGateway = ExplodingGateway
     monkeypatch.setitem(sys.modules, "ai.factory.authority_gateway", fake_module)
 
-    result = execute_factory_command({
-        "id": "fx-missing-objective",
-        "mode": "LIVE",
-        "approval_status": "approved",
+    command, approval_file = _approved({
+        "id": "fx-missing-objective", "mode": "LIVE",
         "payload": {"action": "factory_execute"},
-    }, execution_gate=True)
+    }, tmp_path)
+    result = execute_factory_command(command, execution_gate=True, approval_file=approval_file)
 
     assert result["status"] == "rejected"
     assert result["reason"] == "missing Factory objective"

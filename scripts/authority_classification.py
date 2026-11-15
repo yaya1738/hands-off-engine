@@ -26,7 +26,12 @@ def classify_and_publish(
     if not isinstance(command, dict):
         return {"status": "rejected", "reason": "invalid_command"}
 
-    decision = authorize(command, execution_gate=execution_gate)
+    root = Path(repo_root) if repo_root is not None else Path(__file__).resolve().parent.parent
+    decision = authorize(
+        command,
+        execution_gate=execution_gate,
+        approval_file=root / "state" / "approval_queue.json",
+    )
     correlation = command.get("correlation")
     if not isinstance(correlation, dict):
         correlation = {}
@@ -41,7 +46,6 @@ def classify_and_publish(
         }
     )
 
-    root = Path(repo_root) if repo_root is not None else Path(__file__).resolve().parent.parent
     result = CommHub(repo_root=root).receive(
         "factory",
         AUTHORITY_DECISION_EVENT,
