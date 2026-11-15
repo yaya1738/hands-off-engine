@@ -18,6 +18,7 @@ on:
       - "scripts/control_api.py"
       - "scripts/telegram_bridge.py"
       - "scripts/yair_control_room.py"
+      - "scripts/realtime_coordination_service.py"
       - "autonomous/governed_authority.py"
       - "executor/**"
       - "scripts/factory_execution_adapter.py"
@@ -28,6 +29,7 @@ on:
       - "tests/test_telegram_authenticated_approval.py"
       - "tests/test_telegram_bridge_sender_auth.py"
       - "tests/test_yair_control_room_http_boundary.py"
+      - "tests/test_realtime_coordination_http_boundary.py"
       - "tests/test_comm_hub_authenticated_approval.py"
       - "tests/test_claude_optimizer_execution_boundary.py"
       - "tests/test_autopilot_control_server_auth.py"
@@ -54,7 +56,7 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install test runner
-        run: python -m pip install --disable-pip-version-check pytest requests structlog
+        run: python -m pip install --disable-pip-version-check pytest requests structlog watchdog
       - name: Run governed execution regressions
         run: >-
           python -m pytest -q
@@ -64,6 +66,7 @@ jobs:
           tests/test_telegram_authenticated_approval.py
           tests/test_telegram_bridge_sender_auth.py
           tests/test_yair_control_room_http_boundary.py
+          tests/test_realtime_coordination_http_boundary.py
           tests/test_comm_hub_authenticated_approval.py
           tests/test_claude_optimizer_execution_boundary.py
           tests/test_autopilot_control_server_auth.py
