@@ -24,6 +24,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Dict, List, Optional
 import hashlib
+import fcntl
 
 REPO_ROOT = Path(__file__).parent.parent
 QUEUE_FILE = REPO_ROOT / "state" / "approval_queue.json"
@@ -170,6 +171,8 @@ class ApprovalQueue:
                 # Move to approved
                 change["status"] = "approved"
                 change["approved_at"] = datetime.now().isoformat()
+                action_bytes = json.dumps(change.get("proposed_action", {}), sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+                change["approved_action_sha256"] = hashlib.sha256(action_bytes).hexdigest()
                 queue["approved"].append(change)
                 queue["pending"].pop(i)
                 self._save_queue(queue)
@@ -199,25 +202,38 @@ class ApprovalQueue:
         return False
 
     def execute_approved(self, change_id: str) -> Dict:
-        """
-        Execute an approved change.
-        Returns result dict with success status and details.
-        """
-        change = self.get_change(change_id)
+        """Execute an approved change once, only if its approved action is unchanged."""
+        lock_path = self.queue_file.with_name(self.queue_file.name + ".lock")
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(lock_path, "a+") as lock_file:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+            queue = self._load_queue()
+            change = next((item for item in queue.get("approved", []) if item.get("id") == change_id), None)
+            if change is None:
+                return {"success": False, "error": "Change not found in approved queue"}
+            if change.get("status") != "approved":
+                return {"success": False, "error": f"Approval is not executable (status={change.get('status')})"}
+            action = change.get("proposed_action", {})
+            action_bytes = json.dumps(action, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+            current_digest = hashlib.sha256(action_bytes).hexdigest()
+            approved_digest = change.get("approved_action_sha256")
+            if not isinstance(approved_digest, str) or not __import__("hmac").compare_digest(approved_digest, current_digest):
+                return {"success": False, "error": "Approved action changed after approval; create a new proposal"}
+            change["status"] = "executing"
+            change["execution_started_at"] = datetime.now().isoformat()
+            self._save_queue(queue)
+            result = self._execute_action(action)
+            change["status"] = "executed" if result.get("success") else "execution_failed"
+            change["executed_at"] = datetime.now().isoformat()
+            change["execution_result"] = result
+            self._save_queue(queue)
+            return result
 
-        if not change:
-            return {"success": False, "error": "Change not found"}
-
-        if change["status"] != "approved":
-            return {"success": False, "error": "Change not approved"}
-
-        # Execute the proposed action
-        action = change.get("proposed_action", {})
+    def _execute_action(self, action: Dict) -> Dict:
+        """Execute only narrow repository-local file actions allowed by policy."""
         action_type = action.get("type")
-
         try:
             if action_type == "edit_file":
-                # Edit file
                 file_path = self._resolve_repo_path(action["file_path"])
                 old_content = action["old_content"]
                 new_content = action["new_content"]
@@ -227,20 +243,14 @@ class ApprovalQueue:
                     return {"success": False, "error": "new_content must be a string"}
                 if not file_path.is_file():
                     return {"success": False, "error": "edit target must be an existing regular file"}
-
                 current = file_path.read_text(encoding="utf-8")
                 match_count = current.count(old_content)
                 if match_count != 1:
-                    return {
-                        "success": False,
-                        "error": f"old_content must match exactly once; found {match_count} matches",
-                    }
+                    return {"success": False, "error": f"old_content must match exactly once; found {match_count} matches"}
                 updated = current.replace(old_content, new_content, 1)
                 file_path.write_text(updated, encoding="utf-8")
                 return {"success": True, "message": f"Edited {file_path.relative_to(self.repo_root)}"}
-
-            elif action_type == "write_file":
-                # Write new file
+            if action_type == "write_file":
                 file_path = self._resolve_repo_path(action["file_path"])
                 content = action["content"]
                 if not isinstance(content, str):
@@ -249,22 +259,14 @@ class ApprovalQueue:
                     return {"success": False, "error": "write_file is create-only; target already exists"}
                 if not file_path.parent.is_dir():
                     return {"success": False, "error": "parent directory must already exist"}
-                with file_path.open("x", encoding="utf-8") as f:
-                    f.write(content)
+                with file_path.open("x", encoding="utf-8") as handle:
+                    handle.write(content)
                 return {"success": True, "message": f"Created {file_path.relative_to(self.repo_root)}"}
-
-            elif action_type == "bash_command":
-                # Approval is not a general-purpose shell execution capability.
-                return {
-                    "success": False,
-                    "error": "arbitrary bash_command actions are disabled; use the governed executor allowlist",
-                }
-
-            else:
-                return {"success": False, "error": f"Unknown action type: {action_type}"}
-
-        except Exception as e:
-            return {"success": False, "error": str(e)}
+            if action_type == "bash_command":
+                return {"success": False, "error": "arbitrary bash_command actions are disabled; use the governed executor allowlist"}
+            return {"success": False, "error": f"Unknown action type: {action_type}"}
+        except Exception as exc:
+            return {"success": False, "error": str(exc)}
 
 
 def send_approval_notification(change_id: str, change: Dict):
