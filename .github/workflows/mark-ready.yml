@@ -25,6 +25,7 @@ jobs:
           PR_NUMBER: ${{ inputs.pr_number }}
           TRUSTED_OPERATORS: ${{ env.TRUSTED_OPERATORS }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           if ! printf '%s' "$PR_NUMBER" | grep -Eq '^[0-9]+$'; then
             echo "::error::A specific valid PR number is required"
