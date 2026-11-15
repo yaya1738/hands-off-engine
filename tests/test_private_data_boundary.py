@@ -72,3 +72,11 @@ def test_public_bootstrap_has_no_private_user_snapshot():
     assert bootstrap["live_services"]["telegram_bot"]["chat_id"] == ""
     assert bootstrap["user_context"]["email"] == ""
     assert bootstrap["user_context"]["situation"].startswith("Private user context")
+
+def test_partner_metadata_has_no_personal_account_email():
+    import json
+
+    metadata = json.loads(
+        (ROOT / "finance/partner_terms.json").read_text(encoding="utf-8")
+    )
+    assert metadata["partners"]["digitalocean"]["account_email"] == ""
