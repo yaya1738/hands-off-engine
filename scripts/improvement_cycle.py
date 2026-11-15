@@ -7,8 +7,11 @@ generation/dispatch and safe improvement application, plus feedback and
 approval checks.
 """
 import json
+import os
+import signal
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -17,24 +20,54 @@ STATE = ROOT / "state"
 CYCLE_LOG = STATE / "improvement_cycles.json"
 
 
+MAX_SUBPROCESS_OUTPUT_CHARS = 1000
+SUBPROCESS_TIMEOUT_SECONDS = 30
+
+
+def _read_subprocess_tail(output_file):
+    output_file.seek(0, os.SEEK_END)
+    size = output_file.tell()
+    output_file.seek(max(0, size - MAX_SUBPROCESS_OUTPUT_CHARS), os.SEEK_SET)
+    return output_file.read(MAX_SUBPROCESS_OUTPUT_CHARS).decode("utf-8", errors="replace").strip()
+
+
 def run_subprocess(script):
-    """Run a script and return bounded output and an explicit result."""
+    """Run a workflow child with file-backed output and process-group timeout cleanup."""
     parts = script.split()
+    process = None
     try:
         cmd = [sys.executable, str(ROOT / "scripts" / parts[0])] + parts[1:]
-        result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            cwd=str(ROOT),
-            timeout=30,
-        )
-        return {
-            "success": result.returncode == 0,
-            "output": (result.stdout + result.stderr).strip()[-1000:],
-        }
+        with tempfile.TemporaryFile(mode="w+b") as output_file:
+            process = subprocess.Popen(
+                cmd,
+                stdout=output_file,
+                stderr=subprocess.STDOUT,
+                cwd=str(ROOT),
+                start_new_session=True,
+            )
+            try:
+                returncode = process.wait(timeout=SUBPROCESS_TIMEOUT_SECONDS)
+            except subprocess.TimeoutExpired as exc:
+                try:
+                    os.killpg(process.pid, signal.SIGKILL)
+                except ProcessLookupError:
+                    pass
+                process.wait()
+                detail = (_read_subprocess_tail(output_file) + "\\n" + str(exc)).strip()
+                return {"success": False, "output": detail[-MAX_SUBPROCESS_OUTPUT_CHARS:]}
+
+            return {
+                "success": returncode == 0,
+                "output": _read_subprocess_tail(output_file),
+            }
     except Exception as exc:
-        return {"success": False, "output": str(exc)[:1000]}
+        if process is not None and process.poll() is None:
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            process.wait()
+        return {"success": False, "output": str(exc)[-MAX_SUBPROCESS_OUTPUT_CHARS:]}
 
 
 def apply_generated_candidates():
