@@ -478,10 +478,17 @@ def run(max_loops=None):
                     if name in procs:
                         rc = procs[name].returncode
                         if rc == 0:
-                            s["consecutive_failures"] = 0
-                            s["backoff"] = INITIAL_BACKOFF
-                            s["next_start_at"] = 0
-                            _log(f"{name} exited cleanly (rc=0)")
+                            # Every entry in SERVICES is a long-running daemon.
+                            # A clean exit is still an unexpected termination:
+                            # apply bounded backoff rather than hot-looping it.
+                            s["consecutive_failures"] += 1
+                            s["backoff"] = _get_backoff(s["consecutive_failures"], s["backoff"])
+                            s["next_start_at"] = time.time() + s["backoff"]
+                            _log(
+                                f"{name} exited cleanly but unexpectedly (rc=0), "
+                                f"consecutive_failures={s['consecutive_failures']}, "
+                                f"next_backoff={s['backoff']}s"
+                            )
                         elif rc == EXIT_ALREADY_RUNNING and _external_owner_healthy(svc, time.time()):
                             s["next_start_at"] = time.time() + ALREADY_RUNNING_RETRY
                             _log(f"{name} exit 75: healthy external owner verified; retry in {ALREADY_RUNNING_RETRY}s")

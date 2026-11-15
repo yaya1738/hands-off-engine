@@ -56,6 +56,9 @@ jobs:
           python -m unittest tests/test_improvement_applier_safety.py -v
           python -m unittest tests/test_improvement_applier.py -v
           python -m unittest tests/test_improvement_cycle_exit.py -v
+          if [ -f tests/test_telegram_bridge_delivery.py ]; then
+            python -m unittest tests/test_telegram_bridge_delivery.py -v
+          fi
           python -m unittest tests/test_github_governance_monitor.py -v
           python -m unittest tests/test_factory_authority_gateway.py -v
           python -m unittest tests/test_factory_objective_review.py -v

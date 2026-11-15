@@ -47,6 +47,31 @@ class FailingChild:
         self.returncode = -9
 
 
+class CleanExitChild:
+    """Long-running service stand-in that unexpectedly exits with rc=0."""
+    pid = 45679
+
+    def __init__(self, clock):
+        self.clock = clock
+        self.returncode = None
+        self.exit_observed_at = None
+
+    def poll(self):
+        if self.returncode is None:
+            self.returncode = 0
+            self.exit_observed_at = self.clock.now
+        return self.returncode
+
+    def terminate(self):
+        self.returncode = -15
+
+    def wait(self, timeout=None):
+        return self.returncode
+
+    def kill(self):
+        self.returncode = -9
+
+
 class Clock:
     def __init__(self, start=1000.0, step=10.0):
         self.now = start
@@ -105,6 +130,48 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
              mock.patch.object(supervisor.subprocess, "Popen", side_effect=fake_popen):
             supervisor.run(max_loops=max_loops)
         return popen_times, children
+
+    def _run_clean_exit_with(self, clock, max_loops):
+        popen_times = []
+        children = []
+
+        def fake_popen(*args, **kwargs):
+            popen_times.append(clock.now)
+            child = CleanExitChild(clock)
+            children.append(child)
+            return child
+
+        with mock.patch.object(supervisor, "SERVICES", [self.service]), \
+             mock.patch.object(supervisor, "time", clock), \
+             mock.patch.object(supervisor.subprocess, "Popen", side_effect=fake_popen):
+            supervisor.run(max_loops=max_loops)
+        return popen_times, children
+
+    def test_unexpected_clean_exit_uses_backoff_instead_of_immediate_restart(self):
+        clock = Clock(step=1.0)
+        popen_times, _ = self._run_clean_exit_with(clock, max_loops=11)
+        self.assertEqual(len(popen_times), 1)
+        self.assertIn("exited cleanly but unexpectedly", self.log.read_text())
+        self.assertIn("next_backoff=10s", self.log.read_text())
+
+    def test_unexpected_clean_exit_restarts_only_after_backoff(self):
+        clock = Clock(step=1.0)
+        popen_times, _ = self._run_clean_exit_with(clock, max_loops=12)
+        self.assertEqual(len(popen_times), 2)
+        self.assertGreaterEqual(popen_times[1] - popen_times[0], 10)
+
+    def test_repeated_clean_exits_reach_bounded_cooldown(self):
+        clock = Clock(step=60.0)
+        popen_times, children = self._run_clean_exit_with(clock, max_loops=80)
+        log = self.log.read_text()
+        self.assertIn(
+            f"entering cooldown for {supervisor.COOLDOWN_DURATION}s "
+            f"after {supervisor.MAX_CONSECUTIVE} consecutive failures",
+            log,
+        )
+        self.assertGreaterEqual(len(children), supervisor.MAX_CONSECUTIVE)
+        self.assertTrue(any(t >= children[9].exit_observed_at + supervisor.COOLDOWN_DURATION
+                            for t in popen_times[10:]))
 
     def test_backoff_ladder_is_bounded(self):
         expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 600]
