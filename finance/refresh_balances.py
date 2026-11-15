@@ -52,6 +52,9 @@ def get_native_balance(wallet, rpc_url, decimals=18):
 
 def refresh():
     """Refresh all readable balances"""
+    if not FINANCE_HUB.exists():
+        print("Private finance hub is not present; restore it from a secure local backup.")
+        return False
     with open(FINANCE_HUB) as f:
         hub = json.load(f)
     
