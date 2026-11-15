@@ -54,6 +54,15 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertNotIn("health_check", restored["jobs"])
         self.assertEqual(restored["jobs"]["integrity_check"]["next_run_at"], 123)
 
+    def test_missing_due_time_is_initialized_once(self):
+        job = {}
+        due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
+        self.assertEqual(due_at, 400)
+        self.assertEqual(job["next_run_at"], 400)
+
+        # A later poll must retain the original deadline, not postpone it.
+        self.assertEqual(scheduler.get_due_time(job, scheduler.TASKS[0], now=200), 400)
+
     def test_malformed_due_time_is_recovered_without_crashing(self):
         job = {"next_run_at": "not-a-time"}
         due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
