@@ -77,7 +77,6 @@ def process_command(cmd):
                 if execute_factory_command is None:
                     return {"action": "execute", "error": "Factory execution adapter unavailable", "command_status": "blocked", "timestamp": datetime.now(timezone.utc).isoformat()}
                 factory_command = dict(cmd)
-                factory_command["objective"] = cmd.get("objective") or payload.get("objective")
                 factory_command["correlation_id"] = cmd.get("reply_to") or cmd.get("correlation_id") or cmd.get("id")
                 factory_result = execute_factory_command(factory_command, execution_gate=True, approval_file=APPROVAL_FILE)
                 status = factory_result.get("status")
