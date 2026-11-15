@@ -41,17 +41,20 @@ DANGEROUS_PATTERNS = [
     "wget | sh",
 ]
 
-# Setup logging
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_DIR / "ai-runner.log"),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
+# Keep imports side-effect free. Runtime logging is configured by main().
 logger = logging.getLogger(__name__)
+
+
+def configure_logging():
+    LOG_DIR.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] %(message)s',
+        handlers=[
+            logging.FileHandler(LOG_DIR / "ai-runner.log"),
+            logging.StreamHandler(sys.stdout)
+        ]
+    )
 
 
 def validate_command(cmd):
@@ -134,40 +137,21 @@ def call_llm(system_prompt, user_prompt):
 
 
 def execute_command(cmd):
-    """Execute shell command and return result."""
-    logger.info(f"Executing: {cmd}")
-    try:
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            check=True,
-            capture_output=True,
-            text=True,
-            timeout=300
-        )
-        return {
-            "command": cmd,
-            "status": "success",
-            "stdout": result.stdout,
-            "stderr": result.stderr,
-            "returncode": result.returncode
-        }
-    except subprocess.CalledProcessError as e:
-        return {
-            "command": cmd,
-            "status": "failed",
-            "stdout": e.stdout,
-            "stderr": e.stderr,
-            "returncode": e.returncode
-        }
-    except subprocess.TimeoutExpired:
-        return {
-            "command": cmd,
-            "status": "timeout",
-            "stdout": "",
-            "stderr": "Command timed out after 300 seconds",
-            "returncode": -1
-        }
+    """Fail closed: generated shell commands have no governed authority grant.
+
+    AI_RUNNER_EXECUTE is retained as a compatibility setting, but it cannot
+    authorize execution. Migrate this runner to the governed command protocol
+    before enabling any execution path.
+    """
+    logger.warning("AI Runner execution blocked: governed authority integration required")
+    return {
+        "command": cmd,
+        "status": "blocked",
+        "reason": "No governed execution authority grant",
+        "stdout": "",
+        "stderr": "",
+        "returncode": -1
+    }
 
 
 def process_task(task_file):
@@ -248,7 +232,7 @@ Provide a plan and shell commands to accomplish this goal."""
                 if result["status"] != "success":
                     overall_status = "failed"
             else:
-                logger.info(f"DRY RUN (AI_RUNNER_EXECUTE not set): {cmd}")
+                logger.info("DRY RUN (governed execution integration required)")
                 command_results.append({
                     "command": cmd,
                     "status": "dry_run",
@@ -308,6 +292,7 @@ Provide a plan and shell commands to accomplish this goal."""
 
 def main():
     """Main loop."""
+    configure_logging()
     logger.info("AI Runner started")
     logger.info(f"API URL: {API_URL}")
     logger.info(f"Model: {MODEL}")

@@ -1145,25 +1145,13 @@ class SystemDoctor:
                 print(f"   [DRY RUN] Would execute: {treatment.command}")
                 return True
             else:
-                try:
-                    result = subprocess.run(
-                        treatment.command,
-                        shell=True,
-                        capture_output=True,
-                        text=True,
-                        timeout=60,
-                        cwd=str(BASE_DIR)
-                    )
-                    treatment.executed = True
-                    treatment.success = result.returncode == 0
-                    self._log_treatment(treatment)
-                    self.state["treatments_applied"] += 1
-                    self._save_state()
-                    print(f"   {'✅ Success' if treatment.success else '❌ Failed'}")
-                    return treatment.success
-                except Exception as e:
-                    print(f"   ❌ Error: {e}")
-                    return False
+                # A CLI --apply flag is not an authority grant. Prescriptions
+                # contain shell strings and must not execute outside the
+                # governed command protocol.
+                treatment.executed = False
+                treatment.success = False
+                print("   [BLOCKED] Treatment execution requires governed authority.")
+                return False
 
         if treatment.manual_steps:
             print("   Manual steps required:")

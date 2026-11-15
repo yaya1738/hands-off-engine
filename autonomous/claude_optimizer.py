@@ -339,27 +339,13 @@ All actions are logged and validated through protection layers.
     # ========================================================================
 
     def safe_execute(self, command: str) -> Tuple[bool, str]:
-        """
-        Execute a command with full protection.
+        """Fail closed until shell execution is routed through governed authority.
 
-        Validates through all layers before execution.
+        Legacy protection-layer validation is advisory and cannot grant
+        execution rights. Do not run model- or caller-supplied shell strings.
         """
-        allowed, reason = self.validate_action("execute_command", command)
-        if not allowed:
-            return False, reason
+        return False, "Execution blocked: governed authority integration required"
 
-        try:
-            result = subprocess.run(
-                command,
-                shell=True,
-                capture_output=True,
-                text=True,
-                timeout=60,
-                cwd=str(BASE_DIR)
-            )
-            return True, result.stdout if result.returncode == 0 else result.stderr
-        except Exception as e:
-            return False, str(e)
 
     def safe_file_modify(self, file_path: str, intention: str) -> Tuple[bool, str]:
         """

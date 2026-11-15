@@ -101,9 +101,9 @@ def propose_change(
         result = queue.execute_approved(change_id)
 
         return {
-            "applied": True,
+            "applied": bool(result.get("success")),
             "change_id": change_id,
-            "status": "auto_applied",
+            "status": "auto_applied" if result.get("success") else "execution_blocked",
             "result": result
         }
 

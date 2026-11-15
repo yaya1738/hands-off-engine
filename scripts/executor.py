@@ -24,6 +24,8 @@ from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, Optional
 from dataclasses import dataclass, asdict
 
+from autonomous.governed_authority import authorize
+
 log = logging.getLogger("Executor")
 
 REPO_ROOT = Path.home() / "hands-off-engine"
@@ -70,13 +72,24 @@ class Executor:
         cmd_id = cmd.get("id", "unknown")
         action = cmd.get("payload", {}).get("action", "unknown")
         target = cmd.get("target", "system")
-        mode = cmd.get("mode", "DRYRUN")
+        mode = str(cmd.get("mode", "DRYRUN")).upper()
         approval_status = cmd.get("approval_status", "")
 
         log.info(f"Executor: processing {cmd_id[:8]} action={action} mode={mode}")
 
-        # ── safety gate 1: approval freshness ──
+        if mode not in {"DRYRUN", "LIVE"}:
+            return self._reject(cmd_id, action, target, f"Unsupported execution mode: {mode}")
+
+        # ── safety gate 1: governed authority + approval freshness ──
         if mode == "LIVE":
+            decision = authorize(cmd, execution_gate=True)
+            if decision.decision != "approved" or decision.execution_enabled is not True:
+                return self._reject(
+                    cmd_id,
+                    action,
+                    target,
+                    f"Governed authority denied LIVE execution: {decision.reason}",
+                )
             if approval_status != "approved":
                 return self._reject(cmd_id, action, target, "LIVE command not approved")
             if not self._check_approval_freshness(cmd):

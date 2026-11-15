@@ -1,0 +1,122 @@
+import scripts.telegram_bridge as bridge_module
+
+
+def test_telegram_bridge_rejects_unlisted_users_and_non_private_chats(monkeypatch):
+    bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", {"77123"})
+    sent = []
+    bridge.send = lambda text, chat_id=None: sent.append((text, chat_id))
+    calls = []
+
+    class Hub:
+        def receive(self, *args, **kwargs):
+            calls.append((args, kwargs))
+            return {"routed_to": "logged"}
+
+    monkeypatch.setattr("scripts.comm_hub.CommHub", lambda: Hub())
+
+    bridge.process_inbound([
+        {"text": "/approve cmd-1", "chat_id": 77123, "chat_type": "group", "user_id": 77123},
+        {"text": "/approve cmd-1", "chat_id": 77123, "chat_type": "private", "user_id": 99999},
+    ])
+
+    assert calls == []
+    assert len(sent) == 2
+
+
+def test_telegram_bridge_passes_verified_actor_identity(monkeypatch):
+    bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", {"77123"})
+    bridge.send = lambda *args, **kwargs: None
+    calls = []
+
+    class Hub:
+        def receive(self, *args, **kwargs):
+            calls.append((args, kwargs))
+            return {"routed_to": "approval_workflow", "result": {"status": "denied"}}
+
+    monkeypatch.setattr("scripts.comm_hub.CommHub", lambda: Hub())
+
+    bridge.process_inbound([
+        {"text": "/approve cmd-1", "chat_id": 77123, "chat_type": "private", "user_id": 77123}
+    ])
+
+    assert len(calls) == 1
+    assert calls[0][0][0:2] == ("operator", "approve")
+    assert calls[0][1]["authenticated"] is True
+    assert calls[0][1]["authenticated_actor_id"] == "77123"
+
+
+def test_telegram_bridge_help_is_the_only_public_private_chat_command(monkeypatch):
+    bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", set())
+    bridge.send = lambda *args, **kwargs: None
+
+    class Hub:
+        def receive(self, *args, **kwargs):
+            raise AssertionError("help must not route through privileged CommHub")
+
+    monkeypatch.setattr("scripts.comm_hub.CommHub", lambda: Hub())
+    bridge.process_inbound([
+        {"text": "/help", "chat_id": 77123, "chat_type": "private", "user_id": 99999}
+    ])
+
+
+
+
+def test_telegram_bridge_routes_objective_review_with_verified_actor(monkeypatch):
+    bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", {"77123"})
+    bridge.send = lambda *args, **kwargs: None
+    calls = []
+
+    class Hub:
+        def receive(self, *args, **kwargs):
+            calls.append((args, kwargs))
+            return {"routed_to": "factory_objective_review", "result": {"status": "accepted_for_planning"}}
+
+    monkeypatch.setattr("scripts.comm_hub.CommHub", lambda: Hub())
+    bridge.process_inbound([
+        {
+            "text": "/review " + "a" * 64 + " accept",
+            "chat_id": 77123,
+            "chat_type": "private",
+            "user_id": 77123,
+        }
+    ])
+
+    assert len(calls) == 1
+    assert calls[0][0][0:2] == ("operator", "objective_review")
+    assert calls[0][0][2]["goal_id"] == "a" * 64
+    assert calls[0][0][2]["decision"] == "accept_for_planning"
+    assert calls[0][1]["authenticated"] is True
+    assert calls[0][1]["authenticated_actor_id"] == "77123"
+    assert calls[0][1]["channel"] == "telegram"
+
+
+def test_telegram_bridge_rejects_malformed_objective_review_command(monkeypatch):
+    bridge = bridge_module.TelegramBridge.__new__(bridge_module.TelegramBridge)
+    bridge.config = {"chat_ids": ["77123"]}
+    monkeypatch.setattr(bridge_module, "ADMIN_USER_IDS", {"77123"})
+    sent = []
+    bridge.send = lambda text, chat_id=None: sent.append(text)
+
+    class Hub:
+        def receive(self, *args, **kwargs):
+            raise AssertionError("malformed review must not reach CommHub")
+
+    monkeypatch.setattr("scripts.comm_hub.CommHub", lambda: Hub())
+    bridge.process_inbound([
+        {
+            "text": "/review invalid maybe",
+            "chat_id": 77123,
+            "chat_type": "private",
+            "user_id": 77123,
+        }
+    ])
+
+    assert sent and "Usage:" in sent[0]
