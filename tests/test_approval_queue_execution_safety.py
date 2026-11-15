@@ -107,6 +107,19 @@ def test_edit_file_refuses_empty_or_nonmatching_old_content(tmp_path):
     assert target.read_text() == '{"limit": 10}'
 
 
+def test_edit_file_refuses_ambiguous_multiple_matches(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    target.write_text('{"limit": 10, "backup_limit": 10}')
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": "10", "new_content": "20",
+    })
+    result = queue.execute_approved(change_id)
+    assert not result["success"]
+    assert "match exactly once" in result["error"]
+    assert target.read_text() == '{"limit": 10, "backup_limit": 10}'
+
 def test_write_file_is_create_only_inside_repo(tmp_path):
     queue, root = make_queue(tmp_path)
     change_id = queue_and_approve(queue, {
