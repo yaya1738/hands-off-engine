@@ -25,6 +25,7 @@ import time
 import signal
 import logging
 import subprocess
+import threading
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Dict, List, Optional
@@ -259,6 +260,23 @@ class ManagedDaemon:
         self.process: Optional[subprocess.Popen] = None
         self.log = RotatingLog(name)
         self.start_time: Optional[float] = None
+        self.output_thread: Optional[threading.Thread] = None
+
+    def _drain_output(self, stream):
+        """Continuously drain merged stdout/stderr into bounded rotating logs."""
+        try:
+            while True:
+                chunk = stream.read(4096)
+                if not chunk:
+                    break
+                self.log.write(chunk)
+        except (OSError, ValueError) as e:
+            log.debug("%s: output drain stopped: %s", self.name, e)
+        finally:
+            try:
+                stream.close()
+            except Exception:
+                pass
 
     def start(self):
         if not self.script.exists():
@@ -271,6 +289,13 @@ class ManagedDaemon:
                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                 text=True, bufsize=1,
             )
+            self.output_thread = threading.Thread(
+                target=self._drain_output,
+                args=(self.process.stdout,),
+                name=f"{self.name}-output-drain",
+                daemon=True,
+            )
+            self.output_thread.start()
             self.start_time = time.time()
             self.state["last_start"] = datetime.now(timezone.utc).isoformat()
             log.info(f"Started {self.name} (pid={self.process.pid})")
@@ -285,13 +310,13 @@ class ManagedDaemon:
         if returncode is not None:
             self.state["last_exit"] = datetime.now(timezone.utc).isoformat()
             self.state["last_exit_code"] = returncode
-            # Drain stdout
-            try:
-                output = self.process.stdout.read()
-                if output:
-                    self.log.write(output)
-            except Exception:
-                pass
+            # The reader drains concurrently while the child runs. On exit,
+            # allow it to consume the final buffered bytes without blocking
+            # the supervisor indefinitely if a descendant inherited the pipe.
+            if self.output_thread is not None:
+                self.output_thread.join(timeout=1.0)
+                if not self.output_thread.is_alive():
+                    self.output_thread = None
             self.process = None
             self.start_time = None
         return returncode
