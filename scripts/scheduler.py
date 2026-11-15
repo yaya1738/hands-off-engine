@@ -8,6 +8,7 @@ their next scheduled interval.
 """
 import fcntl
 import json
+import math
 import os
 import signal
 import subprocess
@@ -85,6 +86,8 @@ def get_due_time(job, task, now):
     raw_due = job.get("next_run_at", now + task["interval_seconds"])
     try:
         due_at = float(raw_due)
+        if not math.isfinite(due_at):
+            raise ValueError("non-finite due timestamp")
     except (TypeError, ValueError):
         due_at = now + task["interval_seconds"]
     if not isinstance(raw_due, (int, float)) or isinstance(raw_due, bool):
