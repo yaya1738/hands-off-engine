@@ -421,7 +421,7 @@ class UnifiedAutonomousSystem:
                 decision = self._create_infra_decision(
                     action="upgrade_server",
                     reason=f"Warning health state ({health.overall_score})",
-                    auto_approve=self._within_auto_approve_budget()
+                    auto_approve=(self.allow_paid_actions and self._within_auto_approve_budget())
                 )
                 if decision:
                     decisions.append(decision)
@@ -767,7 +767,8 @@ class UnifiedAutonomousSystem:
                 decision = action.get("decision", {})
                 self._execute_infra_decision(decision, approved=True)
                 change["executed"] = bool(decision.get("executed"))
-                change["executed_at"] = datetime.utcnow().isoformat()
+                if change["executed"]:
+                    change["executed_at"] = datetime.utcnow().isoformat()
 
             elif action_type == "hardware_decision":
                 # Hardware decisions are handled by the decision engine
