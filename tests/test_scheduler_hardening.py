@@ -63,6 +63,17 @@ class SchedulerHardeningTests(unittest.TestCase):
         # A later poll must retain the original deadline, not postpone it.
         self.assertEqual(scheduler.get_due_time(job, scheduler.TASKS[0], now=200), 400)
 
+    def test_missing_due_time_is_persisted_by_scheduler_loop(self):
+        previous_running = scheduler._RUNNING
+        state = {"jobs": {"health_check": {}}}
+        try:
+            with mock.patch.object(scheduler, "TASKS", [scheduler.TASKS[0]]), mock.patch.object(scheduler, "acquire_lock", return_value=object()), mock.patch.object(scheduler, "release_lock"), mock.patch.object(scheduler, "load_state", return_value=state), mock.patch.object(scheduler.time, "time", return_value=100), mock.patch.object(scheduler.time, "sleep", side_effect=lambda _: setattr(scheduler, "_RUNNING", False)):
+                scheduler.run_forever()
+            saved = json.loads(scheduler.SCHEDULER_STATE.read_text())
+            self.assertEqual(saved["jobs"]["health_check"]["next_run_at"], 400)
+        finally:
+            scheduler._RUNNING = previous_running
+
     def test_malformed_due_time_is_recovered_without_crashing(self):
         job = {"next_run_at": "not-a-time"}
         due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
