@@ -563,18 +563,29 @@ class TermuxSupervisor:
         deadline = time.monotonic() + max(0.0, grace)
         for name, daemon, process, pgid_pinned in owned:
             if pgid_pinned:
-                _observe_exit_without_reaping(
+                _exited, still_pinned = _observe_exit_without_reaping(
                     process,
                     timeout=max(0.0, deadline - time.monotonic()),
                 )
-                # Do this even if the leader exited promptly: an unreaped zombie
-                # keeps the PGID reserved while remaining descendants are killed.
-                try:
-                    os.killpg(process.pid, signal.SIGKILL)
-                except ProcessLookupError:
-                    pass
-                except OSError as exc:
-                    log.warning("Unable to kill remaining process group for %s: %s", name, exc)
+                if not still_pinned:
+                    # A concurrent waiter may have reaped the leader during
+                    # the grace period. The original PGID is no longer pinned;
+                    # never send the final signal to a potentially recycled ID.
+                    log.error(
+                        "%s leader lost its process-group pin during shutdown; "
+                        "refusing final PID/PGID signal",
+                        name,
+                    )
+                    pgid_pinned = False
+                else:
+                    # The still-waitable leader pins the PGID, whether it exited
+                    # during grace or remains alive after the grace deadline.
+                    try:
+                        os.killpg(process.pid, signal.SIGKILL)
+                    except ProcessLookupError:
+                        pass
+                    except OSError as exc:
+                        log.warning("Unable to kill remaining process group for %s: %s", name, exc)
             else:
                 # ChildProcessError means another waiter may already have reaped
                 # the leader. Its numeric PID may have been reused, so do not

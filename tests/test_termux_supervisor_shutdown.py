@@ -196,6 +196,28 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
         else:
             self.fail("redirected descendant survived natural daemon-exit cleanup")
 
+    def test_shutdown_does_not_signal_after_leader_is_reaped_during_grace(self):
+        process = mock.Mock(pid=34568, returncode=None)
+        daemon = mock.Mock()
+        daemon.process = process
+        daemon.output_thread = None
+        runner = supervisor.TermuxSupervisor.__new__(supervisor.TermuxSupervisor)
+        runner.daemons = {"child": daemon}
+
+        # The leader is initially alive, so SIGTERM is safe. Simulate another
+        # waiter reaping it during the grace interval: the second observation
+        # must revoke the PGID pin before any SIGKILL is attempted.
+        with mock.patch.object(
+            supervisor,
+            "_observe_exit_without_reaping",
+            side_effect=[(False, True), (True, False)],
+        ), mock.patch.object(supervisor.os, "killpg") as killpg:
+            runner._shutdown_daemons(grace=0.0)
+
+        killpg.assert_called_once_with(process.pid, signal.SIGTERM)
+        process.wait.assert_called_once_with(timeout=0)
+        self.assertIsNone(daemon.process)
+
     def test_already_reaped_child_is_never_signalled_by_recycled_pid(self):
         daemon = self.start_child("pass\n")
         process = daemon.process
