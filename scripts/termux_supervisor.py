@@ -568,8 +568,25 @@ class TermuxSupervisor:
                     if daemon.timeout and daemon.start_time:
                         elapsed = time.time() - daemon.start_time
                         if elapsed > daemon.timeout:
-                            log.warning(f"{name}: timeout after {elapsed:.0f}s, killing")
-                            daemon.process.kill()
+                            log.warning(f"{name}: timeout after {elapsed:.0f}s, killing owned process group")
+                            process = daemon.process
+                            exited, pgid_pinned = _observe_exit_without_reaping(process)
+                            if pgid_pinned:
+                                # Keep the leader unreaped while signalling its
+                                # session/process group; Popen.kill() calls poll()
+                                # internally and can release the PGID first.
+                                try:
+                                    os.killpg(process.pid, signal.SIGKILL)
+                                except ProcessLookupError:
+                                    pass
+                                except OSError as exc:
+                                    log.warning("%s: timeout process-group kill failed: %s", name, exc)
+                            else:
+                                log.error(
+                                    "%s: timeout observed without a safely pinned PGID; "
+                                    "refusing PID/PGID signal",
+                                    name,
+                                )
                     # Check for exit
                     rc = daemon.poll()
                     if rc is not None:
