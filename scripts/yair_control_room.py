@@ -8,6 +8,7 @@ source of truth.
 from __future__ import annotations
 
 import argparse
+import ipaddress
 import json
 import sys
 from datetime import datetime, timezone
@@ -44,6 +45,40 @@ document.querySelector('#send').onsubmit=async e=>{e.preventDefault();let i=docu
 </script></body></html>'''
 
 
+MAX_REQUEST_BYTES = 8192
+
+def is_loopback_host(host):
+    """The control room is intentionally local-only; reject wildcard/LAN binds."""
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host.strip("[]")).is_loopback
+    except ValueError:
+        return False
+
+
+def read_json_request(headers, stream):
+    """Read a bounded JSON object and return (status, body, error)."""
+    if headers.get("transfer-encoding"):
+        return 400, None, "transfer-encoding is not supported"
+    raw_length = headers.get("content-length")
+    try:
+        length = int(raw_length)
+    except (TypeError, ValueError):
+        return 400, None, "valid content-length required"
+    if length < 0:
+        return 400, None, "invalid content-length"
+    if length > MAX_REQUEST_BYTES:
+        return 413, None, "request body too large"
+    try:
+        body = json.loads(stream.read(length))
+    except Exception:
+        return 400, None, "invalid json"
+    if not isinstance(body, dict):
+        return 400, None, "json object required"
+    return 200, body, None
+
+
 def read_events(limit: int = 120):
     if not BUS.exists():
         return []
@@ -75,8 +110,9 @@ class Handler(BaseHTTPRequestHandler):
         self.send_json(404,{'error':'not found'})
     def do_POST(self):
         if urlparse(self.path).path!='/api/send': self.send_json(404,{'error':'not found'}); return
-        try: body=json.loads(self.rfile.read(int(self.headers.get('content-length','0'))))
-        except Exception: self.send_json(400,{'error':'invalid json'}); return
+        code, body, error = read_json_request(self.headers, self.rfile)
+        if error:
+            self.send_json(code, {'error': error}); return
         text=str(body.get('message','')).strip()
         if not text or len(text)>4000: self.send_json(400,{'error':'message must be 1-4000 characters'}); return
         try:
@@ -87,6 +123,8 @@ class Handler(BaseHTTPRequestHandler):
 
 def main():
     p=argparse.ArgumentParser(); p.add_argument('--host',default='127.0.0.1'); p.add_argument('--port',type=int,default=8787); a=p.parse_args()
+    if not is_loopback_host(a.host):
+        p.error("Control Room must bind to localhost/loopback only")
     print(f'Yair Control Room: http://{a.host}:{a.port}')
     ThreadingHTTPServer((a.host,a.port),Handler).serve_forever()
 
