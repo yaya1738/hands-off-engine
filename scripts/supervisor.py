@@ -168,6 +168,15 @@ def _lock_owner_pid(path):
     return pid if pid > 0 else None
 
 
+def _registered_supervisor_pid():
+    """Read the registered PID without allowing corrupt state to crash status/stop."""
+    try:
+        pid = int(SUPERVISOR_PID.read_text().strip())
+    except (OSError, ValueError):
+        return None
+    return pid if pid > 0 else None
+
+
 def _lock_is_held(path):
     """True if some process currently holds the flock on path (never creates it)."""
     try:
@@ -555,20 +564,17 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.action == "status":
-        if SUPERVISOR_PID.exists():
-            pid = int(SUPERVISOR_PID.read_text().strip())
+        pid = _registered_supervisor_pid()
+        if pid is None:
+            print("Supervisor: NOT STARTED (missing or invalid PID file)")
+        else:
             alive = _is_process_alive(pid)
             print(f"Supervisor: {'RUNNING' if alive else 'DEAD'} (pid={pid})")
-        else:
-            print("Supervisor: NOT STARTED")
         if WATCHDOG_STATE.exists():
             print(json.dumps(json.loads(WATCHDOG_STATE.read_text()), indent=1)[:400])
     elif args.action == "stop":
         if SUPERVISOR_PID.exists():
-            try:
-                pid = int(SUPERVISOR_PID.read_text().strip())
-            except (OSError, ValueError):
-                pid = 0
+            pid = _registered_supervisor_pid()
             if not _can_signal_supervisor(pid):
                 print(f"Supervisor not verified (pid={pid}); not signalling")
             else:
