@@ -156,6 +156,11 @@ class Executor:
                 json.dump({"command_id": command_id, "claimed_at": datetime.now(timezone.utc).isoformat()}, handle)
                 handle.flush()
                 os.fsync(handle.fileno())
+            directory_fd = os.open(str(claim_dir), os.O_RDONLY)
+            try:
+                os.fsync(directory_fd)
+            finally:
+                os.close(directory_fd)
             return True
         except FileExistsError:
             return False
