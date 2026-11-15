@@ -13,6 +13,7 @@ result instead of falling back to legacy execution.
 from __future__ import annotations
 
 from typing import Any, Dict
+from pathlib import Path
 
 from autonomous.governed_authority import authorize
 
@@ -21,12 +22,13 @@ def execute_factory_command(
     command: Dict[str, Any],
     *,
     execution_gate: bool = False,
+    approval_file=None,
 ) -> Dict[str, Any]:
     """Execute one explicitly approved Factory objective, fail closed."""
     if not isinstance(command, dict):
         return {"status": "rejected", "reason": "command must be a dict"}
 
-    decision = authorize(command, execution_gate=execution_gate)
+    decision = authorize(command, execution_gate=execution_gate, approval_file=approval_file)
     correlation_id = command.get("correlation_id") or command.get("reply_to") or decision.command_id
 
     if decision.decision != "approved":
