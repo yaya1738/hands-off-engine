@@ -186,8 +186,8 @@ class LedgerPermissionTests(unittest.TestCase):
                 review = FactoryObjectiveReview(tmp, gateway)
                 review.review(
                     goal_id, "accept_for_planning", authenticated=True, authenticated_actor_id="12345")
-                # Operator relaxes the mode manually; appends must not fight it.
-                os.chmod(review.events_path, 0o640)
+                # Operator tightens the mode manually; appends must not fight it.
+                os.chmod(review.events_path, 0o700)
                 review.review(
                     goal_id, "accept_for_planning", authenticated=True, authenticated_actor_id="12345")
-                self.assertEqual(review.events_path.stat().st_mode & 0o777, 0o640)
+                self.assertEqual(review.events_path.stat().st_mode & 0o777, 0o700)

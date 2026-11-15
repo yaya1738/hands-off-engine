@@ -112,6 +112,7 @@ class GatewayPermissionTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             gateway = FactoryAuthorityGateway(tmp)
             gateway.submit_goal("First objective", source="test", idempotency_key="k1")
-            os.chmod(gateway.queue_path, 0o640)
+            # Owner-read-only: appends must preserve whatever mode exists.
+            os.chmod(gateway.queue_path, 0o700)
             gateway.submit_goal("Second objective", source="test", idempotency_key="k2")
-            self.assertEqual(gateway.queue_path.stat().st_mode & 0o777, 0o640)
+            self.assertEqual(gateway.queue_path.stat().st_mode & 0o777, 0o700)

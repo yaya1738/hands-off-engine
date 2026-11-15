@@ -197,7 +197,8 @@ class DispatchStatePermissionTests(unittest.TestCase):
         import os
         self_improvement.BUS.parent.mkdir(parents=True, exist_ok=True)
         self_improvement.BUS.write_text("")
-        os.chmod(self_improvement.BUS, 0o644)
+        # Owner-read-only: appends must preserve whatever mode exists.
+        os.chmod(self_improvement.BUS, 0o700)
         message = {
             "msg_id": "perm-msg-2",
             "from": "factory",
@@ -206,4 +207,4 @@ class DispatchStatePermissionTests(unittest.TestCase):
             "context": {"task_id": "t-perm2", "action": "system_status", "params": {}},
         }
         self.assertTrue(self_improvement._append_bus(message))
-        self.assertEqual(self_improvement.BUS.stat().st_mode & 0o777, 0o644)
+        self.assertEqual(self_improvement.BUS.stat().st_mode & 0o777, 0o700)
