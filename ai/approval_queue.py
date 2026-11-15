@@ -229,12 +229,15 @@ class ApprovalQueue:
                     return {"success": False, "error": "edit target must be an existing regular file"}
 
                 current = file_path.read_text(encoding="utf-8")
-                if old_content in current:
-                    updated = current.replace(old_content, new_content)
-                    file_path.write_text(updated, encoding="utf-8")
-                    return {"success": True, "message": f"Edited {file_path.relative_to(self.repo_root)}"}
-                else:
-                    return {"success": False, "error": "Old content not found in file"}
+                match_count = current.count(old_content)
+                if match_count != 1:
+                    return {
+                        "success": False,
+                        "error": f"old_content must match exactly once; found {match_count} matches",
+                    }
+                updated = current.replace(old_content, new_content, 1)
+                file_path.write_text(updated, encoding="utf-8")
+                return {"success": True, "message": f"Edited {file_path.relative_to(self.repo_root)}"}
 
             elif action_type == "write_file":
                 # Write new file
