@@ -201,7 +201,10 @@ class TelegramBridge:
                 response = hub.receive("operator", "inbound_from_operator", {"text": text}, channel="telegram")
 
             # Send response back
-            reply = response.get("response", response.get("data", response.get("result", "")))
+            if isinstance(response, dict):
+                reply = response.get("response", response.get("data", response.get("result", "")))
+            else:
+                reply = response
             if isinstance(reply, dict):
                 reply = json.dumps(reply, indent=2)[:MAX_MESSAGE_LENGTH]
             elif reply:
