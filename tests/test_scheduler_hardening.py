@@ -55,15 +55,16 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertEqual(restored["jobs"]["integrity_check"]["next_run_at"], 123)
 
     def test_malformed_due_time_is_recovered_without_crashing(self):
-        state = {"jobs": {"health_check": {"next_run_at": "not-a-time"}}}
-        job = state["jobs"]["health_check"]
-        try:
-            due_at = float(job.get("next_run_at", 100))
-        except (TypeError, ValueError):
-            due_at = 100 + scheduler.TASKS[0]["interval_seconds"]
-            job["next_run_at"] = due_at
+        job = {"next_run_at": "not-a-time"}
+        due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
         self.assertEqual(due_at, 400)
         self.assertEqual(job["next_run_at"], 400)
+
+    def test_numeric_string_due_time_is_normalized(self):
+        job = {"next_run_at": "123"}
+        due_at = scheduler.get_due_time(job, scheduler.TASKS[0], now=100)
+        self.assertEqual(due_at, 123)
+        self.assertEqual(job["next_run_at"], 123)
 
     def test_lock_rejects_second_scheduler_instance(self):
         first = scheduler.acquire_lock()
