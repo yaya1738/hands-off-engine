@@ -375,6 +375,7 @@ def _new_stats():
         "cooldown_until": None,
         "next_start_at": 0,
         "started_at": None,
+        "completed": False,
     }
 
 
@@ -405,6 +406,7 @@ def _restore_stats(state):
         except (TypeError, ValueError):
             st = _new_stats()
         st["last_success"] = saved.get("last_success")
+        st["completed"] = bool(saved.get("completed", False))
         stats[svc["name"]] = st
     return stats
 
@@ -422,6 +424,7 @@ def _services_snapshot(procs, stats):
             "cooldown_until": s.get("cooldown_until"),
             "next_start_at": s.get("next_start_at", 0),
             "last_success": s.get("last_success"),
+            "completed": bool(s.get("completed", False)),
         }
     return snap
 
@@ -477,11 +480,25 @@ def run(max_loops=None):
                     # Clean up dead process
                     if name in procs:
                         rc = procs[name].returncode
-                        if rc == 0:
+                        if rc == 0 and svc.get("expected_exit", False):
+                            # Explicit one-shot services are complete; do not
+                            # relaunch them on every supervisor loop.
+                            s["completed"] = True
                             s["consecutive_failures"] = 0
                             s["backoff"] = INITIAL_BACKOFF
                             s["next_start_at"] = 0
-                            _log(f"{name} exited cleanly (rc=0)")
+                            _log(f"{name} completed expected one-shot (rc=0)")
+                        elif rc == 0:
+                            # All ordinary services are daemons. A clean exit
+                            # is still unexpected and must use bounded backoff.
+                            s["consecutive_failures"] += 1
+                            s["backoff"] = _get_backoff(s["consecutive_failures"], s["backoff"])
+                            s["next_start_at"] = time.time() + s["backoff"]
+                            _log(
+                                f"{name} exited unexpectedly with rc=0, "
+                                f"consecutive_failures={s['consecutive_failures']}, "
+                                f"next_backoff={s['backoff']}s"
+                            )
                         elif rc == EXIT_ALREADY_RUNNING and _external_owner_healthy(svc, time.time()):
                             s["next_start_at"] = time.time() + ALREADY_RUNNING_RETRY
                             _log(f"{name} exit 75: healthy external owner verified; retry in {ALREADY_RUNNING_RETRY}s")
@@ -493,6 +510,10 @@ def run(max_loops=None):
                             s["next_start_at"] = time.time() + s["backoff"]
                             _log(f"{name} exited with rc={rc}, consecutive_failures={s['consecutive_failures']}, next_backoff={s['backoff']}s")
                         del procs[name]
+
+                    # A declared one-shot service remains complete after rc=0.
+                    if s.get("completed"):
+                        continue
 
                     # Apply backoff / cooldown
                     if s["consecutive_failures"] >= MAX_CONSECUTIVE:

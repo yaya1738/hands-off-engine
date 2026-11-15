@@ -8,6 +8,7 @@ on:
       - "scripts/self_improvement.py"
       - "scripts/improvement_cycle.py"
       - "scripts/supervisor.py"
+      - "scripts/telegram_bridge.py"
       - "scripts/termux_supervisor.py"
       - "scripts/github_governance_monitor.py"
       - "scripts/github_governance_cycle.py"
@@ -28,6 +29,7 @@ on:
       - "tests/test_supervisor_ownership_contract.py"
       - "tests/test_scheduler_heartbeat_contract.py"
       - "tests/test_supervisor_recovery_contract.py"
+      - "tests/test_telegram_bridge_delivery.py"
       - "tests/test_termux_supervisor_lock_ownership.py"
       - "tests/test_self_improvement_dispatch.py"
       - ".github/workflows/factory-scheduler-tests.yml"
@@ -49,6 +51,7 @@ jobs:
           python -m unittest tests/test_supervisor_ownership_contract.py -v
           python -m unittest tests/test_scheduler_heartbeat_contract.py -v
           python -m unittest tests/test_supervisor_recovery_contract.py -v
+          python -m unittest tests/test_telegram_bridge_delivery.py -v
           if [ -f tests/test_termux_supervisor_lock_ownership.py ]; then
             python -m unittest tests/test_termux_supervisor_lock_ownership.py -v
           fi

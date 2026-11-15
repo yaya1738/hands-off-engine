@@ -26,14 +26,15 @@ class FailingChild:
 
     pid = 45678
 
-    def __init__(self, clock):
+    def __init__(self, clock, exit_code=1):
         self.clock = clock
+        self.exit_code = exit_code
         self.returncode = None
         self.fail_observed_at = None
 
     def poll(self):
         if self.returncode is None:
-            self.returncode = 1
+            self.returncode = self.exit_code
             self.fail_observed_at = self.clock.now
         return self.returncode
 
@@ -89,14 +90,14 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
 
-    def _run_with(self, clock, max_loops):
+    def _run_with(self, clock, max_loops, exit_code=1):
         """Run the supervisor loop; return (popen times, children started)."""
         popen_times = []
         children = []
 
         def fake_popen(*args, **kwargs):
             popen_times.append(clock.now)
-            child = FailingChild(clock)
+            child = FailingChild(clock, exit_code=exit_code)
             children.append(child)
             return child
 
@@ -105,6 +106,29 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
              mock.patch.object(supervisor.subprocess, "Popen", side_effect=fake_popen):
             supervisor.run(max_loops=max_loops)
         return popen_times, children
+
+    def test_unexpected_clean_exit_uses_persisted_backoff(self):
+        clock = Clock(step=1.0)
+        popen_times, children = self._run_with(clock, max_loops=3, exit_code=0)
+
+        self.assertEqual(len(children), 1)
+        self.assertEqual(len(popen_times), 1, "rc=0 daemon exit must not restart immediately")
+        self.assertIn("exited unexpectedly with rc=0", self.log.read_text())
+        saved = json.loads(self.state.read_text())["services"]["factory_scheduler"]
+        self.assertEqual(saved["consecutive_failures"], 1)
+        self.assertEqual(saved["backoff"], 10)
+        self.assertGreaterEqual(saved["next_start_at"], children[0].fail_observed_at + 10)
+
+    def test_declared_one_shot_clean_exit_is_not_restarted(self):
+        self.service["expected_exit"] = True
+        clock = Clock(step=1.0)
+        popen_times, _ = self._run_with(clock, max_loops=5, exit_code=0)
+
+        self.assertEqual(len(popen_times), 1)
+        saved = json.loads(self.state.read_text())["services"]["factory_scheduler"]
+        self.assertTrue(saved["completed"])
+        self.assertEqual(saved["consecutive_failures"], 0)
+        self.assertIn("completed expected one-shot", self.log.read_text())
 
     def test_backoff_ladder_is_bounded(self):
         expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 600]

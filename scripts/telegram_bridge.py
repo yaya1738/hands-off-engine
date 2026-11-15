@@ -93,18 +93,39 @@ class TelegramBridge:
 
         # Split long messages
         chunks = [text[i:i+MAX_MESSAGE_LENGTH] for i in range(0, len(text), MAX_MESSAGE_LENGTH)]
-        results = []
-        for chunk in chunks:
+        failures = []
+        sent_chunks = 0
+        for index, chunk in enumerate(chunks, start=1):
             result = self._api_call("sendMessage", {
                 "chat_id": target_chat,
                 "text": chunk,
                 "parse_mode": "Markdown",
             })
-            results.append(result)
-            self.state["messages_sent"] = self.state.get("messages_sent", 0) + 1
+            if isinstance(result, dict) and result.get("ok") is True:
+                sent_chunks += 1
+                self.state["messages_sent"] = self.state.get("messages_sent", 0) + 1
+            else:
+                failures.append({
+                    "chunk": index,
+                    "error": (
+                        result.get("description")
+                        or result.get("error")
+                        or "Telegram API did not confirm delivery"
+                    ) if isinstance(result, dict) else "Invalid Telegram API response",
+                })
 
         save_state(self.state)
-        return {"status": "sent", "chunks": len(chunks), "chat_id": target_chat}
+        status = "sent" if not failures else ("partial_failure" if sent_chunks else "error")
+        response = {
+            "status": status,
+            "chunks": len(chunks),
+            "sent_chunks": sent_chunks,
+            "failed_chunks": len(failures),
+            "chat_id": target_chat,
+        }
+        if failures:
+            response["errors"] = failures
+        return response
 
     def send_alert(self, title, body, severity="normal"):
         """Send a formatted alert with emoji prefix."""
