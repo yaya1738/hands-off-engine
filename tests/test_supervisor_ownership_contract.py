@@ -163,6 +163,14 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
         self.assertEqual(child.returncode, -15)
         self.assertIn("factory_scheduler heartbeat stale; restarting", self.log.read_text())
 
+    def test_corrupt_registered_pid_is_reported_as_invalid(self):
+        self.pid.write_text("not-a-pid")
+        with mock.patch.object(supervisor, "SUPERVISOR_PID", self.pid):
+            self.assertIsNone(supervisor._registered_supervisor_pid())
+        self.pid.write_text("0")
+        with mock.patch.object(supervisor, "SUPERVISOR_PID", self.pid):
+            self.assertIsNone(supervisor._registered_supervisor_pid())
+
     def test_state_write_uses_atomic_replacement(self):
         supervisor._save_state({"healthy": True})
         self.assertEqual(supervisor._load_state(), {"healthy": True})
