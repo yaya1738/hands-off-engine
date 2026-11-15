@@ -43,6 +43,11 @@ TOKEN_FILE = Path.home() / ".codex" / "telegram-bridge.json"
 STATE_DIR = REPO_ROOT / "state"
 TELEGRAM_STATE = STATE_DIR / "telegram_state.json"
 MAX_MESSAGE_LENGTH = 4000
+ADMIN_USER_IDS = {
+    value.strip()
+    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+    if value.strip()
+}
 
 
 def load_config():
@@ -53,9 +58,8 @@ def load_config():
         cfg = json.loads(TOKEN_FILE.read_text())
         token = cfg.get("botToken", "")
         chat_ids = cfg.get("chatIds", [])
-        user_ids = cfg.get("userIds", [])
         if token and chat_ids:
-            return {"token": token, "chat_ids": chat_ids, "user_ids": user_ids}
+            return {"token": token, "chat_ids": chat_ids}
     except Exception:
         pass
     return None
@@ -151,22 +155,25 @@ class TelegramBridge:
         for msg in messages:
             text = msg["text"].strip()
 
-            # Outbound delivery remains available without inbound authority.
-            # Inbound commands require a private chat and explicit numeric
-            # sender allowlisting; chat IDs and usernames are not identities.
-            allowed_users = self.config.get("user_ids", []) if self.config else []
-            if (
-                msg.get("chat_type") != "private"
-                or not allowed_users
-                or str(msg.get("user_id")) not in {str(value) for value in allowed_users}
+            # Inbound commands require a private chat and the same environment-
+            # managed numeric sender allowlist used by the command listener.
+            # Outbound notifications remain available when this allowlist is absent.
+            command = text.split()[0].split("@", 1)[0].lower() if text else ""
+            is_help = command == "/help"
+            if msg.get("chat_type") != "private" or (
+                not is_help
+                and (
+                    not ADMIN_USER_IDS
+                    or str(msg.get("user_id")) not in ADMIN_USER_IDS
+                )
             ):
                 log.warning("Rejected Telegram inbound message from untrusted sender")
                 self.send("Denied: this Telegram user is not authorized.", chat_id=msg["chat_id"])
                 continue
 
             authenticated_args = {
-                "authenticated": True,
-                "authenticated_actor_id": str(msg["user_id"]),
+                "authenticated": bool(not is_help and ADMIN_USER_IDS and str(msg.get("user_id")) in ADMIN_USER_IDS),
+                "authenticated_actor_id": str(msg["user_id"]) if msg.get("user_id") is not None else None,
             }
 
             # Parse command-style messages
