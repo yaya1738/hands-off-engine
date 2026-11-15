@@ -9,6 +9,8 @@ on:
       - "scripts/improvement_cycle.py"
       - "scripts/supervisor.py"
       - "scripts/termux_supervisor.py"
+      - "scripts/github_governance_monitor.py"
+      - "tests/test_github_governance_monitor.py"
       - "scripts/improvement_applier.py"
       - "tests/test_improvement_applier_safety.py"
       - "scripts/task_worker.py"
@@ -32,3 +34,4 @@ jobs:
           python -m unittest tests/test_scheduler_hardening.py -v
           python -m unittest tests/test_self_improvement_dispatch.py -v
           python -m unittest tests/test_improvement_applier_safety.py -v
+          python -m pytest tests/test_github_governance_monitor.py -q
