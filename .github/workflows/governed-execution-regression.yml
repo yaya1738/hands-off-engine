@@ -42,7 +42,7 @@ on:
       - "tests/executor/**"
       - ".github/workflows/governed-execution-regression.yml"
   push:
-    branches: [main, "security/**"]
+    branches: [main]
 
 permissions:
   contents: read
