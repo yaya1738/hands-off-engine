@@ -174,14 +174,15 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
                             for t in popen_times[10:]))
 
     def test_backoff_ladder_is_bounded(self):
-        expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 600]
+        expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 300]
         for consecutive, want in enumerate(expected, start=1):
             got = supervisor._get_backoff(consecutive, supervisor.INITIAL_BACKOFF)
             self.assertEqual(
                 got, want,
                 f"backoff for {consecutive} failures should be {want}, got {got}",
             )
-        self.assertEqual(supervisor._get_backoff(999, 5), supervisor.COOLDOWN_DURATION)
+        self.assertEqual(supervisor._get_backoff(999, 5), supervisor.MAX_BACKOFF)
+        self.assertGreater(supervisor.COOLDOWN_DURATION, supervisor.MAX_BACKOFF)
 
     def test_restore_stats_clamps_timestamps_and_fails_safe_on_garbage(self):
         name = "factory_scheduler"
@@ -243,7 +244,7 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
         )
         ladder = [int(m) for m in re.findall(r"next_backoff=(\d+)s", log)]
         self.assertEqual(
-            ladder[:10], [10, 20, 40, 80, 160, 300, 300, 300, 300, 600],
+            ladder[:10], [10, 20, 40, 80, 160, 300, 300, 300, 300, 300],
             f"backoff ladder wrong: {ladder}",
         )
 
@@ -265,6 +266,33 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
             f"no restart after cooldown expired at {window_end}; "
             f"restarts={popen_times[10:]}",
         )
+
+    def test_declared_one_shot_completion_is_persisted_across_supervisor_restart(self):
+        self.service["expected_exit"] = True
+        clock = Clock(step=1.0)
+        popen_times, _ = self._run_clean_exit_with(clock, max_loops=4)
+
+        self.assertEqual(len(popen_times), 1)
+        saved = json.loads(self.state.read_text())["services"]["factory_scheduler"]
+        self.assertTrue(saved["completed"])
+        self.assertEqual(saved["consecutive_failures"], 0)
+        self.assertIn("completed expected one-shot", self.log.read_text())
+
+        # A second supervisor invocation restores completion and must not
+        # relaunch the one-shot after process state has been lost.
+        with mock.patch.object(supervisor, "SERVICES", [self.service]), \
+             mock.patch.object(supervisor, "time", clock), \
+             mock.patch.object(supervisor.subprocess, "Popen") as popen:
+            supervisor.run(max_loops=2)
+        popen.assert_not_called()
+
+    def test_corrupt_completed_marker_does_not_mark_one_shot_complete(self):
+        name = "factory_scheduler"
+        with mock.patch.object(supervisor, "SERVICES", [self.service]):
+            restored = supervisor._restore_stats({
+                "services": {name: {"completed": "false"}}
+            })
+        self.assertFalse(restored[name]["completed"])
 
     def test_future_heartbeat_timestamp_is_stale(self):
         with tempfile.TemporaryDirectory() as tmp:

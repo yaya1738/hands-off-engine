@@ -110,9 +110,11 @@ def _is_process_alive(pid):
 
 
 def _get_backoff(consecutive, backoff):
-    """Bounded exponential backoff with reset on success."""
-    if consecutive >= MAX_CONSECUTIVE:
-        return COOLDOWN_DURATION
+    """Return exponential restart backoff, independently capped at MAX_BACKOFF.
+
+    The longer cooldown is applied by the supervisor loop as a separate gate
+    after MAX_CONSECUTIVE failures; it must not inflate the backoff field.
+    """
     return min(INITIAL_BACKOFF * (2 ** min(consecutive, 6)), MAX_BACKOFF)
 
 
@@ -375,6 +377,7 @@ def _new_stats():
         "cooldown_until": None,
         "next_start_at": 0,
         "started_at": None,
+        "completed": False,
     }
 
 
@@ -405,6 +408,7 @@ def _restore_stats(state):
         except (TypeError, ValueError):
             st = _new_stats()
         st["last_success"] = saved.get("last_success")
+        st["completed"] = saved.get("completed") is True
         stats[svc["name"]] = st
     return stats
 
@@ -422,6 +426,7 @@ def _services_snapshot(procs, stats):
             "cooldown_until": s.get("cooldown_until"),
             "next_start_at": s.get("next_start_at", 0),
             "last_success": s.get("last_success"),
+            "completed": s.get("completed") is True,
         }
     return snap
 
@@ -477,10 +482,17 @@ def run(max_loops=None):
                     # Clean up dead process
                     if name in procs:
                         rc = procs[name].returncode
-                        if rc == 0:
-                            # Every entry in SERVICES is a long-running daemon.
-                            # A clean exit is still an unexpected termination:
-                            # apply bounded backoff rather than hot-looping it.
+                        if rc == 0 and svc.get("expected_exit", False):
+                            # Declared one-shot services complete normally and
+                            # must remain complete across supervisor restarts.
+                            s["completed"] = True
+                            s["consecutive_failures"] = 0
+                            s["backoff"] = INITIAL_BACKOFF
+                            s["next_start_at"] = 0
+                            _log(f"{name} completed expected one-shot (rc=0)")
+                        elif rc == 0:
+                            # Ordinary SERVICES entries are long-running daemons.
+                            # A clean exit is unexpected and receives bounded backoff.
                             s["consecutive_failures"] += 1
                             s["backoff"] = _get_backoff(s["consecutive_failures"], s["backoff"])
                             s["next_start_at"] = time.time() + s["backoff"]
@@ -500,6 +512,10 @@ def run(max_loops=None):
                             s["next_start_at"] = time.time() + s["backoff"]
                             _log(f"{name} exited with rc={rc}, consecutive_failures={s['consecutive_failures']}, next_backoff={s['backoff']}s")
                         del procs[name]
+
+                    # Do not relaunch a declared one-shot after successful completion.
+                    if s.get("completed") is True:
+                        continue
 
                     # Apply backoff / cooldown
                     if s["consecutive_failures"] >= MAX_CONSECUTIVE:
