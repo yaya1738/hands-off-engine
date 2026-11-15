@@ -7,6 +7,26 @@ from scripts.system_listener_inline import process_command
 from scripts.control_api import SystemControl
 from scripts.executor import Executor
 from scripts.comm_hub import CommHub
+from scripts.command_approval import command_fingerprint
+from datetime import datetime, timezone
+
+
+
+def _seed_executor_approvals(tmp, commands):
+    approved = []
+    prepared = []
+    for command in commands:
+        command = dict(command)
+        command.setdefault("queued_at", datetime.now(timezone.utc).isoformat())
+        command["approval_status"] = "approved"
+        fingerprint = command_fingerprint(command)
+        command["approval_fingerprint"] = fingerprint
+        approved.append({"id": command["id"], "approved_at": datetime.now(timezone.utc).isoformat(), "fingerprint": fingerprint})
+        prepared.append(command)
+    (tmp / "state" / "approval_queue.json").write_text(
+        json.dumps({"pending": [], "approved": approved, "rejected": []}), encoding="utf-8"
+    )
+    return prepared
 
 
 def _make_workspace():
@@ -114,15 +134,19 @@ def test_dryrun_needs_no_approval():
         shutil.rmtree(tmp)
 
 
-def test_reject_sacred_file():
-    ex = Executor()
-    result = ex.execute_command({
+def test_reject_sacred_file(tmp_path, monkeypatch):
+    (tmp_path / "state").mkdir()
+    import scripts.executor as exec_mod
+    monkeypatch.setattr(exec_mod, "EXECUTION_LOG", tmp_path / "state" / "execution_log.jsonl")
+    monkeypatch.setattr(exec_mod, "RATE_LIMIT_FILE", tmp_path / "state" / "rate_limit_state.json")
+    command = {
         "id": "sacred-1", "action": "execute", "mode": "LIVE",
-        "approval_status": "approved",
-        "queued_at": __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat(),
         "payload": {"action": "modify_file", "params": {"path": ".env.polymarket"}},
         "target": "executor",
-    })
+    }
+    command = _seed_executor_approvals(tmp_path, [command])[0]
+    ex = Executor(repo_root=tmp_path)
+    result = ex.execute_command(command)
     assert result.status == "rejected"
     assert "sacred" in result.error.lower()
 
@@ -135,18 +159,17 @@ def test_rate_limit():
     orig_exec = ex_mod.EXECUTION_LOG
     ex_mod.RATE_LIMIT_FILE = tmp / "state" / "rate_limit_state.json"
     ex_mod.EXECUTION_LOG = tmp / "state" / "execution_log.jsonl"
-    ex = Executor()
-    now = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
-    base = {"mode": "LIVE", "approval_status": "approved", "queued_at": now,
-            "payload": {"action": "trade", "params": {"market": "BTC"}}, "target": "executor"}
+    base = {"mode": "LIVE", "payload": {"action": "trade", "params": {"market": "BTC"}}, "target": "executor", "action": "execute"}
+    commands = _seed_executor_approvals(tmp, [dict(base, id=f"rate-{i}") for i in range(11)])
+    ex = Executor(repo_root=tmp)
 
-    # Execute 10 commands (the limit)
+    # Execute 10 uniquely approved commands (the limit)
     for i in range(10):
-        r = ex.execute_command(dict(base, id=f"rate-{i}"))
-        assert r.status == "executed", f"Command {i} should succeed"
+        r = ex.execute_command(commands[i])
+        assert r.status == "executed", f"Command {i} should succeed: {r.error}"
 
     # 11th should be rate limited
-    r11 = ex.execute_command(dict(base, id="rate-11"))
+    r11 = ex.execute_command(commands[10])
     assert r11.status == "rate_limited"
 
     # Cleanup

@@ -126,8 +126,15 @@ def test_control_api_approve_reject_flow():
         sc.results_file = sc.state_dir / "results.jsonl"
         sc.approval_file = sc.state_dir / "approval_queue.json"
 
-        # Seed a pending approval entry directly
-        q = {"pending": [{"id": "test-cmd-1", "action": "execute", "mode": "LIVE"}], "approved": [], "rejected": []}
+        # Seed one queued LIVE command and its matching approval request.
+        queued_at = __import__("datetime").datetime.now(__import__("datetime").timezone.utc).isoformat()
+        command = {"id": "test-cmd-1", "source": "test", "action": "execute",
+                   "target": "executor", "payload": {"action": "trade", "params": {}},
+                   "mode": "LIVE", "timestamp": queued_at, "status": "pending"}
+        sc.queue_file.write_text(json.dumps(command) + "\n")
+        q = {"pending": [{"id": "test-cmd-1", "action": "execute", "target": "executor",
+                          "payload": command["payload"], "mode": "LIVE", "queued_at": queued_at}],
+             "approved": [], "rejected": []}
         sc.approval_file.write_text(json.dumps(q, indent=2) + "\n")
 
         # Approve
