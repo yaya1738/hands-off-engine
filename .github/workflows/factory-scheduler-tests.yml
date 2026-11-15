@@ -2,7 +2,7 @@ name: Factory scheduler contract tests
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, factory/scheduler-single-owner-hardening-20261115]
     paths:
       - "scripts/scheduler.py"
       - "scripts/self_improvement.py"
