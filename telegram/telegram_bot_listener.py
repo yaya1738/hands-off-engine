@@ -27,7 +27,8 @@ from telegram_command_bot import TelegramCommandBot
 
 # Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional - restrict to specific user
+ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+ALLOWED_USER_ID = os.getenv("TELEGRAM_USER_ID")
 POLL_INTERVAL = 2  # seconds
 LOG_FILE = "/var/log/telegram-bot.log"
 
@@ -110,13 +111,23 @@ class SimpleTelegramBot:
             if not message:
                 return
 
-            chat_id = message.get("chat", {}).get("id")
+            chat = message.get("chat", {})
+            chat_id = chat.get("id")
             text = message.get("text", "")
-            username = message.get("from", {}).get("username", "unknown")
+            sender = message.get("from", {})
+            sender_id = sender.get("id")
+            username = sender.get("username", "unknown")
 
-            # Check if chat is allowed (if ALLOWED_CHAT_ID is set)
-            if ALLOWED_CHAT_ID and str(chat_id) != ALLOWED_CHAT_ID:
-                logger.warning(f"Ignoring message from unauthorized chat: {chat_id}")
+            # Both a private chat and a distinct user identity must be
+            # configured. Never treat a group chat ID or username as identity.
+            if not ALLOWED_CHAT_ID or not ALLOWED_USER_ID:
+                logger.error("Telegram command denied: TELEGRAM_CHAT_ID and TELEGRAM_USER_ID must both be configured")
+                return
+            if chat.get("type") != "private":
+                logger.warning("Ignoring Telegram command outside a private chat")
+                return
+            if str(chat_id) != str(ALLOWED_CHAT_ID) or str(sender_id) != str(ALLOWED_USER_ID):
+                logger.warning("Ignoring Telegram command from unauthorized chat/user")
                 return
 
             # Only process commands (start with /)
@@ -126,7 +137,7 @@ class SimpleTelegramBot:
             logger.info(f"Received command from {username} (chat {chat_id}): {text}")
 
             # Process command using command bot
-            response = self.command_bot.process_command(text)
+            response = self.command_bot.process_command(text, actor_id=sender_id)
 
             # Send response
             self.send_message(chat_id, response)
@@ -139,6 +150,9 @@ class SimpleTelegramBot:
         """Main loop - poll for updates and process commands."""
         logger.info("Telegram Bot Listener starting...")
         logger.info(f"Poll interval: {POLL_INTERVAL}s")
+
+        if not ALLOWED_CHAT_ID or not ALLOWED_USER_ID:
+            raise RuntimeError("TELEGRAM_CHAT_ID and TELEGRAM_USER_ID are required; refusing unauthenticated command service")
 
         if ALLOWED_CHAT_ID:
             logger.info(f"Restricted to chat ID: {ALLOWED_CHAT_ID}")
