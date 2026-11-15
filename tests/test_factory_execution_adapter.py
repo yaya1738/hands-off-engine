@@ -19,7 +19,8 @@ def test_factory_live_requires_explicit_executor_gate():
         {"id": "fx-2", "mode": "LIVE", "approval_status": "approved", "objective": "inspect runtime"},
         execution_gate=False,
     )
-    assert result["status"] == "awaiting_executor_gate"
+    assert result["status"] == "blocked"
+    assert result["reason"] == "authority decision does not grant execution"
 
 
 def test_factory_dryrun_never_requires_execution_gate():
@@ -35,7 +36,7 @@ def test_factory_missing_objective_fails_closed():
         {"id": "fx-4", "mode": "LIVE", "approval_status": "approved"},
         execution_gate=True,
     )
-    assert result["status"] == "rejected"
+    assert result["status"] == "blocked"
 
 
 def test_factory_live_preserves_correlation(monkeypatch):
@@ -43,10 +44,8 @@ def test_factory_live_preserves_correlation(monkeypatch):
     import sys
 
     class FakeGateway:
-        def execute_autonomous(self, objective, idempotency_key=None):
-            assert objective == "inspect runtime"
-            assert idempotency_key == "fx-5"
-            return {"decision": "accepted"}
+        def __init__(self):
+            raise AssertionError("Authority must block before gateway construction")
 
     fake_module = types.ModuleType("ai.factory.authority_gateway")
     fake_module.FactoryAuthorityGateway = FakeGateway
@@ -63,10 +62,10 @@ def test_factory_live_preserves_correlation(monkeypatch):
         execution_gate=True,
     )
 
-    assert result["status"] == "completed"
+    assert result["status"] == "blocked"
     assert result["command_id"] == "fx-5"
     assert result["correlation_id"] == "mailbox-42"
-    assert result["factory"] == {"decision": "accepted"}
+    assert result["reason"] == "authority decision does not grant execution"
 
 
 def test_system_listener_routes_approved_factory_command(monkeypatch):
@@ -132,8 +131,8 @@ def test_factory_adapter_preserves_terminal_status(monkeypatch):
     import sys
 
     class FakeGateway:
-        def execute_autonomous(self, objective, idempotency_key=None):
-            return {"status": "blocked", "execution_id": "ex-1"}
+        def __init__(self):
+            raise AssertionError("Authority must block before gateway construction")
 
     fake_module = types.ModuleType("ai.factory.authority_gateway")
     fake_module.FactoryAuthorityGateway = FakeGateway
@@ -147,7 +146,8 @@ def test_factory_adapter_preserves_terminal_status(monkeypatch):
     }, execution_gate=True)
 
     assert result["status"] == "blocked"
-    assert result["factory"]["status"] == "blocked"
+    assert result["reason"] == "authority decision does not grant execution"
+    assert "factory" not in result
 
 
 def test_factory_adapter_maps_verified_to_completed(monkeypatch):
@@ -155,8 +155,8 @@ def test_factory_adapter_maps_verified_to_completed(monkeypatch):
     import sys
 
     class FakeGateway:
-        def execute_autonomous(self, objective, idempotency_key=None):
-            return {"status": "verified", "execution_id": "ex-verified"}
+        def __init__(self):
+            raise AssertionError("Authority must block before gateway construction")
 
     fake_module = types.ModuleType("ai.factory.authority_gateway")
     fake_module.FactoryAuthorityGateway = FakeGateway
@@ -169,8 +169,8 @@ def test_factory_adapter_maps_verified_to_completed(monkeypatch):
         "objective": "inspect runtime",
     }, execution_gate=True)
 
-    assert result["status"] == "completed"
-    assert result["factory"]["status"] == "verified"
+    assert result["status"] == "blocked"
+    assert result["reason"] == "authority decision does not grant execution"
 
 
 def test_factory_adapter_rejects_action_as_objective(monkeypatch):
