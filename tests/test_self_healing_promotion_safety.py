@@ -91,11 +91,39 @@ class SelfHealingPromotionSafetyTests(unittest.TestCase):
         with mock.patch.object(sha.subprocess, "run") as run:
             result = self.agent.attempt_fix(issue)
             run.assert_not_called()
-        self.assertTrue(result.startswith("Proposed for human review"))
+        self.assertIsNone(result)  # A proposal must not be counted as a completed fix.
         proposals = self.agent.state["pending_review_proposals"]
         self.assertEqual(len(proposals), 1)
         self.assertEqual(proposals[0]["kind"], "mark_ready_review")
         self.assertIn("human", proposals[0]["recommended_action"])
+
+
+    def test_check_cycle_records_proposal_without_counting_a_fix(self):
+        issue = self._unmerged_issue()
+        check_methods = (
+            "check_git_locks", "check_cron_job", "check_stale_data",
+            "check_execution_plan_freshness", "check_disk_space",
+            "check_log_rotation", "check_stale_processes",
+            "check_file_permissions", "check_trading_health",
+            "check_instruction_consistency", "check_orphaned_docs",
+            "check_development_standards", "check_meta_metrics",
+            "check_json_validity", "check_atomic_writes",
+        )
+        patches = [
+            mock.patch.object(self.agent, name, return_value=[])
+            for name in check_methods
+        ]
+        patches.append(mock.patch.object(self.agent, "check_unmerged_branches", return_value=[issue]))
+        for patcher in patches:
+            patcher.start()
+            self.addCleanup(patcher.stop)
+
+        issues, fixes = self.agent.check_and_heal()
+
+        self.assertEqual(issues, 1)
+        self.assertEqual(fixes, 0)
+        self.assertEqual(self.agent.fixes_applied, 0)
+        self.assertEqual(len(self.agent.state["pending_review_proposals"]), 1)
 
     def test_repeated_cycles_do_not_duplicate_proposals(self):
         issue = self._unmerged_issue()

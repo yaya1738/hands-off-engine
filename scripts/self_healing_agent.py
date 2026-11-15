@@ -1109,7 +1109,9 @@ class SelfHealingAgent:
         if not any(p.get("description") == description for p in proposals):
             proposals.append(proposal)
         logger.info("Proposed for human review (no action taken): %s", description)
-        return f"Proposed for human review: {description}"
+        # A proposal is not a repair. Returning a truthy value here would
+        # make check_and_heal() increment fixes_applied/total_fixes.
+        return None
 
 
     def send_telegram_alert(self, issue: Dict):
