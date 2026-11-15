@@ -514,13 +514,16 @@ class TermuxSupervisor:
                 except OSError as exc:
                     log.warning("Unable to kill remaining process group for %s: %s", name, exc)
             else:
-                # No safe PGID identity is available. Reap/stop only the exact
-                # Popen leader; never risk signalling a recycled process group.
-                try:
-                    if process.poll() is None:
-                        process.terminate()
-                except ProcessLookupError:
-                    pass
+                # ChildProcessError means another waiter may already have reaped
+                # the leader. Its numeric PID may have been reused, so do not
+                # call poll/terminate/kill or signal its former process group.
+                # Only wait for Popen bookkeeping and perform best-effort reader
+                # cleanup; descendants may remain if their identity was lost.
+                log.error(
+                    "%s leader was already reaped or could not be safely pinned; "
+                    "skipping all PID/PGID signals",
+                    name,
+                )
 
             if daemon.output_thread is not None:
                 daemon.output_thread.join(timeout=1.0)
@@ -529,18 +532,22 @@ class TermuxSupervisor:
                 else:
                     daemon.output_thread = None
 
-            try:
-                process.wait(timeout=1.0)
-            except subprocess.TimeoutExpired:
-                log.error("%s leader survived shutdown; killing exact process", name)
-                try:
-                    process.kill()
-                except ProcessLookupError:
-                    pass
+            if pgid_pinned:
                 try:
                     process.wait(timeout=1.0)
                 except subprocess.TimeoutExpired:
+                    # The leader was deliberately kept waitable while its PGID
+                    # was pinned. If it still has not exited, the exact process
+                    # group was already SIGKILLed above; do not add PID signalling
+                    # after the bounded cleanup attempt.
                     log.error("%s leader could not be reaped during shutdown", name)
+            else:
+                # The child was externally reaped or process identity is unknown.
+                # Popen.wait() handles ChildProcessError without signalling.
+                try:
+                    process.wait(timeout=0)
+                except (subprocess.TimeoutExpired, ChildProcessError, OSError) as exc:
+                    log.warning("%s exit status unavailable after external reap: %s", name, exc)
             daemon.process = None
             daemon.start_time = None
 
