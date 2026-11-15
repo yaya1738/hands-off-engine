@@ -40,6 +40,7 @@ from ai.approval_queue import ApprovalQueue
 # Telegram config (from environment or config file)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+TELEGRAM_USER_ID = os.getenv("TELEGRAM_USER_ID")
 
 
 class TelegramCommandBot:
@@ -68,11 +69,18 @@ class TelegramCommandBot:
             '/fixssh': self.cmd_fixssh,
         }
 
-    def process_command(self, command_text: str) -> str:
+    def process_command(self, command_text: str, actor_id=None) -> str:
         """Process incoming command and return response text."""
         parts = command_text.strip().split()
         cmd = parts[0].lower()
         args = parts[1:] if len(parts) > 1 else []
+
+        # Privileged approval actions require a separately configured Telegram
+        # user identity. A chat ID, username, command text, or local caller
+        # cannot substitute for the authenticated sender ID.
+        if cmd in ("/approve", "/reject"):
+            if not TELEGRAM_USER_ID or actor_id is None or str(actor_id) != str(TELEGRAM_USER_ID):
+                return "Denied: authenticated Telegram user is not authorized for approvals."
 
         if cmd in self.commands:
             try:
@@ -266,24 +274,14 @@ Risk: {change['risk_level']}
         if change["status"] != "pending":
             return f"❌ Change {change_id} is already {change['status']}"
 
-        # Approve it
+        # Approval records are not execution authorization. The legacy
+        # queue executor is intentionally disabled; record the approval only.
         if queue.approve(change_id):
-            # Execute the change
-            result = queue.execute_approved(change_id)
-
-            if result["success"]:
-                return f"""✅ Approved and executed: {change_id}
-
-**{change['title']}**
-
-{result.get('message', 'Change applied successfully')}"""
-            else:
-                return f"""✅ Approved: {change_id}
-❌ Execution failed: {result.get('error', 'Unknown error')}
-
-Change is marked approved but not applied. Check logs."""
-        else:
-            return f"❌ Failed to approve {change_id}"
+            return (
+                f"Approval recorded for {change_id}. "
+                "Execution remains blocked pending governed execution."
+            )
+        return f"Failed to approve {change_id}"
 
     def cmd_reject(self, args) -> str:
         """Reject a pending change."""
