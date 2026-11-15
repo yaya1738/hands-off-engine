@@ -200,11 +200,9 @@ class Node1Runtime:
             applier = None
             log.warning("improvement_applier not available")
         
-        try:
-            from scripts.self_improvement import generate_improvements, save_improvements
-        except ImportError:
-            generate_improvements = None
-            log.warning("self_improvement not available")
+        # Candidate generation and bounded bus dispatch have one owner:
+        # self_improvement.py, invoked by the periodic scheduler. Node 1 only
+        # consumes the durable candidate snapshot and owns safe application.
 
         try:
             from scripts.continuation import ContinuationEmitter
@@ -291,31 +289,31 @@ class Node1Runtime:
                     except Exception as e:
                         log.error(f"Request intake error: {e}")
 
-                # 3c. Improvement applier (every 5 minutes, tick % 30)
+                # 3c. Apply the latest durable candidates (every 5 minutes).
+                # Candidate generation/dispatch belongs exclusively to the
+                # periodic self_improvement workflow; this process owns apply.
                 if applier and tick % 30 == 0:
                     try:
-                        # Generate improvement candidates
-                        if generate_improvements:
-                            candidates = generate_improvements()
-                            save_improvements(candidates)
-                            # Apply safe ones
-                            results = applier.apply_batch(candidates)
-                            applied = sum(1 for r in results if r.get("applied"))
-                            if applied:
-                                log.info(f"Improvement applier: {applied} improvements applied")
-                                self.state.data["improvements_applied"] = (
-                                    self.state.data.get("improvements_applied", 0) + applied
-                                )
+                        candidate_file = STATE_DIR / "improvement_state.json"
+                        candidates = []
+                        if candidate_file.exists():
+                            candidate_state = json.loads(candidate_file.read_text())
+                            if isinstance(candidate_state, dict):
+                                raw_candidates = candidate_state.get("improvements", [])
+                                if isinstance(raw_candidates, list):
+                                    candidates = [
+                                        item for item in raw_candidates
+                                        if isinstance(item, dict) and item.get("id")
+                                    ]
+                        results = applier.apply_batch(candidates)
+                        applied = sum(1 for result in results if result.get("applied"))
+                        if applied:
+                            log.info(f"Improvement applier: {applied} improvements applied")
+                            self.state.data["improvements_applied"] = (
+                                self.state.data.get("improvements_applied", 0) + applied
+                            )
                     except Exception as e:
                         log.error(f"Improvement applier error: {e}")
-
-                # 3d. Feedback analysis (every 10 minutes, tick % 60)
-                if tick % 60 == 0:
-                    try:
-                        from scripts.improvement_feedback import analyze_feedback
-                        analyze_feedback()
-                    except Exception as e:
-                        log.error(f"Feedback analysis error: {e}")
 
                 # 4. Heartbeat (every 60s)
                 if time.time() - self.last_heartbeat >= 60:
