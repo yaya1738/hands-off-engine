@@ -51,6 +51,25 @@ class ProcessGroupLifecycleTests(unittest.TestCase):
         self.assertIn("normal-output", result["output"])
         self.assertFalse(result["timed_out"])
 
+    def test_normal_leader_exit_kills_orphaned_descendants(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            pid_file = Path(tmp) / "descendant.pid"
+            script = self._script(tmp, """
+import subprocess, sys
+from pathlib import Path
+child = subprocess.Popen([sys.executable, '-c', 'import time; time.sleep(60)'])
+Path(sys.argv[1]).write_text(str(child.pid))
+print('leader exits while child remains')
+""")
+            result = process_group.run_process(
+                [sys.executable, str(script), str(pid_file)], cwd=tmp,
+                timeout=3, max_output_chars=200,
+            )
+            child_pid = int(pid_file.read_text())
+        self.assertTrue(result["success"], result)
+        self.assertIn("leader exits while child remains", result["output"])
+        self.assertTrue(_wait_stopped(child_pid), f"orphan descendant {child_pid} survived normal exit")
+
     def test_timeout_kills_entire_real_process_group(self):
         with tempfile.TemporaryDirectory() as tmp:
             pid_file = Path(tmp) / "descendant.pid"

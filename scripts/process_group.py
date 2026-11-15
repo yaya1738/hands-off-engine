@@ -79,6 +79,11 @@ def run_process(command, *, cwd, timeout, max_output_chars):
                 return {"success": False, "returncode": returncode,
                         "output": detail[-max_output_chars:], "timed_out": True}
 
+            # The leader has exited but remains unreaped, so its PID still
+            # pins the original process-group identity. Remove any descendants
+            # it left behind before output capture and before releasing that ID.
+            _kill_group(process.pid)
+
             # Deliberately perform fallible output capture before wait()/reap.
             output = _read_tail(output_file, max_output_chars)
             returncode = process.wait()
