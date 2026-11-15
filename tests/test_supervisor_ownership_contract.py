@@ -1,12 +1,15 @@
 """Regression tests for supervisor lock/PID ownership boundaries."""
 import json
 import os
+import subprocess
+import sys
 import tempfile
+import time
 import unittest
 from pathlib import Path
 from unittest import mock
 
-from scripts import supervisor
+from scripts import scheduler, supervisor
 
 
 class SupervisorOwnershipContractTests(unittest.TestCase):
@@ -162,6 +165,81 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
             supervisor.run(max_loops=2)
         self.assertEqual(child.returncode, -15)
         self.assertIn("factory_scheduler heartbeat stale; restarting", self.log.read_text())
+
+    def test_supervisor_restarts_real_scheduler_after_task_deadline_expires(self):
+        heartbeat = self.state.parent / "scheduler_heartbeat.json"
+        child_script = self.state.parent / "hung_scheduler_child.py"
+        repo_root = Path(__file__).resolve().parents[1]
+        child_script.write_text(
+            "import sys, time\n"
+            "from pathlib import Path\n"
+            "sys.path.insert(0, sys.argv[2])\n"
+            "from scripts import scheduler\n"
+            "scheduler.SCHEDULER_HEARTBEAT = Path(sys.argv[1])\n"
+            "scheduler.write_heartbeat(phase='task', task='hung_task', "
+            "task_deadline=time.time() + 1)\n"
+            "while True: time.sleep(1)\n"
+        )
+
+        class Clock:
+            def __init__(self):
+                self.now = time.time()
+
+            def time(self):
+                return self.now
+
+            def monotonic(self):
+                return self.now
+
+            def sleep(self, seconds):
+                # Simulate the watchdog poll interval elapsing beyond the
+                # scheduler's published task deadline without slowing the suite.
+                self.now += 60.0
+
+        real_popen = subprocess.Popen
+        launched = {}
+
+        def launch_child(command, **kwargs):
+            child = real_popen(command, **kwargs)
+            launched["child"] = child
+            deadline = time.monotonic() + 5.0
+            while time.monotonic() < deadline and not heartbeat.exists():
+                if child.poll() is not None:
+                    break
+                time.sleep(0.01)
+            if not heartbeat.exists():
+                child.terminate()
+                child.wait(timeout=3)
+                raise AssertionError("scheduler child did not publish its heartbeat")
+            return child
+
+        service = {
+            "name": "factory_scheduler",
+            "cmd": [sys.executable, str(child_script), str(heartbeat), str(repo_root)],
+            "cwd": str(repo_root),
+            "log": self.log,
+            "heartbeat": heartbeat,
+            "singleton_lock": self.lock,
+        }
+
+        try:
+            with mock.patch.object(supervisor, "SERVICES", [service]), \
+                 mock.patch.object(supervisor, "time", Clock()), \
+                 mock.patch.object(supervisor.subprocess, "Popen", side_effect=launch_child):
+                supervisor.run(max_loops=2)
+        finally:
+            child = launched.get("child")
+            if child is not None and child.poll() is None:
+                child.terminate()
+                child.wait(timeout=3)
+
+        child = launched["child"]
+        self.assertIsNotNone(child.poll(), "watchdog left the hung scheduler alive")
+        self.assertEqual(child.returncode, -15)
+        self.assertIn("factory_scheduler heartbeat hung; restarting", self.log.read_text())
+        payload = json.loads(heartbeat.read_text())
+        self.assertEqual(payload["phase"], "task")
+        self.assertEqual(payload["task"], "hung_task")
 
     def test_corrupt_registered_pid_is_reported_as_invalid(self):
         self.pid.write_text("not-a-pid")
