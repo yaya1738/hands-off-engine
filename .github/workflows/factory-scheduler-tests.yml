@@ -18,6 +18,8 @@ on:
       - "scripts/improvement_applier.py"
       - "tests/test_improvement_applier_safety.py"
       - "scripts/task_worker.py"
+      - "scripts/factory_execution_adapter.py"
+      - "tests/test_factory_execution_adapter.py"
       - "tests/test_scheduler_hardening.py"
       - "tests/test_self_improvement_dispatch.py"
       - ".github/workflows/factory-scheduler-tests.yml"
@@ -41,3 +43,4 @@ jobs:
           python -m unittest tests/test_github_governance_monitor.py -v
           python -m unittest tests/test_factory_authority_gateway.py -v
           python -m unittest tests/test_github_governance_cycle.py -v
+          python -m unittest tests/test_factory_execution_adapter.py -v
