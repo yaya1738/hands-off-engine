@@ -2,6 +2,8 @@ import json, uuid, time
 from pathlib import Path
 from datetime import datetime, timezone
 
+from scripts.command_approval import command_fingerprint
+
 
 class SystemControl:
     def __init__(self, repo_root=None):
@@ -101,20 +103,39 @@ class SystemControl:
         if not found:
             return {"status": "not_found", "error": f"No pending approval for {command_id}"}
 
-        # Grab queued_at from approval entry before removing it
-        queued_at = None
-        for p in q.get("pending", []):
-            if p.get("id") == command_id:
-                queued_at = p.get("queued_at")
-                break
-
-        entry = {"id": command_id, "approved_at": datetime.now(timezone.utc).isoformat()}
+        # Bind the approval to exactly one queued command snapshot.
+        matches = []
+        if self.queue_file.exists():
+            for line in self.queue_file.read_text().splitlines():
+                if not line.strip():
+                    continue
+                try:
+                    command = json.loads(line)
+                except json.JSONDecodeError:
+                    continue
+                if command.get("id") == command_id:
+                    matches.append(command)
+        if len(matches) != 1:
+            return {"status": "error", "error": "Approval requires exactly one matching queued command"}
+        command = matches[0]
+        for field in ("action", "target", "payload", "mode"):
+            if field in found and found.get(field) != command.get(field):
+                return {"status": "error", "error": f"Pending approval does not match queued command ({field})"}
+        queued_at = found.get("queued_at")
+        if not queued_at:
+            return {"status": "error", "error": "Pending approval is missing queued_at"}
+        command["queued_at"] = queued_at
+        fingerprint = command_fingerprint(command)
+        approved_at = datetime.now(timezone.utc).isoformat()
+        entry = {"id": command_id, "approved_at": approved_at, "fingerprint": fingerprint}
         q["approved"].append(entry)
         q["pending"] = [p for p in q["pending"] if p.get("id") != command_id]
         self._save_approval_queue(q)
 
-        # Also stamp approval_status and queued_at on the original queued command
-        self._stamp_command_approval(command_id, "approved", queued_at=queued_at)
+        # The command and independent approval record must both carry the digest.
+        self._stamp_command_approval(
+            command_id, "approved", queued_at=queued_at, fingerprint=fingerprint
+        )
         return {"status": "approved", "id": command_id}
 
     def reject(self, command_id):
@@ -136,7 +157,7 @@ class SystemControl:
         self._stamp_command_approval(command_id, "rejected")
         return {"status": "rejected", "id": command_id}
 
-    def _stamp_command_approval(self, command_id, approval_status, queued_at=None):
+    def _stamp_command_approval(self, command_id, approval_status, queued_at=None, fingerprint=None):
         """Stamp approval_status onto the original command in the queue.
 
         On approval, resets queue status to 'pending' and carries queued_at
@@ -152,6 +173,10 @@ class SystemControl:
                         d = json.loads(line)
                         if d.get("id") == command_id:
                             d["approval_status"] = approval_status
+                            if approval_status == "approved" and fingerprint:
+                                d["approval_fingerprint"] = fingerprint
+                            if approval_status != "approved":
+                                d.pop("approval_fingerprint", None)
                             if approval_status == "approved":
                                 d["status"] = "pending"
                                 if queued_at:
