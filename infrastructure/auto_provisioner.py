@@ -963,12 +963,14 @@ def get_auto_provisioner(
     *,
     allow_paid_actions: bool = False,
     auto_execute_enabled: bool = False,
+    budget: Optional[InfrastructureBudget] = None,
 ) -> AutoProvisioner:
     """Get a fail-closed provisioner; paid actions require explicit opt-in."""
     return AutoProvisioner(
         dry_run=dry_run,
         allow_paid_actions=allow_paid_actions,
         auto_execute_enabled=auto_execute_enabled,
+        budget=budget,
     )
 
 
@@ -979,6 +981,7 @@ if __name__ == "__main__":
     parser.add_argument("--dry-run", action="store_true", help="Don't actually provision")
     parser.add_argument("--live", action="store_true", help="Explicitly authorize paid infrastructure actions")
     parser.add_argument("--enable-auto-execution", action="store_true", help="Also auto-execute eligible paid decisions")
+    parser.add_argument("--budget", type=float, default=0.0, help="Explicit monthly spend cap in USD")
     parser.add_argument("--status", action="store_true", help="Show infrastructure status")
     parser.add_argument("--analyze", action="store_true", help="Analyze and make decisions")
     parser.add_argument("--provision", metavar="SIZE", help="Provision new server")
@@ -989,6 +992,7 @@ if __name__ == "__main__":
         dry_run=not args.live or args.dry_run,
         allow_paid_actions=args.live,
         auto_execute_enabled=args.live and args.enable_auto_execution,
+        budget=InfrastructureBudget(monthly_limit=max(0.0, args.budget)),
     )
 
     if args.status:
