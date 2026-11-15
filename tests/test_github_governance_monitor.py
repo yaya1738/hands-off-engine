@@ -35,6 +35,10 @@ def test_monitor_persists_findings_and_deduplicates_bus_report(tmp_path):
             return {"check_runs": []}
         if "/check-runs" in path and "b" * 40 in path:
             return {"check_runs": [{"status": "completed", "conclusion": "failure"}]}
+        if "/pulls/1/reviews" in path:
+            return [{"user": {"login": "reviewer"}, "state": "APPROVED"}]
+        if "/pulls/2/reviews" in path:
+            return [{"user": {"login": "reviewer"}, "state": "CHANGES_REQUESTED"}]
         if "/issues/374/comments" in path:
             return [{"id": 99, "body": "secret text must not be copied"}]
         raise AssertionError(path)
@@ -46,11 +50,12 @@ def test_monitor_persists_findings_and_deduplicates_bus_report(tmp_path):
     second_lines = bus.read_text().splitlines()
 
     categories = {item["category"] for item in first["findings"]}
-    assert {"ci_missing", "ci_failed", "stale_pr", "merge_blocked"} <= categories
+    assert {"ci_missing", "ci_failed", "stale_pr", "merge_blocked", "review_changes_requested"} <= categories
     assert first["draft_pr_count"] == 1
     assert first["new_coordination_comments"] == 1
     assert len(first_lines) == 1
     assert len(second_lines) == 1
+    assert first["signature"] == second["signature"]
     assert "secret text" not in json.dumps(first)
 
 
@@ -72,6 +77,8 @@ def test_monitor_reports_missing_runtime_evidence_as_unknown(tmp_path):
 
     def fetch(path):
         if "/pulls?" in path:
+            return []
+        if "/pulls/" in path and path.endswith("/reviews"):
             return []
         if "/issues/374/comments" in path:
             return []
