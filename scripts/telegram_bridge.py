@@ -53,8 +53,9 @@ def load_config():
         cfg = json.loads(TOKEN_FILE.read_text())
         token = cfg.get("botToken", "")
         chat_ids = cfg.get("chatIds", [])
+        user_ids = cfg.get("userIds", [])
         if token and chat_ids:
-            return {"token": token, "chat_ids": chat_ids}
+            return {"token": token, "chat_ids": chat_ids, "user_ids": user_ids}
     except Exception:
         pass
     return None
@@ -131,6 +132,7 @@ class TelegramBridge:
                 messages.append({
                     "update_id": update["update_id"],
                     "chat_id": msg["chat"]["id"],
+                    "chat_type": msg.get("chat", {}).get("type"),
                     "user_id": msg.get("from", {}).get("id"),
                     "username": msg.get("from", {}).get("username", ""),
                     "text": msg["text"],
@@ -149,10 +151,28 @@ class TelegramBridge:
         for msg in messages:
             text = msg["text"].strip()
 
+            # Outbound delivery remains available without inbound authority.
+            # Inbound commands require a private chat and explicit numeric
+            # sender allowlisting; chat IDs and usernames are not identities.
+            allowed_users = self.config.get("user_ids", []) if self.config else []
+            if (
+                msg.get("chat_type") != "private"
+                or not allowed_users
+                or str(msg.get("user_id")) not in {str(value) for value in allowed_users}
+            ):
+                log.warning("Rejected Telegram inbound message from untrusted sender")
+                self.send("Denied: this Telegram user is not authorized.", chat_id=msg["chat_id"])
+                continue
+
+            authenticated_args = {
+                "authenticated": True,
+                "authenticated_actor_id": str(msg["user_id"]),
+            }
+
             # Parse command-style messages
             if text.startswith("/approve "):
                 cmd_id = text.split(" ", 1)[1].strip()
-                response = hub.receive("operator", "approve", {"command_id": cmd_id}, channel="telegram")
+                response = hub.receive("operator", "approve", {"command_id": cmd_id}, channel="telegram", **authenticated_args)
             elif text.startswith("/reject "):
                 cmd_id = text.split(" ", 1)[1].strip()
                 response = hub.receive("operator", "reject", {"command_id": cmd_id}, channel="telegram")
