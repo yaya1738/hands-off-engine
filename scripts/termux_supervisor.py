@@ -90,8 +90,14 @@ class SupervisorLock:
         self.fd = None
         self.owner_pid = None
 
-    def _clear_owned_records(self):
-        """Clear records only when they still identify this lock owner."""
+    def _clear_owned_records(self, *, allow_partial_lock_record: bool = False):
+        """Clear our owner markers while flock is held.
+
+        A failed owner-PID publication may leave a prefix after a short write.
+        The caller may clear that prefix only on the acquisition failure path,
+        where this process truncated the file immediately before writing it.
+        Normal release remains exact-match-only.
+        """
         if self.owner_pid is None or self.fd is None:
             return
 
@@ -106,7 +112,11 @@ class SupervisorLock:
         try:
             os.lseek(self.fd, 0, os.SEEK_SET)
             recorded = os.read(self.fd, 128).decode("ascii", errors="strict").strip()
-            if recorded == owner:
+            is_our_record = recorded == owner
+            is_our_partial_record = (
+                allow_partial_lock_record and owner.startswith(recorded)
+            )
+            if is_our_record or is_our_partial_record:
                 os.ftruncate(self.fd, 0)
                 os.fsync(self.fd)
         except (OSError, UnicodeError):
@@ -147,7 +157,7 @@ class SupervisorLock:
             self.pid_path.write_text(str(self.owner_pid), encoding="utf-8")
             return True
         except (OSError, UnicodeError):
-            self._clear_owned_records()
+            self._clear_owned_records(allow_partial_lock_record=True)
             try:
                 fcntl.flock(fd, fcntl.LOCK_UN)
             finally:
