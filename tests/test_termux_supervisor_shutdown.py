@@ -303,7 +303,7 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
         process = mock.Mock(pid=34567)
         daemon = mock.Mock()
         daemon.process = process
-        daemon.timeout = 0
+        daemon.timeout = 0.1
         daemon.start_time = time.time() - 1
         daemon.state = {"total_restarts": 0}
         daemon.poll.return_value = None
