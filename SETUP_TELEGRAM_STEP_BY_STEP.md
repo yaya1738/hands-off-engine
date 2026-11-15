@@ -36,7 +36,7 @@
 4. **Click "START"** at the bottom
 5. **Type and send any message:** `hi`
 6. **Bot replies with your info, including "Id:"**
-   - Looks like: `Id: 123456789` (just numbers)
+   - Looks like: `Id: YOUR_CHAT_ID` (just numbers)
 7. **COPY the number** (the ID number)
 8. **Paste it somewhere safe** (next to your bot token)
 
@@ -76,7 +76,7 @@ echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 
 **Real example (YOUR ID WILL BE DIFFERENT):**
 ```bash
-echo 'export TELEGRAM_CHAT_ID="123456789"' >> ~/.bashrc
+echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 ```
 
 ### Step 2.4: Load the Settings
