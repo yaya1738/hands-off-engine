@@ -251,10 +251,58 @@ def run_forever():
                 due_at = get_due_time(job, task, now)
                 # Persist newly initialized or repaired deadlines. Comparing
                 # only the post-repair value to due_at misses both cases.
-                if previous_due != job.get("next_run_at"):
-                    save_state(state)
+                if previous_due != job.get("next_run_at"):                    save_state(state)
                 if now < due_at:
                     continue
 
                 # Persist the next due time before launch (at-most-once per
                 # interval across crashes; a failed job is not tight-looped).
+                job["last_started_at"] = now
+                job["next_run_at"] = now + task["interval_seconds"]
+                save_state(state)
+
+                result = run_task(task)
+                job["last_result"] = result
+                save_state(state)
+                append_log(result)
+                if task["name"] in ("health_check", "integrity_check") and not result["success"]:
+                    try:
+                        from scripts.telegram_bridge import send_message
+                        label = "health monitor" if task["name"] == "health_check" else "state integrity check"
+                        send_message(f"⚠️ Scheduled {label} failed")
+                    except Exception:
+                        pass
+                status = "OK" if result["success"] else "FAIL"
+                print(f"[{result['timestamp'][:19]}] {status} {task['name']}")
+
+            if _RUNNING:
+                time.sleep(POLL_SECONDS)
+        return True
+    finally:
+        for sig, handler in previous_handlers.items():
+            signal.signal(sig, handler)
+        release_lock(lock)
+
+
+def run_once():
+    """Run each configured job once for explicit diagnostics."""
+    lock = acquire_lock()
+    if lock is None:
+        print("Scheduler already running; refusing duplicate instance")
+        return False
+    try:
+        for task in TASKS:
+            result = run_task(task)
+            append_log(result)
+            status = "OK" if result["success"] else "FAIL"
+            print(f"{status} {task['name']}: {result['output'][:100]}")
+        return True
+    finally:
+        release_lock(lock)
+
+
+if __name__ == "__main__":
+    if "--once" in sys.argv:
+        run_once()
+    else:
+        run_forever()
