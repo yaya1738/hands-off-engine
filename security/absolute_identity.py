@@ -23,46 +23,9 @@ from datetime import datetime
 from typing import Optional
 
 PROFILE_PATH = Path("/root/hands-off-engine/security/yair_identity_profile.json")
-HUMAN_IDENTITY_PATH = Path("/root/hands-off-engine/security/yair_human_identity.json")
 VERIFICATION_LOG = Path("/root/hands-off-engine/security/verification_audit.jsonl")
 
-# PERMANENT HUMAN CONSTANTS - YAIR SIEGEL
-# These cannot change for lifetime - hardcoded for maximum security
-HUMAN_CONSTANTS = {
-    "birth": {
-        "date": "2001-05-20",
-        "city": "New York City",
-        "state": "NY",
-        "day_of_week": "Sunday",
-        "zodiac": "Taurus",
-        "chinese_zodiac": "Snake",
-        "unix_timestamp": 990331200
-    },
-    "biology": {
-        "height_cm": 193,
-        "eye_color": "hazel",
-        "handedness": "ambidextrous",
-        "sex": "male"
-    },
-    "family": {
-        "father": "David",
-        "mother": "Lara",
-        "mother_maiden": "Kaplan",
-        "siblings": 2
-    },
-    "history": {
-        "childhood_city": "White Plains",
-        "first_school": "WDS",
-        "first_pet": None,  # Never had one
-        "first_job": "cleaner"
-    },
-    "rarity": {
-        "height_percentile": 97,
-        "ambidextrous_percent": 1,
-        "hazel_eyes_percent": 5,
-        "combined_probability": 0.0005  # 0.05% of population
-    }
-}
+# Human identity facts are never embedded in source control.
 
 class AbsoluteIdentity:
     def __init__(self):
@@ -240,80 +203,11 @@ class AbsoluteIdentity:
         return score
 
     def verify_human_identity(self, answers: dict = None) -> float:
-        """Layer 6: Permanent human identity verification (challenge-response)"""
-        if not answers:
-            # No challenge provided - use existence of human constants as baseline
-            self.signals.append("HUMAN:identity_record_exists")
-            return 0.05  # Small bonus for having the record
+        """Disabled until a private, cryptographic challenge-response is implemented.
 
-        score = 0.0
-        correct = 0
-        total = 0
-
-        # Birth verification
-        if "birth_year" in answers:
-            total += 1
-            if str(answers["birth_year"]) == "2001":
-                correct += 1
-        if "birth_city" in answers:
-            total += 1
-            if answers["birth_city"].lower() in ["nyc", "new york", "new york city"]:
-                correct += 1
-
-        # Family verification
-        if "father_name" in answers:
-            total += 1
-            if answers["father_name"].lower() == "david":
-                correct += 1
-        if "mother_name" in answers:
-            total += 1
-            if answers["mother_name"].lower() == "lara":
-                correct += 1
-        if "mother_maiden" in answers:
-            total += 1
-            if answers["mother_maiden"].lower() == "kaplan":
-                correct += 1
-
-        # History verification
-        if "childhood_city" in answers:
-            total += 1
-            if answers["childhood_city"].lower() == "white plains":
-                correct += 1
-        if "first_school" in answers:
-            total += 1
-            if answers["first_school"].lower() == "wds":
-                correct += 1
-        if "first_pet" in answers:
-            total += 1
-            if answers["first_pet"].lower() in ["none", "never", "no pet", "didn't have one"]:
-                correct += 1
-        if "first_job" in answers:
-            total += 1
-            if answers["first_job"].lower() == "cleaner":
-                correct += 1
-
-        # Biology verification
-        if "height" in answers:
-            total += 1
-            if "6'4" in str(answers["height"]) or "193" in str(answers["height"]):
-                correct += 1
-        if "eye_color" in answers:
-            total += 1
-            if answers["eye_color"].lower() == "hazel":
-                correct += 1
-        if "handedness" in answers:
-            total += 1
-            if answers["handedness"].lower() in ["ambidextrous", "ambi", "both"]:
-                correct += 1
-
-        if total > 0:
-            accuracy = correct / total
-            score = accuracy * 0.25  # Up to 25% for human verification
-            self.signals.append(f"HUMAN:verified_{correct}_of_{total}_facts")
-            if accuracy >= 0.8:
-                self.signals.append("HUMAN:HIGH_CONFIDENCE_MATCH")
-
-        return score
+        Publicly embedded personal facts are not an authentication factor.
+        """
+        return 0.0
 
     def full_verification(self, message: str = None, knowledge_responses: dict = None, human_answers: dict = None) -> dict:
         """Run all verification layers"""
@@ -394,13 +288,8 @@ if __name__ == "__main__":
     print("SUBJECT: YAIR SIEGEL")
     print("=" * 60)
 
-    print("\n[PERMANENT HUMAN CONSTANTS]")
-    print(f"  Born: {HUMAN_CONSTANTS['birth']['date']} in {HUMAN_CONSTANTS['birth']['city']}, {HUMAN_CONSTANTS['birth']['state']}")
-    print(f"  Parents: {HUMAN_CONSTANTS['family']['father']} & {HUMAN_CONSTANTS['family']['mother']} ({HUMAN_CONSTANTS['family']['mother_maiden']})")
-    print(f"  Physical: {HUMAN_CONSTANTS['biology']['height_cm']}cm, {HUMAN_CONSTANTS['biology']['eye_color']} eyes, {HUMAN_CONSTANTS['biology']['handedness']}")
-    print(f"  History: {HUMAN_CONSTANTS['history']['childhood_city']} -> {HUMAN_CONSTANTS['history']['first_school']}")
-    print(f"  Rarity: Top {100-HUMAN_CONSTANTS['rarity']['height_percentile']}% height + {HUMAN_CONSTANTS['rarity']['hazel_eyes_percent']}% eye color + {HUMAN_CONSTANTS['rarity']['ambidextrous_percent']}% handedness")
-    print(f"  Combined probability: {HUMAN_CONSTANTS['rarity']['combined_probability']*100}% of population")
+    print("\n[HUMAN IDENTITY CHALLENGE]")
+    print("  Disabled: hard-coded personal challenge facts were removed.")
 
     print(f"\n[VERIFICATION RESULT]")
     print(f"  Identity: {result['identity']}")
