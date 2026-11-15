@@ -16,6 +16,9 @@ class FakeCloud:
         self.create_calls += 1
         return True, None, "created"
 
+    def list_servers(self):
+        return []
+
 
 def _provisioner(monkeypatch, tmp_path, **kwargs):
     api = FakeCloud()
