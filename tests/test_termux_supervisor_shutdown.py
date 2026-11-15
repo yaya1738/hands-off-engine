@@ -197,7 +197,7 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
             self.fail("redirected descendant survived natural daemon-exit cleanup")
 
     def test_already_reaped_child_is_never_signalled_by_recycled_pid(self):
-        daemon = self.start_child("pass\\n")
+        daemon = self.start_child("pass\n")
         process = daemon.process
         deadline = time.monotonic() + 2
         while time.monotonic() < deadline:
@@ -215,10 +215,10 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
         runner = supervisor.TermuxSupervisor.__new__(supervisor.TermuxSupervisor)
         runner.daemons = {"child": daemon}
 
-        with mock.patch.object(supervisor, "_observe_exit_without_reaping", return_value=(True, False)), \\
-             mock.patch.object(process, "poll", return_value=None), \\
-             mock.patch.object(process, "terminate") as terminate, \\
-             mock.patch.object(process, "kill") as kill, \\
+        with mock.patch.object(supervisor, "_observe_exit_without_reaping", return_value=(True, False)), \
+             mock.patch.object(process, "poll", return_value=None), \
+             mock.patch.object(process, "terminate") as terminate, \
+             mock.patch.object(process, "kill") as kill, \
              mock.patch.object(supervisor.os, "killpg") as killpg:
             runner._shutdown_daemons(grace=0.0)
 
