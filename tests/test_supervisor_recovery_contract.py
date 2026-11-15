@@ -149,14 +149,15 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
         popen.assert_not_called()
 
     def test_backoff_ladder_is_bounded(self):
-        expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 600]
+        expected = [10, 20, 40, 80, 160, 300, 300, 300, 300, 300]
         for consecutive, want in enumerate(expected, start=1):
             got = supervisor._get_backoff(consecutive, supervisor.INITIAL_BACKOFF)
             self.assertEqual(
                 got, want,
                 f"backoff for {consecutive} failures should be {want}, got {got}",
             )
-        self.assertEqual(supervisor._get_backoff(999, 5), supervisor.COOLDOWN_DURATION)
+        self.assertEqual(supervisor._get_backoff(999, 5), supervisor.MAX_BACKOFF)
+        self.assertGreater(supervisor.COOLDOWN_DURATION, supervisor.MAX_BACKOFF)
 
     def test_restore_stats_clamps_timestamps_and_fails_safe_on_garbage(self):
         name = "factory_scheduler"
@@ -218,7 +219,7 @@ class SupervisorRecoveryContractTests(unittest.TestCase):
         )
         ladder = [int(m) for m in re.findall(r"next_backoff=(\d+)s", log)]
         self.assertEqual(
-            ladder[:10], [10, 20, 40, 80, 160, 300, 300, 300, 300, 600],
+            ladder[:10], [10, 20, 40, 80, 160, 300, 300, 300, 300, 300],
             f"backoff ladder wrong: {ladder}",
         )
 

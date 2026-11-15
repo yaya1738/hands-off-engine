@@ -110,9 +110,11 @@ def _is_process_alive(pid):
 
 
 def _get_backoff(consecutive, backoff):
-    """Bounded exponential backoff with reset on success."""
-    if consecutive >= MAX_CONSECUTIVE:
-        return COOLDOWN_DURATION
+    """Return exponential restart backoff, independently capped at MAX_BACKOFF.
+
+    The longer cooldown is applied by the supervisor loop as a separate gate
+    after MAX_CONSECUTIVE failures; it must not inflate the backoff field.
+    """
     return min(INITIAL_BACKOFF * (2 ** min(consecutive, 6)), MAX_BACKOFF)
 
 
