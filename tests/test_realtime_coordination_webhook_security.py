@@ -114,6 +114,35 @@ def test_authorized_agent_message_is_persisted_without_git_side_effects(tmp_path
         thread.join(timeout=2)
 
 
+def test_callback_failure_after_persist_still_acknowledges_once(tmp_path, monkeypatch):
+    monkeypatch.setenv("COORDINATION_WEBHOOK_TOKEN", "correct-secret")
+    server, thread, bus = start_server(tmp_path, monkeypatch)
+    callback = Mock(side_effect=RuntimeError("consumer temporarily failed"))
+    service.CoordinationWebhook.message_callback = callback
+    try:
+        assert post(server, valid_message(), token="correct-secret") == 200
+        saved = [json.loads(line) for line in bus.read_text().splitlines()]
+        assert len(saved) == 1
+        callback.assert_called_once_with(saved[0])
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
+def test_oversized_webhook_body_is_rejected_without_persisting(tmp_path, monkeypatch):
+    monkeypatch.setenv("COORDINATION_WEBHOOK_TOKEN", "correct-secret")
+    server, thread, bus = start_server(tmp_path, monkeypatch)
+    try:
+        payload = valid_message()
+        payload["message"] = "x" * service.MAX_WEBHOOK_BODY_BYTES
+        assert post(server, payload, token="correct-secret") == 413
+        assert not bus.exists()
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
 def test_valid_token_does_not_allow_forged_operator_sender(tmp_path, monkeypatch):
     monkeypatch.setenv("COORDINATION_WEBHOOK_TOKEN", "correct-secret")
     server, thread, bus = start_server(tmp_path, monkeypatch)
