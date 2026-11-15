@@ -74,5 +74,5 @@ def test_receive_requires_central_telegram_allowlist_even_when_caller_sets_authe
     )
 
     assert result["routed_to"] == "rejected"
-    assert hub.messages_file.read_text() == ""
-    assert hub.comm_log.read_text() == ""
+    assert not hub.messages_file.exists()
+    assert not hub.comm_log.exists()
