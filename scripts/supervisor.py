@@ -149,7 +149,23 @@ def _acquire_lock(path):
         os.close(fd)
         return None
     os.fchmod(fd, 0o600)
+    # Publish the exact lock owner only after flock succeeds. Readers use this
+    # value to distinguish the lock owner from another matching process.
+    os.ftruncate(fd, 0)
+    os.lseek(fd, 0, os.SEEK_SET)
+    os.write(fd, str(os.getpid()).encode("ascii"))
+    os.fsync(fd)
     return fd
+
+
+def _lock_owner_pid(path):
+    """Return the PID recorded by the current lock owner, or None if invalid."""
+    try:
+        value = Path(path).read_text().strip()
+        pid = int(value)
+    except (OSError, ValueError):
+        return None
+    return pid if pid > 0 else None
 
 
 def _lock_is_held(path):
@@ -238,6 +254,7 @@ def _can_signal_supervisor(pid):
     return (type(pid) is int and pid > 0 and pid != os.getpid()
             and pid == registered_pid
             and _is_process_alive(pid) and _lock_is_held(SUPERVISOR_LOCK)
+            and _lock_owner_pid(SUPERVISOR_LOCK) == pid
             and _is_supervisor_process(pid))
 
 
@@ -299,7 +316,8 @@ def _external_owner_healthy(svc, now):
         return False
     pid = data.get("pid")
     if (type(pid) is not int or pid <= 0 or pid == os.getpid()
-            or not _is_process_alive(pid) or not _is_scheduler_process(pid)):
+            or not _is_process_alive(pid) or not _is_scheduler_process(pid)
+            or _lock_owner_pid(lock) != pid):
         return False
     return _heartbeat_verdict(hb, now, expected_pid=pid) == "ok"
 
