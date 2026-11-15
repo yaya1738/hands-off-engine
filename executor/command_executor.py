@@ -32,7 +32,20 @@ class CommandExecutor:
         # 2. Determine Mode (Config overrides Task if Config is strictly DRYRUN?)
         # For V1, let's say Task can request LIVE, but we respect Config default if not specified.
         # Here we just trust the task's requested mode if valid.
-        mode = task.mode.upper()
+        mode = str(task.mode).upper()
+
+        if mode != "DRYRUN":
+            return ExecutionResult(
+                task_id=task.task_id,
+                status="rejected",
+                exit_code=None,
+                stdout="",
+                stderr="",
+                reason="Execution blocked: this legacy executor has no governed LIVE authority grant.",
+                started_at=start_time,
+                finished_at=datetime.datetime.now().isoformat(),
+                mode=mode
+            )
 
         if mode == "DRYRUN":
             return ExecutionResult(
