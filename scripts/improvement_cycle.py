@@ -1,110 +1,161 @@
 #!/usr/bin/env python3
-"""Periodic Improvement Cycle — runs all monitoring and improvement subsystems.
+"""Periodic improvement workflow.
 
-Ties together: health monitor → learning loop → self-improvement → state integrity.
-Sends a summary to Telegram and posts results to the bus.
-
-Intended to run every N minutes via cron or Termux scheduler.
+The scheduler owns periodic cadence. Node 1 owns event-driven runtime work
+and lifecycle projection only. This workflow is the sole owner of candidate
+generation/dispatch and safe improvement application, plus feedback and
+approval checks.
 """
 import json
-import subprocess
 import sys
 from pathlib import Path
 from datetime import datetime, timezone
 
 ROOT = Path(__file__).resolve().parent.parent
 STATE = ROOT / "state"
-BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
 CYCLE_LOG = STATE / "improvement_cycles.json"
 
 
-def run_subprocess(script):
-    """Run a script and return its output. Supports 'script.py arg1 arg2' format."""
-    parts = script.split()
+MAX_SUBPROCESS_OUTPUT_CHARS = 1000
+SUBPROCESS_TIMEOUT_SECONDS = 30
+
+# Fatal failure policy: these cycle outcomes make the whole run exit
+# non-zero, so scheduler.run_task() records the cycle as failed instead of
+# a false green. Fatal:
+#   - improvement: candidate generation failed — the cycle produced nothing.
+#   - applier_apply: the apply step raised an unexpected error (integrity
+#     problem with improvement_state.json / applier), not merely "no
+#     candidates" or "risky actions queued".
+# Non-fatal (observational; approval failures carry their own alert):
+#   - applier_status, feedback, approval — diagnostics with independent
+#     alerting; a failure here must not mark the whole cycle failed.
+FATAL_FIELDS = ("improvement", "applier_apply")
+
+
+def _send_approval_alert():
+    """Best-effort approval-check alert through the real TelegramBridge API.
+
+    The bridge handles not-configured and delivery errors internally; only
+    genuinely unexpected errors are logged here instead of being swallowed.
+    Returns True when an alert was actually dispatched.
+    """
     try:
-        cmd = [sys.executable, str(ROOT / "scripts" / parts[0])] + parts[1:]
-        r = subprocess.run(
-            cmd,
-            capture_output=True, text=True, cwd=str(ROOT), timeout=30
-        )
-        return {"success": r.returncode == 0, "output": (r.stdout + r.stderr).strip()}
-    except Exception as e:
-        return {"success": False, "output": str(e)}
+        from scripts.telegram_bridge import TelegramBridge
+        bridge = TelegramBridge()
+        result = bridge.send_alert(
+            "Improvement cycle", "Approval check failed", severity="warning")
+        if isinstance(result, dict) and result.get("status") == "not_configured":
+            print("Telegram not configured; approval-check alert not sent")
+            return False
+        return isinstance(result, dict) and result.get("status") == "sent"
+    except Exception as exc:
+        print(f"Telegram approval alert error: {exc}")
+        return False
+
+
+def run_subprocess(script):
+    """Run a workflow child with bounded output and owned group cleanup."""
+    from scripts.process_group import run_process
+
+    parts = script.split()
+    cmd = [sys.executable, str(ROOT / "scripts" / parts[0])] + parts[1:]
+    outcome = run_process(
+        cmd,
+        cwd=ROOT,
+        timeout=SUBPROCESS_TIMEOUT_SECONDS,
+        max_output_chars=MAX_SUBPROCESS_OUTPUT_CHARS,
+    )
+    return {"success": outcome["success"], "output": outcome["output"]}
+
+
+def apply_generated_candidates():
+    """Apply the latest candidates after successful generation.
+
+    The applier itself is the policy boundary: only SAFE_ACTIONS execute;
+    RISKY_ACTIONS are queued for explicit operator approval.
+    """
+    candidate_file = STATE / "improvement_state.json"
+    if not candidate_file.exists():
+        return []
+
+    candidate_state = json.loads(candidate_file.read_text())
+    if not isinstance(candidate_state, dict):
+        raise ValueError("improvement candidate state must be an object")
+    candidates = candidate_state.get("improvements", [])
+    if not isinstance(candidates, list):
+        raise ValueError("improvement candidates must be a list")
+    candidates = [
+        item for item in candidates
+        if isinstance(item, dict) and isinstance(item.get("id"), str) and item["id"]
+    ]
+
+    from scripts.improvement_applier import ImprovementApplier
+    applier = ImprovementApplier(repo_root=ROOT)
+    return applier.apply_batch(candidates)
 
 
 def main():
+    """Run one improvement cycle; return a process exit code (0 success, 1 fatal failure)."""
     now = datetime.now(timezone.utc).isoformat()
-    
     print(f"=== IMPROVEMENT CYCLE @ {now} ===")
-    
-    # 1. Health check
-    health = run_subprocess("health_monitor.py")
-    print(f"Health: {'✅' if health['success'] else '⚠️'}")
-    
-    # 2. Learning analysis
-    learning = run_subprocess("learning_loop.py")
-    
-    # 3. Self-improvement
+
+    # Sole owner of candidate generation, durable dedup, and one bus dispatch.
     improvement = run_subprocess("self_improvement.py")
-    
-    # 4. State integrity
-    integrity = run_subprocess("state_integrity.py")
-    
-    # 5. Improvement applier (apply safe improvements)
+
+    # Apply only after this cycle generated a fresh candidate snapshot.
+    # ImprovementApplier enforces its SAFE_ACTIONS / RISKY_ACTIONS policy:
+    # safe actions may run; risky actions remain queued for operator approval.
+    apply_success = False
+    apply_results = []
+    if improvement["success"]:
+        try:
+            apply_results = apply_generated_candidates()
+            apply_success = True
+        except Exception as exc:
+            print(f"Improvement apply failed: {exc}")
+
+    # Status is observational; this cycle is the only apply_batch owner.
     applier = run_subprocess("improvement_applier.py status")
-    
-    # 6. Feedback analysis (measure improvement impact)
+
+    # Feedback and approval checks are periodic workflow responsibilities.
     feedback = run_subprocess("improvement_feedback.py analyze")
-    
-    # 7. Approval check (notify operator of pending risky improvements)
     approval = run_subprocess("improvement_approval.py check")
-    
-    # 8. Lifecycle projection refresh (shared task view stays current)
-    projection = run_subprocess("lifecycle_projection.py")
-    
-    # Load results
+
     cycle_result = {
         "timestamp": now,
-        "health": health["success"],
-        "learning": learning["success"],
         "improvement": improvement["success"],
-        "integrity": integrity["success"],
-        "applier": applier["success"],
+        "applier_apply": apply_success,
+        "applied_count": sum(1 for result in apply_results if result.get("applied")),
+        "applier_status": applier["success"],
         "feedback": feedback["success"],
         "approval": approval["success"],
-        "projection": projection["success"],
     }
-    
-    # Save cycle history
+
     STATE.mkdir(parents=True, exist_ok=True)
     history = []
     if CYCLE_LOG.exists():
         try:
-            history = json.loads(CYCLE_LOG.read_text())
+            loaded = json.loads(CYCLE_LOG.read_text())
+            if isinstance(loaded, list):
+                history = loaded
         except Exception:
             pass
     history.append(cycle_result)
-    if len(history) > 50:
-        history = history[-50:]
-    CYCLE_LOG.write_text(json.dumps(history, indent=2) + "\n")
-    
-    # Send Telegram alert only if something's wrong
-    issues = []
-    if not health["success"]:
-        issues.append("health check failed")
-    if not integrity["success"]:
-        issues.append("state integrity check failed")
-    
-    if issues:
-        try:
-            from scripts.telegram_bridge import send_message
-            send_message(f"⚠️ Improvement cycle issues: {', '.join(issues)}")
-        except Exception:
-            pass
-    
-    print(f"Cycle complete: {'ALL OK' if not issues else 'ISSUES: ' + ', '.join(issues)}")
-    return cycle_result
+    CYCLE_LOG.write_text(json.dumps(history[-50:], indent=2) + "\n")
+
+    if not approval["success"]:
+        _send_approval_alert()
+
+    print(json.dumps(cycle_result, indent=2, sort_keys=True))
+
+    fatal = [field for field in FATAL_FIELDS if not cycle_result.get(field)]
+    if fatal:
+        print(f"Fatal cycle failures: {', '.join(fatal)}")
+    print("Cycle complete")
+    # Fatal failures must propagate to the process exit code; the scheduler
+    # records cycle success from this code and must never see a false green.
+    return 1 if fatal else 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

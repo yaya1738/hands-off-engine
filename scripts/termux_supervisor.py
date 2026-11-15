@@ -51,12 +51,6 @@ DAEMONS = {
         "required": True,
         "timeout": None,  # no timeout — runs indefinitely
     },
-    "event_router": {
-        "script": REPO_ROOT / "scripts" / "event_router.py",
-        "args": ["loop", "--interval", "10"],
-        "required": True,
-        "timeout": None,
-    },
     "analysis_engine": {
         "script": REPO_ROOT / "scripts" / "analysis_engine.py",
         "required": False,
@@ -66,11 +60,6 @@ DAEMONS = {
         "script": REPO_ROOT / "scripts" / "proactive_monitor.py",
         "args": ["--interval", "60"],
         "required": False,
-        "timeout": None,
-    },
-    "control_room": {
-        "script": REPO_ROOT / "scripts" / "yair_control_room.py",
-        "required": True,
         "timeout": None,
     },
     "telegram_bridge": {
@@ -176,7 +165,6 @@ class RotatingLog:
                 f.write(data)
         except Exception:
             pass
-
 
 # ── Daemon management ──
 

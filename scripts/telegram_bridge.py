@@ -93,18 +93,46 @@ class TelegramBridge:
 
         # Split long messages
         chunks = [text[i:i+MAX_MESSAGE_LENGTH] for i in range(0, len(text), MAX_MESSAGE_LENGTH)]
-        results = []
-        for chunk in chunks:
+        if not chunks:
+            return {
+                "status": "failed",
+                "chunks": 0,
+                "sent_chunks": 0,
+                "failed_chunks": 0,
+                "chat_id": target_chat,
+                "errors": [{"chunk": 0, "error": "empty message"}],
+            }
+
+        errors = []
+        sent_chunks = 0
+        for index, chunk in enumerate(chunks, start=1):
             result = self._api_call("sendMessage", {
                 "chat_id": target_chat,
                 "text": chunk,
                 "parse_mode": "Markdown",
             })
-            results.append(result)
-            self.state["messages_sent"] = self.state.get("messages_sent", 0) + 1
+            if isinstance(result, dict) and result.get("ok") is True:
+                sent_chunks += 1
+                self.state["messages_sent"] = self.state.get("messages_sent", 0) + 1
+            else:
+                error = (
+                    result.get("description") or result.get("error") or "Telegram API rejected request"
+                    if isinstance(result, dict)
+                    else "invalid Telegram API response"
+                )
+                errors.append({"chunk": index, "error": str(error)})
 
         save_state(self.state)
-        return {"status": "sent", "chunks": len(chunks), "chat_id": target_chat}
+        failed_chunks = len(chunks) - sent_chunks
+        status = "sent" if failed_chunks == 0 else ("partial_failure" if sent_chunks else "failed")
+        return {
+            "status": status,
+            "chunks": len(chunks),
+            "sent_chunks": sent_chunks,
+            "failed_chunks": failed_chunks,
+            "chat_id": target_chat,
+            "errors": errors,
+        }
 
     def send_alert(self, title, body, severity="normal"):
         """Send a formatted alert with emoji prefix."""
