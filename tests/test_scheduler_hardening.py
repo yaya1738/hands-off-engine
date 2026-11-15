@@ -190,6 +190,12 @@ class SchedulerHardeningTests(unittest.TestCase):
         killpg.assert_called_once_with(456, scheduler.signal.SIGKILL)
         self.assertEqual(process.wait.call_count, 2)
 
+    def test_scheduler_lock_conflict_returns_nonzero_entrypoint_status(self):
+        with mock.patch.object(scheduler, "run_forever", return_value=False):
+            self.assertEqual(scheduler.main([]), 1)
+        with mock.patch.object(scheduler, "run_once", return_value=False):
+            self.assertEqual(scheduler.main(["--once"]), 1)
+
     def test_scheduler_log_is_bounded(self):
         scheduler.SCHEDULER_LOG.write_text(json.dumps([{"n": i} for i in range(100)]))
         scheduler.append_log({"n": 100})
