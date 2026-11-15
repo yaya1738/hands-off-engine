@@ -299,5 +299,34 @@ class TermuxSupervisorShutdownTests(unittest.TestCase):
         process.poll.assert_not_called()
 
 
+    def test_timeout_kills_pinned_process_group_without_popen_kill(self):
+        process = mock.Mock(pid=34567)
+        daemon = mock.Mock()
+        daemon.process = process
+        daemon.timeout = 0
+        daemon.start_time = time.time() - 1
+        daemon.state = {"total_restarts": 0}
+        daemon.poll.return_value = None
+
+        runner = supervisor.TermuxSupervisor.__new__(supervisor.TermuxSupervisor)
+        runner.running = True
+        runner.daemons = {"child": daemon}
+        runner.state = {"supervisor": {}}
+
+        def stop_after_one_iteration(_seconds):
+            runner.running = False
+
+        with mock.patch.object(supervisor, "_observe_exit_without_reaping", return_value=(False, True)), \
+             mock.patch.object(supervisor.os, "killpg") as killpg, \
+             mock.patch.object(supervisor, "save_state"), \
+             mock.patch.object(supervisor.time, "sleep", side_effect=stop_after_one_iteration):
+            runner._loop()
+
+        killpg.assert_called_once_with(34567, signal.SIGKILL)
+        process.kill.assert_not_called()
+        process.poll.assert_not_called()
+        daemon.poll.assert_called_once_with()
+
+
 if __name__ == "__main__":
     unittest.main()
