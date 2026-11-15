@@ -1,0 +1,65 @@
+import json
+import tempfile
+import unittest
+from pathlib import Path
+
+from ai.factory.authority_gateway import FactoryAuthorityGateway
+
+
+class FactoryAuthorityGatewayTests(unittest.TestCase):
+    def test_submit_goal_persists_review_only_record(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            result = gateway.submit_goal(
+                "Review failed CI for PR 12",
+                priority=2,
+                source="github_governance_monitor",
+                idempotency_key="finding:pr12:ci_failed:abc",
+                metadata={"pr_number": 12, "category": "ci_failed"},
+            )
+            rows = [json.loads(line) for line in (Path(tmp) / "state" / "factory_objectives.jsonl").read_text().splitlines()]
+            self.assertEqual(result["status"], "queued_for_review")
+            self.assertFalse(result["execution_enabled"])
+            self.assertEqual(len(rows), 1)
+            self.assertEqual(rows[0]["status"], "pending_review")
+            self.assertTrue(rows[0]["approval_required"])
+            self.assertFalse(rows[0]["execution_enabled"])
+
+    def test_duplicate_idempotency_key_does_not_append_twice(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            kwargs = {"idempotency_key": "same-finding", "source": "monitor"}
+            first = gateway.submit_goal("Inspect stale PR", **kwargs)
+            second = gateway.submit_goal("Inspect stale PR", **kwargs)
+            queue = Path(tmp) / "state" / "factory_objectives.jsonl"
+            self.assertEqual(first["goal_id"], second["goal_id"])
+            self.assertEqual(second["status"], "idempotent_replay")
+            self.assertEqual(len(queue.read_text().splitlines()), 1)
+
+    def test_conflicting_reuse_of_idempotency_key_is_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            gateway.submit_goal("First objective", idempotency_key="same")
+            with self.assertRaisesRegex(ValueError, "different objective"):
+                gateway.submit_goal("Different objective", idempotency_key="same")
+
+    def test_invalid_priority_and_objective_are_rejected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            for priority in (True, 0, 6, 2.5):
+                with self.subTest(priority=priority), self.assertRaises(ValueError):
+                    gateway.submit_goal("Valid objective", priority=priority)
+            with self.assertRaises(ValueError):
+                gateway.submit_goal("   ")
+
+    def test_metadata_must_be_bounded_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            gateway = FactoryAuthorityGateway(tmp)
+            with self.assertRaisesRegex(ValueError, "JSON serializable"):
+                gateway.submit_goal("Objective", metadata={"bad": object()})
+            with self.assertRaisesRegex(ValueError, "exceeds 4096"):
+                gateway.submit_goal("Objective", metadata={"payload": "x" * 5000})
+
+
+if __name__ == "__main__":
+    unittest.main()
