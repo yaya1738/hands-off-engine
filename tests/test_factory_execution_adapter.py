@@ -102,14 +102,14 @@ def test_system_listener_routes_approved_factory_command(monkeypatch):
     assert calls["command"]["objective"] == "inspect runtime"
 
 
-def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
+def test_system_listener_routes_factory_command_without_objective_to_fail_closed_adapter(monkeypatch):
     import scripts.system_listener_inline as listener
 
     calls = []
 
     def fake_execute(command, execution_gate=False):
         calls.append(command)
-        return {"status": "completed"}
+        return {"status": "blocked"}
 
     monkeypatch.setattr(listener, "execute_factory_command", fake_execute)
 
@@ -122,8 +122,9 @@ def test_system_listener_rejects_factory_command_without_objective(monkeypatch):
         "payload": {"action": "factory_execute"},
     })
 
-    assert result["command_status"] == "rejected"
-    assert calls == []
+    assert result["command_status"] == "blocked"
+    assert len(calls) == 1
+    assert calls[0]["objective"] is None
 
 
 def test_factory_adapter_preserves_terminal_status(monkeypatch):
@@ -173,7 +174,7 @@ def test_factory_adapter_maps_verified_to_completed(monkeypatch):
     assert result["reason"] == "authority decision does not grant execution"
 
 
-def test_factory_adapter_rejects_action_as_objective(monkeypatch):
+def test_factory_adapter_blocks_action_as_objective_without_gateway(monkeypatch):
     import types
     import sys
 
@@ -192,5 +193,5 @@ def test_factory_adapter_rejects_action_as_objective(monkeypatch):
         "payload": {"action": "factory_execute"},
     }, execution_gate=True)
 
-    assert result["status"] == "rejected"
-    assert result["reason"] == "missing Factory objective"
+    assert result["status"] == "blocked"
+    assert result["reason"] == "authority decision does not grant execution"
