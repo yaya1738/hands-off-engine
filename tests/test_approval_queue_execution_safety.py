@@ -1,4 +1,6 @@
 """ApprovalQueue must not turn an approval ID into arbitrary host execution."""
+import json
+import pytest
 import subprocess
 from pathlib import Path
 from unittest.mock import patch
@@ -119,6 +121,117 @@ def test_edit_file_refuses_ambiguous_multiple_matches(tmp_path):
     assert not result["success"]
     assert "match exactly once" in result["error"]
     assert target.read_text() == '{"limit": 10, "backup_limit": 10}'
+
+def test_execution_claim_survives_crash_before_action_finishes(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    target.write_text('{"limit": 10}')
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    def crash(_action):
+        raise SystemExit("simulated process termination")
+    queue._execute_action = crash
+    with pytest.raises(SystemExit):
+        queue.execute_approved(change_id)
+    persisted = json.loads(queue.queue_file.read_text())
+    assert persisted["approved"][0]["status"] == "executing"
+    queue._execute_action = lambda _action: {"success": True}
+    retry = queue.execute_approved(change_id)
+    assert not retry["success"]
+    assert "executing" in retry["error"]
+    assert target.read_text() == '{"limit": 10}'
+
+
+def test_concurrent_execute_requests_run_action_only_once(tmp_path):
+    import threading
+    import time
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    target.write_text('{"limit": 10}')
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    calls = []
+    calls_lock = threading.Lock()
+    def action(_action):
+        with calls_lock:
+            calls.append(1)
+        time.sleep(0.05)
+        return {"success": True}
+    queue._execute_action = action
+    from concurrent.futures import ThreadPoolExecutor
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(lambda _n: queue.execute_approved(change_id), range(2)))
+    assert len(calls) == 1
+    assert sum(bool(result["success"]) for result in results) == 1
+
+
+def test_atomic_queue_save_preserves_previous_file_on_replace_failure(tmp_path):
+    queue, root = make_queue(tmp_path)
+    change_id = queue.add_change(
+        title="durability", description="test", change_type="code",
+        files_affected=[], proposed_action={"type": "unknown"},
+    )
+    before = queue.queue_file.read_text()
+    with patch("ai.approval_queue.os.replace", side_effect=OSError("simulated disk failure")):
+        with pytest.raises(OSError):
+            queue._save_queue({"pending": [], "approved": [], "rejected": []})
+    assert queue.queue_file.read_text() == before
+    assert queue.get_pending()[0]["id"] == change_id
+
+def test_approved_action_tampering_fails_closed(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    target.write_text('{"limit": 10}')
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    persisted = json.loads(queue.queue_file.read_text())
+    persisted["approved"][0]["proposed_action"]["new_content"] = '"limit": 999'
+    queue.queue_file.write_text(json.dumps(persisted))
+    result = queue.execute_approved(change_id)
+    assert not result["success"]
+    assert "changed after approval" in result["error"]
+    assert target.read_text() == '{"limit": 10}'
+
+
+def test_stale_approval_expires_without_executing(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    target.write_text('{"limit": 10}')
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    persisted = json.loads(queue.queue_file.read_text())
+    persisted["approved"][0]["approved_at"] = "2000-01-01T00:00:00"
+    queue.queue_file.write_text(json.dumps(persisted))
+    result = queue.execute_approved(change_id)
+    assert not result["success"]
+    assert "expired" in result["error"]
+    assert target.read_text() == '{"limit": 10}'
+
+def test_approval_is_one_shot_even_if_file_is_restored(tmp_path):
+    queue, root = make_queue(tmp_path)
+    target = root / "config.json"
+    original = '{"limit": 10}'
+    target.write_text(original)
+    change_id = queue_and_approve(queue, {
+        "type": "edit_file", "file_path": "config.json",
+        "old_content": '"limit": 10', "new_content": '"limit": 20',
+    })
+    first = queue.execute_approved(change_id)
+    assert first["success"]
+    assert target.read_text() == '{"limit": 20}'
+    target.write_text(original)
+    second = queue.execute_approved(change_id)
+    assert not second["success"]
+    assert "not executable" in second["error"]
+    assert target.read_text() == original
 
 def test_write_file_is_create_only_inside_repo(tmp_path):
     queue, root = make_queue(tmp_path)
