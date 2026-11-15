@@ -109,6 +109,43 @@ class SupervisorOwnershipContractTests(unittest.TestCase):
              mock.patch.object(supervisor, "_is_scheduler_process", return_value=True):
             self.assertTrue(supervisor._external_owner_healthy(service, 1001.0))
 
+    def test_supervisor_restarts_service_after_startup_heartbeat_grace_expires(self):
+        class Clock:
+            def __init__(self):
+                self.now = 1000.0
+            def time(self):
+                return self.now
+            def monotonic(self):
+                return self.now
+            def sleep(self, seconds):
+                self.now += 130.0
+
+        class Child:
+            pid = 45678
+            returncode = None
+            def poll(self):
+                return self.returncode
+            def terminate(self):
+                self.returncode = -15
+            def wait(self, timeout=None):
+                return self.returncode
+            def kill(self):
+                self.returncode = -9
+
+        heartbeat = self.state.parent / "scheduler_heartbeat.json"
+        service = {
+            "name": "factory_scheduler", "cmd": ["scheduler.py"],
+            "cwd": str(self.state.parent), "log": self.log,
+            "heartbeat": heartbeat, "singleton_lock": self.lock,
+        }
+        child = Child()
+        with mock.patch.object(supervisor, "SERVICES", [service]), \
+             mock.patch.object(supervisor, "time", Clock()), \
+             mock.patch.object(supervisor.subprocess, "Popen", return_value=child):
+            supervisor.run(max_loops=2)
+        self.assertEqual(child.returncode, -15)
+        self.assertIn("factory_scheduler heartbeat stale; restarting", self.log.read_text())
+
     def test_state_write_uses_atomic_replacement(self):
         supervisor._save_state({"healthy": True})
         self.assertEqual(supervisor._load_state(), {"healthy": True})
