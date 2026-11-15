@@ -33,17 +33,21 @@ class SupervisorLockOwnershipTests(unittest.TestCase):
         return lock
 
     def test_three_participant_contention_preserves_one_inode(self):
+        import fcntl
+
         owner_a = self.new_lock()
-        contender_b = self.new_lock()
         contender_c = self.new_lock()
 
         self.assertTrue(owner_a.try_acquire())
         inode = self.lock_path.stat().st_ino
         owner_marker = self.pid_path.read_text()
 
-        # B opens the same persistent inode but cannot acquire A's flock.
-        self.assertFalse(contender_b.try_acquire())
-        self.assertEqual(self.lock_path.stat().st_ino, inode)
+        # B opens the old inode before A releases it. Its failed nonblocking
+        # flock must not alter A's marker, and B deliberately keeps this fd.
+        contender_b_fd = os.open(str(self.lock_path), os.O_RDWR | os.O_CREAT, 0o600)
+        self.assertEqual(os.fstat(contender_b_fd).st_ino, inode)
+        with self.assertRaises(BlockingIOError):
+            fcntl.flock(contender_b_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
         self.assertEqual(self.pid_path.read_text(), owner_marker)
         self.assertEqual(self.lock_path.read_text(), owner_marker)
 
@@ -51,19 +55,26 @@ class SupervisorLockOwnershipTests(unittest.TestCase):
         self.assertTrue(self.lock_path.exists())
         self.assertEqual(self.lock_path.stat().st_ino, inode)
 
-        # B can now acquire the same inode; C must fail against B.
-        self.assertTrue(contender_b.try_acquire())
-        self.assertEqual(self.lock_path.stat().st_ino, inode)
-        marker_b = self.pid_path.read_text()
+        # B now acquires using its already-open descriptor. C opens by pathname
+        # and must contend on the exact same inode rather than a replacement.
+        fcntl.flock(contender_b_fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        os.ftruncate(contender_b_fd, 0)
+        os.lseek(contender_b_fd, 0, os.SEEK_SET)
+        os.write(contender_b_fd, str(os.getpid()).encode("ascii"))
+        os.fsync(contender_b_fd)
+        self.pid_path.write_text(str(os.getpid()))
         self.assertFalse(contender_c.try_acquire())
-        self.assertEqual(self.pid_path.read_text(), marker_b)
+        self.assertEqual(self.pid_path.read_text(), str(os.getpid()))
         self.assertEqual(self.lock_path.stat().st_ino, inode)
 
-        contender_b.release()
+        self.pid_path.unlink()
+        os.ftruncate(contender_b_fd, 0)
+        os.fsync(contender_b_fd)
+        fcntl.flock(contender_b_fd, fcntl.LOCK_UN)
+        os.close(contender_b_fd)
         self.assertTrue(self.lock_path.exists())
         self.assertEqual(self.lock_path.stat().st_ino, inode)
-        self.assertFalse(self.pid_path.exists())
-
+        self.assertEqual(self.lock_path.read_text(), "")
     def test_release_does_not_remove_mismatched_pid_marker(self):
         owner = self.new_lock()
         self.assertTrue(owner.try_acquire())
