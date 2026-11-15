@@ -1,0 +1,126 @@
+import json
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+from unittest import mock
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT))
+
+from scripts import self_improvement
+
+
+class DurableImprovementDispatchTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.root = Path(self.temp.name)
+        self.old = {
+            "STATE": self_improvement.STATE,
+            "BUS": self_improvement.BUS,
+            "DISPATCH_STATE": self_improvement.DISPATCH_STATE,
+            "DISPATCH_LOCK": self_improvement.DISPATCH_LOCK,
+        }
+        self_improvement.STATE = self.root / "state"
+        self_improvement.BUS = self.root / "messages.jsonl"
+        self_improvement.DISPATCH_STATE = self.root / "state" / "dispatch.json"
+        self_improvement.DISPATCH_LOCK = self.root / "state" / "dispatch.lock"
+
+    def tearDown(self):
+        for name, value in self.old.items():
+            setattr(self_improvement, name, value)
+        self.temp.cleanup()
+
+    def _candidate(self, cid):
+        return {
+            "id": cid,
+            "category": "reliability",
+            "title": f"Candidate {cid}",
+            "description": "Read-only health log review",
+        }
+
+    def _write_pending(self, cid="imp-pending"):
+        message = {
+            "msg_id": f"msg-{cid}",
+            "timestamp": "2026-11-15T00:00:00+00:00",
+            "from": "factory",
+            "to": "anyclaw",
+            "type": "task_assignment",
+            "task_id": f"task-{cid}",
+            "action": "read_file_fact",
+            "params": {"path": "state/health_log.jsonl"},
+            "payload": {"candidate_id": cid},
+            "reply_to": "self_improvement",
+        }
+        state = {
+            "dispatched": {},
+            "pending": {
+                cid: {
+                    "msg_id": message["msg_id"],
+                    "task_id": message["task_id"],
+                    "action": message["action"],
+                    "dispatched_at": message["timestamp"],
+                    "message": message,
+                }
+            },
+            "history": [],
+        }
+        self_improvement._save_dispatch_state(state)
+        return message
+
+    def _bus_messages(self):
+        if not self_improvement.BUS.exists():
+            return []
+        return [
+            json.loads(line)
+            for line in self_improvement.BUS.read_text().splitlines()
+            if line.strip()
+        ]
+
+    def test_dispatches_at_most_one_candidate_per_call(self):
+        result = self_improvement.dispatch_one([
+            self._candidate("imp-one"),
+            self._candidate("imp-two"),
+        ])
+        self.assertEqual(result["payload"]["candidate_id"], "imp-one")
+        self.assertEqual(len(self._bus_messages()), 1)
+        state = self_improvement._load_dispatch_state()
+        self.assertEqual(len(state["dispatched"]), 1)
+        self.assertEqual(state["pending"], {})
+
+    def test_pending_outbox_recovers_after_pre_append_crash(self):
+        message = self._write_pending()
+        self_improvement.dispatch_one([])
+        self.assertEqual(self._bus_messages(), [message])
+        state = self_improvement._load_dispatch_state()
+        self.assertIn("imp-pending", state["dispatched"])
+        self.assertEqual(state["pending"], {})
+
+    def test_recovery_does_not_duplicate_message_already_on_bus(self):
+        message = self._write_pending()
+        self_improvement.BUS.parent.mkdir(parents=True, exist_ok=True)
+        self_improvement.BUS.write_text(json.dumps(message) + "\\n")
+        self_improvement.dispatch_one([])
+        self.assertEqual(len(self._bus_messages()), 1)
+        state = self_improvement._load_dispatch_state()
+        self.assertIn("imp-pending", state["dispatched"])
+        self.assertEqual(state["pending"], {})
+
+    def test_pending_record_survives_append_failure_and_retries(self):
+        with mock.patch.object(self_improvement, "_append_bus", side_effect=OSError("simulated crash")):
+            with self.assertRaises(OSError):
+                self_improvement.dispatch_one([self._candidate("imp-retry")])
+
+        state = self_improvement._load_dispatch_state()
+        self.assertIn("imp-retry", state["pending"])
+        self.assertNotIn("imp-retry", state["dispatched"])
+
+        self_improvement.dispatch_one([])
+        self.assertEqual(len(self._bus_messages()), 1)
+        state = self_improvement._load_dispatch_state()
+        self.assertIn("imp-retry", state["dispatched"])
+        self.assertEqual(state["pending"], {})
+
+
+if __name__ == "__main__":
+    unittest.main()
