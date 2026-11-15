@@ -363,7 +363,12 @@ def run():
 
     print(f"Self-improvement: {len(improvements)} improvements generated")
     if dispatched:
-        print(f"  dispatched: {dispatched['task_id']} -> {dispatched['action']}")
+        context = dispatched.get("context", {}) if isinstance(dispatched, dict) else {}
+        if not isinstance(context, dict):
+            context = {}
+        task_id = context.get("task_id", "unknown")
+        action = context.get("action", "unknown")
+        print(f"  dispatched: {task_id} -> {action}")
     else:
         print("  dispatched: none (all candidates already handled or unsupported)")
     for imp in improvements:

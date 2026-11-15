@@ -140,6 +140,27 @@ class DurableImprovementDispatchTests(unittest.TestCase):
         self.assertEqual(state["pending"], {})
 
 
+    def test_run_reports_task_envelope_fields_from_context(self):
+        improvement = self._candidate("imp-run-report")
+        improvement["priority"] = "high"
+        message = {
+            "context": {
+                "task_id": "task-imp-run-report",
+                "action": "read_file_fact",
+            }
+        }
+        saved_state = {"total": 1, "improvements": [improvement]}
+
+        with mock.patch.object(self_improvement, "generate_improvements", return_value=[improvement]), \
+             mock.patch.object(self_improvement, "save_improvements", return_value=saved_state), \
+             mock.patch.object(self_improvement, "dispatch_one", return_value=message), \
+             mock.patch("builtins.print") as printed:
+            result = self_improvement.run()
+
+        printed.assert_any_call("  dispatched: task-imp-run-report -> read_file_fact")
+        self.assertIs(result["dispatched"], message)
+
+
 if __name__ == "__main__":
     unittest.main()
 
