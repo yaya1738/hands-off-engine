@@ -363,7 +363,12 @@ def run():
 
     print(f"Self-improvement: {len(improvements)} improvements generated")
     if dispatched:
-        print(f"  dispatched: {dispatched['task_id']} -> {dispatched['action']}")
+        # dispatch_one returns the canonical Task Worker envelope; identifiers
+        # live under context rather than at the message's top level.
+        context = dispatched.get("context", {}) if isinstance(dispatched, dict) else {}
+        task_id = context.get("task_id", "unknown-task")
+        action = context.get("action", "unknown-action")
+        print(f"  dispatched: {task_id} -> {action}")
     else:
         print("  dispatched: none (all candidates already handled or unsupported)")
     for imp in improvements:

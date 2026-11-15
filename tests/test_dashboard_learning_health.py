@@ -79,3 +79,27 @@ def test_sender_validation_accepts_known(tmp_path):
     hub = CommHub(tmp_path)
     result = hub.receive("operator", "status_query", {})
     assert result.get("routed_to") != "rejected"
+
+
+def test_self_improvement_run_prints_canonical_dispatch_envelope(tmp_path, monkeypatch, capsys):
+    from scripts import self_improvement
+
+    monkeypatch.setattr(self_improvement, "ROOT", tmp_path)
+    monkeypatch.setattr(self_improvement, "STATE", tmp_path / "state")
+    monkeypatch.setattr(self_improvement, "BUS", tmp_path / "messages.jsonl")
+    monkeypatch.setattr(self_improvement, "DISPATCH_STATE", tmp_path / "dispatch.json")
+    monkeypatch.setattr(self_improvement, "DISPATCH_LOCK", tmp_path / "dispatch.lock")
+    monkeypatch.setattr(self_improvement, "generate_improvements", lambda: [])
+    monkeypatch.setattr(self_improvement, "save_improvements", lambda items: {})
+    monkeypatch.setattr(
+        self_improvement,
+        "dispatch_one",
+        lambda items: {
+            "type": "task_assignment",
+            "context": {"task_id": "task-test", "action": "read_file_fact"},
+        },
+    )
+
+    result = self_improvement.run()
+    assert result["dispatched"]["context"]["task_id"] == "task-test"
+    assert "dispatched: task-test -> read_file_fact" in capsys.readouterr().out
