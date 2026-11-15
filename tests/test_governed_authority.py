@@ -5,6 +5,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from autonomous.governed_authority import authorize, AuthorityDecision
+from scripts.command_approval import command_fingerprint
+from datetime import datetime, timezone
+
+
+def _approved_fixture(tmp_path, command_id):
+    command = {"id": command_id, "source": "test", "action": "execute", "target": "factory",
+               "payload": {"action": "factory_execute", "objective": "inspect runtime"},
+               "mode": "LIVE", "timestamp": datetime.now(timezone.utc).isoformat(),
+               "priority": 5, "sync": False, "timeout_seconds": 300,
+               "queued_at": datetime.now(timezone.utc).isoformat(), "approval_status": "approved"}
+    fingerprint = command_fingerprint(command)
+    command["approval_fingerprint"] = fingerprint
+    path = tmp_path / "approval_queue.json"
+    path.write_text(json.dumps({"pending": [], "approved": [{"id": command_id,
+        "approved_at": datetime.now(timezone.utc).isoformat(), "fingerprint": fingerprint}], "rejected": []}))
+    return command, path
 
 
 # ── authority contract tests ──
@@ -15,9 +31,9 @@ def test_live_without_approval_is_blocked():
     assert decision.execution_enabled is False
 
 
-def test_approved_live_still_does_not_grant_executor_authority():
+def test_approved_flag_without_durable_record_is_not_authority():
     decision = authorize({"id": "c2", "mode": "LIVE", "approval_status": "approved"})
-    assert decision.decision == "approved"
+    assert decision.decision == "approval_required"
     assert decision.execution_enabled is False
 
 
@@ -50,9 +66,11 @@ def test_decision_to_dict():
     assert d["decision"] == "approval_required"
 
 
-def test_live_approved_still_requires_executor():
-    decision = authorize({"id": "c7", "mode": "LIVE", "approval_status": "approved"})
+def test_live_approved_still_requires_executor(tmp_path):
+    command, path = _approved_fixture(tmp_path, "c7")
+    decision = authorize(command, approval_file=path)
     assert decision.approval_required is True
+    assert decision.decision == "approved"
 
 
 # ── listener integration tests ──
@@ -154,31 +172,25 @@ def test_control_api_approve_reject_flow():
 
 # ── execution gate tests ──
 
-def test_live_approved_with_gate_still_execution_disabled():
-    """Even with approval AND gate=True, execution_enabled stays False."""
-    decision = authorize(
-        {"id": "g1", "mode": "LIVE", "approval_status": "approved"},
-        execution_gate=True,
-    )
+def test_live_approved_with_gate_still_execution_disabled(tmp_path):
+    """Even with durable approval AND gate=True, execution_enabled stays False."""
+    command, path = _approved_fixture(tmp_path, "g1")
+    decision = authorize(command, execution_gate=True, approval_file=path)
     assert decision.execution_enabled is False
     assert decision.decision == "approved"
     assert "gate active" in decision.reason
 
 
-def test_live_approved_gate_none_keeps_gate_absent():
-    decision = authorize(
-        {"id": "g2", "mode": "LIVE", "approval_status": "approved"},
-        execution_gate=None,
-    )
+def test_live_approved_gate_none_keeps_gate_absent(tmp_path):
+    command, path = _approved_fixture(tmp_path, "g2")
+    decision = authorize(command, execution_gate=None, approval_file=path)
     assert decision.execution_enabled is False
     assert "gate absent" in decision.reason
 
 
-def test_live_approved_gate_false_keeps_gate_absent():
-    decision = authorize(
-        {"id": "g3", "mode": "LIVE", "approval_status": "approved"},
-        execution_gate=False,
-    )
+def test_live_approved_gate_false_keeps_gate_absent(tmp_path):
+    command, path = _approved_fixture(tmp_path, "g3")
+    decision = authorize(command, execution_gate=False, approval_file=path)
     assert decision.execution_enabled is False
     assert "gate absent" in decision.reason
 
