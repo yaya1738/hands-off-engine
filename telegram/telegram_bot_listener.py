@@ -71,13 +71,12 @@ class SimpleTelegramBot:
             return True
         return self.allowed_user_id is not None and str(user_id) == self.allowed_user_id
 
-        # Check if requests is available
+        # Initialize the HTTP client during construction, before polling.
         try:
             import requests
             self.requests = requests
-        except ImportError:
-            logger.error("requests library not found. Install with: pip3 install requests")
-            sys.exit(1)
+        except ImportError as exc:
+            raise RuntimeError("requests library is required for Telegram polling") from exc
 
     def get_updates(self, timeout=30):
         """Get updates from Telegram using long polling."""
