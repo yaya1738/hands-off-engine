@@ -185,7 +185,7 @@ class TelegramBridge:
                     response = hub.receive("operator", "trade_command", {
                         "action": parts[1],
                         "params": {"market": parts[2], "amount": parts[3] if len(parts) > 3 else None},
-                    }, channel="telegram")
+                    }, channel="telegram", **authenticated_args)
                 else:
                     response = {"error": "Usage: /trade <buy|sell> <market> [amount]"}
             elif text.startswith("/help"):
