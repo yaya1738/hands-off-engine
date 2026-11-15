@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from scripts import self_improvement
+from scripts.task_worker import validate_task_envelope
 
 
 class DurableImprovementDispatchTests(unittest.TestCase):
@@ -46,19 +47,22 @@ class DurableImprovementDispatchTests(unittest.TestCase):
             "from": "factory",
             "to": "anyclaw",
             "type": "task_assignment",
-            "task_id": f"task-{cid}",
-            "action": "read_file_fact",
-            "params": {"path": "state/health_log.jsonl"},
+            "context": {
+                "task_id": f"task-{cid}",
+                "action": "read_file_fact",
+                "params": {"file_path": "state/health_log.jsonl"},
+                "reply_to": "self_improvement",
+                "correlation_id": cid,
+            },
             "payload": {"candidate_id": cid},
-            "reply_to": "self_improvement",
         }
         state = {
             "dispatched": {},
             "pending": {
                 cid: {
                     "msg_id": message["msg_id"],
-                    "task_id": message["task_id"],
-                    "action": message["action"],
+                    "task_id": message["context"]["task_id"],
+                    "action": message["context"]["action"],
                     "dispatched_at": message["timestamp"],
                     "message": message,
                 }
@@ -76,6 +80,20 @@ class DurableImprovementDispatchTests(unittest.TestCase):
             for line in self_improvement.BUS.read_text().splitlines()
             if line.strip()
         ]
+
+    def test_dispatched_envelope_is_accepted_by_real_local_worker(self):
+        message = self_improvement.dispatch_one([self._candidate("imp-contract")])
+        valid, error = validate_task_envelope(message)
+        self.assertTrue(valid, error)
+        self.assertEqual(message["context"]["task_id"], "task-imp-contract")
+        self.assertEqual(message["context"]["action"], "read_file_fact")
+        self.assertEqual(
+            message["context"]["params"]["file_path"],
+            "state/health_log.jsonl",
+        )
+        self.assertNotIn("task_id", message)
+        self.assertNotIn("action", message)
+        self.assertNotIn("params", message)
 
     def test_dispatches_at_most_one_candidate_per_call(self):
         result = self_improvement.dispatch_one([
