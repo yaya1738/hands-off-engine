@@ -32,6 +32,7 @@ TASKS = [
     {"name": "improvement_cycle", "script": "improvement_cycle.py", "interval_seconds": 900},
     {"name": "integrity_check", "script": "state_integrity.py", "interval_seconds": 600},
     {"name": "learning_analysis", "script": "learning_loop.py", "interval_seconds": 900},
+    {"name": "github_governance_monitor", "script": "github_governance_monitor.py", "interval_seconds": 21600},
 ]
 
 _RUNNING = True
