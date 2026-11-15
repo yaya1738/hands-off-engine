@@ -6,7 +6,7 @@ ChatGPT: the fastest way to get the Telegram token to AnyClaw is:
 
 In your session on the device, run:
 ```bash
-termux-clipboard-set '{"botToken":"BOT_TOKEN_HERE","chatIds":[CHAT_ID_HERE]}'
+termux-clipboard-set '{"botToken":"BOT_TOKEN_HERE","chatIds":[CHAT_ID_HERE],"userIds":[TELEGRAM_USER_ID_HERE]}'
 ```
 
 AnyClaw reads the clipboard. After transfer, clear it:
@@ -18,7 +18,7 @@ termux-clipboard-set "cleared"
 
 Write to `/tmp/telegram_token.json` with:
 ```json
-{"botToken": "BOT_TOKEN_HERE", "chatIds": [CHAT_ID_HERE]}
+{"botToken": "BOT_TOKEN_HERE", "chatIds": [CHAT_ID_HERE], "userIds": [TELEGRAM_USER_ID_HERE]}
 ```
 
 AnyClaw will auto-detect and install it.
@@ -37,7 +37,7 @@ If you must: commit a file at `state/_token_transfer.json` and AnyClaw will read
 
 ## After transfer
 
-The telegram_bridge.py daemon will auto-activate on next bootstrap, or can be started manually:
+Inbound commands now require `userIds` to contain the numeric Telegram sender ID, and the message must arrive in a private chat. `chatIds` alone is not sufficient authorization. Keep both IDs in the private config file; never commit the bot token.\n\nThe telegram_bridge.py daemon will auto-activate on next bootstrap, or can be started manually:
 ```bash
 python3 scripts/telegram_bridge.py check
 ```
