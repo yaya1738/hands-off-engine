@@ -161,71 +161,25 @@ class ApprovalQueue:
         return False
 
     def execute_approved(self, change_id: str) -> Dict:
-        """
-        Execute an approved change.
-        Returns result dict with success status and details.
+        """Refuse legacy arbitrary actions until they use governed execution.
+
+        ApprovalQueue records approval state; it is not an execution engine.
+        Historical action payloads can contain arbitrary file paths and shell
+        commands, so executing them here would bypass the governed authority
+        contract. Keep this compatibility method fail-closed for callers.
         """
         change = self.get_change(change_id)
-
         if not change:
             return {"success": False, "error": "Change not found"}
-
-        if change["status"] != "approved":
+        if change.get("status") != "approved":
             return {"success": False, "error": "Change not approved"}
-
-        # Execute the proposed action
-        action = change.get("proposed_action", {})
-        action_type = action.get("type")
-
-        try:
-            if action_type == "edit_file":
-                # Edit file
-                file_path = action["file_path"]
-                old_content = action["old_content"]
-                new_content = action["new_content"]
-
-                with open(file_path, 'r') as f:
-                    current = f.read()
-
-                if old_content in current:
-                    updated = current.replace(old_content, new_content)
-                    with open(file_path, 'w') as f:
-                        f.write(updated)
-                    return {"success": True, "message": f"Edited {file_path}"}
-                else:
-                    return {"success": False, "error": "Old content not found in file"}
-
-            elif action_type == "write_file":
-                # Write new file
-                file_path = action["file_path"]
-                content = action["content"]
-
-                with open(file_path, 'w') as f:
-                    f.write(content)
-                return {"success": True, "message": f"Created {file_path}"}
-
-            elif action_type == "bash_command":
-                # Execute bash command
-                import subprocess
-                cmd = action["command"]
-                result = subprocess.run(
-                    cmd,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    timeout=60
-                )
-                return {
-                    "success": result.returncode == 0,
-                    "message": result.stdout,
-                    "error": result.stderr if result.returncode != 0 else None
-                }
-
-            else:
-                return {"success": False, "error": f"Unknown action type: {action_type}"}
-
-        except Exception as e:
-            return {"success": False, "error": str(e)}
+        return {
+            "success": False,
+            "error": (
+                "Execution blocked: legacy ApprovalQueue actions are disabled; "
+                "submit work through the governed execution path."
+            ),
+        }
 
 
 def send_approval_notification(change_id: str, change: Dict):
