@@ -314,8 +314,8 @@ class HardwareDecisionEngine:
                         triggered_by="disk_critical",
                         ai_reasoning="Disk nearly full - immediate cleanup required",
                         confidence=DecisionConfidence.CERTAIN,
-                        auto_executed=True,
-                        requires_approval=False
+                        auto_executed=self.auto_execute_enabled,
+                        requires_approval=not self.auto_execute_enabled
                     )
                     decisions.append(decision)
 
