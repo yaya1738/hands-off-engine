@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """Fail-closed bridge from governed commands to the Factory authority gateway.
 
-This adapter is the only intended bridge from the Sep-18 control plane into the
-Factory execution surface.  It never treats a task payload as execution
-authority: LIVE execution requires explicit approval plus this adapter's
-trusted executor opt-in.
+The adapter never treats approval classification or a caller-supplied gate as
+execution authority. The authority decision must explicitly grant execution.
+The current authority implementation grants no such rights, so LIVE execution
+remains blocked until a separately reviewed authority change exists.
 
 If the Factory runtime is unavailable, the adapter returns a bounded blocked
 result instead of falling back to legacy execution.
