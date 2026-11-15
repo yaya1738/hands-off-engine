@@ -223,72 +223,26 @@ class SelfHealer:
         return len(recent_restarts) < process.max_restarts_per_hour
 
     def restart_process(self, process: ProcessGuard) -> bool:
+        """Fail closed until process recovery uses governed authority.
+
+        ProcessGuard.command and working_dir are configuration data, not
+        permission to launch or terminate processes. In particular, never
+        interpolate them into a shell command or broad pkill pattern.
         """
-        Restart a guarded process.
+        self._log(
+            f"Restart blocked for {process.name}: governed recovery authorization required",
+            level="warning",
+        )
+        self.healing_history.append(HealingAction(
+            timestamp=datetime.utcnow().isoformat(),
+            action_type="restart_process",
+            target=process.name,
+            reason="Governed recovery authorization unavailable",
+            success=False,
+            details={"status": "blocked"},
+        ))
+        return False
 
-        Uses nohup and disown to ensure process survives CLI disconnect.
-        """
-        if not self._can_restart_process(process):
-            self._log(f"Rate limit reached for {process.name}", level='warning')
-            return False
-
-        self._log(f"Restarting process: {process.name}")
-
-        try:
-            # Kill existing if any
-            subprocess.run(['pkill', '-f', process.command[:50]], capture_output=True)
-            time.sleep(2)
-
-            # Start with nohup to survive terminal disconnect
-            log_file = LOG_DIR / f"{process.name}.log"
-            cmd = f"nohup {process.command} >> {log_file} 2>&1 &"
-
-            subprocess.Popen(
-                cmd,
-                shell=True,
-                cwd=process.working_dir,
-                stdin=subprocess.DEVNULL,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL,
-                start_new_session=True,  # Detach from terminal
-            )
-
-            # Record restart
-            if process.name not in self.restart_counts:
-                self.restart_counts[process.name] = []
-            self.restart_counts[process.name].append(datetime.utcnow())
-
-            # Record healing action
-            self.healing_history.append(HealingAction(
-                timestamp=datetime.utcnow().isoformat(),
-                action_type='restart_process',
-                target=process.name,
-                reason='Process not running',
-                success=True,
-            ))
-
-            time.sleep(process.restart_delay_sec)
-
-            # Verify it started
-            running, pid = self.check_process_running(process)
-            if running:
-                self._log(f"Process {process.name} started with PID {pid}")
-                return True
-            else:
-                self._log(f"Process {process.name} failed to start", level='error')
-                return False
-
-        except Exception as e:
-            self._log(f"Error restarting {process.name}: {e}", level='error')
-            self.healing_history.append(HealingAction(
-                timestamp=datetime.utcnow().isoformat(),
-                action_type='restart_process',
-                target=process.name,
-                reason='Process not running',
-                success=False,
-                details={'error': str(e)},
-            ))
-            return False
 
     def check_and_heal_processes(self) -> Dict:
         """Check all guarded processes and restart any that are down."""
