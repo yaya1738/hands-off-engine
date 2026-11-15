@@ -2,8 +2,8 @@
 """Self-Improvement Engine — generate and durably dispatch bounded improvements.
 
 The loop is intentionally fail-closed:
-observe -> deterministic candidate -> durable dedup -> max one dispatch -> AnyClaw
-result/continuation -> Factory intake -> next bounded decision.
+observe -> deterministic candidate -> durable dedup -> max one dispatch -> local
+Task Worker result/continuation -> Factory intake -> next bounded decision.
 
 Only existing read-only task actions are dispatched. This module never executes
 arbitrary commands or modifies source code directly.
@@ -23,12 +23,12 @@ DISPATCH_STATE = STATE / "improvement_dispatch_state.json"
 DISPATCH_LOCK = STATE / "improvement_dispatch.lock"
 FEEDBACK_FILE = STATE / "improvement_feedback.json"
 
-# These actions already exist in the AnyClaw worker and are deliberately read-only.
+# These actions exist in the local governed Task Worker and are deliberately read-only.
 ACTION_BY_CATEGORY = {
     "reliability": ("read_file_fact", "state/health_log.jsonl"),
     "quality": ("read_file_fact", "state/learning_state.json"),
     "maintenance": ("read_file_fact", "ai/coordination/messages.jsonl"),
-    "usability": ("read_file_fact", ".termux/boot/hands-off-engine.sh"),
+    "usability": ("read_file_fact", "scripts/termux_supervisor.py"),
     "security": ("read_file_fact", "scripts/comm_hub.py"),
     "expansion": ("system_status", ""),
 }
@@ -305,16 +305,19 @@ def _dispatch_one_locked(improvements):
             "from": "factory",
             "to": "anyclaw",
             "type": "task_assignment",
-            "task_id": task_id,
-            "action": action,
-            "params": {"path": target} if target else {},
+            "context": {
+                "task_id": task_id,
+                "action": action,
+                "params": {"file_path": target} if target else {},
+                "reply_to": "self_improvement",
+                "correlation_id": cid,
+            },
             "payload": {
                 "candidate_id": cid,
                 "category": imp["category"],
                 "title": imp.get("title", ""),
                 "description": imp.get("description", ""),
             },
-            "reply_to": "self_improvement",
         }
 
         # Write an outbox record first. On restart, pending work is replayed
