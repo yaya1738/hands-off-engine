@@ -65,7 +65,11 @@ def run_subprocess(script):
         timeout=SUBPROCESS_TIMEOUT_SECONDS,
         max_output_chars=MAX_SUBPROCESS_OUTPUT_CHARS,
     )
-    return {"success": outcome["success"], "output": outcome["output"]}
+    return {
+        "success": outcome["success"],
+        "output": outcome["output"],
+        "cleanup_guaranteed": outcome.get("cleanup_guaranteed", True),
+    }
 
 
 def apply_generated_candidates():
