@@ -1,3 +1,4 @@
+import io
 import json
 import sys
 import unittest
@@ -169,14 +170,14 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertIsNotNone(third)
         scheduler.release_lock(third)
 
-    def test_run_task_uses_file_backed_bounded_output(self):
+    def test_run_task_uses_pipe_drained_bounded_output(self):
         task = {"name": "sample", "script": "sample.py"}
         process = mock.Mock(pid=123, returncode=0)
         process.wait.return_value = 0
 
         def fake_popen(*args, **kwargs):
-            # Simulate output far beyond the retained tail limit.
-            kwargs["stdout"].write(b"x" * (scheduler.MAX_OUTPUT_CHARS * 100))
+            # Simulate output far beyond the retained in-memory tail limit.
+            process.stdout = io.BytesIO(b"x" * (scheduler.MAX_OUTPUT_CHARS * 100))
             return process
 
         with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
@@ -185,14 +186,26 @@ class SchedulerHardeningTests(unittest.TestCase):
             result = scheduler.run_task(task)
 
         self.assertTrue(result["success"])
+        self.assertTrue(result["cleanup_guaranteed"])
         self.assertEqual(len(result["output"]), scheduler.MAX_OUTPUT_CHARS)
         self.assertTrue(popen.call_args.kwargs["start_new_session"])
-        self.assertNotEqual(popen.call_args.kwargs["stdout"], process_group.subprocess.PIPE)
-        self.assertTrue(popen.call_args.kwargs["stdout"].closed)
+        self.assertEqual(popen.call_args.kwargs["stdout"], process_group.subprocess.PIPE)
+        self.assertTrue(process.stdout.closed)
+
+    def test_scheduler_surfaces_cleanup_uncertainty(self):
+        outcome = {
+            "success": False, "returncode": None, "output": "ownership lost",
+            "timed_out": False, "cleanup_guaranteed": False,
+        }
+        with mock.patch("scripts.process_group.run_process", return_value=outcome):
+            result = scheduler.run_task({"name": "sample", "script": "sample.py"})
+        self.assertFalse(result["success"])
+        self.assertFalse(result["cleanup_guaranteed"])
 
     def test_run_task_kills_process_group_on_timeout(self):
         task = {"name": "sample", "script": "sample.py"}
         process = mock.Mock(pid=456, returncode=None)
+        process.stdout = io.BytesIO()
         process.wait.side_effect = [
             process_group.subprocess.TimeoutExpired("sample", scheduler.TASK_TIMEOUT_SECONDS),
             -9,
@@ -202,12 +215,14 @@ class SchedulerHardeningTests(unittest.TestCase):
         with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
              mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
              mock.patch("scripts.process_group._wait_for_exit_without_reaping", side_effect=TimeoutError("timeout")), \
-             mock.patch.object(process_group.os, "killpg") as killpg:
+             mock.patch.object(process_group.os, "killpg") as killpg, \
+             mock.patch.object(process_group.os, "waitid", return_value=None):
             result = scheduler.run_task(task)
 
         self.assertFalse(result["success"])
-        killpg.assert_called_once_with(456, scheduler.signal.SIGKILL)
-        self.assertEqual(process.wait.call_count, 1)
+        killpg.assert_has_calls([mock.call(456, scheduler.signal.SIGTERM), mock.call(456, scheduler.signal.SIGKILL)])
+        self.assertEqual(process.wait.call_count, 2)
+        process.kill.assert_called_once_with()
 
     def test_scheduler_lock_conflict_returns_nonzero_entrypoint_status(self):
         with mock.patch.object(scheduler, "run_forever", return_value=False):
@@ -222,12 +237,12 @@ class SchedulerHardeningTests(unittest.TestCase):
         self.assertEqual(len(rows), 100)
         self.assertEqual(rows[-1]["n"], 100)
 
-    def test_improvement_cycle_subprocess_output_is_file_backed_and_bounded(self):
+    def test_improvement_cycle_subprocess_output_is_pipe_drained_and_bounded(self):
         process = mock.Mock(pid=789, returncode=0)
         process.wait.return_value = 0
 
         def fake_popen(*args, **kwargs):
-            kwargs["stdout"].write(b"z" * (improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS * 100))
+            process.stdout = io.BytesIO(b"z" * (improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS * 100))
             return process
 
         with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
@@ -236,13 +251,25 @@ class SchedulerHardeningTests(unittest.TestCase):
             result = improvement_cycle.run_subprocess("sample.py")
 
         self.assertTrue(result["success"])
+        self.assertTrue(result["cleanup_guaranteed"])
         self.assertEqual(len(result["output"]), improvement_cycle.MAX_SUBPROCESS_OUTPUT_CHARS)
-        self.assertNotEqual(popen.call_args.kwargs["stdout"], process_group.subprocess.PIPE)
+        self.assertEqual(popen.call_args.kwargs["stdout"], process_group.subprocess.PIPE)
         self.assertTrue(popen.call_args.kwargs["start_new_session"])
-        self.assertTrue(popen.call_args.kwargs["stdout"].closed)
+        self.assertTrue(process.stdout.closed)
+
+    def test_improvement_cycle_surfaces_cleanup_uncertainty(self):
+        outcome = {
+            "success": False, "returncode": None, "output": "ownership lost",
+            "timed_out": False, "cleanup_guaranteed": False,
+        }
+        with mock.patch("scripts.process_group.run_process", return_value=outcome):
+            result = improvement_cycle.run_subprocess("sample.py")
+        self.assertFalse(result["success"])
+        self.assertFalse(result["cleanup_guaranteed"])
 
     def test_improvement_cycle_subprocess_kills_process_group_on_timeout(self):
         process = mock.Mock(pid=987, returncode=-9)
+        process.stdout = io.BytesIO()
         process.wait.side_effect = [
             process_group.subprocess.TimeoutExpired("sample", improvement_cycle.SUBPROCESS_TIMEOUT_SECONDS),
             -9,
@@ -251,12 +278,14 @@ class SchedulerHardeningTests(unittest.TestCase):
         with mock.patch.object(process_group, "supports_waitid_wnowait", return_value=True), \
              mock.patch.object(process_group.subprocess, "Popen", return_value=process), \
              mock.patch("scripts.process_group._wait_for_exit_without_reaping", side_effect=TimeoutError("timeout")), \
-             mock.patch.object(process_group.os, "killpg") as killpg:
+             mock.patch.object(process_group.os, "killpg") as killpg, \
+             mock.patch.object(process_group.os, "waitid", return_value=None):
             result = improvement_cycle.run_subprocess("sample.py")
 
         self.assertFalse(result["success"])
-        killpg.assert_called_once_with(987, process_group.signal.SIGKILL)
-        self.assertEqual(process.wait.call_count, 1)
+        killpg.assert_has_calls([mock.call(987, process_group.signal.SIGTERM), mock.call(987, process_group.signal.SIGKILL)])
+        self.assertEqual(process.wait.call_count, 2)
+        process.kill.assert_called_once_with()
 
     def test_apply_generated_candidates_reads_snapshot_and_calls_applier_once(self):
         candidate = {"id": "imp-123", "action": "update_documentation"}

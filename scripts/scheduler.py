@@ -193,6 +193,7 @@ def run_task(task):
         "success": outcome["success"],
         "returncode": outcome["returncode"],
         "output": outcome["output"],
+        "cleanup_guaranteed": outcome.get("cleanup_guaranteed", True),
         "started_at": started,
         "timestamp": _timestamp(),
     }
