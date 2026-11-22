@@ -114,3 +114,41 @@ def test_private_finance_hub_is_migrated_out_of_repo_state_tree(tmp_path):
     assert new_hub.read_text(encoding="utf-8") == old_hub.read_text(encoding="utf-8")
     assert old_hub.exists()
     assert result["files"][0]["destination"] == "finance/private_finance_hub.json"
+
+
+
+def test_migration_preserves_recursive_finance_snapshots_and_security_archive(tmp_path):
+    source = tmp_path / "repo"
+    destination = tmp_path / "private"
+    snapshot = source / "termux-hands-off" / "data" / "finances" / "snapshots" / "snapshot.json"
+    state_env = source / "termux-hands-off" / "state" / "alerts.env"
+    archive = source / "termux-hands-off" / "security_snapshot.tar"
+    for path in (snapshot, state_env, archive):
+        path.parent.mkdir(parents=True, exist_ok=True)
+    snapshot.write_text('{"net_worth":null}', encoding="utf-8")
+    state_env.write_text("ALERTS_ENABLED=false\n", encoding="utf-8")
+    archive.write_bytes(b"private-archive-placeholder")
+
+    result = migrate(source, destination)
+
+    assert (destination / "termux-hands-off" / "data" / "finances" / "snapshots" / "snapshot.json").exists()
+    assert (destination / "termux-hands-off" / "state" / "alerts.env").exists()
+    assert (destination / "termux-hands-off" / "security_snapshot.tar").read_bytes() == archive.read_bytes()
+    assert len(result["files"]) == 3
+
+
+def test_legacy_runtime_recursive_finance_history_is_preserved(tmp_path):
+    source = tmp_path / "repo"
+    legacy = tmp_path / "hands-off"
+    destination = tmp_path / "private"
+    snapshot = legacy / "data" / "finances" / "snapshots" / "old.json"
+    log = legacy / "logs" / "finance_balances.log"
+    snapshot.parent.mkdir(parents=True)
+    log.parent.mkdir(parents=True)
+    snapshot.write_text('{"status":"historical"}', encoding="utf-8")
+    log.write_text('{"usd_total":null}\n', encoding="utf-8")
+
+    migrate(source, destination, legacy)
+
+    assert (destination / "legacy_runtime" / "data" / "finances" / "snapshots" / "old.json").exists()
+    assert (destination / "legacy_runtime" / "logs" / "finance_balances.log").exists()
