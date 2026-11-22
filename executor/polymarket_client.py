@@ -38,7 +38,7 @@ class PolymarketTrader:
         self.cfg = cfg
         self.logger = logger or logging.getLogger(__name__)
 
-        self.client = ClobClient(
+        self.__client = ClobClient(
             cfg.host,
             key=cfg.private_key,
             chain_id=cfg.chain_id,
@@ -47,7 +47,7 @@ class PolymarketTrader:
         )
 
         # Derive / create API credentials once
-        self.client.set_api_creds(self.client.create_or_derive_api_creds())
+        self.__client.set_api_creds(self.__client.create_or_derive_api_creds())
         self.logger.info("Polymarket CLOB client initialized")
 
     @classmethod
@@ -79,12 +79,12 @@ class PolymarketTrader:
 
     def get_server_time(self) -> Dict[str, Any]:
         """Test connection - get server timestamp"""
-        return self.client.get_server_time()
+        return self.__client.get_server_time()
 
     def check_health(self) -> bool:
         """Check if API is responding"""
         try:
-            resp = self.client.get_ok()
+            resp = self.__client.get_ok()
             # Handle both dict and string responses
             if isinstance(resp, dict):
                 return resp.get("status") == "ok"
@@ -116,11 +116,11 @@ class PolymarketTrader:
 
     def get_open_orders(self) -> list:
         """Get all open orders for this account"""
-        return self.client.get_orders()
+        return self.__client.get_orders()
 
     def get_trades(self) -> list:
         """Get trade history for this account"""
-        return self.client.get_trades()
+        return self.__client.get_trades()
 
     @staticmethod
     def _blocked_mutation(action: str) -> Dict[str, Any]:
