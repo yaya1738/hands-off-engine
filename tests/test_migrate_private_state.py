@@ -81,3 +81,20 @@ def test_migration_does_not_create_or_copy_missing_files(tmp_path):
 
     assert result["files"] == []
     assert result["manifest_status"] == "written"
+
+
+
+def test_migration_also_preserves_legacy_hands_off_runtime_paths(tmp_path):
+    source = tmp_path / "repo"
+    legacy = tmp_path / "hands-off"
+    destination = tmp_path / "private"
+    record = legacy / "agents" / "external_accounts.json"
+    record.parent.mkdir(parents=True)
+    record.write_text('{"account":"private"}', encoding="utf-8")
+
+    result = migrate(source, destination, legacy)
+
+    copied = destination / "legacy_runtime" / "agents" / "external_accounts.json"
+    assert copied.read_text(encoding="utf-8") == '{"account":"private"}'
+    assert result["files"][0]["source"].startswith("legacy_runtime:")
+    assert result["files"][0]["status"] == "copied"
