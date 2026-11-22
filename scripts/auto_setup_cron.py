@@ -1,19 +1,10 @@
 #!/usr/bin/env python3
 """
-Auto Setup Cron - Install all autonomous operation cron jobs
+Legacy cron installer — disabled.
 
-This script installs the cron jobs needed for fully autonomous operation:
-- Trading pipeline (hourly)
-- Health monitoring (every 15 min)
-- Phase progression (daily)
-- Coordination agent (every 5 min)
-- Claude orchestrator (every 30 min)
-- Self-improvement cycle (every 6 hours)
-
-Usage:
-    python3 auto_setup_cron.py --install   # Install cron jobs
-    python3 auto_setup_cron.py --remove    # Remove cron jobs
-    python3 auto_setup_cron.py --show      # Show what would be installed
+Direct crontab mutation is intentionally blocked. The governed supervisor is
+the only supported owner of runtime scheduling. --show is historical reference
+only and does not imply that these jobs are installed or installable.
 """
 
 import argparse
@@ -103,7 +94,8 @@ def remove_cron_jobs():
 
 def show_cron_jobs():
     """Show what would be installed"""
-    print("Cron jobs that will be installed:")
+    print("BLOCKED: legacy cron definitions are reference-only and will not be installed.")
+    print("The governed supervisor owns runtime scheduling.")
     print("=" * 60)
     print()
 
@@ -114,7 +106,7 @@ def show_cron_jobs():
         print()
 
     print("=" * 60)
-    print(f"Total: {len(CRON_JOBS)} cron jobs")
+    print(f"Historical definitions: {len(CRON_JOBS)} (installation disabled)")
 
 
 def main():
