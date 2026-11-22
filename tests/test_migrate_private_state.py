@@ -218,3 +218,18 @@ def test_migration_preserves_keys_vault_and_rotated_backups(tmp_path):
 
     assert (destination / "secrets" / "keys.vault").read_text(encoding="utf-8") == "KEY=private"
     assert (destination / "secrets" / "keys.vault.bak.123").read_text(encoding="utf-8") == "KEY=historical"
+
+
+
+def test_migration_preserves_legacy_cron_logs(tmp_path):
+    source = tmp_path / "repo"
+    cron_logs = tmp_path / ".cron-logs"
+    destination = tmp_path / "private"
+    log = cron_logs / "finance.log"
+    cron_logs.mkdir(parents=True)
+    log.write_text("historical finance log\n", encoding="utf-8")
+
+    migrate(source, destination, cron_logs_root=cron_logs)
+
+    preserved = destination / "logs" / "cron" / "finance.log"
+    assert preserved.read_text(encoding="utf-8") == log.read_text(encoding="utf-8")
