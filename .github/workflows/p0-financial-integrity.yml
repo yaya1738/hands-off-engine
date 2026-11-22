@@ -31,7 +31,7 @@ jobs:
         run: python -m pip install pytest requests python-dotenv
 
       - name: Compile modified Python packages
-        run: python -m compileall -q ai_nexus autonomous executor finance hardware scripts security ui audit
+        run: python -m compileall -q ai_nexus autonomous executor finance hardware scripts security ui audit termux-hands-off/agents
 
       - name: Validate shell setup syntax
         run: bash -n scripts/setup_autonomous_mode.sh
@@ -89,4 +89,5 @@ jobs:
           tests/test_legacy_finance_watcher_truth.py
           tests/test_migrate_private_state.py
           tests/test_private_identity_profile.py
+          tests/test_private_state_resolver.py
           -q --tb=short
