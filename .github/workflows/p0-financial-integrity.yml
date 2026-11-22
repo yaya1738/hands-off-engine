@@ -90,4 +90,5 @@ jobs:
           tests/test_migrate_private_state.py
           tests/test_private_identity_profile.py
           tests/test_private_state_resolver.py
+          tests/test_private_finance_agents.py
           -q --tb=short
