@@ -2,6 +2,7 @@
 
 import importlib.util
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -12,6 +13,9 @@ BOT_PATH = Path("termux-hands-off/agent/finance_bot.py")
 
 
 def load_module(path, name):
+    parent = str(path.parent.resolve())
+    if parent not in sys.path:
+        sys.path.insert(0, parent)
     spec = importlib.util.spec_from_file_location(name, path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
