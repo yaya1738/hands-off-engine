@@ -29,12 +29,16 @@ for candidate in \
   "$PRIVATE_SECRETS/vault.json" \
   "$PRIVATE_SECRETS/termux-agent-vault.json" \
   "$PRIVATE_SECRETS/.env.polymarket" \
+  "$PRIVATE_SECRETS/keys.vault" \
   "$PRIVATE_RUNTIME/agents/external_accounts.json" \
   "$PRIVATE_RUNTIME/agents/cards.json" \
   "$PRIVATE_RUNTIME/agents/emergency_info.json" \
   "$PRIVATE_RUNTIME/agents/finance_rules.json" \
+  "$PRIVATE_RUNTIME/state" \
+  "$PRIVATE_RUNTIME/agent" \
   "$PRIVATE_RUNTIME/logs" \
   "$PRIVATE_RUNTIME/data/finances" \
+  "$PRIVATE_ROOT/logs" \
   "$PRIVATE_ROOT/termux-hands-off/state" \
   "$PRIVATE_ROOT/termux-hands-off/logs" \
   "$PRIVATE_ROOT/termux-hands-off/data/finances" \
@@ -44,6 +48,9 @@ for candidate in \
   "$PRIVATE_ROOT/security/yair_identity_profile.json"
 do
   if [ -e "$candidate" ]; then set -- "$@" "$candidate"; fi
+done
+for candidate in "$PRIVATE_SECRETS"/keys.vault.bak.*; do
+  if [ -f "$candidate" ]; then set -- "$@" "$candidate"; fi
 done
 [ "$#" -gt 0 ] || { echo "No private files found to archive"; exit 1; }
 tar -cf "$OUT" "$@"
