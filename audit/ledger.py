@@ -5,6 +5,9 @@ Blockchain-inspired append-only ledger
 """
 import hashlib
 import json
+import os
+import fcntl
+from contextlib import contextmanager
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,12 +54,26 @@ class FinancialLedger:
         self.ledger_file = Path(ledger_file)
         self.ledger_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Initialize with genesis entry if new ledger
-        if not self.ledger_file.exists():
-            self._create_genesis_entry()
+        # Genesis creation is serialized with every append across processes.
+        self._create_genesis_entry()
+
+    @contextmanager
+    def _locked(self):
+        """Cross-process exclusive lock for ledger read/modify/append sequences."""
+        lock_path = self.ledger_file.with_suffix(self.ledger_file.suffix + ".lock")
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(lock_path, "a", encoding="utf-8") as lock_handle:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
 
     def _create_genesis_entry(self):
-        """Create the first entry in the ledger"""
+        """Create the first entry exactly once, under the ledger lock."""
+        with self._locked():
+            if self.ledger_file.exists() and self.ledger_file.stat().st_size:
+                return
         genesis = LedgerEntry(
             entry_id="genesis",
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -73,8 +90,34 @@ class FinancialLedger:
             hash_version=1,
         )
 
-        with open(self.ledger_file, "w") as f:
-            f.write(json.dumps(genesis.to_dict()) + "\n")
+            with open(self.ledger_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(genesis.to_dict()) + "\n")
+                f.flush()
+                os.fsync(f.fileno())
+
+    def _append_entry(self, entry: LedgerEntry) -> LedgerEntry:
+        """Atomically assign chain position, enforce idempotency, and append."""
+        with self._locked():
+            lines = self.ledger_file.read_text(encoding="utf-8").splitlines() if self.ledger_file.exists() else []
+            previous_hash = "0" * 64
+            seen_keys = set()
+            for line in lines:
+                if not line.strip():
+                    continue
+                item = json.loads(line)
+                previous_hash = item["current_hash"]
+                key = item.get("idempotency_key")
+                if key:
+                    seen_keys.add(key)
+            if entry.idempotency_key and entry.idempotency_key in seen_keys:
+                raise ValueError("Duplicate financial evidence: idempotency key already recorded")
+            entry.previous_hash = previous_hash
+            entry.current_hash = self._compute_entry_hash(entry.to_dict())
+            with open(self.ledger_file, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(entry.to_dict()) + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+        return entry
 
     def _compute_hash(self, entry_id: str, previous_hash: str, amount: float) -> str:
         """Compute SHA-256 hash for entry"""
@@ -129,9 +172,6 @@ class FinancialLedger:
             and bool(verification.get("evidence_ref"))
         )
         idempotency_key = verification.get("idempotency_key") if verified else None
-        if self._idempotency_exists(idempotency_key):
-            raise ValueError("Duplicate financial evidence: idempotency key already recorded")
-
         entry = LedgerEntry(
             entry_id=str(uuid.uuid4()),
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -141,7 +181,7 @@ class FinancialLedger:
             amount=-abs(value),
             category="cost",
             metadata=data,
-            previous_hash=self._get_last_hash(),
+            previous_hash="",
             current_hash="",
             verified=bool(verified),
             source_type=verification.get("source_type", "unverified") if verified else "unverified",
@@ -149,10 +189,7 @@ class FinancialLedger:
             idempotency_key=idempotency_key,
             hash_version=2,
         )
-        entry.current_hash = self._compute_entry_hash(entry.to_dict())
-        with open(self.ledger_file, "a", encoding="utf-8") as handle:
-            handle.write(json.dumps(entry.to_dict()) + "\n")
-        return entry
+        return self._append_entry(entry)
 
     def add_revenue(
         self,
@@ -188,9 +225,6 @@ class FinancialLedger:
             raise ValueError(
                 "Unverified revenue blocked: provide a verified source_type, evidence_ref and idempotency_key"
             )
-        if self._idempotency_exists(verification["idempotency_key"]):
-            raise ValueError("Duplicate financial evidence: idempotency key already recorded")
-
         entry = LedgerEntry(
             entry_id=str(uuid.uuid4()),
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -200,7 +234,7 @@ class FinancialLedger:
             amount=abs(value),
             category="revenue",
             metadata=data,
-            previous_hash=self._get_last_hash(),
+            previous_hash="",
             current_hash="",
             verified=True,
             source_type=verification["source_type"],
@@ -208,10 +242,7 @@ class FinancialLedger:
             idempotency_key=verification["idempotency_key"],
             hash_version=2,
         )
-        entry.current_hash = self._compute_entry_hash(entry.to_dict())
-        with open(self.ledger_file, "a", encoding="utf-8") as handle:
-            handle.write(json.dumps(entry.to_dict()) + "\n")
-        return entry
+        return self._append_entry(entry)
 
     def get_entries(
         self,
