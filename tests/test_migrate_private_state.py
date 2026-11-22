@@ -293,3 +293,18 @@ def test_migration_preserves_unclassified_legacy_private_config_files(tmp_path):
 
     preserved = destination / "secrets" / "legacy_config" / "hands-off" / "custom_private_config.json"
     assert preserved.read_text(encoding="utf-8") == extra.read_text(encoding="utf-8")
+
+
+
+def test_mirror_passphrase_is_preserved_but_not_copied_into_archive_payload_tree(tmp_path):
+    source = tmp_path / "repo"
+    secrets_root = tmp_path / "config"
+    destination = tmp_path / "private"
+    passphrase = secrets_root / "hands-off" / "enc_passphrase.txt"
+    passphrase.parent.mkdir(parents=True)
+    passphrase.write_text("private-passphrase-placeholder", encoding="utf-8")
+
+    migrate(source, destination, secrets_root=secrets_root)
+
+    assert (destination / "secrets" / "mirror_passphrase.txt").read_text(encoding="utf-8") == passphrase.read_text(encoding="utf-8")
+    assert not (destination / "secrets" / "legacy_config" / "hands-off" / "enc_passphrase.txt").exists()
