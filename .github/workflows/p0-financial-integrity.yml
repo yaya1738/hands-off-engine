@@ -38,22 +38,43 @@ jobs:
 
       - name: Scan current source tree and Git history for embedded credentials
         run: |
-          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --no-git --source /path --redact --report-format json --report-path /path/gitleaks-working-tree.json --exit-code 1 || true
-          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --source /path --redact --report-format json --report-path /path/gitleaks-history.json --exit-code 1 || true
-          python - <<'PY'
+          set +e
+          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --no-git --source /path --redact --report-format json --report-path /path/gitleaks-working-tree.json --exit-code 1
+          working_status=$?
+          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --source /path --redact --report-format json --report-path /path/gitleaks-history.json --exit-code 1
+          history_status=$?
+          set -e
+          WORKING_STATUS="$working_status" HISTORY_STATUS="$history_status" python - <<'PY'
           import json
+          import os
           import sys
           from pathlib import Path
 
           def findings(path):
               report = Path(path)
-              return json.loads(report.read_text()) if report.exists() else []
+              if not report.is_file():
+                  raise SystemExit(f"Credential scanner did not produce {path}")
+              try:
+                  data = json.loads(report.read_text())
+              except (OSError, ValueError) as exc:
+                  raise SystemExit(f"Credential scanner report is unreadable: {path}: {exc}")
+              if not isinstance(data, list):
+                  raise SystemExit(f"Credential scanner report has an invalid shape: {path}")
+              return data
 
           working = findings("gitleaks-working-tree.json")
           history = findings("gitleaks-history.json")
+          working_status = int(os.environ["WORKING_STATUS"])
+          history_status = int(os.environ["HISTORY_STATUS"])
           print(f"Working-tree credential findings: {len(working)}")
           print(f"Git-history credential findings: {len(history)}")
-          for source, items in (("working-tree", working), ("git-history", history)):
+          for source, items, status in (
+              ("working-tree", working, working_status),
+              ("git-history", history, history_status),
+          ):
+              if status not in (0, 1) or (status == 1 and not items):
+                  print(f"{source}: scanner failed (exit {status})")
+                  sys.exit(2)
               for item in items:
                   print(f"{source}: {item.get('File')}:{item.get('StartLine')} rule={item.get('RuleID')}")
           sys.exit(1 if working or history else 0)
