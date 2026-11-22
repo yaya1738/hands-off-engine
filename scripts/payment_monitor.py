@@ -197,7 +197,8 @@ def main():
         f"[{now.isoformat()}] USDC Balance: ${total:.2f} "
         f"(native: ${native:.2f}, bridged: ${bridged:.2f})"
     )
-    print(f"  Previous: {'uninitialized' if previous is None else f'${previous:.2f}'}")
+    previous_text = "uninitialized" if previous is None else f"${previous:.2f}"
+    print(f"  Previous: {previous_text}")
 
     if payment:
         send_telegram(
