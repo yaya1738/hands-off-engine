@@ -2,7 +2,7 @@
 import os, json, time, hmac, hashlib, base64, datetime, sys
 from pathlib import Path
 from urllib.parse import urlencode
-from private_state import private_path, private_directory
+from private_state import private_path, private_directory, private_root
 import requests
 
 HOME = Path.home()
@@ -10,10 +10,7 @@ LOG_DIR = private_directory("logs", create=True)
 RULES_PATH = private_path("agents/finance_rules.json")
 RULES = json.loads(RULES_PATH.read_text(encoding="utf-8")) if RULES_PATH.exists() else {"symbols": [], "alerts": [], "poll_seconds": 45}
 EXTERNAL_FILE = private_path("agents/external_accounts.json")
-VAULT_CANDIDATES = [
-    HOME/"hands-off"/"vault.json",
-    HOME/".config"/"hands-off"/"vault.json"
-]
+VAULT_CANDIDATES = [private_root() / "secrets" / "vault.json"]
 VAULT = next((p for p in VAULT_CANDIDATES if p.exists()), None)
 
 def now_utc_iso():
