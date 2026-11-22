@@ -2,12 +2,12 @@
 import os, json, time, pathlib, csv, re
 from typing import List, Dict, Any
 import requests
+from private_state import private_path
 
-HOME = pathlib.Path.home()
-EXT  = HOME/"hands-off"/"agents"/"external_accounts.json"
-JLOG = HOME/"hands-off"/"logs"/"polymarket_positions.jsonl"
-CSVF = HOME/"hands-off"/"logs"/"polymarket_positions.csv"
-PULL = HOME/"hands-off"/"logs"/"polymarket_pull.log"  # for context
+EXT  = private_path("agents/external_accounts.json", create_parent=True)
+JLOG = private_path("logs/polymarket_positions.jsonl", create_parent=True)
+CSVF = private_path("logs/polymarket_positions.csv", create_parent=True)
+PULL = private_path("logs/polymarket_pull.log", create_parent=True)  # for context
 
 def nowz():
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
