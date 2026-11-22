@@ -35,6 +35,22 @@ STATE_PATTERNS = (
     "pnl_ledger.json",
 )
 
+LEGACY_RUNTIME_PATHS = (
+    "agents/external_accounts.json",
+    "agents/cards.json",
+    "agents/emergency_info.json",
+    "agents/finance_rules.json",
+    "logs/finance_balances.log",
+    "logs/finance_credit.log",
+    "logs/finance_daily.csv",
+    "logs/cards_status.json",
+    "logs/cards_minpay.json",
+    "logs/polymarket_positions.jsonl",
+    "logs/polymarket_positions.csv",
+    "logs/performance_daily.csv",
+    "logs/pnl_ledger.json",
+)
+
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
@@ -45,14 +61,39 @@ def private_root() -> Path:
     return Path(configured).expanduser() if configured else Path.home() / ".config" / "hands-off-engine"
 
 
-def collect_sources(source_root: Path) -> list[Path]:
-    candidates = {source_root / rel for rel in FIXED_RELATIVE_PATHS}
-    state_dir = source_root / "termux-hands-off" / "state"
-    if state_dir.is_dir():
-        for pattern in STATE_PATTERNS:
-            candidates.update(state_dir.glob(pattern))
-    return sorted(path for path in candidates if path.is_file())
+def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) -> list[tuple[Path, Path, str]]:
+    candidates: dict[Path, tuple[Path, str]] = {}
+    for relative in FIXED_RELATIVE_PATHS:
+        source = source_root / relative
+        if source.is_file():
+            candidates[source] = (Path(relative), "repo")
 
+    for state_dir in (source_root / "state", source_root / "termux-hands-off" / "state"):
+        if state_dir.is_dir():
+            for pattern in STATE_PATTERNS:
+                for source in state_dir.glob(pattern):
+                    if source.is_file():
+                        relative = source.relative_to(source_root)
+                        candidates[source] = (relative, "repo")
+
+    if legacy_runtime_root is not None:
+        legacy_runtime_root = legacy_runtime_root.expanduser().resolve()
+        if legacy_runtime_root.is_dir():
+            for relative_text in LEGACY_RUNTIME_PATHS:
+                source = legacy_runtime_root / relative_text
+                if source.is_file():
+                    candidates[source] = (Path("legacy_runtime") / relative_text, "legacy_runtime")
+            for state_dir in (legacy_runtime_root / "state",):
+                if state_dir.is_dir():
+                    for pattern in STATE_PATTERNS:
+                        for source in state_dir.glob(pattern):
+                            if source.is_file():
+                                relative = Path("legacy_runtime") / source.relative_to(legacy_runtime_root)
+                                candidates[source] = (relative, "legacy_runtime")
+
+    return [(source, relative, label) for source, (relative, label) in sorted(
+        candidates.items(), key=lambda item: str(item[1][0])
+    )]
 
 def copy_without_overwrite(source: Path, destination: Path) -> tuple[str, str, int]:
     data = source.read_bytes()
@@ -91,7 +132,7 @@ def copy_without_overwrite(source: Path, destination: Path) -> tuple[str, str, i
             pass
 
 
-def migrate(source_root: Path, destination_root: Path) -> dict:
+def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None) -> dict:
     source_root = source_root.expanduser().resolve()
     destination_root = destination_root.expanduser().resolve()
     destination_root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -101,12 +142,11 @@ def migrate(source_root: Path, destination_root: Path) -> dict:
         pass
 
     results = []
-    for source in collect_sources(source_root):
-        relative = source.relative_to(source_root)
+    for source, relative, source_label in collect_sources(source_root, legacy_runtime_root):
         destination = destination_root / relative
         status, digest, size = copy_without_overwrite(source, destination)
         results.append({
-            "source": str(relative),
+            "source": f"{source_label}:{source}",
             "destination": str(relative),
             "sha256": digest,
             "bytes": size,
@@ -117,6 +157,7 @@ def migrate(source_root: Path, destination_root: Path) -> dict:
         "version": 1,
         "created_at": datetime.now(timezone.utc).isoformat(),
         "source_root": str(source_root),
+        "legacy_runtime_root": str(legacy_runtime_root.expanduser().resolve()) if legacy_runtime_root else None,
         "files": results,
     }
     manifest_path = destination_root / "migration_manifest.json"
@@ -134,7 +175,7 @@ def migrate(source_root: Path, destination_root: Path) -> dict:
     else:
         manifest_status = "written"
 
-    encoded = (json.dumps(manifest, indent=2) + "\\n").encode("utf-8")
+    encoded = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
     fd, temp_name = tempfile.mkstemp(prefix=".manifest-", dir=destination_root)
     temp_path = Path(temp_name)
     try:
@@ -156,10 +197,11 @@ def migrate(source_root: Path, destination_root: Path) -> dict:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parent.parent)
+    parser.add_argument("--legacy-runtime-root", type=Path, default=Path.home() / "hands-off")
     parser.add_argument("--destination", type=Path, default=private_root())
     args = parser.parse_args()
 
-    result = migrate(args.source_root, args.destination)
+    result = migrate(args.source_root, args.destination, args.legacy_runtime_root)
     copied = sum(item["status"] == "copied" for item in result["files"])
     preserved = sum(item["status"] == "already_preserved" for item in result["files"])
     conflicts = sum(item["status"] == "conflict_existing_destination" for item in result["files"])
