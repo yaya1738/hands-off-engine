@@ -143,7 +143,7 @@ def main():
 
     # console summary
     print(json.dumps({
-        "wallet": wallet,
+        "wallet_configured": True,
         "positions_found": len(rows),
         "mark_sum": mark_sum,
         "cost_basis": cost,
