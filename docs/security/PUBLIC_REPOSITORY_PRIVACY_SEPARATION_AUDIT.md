@@ -88,6 +88,8 @@ python scripts/migrate_private_state.py \
 
 It records the repo and legacy runtime sources separately under the private destination. Review the summary and manifest; resolve any destination conflicts before proceeding. The command does not delete or modify originals.
 
+A provider-by-provider rotation checklist is maintained in `docs/security/CREDENTIAL_ROTATION_RUNBOOK.md`. It is a manual runbook only; no credentials have been revoked, replaced, or used.
+
 ## Important boundary
 
 A `.gitignore` entry does not remove a file already tracked by Git. Removing a file from the current tree does not remove its earlier versions from public Git history. Gitleaks passing does not establish that personal financial information or identity data is absent.
