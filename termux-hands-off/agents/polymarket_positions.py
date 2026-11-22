@@ -124,7 +124,15 @@ def main():
         print("[i] No wallet/username set. Aborting.")
         return
     rows = fetch_positions(wallet)
-    mark_sum = round(sum(r["value"] for r in rows), 2) if rows else 0.0
+    if not rows:
+        print(json.dumps({
+            "status": "unknown",
+            "reason": "No confirmed positions response; previous mark was preserved",
+            "positions_found": 0,
+            "mark_sum": None,
+        }, indent=2))
+        return
+    mark_sum = round(sum(r["value"] for r in rows), 2)
 
     # write logs
     if rows:
