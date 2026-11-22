@@ -50,6 +50,8 @@ LEGACY_RUNTIME_PATHS = (
     "agents/emergency_info.json",
     "agent/vault.json",
     "agent/vault.json.bak",
+    "agent/polymarket-compact.json",
+    "agent/polymarket_compact.json",
     "agents/finance_rules.json",
     "agents/perf_inputs.json",
     "logs/finance_balances.log",
