@@ -85,4 +85,5 @@ jobs:
           tests/test_p0_financial_integrity_guards.py
           tests/unit/test_executor_shadow_mode.py
           tests/test_payment_monitor.py
+          tests/test_legacy_execution_boundaries.py
           -q --tb=short
