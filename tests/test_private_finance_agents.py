@@ -112,3 +112,34 @@ def test_empty_polymarket_response_preserves_previous_mark(tmp_path, monkeypatch
     assert result["status"] == "unknown"
     assert result["mark_sum"] is None
     assert not module.EXT.exists()
+
+
+
+def test_manual_external_account_metadata_is_never_summed_into_net_worth(tmp_path, monkeypatch):
+    private_root = tmp_path / "private"
+    monkeypatch.setenv("HANDS_OFF_PRIVATE_DIR", str(private_root))
+    agent_dir = str(AGENTS.resolve())
+    if agent_dir not in sys.path:
+        sys.path.insert(0, agent_dir)
+    spec = importlib.util.spec_from_file_location(
+        "private_finance_watcher_manual_test",
+        AGENTS / "finance_watcher.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    module.EXTERNAL_FILE.parent.mkdir(parents=True, exist_ok=True)
+    module.EXTERNAL_FILE.write_text(json.dumps({
+        "bank_balance": 1000,
+        "credit_limit": 5000,
+        "credit_score": 700,
+        "rent_monthly": 1500,
+        "life_notes": {"note": "metadata"},
+    }), encoding="utf-8")
+
+    snapshot = module.portfolio_snapshot({})
+
+    assert snapshot["external_status"] == "manual_unverified"
+    assert snapshot["external_manual_inputs_present"] is True
+    assert snapshot["usd_total_raw"] is None
+    assert snapshot["usd_total"] is None
+    assert snapshot["status"] == "partial_unknown"
