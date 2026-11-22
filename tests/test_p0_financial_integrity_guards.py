@@ -1115,3 +1115,19 @@ def test_ledger_refuses_to_append_after_existing_chain_tampering(tmp_path):
     else:
         raise AssertionError("append to a tampered ledger must be rejected")
     assert ledger.verify_integrity() is False
+
+
+def test_finance_hub_refuses_to_overwrite_corrupt_json(tmp_path):
+    from finance.hub_store import update_account
+
+    path = tmp_path / "private_finance_hub.json"
+    damaged = '{"accounts": '
+    path.write_text(damaged, encoding="utf-8")
+
+    try:
+        update_account(path, "polymarket", {"balance_usdc": 0.0})
+    except json.JSONDecodeError:
+        pass
+    else:
+        raise AssertionError("corrupt finance hub must not be overwritten")
+    assert path.read_text(encoding="utf-8") == damaged
