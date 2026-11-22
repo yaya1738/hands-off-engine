@@ -168,6 +168,7 @@ def test_finance_vault_importer_writes_only_to_private_secrets_directory(tmp_pat
     data = json.loads(vault.read_text(encoding="utf-8"))
     assert all(value == "" for value in data.values())
     assert vault.stat().st_mode & 0o777 == 0o600
+    assert (tmp_path / "private").stat().st_mode & 0o777 == 0o700
     assert "private" in result.stdout.lower()
 
 
