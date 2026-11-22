@@ -26,9 +26,9 @@ PRIVATE_DIR = Path(os.environ.get(
     "HANDS_OFF_PRIVATE_DIR",
     str(Path.home() / ".config" / "hands-off-engine"),
 )).expanduser()
-PROFILE_PATH = Path(os.environ.get("HANDS_OFF_IDENTITY_PROFILE", str(PRIVATE_DIR / "yair_identity_profile.json"))).expanduser()
-HUMAN_IDENTITY_PATH = Path(os.environ.get("HANDS_OFF_HUMAN_IDENTITY", str(PRIVATE_DIR / "yair_human_identity.json"))).expanduser()
-VERIFICATION_LOG = Path(os.environ.get("HANDS_OFF_IDENTITY_AUDIT_LOG", str(PRIVATE_DIR / "verification_audit.jsonl"))).expanduser()
+PROFILE_PATH = Path(os.environ.get("HANDS_OFF_IDENTITY_PROFILE", str(PRIVATE_DIR / "security" / "yair_identity_profile.json"))).expanduser()
+HUMAN_IDENTITY_PATH = Path(os.environ.get("HANDS_OFF_HUMAN_IDENTITY", str(PRIVATE_DIR / "security" / "yair_human_identity.json"))).expanduser()
+VERIFICATION_LOG = Path(os.environ.get("HANDS_OFF_IDENTITY_AUDIT_LOG", str(PRIVATE_DIR / "security" / "verification_audit.jsonl"))).expanduser()
 
 class AbsoluteIdentity:
     def __init__(self):
