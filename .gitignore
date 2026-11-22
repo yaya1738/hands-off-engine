@@ -106,3 +106,12 @@ security/yair_human_identity.json
 security/verification_audit.jsonl
 state/optimal_trigger_config.json
 state/filler_actions.jsonl
+
+# Termux runtime finance, vault, and security backup data
+termux-hands-off/state/
+termux-hands-off/logs/
+termux-hands-off/data/finances/
+termux-hands-off/agent/vault.json
+termux-hands-off/agent/vault.json.bak
+termux-hands-off/security_snapshot.tar
+termux-hands-off/autopilot/admin.env
