@@ -263,11 +263,10 @@ class AbsoluteIdentity:
     def _log_verification(self, result: dict):
         """Audit log all verification attempts"""
         try:
+            PRIVATE_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
+            PRIVATE_DIR.chmod(0o700)
             VERIFICATION_LOG.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
-            try:
-                VERIFICATION_LOG.parent.chmod(0o700)
-            except OSError:
-                pass
+            VERIFICATION_LOG.parent.chmod(0o700)
             fd = os.open(VERIFICATION_LOG, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o600)
             with os.fdopen(fd, "a", encoding="utf-8") as handle:
                 handle.write(json.dumps(result) + "\n")
