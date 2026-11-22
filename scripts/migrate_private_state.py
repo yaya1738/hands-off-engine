@@ -82,7 +82,7 @@ def private_root() -> Path:
     return Path(configured).expanduser() if configured else Path.home() / ".config" / "hands-off-engine"
 
 
-def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None) -> list[tuple[Path, Path, str]]:
+def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None, cron_logs_root: Path | None = None) -> list[tuple[Path, Path, str]]:
     candidates: dict[Path, tuple[Path, str]] = {}
     for relative in FIXED_RELATIVE_PATHS:
         source = source_root / relative
@@ -138,6 +138,14 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
         for source in key_dir.glob("keys.vault.bak.*"):
             if source.is_file():
                 candidates[source] = (Path("secrets") / source.name, "secrets_root")
+
+    if cron_logs_root is not None:
+        cron_logs_root = cron_logs_root.expanduser().resolve()
+        if cron_logs_root.is_dir():
+            for source in cron_logs_root.rglob("*"):
+                if source.is_file():
+                    relative = Path("logs") / "cron" / source.relative_to(cron_logs_root)
+                    candidates[source] = (relative, "cron_logs_root")
 
     if legacy_runtime_root is not None:
         legacy_runtime_root = legacy_runtime_root.expanduser().resolve()
@@ -196,7 +204,7 @@ def copy_without_overwrite(source: Path, destination: Path) -> tuple[str, str, i
     return "copied", digest, len(data)
 
 
-def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None) -> dict:
+def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None, cron_logs_root: Path | None = None) -> dict:
     source_root = source_root.expanduser().resolve()
     destination_root = destination_root.expanduser().resolve()
     destination_root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -206,7 +214,7 @@ def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path
         pass
 
     results = []
-    for source, relative, source_label in collect_sources(source_root, legacy_runtime_root, secrets_root):
+    for source, relative, source_label in collect_sources(source_root, legacy_runtime_root, secrets_root, cron_logs_root):
         destination = destination_root / relative
         status, digest, size = copy_without_overwrite(source, destination)
         results.append({
@@ -223,6 +231,7 @@ def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path
         "source_root": str(source_root),
         "legacy_runtime_root": str(legacy_runtime_root.expanduser().resolve()) if legacy_runtime_root else None,
         "secrets_root": str(secrets_root.expanduser().resolve()) if secrets_root else None,
+        "cron_logs_root": str(cron_logs_root.expanduser().resolve()) if cron_logs_root else None,
         "files": results,
     }
     manifest_path = destination_root / "migration_manifest.json"
@@ -264,10 +273,11 @@ def main() -> int:
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument("--legacy-runtime-root", type=Path, default=Path.home() / "hands-off")
     parser.add_argument("--secrets-root", type=Path, default=Path.home() / ".config")
+    parser.add_argument("--cron-logs-root", type=Path, default=Path.home() / ".cron-logs")
     parser.add_argument("--destination", type=Path, default=private_root())
     args = parser.parse_args()
 
-    result = migrate(args.source_root, args.destination, args.legacy_runtime_root, args.secrets_root)
+    result = migrate(args.source_root, args.destination, args.legacy_runtime_root, args.secrets_root, args.cron_logs_root)
     copied = sum(item["status"] == "copied" for item in result["files"])
     preserved = sum(item["status"] == "already_preserved" for item in result["files"])
     conflicts = sum(item["status"] == "conflict_existing_destination" for item in result["files"])
