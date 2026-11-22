@@ -133,7 +133,7 @@ def test_migration_preserves_recursive_finance_snapshots_and_security_archive(tm
 
     assert (destination / "termux-hands-off" / "data" / "finances" / "snapshots" / "snapshot.json").exists()
     assert (destination / "termux-hands-off" / "state" / "alerts.env").exists()
-    assert (destination / "termux-hands-off" / "security_snapshot.tar").read_bytes() == archive.read_bytes()
+    assert (destination / "backups" / "security_snapshot.tar").read_bytes() == archive.read_bytes()
     assert len(result["files"]) == 3
 
 
@@ -180,3 +180,23 @@ def test_migration_preserves_autopilot_admin_environment(tmp_path):
 
     private_copy = destination / "termux-hands-off" / "autopilot" / "admin.env"
     assert private_copy.read_text(encoding="utf-8") == admin_env.read_text(encoding="utf-8")
+
+
+
+def test_migration_preserves_tracked_vault_and_local_secret_vault(tmp_path):
+    source = tmp_path / "repo"
+    secrets = tmp_path / "config" / "hands-off"
+    destination = tmp_path / "private"
+    tracked_vault = source / "termux-hands-off" / "agent" / "vault.json"
+    local_vault = secrets / "vault.json"
+    tracked_vault.parent.mkdir(parents=True)
+    secrets.mkdir(parents=True)
+    tracked_vault.write_text('{"OKX_API_KEY":"tracked"}', encoding="utf-8")
+    local_vault.write_text('{"OKX_API_KEY":"local"}', encoding="utf-8")
+
+    result = migrate(source, destination, secrets_root=secrets)
+
+    assert (destination / "secrets" / "termux-agent-vault.json").read_text(encoding="utf-8") == tracked_vault.read_text(encoding="utf-8")
+    assert (destination / "secrets" / "vault.json").read_text(encoding="utf-8") == local_vault.read_text(encoding="utf-8")
+    assert tracked_vault.exists() and local_vault.exists()
+    assert len(result["files"]) == 2
