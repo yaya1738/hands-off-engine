@@ -59,7 +59,7 @@ stmt_notes = " / ".join(credit_last.get("statement_notes", []) or [])
 pm_mark = ext.get("polymarket_positions_mark")
 pm_unr  = ext.get("polymarket_unrealized_est")
 pm_cash = ext.get("polymarket_cash")
-pm_cost = ext.get("polymarket_cost_basis", 0)
+pm_cost = ext.get("polymarket_cost_basis")
 
 rent_ils = ext.get("rent_monthly_shekel")
 rent_usd = ext.get("rent_monthly_usd")
@@ -177,7 +177,7 @@ html = f"""<!doctype html>
       <div class="row"><span class="k">Mark (EV)</span><span class="v">{money(pm_mark) if pm_mark is not None else '-'}</span></div>
       <div class="row"><span class="k">Cash</span><span class="v">{money(pm_cash) if pm_cash is not None else '-'}</span></div>
       <div class="row"><span class="k">Unrealized</span><span class="v {'pos' if (pm_unr or 0)>=0 else 'neg'}">{money(pm_unr) if pm_unr is not None else '-'}</span></div>
-      <small>Cost basis: {money(pm_cost)}</small>
+      <small>Cost basis (manual/unverified): {money(pm_cost)}</small>
     </div>
 
     <div class="card">
