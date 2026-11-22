@@ -34,6 +34,11 @@ The following paths still contain personal or account-specific information in th
 | `security/yair_identity_profile.json` | Identity, device, infrastructure, behavioral and knowledge-verification profile | Preserve privately; remove from public tree after identity consumer migration |
 | `state/optimal_trigger_config.json` | Wallet and obsolete capital-trigger configuration | Preserve audit evidence privately; disable/remove public snapshot |
 | `state/filler_actions.jsonl` | Historical wallet-bearing action records | Preserve privately; remove personal event payloads from public tree |
+| `termux-hands-off/agent/vault.json` and backup | OKX/Kraken API credentials | Preserve privately; rotate exposed credentials; replace public files with examples |
+| `termux-hands-off/security_snapshot.tar` | Embedded vault credentials, external accounts, cards, emergency data and finance logs | Preserve archive privately; remove public copy and scrub history |
+| `termux-hands-off/state/` | Telegram, IFTTT and other integration environment values plus runtime state | Preserve privately; rotate confirmed exposed credentials; remove tracked runtime state |
+| `termux-hands-off/autopilot/admin.env` | Admin/control-plane token | Preserve privately; rotate/revoke; replace with example |
+| `termux-hands-off/data/finances/` and `termux-hands-off/logs/` | Historical snapshots, net-worth/P&L CSVs and finance logs | Preserve recursively; remove personal history from public tree after verification |
 
 The tracked `finance/yair_finance_hub.json` has already been replaced in this branch with a null/unknown, non-authoritative placeholder. The migration utility still preserves a pre-update local copy before the branch is pulled, in case the device checkout contains the former live snapshot. The identity verifier source has also been refactored to use a private profile and fail closed when it is absent.
 
