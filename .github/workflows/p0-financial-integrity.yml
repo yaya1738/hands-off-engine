@@ -7,6 +7,7 @@ on:
   pull_request:
     branches:
       - fix/hardware-cleanup-approval-20261115
+      - fix/p0-financial-integrity-20261122
 
 permissions:
   contents: read
