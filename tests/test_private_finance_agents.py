@@ -88,3 +88,27 @@ def test_balance_entry_forms_keep_blank_unknown_values_as_null(tmp_path):
     path = tmp_path / "private" / "legacy_runtime" / "agents" / "external_accounts.json"
     data = json.loads(path.read_text(encoding="utf-8"))
     assert all(data[key] is None for key in ("paypal", "monzo", "robinhood_cash", "polymarket_cash"))
+
+
+
+def test_empty_polymarket_response_preserves_previous_mark(tmp_path, monkeypatch, capsys):
+    private_root = tmp_path / "private"
+    monkeypatch.setenv("HANDS_OFF_PRIVATE_DIR", str(private_root))
+    agent_dir = str(AGENTS.resolve())
+    if agent_dir not in sys.path:
+        sys.path.insert(0, agent_dir)
+    spec = importlib.util.spec_from_file_location(
+        "private_polymarket_positions_test",
+        AGENTS / "polymarket_positions.py",
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    monkeypatch.setattr(module, "load_wallet", lambda: "0x" + "1" * 40)
+    monkeypatch.setattr(module, "fetch_positions", lambda wallet: [])
+
+    module.main()
+
+    result = json.loads(capsys.readouterr().out)
+    assert result["status"] == "unknown"
+    assert result["mark_sum"] is None
+    assert not module.EXT.exists()
