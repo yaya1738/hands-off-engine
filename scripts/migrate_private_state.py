@@ -300,11 +300,20 @@ def main() -> int:
     result = migrate(args.source_root, args.destination, args.legacy_runtime_root, args.secrets_root, args.cron_logs_root, backup_roots)
     copied = sum(item["status"] == "copied" for item in result["files"])
     preserved = sum(item["status"] == "already_preserved" for item in result["files"])
-    conflicts = sum(item["status"] == "conflict_existing_destination" for item in result["files"])
-    print(f"Private-state preservation: copied={copied}, already_preserved={preserved}, conflicts={conflicts}")
-    print(f"Manifest: {result['manifest_status']}")
+    conflicts = [item for item in result["files"] if item["status"] == "conflict_existing_destination"]
+    total_bytes = sum(item["bytes"] for item in result["files"])
+    source_counts = {}
     for item in result["files"]:
-        print(f"{item['status']}: {item['source']} ({item['bytes']} bytes)")
+        label = item["source"].split(":", 1)[0]
+        source_counts[label] = source_counts.get(label, 0) + 1
+    source_summary = ", ".join(f"{key}={value}" for key, value in sorted(source_counts.items()))
+    print(f"Private-state preservation: copied={copied}, already_preserved={preserved}, conflicts={len(conflicts)}")
+    print(f"Files={len(result['files'])}, bytes={total_bytes}, sources: {source_summary or 'none'}")
+    print(f"Manifest: {result['manifest_status']} at {result['destination'] if 'destination' in result else args.destination / 'migration_manifest.json'}")
+    if conflicts:
+        print("Conflicting destinations (first 10):")
+        for item in conflicts[:10]:
+            print(f"- {item['destination']} <= {item['source']}")
     if conflicts or result["manifest_status"] == "conflict_existing_manifest":
         return 2
     print("Source files were not deleted or modified.")
