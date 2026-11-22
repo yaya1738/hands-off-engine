@@ -104,9 +104,9 @@ def cmd_pmlatest():
                 obj = read_json(p,{})
                 cash = obj.get("cash_usd", obj.get("cashUSD"))
                 mark = obj.get("mark_value_usd", obj.get("markUSD"))
-                if cash is None or mark is None:
-                    return f"🟣 Polymarket compact found:\n{p}\n- cash: UNKNOWN\n- mark: UNKNOWN (required fields missing)"
-                return f"🟣 Polymarket compact found (UNVERIFIED SNAPSHOT):\n{p}\n- cash: {money(cash)}\n- mark: {money(mark)}"
+                cash_text = money(cash) if cash is not None else "UNKNOWN"
+                mark_text = money(mark) if mark is not None else "UNKNOWN"
+                return f"🟣 Polymarket compact found (UNVERIFIED SNAPSHOT):\n{p}\n- cash: {cash_text}\n- mark: {mark_text}"
             except:
                 return f"Polymarket file present but parse failed: {p}"
     return "Polymarket compact not found."
