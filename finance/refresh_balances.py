@@ -13,8 +13,9 @@ from pathlib import Path
 import requests
 
 from finance.hub_store import update_account
+from finance.private_state import private_finance_hub_path
 
-FINANCE_HUB = Path(__file__).resolve().parent.parent / "state" / "private_finance_hub.json"
+FINANCE_HUB = private_finance_hub_path()
 POLYGON_RPC = "https://polygon-rpc.com"
 POLYGON_CHAIN_ID = 137
 USDC_BRIDGED = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
