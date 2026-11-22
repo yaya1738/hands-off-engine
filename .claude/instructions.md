@@ -176,11 +176,15 @@ AGENT TASKS: [Concrete tasks]
 ## Quick State Check (Run This First)
 
 ```bash
-# Current financial state
-cat finance/yair_finance_hub.json | python3 -c "import sys,json; d=json.load(sys.stdin); s=d['summary']; print(f'Balance: \${d[\"accounts\"][\"polymarket\"][\"balance_usdc\"]:.2f}'); print(f'Runway: {s[\"runway_months\"]:.2f} months'); print(f'Burn: \${s[\"monthly_burn_usd\"]}/mo')"
+# Financial state is private and must not be read from tracked repository snapshots.
+# Current balances, liabilities, income, expenses, and runway are UNKNOWN until
+# independently reconciled from current sources. Use the evidence-backed
+# finance.truth adapter and ignored local state/private_finance_hub.json only.
+# Never infer spendable capital from legacy finance/yair_finance_hub.json,
+# cached JSON, simulation snapshots, or revenue projections.
 
-# Current positions
-python3 scripts/position_monitor.py
+# Current positions are not automatically spendable or execution-authoritative.
+# Use read-only position observation only; do not enable trading or place orders.
 
 # System health
 ./scripts/healthcheck.sh
