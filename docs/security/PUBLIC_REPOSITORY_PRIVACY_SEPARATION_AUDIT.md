@@ -24,12 +24,12 @@ The following paths still contain personal or account-specific information in th
 | Path | Data class | Required treatment |
 |---|---|---|
 | `finance/dollar_access.json` | Wallet identifier, historical balances and account-channel metadata | Preserve privately; replace public copy with schema-only example or remove after consumers are migrated |
-| `finance/yair_finance_hub.json` | Personal account, credit and net-worth snapshot | Preserve privately; public copy must contain no live values |
 | `termux-hands-off/agents/external_accounts.json` | External account balances, liabilities, rent, credit and wallet metadata | Preserve privately; migrate every reader/writer before removing public copy |
 | `security/yair_identity_profile.json` | Identity, device, infrastructure, behavioral and knowledge-verification profile | Preserve privately; remove from public tree after identity consumer migration |
 | `state/optimal_trigger_config.json` | Wallet and obsolete capital-trigger configuration | Preserve audit evidence privately; disable/remove public snapshot |
 | `state/filler_actions.jsonl` | Historical wallet-bearing action records | Preserve privately; remove personal event payloads from public tree |
-| `security/absolute_identity.py` | Hardcoded personal identity/challenge facts in source | Replace with private-profile-backed verification; no personal facts in source code |
+
+The tracked `finance/yair_finance_hub.json` has already been replaced in this branch with a null/unknown, non-authoritative placeholder. The migration utility still preserves a pre-update local copy before the branch is pulled, in case the device checkout contains the former live snapshot. The identity verifier source has also been refactored to use a private profile and fail closed when it is absent.
 
 The public funding metadata also associates the project with a wallet address. It is not a private key, but it is a public identity link. Keep the GitHub Sponsors entry; decide separately whether the wallet donation route is an intentional public business decision before changing it.
 
