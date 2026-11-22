@@ -20,6 +20,7 @@ Zero CLI interaction needed.
 
 import os
 import json
+import math
 import subprocess
 import sys
 from datetime import datetime, timedelta
@@ -460,7 +461,7 @@ No need to launch Claude Code CLI for routine operations."""
                 )
 
             cash = truth.get("balance_usdc")
-            if isinstance(cash, bool) or not isinstance(cash, (int, float)) or cash < 0:
+            if isinstance(cash, bool) or not isinstance(cash, (int, float)) or not math.isfinite(cash) or cash < 0:
                 return "💰 Financial Balance\n\nWallet cash: UNKNOWN\nPositions: UNKNOWN\nInvalid verified balance payload."
 
             return (
