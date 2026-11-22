@@ -17,6 +17,7 @@ from pathlib import Path
 
 
 FIXED_RELATIVE_PATHS = (
+    ".env.polymarket",
     "finance/dollar_access.json",
     "finance/yair_finance_hub.json",
     "termux-hands-off/agents/external_accounts.json",
@@ -80,7 +81,12 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
     for relative in FIXED_RELATIVE_PATHS:
         source = source_root / relative
         if source.is_file():
-            destination_relative = Path("finance/private_finance_hub.json") if relative == "state/private_finance_hub.json" else Path(relative)
+            if relative == "state/private_finance_hub.json":
+                destination_relative = Path("finance/private_finance_hub.json")
+            elif relative == ".env.polymarket":
+                destination_relative = Path("secrets/.env.polymarket")
+            else:
+                destination_relative = Path(relative)
             candidates[source] = (destination_relative, "repo")
 
     for state_dir in (source_root / "state", source_root / "termux-hands-off" / "state"):
@@ -97,6 +103,7 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
         source_root / "termux-hands-off" / "state",
         source_root / "termux-hands-off" / "logs",
         source_root / "termux-hands-off" / "data" / "finances",
+        source_root / "termux-hands-off" / "autopilot",
     ):
         if directory.is_dir():
             for source in directory.rglob("*"):
@@ -111,13 +118,16 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
                 source = legacy_runtime_root / relative_text
                 if source.is_file():
                     candidates[source] = (Path("legacy_runtime") / relative_text, "legacy_runtime")
-            for directory_text in ("state", "logs", "data/finances", "security", "finance"):
+            for directory_text in ("state", "logs", "data/finances", "security", "finance", "autopilot"):
                 directory = legacy_runtime_root / directory_text
                 if directory.is_dir():
                     for source in directory.rglob("*"):
                         if source.is_file():
                             relative = Path("legacy_runtime") / source.relative_to(legacy_runtime_root)
                             candidates[source] = (relative, "legacy_runtime")
+            env_file = legacy_runtime_root / ".env.polymarket"
+            if env_file.is_file():
+                candidates[env_file] = (Path("legacy_runtime/secrets/.env.polymarket"), "legacy_runtime")
             archive = legacy_runtime_root / "security_snapshot.tar"
             if archive.is_file():
                 candidates[archive] = (Path("legacy_runtime") / "security_snapshot.tar", "legacy_runtime")
