@@ -1,11 +1,12 @@
 import os, json, pathlib, re, sys
 
 HOME = pathlib.Path.home()
-CANDIDATES = [
-    HOME/".config"/"keys.vault",
-    *sorted((HOME/".config").glob("keys.vault.bak.*"), reverse=True)
-]
 PRIVATE_ROOT = pathlib.Path(os.environ.get("HANDS_OFF_PRIVATE_DIR", str(HOME/".config"/"hands-off-engine"))).expanduser()
+CREDENTIALS_DIR = PRIVATE_ROOT/"secrets"
+CANDIDATES = [
+    CREDENTIALS_DIR/"keys.vault",
+    *sorted(CREDENTIALS_DIR.glob("keys.vault.bak.*"), reverse=True)
+]
 OUT = PRIVATE_ROOT/"secrets"/"vault.json"
 
 def load_candidate(path: pathlib.Path):
