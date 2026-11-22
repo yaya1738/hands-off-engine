@@ -234,6 +234,8 @@ def copy_without_overwrite(source: Path, destination: Path) -> tuple[str, str, i
 def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None, cron_logs_root: Path | None = None, backup_repo_roots: list[Path] | None = None) -> dict:
     source_root = source_root.expanduser().resolve()
     destination_root = destination_root.expanduser().resolve()
+    if destination_root == source_root or source_root in destination_root.parents:
+        raise ValueError("private destination must be outside the source repository")
     destination_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     try:
         destination_root.chmod(0o700)
@@ -308,6 +310,9 @@ def main() -> int:
 
     backup_roots = args.backup_root if args.backup_root is not None else [Path.home() / "hands-off-engine-backup", Path.home() / "hands-off-engine-mirror"]
     result = migrate(args.source_root, args.destination, args.legacy_runtime_root, args.secrets_root, args.cron_logs_root, backup_roots)
+    if not result["files"]:
+        print("STOP: no source files were found; preservation was not performed.")
+        return 1
     copied = sum(item["status"] == "copied" for item in result["files"])
     preserved = sum(item["status"] == "already_preserved" for item in result["files"])
     conflicts = [item for item in result["files"] if item["status"] == "conflict_existing_destination"]
