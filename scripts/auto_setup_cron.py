@@ -92,104 +92,14 @@ def get_current_crontab() -> str:
 
 
 def install_cron_jobs():
-    """Install all cron jobs"""
-    print("Installing autonomous operation cron jobs...")
-    print()
-
-    # Get existing crontab (without our jobs)
-    existing = get_current_crontab()
-
-    # Remove any existing hands-off cron jobs
-    lines = existing.split('\n')
-    cleaned_lines = []
-    skip_next = False
-
-    for line in lines:
-        if CRON_MARKER in line:
-            skip_next = True
-            continue
-        if skip_next:
-            skip_next = False
-            continue
-        if line.strip():
-            cleaned_lines.append(line)
-
-    # Build new crontab
-    new_crontab_lines = cleaned_lines + ["", CRON_MARKER]
-
-    for job in CRON_JOBS:
-        comment = f"# {job['description']}"
-        cron_line = f"{job['schedule']} {job['command']}"
-        new_crontab_lines.extend([comment, cron_line])
-
-    new_crontab = '\n'.join(new_crontab_lines) + '\n'
-
-    # Install new crontab
-    try:
-        process = subprocess.Popen(
-            ["crontab", "-"],
-            stdin=subprocess.PIPE,
-            text=True
-        )
-        process.communicate(input=new_crontab)
-
-        if process.returncode == 0:
-            print(f"Installed {len(CRON_JOBS)} cron jobs:")
-            for job in CRON_JOBS:
-                print(f"  - {job['description']}")
-            print()
-            print("Cron jobs are now active!")
-            return True
-        else:
-            print("ERROR: Failed to install crontab")
-            return False
-
-    except Exception as e:
-        print(f"ERROR: {e}")
-        return False
-
+    """Legacy cron installation is disabled; use the governed supervisor."""
+    print("BLOCKED: direct crontab installation is disabled.")
+    return False
 
 def remove_cron_jobs():
-    """Remove all hands-off cron jobs"""
-    print("Removing hands-off cron jobs...")
-
-    existing = get_current_crontab()
-
-    # Remove our jobs
-    lines = existing.split('\n')
-    cleaned_lines = []
-    skip_next = False
-
-    for line in lines:
-        if CRON_MARKER in line:
-            skip_next = True
-            continue
-        if skip_next:
-            skip_next = False
-            continue
-        if line.strip():
-            cleaned_lines.append(line)
-
-    new_crontab = '\n'.join(cleaned_lines) + '\n' if cleaned_lines else ""
-
-    try:
-        if new_crontab.strip():
-            process = subprocess.Popen(
-                ["crontab", "-"],
-                stdin=subprocess.PIPE,
-                text=True
-            )
-            process.communicate(input=new_crontab)
-        else:
-            subprocess.run(["crontab", "-r"], capture_output=True)
-
-        print("Hands-off cron jobs removed")
-        return True
-
-    except Exception as e:
-        print(f"ERROR: {e}")
-        return False
-
+    """Legacy crontab removal is disabled to avoid mutating unrelated jobs."""
+    print("BLOCKED: direct crontab mutation is disabled.")
+    return False
 
 def show_cron_jobs():
     """Show what would be installed"""
