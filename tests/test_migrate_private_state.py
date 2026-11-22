@@ -185,7 +185,8 @@ def test_migration_preserves_autopilot_admin_environment(tmp_path):
 
 def test_migration_preserves_tracked_vault_and_local_secret_vault(tmp_path):
     source = tmp_path / "repo"
-    secrets = tmp_path / "config" / "hands-off"
+    secrets_root = tmp_path / "config"
+    secrets = secrets_root / "hands-off"
     destination = tmp_path / "private"
     tracked_vault = source / "termux-hands-off" / "agent" / "vault.json"
     local_vault = secrets / "vault.json"
@@ -194,9 +195,26 @@ def test_migration_preserves_tracked_vault_and_local_secret_vault(tmp_path):
     tracked_vault.write_text('{"OKX_API_KEY":"tracked"}', encoding="utf-8")
     local_vault.write_text('{"OKX_API_KEY":"local"}', encoding="utf-8")
 
-    result = migrate(source, destination, secrets_root=secrets)
+    result = migrate(source, destination, secrets_root=secrets_root)
 
     assert (destination / "secrets" / "termux-agent-vault.json").read_text(encoding="utf-8") == tracked_vault.read_text(encoding="utf-8")
     assert (destination / "secrets" / "vault.json").read_text(encoding="utf-8") == local_vault.read_text(encoding="utf-8")
     assert tracked_vault.exists() and local_vault.exists()
     assert len(result["files"]) == 2
+
+
+
+def test_migration_preserves_keys_vault_and_rotated_backups(tmp_path):
+    source = tmp_path / "repo"
+    secrets_root = tmp_path / "config"
+    destination = tmp_path / "private"
+    current = secrets_root / "keys.vault"
+    backup = secrets_root / "keys.vault.bak.123"
+    secrets_root.mkdir(parents=True)
+    current.write_text("KEY=private", encoding="utf-8")
+    backup.write_text("KEY=historical", encoding="utf-8")
+
+    migrate(source, destination, secrets_root=secrets_root)
+
+    assert (destination / "secrets" / "keys.vault").read_text(encoding="utf-8") == "KEY=private"
+    assert (destination / "secrets" / "keys.vault.bak.123").read_text(encoding="utf-8") == "KEY=historical"
