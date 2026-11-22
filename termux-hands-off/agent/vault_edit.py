@@ -3,6 +3,8 @@ from pathlib import Path
 
 PRIVATE_ROOT = Path(os.environ.get("HANDS_OFF_PRIVATE_DIR", str(Path.home()/".config"/"hands-off-engine"))).expanduser()
 vault = PRIVATE_ROOT/"secrets"/"termux-agent-vault.json"
+PRIVATE_ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
+PRIVATE_ROOT.chmod(0o700)
 vault.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
 vault.parent.chmod(0o700)
 data = {}
