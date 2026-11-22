@@ -42,6 +42,7 @@ for candidate in \
   "$PRIVATE_RUNTIME/logs" \
   "$PRIVATE_RUNTIME/data/finances" \
   "$PRIVATE_ROOT/logs" \
+  "$PRIVATE_ROOT/state" \
   "$PRIVATE_ROOT/termux-hands-off/state" \
   "$PRIVATE_ROOT/termux-hands-off/logs" \
   "$PRIVATE_ROOT/termux-hands-off/data/finances" \
