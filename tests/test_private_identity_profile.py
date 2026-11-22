@@ -65,6 +65,7 @@ def test_audit_log_is_created_with_owner_only_permissions(tmp_path, monkeypatch)
     log = private_dir / "security" / "verification_audit.jsonl"
     assert result["verified"] is False
     assert log.stat().st_mode & 0o777 == 0o600
+    assert private_dir.stat().st_mode & 0o777 == 0o700
     assert (private_dir / "security").stat().st_mode & 0o777 == 0o700
     record = json.loads(log.read_text(encoding="utf-8").splitlines()[0])
     assert record["verdict"] == "UNVERIFIED"
