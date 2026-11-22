@@ -25,6 +25,11 @@ tar -cf "$OUT" \
   "$PRIVATE_RUNTIME/agents/finance_rules.json" \
   "$PRIVATE_RUNTIME/logs/finance_balances.log" \
   "$PRIVATE_RUNTIME/logs/finance_credit.log" \
+  "$PRIVATE_RUNTIME/logs/finance_pnl.log" \
+  "$PRIVATE_RUNTIME/logs/finance_events.log" \
+  "$PRIVATE_RUNTIME/logs/finance_errors.log" \
+  "$PRIVATE_RUNTIME/logs/finance_alerts.log" \
+  "$PRIVATE_RUNTIME/logs/guardrail_actions.log" \
   "$PRIVATE_RUNTIME/logs/polymarket_positions.jsonl" \
   "$PRIVATE_RUNTIME/logs/polymarket_positions.csv" \
   "$PRIVATE_ROOT/finance/dollar_access.json" \
