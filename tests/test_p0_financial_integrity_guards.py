@@ -1206,3 +1206,52 @@ def test_action_ledger_concurrent_appends_preserve_every_record(tmp_path):
     rows = [json.loads(line) for line in files[0].read_text(encoding="utf-8").splitlines()]
     assert len(rows) == 40
     assert {row["metadata"]["index"] for row in rows} == set(range(40))
+
+
+def test_capital_recovery_concurrent_runs_record_one_balance_event(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from scripts import capital_recovery_monitor as monitor
+
+    path = tmp_path / "capital-recovery.json"
+    path.write_text(json.dumps({
+        "last_balance": 40.0,
+        "recovery_events": [],
+        "alerts_sent": [],
+    }), encoding="utf-8")
+    monkeypatch.setattr(monitor, "STATE_FILE", path)
+    monkeypatch.setattr(monitor, "LOG_FILE", tmp_path / "capital-recovery.log")
+    monkeypatch.setattr(monitor, "get_balance", lambda: 100.0)
+    monkeypatch.setattr(monitor, "send_telegram", lambda *args, **kwargs: True)
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(lambda _: monitor.check_recovery(), range(8)))
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    assert len(state["recovery_events"]) == 1
+    assert sum(len(result["events"]) for result in results) == 1
+    assert state["last_balance"] == 100.0
+    assert state["trading_enabled"] is False
+    assert state["execution_authorized"] is False
+
+
+def test_capital_recovery_unknown_balance_preserves_last_verified_amount(tmp_path, monkeypatch):
+    from scripts import capital_recovery_monitor as monitor
+
+    path = tmp_path / "capital-recovery.json"
+    original = {
+        "last_balance": 87.5,
+        "recovery_events": [],
+        "alerts_sent": [],
+    }
+    path.write_text(json.dumps(original), encoding="utf-8")
+    monkeypatch.setattr(monitor, "STATE_FILE", path)
+    monkeypatch.setattr(monitor, "get_balance", lambda: None)
+
+    result = monitor.check_recovery()
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    assert result["financial_status"] == "unknown"
+    assert state["last_balance"] == 87.5
+    assert state["financial_status"] == "unknown"
+    assert state["trading_enabled"] is False
+    assert state["execution_authorized"] is False
