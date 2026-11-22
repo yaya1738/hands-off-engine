@@ -34,7 +34,9 @@ jobs:
         run: python -m compileall -q ai_nexus autonomous executor finance hardware scripts security ui audit termux-hands-off/agents
 
       - name: Validate shell setup syntax
-        run: bash -n scripts/setup_autonomous_mode.sh
+        run: |
+          bash -n scripts/setup_autonomous_mode.sh
+          bash -n termux-hands-off/agents/security_mirror.sh
 
       - name: Scan current source tree and Git history for embedded credentials
         run: |
