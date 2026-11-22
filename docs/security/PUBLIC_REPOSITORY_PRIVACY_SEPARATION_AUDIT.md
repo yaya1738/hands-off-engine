@@ -81,7 +81,7 @@ The two private backup repositories `hands-off-engine-backup` and `hands-off-eng
 From Termux, run this single command. It verifies the launcher against its Git blob hash; the launcher separately verifies the migration script before executing it:
 
 ```bash
-cd "$HOME/hands-off-engine" || exit 1; T="${TMPDIR:-$HOME/.cache}/prepare_private_state_migration.sh"; mkdir -p "$(dirname "$T")" && curl -fsSL https://raw.githubusercontent.com/yaya1738/hands-off-engine/0ffd9a4635ccb6727d1f485c8a9f63e98497747d/scripts/prepare_private_state_migration.sh -o "$T" && test "$(git hash-object "$T")" = "645669994c63bf75816a5e189e6552e9e93c7643" && sh "$T"
+cd "$HOME/hands-off-engine" || exit 1; T="${TMPDIR:-$HOME/.cache}/prepare_private_state_migration.sh"; mkdir -p "$(dirname "$T")" && curl -fsSL https://raw.githubusercontent.com/yaya1738/hands-off-engine/894509e1ab1fdedbf1d05568fe602bbf8b6a04ed/scripts/prepare_private_state_migration.sh -o "$T" && test "$(git hash-object "$T")" = "416bab0aaa8caa51bf0dfc36e5d5a4552fee7551" && sh "$T"
 ```
 
 It writes owner-only copies and a SHA-256 manifest under `~/.config/hands-off-engine` (or `HANDS_OFF_PRIVATE_DIR`). It prints only aggregate counts and any conflicts. It never deletes or modifies source files. Do not proceed to public-file removal until the manifest reports zero conflicts and the copied files are verified.
