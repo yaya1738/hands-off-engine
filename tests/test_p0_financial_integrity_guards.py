@@ -1106,7 +1106,7 @@ def test_ledger_refuses_to_append_after_existing_chain_tampering(tmp_path):
     damaged = json.loads(rows[-1])
     damaged["amount"] = -999.0
     rows[-1] = json.dumps(damaged)
-    path.write_text("\\n".join(rows) + "\\n", encoding="utf-8")
+    path.write_text("\n".join(rows) + "\n", encoding="utf-8")
 
     try:
         ledger.add_cost("test", "must-not-append", 2.0, "session")
