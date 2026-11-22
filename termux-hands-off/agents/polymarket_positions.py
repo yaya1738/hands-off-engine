@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, json, time, pathlib, csv, re
+import os, json, time, pathlib, csv, re, math
 from typing import List, Dict, Any
 import requests
 from private_state import private_path
@@ -57,30 +57,25 @@ def fetch_positions(wallet) -> List[Dict[str,Any]]:
                 # generic fields across various versions
                 market = pos.get("market") or pos.get("question") or pos.get("marketTitle") or ""
                 outcome = pos.get("outcome") or pos.get("outcomeName") or pos.get("side") or ""
-                qty = pos.get("quantity") or pos.get("qty") or pos.get("shares") or 0
-                price = (
-                    pos.get("markPrice") or pos.get("price") or pos.get("avgPrice")
-                    or pos.get("valuePerShare") or pos.get("mark") or 0
-                )
-                # fallback: if value given but not price, derive
-                value = pos.get("value") or pos.get("markValue") or pos.get("notionalValue") or pos.get("equity")
+                if not isinstance(pos, dict):
+                    continue
+                qty_raw = next((pos.get(k) for k in ("quantity", "qty", "shares") if pos.get(k) is not None), None)
+                price_raw = next((pos.get(k) for k in ("markPrice", "price", "avgPrice", "valuePerShare", "mark") if pos.get(k) is not None), None)
+                value_raw = next((pos.get(k) for k in ("value", "markValue", "notionalValue", "equity") if pos.get(k) is not None), None)
                 try:
-                    qty = float(qty)
-                except: qty = 0.0
-                try:
-                    price = float(price)
-                except:
-                    if value is not None:
-                        try:
-                            price = float(value) / qty if qty else 0.0
-                        except: price = 0.0
-                    else:
-                        price = 0.0
-                if value is None:
-                    value = qty * price
-                else:
-                    try: value = float(value)
-                    except: value = qty * price
+                    if qty_raw is None:
+                        continue
+                    qty = float(qty_raw)
+                    if not math.isfinite(qty) or qty <= 0:
+                        continue
+                    if price_raw is None and value_raw is None:
+                        continue
+                    price = float(price_raw) if price_raw is not None else float(value_raw) / qty
+                    value = float(value_raw) if value_raw is not None else qty * price
+                    if not math.isfinite(price) or price < 0 or not math.isfinite(value) or value < 0:
+                        continue
+                except (TypeError, ValueError, OverflowError, ZeroDivisionError):
+                    continue
 
                 # capture ids if present
                 mid = pos.get("marketId") or pos.get("market_id") or pos.get("id") or ""
