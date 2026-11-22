@@ -12,6 +12,7 @@ Designed to be run via cron or manually for testing.
 """
 
 import json
+import math
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -105,8 +106,37 @@ def print_header(text: str):
     print(f"{'=' * 70}\n")
 
 
+def resolve_bankroll(bankroll: float | None) -> tuple[float | None, str, str, str | None]:
+    """Resolve a verified wallet balance or label an explicit shadow-only model input."""
+    if bankroll is None:
+        try:
+            from finance.truth import read_verified_polymarket_balance
+            truth = read_verified_polymarket_balance()
+        except Exception as exc:
+            return None, "unknown", "verified_wallet_required", f"Financial truth unavailable: {type(exc).__name__}"
+        if not isinstance(truth, dict) or truth.get("verified") is not True:
+            reason = truth.get("reason", "No recent verified wallet balance") if isinstance(truth, dict) else "Malformed financial truth result"
+            return None, "unknown", "verified_wallet_required", str(reason)
+        amount = truth.get("balance_usdc")
+        status = "verified"
+        source = "verified_polymarket_wallet"
+    else:
+        amount = bankroll
+        status = "modelled"
+        source = "explicit_shadow_input"
+
+    if (
+        isinstance(amount, bool)
+        or not isinstance(amount, (int, float))
+        or not math.isfinite(amount)
+        or amount < 1.0
+    ):
+        return None, status, source, "Bankroll must be a finite amount of at least $1.00"
+    return float(amount), status, source, None
+
+
 def run_pipeline(
-    bankroll: float = 5000.0,
+    bankroll: float | None = None,
     dryrun: bool = True,
     verbose: bool = True,
     intelligent: bool = False
@@ -140,32 +170,26 @@ def run_pipeline(
             print("BLOCKED: live trading is disabled until governed execution is integrated")
         return results
 
+    resolved_bankroll, financial_status, bankroll_source, bankroll_error = resolve_bankroll(bankroll)
+    if resolved_bankroll is None:
+        results.update({
+            "blocked": True,
+            "financial_status": financial_status,
+            "bankroll_source": bankroll_source,
+            "bankroll": None,
+            "error": bankroll_error,
+        })
+        if verbose:
+            print(f"BLOCKED: financial bankroll unavailable or invalid ({bankroll_error})")
+        return results
+    bankroll = resolved_bankroll
+    results.update({
+        "financial_status": financial_status,
+        "bankroll_source": bankroll_source,
+        "bankroll": bankroll,
+    })
+
     try:
-        # Step 0: Early balance check to avoid wasting LLM API calls
-        from executor.trading_safeguards import TradingSafeguards
-        MIN_TRADING_BALANCE = 1.0  # Enable micro-trading with any balance
-
-        try:
-            safeguards = TradingSafeguards()
-            ok, msg = safeguards.check_wallet_balance(MIN_TRADING_BALANCE)
-            # Parse balance from message like "Wallet: $8.99"
-            import re
-            match = re.search(r'\$(\d+\.?\d*)', msg)
-            if match:
-                balance = float(match.group(1))
-                if balance < MIN_TRADING_BALANCE:
-                    if verbose:
-                        print(f"⏸️  SKIPPING PIPELINE: Balance ${balance:.2f} < ${MIN_TRADING_BALANCE} minimum")
-                        print(f"   No point generating signals we can't trade.")
-                        print(f"   Position monitor still running for exit opportunities.")
-                    results['success'] = True
-                    results['skipped'] = f"Low balance: ${balance:.2f}"
-                    return results
-        except Exception as e:
-            # If balance check fails, continue anyway
-            if verbose:
-                print(f"⚠️  Balance check failed ({e}), continuing...")
-
         # Step 1: Sync Polymarket Model (Alpha)
         if verbose:
             engine_type = "Intelligent (LLM)" if intelligent else "Simple (hash)"
@@ -294,13 +318,15 @@ def run_pipeline(
                     'edge': None,  # Extract from alpha signals if needed
                     'category': 'unknown',  # Extract from market_id if needed
                     'reason': action.reasoning,
-                    'status': 'executed' if result.success else 'planned',
+                    'status': ('simulated' if dryrun and result.success else 'executed' if result.success else 'planned'),
                     'execution_error': result.message if not result.success else None
                 })
 
             execution_plan = {
                 'timestamp': datetime.now().isoformat(),
                 'dryrun': dryrun,
+                'financial_status': results.get('financial_status'),
+                'bankroll_source': results.get('bankroll_source'),
                 'total_orders': len(planned_actions),
                 'total_size_usd': sum(a.amount for a in planned_actions),
                 'successful_orders': summary['successful'],
@@ -365,8 +391,8 @@ def main():
     parser.add_argument(
         '--bankroll',
         type=float,
-        default=5000.0,
-        help='Total bankroll for position sizing (default: 5000.0)'
+        default=None,
+        help='Optional shadow-only model bankroll; omitted requires a recent verified wallet balance'
     )
     parser.add_argument(
         '--live',
@@ -440,7 +466,7 @@ def main():
         print(f"\n🚀 Starting Hands-Off Engine Pipeline")
         print(f"   Mode: {mode}")
         print(f"   Alpha: {alpha_type}")
-        print(f"   Bankroll: ${args.bankroll:.2f}")
+        print(f"   Bankroll: ${args.bankroll:.2f}" if args.bankroll is not None else "   Bankroll: recent verified wallet balance required")
 
     results = run_pipeline(
         bankroll=args.bankroll,
