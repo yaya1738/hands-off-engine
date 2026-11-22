@@ -116,6 +116,8 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
     # Preserve the complete historical finance snapshot tree, private logs,
     # and Termux runtime state (including env files and backup archives).
     for directory in (
+        source_root / "state",
+        source_root / "logs",
         source_root / "termux-hands-off" / "state",
         source_root / "termux-hands-off" / "logs",
         source_root / "termux-hands-off" / "data" / "finances",
@@ -124,6 +126,8 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
         if directory.is_dir():
             for source in directory.rglob("*"):
                 if source.is_file():
+                    if source == source_root / "state" / "private_finance_hub.json":
+                        continue
                     relative = source.relative_to(source_root)
                     candidates[source] = (relative, "repo")
 
