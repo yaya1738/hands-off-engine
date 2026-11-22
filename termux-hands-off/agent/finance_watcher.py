@@ -12,11 +12,16 @@ import time
 import math
 import requests
 import traceback
+from pathlib import Path
 
-BASE = os.path.expanduser("~/hands-off")
-STATE = f"{BASE}/state"
-AGENT = f"{BASE}/agent"
-LOGDIR = os.path.expanduser("~/.cron-logs")
+PRIVATE_ROOT = Path(os.environ.get(
+    "HANDS_OFF_PRIVATE_DIR",
+    str(Path.home() / ".config" / "hands-off-engine"),
+)).expanduser()
+PRIVATE_RUNTIME = PRIVATE_ROOT / "legacy_runtime"
+STATE = str(PRIVATE_RUNTIME / "state")
+AGENT = str(PRIVATE_RUNTIME / "agent")
+LOGDIR = str(PRIVATE_ROOT / "logs")
 
 TG_ENV = f"{STATE}/tg/bots/handsoff.env"
 IFTTTENV = f"{STATE}/auto_sources.env"
@@ -267,7 +272,12 @@ def build_summary(current, delta):
 
 
 def main():
-    os.makedirs(LOGDIR, exist_ok=True)
+    os.makedirs(LOGDIR, mode=0o700, exist_ok=True)
+    try:
+        os.chmod(PRIVATE_ROOT, 0o700)
+        os.chmod(LOGDIR, 0o700)
+    except OSError:
+        pass
     previous = load_json(PREV)
     current = calc_snapshot()
     delta = diff(previous, current)
