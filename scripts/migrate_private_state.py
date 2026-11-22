@@ -24,6 +24,8 @@ FIXED_RELATIVE_PATHS = (
     "termux-hands-off/agents/cards.json",
     "termux-hands-off/agents/emergency_info.json",
     "termux-hands-off/agents/finance_rules.json",
+    "termux-hands-off/agent/vault.json",
+    "termux-hands-off/agent/vault.json.bak",
     "termux-hands-off/security_snapshot.tar",
     "security/yair_identity_profile.json",
     "security/yair_human_identity.json",
@@ -46,6 +48,8 @@ LEGACY_RUNTIME_PATHS = (
     "agents/external_accounts.json",
     "agents/cards.json",
     "agents/emergency_info.json",
+    "agent/vault.json",
+    "agent/vault.json.bak",
     "agents/finance_rules.json",
     "agents/perf_inputs.json",
     "logs/finance_balances.log",
@@ -76,7 +80,7 @@ def private_root() -> Path:
     return Path(configured).expanduser() if configured else Path.home() / ".config" / "hands-off-engine"
 
 
-def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) -> list[tuple[Path, Path, str]]:
+def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None) -> list[tuple[Path, Path, str]]:
     candidates: dict[Path, tuple[Path, str]] = {}
     for relative in FIXED_RELATIVE_PATHS:
         source = source_root / relative
@@ -85,6 +89,12 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
                 destination_relative = Path("finance/private_finance_hub.json")
             elif relative == ".env.polymarket":
                 destination_relative = Path("secrets/.env.polymarket")
+            elif relative == "termux-hands-off/agent/vault.json":
+                destination_relative = Path("secrets/termux-agent-vault.json")
+            elif relative == "termux-hands-off/agent/vault.json.bak":
+                destination_relative = Path("secrets/termux-agent-vault.json.bak")
+            elif relative == "termux-hands-off/security_snapshot.tar":
+                destination_relative = Path("backups/security_snapshot.tar")
             else:
                 destination_relative = Path(relative)
             candidates[source] = (destination_relative, "repo")
@@ -111,6 +121,13 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
                     relative = source.relative_to(source_root)
                     candidates[source] = (relative, "repo")
 
+    if secrets_root is not None:
+        secrets_root = secrets_root.expanduser().resolve()
+        for relative_text in ("vault.json", "tg.env", "ifttt.env", "auto_sources.env"):
+            source = secrets_root / relative_text
+            if source.is_file():
+                candidates[source] = (Path("secrets") / relative_text, "secrets_root")
+
     if legacy_runtime_root is not None:
         legacy_runtime_root = legacy_runtime_root.expanduser().resolve()
         if legacy_runtime_root.is_dir():
@@ -130,7 +147,7 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
                 candidates[env_file] = (Path("legacy_runtime/secrets/.env.polymarket"), "legacy_runtime")
             archive = legacy_runtime_root / "security_snapshot.tar"
             if archive.is_file():
-                candidates[archive] = (Path("legacy_runtime") / "security_snapshot.tar", "legacy_runtime")
+                candidates[archive] = (Path("backups/security_snapshot-legacy.tar"), "legacy_runtime")
 
     return [(source, relative, label) for source, (relative, label) in sorted(
         candidates.items(), key=lambda item: str(item[1][0])
@@ -168,7 +185,7 @@ def copy_without_overwrite(source: Path, destination: Path) -> tuple[str, str, i
     return "copied", digest, len(data)
 
 
-def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None) -> dict:
+def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None) -> dict:
     source_root = source_root.expanduser().resolve()
     destination_root = destination_root.expanduser().resolve()
     destination_root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -178,7 +195,7 @@ def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path
         pass
 
     results = []
-    for source, relative, source_label in collect_sources(source_root, legacy_runtime_root):
+    for source, relative, source_label in collect_sources(source_root, legacy_runtime_root, secrets_root):
         destination = destination_root / relative
         status, digest, size = copy_without_overwrite(source, destination)
         results.append({
@@ -194,6 +211,7 @@ def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path
         "created_at": datetime.now(timezone.utc).isoformat(),
         "source_root": str(source_root),
         "legacy_runtime_root": str(legacy_runtime_root.expanduser().resolve()) if legacy_runtime_root else None,
+        "secrets_root": str(secrets_root.expanduser().resolve()) if secrets_root else None,
         "files": results,
     }
     manifest_path = destination_root / "migration_manifest.json"
@@ -234,10 +252,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument("--legacy-runtime-root", type=Path, default=Path.home() / "hands-off")
+    parser.add_argument("--secrets-root", type=Path, default=Path.home() / ".config" / "hands-off")
     parser.add_argument("--destination", type=Path, default=private_root())
     args = parser.parse_args()
 
-    result = migrate(args.source_root, args.destination, args.legacy_runtime_root)
+    result = migrate(args.source_root, args.destination, args.legacy_runtime_root, args.secrets_root)
     copied = sum(item["status"] == "copied" for item in result["files"])
     preserved = sum(item["status"] == "already_preserved" for item in result["files"])
     conflicts = sum(item["status"] == "conflict_existing_destination" for item in result["files"])
