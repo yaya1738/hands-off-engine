@@ -158,6 +158,7 @@ def test_legacy_runtime_recursive_finance_history_is_preserved(tmp_path):
 def test_migration_preserves_local_polymarket_env_only_under_private_secrets(tmp_path):
     source = tmp_path / "repo"
     destination = tmp_path / "private"
+    source.mkdir(parents=True)
     env_file = source / ".env.polymarket"
     env_file.write_text("POLYMARKET_PRIVATE_KEY=placeholder\n", encoding="utf-8")
 
