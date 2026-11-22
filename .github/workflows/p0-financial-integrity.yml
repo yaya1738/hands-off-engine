@@ -87,4 +87,5 @@ jobs:
           tests/test_payment_monitor.py
           tests/test_legacy_execution_boundaries.py
           tests/test_legacy_finance_watcher_truth.py
+          tests/test_migrate_private_state.py
           -q --tb=short
