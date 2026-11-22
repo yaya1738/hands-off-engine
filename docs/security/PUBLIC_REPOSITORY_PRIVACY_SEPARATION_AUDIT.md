@@ -17,6 +17,12 @@ This is a data-separation audit, not a recommendation to make the repository pri
 - Replaced the obsolete status instructions that sourced a credential file and queried a hardcoded public server with local health and evidence-backed financial-truth guidance.
 - Existing financial-integrity changes also removed the wallet literal from the payment monitor and require its configured address to be supplied through local environment configuration.
 
+## Additional historical exposure found by full tree enumeration
+
+The current tree contains 808 timestamped finance snapshots (about 167 KB total), a historical net-worth CSV, finance state and P&L files (including a multi-megabyte ledger), tracked environment/configuration records, and a 60 KB `termux-hands-off/security_snapshot.tar` archive. The environment records inspected so far contained placeholders rather than active bot credentials; the archive has not yet been extracted or inspected. Treat it as potentially sensitive until reviewed.
+
+The migration utility now recursively preserves `termux-hands-off/state/`, `termux-hands-off/logs/`, `termux-hands-off/data/finances/`, and the security archive, plus corresponding `~/hands-off` runtime directories. It also preserves `security/identity_checks.jsonl`. This prevents the cleanup plan from losing historical finance evidence.
+
 ## Remaining tracked data requiring a private-preservation migration
 
 The following paths still contain personal or account-specific information in the branch's current tree:
