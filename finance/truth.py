@@ -15,8 +15,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from finance.private_state import private_finance_hub_path
+
 DEFAULT_MAX_AGE_SECONDS = 15 * 60
-FINANCE_HUB = Path(__file__).resolve().parent.parent / "state" / "private_finance_hub.json"
+FINANCE_HUB = private_finance_hub_path()
 
 
 def _parse_timestamp(value: Any):
