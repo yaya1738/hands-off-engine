@@ -82,7 +82,7 @@ def private_root() -> Path:
     return Path(configured).expanduser() if configured else Path.home() / ".config" / "hands-off-engine"
 
 
-def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None, cron_logs_root: Path | None = None) -> list[tuple[Path, Path, str]]:
+def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None, cron_logs_root: Path | None = None, backup_repo_roots: list[Path] | None = None) -> list[tuple[Path, Path, str]]:
     candidates: dict[Path, tuple[Path, str]] = {}
     for relative in FIXED_RELATIVE_PATHS:
         source = source_root / relative
@@ -138,6 +138,13 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
         for source in key_dir.glob("keys.vault.bak.*"):
             if source.is_file():
                 candidates[source] = (Path("secrets") / source.name, "secrets_root")
+
+    for backup_root in backup_repo_roots or []:
+        backup_root = backup_root.expanduser().resolve()
+        source = backup_root / ".env.polymarket"
+        if source.is_file():
+            relative = Path("secrets") / "backup_repos" / backup_root.name / ".env.polymarket"
+            candidates[source] = (relative, "backup_repo")
 
     if cron_logs_root is not None:
         cron_logs_root = cron_logs_root.expanduser().resolve()
@@ -210,7 +217,7 @@ def copy_without_overwrite(source: Path, destination: Path) -> tuple[str, str, i
     return "copied", digest, len(data)
 
 
-def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None, cron_logs_root: Path | None = None) -> dict:
+def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None, secrets_root: Path | None = None, cron_logs_root: Path | None = None, backup_repo_roots: list[Path] | None = None) -> dict:
     source_root = source_root.expanduser().resolve()
     destination_root = destination_root.expanduser().resolve()
     destination_root.mkdir(parents=True, exist_ok=True, mode=0o700)
@@ -220,7 +227,7 @@ def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path
         pass
 
     results = []
-    for source, relative, source_label in collect_sources(source_root, legacy_runtime_root, secrets_root, cron_logs_root):
+    for source, relative, source_label in collect_sources(source_root, legacy_runtime_root, secrets_root, cron_logs_root, backup_repo_roots):
         destination = destination_root / relative
         status, digest, size = copy_without_overwrite(source, destination)
         results.append({
@@ -238,6 +245,7 @@ def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path
         "legacy_runtime_root": str(legacy_runtime_root.expanduser().resolve()) if legacy_runtime_root else None,
         "secrets_root": str(secrets_root.expanduser().resolve()) if secrets_root else None,
         "cron_logs_root": str(cron_logs_root.expanduser().resolve()) if cron_logs_root else None,
+        "backup_repo_roots": [str(path.expanduser().resolve()) for path in (backup_repo_roots or [])],
         "files": results,
     }
     manifest_path = destination_root / "migration_manifest.json"
@@ -280,10 +288,12 @@ def main() -> int:
     parser.add_argument("--legacy-runtime-root", type=Path, default=Path.home() / "hands-off")
     parser.add_argument("--secrets-root", type=Path, default=Path.home() / ".config")
     parser.add_argument("--cron-logs-root", type=Path, default=Path.home() / ".cron-logs")
+    parser.add_argument("--backup-root", type=Path, action="append", default=None)
     parser.add_argument("--destination", type=Path, default=private_root())
     args = parser.parse_args()
 
-    result = migrate(args.source_root, args.destination, args.legacy_runtime_root, args.secrets_root, args.cron_logs_root)
+    backup_roots = args.backup_root if args.backup_root is not None else [Path.home() / "hands-off-engine-backup", Path.home() / "hands-off-engine-mirror"]
+    result = migrate(args.source_root, args.destination, args.legacy_runtime_root, args.secrets_root, args.cron_logs_root, backup_roots)
     copied = sum(item["status"] == "copied" for item in result["files"])
     preserved = sum(item["status"] == "already_preserved" for item in result["files"])
     conflicts = sum(item["status"] == "conflict_existing_destination" for item in result["files"])
