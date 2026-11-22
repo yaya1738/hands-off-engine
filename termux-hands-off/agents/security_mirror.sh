@@ -62,6 +62,8 @@ openssl enc -aes-256-cbc -salt -pbkdf2 -iter 150000 \
   -in "$OUT" -out "$ENC" -pass file:"$PASSF"
 chmod 600 "$ENC"
 rm -f "$OUT"
+# The legacy plaintext archives are now inside the verified encrypted mirror.
+rm -f "$PRIVATE_ROOT/backups/security_snapshot.tar" "$PRIVATE_ROOT/backups/security_snapshot-legacy.tar"
 
 echo "[ok] private safety mirror created at $ENC"
 if command -v rclone >/dev/null 2>&1; then
