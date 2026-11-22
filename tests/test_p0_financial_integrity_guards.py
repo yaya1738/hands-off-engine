@@ -1255,3 +1255,58 @@ def test_capital_recovery_unknown_balance_preserves_last_verified_amount(tmp_pat
     assert state["financial_status"] == "unknown"
     assert state["trading_enabled"] is False
     assert state["execution_authorized"] is False
+
+def test_polymarket_client_direct_mutations_are_blocked_without_api_calls(monkeypatch):
+    import importlib.util
+    import sys
+    import types
+
+    package = types.ModuleType("py_clob_client")
+    package.__path__ = []
+    client_module = types.ModuleType("py_clob_client.client")
+    client_module.ClobClient = object
+    types_module = types.ModuleType("py_clob_client.clob_types")
+    types_module.MarketOrderArgs = object
+    types_module.OrderArgs = object
+    types_module.OrderType = type("OrderType", (), {"FOK": "FOK", "GTC": "GTC"})
+    builder_package = types.ModuleType("py_clob_client.order_builder")
+    builder_package.__path__ = []
+    constants_module = types.ModuleType("py_clob_client.order_builder.constants")
+    constants_module.BUY = "BUY"
+    constants_module.SELL = "SELL"
+
+    for name, module in (
+        ("py_clob_client", package),
+        ("py_clob_client.client", client_module),
+        ("py_clob_client.clob_types", types_module),
+        ("py_clob_client.order_builder", builder_package),
+        ("py_clob_client.order_builder.constants", constants_module),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+
+    source = Path(__file__).resolve().parents[1] / "executor" / "polymarket_client.py"
+    spec = importlib.util.spec_from_file_location("isolated_polymarket_client", source)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    calls = []
+    trader = module.PolymarketTrader.__new__(module.PolymarketTrader)
+    trader.client = SimpleNamespace(
+        create_market_order=lambda *a, **k: calls.append("create_market_order"),
+        create_order=lambda *a, **k: calls.append("create_order"),
+        post_order=lambda *a, **k: calls.append("post_order"),
+        cancel=lambda *a, **k: calls.append("cancel"),
+        cancel_all=lambda *a, **k: calls.append("cancel_all"),
+    )
+
+    results = [
+        trader.place_market_order_usd("token", 10.0, "BUY"),
+        trader.place_limit_order("token", 0.5, 10.0, "BUY"),
+        trader.cancel_order("order-id"),
+        trader.cancel_all_orders(),
+    ]
+
+    assert all(result["status"] == "blocked" for result in results)
+    assert all(result["execution_authorized"] is False for result in results)
+    assert all(result["blocked_by"] == "governed_execution" for result in results)
+    assert calls == []
