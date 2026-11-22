@@ -35,6 +35,7 @@ The following paths still contain personal or account-specific information in th
 | `state/optimal_trigger_config.json` | Wallet and obsolete capital-trigger configuration | Preserve audit evidence privately; disable/remove public snapshot |
 | `state/filler_actions.jsonl` | Historical wallet-bearing action records | Preserve privately; remove personal event payloads from public tree |
 | `termux-hands-off/agent/vault.json` and backup | OKX/Kraken API credentials | Preserve privately; rotate exposed credentials; replace public files with examples |
+| `termux-hands-off/agent/balances_manual.yaml.bak` | Historical manual asset/liability snapshot | Preserve privately; remove from public tree after migration |
 | `termux-hands-off/security_snapshot.tar` | Embedded vault credentials, external accounts, cards, emergency data and finance logs | Preserve archive privately; remove public copy and scrub history |
 | `termux-hands-off/state/` | Telegram, IFTTT and other integration environment values plus runtime state | Preserve privately; rotate confirmed exposed credentials; remove tracked runtime state |
 | `termux-hands-off/autopilot/admin.env` | Admin/control-plane token | Preserve privately; rotate/revoke; replace with example |
