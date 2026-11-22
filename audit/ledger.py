@@ -259,77 +259,55 @@ class FinancialLedger:
         component: Optional[str] = None,
         category: Optional[str] = None
     ) -> List[LedgerEntry]:
-        """
-        Query ledger entries
-
-        Args:
-            session_id: Filter by session
-            component: Filter by component
-            category: Filter by category ("cost" or "revenue")
-
-        Returns:
-            List of matching LedgerEntry objects
-        """
-        if not self.ledger_file.exists():
-            return []
-
+        """Read a consistent ledger snapshot and apply optional filters."""
         entries = []
-        with open(self.ledger_file, "r") as f:
-            for line in f:
-                entry_data = json.loads(line.strip())
-
-                # Skip genesis entry
-                if entry_data["entry_id"] == "genesis":
-                    continue
-
-                # Apply filters
-                if session_id and entry_data["session_id"] != session_id:
-                    continue
-                if component and entry_data["component"] != component:
-                    continue
-                if category and entry_data["category"] != category:
-                    continue
-
-                entries.append(LedgerEntry(**entry_data))
-
+        with self._locked():
+            if not self.ledger_file.exists():
+                return []
+            with open(self.ledger_file, "r", encoding="utf-8") as handle:
+                for line in handle:
+                    if not line.strip():
+                        continue
+                    entry_data = json.loads(line)
+                    if entry_data["entry_id"] == "genesis":
+                        continue
+                    if session_id and entry_data["session_id"] != session_id:
+                        continue
+                    if component and entry_data["component"] != component:
+                        continue
+                    if category and entry_data["category"] != category:
+                        continue
+                    entries.append(LedgerEntry(**entry_data))
         return entries
 
     def verify_integrity(self) -> bool:
-        """
-        Verify ledger integrity by checking hash chain
+        """Verify hashes and chain linkage against one locked ledger snapshot."""
+        with self._locked():
+            if not self.ledger_file.exists():
+                return True
+            with open(self.ledger_file, "r", encoding="utf-8") as handle:
+                lines = handle.readlines()
 
-        Returns:
-            True if ledger is intact, False if tampered
-        """
-        if not self.ledger_file.exists():
-            return True
-
-        with open(self.ledger_file, "r") as f:
-            lines = f.readlines()
-
-        for i, line in enumerate(lines):
-            entry_data = json.loads(line.strip())
-
-            # Verify hash computation
+        previous_hash = "0" * 64
+        for index, line in enumerate(lines):
+            if not line.strip():
+                continue
+            entry_data = json.loads(line)
+            if entry_data.get("previous_hash") != previous_hash:
+                print(f"Chain broken at entry {index}")
+                return False
             if entry_data.get("hash_version", 1) >= 2:
                 computed_hash = self._compute_entry_hash(entry_data)
             else:
                 computed_hash = self._compute_hash(
                     entry_data["entry_id"],
                     entry_data["previous_hash"],
-                    entry_data["amount"]
+                    entry_data["amount"],
                 )
-
-            if computed_hash != entry_data["current_hash"]:
-                print(f"Hash mismatch at entry {i}")
+            if computed_hash != entry_data.get("current_hash"):
+                print(f"Hash mismatch at entry {index}")
                 return False
-
-            # Verify chain linkage
-            if i > 0:
-                prev_entry = json.loads(lines[i - 1].strip())
-                if entry_data["previous_hash"] != prev_entry["current_hash"]:
-                    print(f"Chain broken at entry {i}")
-                    return False
+            previous_hash = entry_data["current_hash"]
 
         return True
 
