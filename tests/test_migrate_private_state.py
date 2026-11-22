@@ -325,3 +325,17 @@ def test_migration_preserves_entire_root_state_tree_and_maps_finance_hub_once(tm
     assert (destination / "state" / "financial_state.json").exists()
     assert (destination / "finance" / "private_finance_hub.json").exists()
     assert not (destination / "state" / "private_finance_hub.json").exists()
+
+
+
+def test_migration_rejects_destination_inside_source_repository(tmp_path):
+    source = tmp_path / "repo"
+    source.mkdir()
+    destination = source / ".private"
+
+    try:
+        migrate(source, destination)
+    except ValueError as exc:
+        assert "outside the source repository" in str(exc)
+    else:
+        raise AssertionError("in-repository private destination must be rejected")
