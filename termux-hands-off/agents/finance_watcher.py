@@ -2,13 +2,14 @@
 import os, json, time, hmac, hashlib, base64, datetime, sys
 from pathlib import Path
 from urllib.parse import urlencode
+from private_state import private_path, private_directory
 import requests
 
 HOME = Path.home()
-LOG_DIR = HOME / "hands-off" / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-RULES = json.load(open(HOME/"hands-off"/"agents"/"finance_rules.json"))
-EXTERNAL_FILE = HOME/"hands-off"/"agents"/"external_accounts.json"
+LOG_DIR = private_directory("logs", create=True)
+RULES_PATH = private_path("agents/finance_rules.json")
+RULES = json.loads(RULES_PATH.read_text(encoding="utf-8")) if RULES_PATH.exists() else {"symbols": [], "alerts": [], "poll_seconds": 45}
+EXTERNAL_FILE = private_path("agents/external_accounts.json")
 VAULT_CANDIDATES = [
     HOME/"hands-off"/"vault.json",
     HOME/".config"/"hands-off"/"vault.json"
