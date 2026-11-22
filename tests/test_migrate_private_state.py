@@ -98,3 +98,19 @@ def test_migration_also_preserves_legacy_hands_off_runtime_paths(tmp_path):
     assert copied.read_text(encoding="utf-8") == '{"account":"private"}'
     assert result["files"][0]["source"].startswith("legacy_runtime:")
     assert result["files"][0]["status"] == "copied"
+
+
+
+def test_private_finance_hub_is_migrated_out_of_repo_state_tree(tmp_path):
+    source = tmp_path / "repo"
+    destination = tmp_path / "private"
+    old_hub = source / "state" / "private_finance_hub.json"
+    old_hub.parent.mkdir(parents=True)
+    old_hub.write_text('{"accounts":{},"status":"private"}', encoding="utf-8")
+
+    result = migrate(source, destination)
+
+    new_hub = destination / "finance" / "private_finance_hub.json"
+    assert new_hub.read_text(encoding="utf-8") == old_hub.read_text(encoding="utf-8")
+    assert old_hub.exists()
+    assert result["files"][0]["destination"] == "finance/private_finance_hub.json"
