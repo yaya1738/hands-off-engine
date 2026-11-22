@@ -1,10 +1,13 @@
 import os, json, yaml, math, time, hmac, hashlib, base64
+from pathlib import Path
 from datetime import datetime, timezone
 from rich import print as rprint
 from rich.table import Table
 import requests
 
-CONFIG="finance_sources.yaml"; VAULT="vault.json"
+CONFIG="finance_sources.yaml"
+PRIVATE_ROOT = Path(os.environ.get("HANDS_OFF_PRIVATE_DIR", str(Path.home()/".config"/"hands-off-engine"))).expanduser()
+VAULT = PRIVATE_ROOT/"secrets"/"termux-agent-vault.json"
 
 def money(x):
     try: return "${:,.2f}".format(float(x))
@@ -13,8 +16,8 @@ def money(x):
 def load_yaml(p): return yaml.safe_load(open(p))
 def read_manual(p): return yaml.safe_load(open(p))
 def load_vault():
-    if os.path.exists(VAULT):
-        try: return json.load(open(VAULT))
+    if VAULT.exists():
+        try: return json.loads(VAULT.read_text(encoding="utf-8"))
         except: return {}
     return {}
 
@@ -97,43 +100,9 @@ def compute_totals(doc):
     return {"cash":c,"crypto":x,"securities":s,"liabilities":l,"net":c+x+s-l}
 
 def main():
-    cfg=load_yaml(CONFIG); vault=load_vault()
-    total={"cash":0,"crypto":0,"securities":0,"liabilities":0,"net":0}
-    notes=[]; breakdown=[]
-    for src in cfg.get("sources",[]):
-        t=src["type"]
-        if t=="manual_file":
-            d=read_manual(src["path"]); s=compute_totals(d)
-            for k in total: total[k]+=s[k]
-            breakdown.append(("Manual",s["cash"],s["crypto"],s["securities"],s["liabilities"],s["net"]))
-        elif t=="onchain_usdc_eth":
-            # (kept but not used yet until you add ETHERSCAN + addresses)
-            pass
-        elif t=="okx_spot":
-            val,msg=okx_fetch_balance(vault)
-            total["crypto"]+=val
-            breakdown.append(("OKX",0.0,val,0.0,0.0,val))
-            notes.append(f"OKX status: {msg}")
-        elif t=="kraken_spot":
-            val,msg=kraken_fetch_balance(vault)
-            total["crypto"]+=val
-            breakdown.append(("Kraken",0.0,val,0.0,0.0,val))
-            notes.append(f"Kraken status: {msg}")
-    assets=total["cash"]+total["crypto"]+total["securities"]
-    util=(total["liabilities"]/assets) if assets>0 else 0
-    tbl=Table(title=f"Hands-Off Snapshot @ {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')}")
-    tbl.add_column("Metric",style="cyan"); tbl.add_column("Value",style="green")
-    for k,v in [("Cash",total["cash"]),("Crypto",total["crypto"]),("Securities",total["securities"]),
-                ("Liabilities",f"({money(total['liabilities'])})"),("—","—"),
-                ("Net Worth",total["net"]),("Utilization (est.)",f"{util*100:.1f}%")]:
-        tbl.add_row(k,money(v) if not isinstance(v,str) else v)
-    rprint(tbl)
-    b=Table(title="Source Breakdown")
-    for c in ["Source","Cash","Crypto","Securities","Liabilities","Net Add"]: b.add_column(c)
-    for n,c,x,s,l,net in breakdown: b.add_row(n,money(c),money(x),money(s),money(l),money(net))
-    rprint(b)
-    if notes:
-        rprint("[yellow]Notes:[/yellow]")
-        for n in notes: rprint(f"- {n}")
+    print("BLOCKED: legacy finance aggregator is retired.")
+    print("It mixes manual data with zero-on-error exchange responses and cannot establish financial truth.")
+    print("Use the governed finance.truth adapter and private finance hub instead.")
+    return 1
 
-if __name__=="__main__": main()
+if __name__=="__main__": raise SystemExit(main())
