@@ -128,8 +128,8 @@ def load_external_accounts():
                 out[k] = number
             return out
     except Exception:
-        pass
-    return {}
+        return None
+    return None
 
 def load_vault():
     if not VAULT: return {}
@@ -142,7 +142,7 @@ def load_vault():
 def portfolio_snapshot(vault):
     snap = {"by_asset": {}, "prices": {}}
     # normalize symbols to pull prices
-    for sym in RULES["symbols"]:
+    for sym in RULES.get("symbols", []):
         try:
             px = get_okx_ticker(sym)
             snap["prices"][sym] = px
