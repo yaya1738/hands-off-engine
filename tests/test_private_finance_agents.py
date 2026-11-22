@@ -146,14 +146,37 @@ def test_manual_external_account_metadata_is_never_summed_into_net_worth(tmp_pat
 
 
 
-def test_finance_vault_importer_writes_only_to_private_secrets_directory(tmp_path):
+def test_finance_vault_importer_does_not_create_empty_vault(tmp_path):
     env = os.environ.copy()
     env["HANDS_OFF_PRIVATE_DIR"] = str(tmp_path / "private")
-    env.pop("OKX_API_KEY", None)
-    env.pop("OKX_API_SECRET", None)
-    env.pop("OKX_API_PASSPHRASE", None)
-    env.pop("KRAKEN_API_KEY", None)
-    env.pop("KRAKEN_API_SECRET", None)
+    for key in ("OKX_API_KEY", "OKX_API_SECRET", "OKX_API_PASSPHRASE", "KRAKEN_API_KEY", "KRAKEN_API_SECRET"):
+        env.pop(key, None)
+    result = subprocess.run(
+        [sys.executable, str(AGENTS / "finance_vault_from_any.py")],
+        capture_output=True,
+        text=True,
+        timeout=10,
+        env=env,
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "no exchange credentials found" in result.stdout.lower()
+    assert not (tmp_path / "private" / "secrets" / "vault.json").exists()
+
+
+def test_finance_vault_importer_preserves_existing_private_credentials(tmp_path):
+    private_root = tmp_path / "private"
+    secrets = private_root / "secrets"
+    secrets.mkdir(parents=True)
+    vault = secrets / "vault.json"
+    original = {"OKX_API_KEY": "existing-placeholder", "KRAKEN_API_KEY": ""}
+    vault.write_text(json.dumps(original), encoding="utf-8")
+    env = os.environ.copy()
+    env["HANDS_OFF_PRIVATE_DIR"] = str(private_root)
+    for key in ("OKX_API_KEY", "OKX_API_SECRET", "OKX_API_PASSPHRASE", "KRAKEN_API_KEY", "KRAKEN_API_SECRET"):
+        env.pop(key, None)
+
     result = subprocess.run(
         [sys.executable, str(AGENTS / "finance_vault_from_any.py")],
         capture_output=True,
@@ -164,12 +187,9 @@ def test_finance_vault_importer_writes_only_to_private_secrets_directory(tmp_pat
     )
 
     assert result.returncode == 0
-    vault = tmp_path / "private" / "secrets" / "vault.json"
-    data = json.loads(vault.read_text(encoding="utf-8"))
-    assert all(value == "" for value in data.values())
+    assert json.loads(vault.read_text(encoding="utf-8")) == original
     assert vault.stat().st_mode & 0o777 == 0o600
-    assert (tmp_path / "private").stat().st_mode & 0o777 == 0o700
-    assert "private" in result.stdout.lower()
+    assert private_root.stat().st_mode & 0o777 == 0o700
 
 
 def test_legacy_finance_watcher_reads_only_migrated_private_runtime_state(tmp_path, monkeypatch):
