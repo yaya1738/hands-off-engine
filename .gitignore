@@ -115,3 +115,7 @@ termux-hands-off/agent/vault.json
 termux-hands-off/agent/vault.json.bak
 termux-hands-off/security_snapshot.tar
 termux-hands-off/autopilot/admin.env
+
+termux-hands-off/security_snapshot.enc
+security_snapshot.tar
+security_snapshot.enc
