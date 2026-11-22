@@ -816,7 +816,7 @@ def test_finance_dashboard_does_not_promote_old_hub_values(tmp_path, monkeypatch
         "credit": {"total_balance": 100.0, "utilization_pct": 5.0},
     }
     (tmp_path / "private_finance_hub.json").write_text(json.dumps(hub))
-    monkeypatch.setattr(finance_dashboard, "STATE_DIR", tmp_path)
+    monkeypatch.setattr(finance_dashboard, "private_finance_hub_path", lambda: tmp_path / "private_finance_hub.json")
 
     pm = finance_dashboard.get_polymarket_status()
     runway = finance_dashboard.get_runway_status()
