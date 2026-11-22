@@ -37,7 +37,6 @@ from executor.trading_safeguards import (
     save_risk_profile,
     load_mode,
     save_mode,
-    maybe_auto_resume,
     enforce_hard_limits,
 )
 
@@ -367,48 +366,15 @@ def maybe_resume_trading(
     metrics: Dict[str, float],
     mode: dict
 ) -> bool:
-    """
-    Check if conditions are good enough to auto-resume trading.
-
-    Args:
-        profile: Current risk profile
-        metrics: Performance metrics
-        mode: Current trading mode
-
-    Returns:
-        True if trading was resumed
-    """
-    # Only resume if currently paused
+    """Recovery metrics may recommend review but can never resume live trading."""
     if mode.get("live_trading_enabled", False):
         return False
-
-    # Only resume if auto-paused (not manually paused)
-    if not mode.get("auto_paused", False):
-        LOG.info("Trading manually paused - not auto-resuming")
-        return False
-
-    # Check conditions for resuming
-    hit_rate = metrics.get("hit_rate", 0.0)
-    total_pnl = metrics.get("total_pnl", 0.0)
-    trade_count = metrics.get("trade_count", 0)
-
-    # Need reasonable performance to resume
-    can_resume = (
-        trade_count >= 10 and
-        hit_rate >= 0.50 and
-        total_pnl >= 0
-    )
-
-    if can_resume:
-        maybe_auto_resume(reason="recalibration_conditions_met", notify=True)
-        LOG.info("✅ Auto-resuming trading after recalibration")
-        return True
-    else:
+    if mode.get("auto_paused", False):
         LOG.info(
-            f"Not resuming - hit_rate={hit_rate:.1%}, pnl=${total_pnl:.2f}, "
-            f"trades={trade_count} (need hit_rate≥50%, pnl≥$0, trades≥10)"
+            "Trading remains paused. Recalibration is advisory only; "
+            "explicit governed approval is required to resume."
         )
-        return False
+    return False
 
 
 def main():

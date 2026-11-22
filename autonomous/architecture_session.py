@@ -111,10 +111,10 @@ class EconomicsArchitect(Architect):
 
     def _analyze(self, problem: str, context: Dict) -> str:
         if "power" in problem.lower():
-            balance = context.get("balance", 8.99)
+            balance = context.get("balance", "unknown")
             return f"""
 ECONOMIC ANALYSIS:
-Current balance: ${balance}
+Current verified balance: {balance}
 Current income: $0/day
 Current burn: ~$12/month (infrastructure)
 
@@ -254,16 +254,9 @@ class ArchitectureSession:
         """Gather current system context."""
         context = {}
 
-        # Financial state
-        try:
-            finance_file = STATE_DIR / "financial_state.json"
-            if finance_file.exists():
-                fin = json.loads(finance_file.read_text())
-                context["balance"] = fin.get("balance", 0)
-                context["positions"] = fin.get("positions_value", 0)
-        except:
-            context["balance"] = 8.99
-            context["positions"] = 98.05
+        # A local financial_state.json cache is not verified financial evidence.
+        context["balance"] = "unknown"
+        context["positions"] = "unknown"
 
         # System health
         try:

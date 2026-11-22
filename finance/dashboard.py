@@ -13,6 +13,8 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+from finance.truth import read_verified_polymarket_balance
+
 FINANCE_DIR = Path(__file__).parent
 STATE_DIR = FINANCE_DIR.parent / "state"
 LOGS_DIR = FINANCE_DIR.parent / "logs"
@@ -26,42 +28,44 @@ def load_json(filepath):
         return {}
 
 def get_polymarket_status():
-    """Get Polymarket account status"""
-    hub = load_json(FINANCE_DIR / "yair_finance_hub.json")
-    pm = hub.get("accounts", {}).get("polymarket", {})
-
+    """Return only a recent, provenance-verified Polygon wallet balance."""
+    hub_path = STATE_DIR / "private_finance_hub.json"
+    truth = read_verified_polymarket_balance(hub_path)
     return {
-        "balance_usdc": pm.get("balance_usdc", 0),
-        "balance_matic": pm.get("balance_matic", 0),
-        "wallet": pm.get("wallet_address", "unknown"),
-        "last_updated": pm.get("last_updated", "never")
+        "balance_usdc": truth["balance_usdc"],
+        "balance_matic": None,
+        "wallet": "configured" if truth["wallet_configured"] else "unknown",
+        "last_updated": truth["observed_at"] or "unknown",
+        "verified": truth["verified"],
+        "source": truth["source"],
+        "reason": truth["reason"] if not truth["verified"] else None,
     }
+
 
 def get_credit_status():
-    """Get credit card status"""
-    hub = load_json(FINANCE_DIR / "yair_finance_hub.json")
-    credit = hub.get("credit", {})
-
+    """Credit figures remain unknown until independently verified."""
     return {
-        "score": credit.get("score", 0),
-        "total_limit": credit.get("total_limit", 0),
-        "total_balance": credit.get("total_balance", 0),
-        "available": credit.get("total_available", 0),
-        "utilization": credit.get("utilization_pct", 0)
+        "score": None,
+        "total_limit": None,
+        "total_balance": None,
+        "available": None,
+        "utilization": None,
+        "verified": False,
+        "source": "manual_snapshot_not_reconciled",
     }
+
 
 def get_runway_status():
-    """Get runway status"""
-    hub = load_json(FINANCE_DIR / "yair_finance_hub.json")
-    summary = hub.get("summary", {})
-    burn = hub.get("monthly_burn", {})
-
+    """Runway remains unknown until assets, debts, income and burn are reconciled."""
     return {
-        "total_liquid": summary.get("total_liquid_usd", 0),
-        "monthly_burn": burn.get("total_usd", 0),
-        "runway_months": summary.get("runway_months", 0),
-        "deployable": summary.get("deployable_to_trading", 0)
+        "total_liquid": None,
+        "monthly_burn": None,
+        "runway_months": None,
+        "deployable": None,
+        "verified": False,
+        "source": "manual_snapshot_not_reconciled",
     }
+
 
 def get_trading_status():
     """Get trading status from shadow trades"""
@@ -115,106 +119,35 @@ def get_ai_cost_status():
         }
 
 def print_dashboard():
-    """Print complete financial dashboard"""
-    print("=" * 70)
-    print("FINANCIAL DASHBOARD - YAIR SIEGEL SYSTEM")
-    print(f"Generated: {datetime.utcnow().isoformat()}Z")
-    print("=" * 70)
-    print()
-
-    # Polymarket
+    """Display verified balances and explicitly unknown unreconciled finances."""
     pm = get_polymarket_status()
-    print("POLYMARKET TRADING ACCOUNT:")
-    print(f"  USDC Balance:   ${pm['balance_usdc']:.2f}")
-    print(f"  MATIC (gas):    {pm['balance_matic']:.4f}")
-    print(f"  Last Updated:   {pm['last_updated']}")
-    print()
+    print("=" * 70)
+    print("FINANCIAL DASHBOARD — EVIDENCE STATUS")
+    print(f"Generated: {datetime.now().astimezone().isoformat()}")
+    print("=" * 70)
 
-    # Runway
-    runway = get_runway_status()
-    print("RUNWAY STATUS:")
-    runway_status = "🔴 CRITICAL" if runway['runway_months'] < 1 else "🟡 WARNING" if runway['runway_months'] < 3 else "🟢 OK"
-    print(f"  Total Liquid:   ${runway['total_liquid']:,.0f}")
-    print(f"  Monthly Burn:   ${runway['monthly_burn']:,.0f}")
-    print(f"  Runway:         {runway['runway_months']:.1f} months {runway_status}")
-    print(f"  Deployable:     ${runway['deployable']:.0f}")
-    print()
+    print("\nPOLYMARKET WALLET")
+    if pm["verified"]:
+        print("  Verified USDC: " + "$" + format(pm["balance_usdc"], ".2f"))
+        print(f"  Verified at:   {pm['last_updated']}")
+    else:
+        print("  Verified USDC: UNKNOWN")
+        print(f"  Reason: {pm['reason']}")
 
-    # Credit
-    credit = get_credit_status()
-    util_status = "🔴 HIGH" if credit['utilization'] > 50 else "🟡 ELEVATED" if credit['utilization'] > 30 else "🟢 GOOD"
-    print("CREDIT STATUS:")
-    print(f"  Score:          {credit['score']}")
-    print(f"  Total Limit:    ${credit['total_limit']:,}")
-    print(f"  Balance:        ${credit['total_balance']:,}")
-    print(f"  Available:      ${credit['available']:,}")
-    print(f"  Utilization:    {credit['utilization']}% {util_status}")
-    print()
+    print("\nOTHER FINANCES")
+    print("  Cash, brokerage, debts, income, expenses: UNKNOWN / not reconciled")
+    print("  Net worth: UNKNOWN")
+    print("  Runway: UNKNOWN")
+    print("  Spendable trading capital: DISABLED")
 
-    # Signals
     signals = get_signals_status()
-    print("TRADING SIGNALS:")
-    print(f"  Active Signals: {signals['count']}")
-    print(f"  Average Edge:   {signals['avg_edge']:.1f}%")
-    print(f"  Avg Confidence: {signals['avg_conf']:.1f}%")
+    print("\nRESEARCH SIGNALS (NOT VERIFIED PERFORMANCE)")
+    print(f"  Active signals: {signals['count']}")
+    print(f"  Average model edge: {signals['avg_edge']:.1f}% (unvalidated)")
+    print("\nTRADING")
+    print("  Live execution: DISABLED pending financial truth and governed authority")
     print()
 
-    # Shadow trades
-    trading = get_trading_status()
-    print("TRADING ACTIVITY:")
-    print(f"  Shadow Trades:  {trading['total_shadow']} total")
-    print(f"  Today:          {trading['today']} trades")
-    print()
-
-    # AI Costs
-    print("AI API COSTS:")
-    print(f"  Monthly Budget: $250")
-    print(f"  Strategy:       Reserve API for trading signals")
-    print(f"  Subs (fixed):   $50/mo (Claude Max + ChatGPT + Copilot)")
-    print(f"  Variable:       $200/mo for signal generation")
-    print()
-
-    # Key Actions
-    print("=" * 70)
-    print("KEY ACTIONS:")
-    print("=" * 70)
-
-    actions = []
-
-    if runway['runway_months'] < 1:
-        actions.append("🔴 CRITICAL: Execute cash generation trades IMMEDIATELY")
-        actions.append("   Run: HANDS_OFF_EXECUTOR_MODE=live LIVE_TRADING_ENABLED=1 python3 scripts/run_pipeline.py")
-
-    if credit['utilization'] > 50:
-        actions.append("🟡 Pay down credit cards to reduce utilization (CC optimizer)")
-        actions.append("   Run: python3 finance/cc_optimizer.py")
-
-    if signals['count'] > 10 and signals['avg_edge'] > 10:
-        actions.append("🟢 Good signals available - consider increasing trade frequency")
-
-    if trading['today'] == 0:
-        actions.append("⚠️  No trades today - pipeline may need activation")
-
-    if not actions:
-        actions.append("✅ System healthy - continue monitoring")
-
-    for action in actions:
-        print(f"  {action}")
-    print()
-
-    # Summary
-    print("=" * 70)
-    print("SUMMARY:")
-    print("=" * 70)
-    print(f"  Net Position:    ${pm['balance_usdc'] + runway['total_liquid']:,.2f} liquid")
-    print(f"  Net Worth:       ${pm['balance_usdc'] + runway['total_liquid'] - credit['total_balance']:,.2f} (liquid - debt)")
-    print(f"  Time to Crisis:  {runway['runway_months']:.1f} months")
-    print()
-
-    if signals['avg_edge'] > 10:
-        expected_monthly = pm['balance_usdc'] * 0.2 * (signals['avg_edge'] / 100) * 4  # 4 rounds per month
-        print(f"  Expected Monthly Profit (with trading): ${expected_monthly:.2f}")
-        print(f"  Months until break-even (vs burn):     {runway['monthly_burn'] / expected_monthly:.1f}" if expected_monthly > 0 else "  Need larger bankroll")
 
 if __name__ == "__main__":
     print_dashboard()

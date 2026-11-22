@@ -18,7 +18,8 @@ collapses into instant execution.
 # UNIFIED AI - All systems serve Yair Siegel
 import sys
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).parent.parent))
+BASE_DIR = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(BASE_DIR))
 try:
     from ai.unified_ai import MASTER, get_master
 except ImportError:
@@ -28,13 +29,10 @@ except ImportError:
 import os
 import sys
 import json
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 
-sys.path.insert(0, '/root/hands-off-engine')
-
-TRIGGER_STATE = Path("/root/hands-off-engine/state/singularity_trigger.json")
+TRIGGER_STATE = BASE_DIR / "state" / "singularity_trigger.json"
 TRADING_THRESHOLD = 50.0
 MINIMUM_VIABLE_THRESHOLD = 25.0  # Can do small trades at $25
 
@@ -44,32 +42,38 @@ def log(msg: str):
 
 
 def send_telegram(msg: str, priority: str = "normal"):
+    """Send notifications only when credentials are supplied through the environment."""
     import requests
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
     if priority == "critical":
         msg = "🚨🚨🚨\n" + msg
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": msg, "parse_mode": "Markdown"},
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"},
             timeout=10
         )
-    except:
-        pass
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 
-def get_balance() -> float:
-    """Get current balance"""
+def get_balance() -> float | None:
+    """Return a balance only when both supported token balances are verified."""
     try:
         from executor.trading_safeguards import TradingSafeguards
-        safeguards = TradingSafeguards()
-        ok, msg = safeguards.check_wallet_balance(0)
+        ok, msg = TradingSafeguards().check_wallet_balance(0)
+        if not ok:
+            return None
         if "balance: $" in msg:
-            return float(msg.split("balance: $")[1].split()[0])
-        elif "Insufficient" in msg:
-            return float(msg.split("$")[1].split()[0])
-    except:
-        pass
-    return 0.0
+            return float(msg.split("balance: $", 1)[1].split()[0])
+    except Exception:
+        return None
+    return None
 
 
 def load_state() -> dict:
@@ -90,202 +94,73 @@ def save_state(state: dict):
 
 
 def execute_singularity():
-    """THE SINGULARITY - Execute everything"""
-
-    log("=" * 60)
-    log("SINGULARITY TRIGGERED")
-    log("Executing all prepared actions...")
-    log("=" * 60)
-
-    actions = []
-
-    # 1. Run the intelligent pipeline in LIVE mode
-    log("ACTION 1: Executing intelligent pipeline...")
-    try:
-        result = subprocess.run([
-            'python3', 'scripts/run_pipeline.py',
-            '--intelligent', '--live', '--bankroll', '500'
-        ], cwd='/root/hands-off-engine', capture_output=True, text=True, timeout=300)
-
-        if 'LIVE' in result.stdout:
-            actions.append("✓ Pipeline executed in LIVE mode")
-            log("✓ Pipeline executed")
-        else:
-            actions.append("! Pipeline ran but check output")
-    except Exception as e:
-        actions.append(f"✗ Pipeline: {e}")
-
-    # 2. Update escape velocity
-    log("ACTION 2: Recording escape velocity breakthrough...")
-    try:
-        from autonomous.escape_velocity_tracker import record_measurement
-        balance = get_balance()
-        record_measurement(balance=balance, positions=98.05)
-        actions.append("✓ Escape velocity recorded")
-    except Exception as e:
-        actions.append(f"✗ Escape velocity: {e}")
-
-    # 3. Run moonshot cycle
-    log("ACTION 3: Triggering moonshot improvement cycle...")
-    try:
-        # Reset moonshot cooldown to allow immediate execution
-        ms_state_file = Path("/root/hands-off-engine/state/moonshot_state.json")
-        if ms_state_file.exists():
-            ms_state = json.load(open(ms_state_file))
-            ms_state["last_cycle"] = None  # Reset cooldown
-            with open(ms_state_file, 'w') as f:
-                json.dump(ms_state, f, indent=2)
-
-        result = subprocess.run([
-            'python3', 'autonomous/moonshot_loop.py'
-        ], cwd='/root/hands-off-engine', capture_output=True, text=True, timeout=600)
-        actions.append("✓ Moonshot cycle triggered")
-    except Exception as e:
-        actions.append(f"✗ Moonshot: {e}")
-
-    # 4. Time collapse
-    log("ACTION 4: Collapsing timeline...")
-    try:
-        result = subprocess.run([
-            'python3', 'autonomous/time_collapse.py'
-        ], cwd='/root/hands-off-engine', capture_output=True, text=True, timeout=120)
-        actions.append("✓ Timeline collapsed")
-    except Exception as e:
-        actions.append(f"✗ Time collapse: {e}")
-
-    return actions
+    """Legacy execution entry point is permanently fail-closed."""
+    return [{
+        "status": "blocked",
+        "execution_authorized": False,
+        "reason": "Threshold monitoring cannot authorize trading or system mutations",
+    }]
 
 
 def execute_mini_singularity(balance: float):
-    """Execute smaller singularity at $25 threshold"""
-    log("MINI-SINGULARITY: Executing limited trading capability...")
-
-    actions = []
-
-    # Run pipeline with smaller bankroll
-    try:
-        result = subprocess.run([
-            'python3', 'scripts/run_pipeline.py',
-            '--intelligent', '--live', '--bankroll', str(balance)
-        ], cwd='/root/hands-off-engine', capture_output=True, text=True, timeout=300)
-
-        if 'Executed' in result.stdout or 'LIVE' in result.stdout:
-            actions.append("✓ Mini pipeline executed")
-    except Exception as e:
-        actions.append(f"✗ Mini pipeline: {e}")
-
-    return actions
+    """Legacy mini-execution entry point is permanently fail-closed."""
+    return [{
+        "status": "blocked",
+        "execution_authorized": False,
+        "reason": "Threshold monitoring cannot authorize trading or system mutations",
+    }]
 
 
 def check_and_trigger():
-    """Check if singularity conditions are met"""
-
+    """Observe verified wallet thresholds; never execute or enable trading."""
     state = load_state()
+    balance = get_balance()
+    state["last_check"] = datetime.now(timezone.utc).isoformat()
+    state["trading_enabled"] = False
+    state["execution_authorized"] = False
 
-    # Already triggered full singularity?
-    if state.get("triggered"):
-        log("Full singularity already triggered. Monitoring for next breakthrough.")
+    if balance is None:
+        state["financial_status"] = "unknown"
+        state["last_balance"] = None
+        state["approval_required"] = False
+        state["message"] = "Wallet balance could not be verified; no action taken."
+        save_state(state)
+        log(state["message"])
         return state
 
-    # Check balance
-    balance = get_balance()
-    log(f"Current balance: ${balance:.2f}")
-    log(f"Full threshold: ${TRADING_THRESHOLD:.2f}")
-    log(f"Mini threshold: ${MINIMUM_VIABLE_THRESHOLD:.2f}")
-
+    state["financial_status"] = "verified_read_only"
+    state["last_balance"] = balance
     if balance >= TRADING_THRESHOLD:
-        log("")
-        log("💥 THRESHOLD CROSSED - SINGULARITY CONDITIONS MET 💥")
-        log("")
-
-        # Send critical notification
-        send_telegram(
-            f"*💥 SINGULARITY TRIGGERED 💥*\n\n"
-            f"Balance: ${balance:.2f}\n"
-            f"Threshold: ${TRADING_THRESHOLD:.2f}\n\n"
-            f"*EXECUTING ALL PREPARED ACTIONS...*",
-            priority="critical"
+        state["threshold_status"] = "full_threshold_observed"
+        state["approval_required"] = True
+        state["message"] = (
+            "Capital threshold observed. No trading or financial action executed; "
+            "explicit governed approval is required."
         )
-
-        # Execute singularity
-        actions = execute_singularity()
-
-        # Update state
-        state["triggered"] = True
-        state["trigger_time"] = datetime.now(timezone.utc).isoformat()
-        state["trigger_balance"] = balance
-        state["actions_executed"] = actions
-
-        # Calculate new escape velocity
-        try:
-            ev_file = Path("/root/hands-off-engine/state/escape_velocity.json")
-            if ev_file.exists():
-                ev_data = json.load(open(ev_file))
-                state["escape_velocity_at_trigger"] = ev_data.get("current_velocity", 0)
-        except:
-            pass
-
-        save_state(state)
-
-        # Send completion notification
-        summary = f"""*💥 SINGULARITY COMPLETE 💥*
-
-*Trigger Details:*
-• Balance: ${balance:.2f}
-• Time: {state['trigger_time']}
-
-*Actions Executed:*
-"""
-        for action in actions:
-            summary += f"• {action}\n"
-
-        summary += "\n*The system has crossed the threshold.*\n_Exponential growth activated._"
-
-        send_telegram(summary, priority="critical")
-
-        log("")
-        log("=" * 60)
-        log("SINGULARITY COMPLETE")
-        log("=" * 60)
-
-    elif balance >= MINIMUM_VIABLE_THRESHOLD and not state.get("mini_triggered"):
-        log("")
-        log("⚡ MINI-THRESHOLD CROSSED - LIMITED TRADING ENABLED ⚡")
-        log("")
-
         send_telegram(
-            f"*⚡ MINI-SINGULARITY ⚡*\n\n"
-            f"Balance: ${balance:.2f}\n"
-            f"Executing limited trades...",
-            priority="normal"
+            f"Capital threshold observed: ${balance:.2f}. No trades were executed. "
+            "Explicit approval is required.",
+            priority="critical",
         )
-
-        actions = execute_mini_singularity(balance)
-        state["mini_triggered"] = True
-        state["mini_trigger_time"] = datetime.now(timezone.utc).isoformat()
-        state["mini_actions"] = actions
-        save_state(state)
-
+    elif balance >= MINIMUM_VIABLE_THRESHOLD:
+        state["threshold_status"] = "minimum_threshold_observed"
+        state["approval_required"] = True
+        state["message"] = (
+            "Minimum capital threshold observed. No trading or financial action executed; "
+            "explicit governed approval is required."
+        )
         send_telegram(
-            f"*Mini-Singularity Complete*\n\n"
-            f"Actions: {len(actions)}\n"
-            f"Gap to full: ${TRADING_THRESHOLD - balance:.2f}"
+            f"Minimum capital threshold observed: ${balance:.2f}. No trades were executed.",
+            priority="normal",
         )
-
     else:
-        gap = TRADING_THRESHOLD - balance
-        mini_gap = MINIMUM_VIABLE_THRESHOLD - balance
-        log(f"Gap to full singularity: ${gap:.2f}")
-        log(f"Gap to mini singularity: ${mini_gap:.2f}")
-        log("Waiting for capital...")
+        state["threshold_status"] = "below_threshold"
+        state["approval_required"] = False
+        state["message"] = "Below threshold; observation only."
 
-        # Update monitoring state
-        state["last_check"] = datetime.now(timezone.utc).isoformat()
-        state["last_balance"] = balance
-        state["gap_to_trigger"] = gap
-        state["gap_to_mini"] = mini_gap
-        save_state(state)
-
+    state["legacy_triggered_flag_ignored"] = bool(state.get("triggered"))
+    save_state(state)
+    log(state["message"])
     return state
 
 
@@ -293,7 +168,7 @@ def main():
     """Main entry point"""
 
     # Load env
-    env_file = Path("/root/hands-off-engine/.env.polymarket")
+    env_file = BASE_DIR / ".env.polymarket"
     if env_file.exists():
         for line in env_file.read_text().splitlines():
             if '=' in line and not line.startswith('#'):
@@ -305,10 +180,7 @@ def main():
 
     state = check_and_trigger()
 
-    if not state.get("triggered"):
-        log("")
-        log("System primed and waiting.")
-        log("Singularity will execute automatically when capital arrives.")
+    log("Observation-only mode. Capital thresholds never trigger automatic execution.")
 
 
 if __name__ == "__main__":

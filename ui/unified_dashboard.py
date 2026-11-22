@@ -19,6 +19,8 @@ Serving: Yair Siegel
 import json
 import sys
 from pathlib import Path
+
+from finance.truth import read_verified_polymarket_balance
 from datetime import datetime
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -47,40 +49,36 @@ app = FastAPI(title="Unified System Dashboard", description=f"Serving {MASTER}")
 # ============================================================================
 
 def get_finance_data():
-    """Collect financial data from existing finance module."""
-    try:
-        hub_file = REPO_ROOT / "finance" / "yair_finance_hub.json"
-        if hub_file.exists():
-            with open(hub_file) as f:
-                hub = json.load(f)
-
-            pm = hub.get("accounts", {}).get("polymarket", {})
-            summary = hub.get("summary", {})
-            credit = hub.get("credit", {})
-            burn = hub.get("monthly_burn", {})
-
-            return {
-                "polymarket": {
-                    "balance_usdc": pm.get("balance_usdc", 0),
-                    "balance_matic": pm.get("balance_matic", 0),
-                    "wallet": pm.get("wallet_address", "unknown"),
-                },
-                "runway": {
-                    "total_liquid": summary.get("total_liquid_usd", 0),
-                    "monthly_burn": burn.get("total_usd", 0),
-                    "runway_months": summary.get("runway_months", 0),
-                    "deployable": summary.get("deployable_to_trading", 0),
-                },
-                "credit": {
-                    "score": credit.get("score", 0),
-                    "utilization": credit.get("utilization_pct", 0),
-                    "available": credit.get("total_available", 0),
-                }
-            }
-    except Exception as e:
-        pass
-
-    return {"polymarket": {}, "runway": {}, "credit": {}, "error": str(e) if 'e' in dir() else "No data"}
+    """Return only verified wallet truth; other local finance snapshots stay unknown."""
+    hub_file = REPO_ROOT / "state" / "private_finance_hub.json"
+    truth = read_verified_polymarket_balance(hub_file)
+    return {
+        "polymarket": {
+            "balance_usdc": truth["balance_usdc"],
+            "balance_matic": None,
+            "wallet": "configured" if truth["wallet_configured"] else "unknown",
+            "verified": truth["verified"],
+            "source": truth["source"],
+            "observed_at": truth["observed_at"],
+        },
+        "runway": {
+            "total_liquid": None,
+            "monthly_burn": None,
+            "runway_months": None,
+            "deployable": None,
+            "verified": False,
+        },
+        "credit": {
+            "score": None,
+            "utilization": None,
+            "available": None,
+            "verified": False,
+        },
+        "financial_truth": {
+            "status": truth["status"],
+            "reason": truth["reason"],
+        },
+    }
 
 
 def get_positions_data():
@@ -193,8 +191,9 @@ def get_escape_velocity():
 
     score = 0
     # Capital: 30%
-    balance = finance.get("polymarket", {}).get("balance_usdc", 0)
-    score += min(30, balance / 200 * 30)
+    balance = finance.get("polymarket", {}).get("balance_usdc")
+    if isinstance(balance, (int, float)) and balance >= 0:
+        score += min(30, balance / 200 * 30)
 
     # Cluster: 20%
     healthy = cluster.get("healthy_nodes", 0)
@@ -576,18 +575,18 @@ def get_dashboard_html():
                 document.getElementById('ev-score').textContent = (ev.score || 0) + '/100';
                 document.getElementById('ev-bar').style.width = (ev.score || 0) + '%';
                 document.getElementById('ev-factors').innerHTML = `
-                    <div class="metric"><span class="label">Capital</span><span class="value">${{(ev.factors?.capital || 0).toFixed(2)}}</span></div>
+                    <div class="metric"><span class="label">Capital</span><span class="value">${{ev.factors?.capital != null ? (ev.factors.capital).toFixed(2) : 'UNKNOWN'}}</span></div>
                     <div class="metric"><span class="label">Nodes</span><span class="value">{{ev.factors?.nodes || 0}}</span></div>
                     <div class="metric"><span class="label">Signals</span><span class="value">{{ev.factors?.signals || 0}}</span></div>
                 `;
 
                 // Finance
                 const fin = data.finance || {{}};
-                document.getElementById('pm-balance').textContent = '$' + (fin.polymarket?.balance_usdc || 0).toFixed(2);
-                document.getElementById('total-liquid').textContent = '$' + (fin.runway?.total_liquid || 0).toLocaleString();
-                document.getElementById('monthly-burn').textContent = '-$' + (fin.runway?.monthly_burn || 0).toLocaleString();
-                document.getElementById('runway').textContent = (fin.runway?.runway_months || 0).toFixed(1) + ' months';
-                document.getElementById('credit-util').textContent = (fin.credit?.utilization || 0) + '%';
+                document.getElementById('pm-balance').textContent = fin.polymarket?.verified ? 'USD ' + fin.polymarket.balance_usdc.toFixed(2) : 'UNKNOWN';
+                document.getElementById('total-liquid').textContent = 'UNKNOWN';
+                document.getElementById('monthly-burn').textContent = 'UNKNOWN';
+                document.getElementById('runway').textContent = 'UNKNOWN';
+                document.getElementById('credit-util').textContent = 'UNKNOWN';
 
                 // Signals
                 const sig = data.signals || {{}};

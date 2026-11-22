@@ -294,30 +294,13 @@ class ProcessCycler:
             return {"success": False, "error": str(e)}
 
     def _execute_script(self, endpoint: Endpoint, context: Dict = None) -> Dict:
-        """Execute a Python script endpoint."""
-        script_path = BASE_DIR / endpoint.target
-        if not script_path.exists():
-            return {"success": False, "error": f"Script not found: {endpoint.target}"}
-
-        cmd = ["python3", str(script_path)] + (endpoint.args or [])
-
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=120,
-                cwd=str(BASE_DIR),
-                env={"PYTHONPATH": str(BASE_DIR), **dict(__import__('os').environ)}
-            )
-
-            return {
-                "success": result.returncode == 0,
-                "output": result.stdout[-500:] if result.stdout else "",
-                "error": result.stderr[-200:] if result.returncode != 0 else None,
-            }
-        except subprocess.TimeoutExpired:
-            return {"success": False, "error": "Script timed out (120s)"}
+        """Block legacy arbitrary script execution until governed grants are integrated."""
+        return {
+            "success": False,
+            "execution_authorized": False,
+            "blocked_by": "governed_execution",
+            "error": "ProcessCycler script execution is disabled; use the governed Factory executor.",
+        }
 
     def _execute_actuator(self, endpoint: Endpoint, context: Dict = None) -> Dict:
         """Execute an actuator-based endpoint."""
@@ -341,17 +324,11 @@ class ProcessCycler:
             }
 
         elif actuator_name == "polymarket_trade":
-            if not context or "token_id" not in context:
-                return {"success": False, "error": "Missing trade parameters"}
-            result = self.actuators.trade(
-                context["token_id"],
-                context.get("amount", 1.0),
-                context.get("side", "BUY")
-            )
             return {
-                "success": "error" not in result,
-                "output": json.dumps(result),
-                "data": result,
+                "success": False,
+                "execution_authorized": False,
+                "blocked_by": "governed_execution",
+                "error": "Direct ProcessCycler trading is disabled; route through the governed command executor.",
             }
 
         return {"success": False, "error": f"Unknown actuator: {actuator_name}"}

@@ -28,8 +28,9 @@ import time
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from ai.unified_ai import announce_agent, get_master, log_action, MASTER
 
-MOONSHOT_STATE = Path("/root/hands-off-engine/state/moonshot_state.json")
-MOONSHOT_LOG = Path("/var/log/hands-off/moonshot.log")
+BASE_DIR = Path(__file__).resolve().parent.parent
+MOONSHOT_STATE = BASE_DIR / "state" / "moonshot_state.json"
+MOONSHOT_LOG = BASE_DIR / "state" / "logs" / "moonshot.log"
 MAX_CYCLES_PER_DAY = 12  # Rate limit
 CYCLE_COOLDOWN_MINUTES = 30  # Minimum time between cycles
 
@@ -71,93 +72,64 @@ def log(msg: str):
 
 
 def send_telegram(message: str):
-    """Send notification"""
+    """Send notifications only with explicitly configured credentials."""
     import requests
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": message, "parse_mode": "Markdown"},
-            timeout=10
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": message, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except:
-        pass
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 
 def get_system_metrics() -> dict:
-    """Gather current system metrics for escape velocity calculation"""
+    """Collect operational metrics without promoting stale caches into financial truth."""
     metrics = {
-        "balance": 0.0,
-        "position_value": 0.0,
+        "balance": None,
+        "balance_verified": False,
+        "position_value": None,
         "trading_enabled": False,
         "monitors_active": 0,
         "income_channels": 0,
         "last_improvement": None,
-        # Full resource awareness
-        "monthly_burn": 3280,
-        "ai_spend": 250,
-        "runway_days": 0,
-        "total_resources": 0,
+        "monthly_burn": None,
+        "ai_spend": None,
+        "runway_days": None,
+        "total_resources": None,
         "cost_cut_opportunities": [],
-        "roi_status": "unknown"
+        "roi_status": "unverified",
+        "financial_truth_status": "unknown",
     }
 
-    # Get balance
     try:
-        sys.path.insert(0, '/root/hands-off-engine')
         from executor.trading_safeguards import TradingSafeguards
-        safeguards = TradingSafeguards()
-        ok, msg = safeguards.check_wallet_balance(0)
-        if "balance: $" in msg:
-            metrics["balance"] = float(msg.split("balance: $")[1].split()[0])
-        elif "Insufficient" in msg:
-            metrics["balance"] = float(msg.split("$")[1].split()[0])
-    except:
+        ok, message = TradingSafeguards().check_wallet_balance(0)
+        if ok and "balance: $" in message:
+            metrics["balance"] = float(message.split("balance: $", 1)[1].split()[0])
+            metrics["balance_verified"] = True
+            metrics["financial_truth_status"] = "verified_wallet_only"
+    except Exception:
         pass
 
-    # Check trading capability
-    metrics["trading_enabled"] = metrics["balance"] >= 50.0
+    # Trading remains disabled until a separate governed execution grant exists.
+    metrics["trading_enabled"] = False
 
-    # Count active monitors (from cron)
     try:
-        result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
-        metrics["monitors_active"] = result.stdout.count('*/') + result.stdout.count('0 ')
-    except:
+        result = subprocess.run(["crontab", "-l"], capture_output=True, text=True)
+        metrics["monitors_active"] = result.stdout.count("*/") + result.stdout.count("0 ")
+    except Exception:
         pass
 
-    # Count income channels
-    channels = 0
-    if Path("/var/www/polymarket/index.html").exists():
-        channels += 1
-    if Path("/var/www/ainexus/index.html").exists():
-        channels += 1
-    metrics["income_channels"] = channels
-
-    # Load finance hub for full resource awareness
-    try:
-        finance_hub = Path("/root/hands-off-engine/finance/yair_finance_hub.json")
-        if finance_hub.exists():
-            hub = json.load(open(finance_hub))
-            metrics["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 3280)
-            metrics["ai_spend"] = hub.get("monthly_burn", {}).get("ai_services", {}).get("amount_usd", 250)
-            metrics["total_resources"] = hub.get("summary", {}).get("total_liquid_usd", 0)
-
-            # Calculate if AI spend is generating ROI
-            if metrics["trading_enabled"] or metrics["income_channels"] > 0:
-                metrics["roi_status"] = "generating_value"
-            else:
-                metrics["roi_status"] = "not_yet_profitable"
-
-            # Identify cost cut opportunities
-            if metrics["ai_spend"] > 0 and not metrics["trading_enabled"]:
-                metrics["cost_cut_opportunities"].append("Switch to free Groq/Google APIs")
-    except:
-        pass
-
-    # Calculate runway
-    if metrics["monthly_burn"] > 0:
-        total_liquid = metrics["balance"] + metrics.get("position_value", 98)
-        metrics["runway_days"] = (total_liquid / metrics["monthly_burn"]) * 30
-
+    # Web applications and model signals are not evidence of earned income.
+    metrics["income_channels"] = 0
     return metrics
 
 
@@ -175,15 +147,17 @@ def calculate_escape_velocity_score(metrics: dict, state: dict) -> float:
     """
     score = 0.0
 
-    # Capital score (0-30 points)
-    if metrics["balance"] >= 200:
-        score += 30
-    elif metrics["balance"] >= 50:
-        score += 20
-    elif metrics["balance"] >= 10:
-        score += 10
-    else:
-        score += metrics["balance"]
+    # Capital score is awarded only from a fresh verified wallet balance.
+    balance = metrics.get("balance")
+    if metrics.get("balance_verified") and isinstance(balance, (int, float)) and balance >= 0:
+        if balance >= 200:
+            score += 30
+        elif balance >= 50:
+            score += 20
+        elif balance >= 10:
+            score += 10
+        else:
+            score += balance
 
     # Trading capability (0-20 points)
     if metrics["trading_enabled"]:
@@ -203,61 +177,52 @@ def calculate_escape_velocity_score(metrics: dict, state: dict) -> float:
 
 
 def build_claude_prompt(state: dict, metrics: dict) -> str:
-    """Build the self-improvement prompt for Claude CLI"""
+    """Build a self-improvement prompt with explicit unknown financial fields."""
+    cost_cuts = ", ".join(metrics.get("cost_cut_opportunities", [])) or "None verified"
+    balance = metrics.get("balance")
+    balance_label = "$" + format(balance, ".2f") if metrics.get("balance_verified") and isinstance(balance, (int, float)) else "UNKNOWN"
+    monthly_burn = metrics.get("monthly_burn")
+    burn_label = "$" + format(monthly_burn, ".2f") if isinstance(monthly_burn, (int, float)) else "UNKNOWN"
+    ai_spend = metrics.get("ai_spend")
+    ai_label = "$" + format(ai_spend, ".2f") if isinstance(ai_spend, (int, float)) else "UNKNOWN"
+    runway = metrics.get("runway_days")
+    runway_label = format(runway, ".0f") + " days" if isinstance(runway, (int, float)) else "UNKNOWN"
 
-    cost_cuts = ", ".join(metrics.get("cost_cut_opportunities", [])) or "None identified"
-
-    # Check for specific improvement context from triggering agent
     improvement_context = os.environ.get("IMPROVEMENT_CONTEXT", "")
-    context_section = f"\nIMPROVEMENT CONTEXT (from triggering agent):\n{improvement_context}\n" if improvement_context else ""
+    context_section = f"\nIMPROVEMENT CONTEXT:\n{improvement_context}\n" if improvement_context else ""
 
-    prompt = f"""You are the SUPER SERVANT of Yair Siegel - autonomous improvement system.
+    return f"""You are the autonomous engineering and revenue-operations agent.
 {context_section}
-
-MISSION: Achieve escape velocity while maximizing ROI on every resource.
+MISSION: Build sustainable, verified earned income while reducing operating cost and manual effort.
 
 RESOURCE AWARENESS:
-- Polymarket Balance: ${metrics['balance']:.2f}
-- Positions Value: ~$98
-- Monthly Burn: ${metrics['monthly_burn']}/month
-- AI Spend: ${metrics['ai_spend']}/month
-- Runway: {metrics['runway_days']:.0f} days
-- ROI Status: {metrics['roi_status']}
-- Cost Cut Opportunities: {cost_cuts}
+- Verified Polymarket wallet balance: {balance_label}
+- Verified positions: UNKNOWN
+- Monthly burn: {burn_label}
+- AI spend: {ai_label}
+- Runway: {runway_label}
+- ROI status: {metrics.get("roi_status", "unverified")}
+- Cost-cut opportunities: {cost_cuts}
 
 SYSTEM STATE:
-- Escape Velocity Score: {state['escape_velocity_score']:.1f}/100
-- Trading: {'ENABLED' if metrics['trading_enabled'] else 'DISABLED (need $50+)'}
-- Active Monitors: {metrics['monitors_active']}
-- Income Channels: {metrics['income_channels']}
+- Escape velocity score: {state.get("escape_velocity_score", 0):.1f}/100
+- Live trading: DISABLED pending governed approval
+- Active monitors: {metrics.get("monitors_active", 0)}
+- Verified income channels: {metrics.get("income_channels", 0)}
 
-MILESTONES:
-- First Dollar: {'✓' if state['milestones']['first_dollar'] else '○'}
-- Trading Enabled: {'✓' if state['milestones']['trading_enabled'] else '○'}
-- Positive PnL: {'✓' if state['milestones']['positive_pnl'] else '○'}
-- Escape Velocity: {'✓' if state['milestones']['escape_velocity'] else '○'}
-
-YOUR PRIORITIES (in order):
-1. Enable trading capability (get to $50)
-2. Generate income from existing assets
-3. Compound improvements
-4. Optimize resource USAGE (not destruction)
-5. Find refund opportunities for EXTERNAL services only
+PRIORITIES:
+1. Establish verified financial truth and reconciled runway.
+2. Find low-cost, customer-funded income opportunities.
+3. Reduce recurring spend that has no demonstrated ROI.
+4. Improve system reliability and automation coverage.
+5. Preserve infrastructure; do not destroy productive assets.
 
 ABSOLUTE PROHIBITION:
-- NEVER delete droplets or infrastructure
-- NEVER "cut costs" by destroying system components
-- Infrastructure exists to SUPPORT the system - destroying it is self-harm
-- Cost optimization means BETTER USE of resources, not destruction
-- The Nov 30 incident deleted 5 droplets claiming "zero ROI" - this was WRONG
-
-EXECUTE ONE HIGH-IMPACT ACTION NOW.
-Document in state/moonshot_improvements.jsonl
-
-Serving: Yair Siegel
-Focus: {state['current_focus']}
+- Never infer income from websites, signals, estimates, or model activity.
+- Never treat positions or cached balances as spendable cash.
+- Never enable trading or move money without governed authorization.
+- Never delete infrastructure to cut costs.
 """
-    return prompt
 
 
 def run_claude_cycle(state: dict, metrics: dict) -> dict:

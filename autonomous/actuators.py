@@ -170,36 +170,12 @@ class PolymarketActuator:
             return False, f"Safeguard error: {e}"
 
     def place_market_order(self, token_id: str, usd_amount: float, side: str, force: bool = False) -> Dict:
-        """Place a market order WITH SAFETY CHECKS.
-
-        Args:
-            token_id: The token to trade
-            usd_amount: Amount in USD
-            side: BUY or SELL
-            force: If True, bypass safety checks (DANGEROUS - requires explicit flag)
-
-        Returns:
-            Dict with result or error
-        """
-        if not self.trader:
-            return {"error": "Trader not initialized"}
-
-        # SAFETY GATE 1: Check trading mode
-        if not force:
-            mode_ok, mode_msg = self._check_trading_mode()
-            if not mode_ok:
-                return {"error": f"BLOCKED: {mode_msg}", "blocked_by": "trading_mode"}
-
-            # SAFETY GATE 2: Check safeguards
-            safe_ok, safe_msg = self._check_safeguards(usd_amount)
-            if not safe_ok:
-                return {"error": f"BLOCKED: {safe_msg}", "blocked_by": "safeguards"}
-
-        try:
-            result = self.trader.place_market_order_usd(token_id, usd_amount, side)
-            return result
-        except Exception as e:
-            return {"error": str(e)}
+        """Quarantine direct trading; live orders must enter through governed execution."""
+        return {
+            "error": "Direct Polymarket actuator trading is disabled; use the governed command executor.",
+            "blocked_by": "governed_execution",
+            "execution_authorized": False,
+        }
 
 
 class ActuatorHub:

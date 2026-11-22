@@ -19,6 +19,7 @@ Lifecycle:
 import json
 import time
 import logging
+import math
 import os
 import hashlib
 from pathlib import Path
@@ -29,6 +30,8 @@ from dataclasses import dataclass, asdict
 from scripts.command_approval import command_fingerprint
 
 log = logging.getLogger("Executor")
+
+from autonomous.governed_authority import authorize
 
 REPO_ROOT = Path.home() / "hands-off-engine"
 STATE_DIR = REPO_ROOT / "state"
@@ -69,7 +72,7 @@ class Executor:
         self.state_dir.mkdir(parents=True, exist_ok=True)
         self.rate_limit_state = self._load_rate_limit()
 
-    def execute_command(self, cmd: Dict[str, Any]) -> ExecutionResult:
+    def execute_command(self, cmd: Dict[str, Any], *, execution_gate: bool = False) -> ExecutionResult:
         """Execute an approved command through safety gates."""
         cmd_id = cmd.get("id", "unknown")
         action = cmd.get("payload", {}).get("action", "unknown")
@@ -87,6 +90,18 @@ class Executor:
                 return self._reject(cmd_id, action, target, "Approval missing, mismatched, or command changed after approval")
             if not self._check_approval_freshness(cmd):
                 return self._reject(cmd_id, action, target, "Approval expired (TTL exceeded)")
+            authority = authorize(
+                cmd,
+                execution_gate=execution_gate,
+                approval_file=self.state_dir / "approval_queue.json",
+            )
+            if authority.decision != "approved" or authority.execution_enabled is not True:
+                return self._reject(
+                    cmd_id,
+                    action,
+                    target,
+                    f"Governed authority did not grant execution: {authority.reason}",
+                )
 
         # ── safety gate 2: sacred target protection ──
         if action in ("modify", "delete", "write") and target in SACRED_FILES:
@@ -206,7 +221,11 @@ class Executor:
 
         if action == "trade":
             amount = params.get("amount", params.get("position_usd", 0))
-            if isinstance(amount, (int, float)) and amount > MAX_POSITION_USD:
+            if isinstance(amount, bool) or not isinstance(amount, (int, float)):
+                return {"ok": False, "reason": "Position size must be numeric"}
+            if not math.isfinite(amount) or amount <= 0:
+                return {"ok": False, "reason": "Position size must be finite and positive"}
+            if amount > MAX_POSITION_USD:
                 return {"ok": False, "reason": f"Position size ${amount} exceeds max ${MAX_POSITION_USD}"}
 
         if action == "kill_process":
@@ -244,69 +263,41 @@ class Executor:
         )
 
     def _live_execute(self, cmd):
-        """Actually execute — dispatches to the appropriate backend."""
+        """No LIVE backend is authorized until the authority grants execution."""
         action = cmd.get("payload", {}).get("action", "unknown")
-        params = cmd.get("payload", {}).get("params", {})
-        target = cmd.get("target", "system")
-
-        try:
-            if target == "executor" and action == "trade":
-                result = self._execute_trade(params)
-            elif target == "system" and action in ("pause", "resume"):
-                result = self._execute_system_control(action, params)
-            elif target == "executor" and action == "adjust":
-                result = self._execute_adjust(params)
-            else:
-                result = {"status": "executed", "action": action, "params": params,
-                          "note": f"No specific backend for target={target} action={action}; logged as executed"}
-
-            return ExecutionResult(
-                command_id=cmd.get("id", "unknown"),
-                status="executed",
-                action=action,
-                target=target,
-                result=result,
-                executed_at=datetime.now(timezone.utc).isoformat(),
-            )
-        except Exception as e:
-            log.error(f"Live execution failed: {e}")
-            return ExecutionResult(
-                command_id=cmd.get("id", "unknown"),
-                status="error",
-                action=action,
-                target=target,
-                error=str(e),
-                executed_at=datetime.now(timezone.utc).isoformat(),
-            )
+        return ExecutionResult(
+            command_id=cmd.get("id", "unknown"),
+            status="rejected",
+            action=action,
+            target=cmd.get("target", "system"),
+            error="LIVE execution is disabled: no governed execution grant is available",
+            executed_at=datetime.now(timezone.utc).isoformat(),
+        )
 
     def _execute_trade(self, params):
-        """Execute a trade — currently logs, would connect to Polymarket client."""
-        log.info(f"LIVE TRADE: {params}")
+        """Trading backend is unavailable; never label a log entry as an order."""
         return {
-            "status": "logged",
-            "action": "trade",
-            "params": params,
-            "note": "Trade logged — Polymarket client not connected in this environment",
-            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "status": "blocked",
+            "execution_authorized": False,
+            "reason": "No governed live trading adapter is integrated",
         }
 
     def _execute_system_control(self, action, params):
-        """Execute system control action."""
-        log.info(f"LIVE SYSTEM CONTROL: {action}")
+        """System-control backend is unavailable; report no mutation."""
         return {
-            "status": "executed",
-            "action": action,
-            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "status": "blocked",
+            "execution_authorized": False,
+            "accounting_mutated": False,
+            "reason": "No governed system-control adapter is integrated",
         }
 
     def _execute_adjust(self, params):
-        """Execute parameter adjustment."""
-        log.info(f"LIVE ADJUST: {params}")
+        """Adjustment backend is unavailable; report no mutation."""
         return {
-            "status": "executed",
-            "action": "adjust",
-            "params": params,
-            "executed_at": datetime.now(timezone.utc).isoformat(),
+            "status": "blocked",
+            "execution_authorized": False,
+            "accounting_mutated": False,
+            "reason": "No governed adjustment adapter is integrated",
         }
 
     # ── rejection ──

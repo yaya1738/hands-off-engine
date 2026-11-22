@@ -8,6 +8,7 @@ to ensure no dangerous actions are taken.
 
 import sys
 import os
+import math
 from dataclasses import dataclass
 from typing import List
 
@@ -73,9 +74,17 @@ class Executor:
         if action.confidence < self.MIN_CONFIDENCE_THRESHOLD:
             return False, f"Confidence {action.confidence:.1%} below threshold {self.MIN_CONFIDENCE_THRESHOLD:.1%}"
 
+        # Reject malformed, non-finite, zero, or negative amounts.
+        try:
+            amount = float(action.amount)
+        except (TypeError, ValueError):
+            return False, "Invalid position size"
+        if not math.isfinite(amount) or amount <= 0:
+            return False, "Position size must be finite and positive"
+
         # Check position size
-        if action.amount > self.MAX_POSITION_SIZE:
-            return False, f"Position size ${action.amount:.2f} exceeds max ${self.MAX_POSITION_SIZE:.2f}"
+        if amount > self.MAX_POSITION_SIZE:
+            return False, f"Position size ${amount:.2f} exceeds max ${self.MAX_POSITION_SIZE:.2f}"
 
         # Check for valid side
         if action.side not in ["YES", "NO"]:
@@ -132,13 +141,13 @@ class Executor:
                     executed_amount=final_amount
                 )
             else:
-                # In production, this would call actual trading API
+                # Never report a live order unless a governed adapter confirms it.
                 result = ExecutionResult(
                     market_id=action.market_id,
                     market_name=action.market_name,
-                    success=True,
-                    message=f"LIVE: Placed {action.side} order for ${final_amount:.2f}{scaling_note}",
-                    executed_amount=final_amount
+                    success=False,
+                    message="BLOCKED: no governed live execution adapter is integrated",
+                    executed_amount=0.0
                 )
 
             results.append(result)

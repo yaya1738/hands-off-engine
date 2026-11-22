@@ -17,6 +17,7 @@ The vessel gives the system SUBSTANCE for its capital.
 """
 
 import json
+import math
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -68,14 +69,22 @@ class VesselCompartment:
         return (self.contents / self.capacity) * 100
 
     def deposit(self, amount: float) -> float:
-        """Deposit into compartment. Returns actual deposited."""
+        """Deposit a finite positive amount into compartment."""
+        if isinstance(amount, bool) or not isinstance(amount, (int, float)):
+            return 0.0
+        if not math.isfinite(amount) or amount <= 0:
+            return 0.0
         actual = min(amount, self.space)
         self.contents += actual
         return actual
 
     def withdraw(self, amount: float) -> float:
-        """Withdraw from compartment. Returns actual withdrawn."""
+        """Withdraw a finite positive amount from compartment."""
         if self.locked:
+            return 0.0
+        if isinstance(amount, bool) or not isinstance(amount, (int, float)):
+            return 0.0
+        if not math.isfinite(amount) or amount <= 0:
             return 0.0
         actual = min(amount, self.available)
         self.contents -= actual
@@ -114,7 +123,11 @@ class FlowValve:
     daily_used: float = 0.0
 
     def can_flow(self, amount: float) -> bool:
-        """Can this amount flow through?"""
+        """Only finite positive amounts may flow through a valve."""
+        if isinstance(amount, bool) or not isinstance(amount, (int, float)):
+            return False
+        if not math.isfinite(amount) or amount <= 0:
+            return False
         if not self.open:
             return False
         if amount > self.max_flow:
@@ -161,6 +174,7 @@ class CapitalVessel:
 
     def __init__(self):
         self.state = self._load_state()
+        self.state["financial_status"] = "unverified_local_model"
         self._init_structure()
 
     def _load_state(self) -> Dict:
@@ -290,113 +304,28 @@ class CapitalVessel:
     # ==================== OPERATIONS ====================
 
     def deposit(self, amount: float, target: Compartment = None) -> Dict:
-        """
-        Deposit capital into vessel.
-        If no target specified, auto-distribute.
-        """
-        result = {
+        """Block deposits until a verified source-of-funds adapter exists."""
+        return {
             "operation": "deposit",
             "requested": amount,
             "deposited": 0.0,
             "distribution": {},
+            "status": "blocked",
+            "accounting_mutated": False,
+            "reason": "No verified source-of-funds evidence or financial ledger is connected",
         }
 
-        # Check inlet
-        if not self.inlet.can_flow(amount):
-            result["error"] = "Inlet blocked or limit exceeded"
-            return result
-
-        remaining = amount
-
-        if target:
-            # Deposit to specific compartment
-            comp = self.compartments[target]
-            deposited = comp.deposit(remaining)
-            result["distribution"][target.value] = deposited
-            result["deposited"] = deposited
-        else:
-            # Auto-distribute by priority
-            priority = [
-                Compartment.OPERATING,  # First fill operating
-                Compartment.TRADING,    # Then trading
-                Compartment.RESERVE,    # Then reserve (if unlocked)
-                Compartment.GROWTH,     # Then growth
-                Compartment.BUFFER,     # Finally buffer
-            ]
-
-            for comp_type in priority:
-                if remaining <= 0:
-                    break
-                comp = self.compartments[comp_type]
-                if comp.locked and comp_type != Compartment.RESERVE:
-                    continue
-                deposited = comp.deposit(remaining)
-                if deposited > 0:
-                    result["distribution"][comp_type.value] = deposited
-                    remaining -= deposited
-
-            result["deposited"] = amount - remaining
-
-        # Update totals
-        self.state["total_deposited"] = self.state.get("total_deposited", 0) + result["deposited"]
-        self._save_state()
-        self._log_transaction(result)
-
-        return result
-
     def withdraw(self, amount: float, source: Compartment = None) -> Dict:
-        """
-        Withdraw capital from vessel.
-        If no source specified, auto-select.
-        """
-        result = {
+        """Block external-withdrawal claims until a verified payout adapter exists."""
+        return {
             "operation": "withdraw",
             "requested": amount,
             "withdrawn": 0.0,
             "source": {},
+            "status": "blocked",
+            "accounting_mutated": False,
+            "reason": "No verified payout adapter is connected; internal compartment balances are not wallet funds",
         }
-
-        # Check outlet
-        actual_amount = self.outlet.flow(amount)
-        if actual_amount == 0:
-            result["error"] = "Outlet blocked or daily limit exceeded"
-            return result
-
-        remaining = actual_amount
-
-        if source:
-            # Withdraw from specific compartment
-            comp = self.compartments[source]
-            withdrawn = comp.withdraw(remaining)
-            result["source"][source.value] = withdrawn
-            result["withdrawn"] = withdrawn
-        else:
-            # Auto-select by priority (inverse of deposit)
-            priority = [
-                Compartment.BUFFER,     # First from buffer
-                Compartment.OPERATING,  # Then operating
-                Compartment.TRADING,    # Then trading
-                Compartment.GROWTH,     # Then growth
-                # Reserve is locked, never auto-withdraw
-            ]
-
-            for comp_type in priority:
-                if remaining <= 0:
-                    break
-                comp = self.compartments[comp_type]
-                withdrawn = comp.withdraw(remaining)
-                if withdrawn > 0:
-                    result["source"][comp_type.value] = withdrawn
-                    remaining -= withdrawn
-
-            result["withdrawn"] = actual_amount - remaining
-
-        # Update totals
-        self.state["total_withdrawn"] = self.state.get("total_withdrawn", 0) + result["withdrawn"]
-        self._save_state()
-        self._log_transaction(result)
-
-        return result
 
     def transfer(self, amount: float, from_comp: Compartment, to_comp: Compartment) -> Dict:
         """Transfer between compartments."""
@@ -407,6 +336,13 @@ class CapitalVessel:
             "requested": amount,
             "transferred": 0.0,
         }
+
+        if isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount <= 0:
+            result["error"] = "Transfer amount must be finite and positive"
+            return result
+        if from_comp == to_comp:
+            result["error"] = "Source and destination must differ"
+            return result
 
         source = self.compartments[from_comp]
         dest = self.compartments[to_comp]
@@ -435,30 +371,19 @@ class CapitalVessel:
         return result
 
     def sync_from_reality(self):
-        """Sync vessel contents from actual financial state."""
-        fin_file = STATE_DIR / "financial_state.json"
-        if fin_file.exists():
-            try:
-                data = json.loads(fin_file.read_text())
-                balance = data.get("balance", 0)
-                positions = data.get("positions_value", 0)
-
-                # Put current balance in operating
-                self.compartments[Compartment.OPERATING].contents = balance
-
-                # Put positions value in trading (as pending)
-                self.compartments[Compartment.TRADING].contents = positions
-
-                self._save_state()
-            except:
-                pass
-
-    # ==================== DISPLAY ====================
+        """Refuse to import unverified local snapshots into capital compartments."""
+        return {
+            "status": "blocked",
+            "updated": False,
+            "accounting_mutated": False,
+            "reason": "financial_state.json is an unverified cache, not a financial source of truth",
+        }
 
     def display(self):
         """Display vessel status."""
-        print("\n🏺 CAPITAL VESSEL")
+        print("\n🏺 CAPITAL VESSEL — UNVERIFIED LOCAL MODEL")
         print("═" * 60)
+        print("Snapshot values are not verified wallet balances or spendable capital.")
 
         # Wall status
         wall_status = "🟢 INTACT" if self.wall.integrity > 80 else "🟡 DAMAGED" if self.wall.integrity > 20 else "🔴 BREACHED"

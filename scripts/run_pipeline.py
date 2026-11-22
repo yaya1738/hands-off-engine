@@ -133,6 +133,13 @@ def run_pipeline(
         'steps': {}
     }
     
+    if not dryrun:
+        results["blocked"] = True
+        results["error"] = "LIVE mode disabled: no governed execution adapter is integrated"
+        if verbose:
+            print("BLOCKED: live trading is disabled until governed execution is integrated")
+        return results
+
     try:
         # Step 0: Early balance check to avoid wasting LLM API calls
         from executor.trading_safeguards import TradingSafeguards
@@ -383,6 +390,10 @@ def main():
     )
     
     args = parser.parse_args()
+
+    if args.live:
+        print("BLOCKED: --live is disabled until governed execution is integrated.")
+        return 2
 
     # Safety check for live mode - only prompt if running interactively
     if args.live:

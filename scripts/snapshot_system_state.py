@@ -17,51 +17,45 @@ except ImportError:
 import json
 import os
 import subprocess
+import os
 from datetime import datetime
 
-REPO_ROOT = Path(__file__).parent.parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 def get_polymarket_balance():
-    """Get current Polymarket balance"""
+    """Return a wallet balance only from a recent complete RPC proof."""
     try:
-        os.chdir(REPO_ROOT)
-        result = subprocess.run(
-            ['python3', '-c', '''
-import os
-os.chdir("/root/hands-off-engine")
-exec(open(".env.polymarket").read().replace("export ", ""))
-from executor.trading_safeguards import TradingSafeguards
-s = TradingSafeguards()
-ok, msg = s.check_wallet_balance(0)
-import re
-match = re.search(r"\\$([\\d.]+)", msg)
-print(match.group(1) if match else "0")
-'''],
-            capture_output=True, text=True, timeout=30
-        )
-        return float(result.stdout.strip()) if result.stdout.strip() else 0
-    except:
-        return 0
+        from finance.truth import read_verified_polymarket_balance
+        result = read_verified_polymarket_balance(REPO_ROOT / "finance" / "yair_finance_hub.json")
+        return result["balance_usdc"] if result["verified"] else None
+    except Exception:
+        return None
+
 
 def get_api_status():
-    """Check which APIs are working"""
+    """Check configured APIs without embedding or assuming credentials."""
     status = {}
-    
-    # Check env vars
     env_file = REPO_ROOT / ".env"
     if env_file.exists():
-        content = env_file.read_text()
-        status['openai'] = 'OPENAI_API_KEY=' in content and 'your-' not in content
-    
-    # Telegram - test it
-    try:
-        import requests
-        r = requests.get('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/getMe', timeout=5)
-        status['telegram'] = r.json().get('ok', False)
-    except:
-        status['telegram'] = False
-    
+        content = env_file.read_text(encoding="utf-8")
+        status["openai"] = "OPENAI_API_KEY=" in content and "your-" not in content
+
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        status["telegram"] = False
+    else:
+        try:
+            import requests
+            response = requests.get(
+                f"https://api.telegram.org/bot{token}/getMe",
+                timeout=5,
+            )
+            response.raise_for_status()
+            status["telegram"] = response.json().get("ok", False)
+        except Exception:
+            status["telegram"] = False
     return status
+
 
 def get_git_status():
     """Get current git state"""
@@ -76,6 +70,7 @@ def generate_snapshot():
     snapshot = {
         "generated": datetime.utcnow().isoformat() + "Z",
         "polymarket_balance": get_polymarket_balance(),
+        "polymarket_balance_verified": get_polymarket_balance() is not None,
         "api_status": get_api_status(),
         "recent_commits": get_git_status(),
         "server_ip": "138.68.103.156",

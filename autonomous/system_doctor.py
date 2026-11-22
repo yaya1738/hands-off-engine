@@ -736,47 +736,21 @@ class SystemDoctor:
         return symptoms
 
     def check_financial_runway(self) -> List[Symptom]:
-        """Calculate financial runway based on burn rate."""
-        symptoms = []
-
-        try:
-            # Get current balance
-            wallet_balance = self._sensitive_data.get("wallet_usdc", 0)
-
-            # Load finance hub data
-            finance_file = BASE_DIR / "finance" / "finance_hub.json"
-            if finance_file.exists():
-                data = json.loads(finance_file.read_text())
-                monthly_burn = data.get("monthly_burn", 0)
-                income = data.get("income", {}).get("total", 0)
-
-                net_burn = monthly_burn - income
-                if net_burn > 0 and wallet_balance > 0:
-                    runway_months = wallet_balance / net_burn
-                    self._sensitive_data["runway_months"] = runway_months
-
-                    if runway_months < 1:
-                        symptoms.append(Symptom(
-                            component="runway",
-                            severity="critical",
-                            symptom="Less than 1 month runway",
-                            details=f"Runway: {runway_months:.1f} months"
-                        ))
-                    elif runway_months < 3:
-                        symptoms.append(Symptom(
-                            component="runway",
-                            severity="warning",
-                            symptom="Short runway",
-                            details=f"Runway: {runway_months:.1f} months"
-                        ))
-
-                self._sensitive_data["monthly_burn"] = monthly_burn
-                self._sensitive_data["income"] = income
-
-        except Exception as e:
-            pass
-
-        return symptoms
+        """Never calculate runway from unreconciled finance-hub snapshots."""
+        self._sensitive_data["runway_months"] = "unknown"
+        self._sensitive_data["monthly_burn"] = None
+        self._sensitive_data["income"] = None
+        return [
+            Symptom(
+                component="finance",
+                severity="warning",
+                symptom="Financial runway is unverified",
+                details=(
+                    "Cash, debts, income and recurring expenses are not reconciled "
+                    "against current source records; no runway estimate is authoritative."
+                ),
+            )
+        ]
 
     def check_database_integrity(self) -> List[Symptom]:
         """Check state file integrity and corruption."""
