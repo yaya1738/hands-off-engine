@@ -18,6 +18,8 @@ import requests
 from datetime import datetime
 from pathlib import Path
 
+from finance.hub_store import load_hub, update_account
+
 FINANCE_DIR = Path(__file__).parent.parent
 HUB_PATH = Path(__file__).resolve().parents[2] / "state" / "private_finance_hub.json"
 
@@ -28,16 +30,17 @@ class FreeAggregator:
         self.hub = self._load_hub()
     
     def _load_hub(self):
-        if HUB_PATH.exists():
-            with open(HUB_PATH) as f:
-                return json.load(f)
-        return {}
-    
-    def _save_hub(self):
-        HUB_PATH.parent.mkdir(parents=True, exist_ok=True)
-        self.hub["last_updated"] = datetime.now().astimezone().isoformat()
-        with open(HUB_PATH, 'w') as f:
-            json.dump(self.hub, f, indent=2)
+        return load_hub(HUB_PATH)
+
+    def _save_hub(self, account_updates, remove_account_keys=("wallet_address",)):
+        """Persist only this refresh's account delta; never write a stale full snapshot."""
+        self.hub = update_account(
+            HUB_PATH,
+            "polymarket",
+            account_updates,
+            remove_keys=remove_account_keys,
+            top_level_updates={"last_updated": datetime.now().astimezone().isoformat()},
+        )
     
     # ═══════════════════════════════════════════════════════════
     # POLYMARKET - FREE via blockchain RPC
@@ -276,7 +279,7 @@ class FreeAggregator:
     # REFRESH ALL
     # ═══════════════════════════════════════════════════════════
     def refresh_all(self):
-        """Refresh supported sources without promoting partial data to balances."""
+        """Refresh sources and merge only verified deltas into the latest hub state."""
         results = {}
         try:
             from dotenv import load_dotenv
@@ -284,27 +287,26 @@ class FreeAggregator:
         except ImportError:
             pass
         wallet = os.getenv("POLYMARKET_FUNDER_ADDRESS")
-        self.hub.setdefault("accounts", {})
-        account = self.hub["accounts"].setdefault("polymarket", {})
-        account.pop("wallet_address", None)
+        account_updates = {}
         if wallet:
             result = self.fetch_polymarket(wallet)
-            account["balance_verification"] = result["balance_verification"]
-            account["balance_status"] = result["status"]
+            account_updates["balance_verification"] = result["balance_verification"]
+            account_updates["balance_status"] = result["status"]
             if result["status"] == "verified":
-                account["balance_usdc"] = result["balance_usdc"]
-                account["last_updated"] = result["balance_verification"]["observed_at"]
+                account_updates["balance_usdc"] = result["balance_usdc"]
+                account_updates["last_updated"] = result["balance_verification"]["observed_at"]
             if result["balance_matic"] is not None:
-                account["balance_matic"] = result["balance_matic"]
+                account_updates["balance_matic"] = result["balance_matic"]
             results["polymarket"] = result
         else:
+            account_updates["balance_status"] = "unknown"
             results["polymarket"] = {
                 "status": "unknown",
                 "balance_usdc": None,
                 "reason": "POLYMARKET_FUNDER_ADDRESS is not configured",
             }
 
-        self._save_hub()
+        self._save_hub(account_updates)
         return results
 
 
