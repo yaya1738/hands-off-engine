@@ -4,8 +4,8 @@ umask 077
 
 REPO_ROOT="$HOME/hands-off-engine"
 PRIVATE_ROOT="${HANDS_OFF_PRIVATE_DIR:-$HOME/.config/hands-off-engine}"
-RAW_BASE="https://raw.githubusercontent.com/yaya1738/hands-off-engine/07e8a3fd04d230bebdf4a53a752af5a8df3a9c1c"
-EXPECTED_MIGRATION_BLOB="0c2d6dd379748064d92d19a1428b4765fa135d16"
+RAW_BASE="https://raw.githubusercontent.com/yaya1738/hands-off-engine/76c9c5f79aca24947e88a25e203b3dc447e097ef"
+EXPECTED_MIGRATION_BLOB="45afab951b38332af6bdec7de430afbea9ca1bfd"
 
 [ -d "$REPO_ROOT/.git" ] || { echo "STOP: expected checkout not found at $REPO_ROOT"; exit 2; }
 command -v curl >/dev/null 2>&1 || { echo "STOP: curl is required"; exit 127; }
