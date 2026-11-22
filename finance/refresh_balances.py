@@ -4,7 +4,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import math
 import os
 import re
@@ -12,6 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
+
+from finance.hub_store import update_account
 
 FINANCE_HUB = Path(__file__).resolve().parent.parent / "state" / "private_finance_hub.json"
 POLYGON_RPC = "https://polygon-rpc.com"
@@ -90,13 +91,6 @@ def refresh() -> dict:
     wallet = os.getenv("POLYMARKET_FUNDER_ADDRESS")
     if not _valid_address(wallet):
         raise ValueError("POLYMARKET_FUNDER_ADDRESS is missing or invalid")
-    FINANCE_HUB.parent.mkdir(parents=True, exist_ok=True)
-    if FINANCE_HUB.exists():
-        hub = json.loads(FINANCE_HUB.read_text(encoding="utf-8"))
-    else:
-        hub = {"accounts": {}}
-    account = hub.setdefault("accounts", {}).setdefault("polymarket", {})
-    account.pop("wallet_address", None)
     observed_at = datetime.now(timezone.utc).isoformat()
     wallet_fingerprint = hashlib.sha256(wallet.lower().encode("ascii")).hexdigest()
 
@@ -129,19 +123,24 @@ def refresh() -> dict:
             },
         },
     }
-    account["balance_verification"] = proof
-    account["balance_status"] = proof["status"]
+    account_updates = {
+        "balance_verification": proof,
+        "balance_status": proof["status"],
+    }
     if complete:
-        account["balance_usdc"] = bridged + native
-        account["last_updated"] = observed_at
+        account_updates["balance_usdc"] = bridged + native
+        account_updates["last_updated"] = observed_at
     if gas is not None:
-        account["balance_matic"] = gas
-        account["gas_last_updated"] = observed_at
+        account_updates["balance_matic"] = gas
+        account_updates["gas_last_updated"] = observed_at
 
-    hub["last_updated"] = observed_at
-    tmp = FINANCE_HUB.with_suffix(".json.tmp")
-    tmp.write_text(json.dumps(hub, indent=2), encoding="utf-8")
-    tmp.replace(FINANCE_HUB)
+    update_account(
+        FINANCE_HUB,
+        "polymarket",
+        account_updates,
+        remove_keys=("wallet_address",),
+        top_level_updates={"last_updated": observed_at},
+    )
 
     result = {
         "status": proof["status"],
