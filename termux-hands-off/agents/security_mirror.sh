@@ -1,48 +1,50 @@
 #!/data/data/com.termux/files/usr/bin/sh
-set -e
-BASE="$HOME/hands-off"
+set -eu
+umask 077
+
 PRIVATE_ROOT="${HANDS_OFF_PRIVATE_DIR:-$HOME/.config/hands-off-engine}"
 PRIVATE_RUNTIME="$PRIVATE_ROOT/legacy_runtime"
-OUT="$BASE/security_snapshot.tar"
-ENC="$BASE/security_snapshot.enc"
-PASSF="$HOME/.config/hands-off/enc_passphrase.txt"
-mkdir -p "$(dirname "$PASSF")"
+PRIVATE_BACKUPS="$PRIVATE_ROOT/backups"
+PRIVATE_SECRETS="$PRIVATE_ROOT/secrets"
+OUT="$PRIVATE_BACKUPS/security_snapshot.tar"
+ENC="$PRIVATE_BACKUPS/security_snapshot.enc"
+PASSF="$PRIVATE_SECRETS/mirror_passphrase.txt"
 
-# prompt once if missing
+mkdir -p "$PRIVATE_BACKUPS" "$PRIVATE_SECRETS"
+chmod 700 "$PRIVATE_ROOT" "$PRIVATE_BACKUPS" "$PRIVATE_SECRETS"
+
+# Reuse a passphrase migrated from the former private config, or prompt once.
 if [ ! -f "$PASSF" ]; then
-  echo "Enter a strong passphrase for safety mirror:"
+  echo "Enter a strong passphrase for the private safety mirror:"
   read -r PASS
-  echo "$PASS" > "$PASSF"
+  [ -n "$PASS" ] || { echo "Empty passphrase rejected"; exit 1; }
+  printf '%s' "$PASS" > "$PASSF"
   chmod 600 "$PASSF"
 fi
 
-# collect files (extend as needed)
+# Archive only private local paths. Nothing is written into the public checkout.
 tar -cf "$OUT" \
-  "$HOME/.config/hands-off/vault.json" \
+  "$PRIVATE_SECRETS/vault.json" \
+  "$PRIVATE_SECRETS/termux-agent-vault.json" \
+  "$PRIVATE_SECRETS/.env.polymarket" \
   "$PRIVATE_RUNTIME/agents/external_accounts.json" \
   "$PRIVATE_RUNTIME/agents/cards.json" \
   "$PRIVATE_RUNTIME/agents/emergency_info.json" \
   "$PRIVATE_RUNTIME/agents/finance_rules.json" \
-  "$PRIVATE_RUNTIME/logs/finance_balances.log" \
-  "$PRIVATE_RUNTIME/logs/finance_credit.log" \
-  "$PRIVATE_RUNTIME/logs/finance_pnl.log" \
-  "$PRIVATE_RUNTIME/logs/finance_events.log" \
-  "$PRIVATE_RUNTIME/logs/finance_errors.log" \
-  "$PRIVATE_RUNTIME/logs/finance_alerts.log" \
-  "$PRIVATE_RUNTIME/logs/guardrail_actions.log" \
-  "$PRIVATE_RUNTIME/logs/polymarket_positions.jsonl" \
-  "$PRIVATE_RUNTIME/logs/polymarket_positions.csv" \
+  "$PRIVATE_RUNTIME/logs" \
+  "$PRIVATE_RUNTIME/data/finances" \
+  "$PRIVATE_ROOT/finance/private_finance_hub.json" \
   "$PRIVATE_ROOT/finance/dollar_access.json" \
   "$PRIVATE_ROOT/security/yair_identity_profile.json" \
-  2>/dev/null || true
+  2>/dev/null
 
-# encrypt (AES-256)
+chmod 600 "$OUT"
 openssl enc -aes-256-cbc -salt -pbkdf2 -iter 150000 \
   -in "$OUT" -out "$ENC" -pass file:"$PASSF"
-
+chmod 600 "$ENC"
 rm -f "$OUT"
-echo "[ok] safety mirror -> $ENC"
-# optional cloud push via rclone (remote: secure) 
-if command -v rclone >/dev/null 2>&1; then 
-  rclone copy -q "$ENC" secure:/hands-off/ || true; 
+
+echo "[ok] private safety mirror created at $ENC"
+if command -v rclone >/dev/null 2>&1; then
+  rclone copy -q "$ENC" secure:/hands-off/ || true
 fi
