@@ -31,6 +31,7 @@ for candidate in \
   "$PRIVATE_SECRETS/termux-agent-vault.json.bak" \
   "$PRIVATE_SECRETS/.env.polymarket" \
   "$PRIVATE_SECRETS/keys.vault" \
+  "$PRIVATE_SECRETS/backup_repos" \
   "$PRIVATE_RUNTIME/agents/external_accounts.json" \
   "$PRIVATE_RUNTIME/agents/cards.json" \
   "$PRIVATE_RUNTIME/agents/emergency_info.json" \
