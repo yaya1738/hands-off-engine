@@ -65,4 +65,4 @@ def mask(x):
 print(f"[ok] wrote -> {OUT}")
 print("[mask preview]")
 for k in sorted(final):
-    print(f"  {k} = {"configured" if final[k] else "missing"}")
+    print(f"  {k} = {'configured' if final[k] else 'missing'}")
