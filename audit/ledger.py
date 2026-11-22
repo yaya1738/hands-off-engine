@@ -90,7 +90,7 @@ class FinancialLedger:
                 hash_version=1,
             )
             with open(self.ledger_file, "a", encoding="utf-8") as f:
-                f.write(json.dumps(genesis.to_dict()) + "\\n")
+                f.write(json.dumps(genesis.to_dict()) + "\n")
                 f.flush()
                 os.fsync(f.fileno())
 
