@@ -109,27 +109,15 @@ def get_kraken_balances(vault):
     return out
 
 def load_external_accounts():
+    """Load a private manual snapshot without treating its fields as reconciled assets."""
     try:
-        import json
-        p = EXTERNAL_FILE
-        if p.exists():
-            with open(p, "r", encoding="utf-8") as f:
-                d = json.load(f)
-            # Require every manual field to be numeric; missing is not zero.
-            if not isinstance(d, dict) or not d:
-                return None
-            out = {}
-            for k, v in d.items():
-                if isinstance(v, bool):
-                    return None
-                number = float(v)
-                if not __import__("math").isfinite(number):
-                    return None
-                out[k] = number
-            return out
-    except Exception:
+        if not EXTERNAL_FILE.exists():
+            return None
+        with open(EXTERNAL_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return data if isinstance(data, dict) and data else None
+    except (OSError, ValueError, TypeError):
         return None
-    return None
 
 def load_vault():
     if not VAULT: return {}
@@ -169,21 +157,17 @@ def portfolio_snapshot(vault):
             if px: usd_total += amt * px
     # External accounts support (manual balances, liabilities negative)
     ext = load_external_accounts()
-    if ext is None:
-        snap["external_status"] = "unknown"
-        snap["usd_total_raw"] = None
-        snap["usd_total"] = None
-        snap["status"] = "partial_unknown"
-        return snap
-
-    ext_total = sum(ext.values())
-    snap["external"] = ext
-    snap["external_status"] = "manual_unverified"
-
-    usd_total_raw = usd_total + ext_total
-    snap["usd_total_raw"] = usd_total_raw
-    snap["usd_total"] = round(usd_total_raw, 2)
-    snap["status"] = "unverified_estimate"
+    snap["external_status"] = "manual_unverified" if ext is not None else "unknown"
+    snap["exchange_estimate_usd"] = round(usd_total, 2) if vault else None
+    # External-account JSON mixes balances, liabilities, limits, metadata, and notes.
+    # It is not reconciled and must never be summed into net worth.
+    snap["external_manual_inputs_present"] = ext is not None
+    snap["usd_total_raw"] = None
+    snap["usd_total"] = None
+    snap["status"] = "partial_unknown"
+    snap["notes"] = [
+        "Authoritative net worth is UNKNOWN: external accounts are manual/unverified and exchange coverage is incomplete."
+    ]
     return snap
 
 def check_alerts(prices):
