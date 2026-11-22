@@ -19,11 +19,20 @@ def _relative(value: str | Path) -> Path:
 
 
 def _secure_directory(path: Path) -> None:
+    root = private_root().resolve()
+    path = path.resolve()
+    if root != path and root not in path.parents:
+        raise ValueError("private directory must remain inside the configured private root")
     path.mkdir(parents=True, exist_ok=True, mode=0o700)
-    try:
-        path.chmod(0o700)
-    except OSError:
-        pass
+    current = path
+    while current == root or root in current.parents:
+        try:
+            current.chmod(0o700)
+        except OSError:
+            pass
+        if current == root:
+            break
+        current = current.parent
 
 
 def private_path(relative: str | Path, *, create_parent: bool = False) -> Path:
