@@ -46,7 +46,9 @@ The external-account JSON is read or written by multiple legacy agents, includin
 - `dashboard_builder.py`
 - `rotate_today.py`
 
-The finance hub is read by dashboard and autonomous modules. The identity profile is read by `security/absolute_identity.py`. A file deletion before these consumers are migrated would break or silently degrade functionality.
+These consumers now use the shared `termux-hands-off/agents/private_state.py` resolver, which prefers the migrated `legacy_runtime` copy, then the migrated repository-source copy, and never falls back to plaintext files in the public checkout or old `~/hands-off` paths. The security mirror now archives the migrated private records. The migration utility also preserves the card, emergency-info, and finance-rules files needed by these agents.
+
+The finance hub is read by dashboard and autonomous modules; its tracked current-tree file is now an unknown placeholder. The identity profile is read from the private `security/` path by `security/absolute_identity.py`. Public tracked copies must still remain until the device has run the preservation command and the updated checkout is deployed. Deploying these code changes before migration would intentionally leave the agents without those local inputs.
 
 ## Required migration design
 
