@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import json, pathlib
+import json, pathlib, math
 from private_state import private_path
 
 EXT = private_path("agents/external_accounts.json", create_parent=True)
@@ -9,14 +9,19 @@ if EXT.exists():
     except: d={}
 def ask(k, cur):
     try:
-        v=input(f"{k} [{cur}]: ").strip()
-        return float(v) if v!="" else float(cur or 0)
-    except: return float(cur or 0)
+        shown = cur if cur is not None else "unknown"
+        value = input(f"{k} [{shown}]: ").strip()
+        if value == "":
+            return float(cur) if cur is not None else None
+        number = float(value)
+        return number if math.isfinite(number) else None
+    except (TypeError, ValueError, OverflowError):
+        return float(cur) if cur is not None else None
 fields=[
-    ("paypal", d.get("paypal",0.0)),
-    ("monzo", d.get("monzo",0.0)),
-    ("robinhood_cash", d.get("robinhood_cash",0.0)),
-    ("polymarket_cash", d.get("polymarket_cash",0.0)),
+    ("paypal", d.get("paypal")),
+    ("monzo", d.get("monzo")),
+    ("robinhood_cash", d.get("robinhood_cash")),
+    ("polymarket_cash", d.get("polymarket_cash")),
 ]
 for k,cur in fields:
     d[k]=ask(k, cur)
