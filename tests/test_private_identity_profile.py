@@ -28,13 +28,13 @@ def test_missing_private_profile_fails_closed_and_logs_privately(tmp_path, monke
     assert result["confidence"] == 0.0
     assert result["verdict"] == "UNVERIFIED"
     assert result["signals"] == ["PROFILE:missing_or_invalid"]
-    assert (private_dir / "verification_audit.jsonl").exists()
+    assert (private_dir / "security" / "verification_audit.jsonl").exists()
 
 
 def test_malformed_private_profile_fails_closed(tmp_path, monkeypatch):
     module, private_dir = load_identity(tmp_path, monkeypatch)
-    private_dir.mkdir(parents=True)
-    (private_dir / "yair_identity_profile.json").write_text("{not-json", encoding="utf-8")
+    (private_dir / "security").mkdir(parents=True)
+    (private_dir / "security" / "yair_identity_profile.json").write_text("{not-json", encoding="utf-8")
 
     verifier = module.AbsoluteIdentity()
     assert verifier.profile == {}
