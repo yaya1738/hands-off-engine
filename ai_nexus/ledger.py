@@ -118,7 +118,7 @@ class ActionLedger:
                 try:
                     self._ensure_ledger_file()
                     with open(self._ledger_file, "a", encoding="utf-8") as f:
-                        f.write(json.dumps(entry.to_dict()) + '\\n')
+                        f.write(json.dumps(entry.to_dict()) + '\n')
                         f.flush()
                         os.fsync(f.fileno())
                 finally:
