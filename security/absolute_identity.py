@@ -40,10 +40,10 @@ class AbsoluteIdentity:
     def _load_profile(self) -> dict:
         if PROFILE_PATH.exists():
             try:
-            profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
-            return profile if isinstance(profile, dict) else {}
-        except (OSError, ValueError, TypeError):
-            return {}
+                profile = json.loads(PROFILE_PATH.read_text(encoding="utf-8"))
+                return profile if isinstance(profile, dict) else {}
+            except (OSError, ValueError, TypeError):
+                return {}
         return {}
 
     def verify_cryptographic(self) -> float:
