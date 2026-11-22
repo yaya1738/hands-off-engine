@@ -142,6 +142,12 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
         for source in key_dir.glob("keys.vault.bak.*"):
             if source.is_file():
                 candidates[source] = (Path("secrets") / source.name, "secrets_root")
+        legacy_config = secrets_root / "hands-off"
+        if legacy_config.is_dir():
+            for source in legacy_config.rglob("*"):
+                if source.is_file():
+                    relative = Path("secrets") / "legacy_config" / "hands-off" / source.relative_to(legacy_config)
+                    candidates[source] = (relative, "secrets_root")
 
     for backup_root in backup_repo_roots or []:
         backup_root = backup_root.expanduser().resolve()
