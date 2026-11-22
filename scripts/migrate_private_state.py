@@ -120,35 +120,36 @@ def migrate(source_root: Path, destination_root: Path) -> dict:
         "files": results,
     }
     manifest_path = destination_root / "migration_manifest.json"
-    encoded = (json.dumps(manifest, indent=2) + "\n").encode("utf-8")
     if manifest_path.exists():
         old = json.loads(manifest_path.read_text(encoding="utf-8"))
-        old_files = {(item["source"], item["sha256"]) for item in old.get("files", [])}
-        new_files = {(item["source"], item["sha256"]) for item in results}
-        if not new_files.issubset(old_files):
-            return {**manifest, "manifest_status": "conflict_existing_manifest"}
-        manifest_status = "already_preserved"
+        merged = list(old.get("files", []))
+        known = {(item.get("source"), item.get("sha256")) for item in merged}
+        for item in results:
+            identity = (item["source"], item["sha256"])
+            if identity not in known:
+                merged.append(item)
+                known.add(identity)
+        manifest["files"] = merged
+        manifest_status = "updated"
     else:
-        fd, temp_name = tempfile.mkstemp(prefix=".manifest-", dir=destination_root)
-        temp_path = Path(temp_name)
-        try:
-            with os.fdopen(fd, "wb") as handle:
-                handle.write(encoded)
-                handle.flush()
-                os.fsync(handle.fileno())
-            temp_path.chmod(0o600)
-            try:
-                os.link(temp_path, manifest_path)
-                manifest_status = "written"
-            except FileExistsError:
-                manifest_status = "conflict_existing_manifest"
-        finally:
-            try:
-                temp_path.unlink()
-            except FileNotFoundError:
-                pass
+        manifest_status = "written"
 
-    manifest_path.chmod(0o600) if manifest_path.exists() else None
+    encoded = (json.dumps(manifest, indent=2) + "\\n").encode("utf-8")
+    fd, temp_name = tempfile.mkstemp(prefix=".manifest-", dir=destination_root)
+    temp_path = Path(temp_name)
+    try:
+        with os.fdopen(fd, "wb") as handle:
+            handle.write(encoded)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temp_path.chmod(0o600)
+        os.replace(temp_path, manifest_path)
+    finally:
+        try:
+            temp_path.unlink()
+        except FileNotFoundError:
+            pass
+    manifest_path.chmod(0o600)
     return {**manifest, "manifest_status": manifest_status}
 
 
