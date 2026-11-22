@@ -16,7 +16,12 @@ ext = jload(EXT, {})
 minp = jload(CARDS_MINPAY, {"cards":[]})
 stat = jload(CARDS_STATUS, {"cards":[]})
 
-cash = float(ext.get("paypal",0) or 0) + float(ext.get("monzo",0) or 0)
+cash = None
+if EXT.exists() and ext.get("paypal") is not None and ext.get("monzo") is not None:
+    try:
+        cash = float(ext["paypal"]) + float(ext["monzo"])
+    except (TypeError, ValueError, OverflowError):
+        cash = None
 cards_mp = {c["name"]:c for c in minp.get("cards",[])}
 cards_st = {c["name"]:c for c in stat.get("cards",[])}
 
@@ -66,8 +71,21 @@ for r in sorted([x for x in rows if x["to45"]>0], key=lambda x:(-x["apr"], -x["u
         plan.append({"card":r["name"], "reason":"tighten to 45%", "amount":round(pay,2)})
         left -= pay
 
+if cash is None:
+    summary = {
+      "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
+      "status": "blocked_unknown_cash",
+      "cash_available": None,
+      "cash_remaining": None,
+      "actions": []
+    }
+    OUT_JSON.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(json.dumps(summary, indent=2))
+    raise SystemExit(0)
+
 summary = {
   "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
+  "status": "modelled_from_manual_private_inputs",
   "cash_available": round(cash,2),
   "cash_remaining": round(left,2),
   "actions": plan
