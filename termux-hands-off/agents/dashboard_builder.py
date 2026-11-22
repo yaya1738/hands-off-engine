@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 import json, csv, pathlib, datetime
+from private_state import private_path
 
 HOME = pathlib.Path.home()
 OUT  = HOME/"hands-off"/"dashboard"/"index.html"
 
-EXT       = HOME/"hands-off"/"agents"/"external_accounts.json"
-CARDS     = HOME/"hands-off"/"agents"/"cards.json"
-BAL_LOG   = HOME/"hands-off"/"logs"/"finance_balances.log"
-DAILY_CSV = HOME/"hands-off"/"logs"/"finance_daily.csv"
-PERF_CSV  = HOME/"hands-off"/"logs"/"performance_daily.csv"
-PM_POS_CSV= HOME/"hands-off"/"logs"/"polymarket_positions.csv"
-CRED_LOG  = HOME/"hands-off"/"logs"/"finance_credit.log"
-CARDS_JSON= HOME/"hands-off"/"logs"/"cards_status.json"
+EXT       = private_path("agents/external_accounts.json")
+CARDS     = private_path("agents/cards.json")
+BAL_LOG   = private_path("logs/finance_balances.log")
+DAILY_CSV = private_path("logs/finance_daily.csv")
+PERF_CSV  = private_path("logs/performance_daily.csv")
+PM_POS_CSV= private_path("logs/polymarket_positions.csv")
+CRED_LOG  = private_path("logs/finance_credit.log")
+CARDS_JSON= private_path("logs/cards_status.json")
 
 def last_json_line(path):
     if not path.exists(): return None
