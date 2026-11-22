@@ -74,24 +74,23 @@ class FinancialLedger:
         with self._locked():
             if self.ledger_file.exists() and self.ledger_file.stat().st_size:
                 return
-        genesis = LedgerEntry(
-            entry_id="genesis",
-            timestamp=datetime.now(timezone.utc).isoformat(),
-            session_id="system",
-            component="ledger.system",
-            action="initialize",
-            amount=0.0,
-            category="system",
-            metadata={"description": "Genesis block"},
-            previous_hash="0" * 64,
-            current_hash=self._compute_hash("genesis", "0" * 64, 0.0),
-            verified=False,
-            source_type="system",
-            hash_version=1,
-        )
-
+            genesis = LedgerEntry(
+                entry_id="genesis",
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                session_id="system",
+                component="ledger.system",
+                action="initialize",
+                amount=0.0,
+                category="system",
+                metadata={"description": "Genesis block"},
+                previous_hash="0" * 64,
+                current_hash=self._compute_hash("genesis", "0" * 64, 0.0),
+                verified=False,
+                source_type="system",
+                hash_version=1,
+            )
             with open(self.ledger_file, "a", encoding="utf-8") as f:
-                f.write(json.dumps(genesis.to_dict()) + "\n")
+                f.write(json.dumps(genesis.to_dict()) + "\\n")
                 f.flush()
                 os.fsync(f.fileno())
 
