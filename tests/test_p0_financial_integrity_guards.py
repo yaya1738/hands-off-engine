@@ -1094,3 +1094,24 @@ def test_aggregator_merges_delta_into_latest_finance_hub(tmp_path, monkeypatch):
     hub = free_stack.load_hub(path)
     assert hub["accounts"]["other"]["newer_value"] == 99
     assert hub["accounts"]["polymarket"]["balance_usdc"] == 10.0
+
+
+def test_ledger_refuses_to_append_after_existing_chain_tampering(tmp_path):
+    from audit.ledger import FinancialLedger
+
+    path = tmp_path / "ledger.jsonl"
+    ledger = FinancialLedger(str(path))
+    ledger.add_cost("test", "first", 1.0, "session")
+    rows = path.read_text(encoding="utf-8").splitlines()
+    damaged = json.loads(rows[-1])
+    damaged["amount"] = -999.0
+    rows[-1] = json.dumps(damaged)
+    path.write_text("\\n".join(rows) + "\\n", encoding="utf-8")
+
+    try:
+        ledger.add_cost("test", "must-not-append", 2.0, "session")
+    except ValueError as exc:
+        assert "tampered ledger" in str(exc)
+    else:
+        raise AssertionError("append to a tampered ledger must be rejected")
+    assert ledger.verify_integrity() is False
