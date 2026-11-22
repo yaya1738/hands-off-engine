@@ -175,7 +175,7 @@ def calc_snapshot():
         and sources.get("crypto") == "market_priced_manual_amounts"
     )
     if complete_inputs:
-        snapshot["estimated_net_usd"] = sum(components.values())
+        snapshot["estimated_net_usd"] = sum(value for key, value in components.items() if key != "crypto_total_usd")
         snapshot["status"] = "unverified_estimate"
 
     snapshot["notes"].append(
