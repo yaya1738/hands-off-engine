@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import json, pathlib, datetime
+from private_state import private_path
 
-HOME = pathlib.Path.home()
-EXT          = HOME/"hands-off"/"agents"/"external_accounts.json"
-CARDS_MINPAY = HOME/"hands-off"/"logs"/"cards_minpay.json"
-CARDS_STATUS = HOME/"hands-off"/"logs"/"cards_status.json"   # from per_card_guardrail.py
-OUT_JSON     = HOME/"hands-off"/"logs"/"rotate_today.json"
+EXT          = private_path("agents/external_accounts.json")
+CARDS_MINPAY = private_path("logs/cards_minpay.json")
+CARDS_STATUS = private_path("logs/cards_status.json")   # from per_card_guardrail.py
+OUT_JSON     = private_path("logs/rotate_today.json", create_parent=True)
 
 def jload(p, default=None):
     if not p.exists(): return default
