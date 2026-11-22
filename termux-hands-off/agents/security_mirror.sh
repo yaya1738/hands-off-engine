@@ -35,11 +35,15 @@ for candidate in \
   "$PRIVATE_RUNTIME/agents/finance_rules.json" \
   "$PRIVATE_RUNTIME/logs" \
   "$PRIVATE_RUNTIME/data/finances" \
+  "$PRIVATE_ROOT/termux-hands-off/state" \
+  "$PRIVATE_ROOT/termux-hands-off/logs" \
+  "$PRIVATE_ROOT/termux-hands-off/data/finances" \
+  "$PRIVATE_ROOT/backups/security_snapshot.tar" \
   "$PRIVATE_ROOT/finance/private_finance_hub.json" \
   "$PRIVATE_ROOT/finance/dollar_access.json" \
   "$PRIVATE_ROOT/security/yair_identity_profile.json"
 do
-  [ -e "$candidate" ] && set -- "$@" "$candidate"
+  if [ -e "$candidate" ]; then set -- "$@" "$candidate"; fi
 done
 [ "$#" -gt 0 ] || { echo "No private files found to archive"; exit 1; }
 tar -cf "$OUT" "$@"
