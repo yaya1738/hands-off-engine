@@ -19,7 +19,7 @@ This is a data-separation audit, not a recommendation to make the repository pri
 
 ## Additional historical exposure found by full tree enumeration
 
-The current tree contains 808 timestamped finance snapshots (about 167 KB total), a historical net-worth CSV, finance state and P&L files (including a multi-megabyte ledger), tracked environment/configuration records, and a 60 KB `termux-hands-off/security_snapshot.tar` archive. The environment records inspected so far contained placeholders rather than active bot credentials; the archive has not yet been extracted or inspected. Treat it as potentially sensitive until reviewed.
+The current tree contains 808 timestamped finance snapshots (about 167 KB total), a historical net-worth CSV, finance state and P&L files (including a multi-megabyte ledger), tracked environment/configuration records, and a 60 KB `termux-hands-off/security_snapshot.tar` archive. The public main branch contains non-empty credential-shaped values in tracked `auto_sources.env`, `ifttt.env`, Telegram bot configuration, and the autopilot admin environment. The Google Apps Script webhook, IFTTT webhook, Telegram token, and admin token values match their respective credential formats; provider-side validity was not tested. Treat them as exposed and rotate/revoke through the providers. Some adjacent environment values are placeholders. The security archive has not been extracted or inspected; treat it as potentially containing further secrets.
 
 The migration utility now recursively preserves `termux-hands-off/state/`, `termux-hands-off/logs/`, `termux-hands-off/data/finances/`, and the security archive, plus corresponding `~/hands-off` runtime directories. It also preserves `security/identity_checks.jsonl`. This prevents the cleanup plan from losing historical finance evidence.
 
@@ -55,6 +55,10 @@ The external-account JSON is read or written by multiple legacy agents, includin
 These consumers now use the shared `termux-hands-off/agents/private_state.py` resolver, which prefers the migrated `legacy_runtime` copy, then the migrated repository-source copy, and never falls back to plaintext files in the public checkout or old `~/hands-off` paths. The security mirror now archives the migrated private records. The migration utility also preserves the card, emergency-info, and finance-rules files needed by these agents.
 
 The finance hub is read by dashboard and autonomous modules; its tracked current-tree file is now an unknown placeholder. The identity profile is read from the private `security/` path by `security/absolute_identity.py`. Public tracked copies must still remain until the device has run the preservation command and the updated checkout is deployed. Deploying these code changes before migration would intentionally leave the agents without those local inputs.
+
+
+
+The two private backup repositories `hands-off-engine-backup` and `hands-off-engine-mirror` contain the same `.env.polymarket` blob. Its Polymarket private-key field is a valid 32-byte hex key, the funder field is a populated wallet address, and the DigitalOcean token field is non-empty; `LIVE_TRADING_ENABLED` is set to `1`. Treat the key and token as compromised even though the repositories are private. Do not use the key to sign or trade. No values are reproduced here and no credential rotation was performed.
 
 ## Required migration design
 
