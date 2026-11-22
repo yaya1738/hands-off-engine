@@ -149,7 +149,7 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
         legacy_config = secrets_root / "hands-off"
         if legacy_config.is_dir():
             for source in legacy_config.rglob("*"):
-                if source.is_file() and source.name != "enc_passphrase.txt":
+                if source.is_file() and source.name not in {"enc_passphrase.txt", "vault.json"}:
                     relative = Path("secrets") / "legacy_config" / "hands-off" / source.relative_to(legacy_config)
                     candidates[source] = (relative, "secrets_root")
 
