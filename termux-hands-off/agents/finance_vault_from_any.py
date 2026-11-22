@@ -5,7 +5,8 @@ CANDIDATES = [
     HOME/".config"/"keys.vault",
     *sorted((HOME/".config").glob("keys.vault.bak.*"), reverse=True)
 ]
-OUT = HOME/".config"/"hands-off"/"vault.json"
+PRIVATE_ROOT = pathlib.Path(os.environ.get("HANDS_OFF_PRIVATE_DIR", str(HOME/".config"/"hands-off-engine"))).expanduser()
+OUT = PRIVATE_ROOT/"secrets"/"vault.json"
 
 def load_candidate(path: pathlib.Path):
     if not path.exists():
@@ -53,8 +54,10 @@ for k in need:
 # final structure (empty strings allowed but we keep keys)
 final = {k: merged.get(k, "") for k in need}
 
-OUT.parent.mkdir(parents=True, exist_ok=True)
+OUT.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+OUT.parent.chmod(0o700)
 OUT.write_text(json.dumps(final, indent=2), encoding="utf-8")
+OUT.chmod(0o600)
 
 def mask(x):
     x = str(x or "")
@@ -62,4 +65,4 @@ def mask(x):
 print(f"[ok] wrote -> {OUT}")
 print("[mask preview]")
 for k in sorted(final):
-    print(f"  {k} = {mask(final[k])}")
+    print(f"  {k} = {"configured" if final[k] else "missing"}")
