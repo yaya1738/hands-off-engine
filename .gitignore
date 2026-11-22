@@ -119,3 +119,6 @@ termux-hands-off/autopilot/admin.env
 termux-hands-off/security_snapshot.enc
 security_snapshot.tar
 security_snapshot.enc
+
+termux-hands-off/agent/balances_manual.yaml
+termux-hands-off/agent/balances_manual.yaml.bak
