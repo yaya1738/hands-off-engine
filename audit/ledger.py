@@ -100,10 +100,20 @@ class FinancialLedger:
             lines = self.ledger_file.read_text(encoding="utf-8").splitlines() if self.ledger_file.exists() else []
             previous_hash = "0" * 64
             seen_keys = set()
-            for line in lines:
+            for index, line in enumerate(lines):
                 if not line.strip():
                     continue
                 item = json.loads(line)
+                if item.get("previous_hash") != previous_hash:
+                    raise ValueError(f"Cannot append to broken ledger chain at line {index + 1}")
+                if item.get("hash_version", 1) >= 2:
+                    expected_hash = self._compute_entry_hash(item)
+                else:
+                    expected_hash = self._compute_hash(
+                        item["entry_id"], item["previous_hash"], item["amount"]
+                    )
+                if item.get("current_hash") != expected_hash:
+                    raise ValueError(f"Cannot append to tampered ledger at line {index + 1}")
                 previous_hash = item["current_hash"]
                 key = item.get("idempotency_key")
                 if key:
