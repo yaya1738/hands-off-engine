@@ -19,9 +19,10 @@ from datetime import datetime
 from pathlib import Path
 
 from finance.hub_store import load_hub, update_account
+from finance.private_state import private_finance_hub_path
 
 FINANCE_DIR = Path(__file__).parent.parent
-HUB_PATH = Path(__file__).resolve().parents[2] / "state" / "private_finance_hub.json"
+HUB_PATH = private_finance_hub_path()
 
 class FreeAggregator:
     """Zero-cost financial data aggregation"""
