@@ -233,3 +233,18 @@ def test_migration_preserves_legacy_cron_logs(tmp_path):
 
     preserved = destination / "logs" / "cron" / "finance.log"
     assert preserved.read_text(encoding="utf-8") == log.read_text(encoding="utf-8")
+
+
+
+def test_legacy_runtime_vault_maps_to_shared_private_secret_path(tmp_path):
+    source = tmp_path / "repo"
+    legacy = tmp_path / "hands-off"
+    destination = tmp_path / "private"
+    vault = legacy / "agent" / "vault.json"
+    vault.parent.mkdir(parents=True)
+    vault.write_text('{"KRAKEN_API_KEY":"legacy"}', encoding="utf-8")
+
+    migrate(source, destination, legacy_runtime_root=legacy)
+
+    preserved = destination / "secrets" / "termux-agent-vault.json"
+    assert preserved.read_text(encoding="utf-8") == vault.read_text(encoding="utf-8")
