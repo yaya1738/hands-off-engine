@@ -71,7 +71,8 @@ else:
     reco.append("All good. Keep cycles modest; avoid >50% per-card at statement cut.")
 
 cash_text = f"${cash_now:,.0f}" if cash_now is not None else "UNKNOWN"
-msg = f"Util {util*100:.1f}% | {decision} | Cash {cash_text} | Cycle% PP {cycle_pp}% / Gen {cycle_gen}%"
+util_text = f"{util*100:.1f}%" if util is not None else "UNKNOWN"
+msg = f"Util {util_text} | {decision} | Cash {cash_text} | Cycle% PP {cycle_pp}% / Gen {cycle_gen}%"
 notify("Credit Guardrail", msg)
 
 PLAN_LOG.parent.mkdir(parents=True, exist_ok=True)
