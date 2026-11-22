@@ -78,16 +78,13 @@ The two private backup repositories `hands-off-engine-backup` and `hands-off-eng
 
 ## Preservation command
 
-From the repository checkout on the device, the copy-only migration can be run as:
+From Termux, one command downloads the copy-only launcher from this review branch and preserves the repository, legacy runtime, local config vaults, cron logs, and any local backup/mirror clones:
 
 ```bash
-python scripts/migrate_private_state.py \
-  --source-root "$HOME/hands-off-engine" \
-  --legacy-runtime-root "$HOME/hands-off" \
-  --destination "$HOME/.config/hands-off-engine"
+curl -fsSL https://raw.githubusercontent.com/yaya1738/hands-off-engine/fix/financial-integrity-concurrency-20261122/scripts/prepare_private_state_migration.sh | sh
 ```
 
-It records the repo and legacy runtime sources separately under the private destination. Review the summary and manifest; resolve any destination conflicts before proceeding. The command does not delete or modify originals.
+It writes owner-only copies and a SHA-256 manifest under `~/.config/hands-off-engine` (or `HANDS_OFF_PRIVATE_DIR`). It prints only aggregate counts and any conflicts. It never deletes or modifies source files. Do not proceed to public-file removal until the manifest reports zero conflicts and the copied files are verified.
 
 A provider-by-provider rotation checklist is maintained in `docs/security/CREDENTIAL_ROTATION_RUNBOOK.md`. It is a manual runbook only; no credentials have been revoked, replaced, or used.
 
