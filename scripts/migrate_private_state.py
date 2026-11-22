@@ -186,7 +186,7 @@ def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path
         except FileNotFoundError:
             pass
     manifest_path.chmod(0o600)
-    return {**manifest, "manifest_status": manifest_status}
+    return {**manifest, "files": results, "manifest_status": manifest_status}
 
 
 def main() -> int:
