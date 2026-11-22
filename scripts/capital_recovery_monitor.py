@@ -26,6 +26,7 @@ except ImportError:
 
 import os
 import json
+import math
 import tempfile
 import fcntl
 import requests
@@ -49,7 +50,8 @@ def get_balance() -> float | None:
         ok, message = TradingSafeguards().check_wallet_balance(0)
         if not ok or "balance: $" not in message:
             return None
-        return float(message.split("balance: $", 1)[1].split()[0])
+        balance = float(message.split("balance: $", 1)[1].split()[0])
+        return balance if math.isfinite(balance) and balance >= 0 else None
     except Exception as exc:
         print(f"Balance verification unavailable: {exc}")
         return None
