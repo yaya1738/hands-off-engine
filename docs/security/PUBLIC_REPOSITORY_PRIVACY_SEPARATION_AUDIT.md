@@ -58,6 +58,19 @@ The finance hub is read by dashboard and autonomous modules. The identity profil
 6. Scan all tracked files and reachable history for personal values, wallet identifiers, secrets, server endpoints, and historical finance/P&L data.
 7. Coordinate a reviewed history rewrite only after a verified private backup exists and all local clones are accounted for. Preserve the public repository and its public code history where possible; remove only sensitive blobs and references.
 
+## Preservation command
+
+From the repository checkout on the device, the copy-only migration can be run as:
+
+```bash
+python scripts/migrate_private_state.py \
+  --source-root "$HOME/hands-off-engine" \
+  --legacy-runtime-root "$HOME/hands-off" \
+  --destination "$HOME/.config/hands-off-engine"
+```
+
+It records the repo and legacy runtime sources separately under the private destination. Review the summary and manifest; resolve any destination conflicts before proceeding. The command does not delete or modify originals.
+
 ## Important boundary
 
 A `.gitignore` entry does not remove a file already tracked by Git. Removing a file from the current tree does not remove its earlier versions from public Git history. Gitleaks passing does not establish that personal financial information or identity data is absent.
