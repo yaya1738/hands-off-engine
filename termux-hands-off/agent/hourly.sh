@@ -1,7 +1,12 @@
 #!/data/data/com.termux/files/usr/bin/bash
 set -euo pipefail
 
-LOG="$HOME/.cron-logs/hourly.log"
+PRIVATE_ROOT="${HANDS_OFF_PRIVATE_DIR:-$HOME/.config/hands-off-engine}"
+LOG="$PRIVATE_ROOT/logs/hourly.log"
+mkdir -p "$(dirname "$LOG")"
+chmod 700 "$PRIVATE_ROOT" "$(dirname "$LOG")"
+touch "$LOG"
+chmod 600 "$LOG"
 PY_NOTIFY="$HOME/hands-off/agent/notify.py"
 
 run() { echo "[$(date -Is)] $*"; eval "$@"; }
