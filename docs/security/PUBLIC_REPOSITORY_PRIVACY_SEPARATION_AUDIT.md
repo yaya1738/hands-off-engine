@@ -78,10 +78,10 @@ The two private backup repositories `hands-off-engine-backup` and `hands-off-eng
 
 ## Preservation command
 
-From Termux, one command downloads the copy-only launcher from this review branch and preserves the repository, legacy runtime, local config vaults, cron logs, and any local backup/mirror clones:
+From Termux, run this single command. It verifies the launcher against its Git blob hash; the launcher separately verifies the migration script before executing it:
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yaya1738/hands-off-engine/fix/financial-integrity-concurrency-20261122/scripts/prepare_private_state_migration.sh | sh
+cd "$HOME/hands-off-engine" || exit 1; T="${TMPDIR:-$HOME/.cache}/prepare_private_state_migration.sh"; mkdir -p "$(dirname "$T")" && curl -fsSL https://raw.githubusercontent.com/yaya1738/hands-off-engine/0ffd9a4635ccb6727d1f485c8a9f63e98497747d/scripts/prepare_private_state_migration.sh -o "$T" && test "$(git hash-object "$T")" = "645669994c63bf75816a5e189e6552e9e93c7643" && sh "$T"
 ```
 
 It writes owner-only copies and a SHA-256 manifest under `~/.config/hands-off-engine` (or `HANDS_OFF_PRIVATE_DIR`). It prints only aggregate counts and any conflicts. It never deletes or modifies source files. Do not proceed to public-file removal until the manifest reports zero conflicts and the copied files are verified.
