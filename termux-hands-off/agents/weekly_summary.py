@@ -28,7 +28,11 @@ def last_usd():
         except: pass
     if not last: return None
     value = last.get("usd_total_raw", last.get("usd_total"))
-    return float(value) if value is not None else None
+    try:
+        number = float(value)
+        return number if __import__("math").isfinite(number) else None
+    except (TypeError, ValueError, OverflowError):
+        return None
 
 def week_delta():
     if not BAL.exists(): return None
