@@ -104,32 +104,27 @@ def copy_without_overwrite(source: Path, destination: Path) -> tuple[str, str, i
     except OSError:
         pass
 
-    if destination.exists():
+    try:
+        fd = os.open(destination, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+    except FileExistsError:
         existing_digest = sha256_bytes(destination.read_bytes())
         if existing_digest == digest:
             return "already_preserved", digest, len(data)
         return "conflict_existing_destination", digest, len(data)
 
-    fd, temp_name = tempfile.mkstemp(prefix=".private-state-", dir=destination.parent)
-    temp_path = Path(temp_name)
     try:
         with os.fdopen(fd, "wb") as handle:
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())
-        temp_path.chmod(0o600)
+        destination.chmod(0o600)
+    except Exception:
         try:
-            os.link(temp_path, destination)
-            status = "copied"
-        except FileExistsError:
-            existing_digest = sha256_bytes(destination.read_bytes())
-            status = "already_preserved" if existing_digest == digest else "conflict_existing_destination"
-        return status, digest, len(data)
-    finally:
-        try:
-            temp_path.unlink()
-        except FileNotFoundError:
+            destination.unlink()
+        except OSError:
             pass
+        raise
+    return "copied", digest, len(data)
 
 
 def migrate(source_root: Path, destination_root: Path, legacy_runtime_root: Path | None = None) -> dict:
