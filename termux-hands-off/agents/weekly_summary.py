@@ -71,7 +71,7 @@ def main():
     delta = week_delta()
     rent_il, rent_usd = rent_info()
     parts=[]
-    if total is not None: parts.append(f"Net ${round(total,2)}")
+    if total is not None: parts.append(f"Estimated (unverified) net ${round(total,2)}")
     if util  is not None: parts.append(f"Util {round(util*100,1)}%")
     if rent_il is not None: parts.append(f"Rent ₪{rent_il}/mo (~${rent_usd})")
     if delta is not None: parts.append(f"W/W Δ ${delta}")
