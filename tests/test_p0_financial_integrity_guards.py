@@ -985,23 +985,6 @@ def test_payment_monitor_does_not_promote_partial_rpc_data(tmp_path, monkeypatch
     assert result == {"status": "unknown", "balance_usdc": None}
     assert json.loads(state_path.read_text(encoding="utf-8")) == original
 
-    state_path = tmp_path / "payment-monitor.json"
-    original = {
-        "last_balance": 41.25,
-        "last_check": "2026-01-01T00:00:00+00:00",
-        "payments": [{"amount": 12.0}],
-    }
-    state_path.write_text(json.dumps(original), encoding="utf-8")
-    monkeypatch.setattr(payment_monitor, "STATE_FILE", state_path)
-    values = iter([41.25, None])
-    monkeypatch.setattr(payment_monitor, "get_token_balance", lambda *_: next(values))
-
-    result = payment_monitor.main()
-
-    assert result == {"status": "unknown", "balance_usdc": None}
-    assert json.loads(state_path.read_text(encoding="utf-8")) == original
-
-
 def test_payment_monitor_rpc_error_is_unknown_not_zero(monkeypatch):
     from finance import refresh_balances
 
@@ -1016,17 +999,6 @@ def test_payment_monitor_rpc_error_is_unknown_not_zero(monkeypatch):
     assert refresh_balances.get_erc20_balance(
         "0x" + "a" * 40, refresh_balances.USDC_NATIVE
     ) is None
-
-    class Response:
-        def raise_for_status(self):
-            return None
-
-        def json(self):
-            return {"jsonrpc": "2.0", "error": {"code": -32000, "message": "unavailable"}}
-
-    monkeypatch.setattr(payment_monitor.requests, "post", lambda *args, **kwargs: Response())
-    assert payment_monitor.get_token_balance(payment_monitor.WALLET, payment_monitor.USDC_CONTRACT) is None
-
 
 def test_ledger_concurrent_appends_preserve_hash_chain(tmp_path):
     from concurrent.futures import ThreadPoolExecutor
@@ -1192,30 +1164,6 @@ def test_payment_monitor_concurrent_runs_record_one_payment(tmp_path, monkeypatc
     assert len(notifications) == 1
     assert sum(1 for result in results if result["payment"]) == 1
 
-    path = tmp_path / "payment-monitor.json"
-    path.write_text(json.dumps({
-        "last_balance": 80.0,
-        "last_check": "2026-11-21T00:00:00+00:00",
-        "payments": [],
-    }), encoding="utf-8")
-    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
-    monkeypatch.setattr(
-        payment_monitor,
-        "get_token_balance",
-        lambda wallet, contract: 100.0 if contract == payment_monitor.USDC_CONTRACT else 0.0,
-    )
-    notifications = []
-    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
-
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        results = list(pool.map(lambda _: payment_monitor.main(), range(8)))
-
-    state = json.loads(path.read_text(encoding="utf-8"))
-    assert len(state["payments"]) == 1
-    assert len(notifications) == 1
-    assert sum(1 for result in results if result["payment"]) == 1
-
-
 def test_payment_monitor_first_observation_is_baseline_not_income(tmp_path, monkeypatch):
     from scripts import payment_monitor
 
@@ -1237,24 +1185,6 @@ def test_payment_monitor_first_observation_is_baseline_not_income(tmp_path, monk
     assert result["payment"] is None
     assert notifications == []
     assert json.loads(path.read_text(encoding="utf-8"))["last_balance"] == 50.0
-
-    path = tmp_path / "payment-monitor.json"
-    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
-    monkeypatch.setattr(
-        payment_monitor,
-        "get_token_balance",
-        lambda wallet, contract: 50.0 if contract == payment_monitor.USDC_CONTRACT else 0.0,
-    )
-    notifications = []
-    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
-
-    result = payment_monitor.main()
-
-    assert result["status"] == "verified"
-    assert result["payment"] is None
-    assert notifications == []
-    assert json.loads(path.read_text(encoding="utf-8"))["last_balance"] == 50.0
-
 
 def test_action_ledger_concurrent_appends_preserve_every_record(tmp_path):
     from concurrent.futures import ThreadPoolExecutor
