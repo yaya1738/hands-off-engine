@@ -1131,3 +1131,78 @@ def test_finance_hub_refuses_to_overwrite_corrupt_json(tmp_path):
     else:
         raise AssertionError("corrupt finance hub must not be overwritten")
     assert path.read_text(encoding="utf-8") == damaged
+
+
+def test_payment_monitor_concurrent_runs_record_one_payment(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from scripts import payment_monitor
+
+    path = tmp_path / "payment-monitor.json"
+    path.write_text(json.dumps({
+        "last_balance": 80.0,
+        "last_check": "2026-11-21T00:00:00+00:00",
+        "payments": [],
+    }), encoding="utf-8")
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
+    monkeypatch.setattr(
+        payment_monitor,
+        "get_token_balance",
+        lambda wallet, contract: 100.0 if contract == payment_monitor.USDC_CONTRACT else 0.0,
+    )
+    notifications = []
+    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(lambda _: payment_monitor.main(), range(8)))
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    assert len(state["payments"]) == 1
+    assert len(notifications) == 1
+    assert sum(1 for result in results if result["payment"]) == 1
+
+
+def test_payment_monitor_first_observation_is_baseline_not_income(tmp_path, monkeypatch):
+    from scripts import payment_monitor
+
+    path = tmp_path / "payment-monitor.json"
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
+    monkeypatch.setattr(
+        payment_monitor,
+        "get_token_balance",
+        lambda wallet, contract: 50.0 if contract == payment_monitor.USDC_CONTRACT else 0.0,
+    )
+    notifications = []
+    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
+
+    result = payment_monitor.main()
+
+    assert result["status"] == "verified"
+    assert result["payment"] is None
+    assert notifications == []
+    assert json.loads(path.read_text(encoding="utf-8"))["last_balance"] == 50.0
+
+
+def test_action_ledger_concurrent_appends_preserve_every_record(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from ai_nexus.ledger import ActionLedger, LedgerEntry
+
+    ledger = ActionLedger(str(tmp_path / "action-ledger"))
+
+    def append(index):
+        return ledger.record(LedgerEntry(
+            timestamp=f"2026-11-22T00:00:{index:02d}+00:00",
+            entry_type="ai_task",
+            action=f"concurrent-{index}",
+            cost=0.01,
+            metadata={"index": index},
+        ))
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(append, range(40)))
+
+    assert all(results)
+    files = list((tmp_path / "action-ledger").glob("ledger_*.jsonl"))
+    assert len(files) == 1
+    rows = [json.loads(line) for line in files[0].read_text(encoding="utf-8").splitlines()]
+    assert len(rows) == 40
+    assert {row["metadata"]["index"] for row in rows} == set(range(40))
