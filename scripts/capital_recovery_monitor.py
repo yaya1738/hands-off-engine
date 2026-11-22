@@ -26,8 +26,11 @@ except ImportError:
 
 import os
 import json
+import tempfile
+import fcntl
 import requests
 from datetime import datetime, timezone
+from contextlib import contextmanager
 from pathlib import Path
 
 # Thresholds
@@ -52,24 +55,68 @@ def get_balance() -> float | None:
         return None
 
 
-def load_state() -> dict:
-    """Load previous state"""
+@contextmanager
+def _state_locked():
+    """Serialize recovery-state updates across overlapping monitor runs."""
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = STATE_FILE.with_suffix(STATE_FILE.suffix + ".lock")
+    with open(lock_path, "a", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def _read_state_unlocked() -> dict:
     if STATE_FILE.exists():
-        return json.load(open(STATE_FILE))
+        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        if not isinstance(state, dict):
+            raise ValueError("Capital recovery state is malformed; refusing to reset it")
+        return state
     return {
         "last_balance": None,
         "last_check": None,
         "recovery_events": [],
         "trading_enabled": False,
-        "alerts_sent": []
+        "execution_authorized": False,
+        "alerts_sent": [],
     }
 
 
+def _write_state_unlocked(state: dict):
+    fd, temp_name = tempfile.mkstemp(
+        prefix=STATE_FILE.name + ".",
+        suffix=".tmp",
+        dir=str(STATE_FILE.parent),
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(state, handle, indent=2, default=str)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_name, STATE_FILE)
+        dir_fd = os.open(str(STATE_FILE.parent), os.O_RDONLY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
+    except Exception:
+        try:
+            os.unlink(temp_name)
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def load_state() -> dict:
+    with _state_locked():
+        return _read_state_unlocked()
+
+
 def save_state(state: dict):
-    """Save current state"""
-    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(STATE_FILE, 'w') as f:
-        json.dump(state, f, indent=2, default=str)
+    with _state_locked():
+        _write_state_unlocked(state)
 
 
 def send_telegram(message: str, priority: str = "normal"):
@@ -115,55 +162,66 @@ def trigger_singularity_if_ready(balance: float):
 
 
 def check_recovery():
-    """Record verified balance observations without enabling or executing trading."""
-    state = load_state()
+    """Record verified observations without losing concurrent updates or enabling trading."""
     current_balance = get_balance()
     now = datetime.now(timezone.utc)
-    state["last_check"] = now.isoformat()
-    state["trading_enabled"] = False
-    state["execution_authorized"] = False
 
-    if current_balance is None:
-        state["financial_status"] = "unknown"
-        state["last_balance"] = None
-        state["approval_required"] = False
-        save_state(state)
-        return {
-            "balance": None,
-            "financial_status": "unknown",
-            "trading_enabled": False,
-            "execution_authorized": False,
-            "events": [],
-        }
+    with _state_locked():
+        state = _read_state_unlocked()
+        state["last_check"] = now.isoformat()
+        state["trading_enabled"] = False
+        state["execution_authorized"] = False
 
-    previous_balance = state.get("last_balance")
-    state["financial_status"] = "verified_read_only"
-    events = []
-
-    if isinstance(previous_balance, (int, float)):
-        change = current_balance - float(previous_balance)
-        if abs(change) > 10:
-            event = {
-                "type": "balance_change_observed",
-                "timestamp": now.isoformat(),
-                "previous": float(previous_balance),
-                "current": current_balance,
-                "change": change,
-                "position_resolution_verified": False,
+        if current_balance is None:
+            # Preserve the last known verified amount; unknown is not a zero balance.
+            state["financial_status"] = "unknown"
+            state["approval_required"] = None
+            _write_state_unlocked(state)
+            return {
+                "balance": None,
+                "financial_status": "unknown",
+                "trading_enabled": False,
+                "execution_authorized": False,
+                "approval_required": None,
+                "events": [],
             }
-            events.append(event)
-            state.setdefault("recovery_events", []).append(event)
-            log_event(
-                f"BALANCE_CHANGE_OBSERVED: {change:+.2f}; source attribution unverified"
-            )
 
-    state["last_balance"] = current_balance
-    state["threshold_status"] = (
-        "capital_threshold_observed"
-        if current_balance >= MIN_TRADING_BALANCE
-        else "below_threshold"
-    )
-    state["approval_required"] = current_balance >= MIN_TRADING_BALANCE
+        previous_balance = state.get("last_balance")
+        state["financial_status"] = "verified_read_only"
+        events = []
+        if previous_balance is not None:
+            if (
+                isinstance(previous_balance, bool)
+                or not isinstance(previous_balance, (int, float))
+                or previous_balance < 0
+            ):
+                raise ValueError("Stored recovery balance is invalid; refusing to overwrite it")
+            change = current_balance - float(previous_balance)
+            if abs(change) > 10:
+                event = {
+                    "type": "balance_change_observed",
+                    "timestamp": now.isoformat(),
+                    "previous": float(previous_balance),
+                    "current": current_balance,
+                    "change": change,
+                    "position_resolution_verified": False,
+                }
+                events.append(event)
+                state.setdefault("recovery_events", []).append(event)
+
+        state["last_balance"] = current_balance
+        state["threshold_status"] = (
+            "capital_threshold_observed"
+            if current_balance >= MIN_TRADING_BALANCE
+            else "below_threshold"
+        )
+        state["approval_required"] = current_balance >= MIN_TRADING_BALANCE
+        _write_state_unlocked(state)
+
+    for event in events:
+        log_event(
+            f"BALANCE_CHANGE_OBSERVED: {event['change']:+.2f}; source attribution unverified"
+        )
 
     if current_balance >= MIN_TRADING_BALANCE:
         send_telegram(
@@ -172,13 +230,12 @@ def check_recovery():
             priority="medium",
         )
 
-    save_state(state)
     return {
         "balance": current_balance,
         "financial_status": "verified_read_only",
         "trading_enabled": False,
         "execution_authorized": False,
-        "approval_required": state["approval_required"],
+        "approval_required": current_balance >= MIN_TRADING_BALANCE,
         "events": events,
     }
 
