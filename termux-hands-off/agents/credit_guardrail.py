@@ -34,7 +34,16 @@ ext = {}
 if EXT.exists():
     try: ext=json.loads(EXT.read_text())
     except: ext={}
-cash_now = sum(float(ext.get(k,0) or 0) for k in ("paypal","monzo","robinhood_cash","polymarket_cash"))
+cash_keys = ("paypal", "monzo", "robinhood_cash", "polymarket_cash")
+cash_now = None
+if EXT.exists() and all(k in ext and ext[k] is not None for k in cash_keys):
+    try:
+        import math
+        values = [float(ext[k]) for k in cash_keys]
+        if all(math.isfinite(value) for value in values):
+            cash_now = sum(values)
+    except (TypeError, ValueError, OverflowError):
+        cash_now = None
 
 decision = "ok"
 reco = []
@@ -61,7 +70,8 @@ else:
     decision="OK"
     reco.append("All good. Keep cycles modest; avoid >50% per-card at statement cut.")
 
-msg = f"Util {util*100:.1f}% | {decision} | Cash ${cash_now:,.0f} | Cycle% PP {cycle_pp}% / Gen {cycle_gen}%"
+cash_text = f"${cash_now:,.0f}" if cash_now is not None else "UNKNOWN"
+msg = f"Util {util*100:.1f}% | {decision} | Cash {cash_text} | Cycle% PP {cycle_pp}% / Gen {cycle_gen}%"
 notify("Credit Guardrail", msg)
 
 PLAN_LOG.parent.mkdir(parents=True, exist_ok=True)
@@ -69,7 +79,7 @@ PLAN_LOG.open("a", encoding="utf-8").write(json.dumps({
     "ts": now,
     "util": util,
     "decision": decision,
-    "cash_liquid": round(cash_now,2),
+    "cash_liquid": round(cash_now,2) if cash_now is not None else None,
     "cycle_cost_pct_at_paypal": cycle_pp,
     "cycle_cost_pct_general": cycle_gen,
     "recommendations": reco
