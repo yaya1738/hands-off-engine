@@ -14,6 +14,7 @@ from datetime import datetime
 from pathlib import Path
 
 from finance.truth import read_verified_polymarket_balance
+from finance.private_state import private_finance_hub_path
 
 FINANCE_DIR = Path(__file__).parent
 STATE_DIR = FINANCE_DIR.parent / "state"
@@ -29,7 +30,7 @@ def load_json(filepath):
 
 def get_polymarket_status():
     """Return only a recent, provenance-verified Polygon wallet balance."""
-    hub_path = STATE_DIR / "private_finance_hub.json"
+    hub_path = private_finance_hub_path()
     truth = read_verified_polymarket_balance(hub_path)
     return {
         "balance_usdc": truth["balance_usdc"],
