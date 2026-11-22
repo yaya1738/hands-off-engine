@@ -189,7 +189,7 @@ def test_force_flag_cannot_bypass_actuator_safeguards():
 
     assert forced.get("blocked_by") == "governed_execution"
     assert ordinary.get("blocked_by") == "governed_execution"
-    assert not hasattr(trader, "client")
+    assert calls == []
 
 
 def test_process_cycler_cannot_directly_execute_polymarket_trade():
@@ -1302,4 +1302,4 @@ def test_polymarket_client_direct_mutations_are_blocked_without_api_calls(monkey
     assert all(result["status"] == "blocked" for result in results)
     assert all(result["execution_authorized"] is False for result in results)
     assert all(result["blocked_by"] == "governed_execution" for result in results)
-    assert calls == []
+    assert not hasattr(trader, "client")
