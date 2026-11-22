@@ -38,6 +38,7 @@ jobs:
           bash -n scripts/setup_autonomous_mode.sh
           bash -n termux-hands-off/agents/security_mirror.sh
           bash -n termux-hands-off/agent/hourly.sh
+          bash -n scripts/prepare_private_state_migration.sh
 
       - name: Scan current source tree and Git history for embedded credentials
         run: |
