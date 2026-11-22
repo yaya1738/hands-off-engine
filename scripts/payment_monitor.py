@@ -30,8 +30,8 @@ USDC_BRIDGED = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"  # Bridged USDC
 STATE_FILE = Path("/root/hands-off-engine/state/payment_monitor.json")
 
 
-def get_token_balance(wallet: str, contract: str) -> float:
-    """Get ERC20 token balance from Polygon RPC"""
+def get_token_balance(wallet: str, contract: str) -> float | None:
+    """Return a balance only when the RPC response is complete and valid."""
     # balanceOf(address) selector
     data = {
         "jsonrpc": "2.0",
@@ -49,12 +49,19 @@ def get_token_balance(wallet: str, contract: str) -> float:
             json=data,
             timeout=10
         )
-        result = resp.json().get("result", "0x0")
+        resp.raise_for_status()
+        payload = resp.json()
+        if not isinstance(payload, dict) or payload.get("error") is not None:
+            return None
+        result = payload.get("result")
+        if not isinstance(result, str) or not result.startswith("0x") or len(result) <= 2:
+            return None
         balance_wei = int(result, 16)
-        return balance_wei / 1e6  # USDC has 6 decimals
-    except Exception as e:
-        print(f"Error: {e}")
-        return 0.0
+        balance = balance_wei / 1e6
+        return balance if balance >= 0 else None
+    except (requests.RequestException, ValueError, TypeError, OverflowError) as e:
+        print(f"Balance verification failed: {e}")
+        return None
 
 
 def send_telegram(message: str):
@@ -90,8 +97,11 @@ def main():
     # Get current balances
     native = get_token_balance(WALLET, USDC_CONTRACT)
     bridged = get_token_balance(WALLET, USDC_BRIDGED)
-    total = native + bridged
+    if native is None or bridged is None:
+        print("Balance status: UNKNOWN (incomplete RPC evidence); state was not changed.")
+        return {"status": "unknown", "balance_usdc": None}
 
+    total = native + bridged
     previous = state.get("last_balance", 0.0)
     now = datetime.now(timezone.utc)
 
