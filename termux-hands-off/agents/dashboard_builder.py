@@ -52,7 +52,8 @@ perf_rows  = read_csv_rows(PERF_CSV)
 pm_rows    = read_csv_rows(PM_POS_CSV)
 
 # derive quicks
-net_usd = balances_last.get("usd_total_raw", balances_last.get("usd_total"))
+net_status = balances_last.get("status", "unknown")
+net_usd = balances_last.get("usd_total_raw", balances_last.get("usd_total")) if net_status == "unverified_estimate" else None
 util = credit_last.get("total_utilization")
 stmt_notes = " / ".join(credit_last.get("statement_notes", []) or [])
 
@@ -160,9 +161,9 @@ html = f"""<!doctype html>
 
   <div class="grid">
     <div class="card">
-      <div class="k">Net worth (live)</div>
+      <div class="k">Estimated net worth (unverified)</div>
       <div class="v">{money(net_usd) if net_usd is not None else "-"}</div>
-      <div class="k">Includes external accounts + crypto balances</div>
+      <div class="k">Manual external inputs and market-price estimates; not reconciled account truth</div>
     </div>
 
     <div class="card">
