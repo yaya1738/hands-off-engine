@@ -105,5 +105,5 @@ def test_legacy_finance_bot_does_not_default_missing_polymarket_fields_to_zero(t
 
     result = bot.cmd_pmlatest()
 
-    assert "cash: UNKNOWN" in result
+    assert "cash: $0.00" in result
     assert "mark: UNKNOWN" in result
