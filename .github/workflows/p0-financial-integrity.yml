@@ -31,12 +31,13 @@ jobs:
         run: python -m pip install pytest requests python-dotenv
 
       - name: Compile modified Python packages
-        run: python -m compileall -q ai_nexus autonomous executor finance hardware scripts security ui audit termux-hands-off/agents
+        run: python -m compileall -q ai_nexus autonomous executor finance hardware scripts security ui audit termux-hands-off/agents termux-hands-off/agent
 
       - name: Validate shell setup syntax
         run: |
           bash -n scripts/setup_autonomous_mode.sh
           bash -n termux-hands-off/agents/security_mirror.sh
+          bash -n termux-hands-off/agent/hourly.sh
 
       - name: Scan current source tree and Git history for embedded credentials
         run: |
