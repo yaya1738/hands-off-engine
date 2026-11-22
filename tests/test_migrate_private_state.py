@@ -278,3 +278,18 @@ def test_migration_preserves_manual_balance_backup(tmp_path):
 
     preserved = destination / "termux-hands-off" / "agent" / "balances_manual.yaml.bak"
     assert preserved.read_text(encoding="utf-8") == backup.read_text(encoding="utf-8")
+
+
+
+def test_migration_preserves_unclassified_legacy_private_config_files(tmp_path):
+    source = tmp_path / "repo"
+    secrets_root = tmp_path / "config"
+    destination = tmp_path / "private"
+    extra = secrets_root / "hands-off" / "custom_private_config.json"
+    extra.parent.mkdir(parents=True)
+    extra.write_text('{"setting":"private"}', encoding="utf-8")
+
+    migrate(source, destination, secrets_root=secrets_root)
+
+    preserved = destination / "secrets" / "legacy_config" / "hands-off" / "custom_private_config.json"
+    assert preserved.read_text(encoding="utf-8") == extra.read_text(encoding="utf-8")
