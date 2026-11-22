@@ -444,54 +444,33 @@ You can control the entire system via Telegram.
 No need to launch Claude Code CLI for routine operations."""
 
     def cmd_balance(self, args) -> str:
-        """Get trading balance and position summary."""
+        """Report only a recent verified wallet balance; positions remain unknown."""
         try:
-            # Read dollar access file for balance info
-            dollar_file = REPO_ROOT / "finance" / "dollar_access.json"
-            if dollar_file.exists():
-                with open(dollar_file) as f:
-                    data = json.load(f)
-                cash = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("current_balance_usdc", 0)
-                positions = data.get("inflow_channels", {}).get("polymarket_wallet", {}).get("positions_value_usdc", 0)
-            else:
-                cash = 0
-                positions = 0
+            from finance.truth import read_verified_polymarket_balance
 
-            # Try to get live position data
-            try:
-                result = subprocess.run(
-                    ["python3", str(SCRIPTS_DIR / "position_monitor.py")],
-                    capture_output=True,
-                    text=True,
-                    timeout=30,
-                    cwd=str(REPO_ROOT),
-                    env={**os.environ, "PYTHONPATH": str(REPO_ROOT)}
+            truth = read_verified_polymarket_balance()
+            if not isinstance(truth, dict) or truth.get("verified") is not True:
+                reason = truth.get("reason", "No recent verified wallet observation") if isinstance(truth, dict) else "Financial truth unavailable"
+                return (
+                    "💰 Financial Balance\n\n"
+                    "Wallet cash: UNKNOWN\n"
+                    "Positions: UNKNOWN\n"
+                    f"Reason: {reason}\n"
+                    "No legacy snapshot or modelled amount was treated as spendable."
                 )
-                if "positions" in result.stdout.lower():
-                    live_info = result.stdout.strip().split('\n')[-1]
-                else:
-                    live_info = ""
-            except:
-                live_info = ""
 
-            total = cash + positions
-            gap = max(0, 50 - cash)
+            cash = truth.get("balance_usdc")
+            if isinstance(cash, bool) or not isinstance(cash, (int, float)) or cash < 0:
+                return "💰 Financial Balance\n\nWallet cash: UNKNOWN\nPositions: UNKNOWN\nInvalid verified balance payload."
 
-            return f"""💰 Trading Balance
-
-Cash: ${cash:.2f}
-Positions: ${positions:.2f}
-Total: ${total:.2f}
-
-Trading threshold: $50
-Gap to trading: ${gap:.2f}
-
-{live_info}
-
-Use /positions for details"""
-
-        except Exception as e:
-            return f"❌ Error getting balance: {str(e)}"
+            return (
+                "💰 Financial Balance\n\n"
+                f"Verified wallet cash: ${cash:.2f} USDC\n"
+                "Positions: UNKNOWN (not included in spendable cash)\n"
+                "This is an observation only; no trading action was taken."
+            )
+        except Exception as exc:
+            return f"❌ Financial balance unavailable: {type(exc).__name__}"
 
     def cmd_positions(self, args) -> str:
         """Get detailed position list."""
