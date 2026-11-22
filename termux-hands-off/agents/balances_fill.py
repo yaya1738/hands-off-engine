@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import json, pathlib
-EXT=pathlib.Path.home()/ "hands-off/agents/external_accounts.json"
+from private_state import private_path
+
+EXT = private_path("agents/external_accounts.json", create_parent=True)
 d={}
 if EXT.exists():
     try: d=json.loads(EXT.read_text())
