@@ -52,8 +52,8 @@ def test_human_challenge_layer_has_no_embedded_answer_fallback(tmp_path, monkeyp
 def test_identity_paths_default_to_private_config_directory(tmp_path, monkeypatch):
     module, private_dir = load_identity(tmp_path, monkeypatch)
 
-    assert module.PROFILE_PATH == private_dir / "yair_identity_profile.json"
-    assert module.VERIFICATION_LOG == private_dir / "verification_audit.jsonl"
+    assert module.PROFILE_PATH == private_dir / "security" / "yair_identity_profile.json"
+    assert module.VERIFICATION_LOG == private_dir / "security" / "verification_audit.jsonl"
 
 
 def test_audit_log_is_created_with_owner_only_permissions(tmp_path, monkeypatch):
@@ -62,9 +62,9 @@ def test_audit_log_is_created_with_owner_only_permissions(tmp_path, monkeypatch)
     module, private_dir = load_identity(tmp_path, monkeypatch)
     result = module.AbsoluteIdentity().full_verification()
 
-    log = private_dir / "verification_audit.jsonl"
+    log = private_dir / "security" / "verification_audit.jsonl"
     assert result["verified"] is False
     assert log.stat().st_mode & 0o777 == 0o600
-    assert private_dir.stat().st_mode & 0o777 == 0o700
+    assert (private_dir / "security").stat().st_mode & 0o777 == 0o700
     record = json.loads(log.read_text(encoding="utf-8").splitlines()[0])
     assert record["verdict"] == "UNVERIFIED"
