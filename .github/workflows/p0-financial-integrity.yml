@@ -86,4 +86,5 @@ jobs:
           tests/unit/test_executor_shadow_mode.py
           tests/test_payment_monitor.py
           tests/test_legacy_execution_boundaries.py
+          tests/test_legacy_finance_watcher_truth.py
           -q --tb=short
