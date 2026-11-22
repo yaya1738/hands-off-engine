@@ -975,6 +975,24 @@ def test_payment_monitor_does_not_promote_partial_rpc_data(tmp_path, monkeypatch
     }
     state_path.write_text(json.dumps(original), encoding="utf-8")
     monkeypatch.setattr(payment_monitor, "STATE_FILE", state_path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "a" * 40)
+    monkeypatch.setattr(payment_monitor, "get_chain_id", lambda: 137)
+    values = iter([41.25, None])
+    monkeypatch.setattr(payment_monitor, "get_erc20_balance", lambda *_: next(values))
+
+    result = payment_monitor.main()
+
+    assert result == {"status": "unknown", "balance_usdc": None}
+    assert json.loads(state_path.read_text(encoding="utf-8")) == original
+
+    state_path = tmp_path / "payment-monitor.json"
+    original = {
+        "last_balance": 41.25,
+        "last_check": "2026-01-01T00:00:00+00:00",
+        "payments": [{"amount": 12.0}],
+    }
+    state_path.write_text(json.dumps(original), encoding="utf-8")
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", state_path)
     values = iter([41.25, None])
     monkeypatch.setattr(payment_monitor, "get_token_balance", lambda *_: next(values))
 
@@ -985,7 +1003,19 @@ def test_payment_monitor_does_not_promote_partial_rpc_data(tmp_path, monkeypatch
 
 
 def test_payment_monitor_rpc_error_is_unknown_not_zero(monkeypatch):
-    from scripts import payment_monitor
+    from finance import refresh_balances
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"jsonrpc": "2.0", "error": {"code": -32000, "message": "unavailable"}}
+
+    monkeypatch.setattr(refresh_balances.requests, "post", lambda *args, **kwargs: Response())
+    assert refresh_balances.get_erc20_balance(
+        "0x" + "a" * 40, refresh_balances.USDC_NATIVE
+    ) is None
 
     class Response:
         def raise_for_status(self):
@@ -1144,6 +1174,31 @@ def test_payment_monitor_concurrent_runs_record_one_payment(tmp_path, monkeypatc
         "payments": [],
     }), encoding="utf-8")
     monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "a" * 40)
+    monkeypatch.setattr(payment_monitor, "get_chain_id", lambda: 137)
+    monkeypatch.setattr(
+        payment_monitor,
+        "get_erc20_balance",
+        lambda wallet, contract: 100.0 if contract == payment_monitor.USDC_NATIVE else 0.0,
+    )
+    notifications = []
+    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(lambda _: payment_monitor.main(), range(8)))
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    assert len(state["payments"]) == 1
+    assert len(notifications) == 1
+    assert sum(1 for result in results if result["payment"]) == 1
+
+    path = tmp_path / "payment-monitor.json"
+    path.write_text(json.dumps({
+        "last_balance": 80.0,
+        "last_check": "2026-11-21T00:00:00+00:00",
+        "payments": [],
+    }), encoding="utf-8")
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
     monkeypatch.setattr(
         payment_monitor,
         "get_token_balance",
@@ -1163,6 +1218,25 @@ def test_payment_monitor_concurrent_runs_record_one_payment(tmp_path, monkeypatc
 
 def test_payment_monitor_first_observation_is_baseline_not_income(tmp_path, monkeypatch):
     from scripts import payment_monitor
+
+    path = tmp_path / "payment-monitor.json"
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "a" * 40)
+    monkeypatch.setattr(payment_monitor, "get_chain_id", lambda: 137)
+    monkeypatch.setattr(
+        payment_monitor,
+        "get_erc20_balance",
+        lambda wallet, contract: 50.0 if contract == payment_monitor.USDC_NATIVE else 0.0,
+    )
+    notifications = []
+    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
+
+    result = payment_monitor.main()
+
+    assert result["status"] == "verified"
+    assert result["payment"] is None
+    assert notifications == []
+    assert json.loads(path.read_text(encoding="utf-8"))["last_balance"] == 50.0
 
     path = tmp_path / "payment-monitor.json"
     monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
