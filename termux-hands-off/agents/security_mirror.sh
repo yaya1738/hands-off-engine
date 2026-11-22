@@ -28,6 +28,7 @@ set --
 for candidate in \
   "$PRIVATE_SECRETS/vault.json" \
   "$PRIVATE_SECRETS/termux-agent-vault.json" \
+  "$PRIVATE_SECRETS/termux-agent-vault.json.bak" \
   "$PRIVATE_SECRETS/.env.polymarket" \
   "$PRIVATE_SECRETS/keys.vault" \
   "$PRIVATE_RUNTIME/agents/external_accounts.json" \
@@ -43,6 +44,7 @@ for candidate in \
   "$PRIVATE_ROOT/termux-hands-off/logs" \
   "$PRIVATE_ROOT/termux-hands-off/data/finances" \
   "$PRIVATE_ROOT/backups/security_snapshot.tar" \
+  "$PRIVATE_ROOT/backups/security_snapshot-legacy.tar" \
   "$PRIVATE_ROOT/finance/private_finance_hub.json" \
   "$PRIVATE_ROOT/finance/dollar_access.json" \
   "$PRIVATE_ROOT/security/yair_identity_profile.json"
