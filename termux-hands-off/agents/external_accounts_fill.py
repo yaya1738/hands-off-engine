@@ -1,5 +1,7 @@
 import json, pathlib
-p = pathlib.Path.home()/ "hands-off/agents/external_accounts.json"
+from private_state import private_path
+
+p = private_path("agents/external_accounts.json", create_parent=True)
 d = {}
 if p.exists():
     try: d = json.loads(p.read_text(encoding="utf-8"))
