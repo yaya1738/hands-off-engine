@@ -52,9 +52,9 @@ The finance hub is read by dashboard and autonomous modules; its tracked current
 
 ## Required migration design
 
-1. Add one shared private-state resolver. Default location: `~/.config/hands-off-engine/`, overridable with `HANDS_OFF_PRIVATE_DIR`.
+1. Use the shared private-state resolvers. Default location: `~/.config/hands-off-engine/`, overridable with `HANDS_OFF_PRIVATE_DIR`.
 2. Add an idempotent migration utility that copies existing local files into that directory with owner-only permissions, verifies byte counts and SHA-256 hashes, and never deletes the source.
-3. Update every finance and identity reader/writer to use the resolver. Missing data must remain unknown; no zero defaults.
+3. Complete any remaining finance and identity reader/writer migrations to the resolver. Missing data must remain unknown; no zero defaults.
 4. Add tests for missing private state, permissions, malformed data, migration repeatability, and read/write isolation.
 5. Replace tracked live-data files with schema-only examples or remove them only after consumer tests pass.
 6. Scan all tracked files and reachable history for personal values, wallet identifiers, secrets, server endpoints, and historical finance/P&L data.
