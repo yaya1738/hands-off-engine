@@ -264,3 +264,17 @@ def test_migration_preserves_polymarket_env_from_local_backup_clones(tmp_path):
 
     preserved = destination / "secrets" / "backup_repos" / backup.name / ".env.polymarket"
     assert preserved.read_text(encoding="utf-8") == env_file.read_text(encoding="utf-8")
+
+
+
+def test_migration_preserves_manual_balance_backup(tmp_path):
+    source = tmp_path / "repo"
+    destination = tmp_path / "private"
+    backup = source / "termux-hands-off" / "agent" / "balances_manual.yaml.bak"
+    backup.parent.mkdir(parents=True)
+    backup.write_text("cash: {}\nliabilities: {}\n", encoding="utf-8")
+
+    migrate(source, destination)
+
+    preserved = destination / "termux-hands-off" / "agent" / "balances_manual.yaml.bak"
+    assert preserved.read_text(encoding="utf-8") == backup.read_text(encoding="utf-8")
