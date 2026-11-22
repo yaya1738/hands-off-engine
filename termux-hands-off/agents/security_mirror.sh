@@ -6,8 +6,9 @@ PRIVATE_ROOT="${HANDS_OFF_PRIVATE_DIR:-$HOME/.config/hands-off-engine}"
 PRIVATE_RUNTIME="$PRIVATE_ROOT/legacy_runtime"
 PRIVATE_BACKUPS="$PRIVATE_ROOT/backups"
 PRIVATE_SECRETS="$PRIVATE_ROOT/secrets"
-OUT="$PRIVATE_BACKUPS/security_snapshot.tar"
-ENC="$PRIVATE_BACKUPS/security_snapshot.enc"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+OUT="$PRIVATE_BACKUPS/security_snapshot-$STAMP.tar"
+ENC="$OUT.enc"
 PASSF="$PRIVATE_SECRETS/mirror_passphrase.txt"
 
 mkdir -p "$PRIVATE_BACKUPS" "$PRIVATE_SECRETS"
@@ -22,8 +23,9 @@ if [ ! -f "$PASSF" ]; then
   chmod 600 "$PASSF"
 fi
 
-# Archive only private local paths. Nothing is written into the public checkout.
-tar -cf "$OUT" \
+# Archive only existing private local paths. Nothing is written into the public checkout.
+set --
+for candidate in \
   "$PRIVATE_SECRETS/vault.json" \
   "$PRIVATE_SECRETS/termux-agent-vault.json" \
   "$PRIVATE_SECRETS/.env.polymarket" \
@@ -35,9 +37,12 @@ tar -cf "$OUT" \
   "$PRIVATE_RUNTIME/data/finances" \
   "$PRIVATE_ROOT/finance/private_finance_hub.json" \
   "$PRIVATE_ROOT/finance/dollar_access.json" \
-  "$PRIVATE_ROOT/security/yair_identity_profile.json" \
-  2>/dev/null
-
+  "$PRIVATE_ROOT/security/yair_identity_profile.json"
+do
+  [ -e "$candidate" ] && set -- "$@" "$candidate"
+done
+[ "$#" -gt 0 ] || { echo "No private files found to archive"; exit 1; }
+tar -cf "$OUT" "$@"
 chmod 600 "$OUT"
 openssl enc -aes-256-cbc -salt -pbkdf2 -iter 150000 \
   -in "$OUT" -out "$ENC" -pass file:"$PASSF"
