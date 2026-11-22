@@ -249,3 +249,18 @@ def test_legacy_runtime_vault_maps_to_shared_private_secret_path(tmp_path):
 
     preserved = destination / "secrets" / "termux-agent-vault.json"
     assert preserved.read_text(encoding="utf-8") == vault.read_text(encoding="utf-8")
+
+
+
+def test_migration_preserves_polymarket_env_from_local_backup_clones(tmp_path):
+    source = tmp_path / "repo"
+    backup = tmp_path / "hands-off-engine-backup"
+    destination = tmp_path / "private"
+    env_file = backup / ".env.polymarket"
+    backup.mkdir(parents=True)
+    env_file.write_text("POLYMARKET_PRIVATE_KEY=backup-placeholder", encoding="utf-8")
+
+    migrate(source, destination, backup_repo_roots=[backup])
+
+    preserved = destination / "secrets" / "backup_repos" / backup.name / ".env.polymarket"
+    assert preserved.read_text(encoding="utf-8") == env_file.read_text(encoding="utf-8")
