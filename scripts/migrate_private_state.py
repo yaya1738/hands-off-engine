@@ -123,10 +123,11 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
 
     if secrets_root is not None:
         secrets_root = secrets_root.expanduser().resolve()
-        for relative_text in ("vault.json", "tg.env", "ifttt.env", "auto_sources.env"):
+        for relative_text in ("vault.json", "tg.env", "ifttt.env", "auto_sources.env", "enc_passphrase.txt"):
             source = secrets_root / relative_text
             if source.is_file():
-                candidates[source] = (Path("secrets") / relative_text, "secrets_root")
+                destination_name = "mirror_passphrase.txt" if relative_text == "enc_passphrase.txt" else relative_text
+                candidates[source] = (Path("secrets") / destination_name, "secrets_root")
 
     if legacy_runtime_root is not None:
         legacy_runtime_root = legacy_runtime_root.expanduser().resolve()
