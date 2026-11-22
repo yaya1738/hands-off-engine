@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import json, pathlib, datetime, os, statistics
+from private_state import private_path
 
-HOME = pathlib.Path.home()
-EXT  = HOME/"hands-off/agents/external_accounts.json"
-CARDS= HOME/"hands-off/agents/cards.json"
-BAL  = HOME/"hands-off/logs/finance_balances.log"
-CRED = HOME/"hands-off/logs/finance_credit.log"
+EXT  = private_path("agents/external_accounts.json")
+CARDS= private_path("agents/cards.json")
+BAL  = private_path("logs/finance_balances.log")
+CRED = private_path("logs/finance_credit.log")
 
 def notify(title, text):
     os.system(f'termux-notification --title "{title}" --content "{text}" >/dev/null 2>&1')
@@ -27,7 +27,8 @@ def last_usd():
             d=json.loads(line); last=d
         except: pass
     if not last: return None
-    return float(last.get("usd_total_raw", last.get("usd_total", 0.0)))
+    value = last.get("usd_total_raw", last.get("usd_total"))
+    return float(value) if value is not None else None
 
 def week_delta():
     if not BAL.exists(): return None
@@ -50,8 +51,6 @@ def week_delta():
     return round(statistics.median(last7) - statistics.median(prev7), 2)
 
 def pm_ev():
-    import json
-    EXT = pathlib.Path.home()/ "hands-off/agents/external_accounts.json"
     if not EXT.exists(): return None, None
     d=json.loads(EXT.read_text())
     return d.get("polymarket_positions_mark"), d.get("polymarket_unrealized_est")
