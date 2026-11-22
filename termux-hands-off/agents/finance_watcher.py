@@ -115,13 +115,17 @@ def load_external_accounts():
         if p.exists():
             with open(p, "r", encoding="utf-8") as f:
                 d = json.load(f)
-            # normalize keys; liabilities are negative
+            # Require every manual field to be numeric; missing is not zero.
+            if not isinstance(d, dict) or not d:
+                return None
             out = {}
-            for k,v in d.items():
-                try:
-                    out[k] = float(v)
-                except:
-                    pass
+            for k, v in d.items():
+                if isinstance(v, bool):
+                    return None
+                number = float(v)
+                if not __import__("math").isfinite(number):
+                    return None
+                out[k] = number
             return out
     except Exception:
         pass
@@ -165,12 +169,21 @@ def portfolio_snapshot(vault):
             if px: usd_total += amt * px
     # External accounts support (manual balances, liabilities negative)
     ext = load_external_accounts()
-    ext_total = sum(ext.values()) if isinstance(ext, dict) else 0.0
+    if ext is None:
+        snap["external_status"] = "unknown"
+        snap["usd_total_raw"] = None
+        snap["usd_total"] = None
+        snap["status"] = "partial_unknown"
+        return snap
+
+    ext_total = sum(ext.values())
     snap["external"] = ext
+    snap["external_status"] = "manual_unverified"
 
     usd_total_raw = usd_total + ext_total
     snap["usd_total_raw"] = usd_total_raw
     snap["usd_total"] = round(usd_total_raw, 2)
+    snap["status"] = "unverified_estimate"
     return snap
 
 def check_alerts(prices):
