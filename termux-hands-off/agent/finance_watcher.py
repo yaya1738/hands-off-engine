@@ -59,14 +59,19 @@ def find_pm_compact():
     return next((path for path in PM_CANDIDATES if os.path.exists(path)), None)
 
 
-def _finite_nonnegative(value):
+def _finite_number(value):
     if isinstance(value, bool):
         return None
     try:
         number = float(value)
     except (TypeError, ValueError, OverflowError):
         return None
-    return number if math.isfinite(number) and number >= 0 else None
+    return number if math.isfinite(number) else None
+
+
+def _finite_nonnegative(value):
+    number = _finite_number(value)
+    return number if number is not None and number >= 0 else None
 
 
 def get_coingecko_prices(ids):
@@ -87,7 +92,7 @@ def get_coingecko_prices(ids):
 
 
 def money(value):
-    number = _finite_nonnegative(value)
+    number = _finite_number(value)
     return f"${number:,.2f}" if number is not None else "UNKNOWN"
 
 
@@ -128,7 +133,7 @@ def calc_snapshot():
     if isinstance(fiat, dict) and fiat:
         valid = True
         for key, value in fiat.items():
-            number = _finite_nonnegative(value)
+            number = _finite_number(value)
             if number is None:
                 valid = False
                 snapshot["notes"].append(f"Fiat input {key!r} is invalid")
@@ -149,7 +154,7 @@ def calc_snapshot():
         for coin_id, amount in amounts.items():
             price_payload = prices.get(coin_id) if isinstance(prices, dict) else None
             price = _finite_nonnegative(price_payload.get("usd")) if isinstance(price_payload, dict) else None
-            if amount is None or price is None:
+            if amount is None or price is None or price <= 0:
                 snapshot["notes"].append(f"Crypto amount/price unavailable for {coin_id}")
                 continue
             priced[coin_id] = amount * price
@@ -204,8 +209,8 @@ def diff(previous, current):
 
     component_deltas = {}
     for key in set(previous_components) & set(current_components):
-        old = _finite_nonnegative(previous_components[key])
-        new = _finite_nonnegative(current_components[key])
+        old = _finite_number(previous_components[key])
+        new = _finite_number(current_components[key])
         if old is not None and new is not None:
             component_deltas[key] = new - old
 
