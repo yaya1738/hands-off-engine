@@ -125,11 +125,19 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
 
     if secrets_root is not None:
         secrets_root = secrets_root.expanduser().resolve()
-        for relative_text in ("vault.json", "tg.env", "ifttt.env", "auto_sources.env", "enc_passphrase.txt"):
-            source = secrets_root / relative_text
+        secret_sources = {
+            "hands-off/vault.json": "vault.json",
+            "hands-off/enc_passphrase.txt": "mirror_passphrase.txt",
+            "keys.vault": "keys.vault",
+        }
+        for source_relative, destination_name in secret_sources.items():
+            source = secrets_root / source_relative
             if source.is_file():
-                destination_name = "mirror_passphrase.txt" if relative_text == "enc_passphrase.txt" else relative_text
                 candidates[source] = (Path("secrets") / destination_name, "secrets_root")
+        key_dir = secrets_root
+        for source in key_dir.glob("keys.vault.bak.*"):
+            if source.is_file():
+                candidates[source] = (Path("secrets") / source.name, "secrets_root")
 
     if legacy_runtime_root is not None:
         legacy_runtime_root = legacy_runtime_root.expanduser().resolve()
@@ -255,7 +263,7 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--source-root", type=Path, default=Path(__file__).resolve().parent.parent)
     parser.add_argument("--legacy-runtime-root", type=Path, default=Path.home() / "hands-off")
-    parser.add_argument("--secrets-root", type=Path, default=Path.home() / ".config" / "hands-off")
+    parser.add_argument("--secrets-root", type=Path, default=Path.home() / ".config")
     parser.add_argument("--destination", type=Path, default=private_root())
     args = parser.parse_args()
 
