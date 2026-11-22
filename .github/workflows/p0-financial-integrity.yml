@@ -36,21 +36,28 @@ jobs:
       - name: Validate shell setup syntax
         run: bash -n scripts/setup_autonomous_mode.sh
 
-      - name: Scan current source tree for embedded credentials
+      - name: Scan current source tree and Git history for embedded credentials
         run: |
-          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --no-git --source /path --redact --report-format json --report-path /path/gitleaks-report.json --exit-code 1 || true
+          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --no-git --source /path --redact --report-format json --report-path /path/gitleaks-working-tree.json --exit-code 1 || true
+          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --source /path --redact --report-format json --report-path /path/gitleaks-history.json --exit-code 1 || true
           python - <<'PY'
           import json
           import sys
           from pathlib import Path
-          report = Path("gitleaks-report.json")
-          findings = json.loads(report.read_text()) if report.exists() else []
-          print(f"Credential scan findings: {len(findings)}")
-          for item in findings:
-              print(f"{item.get('File')}:{item.get('StartLine')} rule={item.get('RuleID')}")
-          sys.exit(1 if findings else 0)
-          PY
 
+          def findings(path):
+              report = Path(path)
+              return json.loads(report.read_text()) if report.exists() else []
+
+          working = findings("gitleaks-working-tree.json")
+          history = findings("gitleaks-history.json")
+          print(f"Working-tree credential findings: {len(working)}")
+          print(f"Git-history credential findings: {len(history)}")
+          for source, items in (("working-tree", working), ("git-history", history)):
+              for item in items:
+                  print(f"{source}: {item.get('File')}:{item.get('StartLine')} rule={item.get('RuleID')}")
+          sys.exit(1 if working or history else 0)
+          PY
       - name: Run financial integrity regressions
         run: >-
           python -m pytest
