@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import json, pathlib, time, datetime
+from private_state import private_path
 
-HOME = pathlib.Path.home()
-CREDIT_LOG = HOME/"hands-off"/"logs"/"finance_credit.log"
-PLAN_LOG   = HOME/"hands-off"/"logs"/"guardrail_actions.log"
-EXT        = HOME/"hands-off"/"agents"/"external_accounts.json"
+CREDIT_LOG = private_path("logs/finance_credit.log")
+PLAN_LOG   = private_path("logs/guardrail_actions.log", create_parent=True)
+EXT        = private_path("agents/external_accounts.json")
 
 def last_json(path):
     if not path.exists(): return None
