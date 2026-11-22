@@ -219,6 +219,20 @@ class AbsoluteIdentity:
         self.signals = []
         self.score = 0.0
 
+        # Never infer an owner identity from hostnames, SSH-agent presence, or defaults.
+        if not self.profile:
+            result = {
+                "timestamp": self.verification_time.isoformat(),
+                "identity": "NOT VERIFIED - ACCESS DENIED",
+                "verified": False,
+                "confidence": 0.0,
+                "signals": ["PROFILE:missing_or_invalid"],
+                "layers_passed": 0,
+                "verdict": "UNVERIFIED",
+            }
+            self._log_verification(result)
+            return result
+
         # Run all layers
         self.score += self.verify_cryptographic()
         self.score += self.verify_infrastructure()
@@ -229,16 +243,16 @@ class AbsoluteIdentity:
 
         # Determine identity
         threshold = 0.5  # 50% required
-        is_yair = self.score >= threshold
+        is_owner = self.score >= threshold
 
         result = {
             "timestamp": self.verification_time.isoformat(),
-            "identity": "CONFIGURED OWNER" if is_yair else "NOT VERIFIED - ACCESS DENIED",
-            "verified": is_yair,
+            "identity": "CONFIGURED OWNER" if is_owner else "NOT VERIFIED - ACCESS DENIED",
+            "verified": is_owner,
             "confidence": round(self.score * 100, 1),
             "signals": self.signals,
             "layers_passed": len([s for s in self.signals if s.startswith(("CRYPTO", "INFRA"))]),
-            "verdict": "AUTHENTIC" if is_yair else "IMPOSTOR"
+            "verdict": "AUTHENTIC" if is_owner else "UNVERIFIED"
         }
 
         # Log verification
@@ -249,9 +263,15 @@ class AbsoluteIdentity:
     def _log_verification(self, result: dict):
         """Audit log all verification attempts"""
         try:
-            with open(VERIFICATION_LOG, "a") as f:
-                f.write(json.dumps(result) + "\n")
-        except:
+            VERIFICATION_LOG.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+            try:
+                VERIFICATION_LOG.parent.chmod(0o700)
+            except OSError:
+                pass
+            fd = os.open(VERIFICATION_LOG, os.O_APPEND | os.O_CREAT | os.O_WRONLY, 0o600)
+            with os.fdopen(fd, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(result) + "\n")
+        except OSError:
             pass
 
 
