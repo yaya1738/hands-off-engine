@@ -26,6 +26,7 @@ FIXED_RELATIVE_PATHS = (
     "security/yair_identity_profile.json",
     "security/yair_human_identity.json",
     "security/verification_audit.jsonl",
+    "state/private_finance_hub.json",
     "state/optimal_trigger_config.json",
     "state/filler_actions.jsonl",
 )
@@ -77,7 +78,8 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
     for relative in FIXED_RELATIVE_PATHS:
         source = source_root / relative
         if source.is_file():
-            candidates[source] = (Path(relative), "repo")
+            destination_relative = Path("finance/private_finance_hub.json") if relative == "state/private_finance_hub.json" else Path(relative)
+            candidates[source] = (destination_relative, "repo")
 
     for state_dir in (source_root / "state", source_root / "termux-hands-off" / "state"):
         if state_dir.is_dir():
