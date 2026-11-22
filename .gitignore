@@ -74,3 +74,25 @@ backups/
 state/
 termux-hands-off/autopilot/*.env
 termux-hands-off/autopilot/*.env.save
+
+# Termux runtime credentials — keep local and never commit
+termux-hands-off/state/auto_sources.env
+termux-hands-off/state/auto_sources.env.bak.*
+termux-hands-off/state/ifttt.env
+termux-hands-off/state/tg/bots/*.env
+
+# Personal finance records and live wallet snapshots must remain local
+finance/yair_finance_hub.json
+termux-hands-off/state/finance*.json
+termux-hands-off/state/pnl*.json
+termux-hands-off/state/crypto_holdings.json
+termux-hands-off/state/fiat_accounts.json
+termux-hands-off/state/alerts.env*
+
+# Runtime vaults, admin credentials and generated caches
+state/ai_nexus_state.json
+state/web_cache/
+termux-hands-off/agent/vault.json
+termux-hands-off/autopilot/admin.env
+termux-hands-off/autopilot/candidates.jsonl
+termux-hands-off/agent/vault.json.bak

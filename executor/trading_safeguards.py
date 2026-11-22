@@ -6,6 +6,7 @@ Implements multiple layers of safety checks before executing live trades.
 
 import os
 import json
+import math
 import requests
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -86,9 +87,15 @@ class TradingSafeguards:
         return True, f"OK - today's losses: ${today_loss:.2f} / ${self.max_daily_loss_usd:.2f}"
 
     def check_position_size(self, size_usd: float) -> tuple[bool, str]:
-        """Check if position size is within limits"""
-        if size_usd > self.max_position_usd:
-            return False, f"Position ${size_usd:.2f} exceeds max ${self.max_position_usd:.2f}"
+        """Reject non-finite and non-positive trade sizes before risk checks."""
+        try:
+            size = float(size_usd)
+        except (TypeError, ValueError):
+            return False, "Invalid position size"
+        if not math.isfinite(size) or size <= 0:
+            return False, "Position size must be a finite positive amount"
+        if size > self.max_position_usd:
+            return False, f"Position ${size:.2f} exceeds max ${self.max_position_usd:.2f}"
         return True, "OK"
 
     def check_rate_limit(self) -> tuple[bool, str]:
@@ -122,11 +129,14 @@ class TradingSafeguards:
         return True, f"OK - {recent_trades} trades in last hour"
 
     def check_wallet_balance(self, trade_size_usd: float) -> tuple[bool, str]:
-        """
-        Check if trading wallet has sufficient USDC balance for the trade.
+        """Verify both supported USDC balances; unknown data always blocks."""
+        try:
+            trade_size = float(trade_size_usd)
+        except (TypeError, ValueError):
+            return False, "Invalid trade size"
+        if not math.isfinite(trade_size) or trade_size < 0:
+            return False, "Trade size must be finite and non-negative"
 
-        Checks the funder wallet (which is where funds are held for trading).
-        """
         from dotenv import load_dotenv
         load_dotenv(Path(__file__).parent.parent / ".env.polymarket")
 
@@ -135,35 +145,33 @@ class TradingSafeguards:
             return False, "No funder address configured"
 
         try:
-            # Check USDC.e (bridged) balance - this is what Polymarket uses
-            balance = self._get_usdc_balance(funder_address, USDC_BRIDGED)
-            if balance is None:
-                return False, "Could not fetch wallet balance"
+            bridged_balance = self._get_usdc_balance(funder_address, USDC_BRIDGED)
+            if bridged_balance is None:
+                return False, "Could not verify bridged USDC balance"
 
-            # Also check native USDC in case funds are there
             native_balance = self._get_usdc_balance(funder_address, USDC_NATIVE)
-            if native_balance:
-                balance += native_balance
+            if native_balance is None:
+                return False, "Could not verify native USDC balance"
 
-            if balance < trade_size_usd:
-                # Trigger auto-pause when wallet is empty
-                if balance < 1.0:  # Less than $1 = effectively empty
-                    maybe_auto_pause(
-                        reason=f"wallet_empty_${balance:.2f}",
-                        notify=True
-                    )
-                return False, f"Insufficient balance: ${balance:.2f} < ${trade_size_usd:.2f} needed"
+            balance = float(bridged_balance) + float(native_balance)
+            if not math.isfinite(balance) or balance < 0:
+                return False, "Wallet balance response is invalid"
+
+            if balance < trade_size:
+                if balance < 1.0:
+                    maybe_auto_pause(reason=f"wallet_empty_${balance:.2f}", notify=True)
+                return False, f"Insufficient balance: ${balance:.2f} < ${trade_size:.2f} needed"
 
             return True, f"OK - balance: ${balance:.2f}"
 
         except Exception as e:
-            LOG.warning(f"Balance check failed: {e}")
-            # Fail open - don't block trading if we can't check balance
-            # The CLOB API will reject the trade anyway if insufficient funds
-            return True, f"Balance check skipped (error: {str(e)[:30]})"
+            LOG.warning(f"Balance verification failed: {e}")
+            return False, f"Wallet balance verification failed: {str(e)[:80]}"
 
     def _get_usdc_balance(self, wallet: str, contract: str) -> Optional[float]:
-        """Fetch USDC balance from Polygon RPC"""
+        """Fetch a verified USDC balance from Polygon RPC; malformed data is unknown."""
+        if not isinstance(wallet, str) or len(wallet) != 42 or not wallet.startswith("0x"):
+            return None
         data = {
             "jsonrpc": "2.0",
             "method": "eth_call",
@@ -175,13 +183,17 @@ class TradingSafeguards:
         }
         try:
             resp = requests.post(POLYGON_RPC, json=data, timeout=10)
+            resp.raise_for_status()
             result = resp.json()
-            if "result" in result and result["result"] != "0x":
-                balance_raw = int(result["result"], 16)
-                return balance_raw / 1e6  # USDC has 6 decimals
-            return 0.0
+            if not isinstance(result, dict) or result.get("error") is not None:
+                return None
+            raw = result.get("result")
+            if not isinstance(raw, str) or not raw.startswith("0x") or raw == "0x":
+                return None
+            balance = int(raw, 16) / 1e6
+            return balance if math.isfinite(balance) and balance >= 0 else None
         except Exception as e:
-            LOG.warning(f"RPC call failed: {e}")
+            LOG.warning(f"RPC balance verification failed: {e}")
             return None
 
     def check_all_safeguards(
@@ -350,41 +362,12 @@ def maybe_auto_pause(reason: str, notify: bool = True):
 
 
 def maybe_auto_resume(reason: str = "recalibration", notify: bool = True):
-    """
-    Automatically resume trading if conditions are met.
-
-    Args:
-        reason: Why trading is being resumed
-        notify: Whether to send a notification (default: True)
-    """
-    mode = load_mode()
-
-    # Already live?
-    if mode.get("live_trading_enabled", False):
-        LOG.debug(f"Auto-resume triggered but already live: {reason}")
-        return
-
-    # Resume trading
-    mode["live_trading_enabled"] = True
-    mode["reason"] = reason
-    mode["auto_paused"] = False
-    mode["last_resume"] = datetime.now(timezone.utc).isoformat()
-
-    save_mode(mode)
-
-    LOG.info(f"✅ TRADING AUTO-RESUMED: {reason}")
-
-    if notify:
-        try:
-            from notifications.telegram_notifier import send_telegram_message
-            send_telegram_message(
-                f"✅ **TRADING AUTO-RESUMED**\n\n"
-                f"Reason: {reason}\n"
-                f"Time: {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M:%S UTC')}\n\n"
-                f"Live trading is now active."
-            )
-        except Exception as e:
-            LOG.error(f"Failed to send auto-resume notification: {e}")
+    """Never auto-enable live trading; a recovery event is not execution approval."""
+    LOG.warning(
+        "Auto-resume blocked (%s): explicit governed approval and executor authority required",
+        reason,
+    )
+    return False
 
 
 def load_risk_profile() -> dict:

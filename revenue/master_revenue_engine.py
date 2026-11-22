@@ -32,65 +32,26 @@ class MasterRevenueEngine:
         self.state_dir = self.base_dir / "state"
 
     def get_polymarket_revenue_potential(self):
-        """Calculate Polymarket trading revenue potential"""
-        # Current capital
-        capital = 241.36
-
-        # With 12.7% average edge and full Kelly
-        # Expected return per trade cycle: edge * capital_deployed
-        # With 50% deployment and 4 cycles/month minimum:
-        monthly_cycles = 8  # More aggressive cycling
-        deployment_pct = 0.50
-        avg_edge = 0.127
-
-        deployed = capital * deployment_pct
-        expected_per_cycle = deployed * avg_edge
-        monthly_expected = expected_per_cycle * monthly_cycles
-
-        # Compound growth projection
-        month_1 = monthly_expected
-        capital_m1 = capital + month_1
-        month_2 = capital_m1 * deployment_pct * avg_edge * monthly_cycles
-        capital_m2 = capital_m1 + month_2
-        month_3 = capital_m2 * deployment_pct * avg_edge * monthly_cycles
-
+        """Do not forecast returns from stale balances or unverified trading edges."""
         return {
             "stream": "polymarket_trading",
-            "current_capital": capital,
-            "monthly_expected": round(monthly_expected, 2),
-            "month_1_end_capital": round(capital_m1, 2),
-            "month_2_expected": round(month_2, 2),
-            "month_3_expected": round(month_3, 2),
-            "3_month_total": round(month_1 + month_2 + month_3, 2),
-            "scaling_factor": "compounds with wins",
-            "status": "ACTIVE"
+            "current_capital": None,
+            "monthly_expected": None,
+            "status": "BLOCKED_UNVERIFIED",
+            "execution_authorized": False,
+            "reason": "No verified financial truth ledger or governed live execution path",
         }
 
     def get_signal_sales_potential(self):
-        """Calculate signal subscription revenue potential"""
-        # We have 15 high-quality crypto signals with 12.7% edge
-        # This is valuable to traders
-
-        # Pricing tiers
-        tiers = {
-            "basic": {"price": 29, "signals": 5, "target_subs": 50},
-            "pro": {"price": 99, "signals": 15, "target_subs": 20},
-            "premium": {"price": 299, "signals": 15, "extras": "live_alerts", "target_subs": 5}
-        }
-
-        monthly_potential = sum(
-            tier["price"] * tier["target_subs"]
-            for tier in tiers.values()
-        )
-
+        """Treat signal monetization as an unvalidated business hypothesis."""
         return {
             "stream": "signal_subscriptions",
-            "product": "crypto_prediction_signals",
-            "edge_offered": "12.7% avg documented edge",
-            "tiers": tiers,
-            "monthly_potential": monthly_potential,
-            "startup_cost": 0,  # Already have the signals
-            "status": "READY_TO_LAUNCH"
+            "product": "research_signals",
+            "edge_offered": "unverified",
+            "tiers": {},
+            "monthly_potential": None,
+            "status": "RESEARCH_ONLY",
+            "reason": "No independently verified track record or paying-customer evidence",
         }
 
     def get_system_licensing_potential(self):
@@ -110,8 +71,8 @@ class MasterRevenueEngine:
                 {"name": "Managed Service", "price": 199, "type": "monthly"}
             ],
             "target_customers": "crypto_traders, funds, individuals",
-            "monthly_potential": 5000,  # Conservative estimate
-            "status": "AVAILABLE"
+            "monthly_potential": None,
+            "status": "NOT_VALIDATED"
         }
 
     def get_consulting_potential(self):
@@ -124,16 +85,16 @@ class MasterRevenueEngine:
 
         return {
             "stream": "consulting",
-            "hourly_rate": 200,
-            "target_hours_month": 20,
-            "monthly_potential": 4000,
+            "hourly_rate": None,
+            "target_hours_month": None,
+            "monthly_potential": None,
             "areas": [
                 "prediction_market_strategy",
                 "ai_trading_systems",
                 "risk_management",
                 "autonomous_systems"
             ],
-            "status": "AVAILABLE"
+            "status": "OFFER_AND_CUSTOMER_VALIDATION_REQUIRED"
         }
 
     def get_alpha_research_potential(self):
@@ -145,67 +106,62 @@ class MasterRevenueEngine:
                 {"name": "Deep Dive Analysis", "price": 199, "sales": 10},
                 {"name": "Custom Research", "price": 999, "projects": 2}
             ],
-            "monthly_potential": 8880,
-            "status": "CAN_LAUNCH"
+            "monthly_potential": None,
+            "status": "RESEARCH_ONLY"
         }
 
     def generate_full_revenue_projection(self):
-        """Generate complete revenue projection"""
+        """Return evidence status, not fabricated revenue forecasts."""
         streams = [
             self.get_polymarket_revenue_potential(),
             self.get_signal_sales_potential(),
             self.get_system_licensing_potential(),
             self.get_consulting_potential(),
-            self.get_alpha_research_potential()
+            self.get_alpha_research_potential(),
         ]
-
-        total_monthly = sum(s.get("monthly_potential", 0) for s in streams)
-
         return {
             "generated_at": datetime.utcnow().isoformat() + "Z",
-            "operator": "yair_siegel",
-            "phase": "full_force_launch",
+            "phase": "validation_before_forecast",
             "streams": streams,
-            "total_monthly_potential": total_monthly,
-            "current_burn": 3280,
-            "net_monthly_potential": total_monthly - 3280,
-            "time_to_profitability": "immediate_with_execution"
+            "projection_status": "UNVERIFIED",
+            "total_monthly_potential": None,
+            "current_burn": None,
+            "net_monthly_potential": None,
+            "time_to_profitability": "unknown_until_revenue_and_costs_are_verified",
         }
 
     def get_immediate_actions(self):
-        """Get immediate revenue-generating actions"""
+        """Prioritize customer validation over speculative trading forecasts."""
         return [
             {
                 "priority": 1,
-                "action": "Execute Polymarket trades",
-                "command": "HANDS_OFF_EXECUTOR_MODE=live LIVE_TRADING_ENABLED=1 python3 scripts/run_pipeline.py",
-                "expected_revenue": "$17/cycle",
-                "time_to_revenue": "immediate"
+                "action": "Keep trading disabled until financial truth and execution controls are verified",
+                "expected_revenue": "Not forecast",
+                "time_to_revenue": "After controls and explicit approval",
             },
             {
                 "priority": 2,
-                "action": "Launch signal subscription on Gumroad/Patreon",
+                "action": "Validate a fixed-scope AI automation and reliability audit offer",
                 "steps": [
-                    "Create landing page with track record",
-                    "Set up payment (Gumroad = 5 min)",
-                    "Post to crypto Twitter/Reddit",
-                    "First subscribers within 24-48 hours"
+                    "Define one concrete deliverable and fixed scope",
+                    "Prepare an evidence-backed, anonymized case study",
+                    "Contact relevant buyers and measure paid interest",
                 ],
-                "expected_revenue": "$500-2000/month",
-                "time_to_revenue": "24-48 hours"
+                "expected_revenue": "Unknown until a customer pays",
+                "time_to_revenue": "Customer-dependent",
             },
             {
                 "priority": 3,
-                "action": "List consulting on Clarity.fm/Expert360",
-                "expected_revenue": "$200/hour",
-                "time_to_revenue": "1-2 weeks"
+                "action": "Validate demand for implementation and integration services",
+                "expected_revenue": "Unknown until a customer pays",
+                "time_to_revenue": "Customer-dependent",
             },
             {
                 "priority": 4,
-                "action": "Package and sell trading system",
-                "expected_revenue": "$499-2499 per sale",
-                "time_to_revenue": "1 week setup"
-            }
+                "action": "Keep signal products research-only until a verified track record exists",
+                "expected_revenue": "Not forecast",
+                "time_to_revenue": "After independent performance validation",
+            },
         ]
 
 
@@ -229,24 +185,26 @@ def main():
     print("-" * 70)
     for stream in projection["streams"]:
         status = stream.get("status", "unknown")
-        monthly = stream.get("monthly_potential", stream.get("monthly_expected", 0))
+        monthly = stream.get("monthly_potential", stream.get("monthly_expected"))
+        monthly_label = f"${monthly:,.0f}" if isinstance(monthly, (int, float)) else "UNVERIFIED"
         print(f"\n{stream['stream'].upper()}:")
-        print(f"  Monthly Potential: ${monthly:,.0f}")
+        print(f"  Monthly Potential: {monthly_label}")
         print(f"  Status: {status}")
 
     print()
     print("=" * 70)
     print("TOTAL PROJECTION:")
-    print(f"  Monthly Revenue Potential: ${projection['total_monthly_potential']:,}")
-    print(f"  Monthly Burn:              ${projection['current_burn']:,}")
-    print(f"  Net Monthly:               ${projection['net_monthly_potential']:,}")
+    for key, label in (("total_monthly_potential", "Monthly Revenue Potential"), ("current_burn", "Monthly Burn"), ("net_monthly_potential", "Net Monthly")):
+        value = projection[key]
+        rendered = f"${value:,.0f}" if isinstance(value, (int, float)) else "UNVERIFIED"
+        print(f"  {label}: {rendered}")
     print()
 
     print("IMMEDIATE ACTIONS:")
     print("-" * 70)
     for action in engine.get_immediate_actions():
         print(f"\n{action['priority']}. {action['action']}")
-        print(f"   Expected: {action['expected_revenue']}")
+        print(f"   Expected: {action.get('expected_revenue', 'UNVERIFIED')}")
         print(f"   Time to Revenue: {action['time_to_revenue']}")
         if "command" in action:
             print(f"   Command: {action['command']}")

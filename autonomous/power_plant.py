@@ -121,57 +121,25 @@ class Generator:
     last_generation: Optional[str] = None
 
     def generate(self, signal: Dict, fuel_amount: float) -> Dict:
-        """
-        Execute a trade based on signal.
-        Returns result with profit/loss.
-        """
-        result = {
+        """Fail closed until this legacy trade path is governed."""
+        return {
             "signal": signal,
-            "fuel_consumed": fuel_amount,
-            "profit": 0.0,
+            "fuel_requested": fuel_amount,
             "success": False,
+            "status": "blocked",
+            "execution_authorized": False,
+            "reason": "PowerPlant has no verified governed execution adapter",
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
 
-        try:
-            # Use real actuator to execute trade
-            from autonomous.actuators import ActuatorHub
-            hub = ActuatorHub()
-
-            if not hub.polymarket.trader:
-                result["error"] = "Trading not configured"
-                return result
-
-            # Execute the trade
-            trade_result = hub.trade(
-                token_id=signal.get("token_id"),
-                amount=fuel_amount,
-                side=signal.get("side", "BUY")
-            )
-
-            if "error" not in trade_result:
-                result["success"] = True
-                result["trade_id"] = trade_result.get("orderID")
-                self.trades_executed += 1
-                self.total_consumed += fuel_amount
-
-                # Profit will be realized when position resolves
-                # For now, track as pending
-                result["status"] = "pending_resolution"
-
-        except Exception as e:
-            result["error"] = str(e)
-
-        self.last_generation = datetime.now(timezone.utc).isoformat()
-        return result
-
     def record_resolution(self, profit: float):
-        """Record profit/loss when a position resolves."""
-        self.total_generated += profit
-        if profit > 0:
-            self.trades_won += 1
-        # Update output watts ($/hour based on recent performance)
-        # This is the REAL power output
+        """Reject unverified profit callbacks; never book estimates as realized cash."""
+        return {
+            "status": "blocked",
+            "accounting_mutated": False,
+            "execution_authorized": False,
+            "reason": "Verified position resolution is not integrated",
+        }
 
 
 @dataclass
@@ -265,27 +233,15 @@ class PowerPlant:
         PLANT_STATE.write_text(json.dumps(self.state, indent=2))
 
     def _sync_fuel_from_reality(self):
-        """Sync fuel tank with actual wallet balance."""
-        try:
-            # Get real balance from trading infrastructure
-            from autonomous.actuators import ActuatorHub
-            hub = ActuatorHub()
-            if hub.polymarket.trader:
-                # Get actual USDC balance
-                # This would query the wallet
-                pass
-        except:
-            pass
-
-        # Also check financial state
-        fin_file = STATE_DIR / "financial_state.json"
-        if fin_file.exists():
-            try:
-                data = json.loads(fin_file.read_text())
-                self.fuel_tank.current_level = data.get("balance", 0)
-                self.fuel_tank.pending_fuel = data.get("positions_value", 0)
-            except:
-                pass
+        """Do not treat local JSON snapshots as verified spendable wallet funds."""
+        self.fuel_tank.current_level = 0.0
+        self.fuel_tank.pending_fuel = 0.0
+        return {
+            "status": "unknown",
+            "spendable_balance": None,
+            "pending_positions": None,
+            "reason": "No verified financial truth adapter is connected",
+        }
 
     def _log_generation(self, event: Dict):
         """Log power generation event."""
@@ -346,27 +302,15 @@ class PowerPlant:
             self._save_state()
             return cycle_result
 
-        # Execute trades via generator
+        # Legacy PowerPlant has no governed execution grant. Generate blocked
+        # observations only; do not consume capital or book estimated profit.
         for signal in signals:
-            if self.fuel_tank.current_level < FUEL_PER_TRADE:
-                break
+            cycle_result["trades"].append(
+                self.generator.generate(signal, FUEL_PER_TRADE)
+            )
 
-            # Consume fuel
-            fuel = self.fuel_tank.consume(FUEL_PER_TRADE)
-
-            # Generate (execute trade)
-            trade_result = self.generator.generate(signal, fuel)
-            cycle_result["trades"].append(trade_result)
-
-        # Calculate watts (profit realized this cycle)
-        # For now, watts = expected value based on win rate
-        trades_made = len(cycle_result["trades"])
-        expected_profit = trades_made * FUEL_PER_TRADE * GENERATOR_EFFICIENCY * 0.1  # 10% profit on wins
-        cycle_result["watts_generated"] = expected_profit
-
-        # Transfer to grid
-        if expected_profit > 0:
-            self.grid.transfer(expected_profit)
+        cycle_result["watts_generated"] = 0.0
+        cycle_result["message"] = "Trading blocked: governed execution adapter is not integrated"
 
         # Update state
         self.state["cycles"] = cycle_result["cycle"]
@@ -378,29 +322,15 @@ class PowerPlant:
 
         return cycle_result
 
-    def process_resolution(self, position_id: str, profit: float):
-        """
-        Process a position resolution.
-        This is when REAL power is generated - actual profit.
-        """
-        # Record the generation
-        self.generator.record_resolution(profit)
-
-        # Refuel with profit (if positive)
-        if profit > 0:
-            self.fuel_tank.refuel(profit)
-
-            # Transfer to grid
-            self.grid.transfer(profit)
-
-        self._save_state()
-
-        self._log_generation({
-            "event": "resolution",
+    def process_resolution(self, position_id: str, profit: float) -> Dict:
+        """Reject unverified resolution callbacks; no trusted source is integrated."""
+        return {
+            "status": "blocked",
             "position_id": position_id,
-            "profit": profit,
-            "new_fuel_level": self.fuel_tank.current_level,
-        })
+            "execution_authorized": False,
+            "accounting_mutated": False,
+            "reason": "Verified position-resolution provenance and idempotency are not integrated",
+        }
 
     # ==================== DISPLAY ====================
 

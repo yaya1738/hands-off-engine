@@ -92,36 +92,12 @@ class ClaudeOptimizer:
         return context
 
     def _get_financial_state(self) -> Dict:
-        """Get current financial state."""
-        try:
-            # Try to get from polymarket state
-            poly_state = STATE_DIR / 'polymarket-model.json'
-            if poly_state.exists():
-                with open(poly_state) as f:
-                    data = json.load(f)
-                    return {
-                        "balance": data.get("balance", 0),
-                        "positions": len(data.get("positions", [])),
-                        "source": "polymarket"
-                    }
-        except:
-            pass
-
-        # Fallback to brain state
-        try:
-            brain_state = STATE_DIR / 'brain_state.json'
-            if brain_state.exists():
-                with open(brain_state) as f:
-                    data = json.load(f)
-                    return {
-                        "balance": data.get("balance", 0),
-                        "positions": data.get("active_positions", 0),
-                        "source": "brain"
-                    }
-        except:
-            pass
-
-        return {"balance": "unknown", "positions": "unknown", "source": "none"}
+        """Do not represent local cache files as verified account balances."""
+        return {
+            "balance": "unknown",
+            "positions": "unknown",
+            "source": "no_verified_financial_truth_adapter",
+        }
 
     def _get_infrastructure_state(self) -> Dict:
         """Get infrastructure state."""

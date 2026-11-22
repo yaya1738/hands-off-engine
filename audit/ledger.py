@@ -24,6 +24,11 @@ class LedgerEntry:
     metadata: Dict[str, Any]
     previous_hash: str
     current_hash: str
+    verified: bool = False
+    source_type: str = "unverified"
+    evidence_ref: Optional[str] = None
+    idempotency_key: Optional[str] = None
+    hash_version: int = 2
 
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for JSON serialization"""
@@ -62,7 +67,10 @@ class FinancialLedger:
             category="system",
             metadata={"description": "Genesis block"},
             previous_hash="0" * 64,
-            current_hash=self._compute_hash("genesis", "0" * 64, 0.0)
+            current_hash=self._compute_hash("genesis", "0" * 64, 0.0),
+            verified=False,
+            source_type="system",
+            hash_version=1,
         )
 
         with open(self.ledger_file, "w") as f:
@@ -72,6 +80,17 @@ class FinancialLedger:
         """Compute SHA-256 hash for entry"""
         data = f"{entry_id}{previous_hash}{amount}".encode()
         return hashlib.sha256(data).hexdigest()
+
+    def _compute_entry_hash(self, entry_data: Dict[str, Any]) -> str:
+        """Hash all immutable entry fields, not just amount and chain pointer."""
+        payload = {key: value for key, value in entry_data.items() if key != "current_hash"}
+        canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
+        return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+    def _idempotency_exists(self, key: Optional[str]) -> bool:
+        if not key:
+            return False
+        return any(entry.idempotency_key == key for entry in self.get_entries())
 
     def _get_last_hash(self) -> str:
         """Get hash of the last entry in the ledger"""
@@ -94,40 +113,45 @@ class FinancialLedger:
         session_id: str,
         metadata: Optional[Dict[str, Any]] = None
     ) -> LedgerEntry:
-        """
-        Record a cost
-
-        Args:
-            component: Component incurring cost (e.g., "ai.claude", "ai.openai")
-            action: Action being performed
-            amount: Cost amount (positive number)
-            session_id: Session ID
-            metadata: Additional context
-
-        Returns:
-            LedgerEntry object
-        """
+        """Record an estimated or evidenced cost without implying verification."""
+        import math
         import uuid
-        entry_id = str(uuid.uuid4())
-        previous_hash = self._get_last_hash()
-        current_hash = self._compute_hash(entry_id, previous_hash, -amount)
+
+        value = float(amount)
+        if not math.isfinite(value) or value <= 0:
+            raise ValueError("Cost amount must be finite and positive")
+        data = metadata or {}
+        verification = data.get("verification", {}) if isinstance(data, dict) else {}
+        verified = (
+            isinstance(verification, dict)
+            and verification.get("status") == "verified"
+            and bool(verification.get("source_type"))
+            and bool(verification.get("evidence_ref"))
+        )
+        idempotency_key = verification.get("idempotency_key") if verified else None
+        if self._idempotency_exists(idempotency_key):
+            raise ValueError("Duplicate financial evidence: idempotency key already recorded")
 
         entry = LedgerEntry(
-            entry_id=entry_id,
+            entry_id=str(uuid.uuid4()),
             timestamp=datetime.now(timezone.utc).isoformat(),
             session_id=session_id,
             component=component,
             action=action,
-            amount=-abs(amount),  # Costs are negative
+            amount=-abs(value),
             category="cost",
-            metadata=metadata or {},
-            previous_hash=previous_hash,
-            current_hash=current_hash
+            metadata=data,
+            previous_hash=self._get_last_hash(),
+            current_hash="",
+            verified=bool(verified),
+            source_type=verification.get("source_type", "unverified") if verified else "unverified",
+            evidence_ref=verification.get("evidence_ref") if verified else None,
+            idempotency_key=idempotency_key,
+            hash_version=2,
         )
-
-        with open(self.ledger_file, "a") as f:
-            f.write(json.dumps(entry.to_dict()) + "\n")
-
+        entry.current_hash = self._compute_entry_hash(entry.to_dict())
+        with open(self.ledger_file, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry.to_dict()) + "\n")
         return entry
 
     def add_revenue(
@@ -138,40 +162,55 @@ class FinancialLedger:
         session_id: str,
         metadata: Optional[Dict[str, Any]] = None
     ) -> LedgerEntry:
-        """
-        Record revenue
-
-        Args:
-            component: Component generating revenue (e.g., "trading.polymarket")
-            action: Action being performed
-            amount: Revenue amount (positive number)
-            session_id: Session ID
-            metadata: Additional context
-
-        Returns:
-            LedgerEntry object
-        """
+        """Record revenue only with explicit source evidence and idempotency."""
+        import math
         import uuid
-        entry_id = str(uuid.uuid4())
-        previous_hash = self._get_last_hash()
-        current_hash = self._compute_hash(entry_id, previous_hash, amount)
+
+        value = float(amount)
+        if not math.isfinite(value) or value <= 0:
+            raise ValueError("Revenue amount must be finite and positive")
+        data = metadata or {}
+        verification = data.get("verification", {}) if isinstance(data, dict) else {}
+        required = ("source_type", "evidence_ref", "idempotency_key", "verified_by", "verified_at")
+        allowed_sources = {
+            "bank_transaction",
+            "payment_processor_settlement",
+            "onchain_settlement",
+            "exchange_fill_settlement",
+            "invoice_payment",
+        }
+        if (
+            not isinstance(verification, dict)
+            or verification.get("status") != "verified"
+            or any(not isinstance(verification.get(key), str) or not verification[key].strip() for key in required)
+            or verification.get("source_type") not in allowed_sources
+        ):
+            raise ValueError(
+                "Unverified revenue blocked: provide a verified source_type, evidence_ref and idempotency_key"
+            )
+        if self._idempotency_exists(verification["idempotency_key"]):
+            raise ValueError("Duplicate financial evidence: idempotency key already recorded")
 
         entry = LedgerEntry(
-            entry_id=entry_id,
+            entry_id=str(uuid.uuid4()),
             timestamp=datetime.now(timezone.utc).isoformat(),
             session_id=session_id,
             component=component,
             action=action,
-            amount=abs(amount),  # Revenue is positive
+            amount=abs(value),
             category="revenue",
-            metadata=metadata or {},
-            previous_hash=previous_hash,
-            current_hash=current_hash
+            metadata=data,
+            previous_hash=self._get_last_hash(),
+            current_hash="",
+            verified=True,
+            source_type=verification["source_type"],
+            evidence_ref=verification["evidence_ref"],
+            idempotency_key=verification["idempotency_key"],
+            hash_version=2,
         )
-
-        with open(self.ledger_file, "a") as f:
-            f.write(json.dumps(entry.to_dict()) + "\n")
-
+        entry.current_hash = self._compute_entry_hash(entry.to_dict())
+        with open(self.ledger_file, "a", encoding="utf-8") as handle:
+            handle.write(json.dumps(entry.to_dict()) + "\n")
         return entry
 
     def get_entries(
@@ -232,11 +271,14 @@ class FinancialLedger:
             entry_data = json.loads(line.strip())
 
             # Verify hash computation
-            computed_hash = self._compute_hash(
-                entry_data["entry_id"],
-                entry_data["previous_hash"],
-                entry_data["amount"]
-            )
+            if entry_data.get("hash_version", 1) >= 2:
+                computed_hash = self._compute_entry_hash(entry_data)
+            else:
+                computed_hash = self._compute_hash(
+                    entry_data["entry_id"],
+                    entry_data["previous_hash"],
+                    entry_data["amount"]
+                )
 
             if computed_hash != entry_data["current_hash"]:
                 print(f"Hash mismatch at entry {i}")
@@ -263,15 +305,20 @@ class FinancialLedger:
         """
         entries = self.get_entries(session_id=session_id)
 
-        total_costs = sum(abs(e.amount) for e in entries if e.category == "cost")
-        total_revenue = sum(e.amount for e in entries if e.category == "revenue")
-        net_profit = total_revenue - total_costs
+        verified_costs = sum(abs(e.amount) for e in entries if e.category == "cost" and e.verified)
+        verified_revenue = sum(e.amount for e in entries if e.category == "revenue" and e.verified)
+        unverified_costs = sum(abs(e.amount) for e in entries if e.category == "cost" and not e.verified)
+        unverified_revenue = sum(e.amount for e in entries if e.category == "revenue" and not e.verified)
+        net_profit = verified_revenue - verified_costs
 
         return {
-            "total_costs": total_costs,
-            "total_revenue": total_revenue,
+            "total_costs": verified_costs,
+            "total_revenue": verified_revenue,
+            "unverified_costs": unverified_costs,
+            "unverified_revenue": unverified_revenue,
             "net_profit": net_profit,
-            "roi_percent": (net_profit / total_costs * 100) if total_costs > 0 else 0
+            "verified": not (unverified_costs or unverified_revenue),
+            "roi_percent": (net_profit / verified_costs * 100) if verified_costs > 0 else 0
         }
 
     def get_component_performance(self) -> Dict[str, Dict[str, float]]:
@@ -289,19 +336,25 @@ class FinancialLedger:
                 component_stats[entry.component] = {
                     "total_cost": 0.0,
                     "total_revenue": 0.0,
+                    "unverified_cost": 0.0,
+                    "unverified_revenue": 0.0,
                     "net_profit": 0.0,
+                    "verified": True,
                     "roi_percent": 0.0
                 }
 
             stats = component_stats[entry.component]
             if entry.category == "cost":
-                stats["total_cost"] += abs(entry.amount)
+                key = "total_cost" if entry.verified else "unverified_cost"
+                stats[key] += abs(entry.amount)
             elif entry.category == "revenue":
-                stats["total_revenue"] += entry.amount
+                key = "total_revenue" if entry.verified else "unverified_revenue"
+                stats[key] += entry.amount
 
-        # Calculate derived metrics
+        # Calculate derived metrics using verified entries only.
         for component, stats in component_stats.items():
             stats["net_profit"] = stats["total_revenue"] - stats["total_cost"]
+            stats["verified"] = stats["unverified_cost"] == 0 and stats["unverified_revenue"] == 0
             if stats["total_cost"] > 0:
                 stats["roi_percent"] = (stats["net_profit"] / stats["total_cost"]) * 100
 

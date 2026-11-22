@@ -30,7 +30,6 @@ BASE_DIR = Path(__file__).parent.parent
 SCRIPTS_DIR = BASE_DIR / 'scripts'
 AUTONOMOUS_DIR = BASE_DIR / 'autonomous'
 STATE_DIR = BASE_DIR / 'state'
-STATE_DIR.mkdir(parents=True, exist_ok=True)
 
 MASTER = "Yair Siegel"
 REGISTRY_FILE = STATE_DIR / 'script_registry.json'
@@ -92,6 +91,7 @@ class ScriptManager:
 
     def _save_registry(self):
         """Save script registry."""
+        STATE_DIR.mkdir(parents=True, exist_ok=True)
         self.registry["last_updated"] = datetime.now(timezone.utc).isoformat()
         with open(REGISTRY_FILE, 'w') as f:
             json.dump(self.registry, f, indent=2)
@@ -259,63 +259,11 @@ class ScriptManager:
             return []
 
     def run_script(self, name: str, args: List[str] = None, timeout: int = 300) -> Tuple[bool, str]:
-        """
-        Run a script by name.
-
-        Returns (success, output).
-        """
-        script = self.registry.get("scripts", {}).get(name)
-        if not script:
-            return False, f"Script '{name}' not found"
-
-        if not script.get('enabled', True):
-            return False, f"Script '{name}' is disabled"
-
-        path = script['path']
-        script_type = script['type']
-        args = args or []
-
-        # Build command
-        if script_type == 'python':
-            cmd = ['python3', path] + args
-        elif script_type == 'bash':
-            cmd = ['bash', path] + args
-        else:
-            cmd = [path] + args
-
-        start_time = datetime.now(timezone.utc)
-
-        try:
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=timeout,
-                cwd=str(BASE_DIR)
-            )
-
-            duration = (datetime.now(timezone.utc) - start_time).total_seconds()
-            success = result.returncode == 0
-            output = result.stdout + result.stderr
-
-            # Update registry
-            self.registry["scripts"][name]["last_run"] = start_time.isoformat()
-            self.registry["scripts"][name]["last_status"] = "success" if success else "failed"
-            self.registry["scripts"][name]["run_count"] = script.get('run_count', 0) + 1
-            if not success:
-                self.registry["scripts"][name]["fail_count"] = script.get('fail_count', 0) + 1
-
-            self._save_registry()
-            self._log_execution(name, "success" if success else "failed", output, duration)
-
-            return success, output
-
-        except subprocess.TimeoutExpired:
-            self._log_execution(name, "timeout", "", timeout)
-            return False, f"Script timed out after {timeout}s"
-        except Exception as e:
-            self._log_execution(name, "error", str(e))
-            return False, str(e)
+        """Fail closed; direct script execution is not an authority."""
+        return False, (
+            f"ScriptManager direct execution is disabled for '{name}'. "
+            "Route execution through FactoryAuthorityGateway."
+        )
 
     def enable_script(self, name: str) -> bool:
         """Enable a script."""
@@ -353,95 +301,12 @@ class ScriptManager:
         return False
 
     def add_cron_job(self, script_name: str, schedule: str) -> Tuple[bool, str]:
-        """
-        Add a cron job for a script.
-
-        schedule: cron expression like "*/30 * * * *"
-        """
-        script = self.registry.get("scripts", {}).get(script_name)
-        if not script:
-            return False, f"Script '{script_name}' not found"
-
-        path = script['path']
-        script_type = script['type']
-
-        # Build cron command
-        if script_type == 'python':
-            cmd = f"cd /root/hands-off-engine && python3 {path} >> /var/log/hands-off/{script_name}.log 2>&1"
-        else:
-            cmd = f"cd /root/hands-off-engine && {path} >> /var/log/hands-off/{script_name}.log 2>&1"
-
-        cron_line = f"{schedule} {cmd}"
-
-        try:
-            # Get current crontab
-            result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
-            current = result.stdout if result.returncode == 0 else ""
-
-            # Check if already exists
-            if script_name in current:
-                return False, f"Cron job for '{script_name}' already exists"
-
-            # Add new job
-            new_crontab = current.rstrip() + '\n' + cron_line + '\n'
-
-            # Install new crontab
-            process = subprocess.Popen(
-                ['crontab', '-'],
-                stdin=subprocess.PIPE,
-                text=True
-            )
-            process.communicate(input=new_crontab)
-
-            # Update registry
-            self.set_schedule(script_name, schedule)
-            self.get_cron_jobs()  # Refresh
-
-            return True, f"Added cron job: {schedule} -> {script_name}"
-
-        except Exception as e:
-            return False, str(e)
+        """Direct cron mutation is not an execution authority."""
+        return False, "Direct cron mutation is disabled; use the approved runtime/deployment authority."
 
     def remove_cron_job(self, script_name: str) -> Tuple[bool, str]:
-        """Remove a cron job for a script (with self-preservation check)."""
-        # SELF-PRESERVATION CHECK
-        try:
-            import sys
-            sys.path.insert(0, str(BASE_DIR))
-            from autonomous.self_preservation import block_self_harm
-            allowed, reason = block_self_harm("remove_cron", script_name)
-            if not allowed:
-                return False, reason
-        except Exception as e:
-            print(f"[DEBUG] Self-preservation check error: {e}")
-
-        try:
-            result = subprocess.run(['crontab', '-l'], capture_output=True, text=True)
-            if result.returncode != 0:
-                return False, "No crontab"
-
-            lines = result.stdout.split('\n')
-            new_lines = [l for l in lines if script_name not in l]
-
-            if len(new_lines) == len(lines):
-                return False, f"No cron job found for '{script_name}'"
-
-            new_crontab = '\n'.join(new_lines)
-
-            process = subprocess.Popen(
-                ['crontab', '-'],
-                stdin=subprocess.PIPE,
-                text=True
-            )
-            process.communicate(input=new_crontab)
-
-            self.set_schedule(script_name, "manual")
-            self.get_cron_jobs()
-
-            return True, f"Removed cron job for '{script_name}'"
-
-        except Exception as e:
-            return False, str(e)
+        """Direct cron mutation is not an execution authority."""
+        return False, "Direct cron mutation is disabled; use the approved runtime/deployment authority."
 
     def get_status(self) -> Dict:
         """Get script management status."""

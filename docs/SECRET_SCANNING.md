@@ -130,7 +130,7 @@ Location: Configuration files
 1. **Never commit secrets directly:**
    ```python
    # ❌ BAD
-   API_KEY = "sk-abc123xyz789"
+   API_KEY = "<REDACTED_EXAMPLE_ONLY>"
    
    # ✅ GOOD
    import os

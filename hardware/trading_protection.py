@@ -457,43 +457,12 @@ class TradingProtectionManager:
         print("🚨 EMERGENCY HALT ACTIVATED")
 
     def resume_trading(self, reason: str = "manual_resume") -> bool:
-        """
-        Resume trading after protection action.
-
-        Args:
-            reason: Reason for resuming
-
-        Returns:
-            True if successfully resumed
-        """
-        try:
-            # Remove all protection flags
-            for flag_file in ["throttle_active", "trading_paused", "shutdown_requested", "emergency_halt"]:
-                flag_path = self.state_path / flag_file
-                if flag_path.exists():
-                    flag_path.unlink()
-
-            self.current_status = TradingStatus.ACTIVE
-
-            # Record resume event
-            event = ProtectionEvent(
-                event_id=f"resume_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}",
-                timestamp=datetime.utcnow(),
-                action=ProtectionAction.NONE,
-                reason=reason,
-                triggered_by="manual",
-                affected_systems=[p.system_name for p in self.protections],
-                outcome="resumed"
-            )
-            self.protection_events.append(event)
-            self._save_event(event)
-
-            print("✅ Trading resumed")
-            return True
-
-        except Exception as e:
-            print(f"❌ Failed to resume trading: {e}")
-            return False
+        """Never clear protection flags without explicit governed approval."""
+        print(
+            "⛔ Trading resume blocked: protection flags remain active until "
+            "a governed approval and executor authority are verified."
+        )
+        return False
 
     def schedule_maintenance(
         self,

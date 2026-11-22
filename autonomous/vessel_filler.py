@@ -127,76 +127,22 @@ class VesselFiller:
     # ==================== ACTION IMPLEMENTATIONS ====================
 
     def _action_wait_positions(self) -> Dict:
-        """Monitor position resolution."""
-        result = {"action": "wait_positions", "status": "monitoring"}
-
-        try:
-            # Check financial state for position status
-            fin_file = STATE_DIR / "financial_state.json"
-            if fin_file.exists():
-                data = json.loads(fin_file.read_text())
-                positions = data.get("positions", [])
-
-                for pos in positions:
-                    result["position"] = pos.get("id")
-                    result["value"] = pos.get("value")
-                    result["resolution_date"] = pos.get("resolution_date")
-
-                    # Calculate days until resolution
-                    if pos.get("resolution_date"):
-                        try:
-                            res_date = datetime.fromisoformat(pos["resolution_date"])
-                            now = datetime.now(timezone.utc)
-                            days = (res_date - now).days
-                            result["days_until"] = days
-                        except:
-                            result["days_until"] = "unknown"
-
-            result["status"] = "waiting"
-            result["message"] = "Position will auto-deposit to vessel on resolution"
-
-        except Exception as e:
-            result["error"] = str(e)
-
-        return result
+        """Do not claim automatic settlement from an unverified local snapshot."""
+        return {
+            "action": "wait_positions",
+            "status": "blocked",
+            "message": "Position status and settlement require verified exchange data",
+            "automatic_deposit": False,
+        }
 
     def _action_micro_trade(self) -> Dict:
-        """Execute a micro-trade with available balance."""
-        result = {"action": "micro_trade", "status": "checking"}
-
-        try:
-            # Check if we have enough for minimum trade
-            fin_file = STATE_DIR / "financial_state.json"
-            if fin_file.exists():
-                data = json.loads(fin_file.read_text())
-                balance = data.get("balance", 0)
-
-                if balance < 5:
-                    result["status"] = "insufficient"
-                    result["message"] = f"Need $5 minimum, have ${balance}"
-                    return result
-
-                # Get best trading signal
-                signal_file = STATE_DIR / "trading_signals.json"
-                if signal_file.exists():
-                    signals = json.loads(signal_file.read_text())
-                    if signals.get("signals"):
-                        best = signals["signals"][0]
-                        result["signal"] = best
-                        result["status"] = "ready"
-                        result["message"] = f"Ready to trade ${balance} on: {best.get('market', 'unknown')}"
-
-                        # Actually execute if conditions met
-                        # This would call the actuator
-                        result["execution"] = "Requires confirmation to execute"
-                else:
-                    result["status"] = "no_signals"
-                    result["message"] = "No trading signals available"
-
-        except Exception as e:
-            result["error"] = str(e)
-
-        return result
+        """Legacy micro-trading cannot size from an unverified balance cache."""
+        return {
+            "action": "micro_trade",
+            "status": "blocked",
+            "execution_authorized": False,
+            "reason": "No verified wallet balance or governed execution grant is connected",
+        }
 
     def _action_setup_telegram_bot(self) -> Dict:
         """Create a Telegram bot for signal delivery."""

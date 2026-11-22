@@ -185,32 +185,9 @@ class FuelDetector:
         return deposits
 
     def scan_positions(self) -> List[FuelDeposit]:
-        """Scan for pending position resolutions."""
-        deposits = []
+        """Do not convert unverified cached positions into spendable fuel."""
+        return []
 
-        # Check trading positions
-        try:
-            fin_file = STATE_DIR / "financial_state.json"
-            if fin_file.exists():
-                data = json.loads(fin_file.read_text())
-                positions = data.get("positions", [])
-
-                for pos in positions:
-                    deposit = FuelDeposit(
-                        deposit_id=f"position_{pos.get('id', 'unknown')}",
-                        fuel_type=FuelType.POSITION,
-                        estimated_amount=pos.get("value", 0),
-                        location="Polymarket",
-                        extraction_difficulty="easy",  # Just wait for resolution
-                        confidence=0.8,  # High confidence - just timing unknown
-                        detected_at=datetime.now(timezone.utc).isoformat(),
-                        expires_at=pos.get("resolution_date"),
-                    )
-                    deposits.append(deposit)
-        except:
-            pass
-
-        return deposits
 
     def full_scan(self) -> List[FuelDeposit]:
         """Run full fuel detection scan."""
@@ -440,42 +417,32 @@ class FuelSystem:
         return result
 
     def get_fuel_status(self) -> Dict:
-        """Get current fuel status across all sources."""
-
-        # Current liquid fuel (in tank)
-        try:
-            fin_file = STATE_DIR / "financial_state.json"
-            if fin_file.exists():
-                fin = json.loads(fin_file.read_text())
-                liquid = fin.get("balance", 0)
-                pending = fin.get("positions_value", 0)
-            else:
-                liquid = 0
-                pending = 0
-        except:
-            liquid = 0
-            pending = 0
-
-        # Detected deposits
-        deposits = self.state.get("detected_deposits", [])
-
-        status = {
-            "liquid_fuel": liquid,  # Available now
-            "pending_fuel": pending,  # From positions
+        """Report opportunities separately; local finance caches are not wallet truth."""
+        deposits = [
+            item for item in self.state.get("detected_deposits", [])
+            if item.get("fuel_type") != FuelType.POSITION.value
+        ]
+        return {
+            "liquid_fuel": 0.0,
+            "pending_fuel": 0.0,
+            "financial_status": "unknown",
+            "balance_source": "no_verified_financial_truth_adapter",
             "detected_deposits": len(deposits),
             "total_detected": sum(d.get("estimated_amount", 0) for d in deposits),
-            "by_type": {},
+            "by_type": self._group_deposits_by_type(deposits),
         }
 
-        # Group by fuel type
-        for d in deposits:
-            ft = d.get("fuel_type", "unknown")
-            if ft not in status["by_type"]:
-                status["by_type"][ft] = {"count": 0, "total": 0}
-            status["by_type"][ft]["count"] += 1
-            status["by_type"][ft]["total"] += d.get("estimated_amount", 0)
+    @staticmethod
+    def _group_deposits_by_type(deposits: List[Dict]) -> Dict:
+        grouped = {}
+        for deposit in deposits:
+            fuel_type = deposit.get("fuel_type", "unknown")
+            if fuel_type not in grouped:
+                grouped[fuel_type] = {"count": 0, "total": 0.0}
+            grouped[fuel_type]["count"] += 1
+            grouped[fuel_type]["total"] += deposit.get("estimated_amount", 0.0)
+        return grouped
 
-        return status
 
     def display(self):
         """Display fuel system status."""
@@ -484,12 +451,12 @@ class FuelSystem:
         print("\n⛽ FUEL SYSTEM STATUS")
         print("=" * 60)
 
-        # Current fuel
-        print(f"\n💧 LIQUID FUEL (Ready to Use)")
-        print(f"   USDC Balance: ${status['liquid_fuel']:.2f}")
+        # Local financial snapshots are deliberately not treated as current funds.
+        print(f"\n💧 LIQUID FUEL")
+        print("   USDC Balance: UNKNOWN (no verified wallet adapter)")
 
-        print(f"\n📦 PENDING FUEL (Extracting)")
-        print(f"   Position Resolutions: ${status['pending_fuel']:.2f}")
+        print(f"\n📦 PENDING FUEL")
+        print("   Position Resolutions: UNKNOWN (unverified positions are excluded)")
 
         # Detected deposits
         print(f"\n🔍 DETECTED DEPOSITS ({status['detected_deposits']} found)")
@@ -497,11 +464,14 @@ class FuelSystem:
             print(f"   {fuel_type}: {info['count']} sources, ${info['total']:.2f} estimated")
 
         print(f"\n📊 TOTALS")
-        print(f"   Total Detected: ${status['total_detected']:.2f}")
-        print(f"   Total Available: ${status['liquid_fuel'] + status['pending_fuel']:.2f}")
+        print(f"   Opportunity Estimates: ${status['total_detected']:.2f}")
+        print("   Verified Spendable Funds: UNKNOWN")
 
         # Predictions
-        deposits = [FuelDeposit(**d) for d in self.state.get("detected_deposits", [])]
+        deposits = [
+            FuelDeposit(**d) for d in self.state.get("detected_deposits", [])
+            if d.get("fuel_type") != FuelType.POSITION.value
+        ]
         if deposits:
             predictions = self.predictor.predict_availability(deposits)
             print(f"\n🔮 FUEL PREDICTIONS")

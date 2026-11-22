@@ -13,12 +13,13 @@ Sources:
 
 import os
 import json
+import hashlib
 import requests
 from datetime import datetime
 from pathlib import Path
 
 FINANCE_DIR = Path(__file__).parent.parent
-HUB_PATH = FINANCE_DIR / "yair_finance_hub.json"
+HUB_PATH = Path(__file__).resolve().parents[2] / "state" / "private_finance_hub.json"
 
 class FreeAggregator:
     """Zero-cost financial data aggregation"""
@@ -33,7 +34,8 @@ class FreeAggregator:
         return {}
     
     def _save_hub(self):
-        self.hub["last_updated"] = datetime.utcnow().isoformat() + "Z"
+        HUB_PATH.parent.mkdir(parents=True, exist_ok=True)
+        self.hub["last_updated"] = datetime.now().astimezone().isoformat()
         with open(HUB_PATH, 'w') as f:
             json.dump(self.hub, f, indent=2)
     
@@ -41,30 +43,53 @@ class FreeAggregator:
     # POLYMARKET - FREE via blockchain RPC
     # ═══════════════════════════════════════════════════════════
     def fetch_polymarket(self, wallet_address):
-        """Fetch USDC balance from Polygon - completely free"""
-        usdc_contract = "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174"
-        rpc_url = "https://polygon-rpc.com"
-        
-        data = {
-            "jsonrpc": "2.0",
-            "method": "eth_call",
-            "params": [{
-                "to": usdc_contract,
-                "data": f"0x70a08231000000000000000000000000{wallet_address[2:].lower()}"
-            }, "latest"],
-            "id": 1
+        """Fetch both supported USDC contracts; partial data is never a total."""
+        from finance.refresh_balances import (
+            USDC_BRIDGED,
+            USDC_NATIVE,
+            get_erc20_balance,
+            get_native_balance,
+            get_chain_id,
+            POLYGON_CHAIN_ID,
+        )
+
+        chain_id = get_chain_id()
+        if chain_id == POLYGON_CHAIN_ID:
+            bridged = get_erc20_balance(wallet_address, USDC_BRIDGED)
+            native = get_erc20_balance(wallet_address, USDC_NATIVE)
+            gas = get_native_balance(wallet_address)
+        else:
+            bridged = native = gas = None
+        complete = chain_id == POLYGON_CHAIN_ID and bridged is not None and native is not None
+        observed_at = datetime.now().astimezone().isoformat()
+
+        proof = {
+            "status": "verified" if complete else "partial",
+            "source": "polygon_rpc",
+            "chain": "polygon",
+            "chain_id": chain_id,
+            "wallet_fingerprint": hashlib.sha256(wallet_address.lower().encode("ascii")).hexdigest(),
+            "observed_at": observed_at,
+            "tokens": {
+                "usdc_bridged": {
+                    "contract": USDC_BRIDGED,
+                    "balance": bridged,
+                    "status": "verified" if bridged is not None else "unknown",
+                },
+                "usdc_native": {
+                    "contract": USDC_NATIVE,
+                    "balance": native,
+                    "status": "verified" if native is not None else "unknown",
+                },
+            },
         }
-        
-        try:
-            resp = requests.post(rpc_url, json=data, timeout=10)
-            result = resp.json()
-            if "result" in result and result["result"] != "0x":
-                balance = int(result["result"], 16) / 1e6
-                return {"balance_usdc": balance, "status": "success"}
-        except Exception as e:
-            return {"error": str(e), "status": "failed"}
-        return {"error": "unknown", "status": "failed"}
-    
+        return {
+            "balance_usdc": bridged + native if complete else None,
+            "balance_matic": gas,
+            "balance_verification": proof,
+            "status": proof["status"],
+        }
+
     # ═══════════════════════════════════════════════════════════
     # ROBINHOOD - FREE via robin_stocks (unofficial)
     # ═══════════════════════════════════════════════════════════
@@ -251,18 +276,34 @@ class FreeAggregator:
     # REFRESH ALL
     # ═══════════════════════════════════════════════════════════
     def refresh_all(self):
-        """Refresh all available data sources"""
+        """Refresh supported sources without promoting partial data to balances."""
         results = {}
-        
-        # Polymarket (always works - public blockchain)
-        pm_wallet = self.hub.get("accounts", {}).get("polymarket", {}).get("wallet_address")
-        if pm_wallet:
-            pm_result = self.fetch_polymarket(pm_wallet)
-            if pm_result.get("status") == "success":
-                self.hub["accounts"]["polymarket"]["balance_usdc"] = pm_result["balance_usdc"]
-                self.hub["accounts"]["polymarket"]["last_updated"] = datetime.utcnow().isoformat() + "Z"
-            results["polymarket"] = pm_result
-        
+        try:
+            from dotenv import load_dotenv
+            load_dotenv(Path(__file__).resolve().parents[2] / ".env.polymarket", override=False)
+        except ImportError:
+            pass
+        wallet = os.getenv("POLYMARKET_FUNDER_ADDRESS")
+        self.hub.setdefault("accounts", {})
+        account = self.hub["accounts"].setdefault("polymarket", {})
+        account.pop("wallet_address", None)
+        if wallet:
+            result = self.fetch_polymarket(wallet)
+            account["balance_verification"] = result["balance_verification"]
+            account["balance_status"] = result["status"]
+            if result["status"] == "verified":
+                account["balance_usdc"] = result["balance_usdc"]
+                account["last_updated"] = result["balance_verification"]["observed_at"]
+            if result["balance_matic"] is not None:
+                account["balance_matic"] = result["balance_matic"]
+            results["polymarket"] = result
+        else:
+            results["polymarket"] = {
+                "status": "unknown",
+                "balance_usdc": None,
+                "reason": "POLYMARKET_FUNDER_ADDRESS is not configured",
+            }
+
         self._save_hub()
         return results
 
