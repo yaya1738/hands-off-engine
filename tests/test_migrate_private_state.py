@@ -308,3 +308,20 @@ def test_mirror_passphrase_is_preserved_but_not_copied_into_archive_payload_tree
 
     assert (destination / "secrets" / "mirror_passphrase.txt").read_text(encoding="utf-8") == passphrase.read_text(encoding="utf-8")
     assert not (destination / "secrets" / "legacy_config" / "hands-off" / "enc_passphrase.txt").exists()
+
+
+
+def test_migration_preserves_entire_root_state_tree_and_maps_finance_hub_once(tmp_path):
+    source = tmp_path / "repo"
+    destination = tmp_path / "private"
+    financial_state = source / "state" / "financial_state.json"
+    private_hub = source / "state" / "private_finance_hub.json"
+    financial_state.parent.mkdir(parents=True)
+    financial_state.write_text('{"status":"private"}', encoding="utf-8")
+    private_hub.write_text('{"accounts":{}}', encoding="utf-8")
+
+    migrate(source, destination)
+
+    assert (destination / "state" / "financial_state.json").exists()
+    assert (destination / "finance" / "private_finance_hub.json").exists()
+    assert not (destination / "state" / "private_finance_hub.json").exists()
