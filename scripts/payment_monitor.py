@@ -19,8 +19,12 @@ except ImportError:
 
 import os
 import json
+import math
+import tempfile
+import fcntl
 import requests
 from datetime import datetime, timezone
+from contextlib import contextmanager
 from pathlib import Path
 
 WALLET = "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D"
@@ -79,22 +83,93 @@ def send_telegram(message: str):
         print(f"Telegram error: {e}")
 
 
-def load_state() -> dict:
+@contextmanager
+def _state_locked():
+    """Serialize payment-state read/modify/write across concurrent processes."""
+    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = STATE_FILE.with_suffix(STATE_FILE.suffix + ".lock")
+    with open(lock_path, "a", encoding="utf-8") as handle:
+        fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
+
+
+def _read_state_unlocked() -> dict:
     if STATE_FILE.exists():
-        return json.load(open(STATE_FILE))
-    return {"last_balance": 0.0, "last_check": None, "payments": []}
+        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        if not isinstance(state, dict) or not isinstance(state.get("payments", []), list):
+            raise ValueError("Payment monitor state is malformed; refusing to reset it")
+        return state
+    return {"last_balance": None, "last_check": None, "payments": []}
+
+
+def _write_state_unlocked(state: dict):
+    fd, temp_name = tempfile.mkstemp(
+        prefix=STATE_FILE.name + ".",
+        suffix=".tmp",
+        dir=str(STATE_FILE.parent),
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(state, handle, indent=2, default=str)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_name, STATE_FILE)
+        dir_fd = os.open(str(STATE_FILE.parent), os.O_RDONLY)
+        try:
+            os.fsync(dir_fd)
+        finally:
+            os.close(dir_fd)
+    except Exception:
+        try:
+            os.unlink(temp_name)
+        except FileNotFoundError:
+            pass
+        raise
+
+
+def load_state() -> dict:
+    with _state_locked():
+        return _read_state_unlocked()
 
 
 def save_state(state: dict):
-    STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(STATE_FILE, 'w') as f:
-        json.dump(state, f, indent=2, default=str)
+    with _state_locked():
+        _write_state_unlocked(state)
+
+
+def record_balance_observation(total: float, now: datetime) -> tuple[dict, float | None, dict | None]:
+    """Commit a verified observation and payment event once under the state lock."""
+    if not math.isfinite(total) or total < 0:
+        raise ValueError("Observed balance must be finite and non-negative")
+    with _state_locked():
+        state = _read_state_unlocked()
+        previous = state.get("last_balance")
+        if previous is not None:
+            if isinstance(previous, bool) or not isinstance(previous, (int, float)) or not math.isfinite(previous) or previous < 0:
+                raise ValueError("Stored payment balance is invalid; refusing to overwrite it")
+            increase = total - float(previous)
+        else:
+            increase = 0.0
+        payment = None
+        if previous is not None and increase >= 10:
+            payment = {
+                "timestamp": now.isoformat(),
+                "amount": increase,
+                "previous_balance": float(previous),
+                "new_balance": total,
+            }
+            state.setdefault("payments", []).append(payment)
+        state["last_balance"] = total
+        state["last_check"] = now.isoformat()
+        _write_state_unlocked(state)
+        return state, (float(previous) if previous is not None else None), payment
 
 
 def main():
-    state = load_state()
-
-    # Get current balances
+    # Fetch both balances before touching local state.
     native = get_token_balance(WALLET, USDC_CONTRACT)
     bridged = get_token_balance(WALLET, USDC_BRIDGED)
     if native is None or bridged is None:
@@ -102,36 +177,24 @@ def main():
         return {"status": "unknown", "balance_usdc": None}
 
     total = native + bridged
-    previous = state.get("last_balance", 0.0)
     now = datetime.now(timezone.utc)
+    state, previous, payment = record_balance_observation(total, now)
 
     print(f"[{now.isoformat()}] USDC Balance: ${total:.2f} (native: ${native:.2f}, bridged: ${bridged:.2f})")
-    print(f"  Previous: ${previous:.2f}")
+    print(f"  Previous: {'uninitialized' if previous is None else f'${previous:.2f}'}")
 
-    # Check for significant increase (payment received)
-    increase = total - previous
-    if increase >= 10:  # $10+ increase = likely payment
-        payment = {
-            "timestamp": now.isoformat(),
-            "amount": increase,
-            "previous_balance": previous,
-            "new_balance": total
-        }
-        state["payments"].append(payment)
-
+    if payment:
+        increase = payment["amount"]
         send_telegram(
-            f"*💵 PAYMENT RECEIVED*\n\n"
-            f"Amount: +${increase:.2f}\n"
-            f"New Balance: ${total:.2f}\n"
-            f"Time: {now.strftime('%Y-%m-%d %H:%M UTC')}\n\n"
+            f"*💵 PAYMENT RECEIVED*\\n\\n"
+            f"Amount: +${increase:.2f}\\n"
+            f"New Balance: ${total:.2f}\\n"
+            f"Time: {now.strftime('%Y-%m-%d %H:%M UTC')}\\n\\n"
             f"_Check for client correspondence!_"
         )
-
         print(f"  [ALERT] Payment detected: +${increase:.2f}")
 
-    state["last_balance"] = total
-    state["last_check"] = now.isoformat()
-    save_state(state)
+    return {"status": "verified", "balance_usdc": total, "payment": payment}
 
 
 if __name__ == "__main__":
