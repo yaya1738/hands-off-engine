@@ -100,32 +100,8 @@ class PolymarketTrader:
         side: Side,
         order_type: OrderType = OrderType.FOK,
     ) -> Dict[str, Any]:
-        """
-        Place market order by USD amount.
-
-        Args:
-            token_id: Conditional token ID from Polymarket
-            usd_amount: Dollar amount to spend/receive
-            side: "BUY" or "SELL"
-            order_type: FOK (fill-or-kill) or GTC (good-til-cancel)
-
-        Returns:
-            API response dict with order details
-        """
-        mo = MarketOrderArgs(
-            token_id=token_id,
-            amount=usd_amount,
-            side=self._side_const(side),
-            order_type=order_type,
-        )
-        signed = self.client.create_market_order(mo)
-        resp = self.client.post_order(signed, order_type)
-
-        self.logger.info(
-            "Placed market order: %s %s $%.2f on token %s",
-            side, order_type if isinstance(order_type, str) else order_type.value, usd_amount, token_id
-        )
-        return resp
+        """Block direct CLOB order submission until a governed adapter exists."""
+        return self._blocked_mutation("market order submission")
 
     def place_limit_order(
         self,
@@ -135,33 +111,8 @@ class PolymarketTrader:
         side: Side,
         order_type: OrderType = OrderType.GTC,
     ) -> Dict[str, Any]:
-        """
-        Place limit order.
-
-        Args:
-            token_id: Conditional token ID from Polymarket
-            price: Limit price in [0, 1]
-            size: Number of shares
-            side: "BUY" or "SELL"
-            order_type: GTC (good-til-cancel) or FOK (fill-or-kill)
-
-        Returns:
-            API response dict with order details
-        """
-        order = OrderArgs(
-            token_id=token_id,
-            price=price,
-            size=size,
-            side=self._side_const(side),
-        )
-        signed = self.client.create_order(order)
-        resp = self.client.post_order(signed, order_type)
-
-        self.logger.info(
-            "Placed limit order: %s %.2f shares @ %.4f on token %s",
-            side, size, price, token_id
-        )
-        return resp
+        """Block direct CLOB order submission until a governed adapter exists."""
+        return self._blocked_mutation("limit order submission")
 
     def get_open_orders(self) -> list:
         """Get all open orders for this account"""
@@ -171,10 +122,20 @@ class PolymarketTrader:
         """Get trade history for this account"""
         return self.client.get_trades()
 
+    @staticmethod
+    def _blocked_mutation(action: str) -> Dict[str, Any]:
+        """Return a fail-closed result without making a CLOB mutation request."""
+        return {
+            "status": "blocked",
+            "execution_authorized": False,
+            "blocked_by": "governed_execution",
+            "error": f"Direct Polymarket {action} is disabled; no governed execution adapter is enabled.",
+        }
+
     def cancel_order(self, order_id: str) -> Dict[str, Any]:
-        """Cancel an open order"""
-        return self.client.cancel(order_id)
+        """Block direct order cancellation pending governed authorization."""
+        return self._blocked_mutation("order cancellation")
 
     def cancel_all_orders(self) -> Dict[str, Any]:
-        """Cancel all open orders"""
-        return self.client.cancel_all()
+        """Block direct bulk cancellation pending governed authorization."""
+        return self._blocked_mutation("bulk order cancellation")
