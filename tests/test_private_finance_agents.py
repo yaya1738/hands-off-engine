@@ -143,3 +143,47 @@ def test_manual_external_account_metadata_is_never_summed_into_net_worth(tmp_pat
     assert snapshot["usd_total_raw"] is None
     assert snapshot["usd_total"] is None
     assert snapshot["status"] == "partial_unknown"
+
+
+
+def test_finance_vault_importer_writes_only_to_private_secrets_directory(tmp_path):
+    env = os.environ.copy()
+    env["HANDS_OFF_PRIVATE_DIR"] = str(tmp_path / "private")
+    env.pop("OKX_API_KEY", None)
+    env.pop("OKX_API_SECRET", None)
+    env.pop("OKX_API_PASSPHRASE", None)
+    env.pop("KRAKEN_API_KEY", None)
+    env.pop("KRAKEN_API_SECRET", None)
+    result = subprocess.run(
+        [sys.executable, str(AGENTS / "finance_vault_from_any.py")],
+        capture_output=True,
+        text=True,
+        timeout=10,
+        env=env,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    vault = tmp_path / "private" / "secrets" / "vault.json"
+    data = json.loads(vault.read_text(encoding="utf-8"))
+    assert all(value == "" for value in data.values())
+    assert vault.stat().st_mode & 0o777 == 0o600
+    assert "private" in result.stdout.lower()
+
+
+def test_legacy_finance_watcher_reads_only_migrated_private_runtime_state(tmp_path, monkeypatch):
+    private_root = tmp_path / "private"
+    monkeypatch.setenv("HANDS_OFF_PRIVATE_DIR", str(private_root))
+    agent_dir = str(Path("termux-hands-off/agent").resolve())
+    if agent_dir not in sys.path:
+        sys.path.insert(0, agent_dir)
+    spec = importlib.util.spec_from_file_location(
+        "private_legacy_finance_watcher_test",
+        Path("termux-hands-off/agent/finance_watcher.py"),
+    )
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    assert module.STATE == str(private_root / "legacy_runtime" / "state")
+    assert module.AGENT == str(private_root / "legacy_runtime" / "agent")
+    assert module.LOGDIR == str(private_root / "logs")
