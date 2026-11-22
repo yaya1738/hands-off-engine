@@ -152,3 +152,31 @@ def test_legacy_runtime_recursive_finance_history_is_preserved(tmp_path):
 
     assert (destination / "legacy_runtime" / "data" / "finances" / "snapshots" / "old.json").exists()
     assert (destination / "legacy_runtime" / "logs" / "finance_balances.log").exists()
+
+
+
+def test_migration_preserves_local_polymarket_env_only_under_private_secrets(tmp_path):
+    source = tmp_path / "repo"
+    destination = tmp_path / "private"
+    env_file = source / ".env.polymarket"
+    env_file.write_text("POLYMARKET_PRIVATE_KEY=placeholder\n", encoding="utf-8")
+
+    result = migrate(source, destination)
+
+    private_copy = destination / "secrets" / ".env.polymarket"
+    assert private_copy.read_text(encoding="utf-8") == env_file.read_text(encoding="utf-8")
+    assert private_copy.stat().st_mode & 0o777 == 0o600
+    assert result["files"][0]["destination"] == "secrets/.env.polymarket"
+
+
+def test_migration_preserves_autopilot_admin_environment(tmp_path):
+    source = tmp_path / "repo"
+    destination = tmp_path / "private"
+    admin_env = source / "termux-hands-off" / "autopilot" / "admin.env"
+    admin_env.parent.mkdir(parents=True)
+    admin_env.write_text("ADMIN_TOKEN=placeholder\n", encoding="utf-8")
+
+    migrate(source, destination)
+
+    private_copy = destination / "termux-hands-off" / "autopilot" / "admin.env"
+    assert private_copy.read_text(encoding="utf-8") == admin_env.read_text(encoding="utf-8")
