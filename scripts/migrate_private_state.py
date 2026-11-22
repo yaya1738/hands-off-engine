@@ -153,7 +153,13 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
             for relative_text in LEGACY_RUNTIME_PATHS:
                 source = legacy_runtime_root / relative_text
                 if source.is_file():
-                    candidates[source] = (Path("legacy_runtime") / relative_text, "legacy_runtime")
+                    if relative_text == "agent/vault.json":
+                        destination_relative = Path("secrets/termux-agent-vault.json")
+                    elif relative_text == "agent/vault.json.bak":
+                        destination_relative = Path("secrets/termux-agent-vault.json.bak")
+                    else:
+                        destination_relative = Path("legacy_runtime") / relative_text
+                    candidates[source] = (destination_relative, "legacy_runtime")
             for directory_text in ("state", "logs", "data/finances", "security", "finance", "autopilot"):
                 directory = legacy_runtime_root / directory_text
                 if directory.is_dir():
@@ -163,7 +169,7 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None, 
                             candidates[source] = (relative, "legacy_runtime")
             env_file = legacy_runtime_root / ".env.polymarket"
             if env_file.is_file():
-                candidates[env_file] = (Path("legacy_runtime/secrets/.env.polymarket"), "legacy_runtime")
+                candidates[env_file] = (Path("secrets/.env.polymarket"), "legacy_runtime")
             archive = legacy_runtime_root / "security_snapshot.tar"
             if archive.is_file():
                 candidates[archive] = (Path("backups/security_snapshot-legacy.tar"), "legacy_runtime")
