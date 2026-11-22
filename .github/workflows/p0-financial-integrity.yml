@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix/p0-financial-integrity-20261122
+      - fix/financial-integrity-concurrency-20261122
   pull_request:
     branches:
       - fix/hardware-cleanup-approval-20261115
