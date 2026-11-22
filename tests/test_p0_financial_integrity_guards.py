@@ -741,7 +741,10 @@ def test_balance_refresh_records_complete_provenance_without_network(tmp_path, m
     wallet = "0x" + "e" * 40
     monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", wallet)
     hub_path = tmp_path / "hub.json"
-    hub_path.write_text(json.dumps({"accounts": {"polymarket": {"balance_usdc": 777.0}}}))
+    hub_path.write_text(json.dumps({"accounts": {
+        "polymarket": {"balance_usdc": 777.0},
+        "unrelated": {"balance_usd": 33.0},
+    }}))
     monkeypatch.setattr(refresh_balances, "FINANCE_HUB", hub_path)
     monkeypatch.setattr(refresh_balances, "get_chain_id", lambda: 137)
     monkeypatch.setattr(refresh_balances, "get_erc20_balance", lambda address, contract: 3.0 if contract == refresh_balances.USDC_BRIDGED else 7.0)
@@ -755,6 +758,7 @@ def test_balance_refresh_records_complete_provenance_without_network(tmp_path, m
     assert updated["accounts"]["polymarket"]["balance_verification"]["status"] == "verified"
     assert updated["accounts"]["polymarket"]["balance_verification"]["source"] == "polygon_rpc"
     assert "wallet_address" not in updated["accounts"]["polymarket"]
+    assert updated["accounts"]["unrelated"]["balance_usd"] == 33.0
 
 
 def test_balance_refresh_partial_rpc_never_promotes_old_balance(tmp_path, monkeypatch):
@@ -1039,3 +1043,54 @@ def test_ledger_idempotency_is_checked_inside_append_lock(tmp_path):
         raise AssertionError("duplicate evidence must be rejected")
     assert len(ledger.get_entries()) == 1
     assert ledger.verify_integrity() is True
+
+
+def test_finance_hub_concurrent_account_updates_do_not_lose_data(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from finance.hub_store import load_hub, update_account
+
+    path = tmp_path / "private_finance_hub.json"
+
+    def update(index):
+        return update_account(
+            path,
+            f"account-{index}",
+            {"observed_value": index},
+            top_level_updates={"writer_timestamp": str(index)},
+        )
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(update, range(24)))
+
+    hub = load_hub(path)
+    assert len(hub["accounts"]) == 24
+    for index in range(24):
+        assert hub["accounts"][f"account-{index}"]["observed_value"] == index
+
+
+def test_aggregator_merges_delta_into_latest_finance_hub(tmp_path, monkeypatch):
+    from finance.aggregators import free_stack
+    from finance.hub_store import update_account
+
+    path = tmp_path / "private_finance_hub.json"
+    monkeypatch.setattr(free_stack, "HUB_PATH", path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "1" * 40)
+    aggregator = free_stack.FreeAggregator()
+    update_account(path, "other", {"newer_value": 99})
+
+    observed = "2026-11-22T00:00:00+00:00"
+    monkeypatch.setattr(
+        aggregator,
+        "fetch_polymarket",
+        lambda wallet: {
+            "status": "verified",
+            "balance_usdc": 10.0,
+            "balance_matic": None,
+            "balance_verification": {"observed_at": observed},
+        },
+    )
+
+    aggregator.refresh_all()
+    hub = free_stack.load_hub(path)
+    assert hub["accounts"]["other"]["newer_value"] == 99
+    assert hub["accounts"]["polymarket"]["balance_usdc"] == 10.0
