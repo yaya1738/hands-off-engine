@@ -25,6 +25,18 @@ if EXT.exists() and ext.get("paypal") is not None and ext.get("monzo") is not No
 cards_mp = {c["name"]:c for c in minp.get("cards",[])}
 cards_st = {c["name"]:c for c in stat.get("cards",[])}
 
+if cash is None:
+    summary = {
+      "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
+      "status": "blocked_unknown_cash",
+      "cash_available": None,
+      "cash_remaining": None,
+      "actions": []
+    }
+    OUT_JSON.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(json.dumps(summary, indent=2))
+    raise SystemExit(0)
+
 # Build working rows merging both sources
 rows=[]
 for name, cm in cards_mp.items():
@@ -70,18 +82,6 @@ for r in sorted([x for x in rows if x["to45"]>0], key=lambda x:(-x["apr"], -x["u
     if pay>0:
         plan.append({"card":r["name"], "reason":"tighten to 45%", "amount":round(pay,2)})
         left -= pay
-
-if cash is None:
-    summary = {
-      "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
-      "status": "blocked_unknown_cash",
-      "cash_available": None,
-      "cash_remaining": None,
-      "actions": []
-    }
-    OUT_JSON.write_text(json.dumps(summary, indent=2), encoding="utf-8")
-    print(json.dumps(summary, indent=2))
-    raise SystemExit(0)
 
 summary = {
   "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
