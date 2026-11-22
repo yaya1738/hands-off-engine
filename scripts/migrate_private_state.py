@@ -23,9 +23,11 @@ FIXED_RELATIVE_PATHS = (
     "termux-hands-off/agents/cards.json",
     "termux-hands-off/agents/emergency_info.json",
     "termux-hands-off/agents/finance_rules.json",
+    "termux-hands-off/security_snapshot.tar",
     "security/yair_identity_profile.json",
     "security/yair_human_identity.json",
     "security/verification_audit.jsonl",
+    "security/identity_checks.jsonl",
     "state/private_finance_hub.json",
     "state/optimal_trigger_config.json",
     "state/filler_actions.jsonl",
@@ -89,6 +91,19 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
                         relative = source.relative_to(source_root)
                         candidates[source] = (relative, "repo")
 
+    # Preserve the complete historical finance snapshot tree, private logs,
+    # and Termux runtime state (including env files and backup archives).
+    for directory in (
+        source_root / "termux-hands-off" / "state",
+        source_root / "termux-hands-off" / "logs",
+        source_root / "termux-hands-off" / "data" / "finances",
+    ):
+        if directory.is_dir():
+            for source in directory.rglob("*"):
+                if source.is_file():
+                    relative = source.relative_to(source_root)
+                    candidates[source] = (relative, "repo")
+
     if legacy_runtime_root is not None:
         legacy_runtime_root = legacy_runtime_root.expanduser().resolve()
         if legacy_runtime_root.is_dir():
@@ -96,13 +111,16 @@ def collect_sources(source_root: Path, legacy_runtime_root: Path | None = None) 
                 source = legacy_runtime_root / relative_text
                 if source.is_file():
                     candidates[source] = (Path("legacy_runtime") / relative_text, "legacy_runtime")
-            for state_dir in (legacy_runtime_root / "state",):
-                if state_dir.is_dir():
-                    for pattern in STATE_PATTERNS:
-                        for source in state_dir.glob(pattern):
-                            if source.is_file():
-                                relative = Path("legacy_runtime") / source.relative_to(legacy_runtime_root)
-                                candidates[source] = (relative, "legacy_runtime")
+            for directory_text in ("state", "logs", "data/finances", "security", "finance"):
+                directory = legacy_runtime_root / directory_text
+                if directory.is_dir():
+                    for source in directory.rglob("*"):
+                        if source.is_file():
+                            relative = Path("legacy_runtime") / source.relative_to(legacy_runtime_root)
+                            candidates[source] = (relative, "legacy_runtime")
+            archive = legacy_runtime_root / "security_snapshot.tar"
+            if archive.is_file():
+                candidates[archive] = (Path("legacy_runtime") / "security_snapshot.tar", "legacy_runtime")
 
     return [(source, relative, label) for source, (relative, label) in sorted(
         candidates.items(), key=lambda item: str(item[1][0])
