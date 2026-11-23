@@ -94,14 +94,15 @@ def get_system_metrics() -> dict:
     """Gather current system metrics for escape velocity calculation"""
     metrics = {
         "balance": 0.0,
+        "balance_status": "unknown",
         "position_value": 0.0,
         "trading_enabled": False,
         "monitors_active": 0,
         "income_channels": 0,
         "last_improvement": None,
         # Full resource awareness
-        "monthly_burn": 3280,
-        "ai_spend": 250,
+        "monthly_burn": 0,
+        "ai_spend": 0,
         "runway_days": 0,
         "total_resources": 0,
         "cost_cut_opportunities": [],
@@ -122,7 +123,7 @@ def get_system_metrics() -> dict:
         pass
 
     # Check trading capability
-    metrics["trading_enabled"] = metrics["balance"] >= 50.0
+    metrics["trading_enabled"] = False  # Balance alone never authorizes trading
 
     # Count active monitors (from cron)
     try:
@@ -144,8 +145,8 @@ def get_system_metrics() -> dict:
         finance_hub = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "finance_hub.json"
         if finance_hub.exists():
             hub = json.load(open(finance_hub))
-            metrics["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 3280)
-            metrics["ai_spend"] = hub.get("monthly_burn", {}).get("ai_services", {}).get("amount_usd", 250)
+            metrics["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 0)
+            metrics["ai_spend"] = hub.get("monthly_burn", {}).get("ai_services", {}).get("amount_usd", 0)
             metrics["total_resources"] = hub.get("summary", {}).get("total_liquid_usd", 0)
 
             # Calculate if AI spend is generating ROI
@@ -162,7 +163,7 @@ def get_system_metrics() -> dict:
 
     # Calculate runway
     if metrics["monthly_burn"] > 0:
-        total_liquid = metrics["balance"] + metrics.get("position_value", 98)
+        total_liquid = metrics["balance"] + metrics.get("position_value", 0)
         metrics["runway_days"] = (total_liquid / metrics["monthly_burn"]) * 30
 
     return metrics
