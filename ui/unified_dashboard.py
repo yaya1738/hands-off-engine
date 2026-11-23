@@ -21,6 +21,7 @@ import sys
 from pathlib import Path
 
 from finance.truth import read_verified_polymarket_balance
+from finance.private_state import private_finance_hub_path
 from datetime import datetime
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse, JSONResponse
@@ -50,7 +51,7 @@ app = FastAPI(title="Unified System Dashboard", description=f"Serving {MASTER}")
 
 def get_finance_data():
     """Return only verified wallet truth; other local finance snapshots stay unknown."""
-    hub_file = REPO_ROOT / "state" / "private_finance_hub.json"
+    hub_file = private_finance_hub_path()
     truth = read_verified_polymarket_balance(hub_file)
     return {
         "polymarket": {

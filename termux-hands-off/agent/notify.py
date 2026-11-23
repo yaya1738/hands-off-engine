@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import os, sys, urllib.parse, urllib.request, json
 
-ENV = os.path.expanduser("~/hands-off/state/tg/bots/handsoff.env")
+PRIVATE_ROOT = os.path.expanduser(os.environ.get("HANDS_OFF_PRIVATE_DIR", "~/.config/hands-off-engine"))
+ENV = os.path.join(PRIVATE_ROOT, "legacy_runtime", "state", "tg", "bots", "handsoff.env")
 def read_env(path):
     d={}
     with open(path,"r",encoding="utf-8") as f:

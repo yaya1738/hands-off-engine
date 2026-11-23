@@ -2,17 +2,15 @@
 import os, json, time, hmac, hashlib, base64, datetime, sys
 from pathlib import Path
 from urllib.parse import urlencode
+from private_state import private_path, private_directory, private_root
 import requests
 
 HOME = Path.home()
-LOG_DIR = HOME / "hands-off" / "logs"
-LOG_DIR.mkdir(parents=True, exist_ok=True)
-RULES = json.load(open(HOME/"hands-off"/"agents"/"finance_rules.json"))
-EXTERNAL_FILE = HOME/"hands-off"/"agents"/"external_accounts.json"
-VAULT_CANDIDATES = [
-    HOME/"hands-off"/"vault.json",
-    HOME/".config"/"hands-off"/"vault.json"
-]
+LOG_DIR = private_directory("logs", create=True)
+RULES_PATH = private_path("agents/finance_rules.json")
+RULES = json.loads(RULES_PATH.read_text(encoding="utf-8")) if RULES_PATH.exists() else {"symbols": [], "alerts": [], "poll_seconds": 45}
+EXTERNAL_FILE = private_path("agents/external_accounts.json")
+VAULT_CANDIDATES = [private_root() / "secrets" / "vault.json"]
 VAULT = next((p for p in VAULT_CANDIDATES if p.exists()), None)
 
 def now_utc_iso():
@@ -108,23 +106,15 @@ def get_kraken_balances(vault):
     return out
 
 def load_external_accounts():
+    """Load a private manual snapshot without treating its fields as reconciled assets."""
     try:
-        import json
-        p = EXTERNAL_FILE
-        if p.exists():
-            with open(p, "r", encoding="utf-8") as f:
-                d = json.load(f)
-            # normalize keys; liabilities are negative
-            out = {}
-            for k,v in d.items():
-                try:
-                    out[k] = float(v)
-                except:
-                    pass
-            return out
-    except Exception:
-        pass
-    return {}
+        if not EXTERNAL_FILE.exists():
+            return None
+        with open(EXTERNAL_FILE, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+        return data if isinstance(data, dict) and data else None
+    except (OSError, ValueError, TypeError):
+        return None
 
 def load_vault():
     if not VAULT: return {}
@@ -137,7 +127,7 @@ def load_vault():
 def portfolio_snapshot(vault):
     snap = {"by_asset": {}, "prices": {}}
     # normalize symbols to pull prices
-    for sym in RULES["symbols"]:
+    for sym in RULES.get("symbols", []):
         try:
             px = get_okx_ticker(sym)
             snap["prices"][sym] = px
@@ -164,12 +154,17 @@ def portfolio_snapshot(vault):
             if px: usd_total += amt * px
     # External accounts support (manual balances, liabilities negative)
     ext = load_external_accounts()
-    ext_total = sum(ext.values()) if isinstance(ext, dict) else 0.0
-    snap["external"] = ext
-
-    usd_total_raw = usd_total + ext_total
-    snap["usd_total_raw"] = usd_total_raw
-    snap["usd_total"] = round(usd_total_raw, 2)
+    snap["external_status"] = "manual_unverified" if ext is not None else "unknown"
+    snap["exchange_estimate_usd"] = round(usd_total, 2) if vault else None
+    # External-account JSON mixes balances, liabilities, limits, metadata, and notes.
+    # It is not reconciled and must never be summed into net worth.
+    snap["external_manual_inputs_present"] = ext is not None
+    snap["usd_total_raw"] = None
+    snap["usd_total"] = None
+    snap["status"] = "partial_unknown"
+    snap["notes"] = [
+        "Authoritative net worth is UNKNOWN: external accounts are manual/unverified and exchange coverage is incomplete."
+    ]
     return snap
 
 def check_alerts(prices):

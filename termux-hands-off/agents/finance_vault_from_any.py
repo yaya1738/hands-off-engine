@@ -1,11 +1,13 @@
 import os, json, pathlib, re, sys
 
 HOME = pathlib.Path.home()
+PRIVATE_ROOT = pathlib.Path(os.environ.get("HANDS_OFF_PRIVATE_DIR", str(HOME/".config"/"hands-off-engine"))).expanduser()
+CREDENTIALS_DIR = PRIVATE_ROOT/"secrets"
 CANDIDATES = [
-    HOME/".config"/"keys.vault",
-    *sorted((HOME/".config").glob("keys.vault.bak.*"), reverse=True)
+    CREDENTIALS_DIR/"keys.vault",
+    *sorted(CREDENTIALS_DIR.glob("keys.vault.bak.*"), reverse=True)
 ]
-OUT = HOME/".config"/"hands-off"/"vault.json"
+OUT = PRIVATE_ROOT/"secrets"/"vault.json"
 
 def load_candidate(path: pathlib.Path):
     if not path.exists():
@@ -34,32 +36,40 @@ def load_candidate(path: pathlib.Path):
     return out or None
 
 need = ["OKX_API_KEY","OKX_API_SECRET","OKX_API_PASSPHRASE","KRAKEN_API_KEY","KRAKEN_API_SECRET"]
-merged = {}
+existing = load_candidate(OUT) or {}
+final = dict(existing)
+added = []
 
-# load from candidates
-for p in CANDIDATES:
-    d = load_candidate(p)
-    if not d: continue
-    for k in need:
-        if k in d and d[k] and k not in merged:
-            merged[k] = str(d[k])
-
-# environment fallback (if user exported anything)
 for k in need:
-    if k not in merged or not merged[k]:
-        v = os.environ.get(k)
-        if v: merged[k] = v
+    if final.get(k):
+        continue
+    value = None
+    for candidate in CANDIDATES:
+        data = load_candidate(candidate)
+        if data and data.get(k):
+            value = str(data[k])
+            break
+    if not value:
+        value = os.environ.get(k)
+    if value:
+        final[k] = str(value)
+        added.append(k)
+    else:
+        final.setdefault(k, "")
 
-# final structure (empty strings allowed but we keep keys)
-final = {k: merged.get(k, "") for k in need}
+if not any(final.get(k) for k in need):
+    print("[blocked] no exchange credentials found; no vault was created or overwritten")
+    raise SystemExit(1)
 
-OUT.parent.mkdir(parents=True, exist_ok=True)
-OUT.write_text(json.dumps(final, indent=2), encoding="utf-8")
+PRIVATE_ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
+PRIVATE_ROOT.chmod(0o700)
+OUT.parent.mkdir(parents=True, exist_ok=True, mode=0o700)
+OUT.parent.chmod(0o700)
+if added or not OUT.exists():
+    OUT.write_text(json.dumps(final, indent=2), encoding="utf-8")
+OUT.chmod(0o600)
 
-def mask(x):
-    x = str(x or "")
-    return x if len(x)<=8 else x[:4]+"…"+x[-4:]
-print(f"[ok] wrote -> {OUT}")
-print("[mask preview]")
-for k in sorted(final):
-    print(f"  {k} = {mask(final[k])}")
+print(f"[ok] private vault available -> {OUT}")
+print(f"Newly imported fields: {len(added)}")
+for k in sorted(need):
+    print(f"  {k}: {'configured' if final.get(k) else 'missing'}")

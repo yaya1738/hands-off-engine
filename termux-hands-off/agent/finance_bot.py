@@ -77,7 +77,7 @@ def cmd_status():
 def cmd_holdings():
     fiat = read_json(f"{STATE}/fiat_accounts.json", {})
     crypto = read_json(f"{STATE}/crypto_holdings.json", {})
-    lines = ["💼 Holdings (inputs)"]
+    lines = ["💼 Holdings (UNVERIFIED MANUAL INPUTS — not reconciled account balances)"]
     if fiat:
         lines.append("Fiat:")
         for k,v in fiat.items():
@@ -102,9 +102,11 @@ def cmd_pmlatest():
         if os.path.exists(p):
             try:
                 obj = read_json(p,{})
-                cash = obj.get("cash_usd") or obj.get("cashUSD") or 0.0
-                mark = obj.get("mark_value_usd") or obj.get("markUSD") or 0.0
-                return f"🟣 Polymarket compact found:\n{p}\n- cash: {money(cash)}\n- mark: {money(mark)}"
+                cash = obj.get("cash_usd", obj.get("cashUSD"))
+                mark = obj.get("mark_value_usd", obj.get("markUSD"))
+                cash_text = money(cash) if cash is not None else "UNKNOWN"
+                mark_text = money(mark) if mark is not None else "UNKNOWN"
+                return f"🟣 Polymarket compact found (UNVERIFIED SNAPSHOT):\n{p}\n- cash: {cash_text}\n- mark: {mark_text}"
             except:
                 return f"Polymarket file present but parse failed: {p}"
     return "Polymarket compact not found."

@@ -1,7 +1,0 @@
-{
-  "pending": [],
-  "approved": [],
-  "rejected": [],
-  "last_cleared": "2025-11-28T07:05:00Z",
-  "clear_reason": "Stale alerts from memory/CPU spikes during shutdown events - no longer relevant"
-}

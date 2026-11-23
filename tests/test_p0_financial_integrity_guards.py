@@ -741,7 +741,10 @@ def test_balance_refresh_records_complete_provenance_without_network(tmp_path, m
     wallet = "0x" + "e" * 40
     monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", wallet)
     hub_path = tmp_path / "hub.json"
-    hub_path.write_text(json.dumps({"accounts": {"polymarket": {"balance_usdc": 777.0}}}))
+    hub_path.write_text(json.dumps({"accounts": {
+        "polymarket": {"balance_usdc": 777.0},
+        "unrelated": {"balance_usd": 33.0},
+    }}))
     monkeypatch.setattr(refresh_balances, "FINANCE_HUB", hub_path)
     monkeypatch.setattr(refresh_balances, "get_chain_id", lambda: 137)
     monkeypatch.setattr(refresh_balances, "get_erc20_balance", lambda address, contract: 3.0 if contract == refresh_balances.USDC_BRIDGED else 7.0)
@@ -755,6 +758,7 @@ def test_balance_refresh_records_complete_provenance_without_network(tmp_path, m
     assert updated["accounts"]["polymarket"]["balance_verification"]["status"] == "verified"
     assert updated["accounts"]["polymarket"]["balance_verification"]["source"] == "polygon_rpc"
     assert "wallet_address" not in updated["accounts"]["polymarket"]
+    assert updated["accounts"]["unrelated"]["balance_usd"] == 33.0
 
 
 def test_balance_refresh_partial_rpc_never_promotes_old_balance(tmp_path, monkeypatch):
@@ -812,7 +816,7 @@ def test_finance_dashboard_does_not_promote_old_hub_values(tmp_path, monkeypatch
         "credit": {"total_balance": 100.0, "utilization_pct": 5.0},
     }
     (tmp_path / "private_finance_hub.json").write_text(json.dumps(hub))
-    monkeypatch.setattr(finance_dashboard, "STATE_DIR", tmp_path)
+    monkeypatch.setattr(finance_dashboard, "private_finance_hub_path", lambda: tmp_path / "private_finance_hub.json")
 
     pm = finance_dashboard.get_polymarket_status()
     runway = finance_dashboard.get_runway_status()
@@ -958,3 +962,348 @@ def test_financial_ledger_excludes_unverified_costs_from_verified_roi(tmp_path):
     assert balance["total_costs"] == 0.0
     assert balance["unverified_costs"] == 5.0
     assert balance["verified"] is False
+
+
+def test_payment_monitor_does_not_promote_partial_rpc_data(tmp_path, monkeypatch):
+    from scripts import payment_monitor
+
+    state_path = tmp_path / "payment-monitor.json"
+    original = {
+        "last_balance": 41.25,
+        "last_check": "2026-01-01T00:00:00+00:00",
+        "payments": [{"amount": 12.0}],
+    }
+    state_path.write_text(json.dumps(original), encoding="utf-8")
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", state_path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "a" * 40)
+    monkeypatch.setattr(payment_monitor, "get_chain_id", lambda: 137)
+    values = iter([41.25, None])
+    monkeypatch.setattr(payment_monitor, "get_erc20_balance", lambda *_: next(values))
+
+    result = payment_monitor.main()
+
+    assert result == {"status": "unknown", "balance_usdc": None}
+    assert json.loads(state_path.read_text(encoding="utf-8")) == original
+
+def test_payment_monitor_rpc_error_is_unknown_not_zero(monkeypatch):
+    from finance import refresh_balances
+
+    class Response:
+        def raise_for_status(self):
+            return None
+
+        def json(self):
+            return {"jsonrpc": "2.0", "error": {"code": -32000, "message": "unavailable"}}
+
+    monkeypatch.setattr(refresh_balances.requests, "post", lambda *args, **kwargs: Response())
+    assert refresh_balances.get_erc20_balance(
+        "0x" + "a" * 40, refresh_balances.USDC_NATIVE
+    ) is None
+
+def test_ledger_concurrent_appends_preserve_hash_chain(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from audit.ledger import FinancialLedger
+
+    ledger_path = tmp_path / "ledger.jsonl"
+    ledger = FinancialLedger(str(ledger_path))
+
+    def append(index):
+        return ledger.add_cost("concurrency-test", f"append-{index}", 1.0, "test")
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        entries = list(pool.map(append, range(32)))
+
+    assert len(entries) == 32
+    assert ledger.verify_integrity() is True
+    rows = [json.loads(line) for line in ledger_path.read_text(encoding="utf-8").splitlines()]
+    assert len(rows) == 33
+    assert len({row["entry_id"] for row in rows}) == 33
+    for previous, current in zip(rows, rows[1:]):
+        assert current["previous_hash"] == previous["current_hash"]
+
+
+def test_ledger_idempotency_is_checked_inside_append_lock(tmp_path):
+    from audit.ledger import FinancialLedger
+
+    ledger = FinancialLedger(str(tmp_path / "ledger.jsonl"))
+    evidence = {
+        "verification": {
+            "status": "verified",
+            "source_type": "bank_transaction",
+            "evidence_ref": "statement-row-123",
+            "idempotency_key": "bank:statement-row-123",
+            "verified_by": "test",
+            "verified_at": "2026-11-22T00:00:00+00:00",
+        }
+    }
+    ledger.add_revenue("test", "settlement", 5.0, "session", evidence)
+    try:
+        ledger.add_revenue("test", "settlement", 5.0, "session", evidence)
+    except ValueError as exc:
+        assert "Duplicate financial evidence" in str(exc)
+    else:
+        raise AssertionError("duplicate evidence must be rejected")
+    assert len(ledger.get_entries()) == 1
+    assert ledger.verify_integrity() is True
+
+
+def test_finance_hub_concurrent_account_updates_do_not_lose_data(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from finance.hub_store import load_hub, update_account
+
+    path = tmp_path / "private_finance_hub.json"
+
+    def update(index):
+        return update_account(
+            path,
+            f"account-{index}",
+            {"observed_value": index},
+            top_level_updates={"writer_timestamp": str(index)},
+        )
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        list(pool.map(update, range(24)))
+
+    hub = load_hub(path)
+    assert len(hub["accounts"]) == 24
+    for index in range(24):
+        assert hub["accounts"][f"account-{index}"]["observed_value"] == index
+
+
+def test_aggregator_merges_delta_into_latest_finance_hub(tmp_path, monkeypatch):
+    from finance.aggregators import free_stack
+    from finance.hub_store import update_account
+
+    path = tmp_path / "private_finance_hub.json"
+    monkeypatch.setattr(free_stack, "HUB_PATH", path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "1" * 40)
+    aggregator = free_stack.FreeAggregator()
+    update_account(path, "other", {"newer_value": 99})
+
+    observed = "2026-11-22T00:00:00+00:00"
+    monkeypatch.setattr(
+        aggregator,
+        "fetch_polymarket",
+        lambda wallet: {
+            "status": "verified",
+            "balance_usdc": 10.0,
+            "balance_matic": None,
+            "balance_verification": {"observed_at": observed},
+        },
+    )
+
+    aggregator.refresh_all()
+    hub = free_stack.load_hub(path)
+    assert hub["accounts"]["other"]["newer_value"] == 99
+    assert hub["accounts"]["polymarket"]["balance_usdc"] == 10.0
+
+
+def test_ledger_refuses_to_append_after_existing_chain_tampering(tmp_path):
+    from audit.ledger import FinancialLedger
+
+    path = tmp_path / "ledger.jsonl"
+    ledger = FinancialLedger(str(path))
+    ledger.add_cost("test", "first", 1.0, "session")
+    rows = path.read_text(encoding="utf-8").splitlines()
+    damaged = json.loads(rows[-1])
+    damaged["amount"] = -999.0
+    rows[-1] = json.dumps(damaged)
+    path.write_text("\n".join(rows) + "\n", encoding="utf-8")
+
+    try:
+        ledger.add_cost("test", "must-not-append", 2.0, "session")
+    except ValueError as exc:
+        assert "tampered ledger" in str(exc)
+    else:
+        raise AssertionError("append to a tampered ledger must be rejected")
+    assert ledger.verify_integrity() is False
+
+
+def test_finance_hub_refuses_to_overwrite_corrupt_json(tmp_path):
+    from finance.hub_store import update_account
+
+    path = tmp_path / "private_finance_hub.json"
+    damaged = '{"accounts": '
+    path.write_text(damaged, encoding="utf-8")
+
+    try:
+        update_account(path, "polymarket", {"balance_usdc": 0.0})
+    except json.JSONDecodeError:
+        pass
+    else:
+        raise AssertionError("corrupt finance hub must not be overwritten")
+    assert path.read_text(encoding="utf-8") == damaged
+
+
+def test_payment_monitor_concurrent_runs_record_one_payment(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from scripts import payment_monitor
+
+    path = tmp_path / "payment-monitor.json"
+    path.write_text(json.dumps({
+        "last_balance": 80.0,
+        "last_check": "2026-11-21T00:00:00+00:00",
+        "payments": [],
+    }), encoding="utf-8")
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "a" * 40)
+    monkeypatch.setattr(payment_monitor, "get_chain_id", lambda: 137)
+    monkeypatch.setattr(
+        payment_monitor,
+        "get_erc20_balance",
+        lambda wallet, contract: 100.0 if contract == payment_monitor.USDC_NATIVE else 0.0,
+    )
+    notifications = []
+    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(lambda _: payment_monitor.main(), range(8)))
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    assert len(state["payments"]) == 1
+    assert len(notifications) == 1
+    assert sum(1 for result in results if result["payment"]) == 1
+
+def test_payment_monitor_first_observation_is_baseline_not_income(tmp_path, monkeypatch):
+    from scripts import payment_monitor
+
+    path = tmp_path / "payment-monitor.json"
+    monkeypatch.setattr(payment_monitor, "STATE_FILE", path)
+    monkeypatch.setenv("POLYMARKET_FUNDER_ADDRESS", "0x" + "a" * 40)
+    monkeypatch.setattr(payment_monitor, "get_chain_id", lambda: 137)
+    monkeypatch.setattr(
+        payment_monitor,
+        "get_erc20_balance",
+        lambda wallet, contract: 50.0 if contract == payment_monitor.USDC_NATIVE else 0.0,
+    )
+    notifications = []
+    monkeypatch.setattr(payment_monitor, "send_telegram", notifications.append)
+
+    result = payment_monitor.main()
+
+    assert result["status"] == "verified"
+    assert result["payment"] is None
+    assert notifications == []
+    assert json.loads(path.read_text(encoding="utf-8"))["last_balance"] == 50.0
+
+def test_action_ledger_concurrent_appends_preserve_every_record(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from ai_nexus.ledger import ActionLedger, LedgerEntry
+
+    ledger = ActionLedger(str(tmp_path / "action-ledger"))
+
+    def append(index):
+        return ledger.record(LedgerEntry(
+            timestamp=f"2026-11-22T00:00:{index:02d}+00:00",
+            entry_type="ai_task",
+            action=f"concurrent-{index}",
+            cost=0.01,
+            metadata={"index": index},
+        ))
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(append, range(40)))
+
+    assert all(results)
+    files = list((tmp_path / "action-ledger").glob("ledger_*.jsonl"))
+    assert len(files) == 1
+    rows = [json.loads(line) for line in files[0].read_text(encoding="utf-8").splitlines()]
+    assert len(rows) == 40
+    assert {row["metadata"]["index"] for row in rows} == set(range(40))
+
+
+def test_capital_recovery_concurrent_runs_record_one_balance_event(tmp_path, monkeypatch):
+    from concurrent.futures import ThreadPoolExecutor
+    from scripts import capital_recovery_monitor as monitor
+
+    path = tmp_path / "capital-recovery.json"
+    path.write_text(json.dumps({
+        "last_balance": 40.0,
+        "recovery_events": [],
+        "alerts_sent": [],
+    }), encoding="utf-8")
+    monkeypatch.setattr(monitor, "STATE_FILE", path)
+    monkeypatch.setattr(monitor, "LOG_FILE", tmp_path / "capital-recovery.log")
+    monkeypatch.setattr(monitor, "get_balance", lambda: 100.0)
+    monkeypatch.setattr(monitor, "send_telegram", lambda *args, **kwargs: True)
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        results = list(pool.map(lambda _: monitor.check_recovery(), range(8)))
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    assert len(state["recovery_events"]) == 1
+    assert sum(len(result["events"]) for result in results) == 1
+    assert state["last_balance"] == 100.0
+    assert state["trading_enabled"] is False
+    assert state["execution_authorized"] is False
+
+
+def test_capital_recovery_unknown_balance_preserves_last_verified_amount(tmp_path, monkeypatch):
+    from scripts import capital_recovery_monitor as monitor
+
+    path = tmp_path / "capital-recovery.json"
+    original = {
+        "last_balance": 87.5,
+        "recovery_events": [],
+        "alerts_sent": [],
+    }
+    path.write_text(json.dumps(original), encoding="utf-8")
+    monkeypatch.setattr(monitor, "STATE_FILE", path)
+    monkeypatch.setattr(monitor, "get_balance", lambda: None)
+
+    result = monitor.check_recovery()
+
+    state = json.loads(path.read_text(encoding="utf-8"))
+    assert result["financial_status"] == "unknown"
+    assert state["last_balance"] == 87.5
+    assert state["financial_status"] == "unknown"
+    assert state["trading_enabled"] is False
+    assert state["execution_authorized"] is False
+
+def test_polymarket_client_direct_mutations_are_blocked_without_api_calls(monkeypatch):
+    import importlib.util
+    import sys
+    import types
+
+    package = types.ModuleType("py_clob_client")
+    package.__path__ = []
+    client_module = types.ModuleType("py_clob_client.client")
+    client_module.ClobClient = object
+    types_module = types.ModuleType("py_clob_client.clob_types")
+    types_module.MarketOrderArgs = object
+    types_module.OrderArgs = object
+    types_module.OrderType = type("OrderType", (), {"FOK": "FOK", "GTC": "GTC"})
+    builder_package = types.ModuleType("py_clob_client.order_builder")
+    builder_package.__path__ = []
+    constants_module = types.ModuleType("py_clob_client.order_builder.constants")
+    constants_module.BUY = "BUY"
+    constants_module.SELL = "SELL"
+
+    for name, module in (
+        ("py_clob_client", package),
+        ("py_clob_client.client", client_module),
+        ("py_clob_client.clob_types", types_module),
+        ("py_clob_client.order_builder", builder_package),
+        ("py_clob_client.order_builder.constants", constants_module),
+    ):
+        monkeypatch.setitem(sys.modules, name, module)
+
+    source = Path(__file__).resolve().parents[1] / "executor" / "polymarket_client.py"
+    spec = importlib.util.spec_from_file_location("isolated_polymarket_client", source)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+
+    trader = module.PolymarketTrader.__new__(module.PolymarketTrader)
+    assert not hasattr(trader, "client")
+
+    results = [
+        trader.place_market_order_usd("token", 10.0, "BUY"),
+        trader.place_limit_order("token", 0.5, 10.0, "BUY"),
+        trader.cancel_order("order-id"),
+        trader.cancel_all_orders(),
+    ]
+
+    assert all(result["status"] == "blocked" for result in results)
+    assert all(result["execution_authorized"] is False for result in results)
+    assert all(result["blocked_by"] == "governed_execution" for result in results)
+    assert not hasattr(trader, "client")

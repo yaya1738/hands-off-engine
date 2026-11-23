@@ -7,6 +7,7 @@ for accountability, budgeting, and self-financing capabilities.
 
 import json
 import os
+import fcntl
 import sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
@@ -109,12 +110,20 @@ class ActionLedger:
         Returns:
             bool: True if successful
         """
-        self._ensure_ledger_file()
-        
         try:
-            with open(self._ledger_file, 'a') as f:
-                f.write(json.dumps(entry.to_dict()) + '\n')
-            
+            # One directory-level lock serializes writers across daily file rotation.
+            lock_path = self.ledger_dir / ".action-ledger.lock"
+            with open(lock_path, "a", encoding="utf-8") as lock_handle:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+                try:
+                    self._ensure_ledger_file()
+                    with open(self._ledger_file, "a", encoding="utf-8") as f:
+                        f.write(json.dumps(entry.to_dict()) + '\n')
+                        f.flush()
+                        os.fsync(f.fileno())
+                finally:
+                    fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
+
             # Audit ledger write
             if audit:
                 audit.log_action(

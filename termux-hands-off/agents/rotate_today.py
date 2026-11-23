@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import json, pathlib, datetime
+from private_state import private_path
 
-HOME = pathlib.Path.home()
-EXT          = HOME/"hands-off"/"agents"/"external_accounts.json"
-CARDS_MINPAY = HOME/"hands-off"/"logs"/"cards_minpay.json"
-CARDS_STATUS = HOME/"hands-off"/"logs"/"cards_status.json"   # from per_card_guardrail.py
-OUT_JSON     = HOME/"hands-off"/"logs"/"rotate_today.json"
+EXT          = private_path("agents/external_accounts.json")
+CARDS_MINPAY = private_path("logs/cards_minpay.json")
+CARDS_STATUS = private_path("logs/cards_status.json")   # from per_card_guardrail.py
+OUT_JSON     = private_path("logs/rotate_today.json", create_parent=True)
 
 def jload(p, default=None):
     if not p.exists(): return default
@@ -16,9 +16,26 @@ ext = jload(EXT, {})
 minp = jload(CARDS_MINPAY, {"cards":[]})
 stat = jload(CARDS_STATUS, {"cards":[]})
 
-cash = float(ext.get("paypal",0) or 0) + float(ext.get("monzo",0) or 0)
+cash = None
+if EXT.exists() and ext.get("paypal") is not None and ext.get("monzo") is not None:
+    try:
+        cash = float(ext["paypal"]) + float(ext["monzo"])
+    except (TypeError, ValueError, OverflowError):
+        cash = None
 cards_mp = {c["name"]:c for c in minp.get("cards",[])}
 cards_st = {c["name"]:c for c in stat.get("cards",[])}
+
+if cash is None:
+    summary = {
+      "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
+      "status": "blocked_unknown_cash",
+      "cash_available": None,
+      "cash_remaining": None,
+      "actions": []
+    }
+    OUT_JSON.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(json.dumps(summary, indent=2))
+    raise SystemExit(0)
 
 # Build working rows merging both sources
 rows=[]
@@ -68,6 +85,7 @@ for r in sorted([x for x in rows if x["to45"]>0], key=lambda x:(-x["apr"], -x["u
 
 summary = {
   "ts": datetime.datetime.utcnow().replace(microsecond=0).isoformat()+"Z",
+  "status": "modelled_from_manual_private_inputs",
   "cash_available": round(cash,2),
   "cash_remaining": round(left,2),
   "actions": plan

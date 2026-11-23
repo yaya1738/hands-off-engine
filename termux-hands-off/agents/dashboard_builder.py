@@ -1,17 +1,18 @@
 #!/usr/bin/env python3
 import json, csv, pathlib, datetime
+from private_state import private_path
 
 HOME = pathlib.Path.home()
 OUT  = HOME/"hands-off"/"dashboard"/"index.html"
 
-EXT       = HOME/"hands-off"/"agents"/"external_accounts.json"
-CARDS     = HOME/"hands-off"/"agents"/"cards.json"
-BAL_LOG   = HOME/"hands-off"/"logs"/"finance_balances.log"
-DAILY_CSV = HOME/"hands-off"/"logs"/"finance_daily.csv"
-PERF_CSV  = HOME/"hands-off"/"logs"/"performance_daily.csv"
-PM_POS_CSV= HOME/"hands-off"/"logs"/"polymarket_positions.csv"
-CRED_LOG  = HOME/"hands-off"/"logs"/"finance_credit.log"
-CARDS_JSON= HOME/"hands-off"/"logs"/"cards_status.json"
+EXT       = private_path("agents/external_accounts.json")
+CARDS     = private_path("agents/cards.json")
+BAL_LOG   = private_path("logs/finance_balances.log")
+DAILY_CSV = private_path("logs/finance_daily.csv")
+PERF_CSV  = private_path("logs/performance_daily.csv")
+PM_POS_CSV= private_path("logs/polymarket_positions.csv")
+CRED_LOG  = private_path("logs/finance_credit.log")
+CARDS_JSON= private_path("logs/cards_status.json")
 
 def last_json_line(path):
     if not path.exists(): return None
@@ -51,14 +52,15 @@ perf_rows  = read_csv_rows(PERF_CSV)
 pm_rows    = read_csv_rows(PM_POS_CSV)
 
 # derive quicks
-net_usd = balances_last.get("usd_total_raw", balances_last.get("usd_total"))
+net_status = balances_last.get("status", "unknown")
+net_usd = balances_last.get("usd_total_raw", balances_last.get("usd_total")) if net_status == "unverified_estimate" else None
 util = credit_last.get("total_utilization")
 stmt_notes = " / ".join(credit_last.get("statement_notes", []) or [])
 
 pm_mark = ext.get("polymarket_positions_mark")
 pm_unr  = ext.get("polymarket_unrealized_est")
 pm_cash = ext.get("polymarket_cash")
-pm_cost = ext.get("polymarket_cost_basis", 0)
+pm_cost = ext.get("polymarket_cost_basis")
 
 rent_ils = ext.get("rent_monthly_shekel")
 rent_usd = ext.get("rent_monthly_usd")
@@ -159,9 +161,9 @@ html = f"""<!doctype html>
 
   <div class="grid">
     <div class="card">
-      <div class="k">Net worth (live)</div>
+      <div class="k">Estimated net worth (unverified)</div>
       <div class="v">{money(net_usd) if net_usd is not None else "-"}</div>
-      <div class="k">Includes external accounts + crypto balances</div>
+      <div class="k">Manual external inputs and market-price estimates; not reconciled account truth</div>
     </div>
 
     <div class="card">
@@ -176,7 +178,7 @@ html = f"""<!doctype html>
       <div class="row"><span class="k">Mark (EV)</span><span class="v">{money(pm_mark) if pm_mark is not None else '-'}</span></div>
       <div class="row"><span class="k">Cash</span><span class="v">{money(pm_cash) if pm_cash is not None else '-'}</span></div>
       <div class="row"><span class="k">Unrealized</span><span class="v {'pos' if (pm_unr or 0)>=0 else 'neg'}">{money(pm_unr) if pm_unr is not None else '-'}</span></div>
-      <small>Cost basis: {money(pm_cost)}</small>
+      <small>Cost basis (manual/unverified): {money(pm_cost)}</small>
     </div>
 
     <div class="card">

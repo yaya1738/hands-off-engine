@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - fix/p0-financial-integrity-20261122
+      - fix/financial-integrity-concurrency-20261122
   pull_request:
     branches:
       - fix/hardware-cleanup-approval-20261115
@@ -19,6 +20,8 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -30,29 +33,71 @@ jobs:
         run: python -m pip install pytest requests python-dotenv
 
       - name: Compile modified Python packages
-        run: python -m compileall -q autonomous executor finance hardware scripts ui audit
+        run: python -m compileall -q ai_nexus autonomous executor finance hardware scripts security ui audit termux-hands-off/agents termux-hands-off/agent
 
       - name: Validate shell setup syntax
-        run: bash -n scripts/setup_autonomous_mode.sh
-
-      - name: Scan current source tree for embedded credentials
         run: |
-          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --no-git --source /path --redact --report-format json --report-path /path/gitleaks-report.json --exit-code 1 || true
-          python - <<'PY'
+          bash -n scripts/setup_autonomous_mode.sh
+          bash -n termux-hands-off/agents/security_mirror.sh
+          bash -n termux-hands-off/agent/hourly.sh
+          bash -n scripts/prepare_private_state_migration.sh
+
+      - name: Scan current source tree and Git history for embedded credentials
+        id: credential_scan
+        run: |
+          set +e
+          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --no-git --source /path --redact --report-format json --report-path /path/gitleaks-working-tree.json --exit-code 1
+          working_status=$?
+          docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --source /path --redact --report-format json --report-path /path/gitleaks-history.json --exit-code 1
+          history_status=$?
+          set -e
+          WORKING_STATUS="$working_status" HISTORY_STATUS="$history_status" python - <<'PY'
           import json
+          import os
           import sys
           from pathlib import Path
-          report = Path("gitleaks-report.json")
-          findings = json.loads(report.read_text()) if report.exists() else []
-          print(f"Credential scan findings: {len(findings)}")
-          for item in findings:
-              print(f"{item.get('File')}:{item.get('StartLine')} rule={item.get('RuleID')}")
-          sys.exit(1 if findings else 0)
-          PY
 
+          def findings(path):
+              report = Path(path)
+              if not report.is_file():
+                  raise SystemExit(f"Credential scanner did not produce {path}")
+              try:
+                  data = json.loads(report.read_text())
+              except (OSError, ValueError) as exc:
+                  raise SystemExit(f"Credential scanner report is unreadable: {path}: {exc}")
+              if not isinstance(data, list):
+                  raise SystemExit(f"Credential scanner report has an invalid shape: {path}")
+              return data
+
+          working = findings("gitleaks-working-tree.json")
+          history = findings("gitleaks-history.json")
+          working_status = int(os.environ["WORKING_STATUS"])
+          history_status = int(os.environ["HISTORY_STATUS"])
+          print(f"Working-tree credential findings: {len(working)}")
+          print(f"Git-history credential findings: {len(history)}")
+          for source, items, status in (
+              ("working-tree", working, working_status),
+              ("git-history", history, history_status),
+          ):
+              if status not in (0, 1) or (status == 1 and not items):
+                  print(f"{source}: scanner failed (exit {status})")
+                  sys.exit(2)
+              for item in items:
+                  print(f"{source}: {item.get('File')}:{item.get('StartLine')} rule={item.get('RuleID')}")
+          sys.exit(1 if working or history else 0)
+          PY
       - name: Run financial integrity regressions
+        if: ${{ !cancelled() && steps.credential_scan.outcome != 'skipped' }}
         run: >-
           python -m pytest
           tests/test_p0_financial_integrity_guards.py
           tests/unit/test_executor_shadow_mode.py
+          tests/test_payment_monitor.py
+          tests/test_legacy_execution_boundaries.py
+          tests/test_legacy_finance_watcher_truth.py
+          tests/test_migrate_private_state.py
+          tests/test_private_identity_profile.py
+          tests/test_private_state_resolver.py
+          tests/test_private_finance_agents.py
+          tests/test_finance_private_state.py
           -q --tb=short

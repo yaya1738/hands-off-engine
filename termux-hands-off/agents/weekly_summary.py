@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 import json, pathlib, datetime, os, statistics
+from private_state import private_path
 
-HOME = pathlib.Path.home()
-EXT  = HOME/"hands-off/agents/external_accounts.json"
-CARDS= HOME/"hands-off/agents/cards.json"
-BAL  = HOME/"hands-off/logs/finance_balances.log"
-CRED = HOME/"hands-off/logs/finance_credit.log"
+EXT  = private_path("agents/external_accounts.json")
+CARDS= private_path("agents/cards.json")
+BAL  = private_path("logs/finance_balances.log")
+CRED = private_path("logs/finance_credit.log")
 
 def notify(title, text):
     os.system(f'termux-notification --title "{title}" --content "{text}" >/dev/null 2>&1')
@@ -27,7 +27,12 @@ def last_usd():
             d=json.loads(line); last=d
         except: pass
     if not last: return None
-    return float(last.get("usd_total_raw", last.get("usd_total", 0.0)))
+    value = last.get("usd_total_raw", last.get("usd_total"))
+    try:
+        number = float(value)
+        return number if __import__("math").isfinite(number) else None
+    except (TypeError, ValueError, OverflowError):
+        return None
 
 def week_delta():
     if not BAL.exists(): return None
@@ -50,8 +55,6 @@ def week_delta():
     return round(statistics.median(last7) - statistics.median(prev7), 2)
 
 def pm_ev():
-    import json
-    EXT = pathlib.Path.home()/ "hands-off/agents/external_accounts.json"
     if not EXT.exists(): return None, None
     d=json.loads(EXT.read_text())
     return d.get("polymarket_positions_mark"), d.get("polymarket_unrealized_est")
@@ -68,7 +71,7 @@ def main():
     delta = week_delta()
     rent_il, rent_usd = rent_info()
     parts=[]
-    if total is not None: parts.append(f"Net ${round(total,2)}")
+    if total is not None: parts.append(f"Estimated (unverified) net ${round(total,2)}")
     if util  is not None: parts.append(f"Util {round(util*100,1)}%")
     if rent_il is not None: parts.append(f"Rent ₪{rent_il}/mo (~${rent_usd})")
     if delta is not None: parts.append(f"W/W Δ ${delta}")

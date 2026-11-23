@@ -5,6 +5,9 @@ Blockchain-inspired append-only ledger
 """
 import hashlib
 import json
+import os
+import fcntl
+from contextlib import contextmanager
 from dataclasses import dataclass, asdict
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,30 +54,79 @@ class FinancialLedger:
         self.ledger_file = Path(ledger_file)
         self.ledger_file.parent.mkdir(parents=True, exist_ok=True)
 
-        # Initialize with genesis entry if new ledger
-        if not self.ledger_file.exists():
-            self._create_genesis_entry()
+        # Genesis creation is serialized with every append across processes.
+        self._create_genesis_entry()
+
+    @contextmanager
+    def _locked(self):
+        """Cross-process exclusive lock for ledger read/modify/append sequences."""
+        lock_path = self.ledger_file.with_suffix(self.ledger_file.suffix + ".lock")
+        lock_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(lock_path, "a", encoding="utf-8") as lock_handle:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+            try:
+                yield
+            finally:
+                fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
 
     def _create_genesis_entry(self):
-        """Create the first entry in the ledger"""
-        genesis = LedgerEntry(
-            entry_id="genesis",
-            timestamp=datetime.now(timezone.utc).isoformat(),
-            session_id="system",
-            component="ledger.system",
-            action="initialize",
-            amount=0.0,
-            category="system",
-            metadata={"description": "Genesis block"},
-            previous_hash="0" * 64,
-            current_hash=self._compute_hash("genesis", "0" * 64, 0.0),
-            verified=False,
-            source_type="system",
-            hash_version=1,
-        )
+        """Create the first entry exactly once, under the ledger lock."""
+        with self._locked():
+            if self.ledger_file.exists() and self.ledger_file.stat().st_size:
+                return
+            genesis = LedgerEntry(
+                entry_id="genesis",
+                timestamp=datetime.now(timezone.utc).isoformat(),
+                session_id="system",
+                component="ledger.system",
+                action="initialize",
+                amount=0.0,
+                category="system",
+                metadata={"description": "Genesis block"},
+                previous_hash="0" * 64,
+                current_hash=self._compute_hash("genesis", "0" * 64, 0.0),
+                verified=False,
+                source_type="system",
+                hash_version=1,
+            )
+            with open(self.ledger_file, "a", encoding="utf-8") as f:
+                f.write(json.dumps(genesis.to_dict()) + "\n")
+                f.flush()
+                os.fsync(f.fileno())
 
-        with open(self.ledger_file, "w") as f:
-            f.write(json.dumps(genesis.to_dict()) + "\n")
+    def _append_entry(self, entry: LedgerEntry) -> LedgerEntry:
+        """Atomically assign chain position, enforce idempotency, and append."""
+        with self._locked():
+            lines = self.ledger_file.read_text(encoding="utf-8").splitlines() if self.ledger_file.exists() else []
+            previous_hash = "0" * 64
+            seen_keys = set()
+            for index, line in enumerate(lines):
+                if not line.strip():
+                    continue
+                item = json.loads(line)
+                if item.get("previous_hash") != previous_hash:
+                    raise ValueError(f"Cannot append to broken ledger chain at line {index + 1}")
+                if item.get("hash_version", 1) >= 2:
+                    expected_hash = self._compute_entry_hash(item)
+                else:
+                    expected_hash = self._compute_hash(
+                        item["entry_id"], item["previous_hash"], item["amount"]
+                    )
+                if item.get("current_hash") != expected_hash:
+                    raise ValueError(f"Cannot append to tampered ledger at line {index + 1}")
+                previous_hash = item["current_hash"]
+                key = item.get("idempotency_key")
+                if key:
+                    seen_keys.add(key)
+            if entry.idempotency_key and entry.idempotency_key in seen_keys:
+                raise ValueError("Duplicate financial evidence: idempotency key already recorded")
+            entry.previous_hash = previous_hash
+            entry.current_hash = self._compute_entry_hash(entry.to_dict())
+            with open(self.ledger_file, "a", encoding="utf-8") as handle:
+                handle.write(json.dumps(entry.to_dict()) + "\n")
+                handle.flush()
+                os.fsync(handle.fileno())
+        return entry
 
     def _compute_hash(self, entry_id: str, previous_hash: str, amount: float) -> str:
         """Compute SHA-256 hash for entry"""
@@ -129,9 +181,6 @@ class FinancialLedger:
             and bool(verification.get("evidence_ref"))
         )
         idempotency_key = verification.get("idempotency_key") if verified else None
-        if self._idempotency_exists(idempotency_key):
-            raise ValueError("Duplicate financial evidence: idempotency key already recorded")
-
         entry = LedgerEntry(
             entry_id=str(uuid.uuid4()),
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -141,7 +190,7 @@ class FinancialLedger:
             amount=-abs(value),
             category="cost",
             metadata=data,
-            previous_hash=self._get_last_hash(),
+            previous_hash="",
             current_hash="",
             verified=bool(verified),
             source_type=verification.get("source_type", "unverified") if verified else "unverified",
@@ -149,10 +198,7 @@ class FinancialLedger:
             idempotency_key=idempotency_key,
             hash_version=2,
         )
-        entry.current_hash = self._compute_entry_hash(entry.to_dict())
-        with open(self.ledger_file, "a", encoding="utf-8") as handle:
-            handle.write(json.dumps(entry.to_dict()) + "\n")
-        return entry
+        return self._append_entry(entry)
 
     def add_revenue(
         self,
@@ -188,9 +234,6 @@ class FinancialLedger:
             raise ValueError(
                 "Unverified revenue blocked: provide a verified source_type, evidence_ref and idempotency_key"
             )
-        if self._idempotency_exists(verification["idempotency_key"]):
-            raise ValueError("Duplicate financial evidence: idempotency key already recorded")
-
         entry = LedgerEntry(
             entry_id=str(uuid.uuid4()),
             timestamp=datetime.now(timezone.utc).isoformat(),
@@ -200,7 +243,7 @@ class FinancialLedger:
             amount=abs(value),
             category="revenue",
             metadata=data,
-            previous_hash=self._get_last_hash(),
+            previous_hash="",
             current_hash="",
             verified=True,
             source_type=verification["source_type"],
@@ -208,10 +251,7 @@ class FinancialLedger:
             idempotency_key=verification["idempotency_key"],
             hash_version=2,
         )
-        entry.current_hash = self._compute_entry_hash(entry.to_dict())
-        with open(self.ledger_file, "a", encoding="utf-8") as handle:
-            handle.write(json.dumps(entry.to_dict()) + "\n")
-        return entry
+        return self._append_entry(entry)
 
     def get_entries(
         self,
@@ -219,77 +259,55 @@ class FinancialLedger:
         component: Optional[str] = None,
         category: Optional[str] = None
     ) -> List[LedgerEntry]:
-        """
-        Query ledger entries
-
-        Args:
-            session_id: Filter by session
-            component: Filter by component
-            category: Filter by category ("cost" or "revenue")
-
-        Returns:
-            List of matching LedgerEntry objects
-        """
-        if not self.ledger_file.exists():
-            return []
-
+        """Read a consistent ledger snapshot and apply optional filters."""
         entries = []
-        with open(self.ledger_file, "r") as f:
-            for line in f:
-                entry_data = json.loads(line.strip())
-
-                # Skip genesis entry
-                if entry_data["entry_id"] == "genesis":
-                    continue
-
-                # Apply filters
-                if session_id and entry_data["session_id"] != session_id:
-                    continue
-                if component and entry_data["component"] != component:
-                    continue
-                if category and entry_data["category"] != category:
-                    continue
-
-                entries.append(LedgerEntry(**entry_data))
-
+        with self._locked():
+            if not self.ledger_file.exists():
+                return []
+            with open(self.ledger_file, "r", encoding="utf-8") as handle:
+                for line in handle:
+                    if not line.strip():
+                        continue
+                    entry_data = json.loads(line)
+                    if entry_data["entry_id"] == "genesis":
+                        continue
+                    if session_id and entry_data["session_id"] != session_id:
+                        continue
+                    if component and entry_data["component"] != component:
+                        continue
+                    if category and entry_data["category"] != category:
+                        continue
+                    entries.append(LedgerEntry(**entry_data))
         return entries
 
     def verify_integrity(self) -> bool:
-        """
-        Verify ledger integrity by checking hash chain
+        """Verify hashes and chain linkage against one locked ledger snapshot."""
+        with self._locked():
+            if not self.ledger_file.exists():
+                return True
+            with open(self.ledger_file, "r", encoding="utf-8") as handle:
+                lines = handle.readlines()
 
-        Returns:
-            True if ledger is intact, False if tampered
-        """
-        if not self.ledger_file.exists():
-            return True
-
-        with open(self.ledger_file, "r") as f:
-            lines = f.readlines()
-
-        for i, line in enumerate(lines):
-            entry_data = json.loads(line.strip())
-
-            # Verify hash computation
+        previous_hash = "0" * 64
+        for index, line in enumerate(lines):
+            if not line.strip():
+                continue
+            entry_data = json.loads(line)
+            if entry_data.get("previous_hash") != previous_hash:
+                print(f"Chain broken at entry {index}")
+                return False
             if entry_data.get("hash_version", 1) >= 2:
                 computed_hash = self._compute_entry_hash(entry_data)
             else:
                 computed_hash = self._compute_hash(
                     entry_data["entry_id"],
                     entry_data["previous_hash"],
-                    entry_data["amount"]
+                    entry_data["amount"],
                 )
-
-            if computed_hash != entry_data["current_hash"]:
-                print(f"Hash mismatch at entry {i}")
+            if computed_hash != entry_data.get("current_hash"):
+                print(f"Hash mismatch at entry {index}")
                 return False
-
-            # Verify chain linkage
-            if i > 0:
-                prev_entry = json.loads(lines[i - 1].strip())
-                if entry_data["previous_hash"] != prev_entry["current_hash"]:
-                    print(f"Chain broken at entry {i}")
-                    return False
+            previous_hash = entry_data["current_hash"]
 
         return True
 
