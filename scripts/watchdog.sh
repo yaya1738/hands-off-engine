@@ -10,7 +10,7 @@
 #   ./watchdog.sh stop     # Stop watchdog
 #   ./watchdog.sh status   # Check status
 #
-# Standard: Yair Siegel Master Level Operations - Full Self-Control
+# Standard: the configured operator Master Level Operations - Full Self-Control
 
 set -e
 
