@@ -315,7 +315,10 @@ def check_trading_allowed(amount: float = 0) -> tuple:
         return False, "Trading disabled: LIVE_TRADING_ENABLED=1 is not set"
 
     try:
-        from executor.trading_safeguards import TradingSafeguards
+        from executor.trading_safeguards import TradingSafeguards, load_mode
+        mode = load_mode()
+        if mode.get("live_trading_enabled") is not True or mode.get("auto_paused") is True:
+            return False, "Trading disabled: authoritative trading_mode.json does not authorize live trading"
         allowed, reason = TradingSafeguards().check_wallet_balance(requested)
     except Exception as exc:
         return False, f"Wallet verification unavailable: {type(exc).__name__}"
