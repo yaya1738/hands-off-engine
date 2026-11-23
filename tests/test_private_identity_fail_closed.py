@@ -55,3 +55,23 @@ def test_absolute_identity_denies_when_private_profile_is_missing(monkeypatch, t
     assert result["verified"] is False
     assert result["confidence"] == 0.0
     assert result["verdict"] == "UNVERIFIED"
+
+def test_auto_identity_accepts_only_a_configured_fingerprint(monkeypatch, tmp_path):
+    monkeypatch.setenv("HANDS_OFF_PRIVATE_DIR", str(tmp_path))
+    monkeypatch.setenv("HANDS_OFF_OWNER_SSH_KEY_FINGERPRINTS", "SHA256:configured-test-fingerprint")
+
+    import security.auto_identity as auto_identity
+    importlib.reload(auto_identity)
+
+    monkeypatch.setattr(
+        auto_identity,
+        "get_ssh_key_comment",
+        lambda: "SHA256:configured-test-fingerprint",
+    )
+    monkeypatch.setattr(auto_identity, "log_identity_check", lambda result: None)
+
+    result = auto_identity.is_yair()
+
+    assert result["is_master"] is True
+    assert result["confidence"] == 1.0
+
