@@ -1,6 +1,6 @@
 {
   "timestamp": null,
-  "master": "Yair Siegel",
+  "master": "Configured operator",
   "balance": 0,
   "positions_value": 0,
   "total_value": 0,
@@ -16,11 +16,7 @@
   "total_ram_gb": 136,
   "healthy_nodes": 9,
   "bottleneck_node": "pm-helper",
-  "idle_nodes": [
-    "ho-compute-2 (134.122.124.240)",
-    "ho-compute-2 (198.211.96.196)",
-    "ho-scale (67.205.153.121)"
-  ],
+  "idle_nodes": [],
   "idle_capacity_vcpus": 24,
   "idle_capacity_ram_gb": 48,
   "hardware_status": "24 vCPU idle while pm-helper bottlenecked",
