@@ -17,7 +17,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
 
       - name: Check for urgent coordination messages
         id: check_urgent
@@ -35,7 +35,7 @@ jobs:
 
       - name: Create notification issue if urgent
         if: steps.check_urgent.outputs.urgent == 'true'
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             const fs = require('fs');
@@ -116,13 +116,3 @@ jobs:
                 body: issueBody
               });
             }
-
-      - name: Trigger Copilot workflow if exists
-        continue-on-error: true
-        run: |
-          # This will trigger repository_dispatch event that Copilot can listen to
-          curl -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/dispatches \
-            -d '{"event_type":"coordination_message","client_payload":{"source":"claude-code","timestamp":"'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}}'
