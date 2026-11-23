@@ -86,3 +86,10 @@ security/access_log.jsonl
 
 security/owner_identity_profile.json
 security/owner_human_identity.json
+
+# Environment backups and generated credential snapshots
+*.env.bak*
+*.env.save*
+*.env.backup*
+*.env.*.bak
+termux-hands-off/state/*.env*
