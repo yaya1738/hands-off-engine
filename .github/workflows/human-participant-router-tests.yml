@@ -1,0 +1,42 @@
+name: Human participant lifecycle routing tests
+
+on:
+  pull_request:
+    paths:
+      - "messaging/human_participant_router.py"
+      - "scripts/continuation.py"
+      - "scripts/task_worker.py"
+      - "scripts/factory_intake.py"
+      - "tests/test_human_participant_router.py"
+      - "tests/test_continuation.py"
+      - "tests/test_task_worker_correlation.py"
+      - "tests/test_factory_intake.py"
+      - ".github/workflows/human-participant-router-tests.yml"
+  push:
+    branches:
+      - "feat/human-participant-email-loop"
+    paths:
+      - "messaging/human_participant_router.py"
+      - "scripts/continuation.py"
+      - "scripts/task_worker.py"
+      - "scripts/factory_intake.py"
+      - "tests/test_human_participant_router.py"
+      - "tests/test_continuation.py"
+      - "tests/test_task_worker_correlation.py"
+      - "tests/test_factory_intake.py"
+      - ".github/workflows/human-participant-router-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  lifecycle-routing-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check pytest
+      - run: python -m pytest -q tests/test_human_participant_router.py tests/test_continuation.py tests/test_task_worker_correlation.py tests/test_factory_intake.py

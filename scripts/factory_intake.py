@@ -3,7 +3,9 @@
 import hashlib
 import json
 import logging
+import os
 import sys
+import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import List, Optional
@@ -22,19 +24,53 @@ EVENT_TYPE_FIELD_CANDIDATES = ("event_type", "type")
 
 
 def _load_state(path: Optional[Path] = None) -> dict:
+    """Load durable intake state; never reset deduplication state on corruption."""
     state_path = Path(path) if path else INTAKE_STATE
-    if state_path.exists():
-        try:
-            return json.loads(state_path.read_text())
-        except Exception:
-            pass
-    return {"consumed_ids": [], "decisions": []}
+    if not state_path.exists():
+        return {"consumed_ids": [], "decisions": []}
+
+    try:
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise RuntimeError(
+            f"Factory intake state is unreadable; refusing to replay events: {state_path}"
+        ) from exc
+
+    if (
+        not isinstance(state, dict)
+        or not isinstance(state.get("consumed_ids"), list)
+        or not all(isinstance(item, str) for item in state["consumed_ids"])
+        or not isinstance(state.get("decisions"), list)
+    ):
+        raise RuntimeError(
+            f"Factory intake state has an invalid schema; refusing to replay events: {state_path}"
+        )
+    return state
 
 
 def _save_state(state: dict, path: Optional[Path] = None):
+    """Persist state atomically so interruption cannot leave a partial JSON file."""
     state_path = Path(path) if path else INTAKE_STATE
     state_path.parent.mkdir(parents=True, exist_ok=True)
-    state_path.write_text(json.dumps(state, indent=2) + "\n")
+    temp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(
+            mode="w",
+            encoding="utf-8",
+            dir=str(state_path.parent),
+            prefix=f".{state_path.name}.",
+            suffix=".tmp",
+            delete=False,
+        ) as handle:
+            temp_path = Path(handle.name)
+            json.dump(state, handle, indent=2)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temp_path, state_path)
+    finally:
+        if temp_path is not None and temp_path.exists():
+            temp_path.unlink()
 
 
 def _get_event_type(event: dict) -> str:
@@ -162,7 +198,7 @@ class FactoryIntake:
             return None
         task_id = _get_task_correlation(event) or "uncorrelated"
         if not self._should_follow_up(event, task_id):
-            reason = "no_explicit_next_action" if event_type == "task_completed" else None
+            reason = "no_explicit_next_action"
             decision = {"fingerprint": fp, "event_id": event.get("event_id") or event.get("msg_id"), "event_type": event_type, "task_id": task_id, "assigned_msg_id": None, "reason": reason, "decided_at": datetime.now(timezone.utc).isoformat()}
             self.decisions.append(decision)
             self._persist()
@@ -201,6 +237,12 @@ class FactoryIntake:
         params = next_action.get("params") or {}
         reply_to = next_action.get("reply_to") or (event.get("context") or {}).get("reply_to") or source_id
         assignment = {"from": "factory", "to": TARGET_PARTY, "type": "task_assignment", "message": f"Factory continuation intake: follow-up on {task_id[:12]}... ({_get_event_type(event)})", "msg_id": msg_id, "timestamp": now.isoformat(), "context": {"task_id": next_task_id, "action": action, "params": params, "reply_to": reply_to, "source_event": source_id, "source_event_type": _get_event_type(event), "source_task_id": task_id}}
+        # Preserve only explicitly declared contact metadata; the downstream
+        # router/policy validates it. Intake never infers a person or question.
+        event_context = event.get("context") if isinstance(event.get("context"), dict) else {}
+        human_contact = event_context.get("human_contact")
+        if isinstance(human_contact, dict):
+            assignment["context"]["human_contact"] = human_contact
         try:
             messages_path.parent.mkdir(parents=True, exist_ok=True)
             with messages_path.open("a") as f:

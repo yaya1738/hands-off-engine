@@ -1,0 +1,36 @@
+name: Human participant email safety tests
+
+on:
+  pull_request:
+    paths:
+      - "scripts/comm_hub.py"
+      - "messaging/email_smtp.py"
+      - "messaging/email_inbox.py"
+      - "tests/test_comm_hub_email.py"
+      - "tests/test_email_inbox.py"
+      - ".github/workflows/human-participant-email-tests.yml"
+  push:
+    branches:
+      - "feat/human-participant-email-loop"
+    paths:
+      - "scripts/comm_hub.py"
+      - "messaging/email_smtp.py"
+      - "messaging/email_inbox.py"
+      - "tests/test_comm_hub_email.py"
+      - "tests/test_email_inbox.py"
+      - ".github/workflows/human-participant-email-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  email-safety-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check pytest
+      - run: python -m pytest -q tests/test_comm_hub_email.py tests/test_email_inbox.py

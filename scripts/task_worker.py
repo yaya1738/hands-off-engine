@@ -445,6 +445,8 @@ def poll_once(max_tasks=None):
                     result_summary=str(result['context'].get('result', result['context'].get('error', '')))[:200],
                     correlation_id=result['context'].get('correlation_id'),
                     next_action=task.get('context', {}).get('next_action'),
+                    # Explicit, task-authored metadata only; no inference or sending.
+                    human_contact=task.get('context', {}).get('human_contact'),
                 )
             count += 1
             if max_tasks is not None and count >= max_tasks:
