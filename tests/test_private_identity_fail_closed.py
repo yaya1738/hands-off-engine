@@ -75,3 +75,27 @@ def test_auto_identity_accepts_only_a_configured_fingerprint(monkeypatch, tmp_pa
     assert result["is_master"] is True
     assert result["confidence"] == 1.0
 
+
+
+def test_absolute_identity_does_not_combine_weak_context_into_authorization(monkeypatch, tmp_path):
+    monkeypatch.setenv("HANDS_OFF_PRIVATE_DIR", str(tmp_path))
+    monkeypatch.delenv("HANDS_OFF_IDENTITY_PROFILE", raising=False)
+
+    import security.absolute_identity as absolute_identity
+    importlib.reload(absolute_identity)
+
+    verifier = absolute_identity.AbsoluteIdentity()
+    verifier.profile = {"verification_weights": {"ssh_key_match": 0.4}}
+    monkeypatch.setattr(verifier, "verify_cryptographic", lambda: 0.0)
+    monkeypatch.setattr(verifier, "verify_infrastructure", lambda: 0.2)
+    monkeypatch.setattr(verifier, "verify_behavioral", lambda message=None: 0.1)
+    monkeypatch.setattr(verifier, "verify_knowledge", lambda responses=None: 0.1)
+    monkeypatch.setattr(verifier, "verify_contextual", lambda: 0.1)
+    monkeypatch.setattr(verifier, "verify_human_identity", lambda answers=None: 0.0)
+    monkeypatch.setattr(verifier, "_log_verification", lambda result: None)
+
+    result = verifier.full_verification(message="ordinary message")
+
+    assert result["verified"] is False
+    assert result["confidence"] == 0.0
+    assert result["verdict"] == "UNVERIFIED"
