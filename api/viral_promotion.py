@@ -170,8 +170,10 @@ That's confidence in our signals.
 def share_on_telegram(message):
     """Share message on Telegram"""
 
-    token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
-    chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+    token = os.getenv('TELEGRAM_BOT_TOKEN', '').strip()
+    chat_id = os.getenv('TELEGRAM_CHAT_ID', '').strip()
+    if not token or not chat_id:
+        return False
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     response = requests.post(url, json={
