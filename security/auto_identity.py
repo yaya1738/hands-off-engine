@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Auto Identity Detection - Always knows when it's Yair Siegel
+Private Identity Detection - configured owner verification
 
 Detection methods:
 1. SSH key fingerprint (most reliable)
@@ -127,7 +127,7 @@ def log_identity_check(result: dict):
         pass
 
 def require_yair(func):
-    """Decorator - only run if it's Yair"""
+    """Decorator - only run when configured owner identity is verified"""
     def wrapper(*args, **kwargs):
         check = is_yair()
         if not check["is_master"]:
@@ -139,7 +139,7 @@ def require_yair(func):
 
 # Quick check function for other scripts
 def am_i_yair() -> bool:
-    """Simple bool check - is the current user Yair?"""
+    """Simple bool check for configured owner identity."""
     return is_yair()["is_master"]
 
 def whoami() -> str:
