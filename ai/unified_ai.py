@@ -178,9 +178,7 @@ def should_execute(action: str, roi_estimate: float = 0, **kwargs) -> bool:
         # Cost gate error - log but don't block
         print(f"[COST GATE] Warning: {e}")
 
-    # Always serve the master
-    if "yair" in action.lower() or "siegel" in action.lower():
-        return True
+    # Owner-name text is not an authorization signal; all actions use policy gates.
 
     # ROI positive actions: execute
     if roi_estimate > 0:
