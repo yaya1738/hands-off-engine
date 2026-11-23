@@ -41,7 +41,7 @@ def is_master(ssh_key_comment: str = None, device_id: str = None) -> bool:
     devices = set(MASTER_IDENTITY["devices"])
     if not ssh_key_comment or ssh_key_comment not in fingerprints:
         return False
-    if devices and (not device_id or device_id not in devices):
+    if device_id is not None and devices and device_id not in devices:
         return False
     return True
 
