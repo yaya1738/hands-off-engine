@@ -256,7 +256,7 @@ def get_system_state() -> Dict:
     state_file = REPO_ROOT / "state" / "unified_system_state.json"
     if not state_file.exists():
         return {
-            "balance": None,
+            "balance": 0.0,
             "balance_status": "unknown",
             "trading_enabled": False,
             "micro_trading": False,
@@ -269,11 +269,28 @@ def get_system_state() -> Dict:
             state = json.load(handle)
         if not isinstance(state, dict):
             raise ValueError("system state must be a JSON object")
+
+        # Historical state snapshots are not financial evidence. Only a balance
+        # explicitly marked verified by a successful wallet check is usable.
+        balance = state.get("balance")
+        verified = (
+            state.get("balance_status") == "verified"
+            and isinstance(balance, (int, float))
+            and math.isfinite(float(balance))
+            and float(balance) >= 0
+        )
+        if not verified:
+            state["balance"] = 0.0
+            state["balance_status"] = "unknown"
+            state["trading_enabled"] = False
+            state["micro_trading"] = False
+        else:
+            state["balance"] = float(balance)
         return state
     except (OSError, ValueError, TypeError) as exc:
         # Corrupt or unreadable state must never create a usable bankroll.
         return {
-            "balance": None,
+            "balance": 0.0,
             "balance_status": "unknown",
             "trading_enabled": False,
             "micro_trading": False,
@@ -387,11 +404,11 @@ def run_system_check() -> Dict:
                 raise ValueError("wallet returned an invalid balance")
             results["checks"]["balance"] = {"value": balance, "status": "verified"}
         else:
-            balance = None
-            results["checks"]["balance"] = {"value": None, "status": "unknown", "reason": str(msg)[:160]}
+            balance = 0.0
+            results["checks"]["balance"] = {"value": 0.0, "status": "unknown", "reason": str(msg)[:160]}
     except Exception as exc:
-        balance = None
-        results["checks"]["balance"] = {"value": None, "status": "unknown", "reason": type(exc).__name__}
+        balance = 0.0
+        results["checks"]["balance"] = {"value": 0.0, "status": "unknown", "reason": type(exc).__name__}
 
     # Check agents
     try:
@@ -406,7 +423,8 @@ def run_system_check() -> Dict:
 
     # Update system state
     update_system_state({
-        "balance": results["checks"].get("balance", {}).get("value", 0),
+        "balance": results["checks"].get("balance", {}).get("value", 0.0),
+        "balance_status": results["checks"].get("balance", {}).get("status", "unknown"),
         "active_agents": results["checks"].get("agents", {}).get("active", [])
     })
 
