@@ -46,7 +46,7 @@ def is_master(ssh_key_comment: str = None, device_id: str = None) -> bool:
     return True
 
 def request_access(requester: str, purpose: str, benefit_to_master: str) -> str:
-    """Others must explain how access benefits Yair"""
+    """External requesters must explain the benefit to the configured operator"""
     _ensure_private_dir()
     request = {
         "id": hashlib.sha256(f"{requester}{datetime.now()}".encode()).hexdigest()[:12],
