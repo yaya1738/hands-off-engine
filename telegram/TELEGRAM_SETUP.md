@@ -11,7 +11,7 @@
 3. Send: `/newbot`
 4. Choose name: "Hands Off Engine Bot" (or whatever you want)
 5. Choose username: `hands_off_bot` (or whatever - must end in 'bot')
-6. **Copy the token** BotFather gives you (looks like: `123456789:ABCdefGHIjklMNOpqrsTUVwxyz`)
+6. **Copy the token** BotFather gives you (looks like: `YOUR_TELEGRAM_BOT_TOKEN`)
 
 ---
 
@@ -27,16 +27,16 @@
 
 ```bash
 # Set environment variables (replace with your values)
-export TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+export TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"
 export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"
 
 # Make permanent (add to ~/.bashrc or /etc/environment)
-echo 'export TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"' >> ~/.bashrc
+echo 'export TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"' >> ~/.bashrc
 echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 
 # Or add to system environment
 sudo tee -a /etc/environment <<EOF
-TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
+TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"
 TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"
 EOF
 ```
