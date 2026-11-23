@@ -21,6 +21,11 @@ on:
       - "fix/**"
     paths:
       - "ai/unified_ai.py"
+      - "ai/mega_unified_system.py"
+      - "autonomous/mega_integration.py"
+      - "state/unified_system_state.json"
+      - "audit/__init__.py"
+      - "audit/audit_logger.py"
       - "executor/ho_executor_plan.py"
       - "scripts/run_pipeline.py"
       - "tests/test_unified_ai_financial_gate.py"
