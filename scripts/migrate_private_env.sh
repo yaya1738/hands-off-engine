@@ -23,6 +23,7 @@ copy_private() {
 copy_private "$REPO_ROOT/security/yair_identity_profile.json" "$PRIVATE_ROOT/security/owner_identity_profile.json"
 copy_private "$REPO_ROOT/security/yair_human_identity.json" "$PRIVATE_ROOT/security/owner_human_identity.json"
 copy_private "$REPO_ROOT/termux-hands-off/state/auto_sources.env" "$PRIVATE_ROOT/termux/auto_sources.env"
+copy_private "$REPO_ROOT/termux-hands-off/state/ifttt.env" "$PRIVATE_ROOT/termux/ifttt.env"
 copy_private "$REPO_ROOT/state/UNIFIED_SYSTEM_STATE.json" "$PRIVATE_ROOT/state/legacy_UNIFIED_SYSTEM_STATE.json"
 copy_private "$REPO_ROOT/state/unified_system_state.json" "$PRIVATE_ROOT/state/legacy_unified_system_state.json"
 copy_private "$REPO_ROOT/docs/claude/USER_PROFILE.md" "$PRIVATE_ROOT/profile/legacy_USER_PROFILE.md"
