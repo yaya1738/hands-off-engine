@@ -47,20 +47,24 @@ def log(msg: str):
 
 
 def send_telegram(message: str):
-    import requests
+    """Send Telegram only with private environment credentials."""
+    import os
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
+    text = message
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": message, "parse_mode": "Markdown"},
-            timeout=10
+        import requests
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except:
-        pass
-
-
-# ============================================================================
-# ACCELERATION VECTORS - Each one collapses a dimension of future into present
-# ============================================================================
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 def accelerate_capital_awareness():
     """Maximize visibility into every capital source"""
