@@ -43,6 +43,11 @@ TOKEN_FILE = Path.home() / ".codex" / "telegram-bridge.json"
 STATE_DIR = REPO_ROOT / "state"
 TELEGRAM_STATE = STATE_DIR / "telegram_state.json"
 MAX_MESSAGE_LENGTH = 4000
+ADMIN_USER_IDS = {
+    value.strip()
+    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+    if value.strip()
+}
 
 
 def load_config():
@@ -148,9 +153,17 @@ class TelegramBridge:
 
         for msg in messages:
             text = msg["text"].strip()
+            sender_id = msg.get("user_id")
 
-            # Parse command-style messages
-            if text.startswith("/approve "):
+            # This bridge has a separate ingress path from telegram_command_bot.
+            # Never promote an arbitrary Telegram sender to the trusted operator.
+            if not ADMIN_USER_IDS or sender_id is None or str(sender_id) not in ADMIN_USER_IDS:
+                response = {
+                    "routed_to": "rejected",
+                    "error": "Unauthorized: Telegram sender is not in TELEGRAM_ADMIN_USER_IDS.",
+                }
+            # Parse command-style messages only after sender authorization.
+            elif text.startswith("/approve "):
                 cmd_id = text.split(" ", 1)[1].strip()
                 response = hub.receive("operator", "approve", {"command_id": cmd_id}, channel="telegram")
             elif text.startswith("/reject "):

@@ -112,6 +112,7 @@ class SimpleTelegramBot:
 
             chat_id = message.get("chat", {}).get("id")
             text = message.get("text", "")
+            sender_id = message.get("from", {}).get("id")
             username = message.get("from", {}).get("username", "unknown")
 
             # Check if chat is allowed (if ALLOWED_CHAT_ID is set)
@@ -126,7 +127,7 @@ class SimpleTelegramBot:
             logger.info(f"Received command from {username} (chat {chat_id}): {text}")
 
             # Process command using command bot
-            response = self.command_bot.process_command(text)
+            response = self.command_bot.process_command(text, actor_id=sender_id)
 
             # Send response
             self.send_message(chat_id, response)
