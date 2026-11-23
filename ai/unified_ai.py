@@ -12,6 +12,8 @@ AI serving Yair Siegel.
 """
 
 import json
+import math
+import os
 import sys
 from pathlib import Path
 from typing import Dict, Optional
@@ -250,18 +252,35 @@ def announce_agent(agent_name: str):
 # ============================================================================
 
 def get_system_state() -> Dict:
-    """Get current unified system state."""
+    """Return system state without inventing financial facts."""
     state_file = REPO_ROOT / "state" / "unified_system_state.json"
-    if state_file.exists():
-        with open(state_file) as f:
-            return json.load(f)
-    return {
-        "balance": 8.99,
-        "trading_enabled": False,
-        "escape_velocity": 44,
-        "active_agents": [],
-        "last_update": None
-    }
+    if not state_file.exists():
+        return {
+            "balance": None,
+            "balance_status": "unknown",
+            "trading_enabled": False,
+            "micro_trading": False,
+            "active_agents": [],
+            "last_update": None,
+        }
+
+    try:
+        with open(state_file, encoding="utf-8") as handle:
+            state = json.load(handle)
+        if not isinstance(state, dict):
+            raise ValueError("system state must be a JSON object")
+        return state
+    except (OSError, ValueError, TypeError) as exc:
+        # Corrupt or unreadable state must never create a usable bankroll.
+        return {
+            "balance": None,
+            "balance_status": "unknown",
+            "trading_enabled": False,
+            "micro_trading": False,
+            "active_agents": [],
+            "last_update": None,
+            "state_error": type(exc).__name__,
+        }
 
 
 def update_system_state(updates: Dict):
@@ -279,17 +298,31 @@ def update_system_state(updates: Dict):
 
 
 def check_trading_allowed(amount: float = 0) -> tuple:
-    """Unified check: is trading allowed?"""
+    """Fail closed unless both explicit live authorization and wallet truth exist."""
+    try:
+        requested = float(amount)
+    except (TypeError, ValueError):
+        return False, "Invalid trade amount"
+
+    if not math.isfinite(requested) or requested <= 0:
+        return False, "Trade amount must be finite and greater than zero"
+
     state = get_system_state()
+    if state.get("trading_enabled") is not True:
+        return False, "Trading disabled: explicit trading_enabled=true is required"
 
-    if not state.get("trading_enabled", False):
-        if state.get("balance", 0) < 50:
-            return False, f"Trading disabled: balance ${state.get('balance', 0):.2f} < $50"
+    if os.environ.get("LIVE_TRADING_ENABLED") != "1":
+        return False, "Trading disabled: LIVE_TRADING_ENABLED=1 is not set"
 
-    if amount > state.get("balance", 0) * 0.5:
-        return False, f"Trade too large: ${amount} > 50% of balance"
+    try:
+        from executor.trading_safeguards import TradingSafeguards
+        allowed, reason = TradingSafeguards().check_wallet_balance(requested)
+    except Exception as exc:
+        return False, f"Wallet verification unavailable: {type(exc).__name__}"
 
-    return True, "Trading allowed"
+    if not allowed:
+        return False, str(reason)
+    return True, str(reason)
 
 
 def optimize_for_master(action: str, options: list) -> str:
@@ -345,13 +378,17 @@ def run_system_check() -> Dict:
         from executor.trading_safeguards import TradingSafeguards
         safeguards = TradingSafeguards()
         ok, msg = safeguards.check_wallet_balance(0)
-        if "balance: $" in msg:
+        if ok and "balance: $" in msg:
             balance = float(msg.split("balance: $")[1].split()[0])
+            if not math.isfinite(balance) or balance < 0:
+                raise ValueError("wallet returned an invalid balance")
+            results["checks"]["balance"] = {"value": balance, "status": "verified"}
         else:
-            balance = 8.99
-        results["checks"]["balance"] = {"value": balance, "status": "ok" if balance > 0 else "low"}
-    except:
-        results["checks"]["balance"] = {"value": 0, "status": "error"}
+            balance = None
+            results["checks"]["balance"] = {"value": None, "status": "unknown", "reason": str(msg)[:160]}
+    except Exception as exc:
+        balance = None
+        results["checks"]["balance"] = {"value": None, "status": "unknown", "reason": type(exc).__name__}
 
     # Check agents
     try:
@@ -379,21 +416,3 @@ CORE = get_core()
 DIRECTIVE = get_directive()
 
 
-# OVERRIDE: Enable micro-trading for capital building
-def check_trading_allowed_v2(amount: float = 0) -> tuple:
-    """Updated check: allow micro-trades to build capital."""
-    state = get_system_state()
-    balance = state.get("balance", 0)
-    
-    # Allow trading if we have ANY balance
-    if balance < 1:
-        return False, f"Need at least $1 to trade"
-    
-    # Limit trade size to 25% of balance
-    if amount > balance * 0.25:
-        return False, f"Trade ${amount} > 25% of ${balance:.2f} balance"
-    
-    return True, f"Micro-trading allowed with ${balance:.2f}"
-
-# Replace the old function
-check_trading_allowed = check_trading_allowed_v2
