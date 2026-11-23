@@ -1,19 +1,19 @@
 {
-  "timestamp": "2025-11-30T21:06:46.285718+00:00",
+  "timestamp": null,
   "master": "Yair Siegel",
-  "balance": 8.99,
-  "positions_value": 95.66,
-  "total_value": 104.65,
+  "balance": 0,
+  "positions_value": 0,
+  "total_value": 0,
   "trading_enabled": false,
-  "micro_trading": true,
-  "min_trade": 1.0,
+  "micro_trading": false,
+  "min_trade": 1,
   "max_trade_pct": 0.25,
-  "trading_threshold": 50.0,
-  "gap_to_trading": 41.01,
-  "mini_singularity_threshold": 25.0,
-  "gap_to_mini": 16.01,
+  "trading_threshold": 50,
+  "gap_to_trading": 0,
+  "mini_singularity_threshold": 25,
+  "gap_to_mini": 0,
   "total_vcpus": 68,
-  "total_ram_gb": 136.0,
+  "total_ram_gb": 136,
   "healthy_nodes": 9,
   "bottleneck_node": "pm-helper",
   "idle_nodes": [
@@ -22,7 +22,7 @@
     "ho-scale (67.205.153.121)"
   ],
   "idle_capacity_vcpus": 24,
-  "idle_capacity_ram_gb": 48.0,
+  "idle_capacity_ram_gb": 48,
   "hardware_status": "24 vCPU idle while pm-helper bottlenecked",
   "automation_processes": 16,
   "cron_jobs": 9,
@@ -32,15 +32,14 @@
     "singularity_trigger"
   ],
   "income_channels": 4,
-  "income_flowing": 0,
+  "income_flowing": false,
   "outreach_status": "materials ready, awaiting user deployment",
   "escape_velocity": 44,
-  "signals_count": 12,
-  "signals_avg_edge": 2.8,
+  "signals_count": 0,
+  "signals_avg_edge": 0,
   "blockers": [
-    "Capital: $41.01 gap to trading ($16.01 to mini)",
-    "Income: Materials ready, user needs to deploy Upwork/Fiverr",
-    "Hardware: GitHub PAT needed to run CLI on compute node"
+    "Financial state is unverified; refresh from the wallet before use.",
+    "Live trading remains disabled."
   ],
   "active_agents": [
     "copilot",
@@ -48,8 +47,10 @@
     "chatgpt",
     "claude-web"
   ],
-  "distribution_ready": true,
-  "last_update": "2025-12-02T02:10:05.990295+00:00",
+  "distribution_ready": false,
+  "last_update": null,
   "scaling_progress": 259.6,
-  "hardware_health": 100.0
+  "hardware_health": 100,
+  "balance_status": "unknown",
+  "financial_state_verified": false
 }
