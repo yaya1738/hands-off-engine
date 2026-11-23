@@ -29,6 +29,9 @@
 # Set environment variables (replace with your values)
 export TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
 export TELEGRAM_CHAT_ID="987654321"
+# Only needed when using a group chat: authorize one specific sender ID.
+# Private chats are authorized only when chat ID and sender ID are the same.
+# export TELEGRAM_USER_ID="987654321"
 
 # Make permanent (add to ~/.bashrc or /etc/environment)
 echo 'export TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"' >> ~/.bashrc
@@ -154,16 +157,19 @@ Once running, send these from Telegram:
 - Token expired - create new bot with @BotFather
 
 **Bot responds to wrong person:**
-- Set TELEGRAM_CHAT_ID to restrict to your chat only
+- TELEGRAM_CHAT_ID is mandatory; the listener refuses to poll without it.
+- For a group chat, also set TELEGRAM_USER_ID to the one authorized sender.
 
 ---
 
 ## Security Notes
 
-- Bot token is like a password - keep it secret
-- Setting TELEGRAM_CHAT_ID restricts bot to only you
-- Without TELEGRAM_CHAT_ID, anyone who finds your bot can use it
-- Always set TELEGRAM_CHAT_ID in production
+- Bot token is like a password - keep it secret.
+- The listener fails closed if TELEGRAM_CHAT_ID is missing.
+- Private chats require the configured chat ID to equal the sender's Telegram user ID.
+- Group chats require both the configured group chat ID and an explicit TELEGRAM_USER_ID.
+- Other members of an allowlisted group cannot issue commands.
+- The primary bridge also checks chatIds and, for groups, userIds from ~/.codex/telegram-bridge.json.
 
 ---
 
