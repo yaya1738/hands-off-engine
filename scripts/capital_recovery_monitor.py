@@ -3,28 +3,21 @@
 Capital Recovery Monitor - Snowball Cycle 1
 ============================================
 
-Monitors for capital recovery events:
-1. Position resolutions returning funds
-2. Balance threshold crossings
-3. Trading capability restoration
-
-When capital returns, automatically:
-- Sends high-priority Telegram alert
-- Updates system state
-- Enables full trading mode
+Read-only monitor for verified capital changes.
+It never enables trading, starts orders, or treats a balance threshold as authorization.
 """
 
-# UNIFIED AI - All systems serve Yair Siegel
+# UNIFIED AI - All systems serve the configured operator
+import os
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
 except ImportError:
-    MASTER = "Yair Siegel"
+    MASTER = os.getenv("HANDS_OFF_OWNER_NAME", "Configured operator")
 
 
-import os
 import json
 import requests
 from datetime import datetime, timezone
