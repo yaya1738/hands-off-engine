@@ -83,3 +83,6 @@ security/verification_audit.jsonl
 security/identity_checks.jsonl
 security/approval_queue.json
 security/access_log.jsonl
+
+security/owner_identity_profile.json
+security/owner_human_identity.json
