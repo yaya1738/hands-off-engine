@@ -16,7 +16,12 @@ permissions:
 
 jobs:
   handle-intake:
+    # Public issue comments are untrusted. Only the repository owner may invoke
+    # the paid OpenAI-backed intake command on the designated intake issue.
+    if: github.event.issue.number == 1 && github.event.comment.user.login == 'yaya1738' && startsWith(github.event.comment.body, '/plan')
     runs-on: ubuntu-latest
+    timeout-minutes: 5
+
 
     env:
       AI_INTAKE_ISSUE_NUMBER: "1"
