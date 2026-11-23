@@ -33,6 +33,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Set
 
+from security.human_capability_registry import HumanCapabilityRegistry
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [EventRouter] %(message)s')
@@ -118,6 +120,7 @@ class EventRouter:
         self.inbound_dir = self.state_dir / "inbound"
         self.inbound_dir.mkdir(parents=True, exist_ok=True)
 
+        self.human_capabilities = HumanCapabilityRegistry()
         self.processed_ids = self._load_processed()
         self.cursor = 0  # byte offset into messages.jsonl
         self._load_cursor()
@@ -202,6 +205,15 @@ class EventRouter:
         event_type = context.get("event_type", msg_type)
         handler_party = context.get("target_party", msg.get("to", ""))
 
+        # Human communication requests are capability-gated and never imply
+        # command, trading, approval, credential, or system-admin access.
+        target_identity = context.get("target_identity")
+        if msg_type in ("human_message", "communication_request") and target_identity:
+            if self.human_capabilities.allowed(target_identity, "communicate"):
+                return f"human:{self.human_capabilities._normalize(target_identity)}"
+            log.warning("Denied human communication route for %s", target_identity)
+            return None
+
         # Task results from AnyClaw → route to Factory for next task
         if sender == "anyclaw" and msg_type in ("task_result", "continuation_event"):
             return "factory"
@@ -257,8 +269,11 @@ class EventRouter:
             "routed": True,
         }
 
-        # Write to handler's inbound queue
-        inbound_file = self.inbound_dir / f"{handler}.jsonl"
+        # Write to handler's inbound queue. Human queues are internal
+        # delivery requests; a transport adapter must enforce the same
+        # capability check before sending externally.
+        safe_handler = handler.replace(":", "_")
+        inbound_file = self.inbound_dir / f"{safe_handler}.jsonl"
         try:
             with open(inbound_file, "a") as f:
                 f.write(json.dumps(record) + "\n")

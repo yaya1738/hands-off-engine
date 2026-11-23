@@ -13,37 +13,93 @@ jobs:
     permissions:
       contents: write  # Need write to commit state changes
     steps:
-      - uses: actions/checkout@v6
+      - name: Authenticate Spark caller
+        env:
+          SPARK_WEBHOOK_TOKEN: ${{ secrets.SPARK_WEBHOOK_TOKEN }}
+          PROVIDED_TOKEN: ${{ github.event.client_payload.webhook_token }}
+        run: |
+          if [ -z "$SPARK_WEBHOOK_TOKEN" ]; then
+            echo "::error::SPARK_WEBHOOK_TOKEN repository secret is not configured"
+            exit 1
+          fi
+          if [ -z "$PROVIDED_TOKEN" ]; then
+            echo "::error::Missing Spark webhook token"
+            exit 1
+          fi
+          python - <<'PY'
+          import hmac
+          import os
+          expected = os.environ["SPARK_WEBHOOK_TOKEN"]
+          provided = os.environ["PROVIDED_TOKEN"]
+          if not hmac.compare_digest(expected, provided):
+              print("::error::Invalid Spark webhook authentication")
+              raise SystemExit(1)
+          PY
+          echo "Spark caller authenticated"
+
+      - name: Validate Spark action payload
+        env:
+          EVENT_ACTION: ${{ github.event.action }}
+          TRADE_ID: ${{ github.event.client_payload.trade_id }}
+          SPARK_USER: ${{ github.event.client_payload.user }}
+        run: |
+          case "$EVENT_ACTION" in
+            spark_emergency_stop|spark_health_check)
+              ;;
+            spark_approve_trade)
+              if [ -z "$TRADE_ID" ] || [[ ! "$TRADE_ID" =~ ^[a-zA-Z0-9_-]{1,128}$ ]]; then
+                echo "::error::Invalid trade ID"
+                exit 1
+              fi
+              if [ -z "$SPARK_USER" ] || [[ ! "$SPARK_USER" =~ ^[a-zA-Z0-9_.@:-]{1,128}$ ]]; then
+                echo "::error::Invalid Spark user identifier"
+                exit 1
+              fi
+              ;;
+            *)
+              echo "::error::Unsupported Spark action"
+              exit 1
+              ;;
+          esac
+          echo "Spark action payload validated"
+
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
         with:
           python-version: '3.11'
       
       - name: Handle Emergency Stop
         if: github.event.action == 'spark_emergency_stop'
+        env:
+          SPARK_USER: ${{ github.event.client_payload.user }}
         run: |
           echo "🛑 Emergency stop triggered from Spark app"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
           
           # Log emergency stop to coordination
           mkdir -p ai/coordination
-          echo "{\"timestamp\": \"${TIMESTAMP}\", \"action\": \"emergency_stop\", \"source\": \"spark_app\", \"triggered_by\": \"${{ github.event.client_payload.user }}\"}" >> ai/coordination/messages.jsonl
+          USER_JSON=$(printf '%s' "$SPARK_USER" | jq -Rs .)
+          jq -cn --arg timestamp "$TIMESTAMP" --argjson user "$USER_JSON" '{timestamp:$timestamp,action:"emergency_stop",source:"spark_app",triggered_by:$user}' >> ai/coordination/messages.jsonl
           
           # Create emergency stop marker
           mkdir -p state
-          echo "{\"stopped\": true, \"timestamp\": \"${TIMESTAMP}\", \"reason\": \"Spark emergency stop\", \"triggered_by\": \"${{ github.event.client_payload.user }}\"}" > state/emergency_stop.json
+          jq -cn --arg timestamp "$TIMESTAMP" --argjson user "$USER_JSON" '{stopped:true,timestamp:$timestamp,reason:"Spark emergency stop",triggered_by:$user}' > state/emergency_stop.json
           
           echo "⚠️ Emergency stop marker created at state/emergency_stop.json"
           echo "System will halt trading operations until manually resumed"
           
       - name: Handle Trade Approval
         if: github.event.action == 'spark_approve_trade'
+        env:
+          SPARK_TRADE_ID: ${{ github.event.client_payload.trade_id }}
+          SPARK_USER: ${{ github.event.client_payload.user }}
         run: |
           echo "✅ Trade approved from Spark app"
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          TRADE_ID="${{ github.event.client_payload.trade_id }}"
-          USER="${{ github.event.client_payload.user }}"
+          TRADE_ID="$SPARK_TRADE_ID"
+          USER="$SPARK_USER"
           
           # Validate trade ID is not empty and contains only safe characters
           if [ -z "$TRADE_ID" ] || [[ ! "$TRADE_ID" =~ ^[a-zA-Z0-9_-]+$ ]]; then
@@ -99,5 +155,5 @@ jobs:
           [ -f state/emergency_stop.json ] && git add state/emergency_stop.json
           git add state/approvals/*.json 2>/dev/null || true
           
-          git diff --staged --quiet || git commit -m "chore: Spark app action - ${{ github.event.action }}"
+          git diff --staged --quiet || git commit -m "chore: process Spark app action"
           git push

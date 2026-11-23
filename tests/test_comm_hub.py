@@ -131,3 +131,19 @@ def test_messages_jsonl_written():
     assert len(lines) >= 1
     entry = json.loads(lines[-1])
     assert entry["to"] == "operator"
+
+
+def test_human_contacts_are_communication_only():
+    hub = _make_hub()
+    for party_id in ("david_kaplan", "carol_kaplan"):
+        result = hub.send(party_id, "human_message", {"text": "hello"})
+        assert result["status"] == "sent"
+        denied = hub.send(party_id, "trade_alert", {"market": "ETH"})
+        assert denied["status"] == "denied"
+
+
+def test_human_inbound_cannot_submit_privileged_commands():
+    hub = _make_hub()
+    for msg_type in ("trade_command", "execute_command", "approve", "reject", "task_result"):
+        result = hub.receive("david_kaplan", msg_type, {"action": "test"})
+        assert result["routed_to"] == "rejected"

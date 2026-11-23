@@ -23,7 +23,10 @@ async def handle_setup_github(update, context):
         "Accept": "application/vnd.github+json"
     }
     payload = {
-        "event_type": "telegram_trigger_setup"
+        "event_type": "telegram_trigger_setup",
+        "client_payload": {
+            "webhook_token": TELEGRAM_SETUP_TOKEN
+        }
     }
     
     response = requests.post(url, headers=headers, json=payload)
@@ -231,3 +234,10 @@ Test the Telegram commands:
 ```
 
 Check workflow runs in the Actions tab.
+
+
+### Authentication requirement
+
+The `telegram_trigger_setup` repository dispatch is an administrative workflow trigger. The workflow now requires the `TELEGRAM_SETUP_TOKEN` repository secret and rejects dispatches without a matching `client_payload.webhook_token`.
+
+Store the same secret only in the authenticated Telegram integration's server-side secret store. Do not put it in source control, client-side code, URLs, or logs. Rotate it if the integration is suspected of compromise.

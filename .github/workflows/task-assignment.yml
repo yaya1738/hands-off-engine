@@ -4,50 +4,74 @@ on:
   issues:
     types: [labeled]
 
+env:
+  TRUSTED_ACTORS: "yaya1738,copilot,copilot-swe-agent,app/copilot-swe-agent,github-actions[bot],dependabot[bot]"
+
 jobs:
   assign-to-copilot:
     if: contains(github.event.label.name, 'copilot-task')
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Need write to commit coordination updates
-      issues: write    # Need write to comment on issues
+      contents: write
+      issues: write
     steps:
+      - name: Authorize task assignment actor
+        env:
+          ACTOR: ${{ github.actor }}
+          TRUSTED_ACTORS: ${{ env.TRUSTED_ACTORS }}
+        run: |
+          ACTOR_LOWER=$(printf '%s' "$ACTOR" | tr '[:upper:]' '[:lower:]')
+          AUTHORIZED="false"
+          for trusted in $(printf '%s' "$TRUSTED_ACTORS" | tr ',' ' '); do
+            trusted_lower=$(printf '%s' "$trusted" | tr '[:upper:]' '[:lower:]')
+            if [ "$ACTOR_LOWER" = "$trusted_lower" ]; then
+              AUTHORIZED="true"
+              break
+            fi
+          done
+          if [ "$AUTHORIZED" != "true" ]; then
+            echo "::error::Task assignment is restricted to trusted actors"
+            exit 1
+          fi
+          echo "Task assignment actor authorized"
+
       - name: Log task assignment
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
         run: |
-          echo "✅ Issue #${{ github.event.issue.number }} assigned to Copilot agent"
-          echo "Title: ${{ github.event.issue.title }}"
-          echo "Created by: ${{ github.event.issue.user.login }}"
-      
+          echo "Issue #${ISSUE_NUMBER} assigned to Copilot agent"
+          printf 'Title: %s\n' "${ISSUE_TITLE}"
+          printf 'Created by: %s\n' "${ISSUE_AUTHOR}"
+
       - name: Checkout repository
-        uses: actions/checkout@v6
-      
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+
       - name: Update coordination status
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
         run: |
-          # Create timestamp
           TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-          
-          # Sanitize issue title for JSON using jq
-          TITLE=$(echo "${{ github.event.issue.title }}" | jq -Rs .)
-          # Remove surrounding quotes from jq output
-          TITLE=${TITLE:1:-1}
-          
-          # Append task assignment to coordination log
           mkdir -p ai/coordination
-          echo "{\"timestamp\": \"${TIMESTAMP}\", \"issue\": ${{ github.event.issue.number }}, \"status\": \"assigned\", \"agent\": \"copilot\", \"title\": ${TITLE}}" >> ai/coordination/copilot_tasks.jsonl
-          
-          # Log assignment
-          echo "📝 Task #${{ github.event.issue.number }} logged to coordination system"
-      
+          jq -cn --arg timestamp "$TIMESTAMP" --argjson issue "$ISSUE_NUMBER" --arg title "$ISSUE_TITLE" \
+            '{timestamp:$timestamp,issue:$issue,status:"assigned",agent:"copilot",title:$title}' \
+            >> ai/coordination/copilot_tasks.jsonl
+          echo "Issue #${ISSUE_NUMBER} logged to coordination system"
+
       - name: Commit and push coordination updates
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add ai/coordination/copilot_tasks.jsonl
-          git diff --staged --quiet || git commit -m "chore: Log Copilot task assignment #${{ github.event.issue.number }}"
+          git diff --staged --quiet || git commit -m "chore: Log Copilot task assignment #${ISSUE_NUMBER}"
           git push
-      
+
       - name: Add comment to issue
-        uses: actions/github-script@v8
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd
         with:
           script: |
             github.rest.issues.createComment({

@@ -31,6 +31,8 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
+from security.human_capability_registry import HumanCapabilityRegistry
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 logging.basicConfig(level=logging.INFO, format='[%(asctime)s] [%(levelname)s] [CommHub] %(message)s')
@@ -150,6 +152,16 @@ DEFAULT_PARTIES = {
         "notify_on": ["*"],
         "format": "json",
     },
+    "david_kaplan": {
+        "id": "david_kaplan", "name": "David Kaplan", "role": "human",
+        "trust_level": 2, "channels": ["file"], "info_scope": "communication_only",
+        "notify_on": ["human_message", "system_status"], "format": "human_readable",
+    },
+    "carol_kaplan": {
+        "id": "carol_kaplan", "name": "Carol Kaplan", "role": "human",
+        "trust_level": 2, "channels": ["file"], "info_scope": "communication_only",
+        "notify_on": ["human_message", "system_status"], "format": "human_readable",
+    },
 }
 
 
@@ -172,6 +184,7 @@ MESSAGE_TYPES = {
     "info_response": {"priority": 4, "requires_ack": False, "retention_hours": 24},
     "health_check": {"priority": 3, "requires_ack": False, "retention_hours": 6},
     "heartbeat": {"priority": 1, "requires_ack": False, "retention_hours": 1},
+    "human_message": {"priority": 4, "requires_ack": False, "retention_hours": 72},
 }
 
 
@@ -237,6 +250,12 @@ class CommHub:
         if not party:
             log.warning(f"Unknown party: {party_id}")
             return {"status": "error", "error": f"Unknown party: {party_id}"}
+        if party.get("role") == "human":
+            capabilities = HumanCapabilityRegistry()
+            if not capabilities.allowed(party_id, "communicate"):
+                return {"status": "denied", "error": f"Human capability denied: {party_id}"}
+            if msg_type not in ("human_message", "system_status"):
+                return {"status": "denied", "error": "Human identities may only receive communication/status messages"}
 
         # Check if this party subscribes to this message type
         if "*" not in party.get("notify_on", []) and msg_type not in party.get("notify_on", []):
@@ -307,6 +326,15 @@ class CommHub:
         if sender_id not in self.parties:
             return {"routed_to": "rejected", "error": f"Unknown sender: {sender_id}"}
         sender = self.parties[sender_id]
+
+        # Human identities are inbound communication peers only. They cannot
+        # submit approvals, trades, execution commands, or agent tasks.
+        if sender.get("role") == "human":
+            capabilities = HumanCapabilityRegistry()
+            if not capabilities.allowed(sender_id, "communicate"):
+                return {"routed_to": "rejected", "error": f"Human capability denied: {sender_id}"}
+            if msg_type not in ("human_message", "status_query", "health_query"):
+                return {"routed_to": "rejected", "error": "Human identities may only send communication/status queries"}
 
         msg = {
             "id": str(uuid.uuid4()),
