@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-REPO_ROOT="${HANDS_OFF_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+REPO_ROOT="${HANDS_OFF_REPO_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 PRIVATE_ROOT="${HANDS_OFF_PRIVATE_DIR:-$HOME/.config/hands-off-engine}"
 
 mkdir -p "$PRIVATE_ROOT/security" "$PRIVATE_ROOT/termux" "$PRIVATE_ROOT/state" "$PRIVATE_ROOT/profile" "$PRIVATE_ROOT/finance"
