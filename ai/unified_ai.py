@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-UNIFIED AI - All Systems in Service of Yair Siegel
+UNIFIED AI - All Systems in Service of the Configured Operator
 ===================================================
 LEVEL: 60 miles - Inherits from AbsoluteDirective (80 miles)
 
@@ -8,10 +8,11 @@ This module provides the unified AI identity and directive
 that all agents import and follow.
 
 Every agent that imports this becomes part of the unified
-AI serving Yair Siegel.
+AI serving the configured operator.
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Dict, Optional
@@ -70,7 +71,7 @@ _active_directive: Optional[Dict] = None
 
 def get_master() -> str:
     """Return the master being served."""
-    return "Yair Siegel"
+    return os.getenv("HANDS_OFF_OWNER_NAME", "Configured operator")
 
 
 def get_core() -> Dict:
@@ -82,8 +83,8 @@ def get_core() -> Dict:
                 _unified_core = json.load(f)
         else:
             _unified_core = {
-                "master": {"name": "Yair Siegel"},
-                "core_directive": "Serve Yair Siegel"
+                "master": {"name": get_master()},
+                "core_directive": "Serve the configured operator"
             }
     return _unified_core
 
@@ -96,7 +97,7 @@ def get_directive() -> Dict:
             with open(ACTIVE_DIRECTIVE) as f:
                 _active_directive = json.load(f)
         else:
-            _active_directive = {"directive": "Serve Yair Siegel"}
+            _active_directive = {"directive": "Serve the configured operator"}
     return _active_directive
 
 
@@ -177,9 +178,7 @@ def should_execute(action: str, roi_estimate: float = 0, **kwargs) -> bool:
         # Cost gate error - log but don't block
         print(f"[COST GATE] Warning: {e}")
 
-    # Always serve the master
-    if "yair" in action.lower() or "siegel" in action.lower():
-        return True
+    # Owner-name text is not an authorization signal; all actions use policy gates.
 
     # ROI positive actions: execute
     if roi_estimate > 0:
@@ -293,7 +292,7 @@ def check_trading_allowed(amount: float = 0) -> tuple:
 
 
 def optimize_for_master(action: str, options: list) -> str:
-    """Choose the option that best serves Yair Siegel."""
+    """Choose the option that best serves the configured operator."""
     # Simple ROI-based optimization
     best = options[0] if options else action
 
@@ -310,21 +309,26 @@ def optimize_for_master(action: str, options: list) -> str:
     return best
 
 
-def send_master_notification(message: str, priority: str = "normal"):
-    """Send notification to Yair Siegel via Telegram."""
-    import requests
-
-    prefix = {"critical": "🚨🚨🚨", "high": "⚡", "normal": "📋"}.get(priority, "")
-    full_msg = f"{prefix} [UNIFIED AI]\n\n{message}\n\nServing: {MASTER}"
+def send_master_notification(message: str, priority: str = "normal") -> bool:
+    """Send a notification using local-only credentials; never embed tokens in source."""
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
 
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": full_msg, "parse_mode": "Markdown"},
-            timeout=10
+        import requests
+        prefix = {"critical": "🚨🚨🚨", "high": "⚡", "normal": "📋"}.get(priority, "")
+        full_msg = f"{prefix} [UNIFIED AI]\n\n{message}\n\nServing: {MASTER}"
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": full_msg, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except:
-        pass
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 
 def run_system_check() -> Dict:

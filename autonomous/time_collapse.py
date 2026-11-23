@@ -47,20 +47,24 @@ def log(msg: str):
 
 
 def send_telegram(message: str):
-    import requests
+    """Send Telegram only with private environment credentials."""
+    import os
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
+    text = message
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": message, "parse_mode": "Markdown"},
-            timeout=10
+        import requests
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except:
-        pass
-
-
-# ============================================================================
-# ACCELERATION VECTORS - Each one collapses a dimension of future into present
-# ============================================================================
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 def accelerate_capital_awareness():
     """Maximize visibility into every capital source"""
@@ -113,27 +117,33 @@ def accelerate_income_channels():
     import requests
 
     pages = [
-        ("Polymarket Affiliate", "http://138.68.103.156:8080"),
-        ("AI Nexus Consulting", "http://138.68.103.156:8081"),
+        ("Polymarket Affiliate", os.getenv("HANDS_OFF_POLYMARKET_AFFILIATE_URL")),
+        ("AI Nexus Consulting", os.getenv("HANDS_OFF_AI_NEXUS_URL")),
     ]
 
     for name, url in pages:
+        if not url:
+            results.append(f"{name}: endpoint not configured")
+            continue
         try:
             resp = requests.get(url, timeout=5)
             if resp.status_code == 200:
                 results.append(f"✓ {name}: LIVE")
             else:
                 results.append(f"✗ {name}: {resp.status_code}")
-        except:
+        except Exception:
             results.append(f"✗ {name}: DOWN")
 
-    # Verify payment address is displayed
-    try:
-        resp = requests.get("http://138.68.103.156:8081", timeout=5)
-        if "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D" in resp.text:
-            results.append("✓ USDC payment address: VISIBLE")
-    except:
-        pass
+    # Verify a payment endpoint only when its address is configured privately.
+    payment_status_url = os.getenv("HANDS_OFF_PAYMENT_STATUS_URL")
+    funding_wallet = os.getenv("HANDS_OFF_FUNDING_WALLET")
+    if payment_status_url and funding_wallet:
+        try:
+            resp = requests.get(payment_status_url, timeout=5)
+            if resp.status_code == 200 and funding_wallet in resp.text:
+                results.append("✓ Configured payment endpoint: VISIBLE")
+        except Exception:
+            pass
 
     return {"vector": "income_channels", "results": results}
 

@@ -20,7 +20,7 @@
    - **Type and send:** `your_name_handsoff_bot` (must end in `bot`)
    - Example: `john_handsoff_bot`
 9. **BotFather sends you a long message with a TOKEN**
-   - Looks like: `7234567890:AAHdkE8FjkslDKF9dkfJDKFjdkf83jdkf`
+   - Looks like: `YOUR_TELEGRAM_BOT_TOKEN`
 10. **COPY this token** (long press on it → Copy)
 11. **Paste it somewhere safe** (Notes app, email yourself, etc.)
 
@@ -63,7 +63,7 @@ echo 'export TELEGRAM_BOT_TOKEN="YOUR_TOKEN_HERE"' >> ~/.bashrc
 
 **Real example (YOUR TOKEN WILL BE DIFFERENT):**
 ```bash
-echo 'export TELEGRAM_BOT_TOKEN="7234567890:AAHdkE8FjkslDKF9dkfJDKFjdkf83jdkf"' >> ~/.bashrc
+echo 'export TELEGRAM_BOT_TOKEN="YOUR_TELEGRAM_BOT_TOKEN"' >> ~/.bashrc
 ```
 
 ### Step 2.3: Save Your Chat ID
@@ -76,7 +76,7 @@ echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 
 **Real example (YOUR ID WILL BE DIFFERENT):**
 ```bash
-echo 'export TELEGRAM_CHAT_ID="123456789"' >> ~/.bashrc
+echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 ```
 
 ### Step 2.4: Load the Settings

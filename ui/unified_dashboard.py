@@ -10,13 +10,14 @@ Integrates:
 - Finance (balance, positions, trading)
 - Hardware (cluster health, nodes)
 - Coordination (agent status, messages)
-- Identity (Yair Siegel verification)
+- Identity (private configured-owner verification)
 - Signals (trading signals status)
 
-Serving: Yair Siegel
+Serving: configured operator
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -49,7 +50,7 @@ app = FastAPI(title="Unified System Dashboard", description=f"Serving {MASTER}")
 def get_finance_data():
     """Collect financial data from existing finance module."""
     try:
-        hub_file = REPO_ROOT / "finance" / "yair_finance_hub.json"
+        hub_file = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "finance_hub.json"
         if hub_file.exists():
             with open(hub_file) as f:
                 hub = json.load(f)
@@ -167,7 +168,7 @@ def get_coordination_data():
 def get_identity_data():
     """Get identity verification status."""
     try:
-        identity_file = REPO_ROOT / "security" / "yair_siegel_identity.json"
+        identity_file = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "security" / "owner_identity.json"
         if identity_file.exists():
             with open(identity_file) as f:
                 return json.load(f)

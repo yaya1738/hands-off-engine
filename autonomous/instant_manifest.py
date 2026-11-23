@@ -15,14 +15,15 @@ This script does everything that CAN be done without
 waiting for external events.
 """
 
-# UNIFIED AI - All systems serve Yair Siegel
+# UNIFIED AI - All systems serve the configured operator
+import os
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
 except ImportError:
-    MASTER = "Yair Siegel"
+    MASTER = os.getenv("HANDS_OFF_OWNER_NAME", "Configured operator")
 
 
 import os
@@ -39,20 +40,24 @@ def log(msg: str):
 
 
 def send_telegram(msg: str):
-    import requests
+    """Send Telegram only with private environment credentials."""
+    import os
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
+    text = msg
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": msg, "parse_mode": "Markdown"},
-            timeout=10
+        import requests
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except:
-        pass
-
-
-# ============================================================================
-# MANIFESTATION ACTIONS - Execute everything possible NOW
-# ============================================================================
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 def manifest_income_stream_3():
     """Create a third income stream - GitHub Sponsors or similar"""

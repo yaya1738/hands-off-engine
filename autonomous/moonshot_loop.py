@@ -24,7 +24,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import time
 
-# UNIFIED AI - All systems serve Yair Siegel
+# UNIFIED AI - All systems serve the configured operator
 sys.path.insert(0, str(Path(__file__).parent.parent))
 from ai.unified_ai import announce_agent, get_master, log_action, MASTER
 
@@ -71,17 +71,24 @@ def log(msg: str):
 
 
 def send_telegram(message: str):
-    """Send notification"""
-    import requests
+    """Send Telegram only with private environment credentials."""
+    import os
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
+    text = message
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": message, "parse_mode": "Markdown"},
-            timeout=10
+        import requests
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": text, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except:
-        pass
-
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 def get_system_metrics() -> dict:
     """Gather current system metrics for escape velocity calculation"""
@@ -134,7 +141,7 @@ def get_system_metrics() -> dict:
 
     # Load finance hub for full resource awareness
     try:
-        finance_hub = Path("/root/hands-off-engine/finance/yair_finance_hub.json")
+        finance_hub = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "finance_hub.json"
         if finance_hub.exists():
             hub = json.load(open(finance_hub))
             metrics["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 3280)
@@ -211,7 +218,7 @@ def build_claude_prompt(state: dict, metrics: dict) -> str:
     improvement_context = os.environ.get("IMPROVEMENT_CONTEXT", "")
     context_section = f"\nIMPROVEMENT CONTEXT (from triggering agent):\n{improvement_context}\n" if improvement_context else ""
 
-    prompt = f"""You are the SUPER SERVANT of Yair Siegel - autonomous improvement system.
+    prompt = f"""You are the autonomous improvement system serving the configured operator within governed permissions and safety constraints.
 {context_section}
 
 MISSION: Achieve escape velocity while maximizing ROI on every resource.
@@ -254,7 +261,7 @@ ABSOLUTE PROHIBITION:
 EXECUTE ONE HIGH-IMPACT ACTION NOW.
 Document in state/moonshot_improvements.jsonl
 
-Serving: Yair Siegel
+Serving: the configured operator
 Focus: {state['current_focus']}
 """
     return prompt

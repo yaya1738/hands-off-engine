@@ -31,7 +31,7 @@ Runway: ~10 days until Dec 10 resolution
 
 ### APIs (Verified Working)
 - **Claude CLI**: This session - WORKING
-- **Telegram**: @pm_alerts_autobot - WORKING
+- **Telegram**: optional; credentials must be supplied through private environment configuration.
 - **Polymarket**: Wallet connected - WORKING ($8.99)
 - **DigitalOcean**: siegel.yaz@gmail.com - WORKING
 - **GitHub**: SSH to yaya1738/hands-off-engine - WORKING
@@ -155,11 +155,7 @@ s = TradingSafeguards()
 print(s.check_wallet_balance(0))
 "
 
-# Send Telegram message
-python3 -c "
-import requests
-requests.post('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage',
-json={'chat_id': '8327766663', 'text': 'Test'})
+# Telegram credentials are local-only environment values; never paste tokens or chat IDs into documentation.
 "
 
 # View landing page

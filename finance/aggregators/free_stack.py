@@ -18,7 +18,7 @@ from datetime import datetime
 from pathlib import Path
 
 FINANCE_DIR = Path(__file__).parent.parent
-HUB_PATH = FINANCE_DIR / "yair_finance_hub.json"
+HUB_PATH = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "finance_hub.json"
 
 class FreeAggregator:
     """Zero-cost financial data aggregation"""

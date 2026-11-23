@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Financial Dashboard - Complete View of Yair's Financial State
+Financial Dashboard - Private Financial State
 
 Integrates:
 - Polymarket trading account
@@ -10,10 +10,13 @@ Integrates:
 """
 
 import json
+import os
 from datetime import datetime
 from pathlib import Path
 
 FINANCE_DIR = Path(__file__).parent
+PRIVATE_FINANCE_DIR = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance"
+FINANCE_HUB = PRIVATE_FINANCE_DIR / "finance_hub.json"
 STATE_DIR = FINANCE_DIR.parent / "state"
 LOGS_DIR = FINANCE_DIR.parent / "logs"
 
@@ -27,7 +30,7 @@ def load_json(filepath):
 
 def get_polymarket_status():
     """Get Polymarket account status"""
-    hub = load_json(FINANCE_DIR / "yair_finance_hub.json")
+    hub = load_json(FINANCE_HUB)
     pm = hub.get("accounts", {}).get("polymarket", {})
 
     return {
@@ -39,7 +42,7 @@ def get_polymarket_status():
 
 def get_credit_status():
     """Get credit card status"""
-    hub = load_json(FINANCE_DIR / "yair_finance_hub.json")
+    hub = load_json(FINANCE_HUB)
     credit = hub.get("credit", {})
 
     return {
@@ -52,7 +55,7 @@ def get_credit_status():
 
 def get_runway_status():
     """Get runway status"""
-    hub = load_json(FINANCE_DIR / "yair_finance_hub.json")
+    hub = load_json(FINANCE_HUB)
     summary = hub.get("summary", {})
     burn = hub.get("monthly_burn", {})
 
