@@ -1,0 +1,30 @@
+name: Device condition trend tests
+
+on:
+  pull_request:
+    paths:
+      - "scripts/device_condition_trends.py"
+      - "tests/test_device_condition_trends.py"
+      - ".github/workflows/device-condition-trend-tests.yml"
+  push:
+    branches:
+      - "feat/device-condition-trend-aggregation"
+    paths:
+      - "scripts/device_condition_trends.py"
+      - "tests/test_device_condition_trends.py"
+      - ".github/workflows/device-condition-trend-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  device-condition-trend-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: python -m pip install --disable-pip-version-check pytest
+      - run: python -m pytest -q tests/test_device_condition_trends.py
