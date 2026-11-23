@@ -74,3 +74,12 @@ backups/
 state/
 termux-hands-off/autopilot/*.env
 termux-hands-off/autopilot/*.env.save
+
+# Local-only identity and access-control records
+security/private_identity.json
+security/yair_identity_profile.json
+security/yair_human_identity.json
+security/verification_audit.jsonl
+security/identity_checks.jsonl
+security/approval_queue.json
+security/access_log.jsonl
