@@ -1,5 +1,5 @@
 {
-  "master": "Yair Siegel",
+  "master": "Configured operator",
   "scripts": {
     "autonomous_phase_manager": {
       "path": "/root/hands-off-engine/scripts/autonomous_phase_manager.py",
