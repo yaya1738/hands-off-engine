@@ -92,4 +92,6 @@ security/owner_human_identity.json
 *.env.save*
 *.env.backup*
 *.env.*.bak
-termux-hands-off/state/*.env*
+termux-hands-off/state/auto_sources.env
+termux-hands-off/state/ifttt.env
+termux-hands-off/state/tg/bots/handsoff.env
