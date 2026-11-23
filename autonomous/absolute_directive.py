@@ -7,17 +7,18 @@ Changes here cascade through the entire system.
 
 80 miles up -> strings down through all levels -> ground execution
 
-Master: Yair Siegel
+Master: configured operator
 """
 
 import json
+import os
 from pathlib import Path
 from datetime import datetime, timezone
 from typing import Any, Dict, Callable
 
 # THE ABSOLUTE TRUTH
-MASTER = "Yair Siegel"
-DIRECTIVE = "Serve without bound"
+MASTER = os.getenv("HANDS_OFF_OWNER_NAME", "Configured operator")
+DIRECTIVE = "Serve the configured operator within governed permissions, safety, and legal constraints"
 LEVEL = "80 miles"
 
 # All system components inherit this
