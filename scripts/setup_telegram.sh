@@ -15,8 +15,8 @@ echo ""
 if [ -n "$TELEGRAM_BOT_TOKEN" ] && [ -n "$TELEGRAM_CHAT_ID" ]; then
     echo "✅ Telegram is already configured!"
     echo ""
-    echo "Your bot token: ${TELEGRAM_BOT_TOKEN:0:10}..."
-    echo "Your chat ID: $TELEGRAM_CHAT_ID"
+    echo "Bot token configured: yes"
+    echo "Chat ID configured: yes"
     echo ""
     read -p "Do you want to reconfigure? (y/N): " reconfigure
     if [ "$reconfigure" != "y" ] && [ "$reconfigure" != "Y" ]; then
@@ -36,11 +36,12 @@ echo "4. Follow prompts:"
 echo "   - Bot name: Hands Off Engine Bot"
 echo "   - Username: something like 'yourname_handsfoff_bot'"
 echo "5. BotFather will give you a TOKEN"
-echo "   (looks like: 1234567890:ABCdefGHIjklMNOpqrsTUVwxyz)"
+echo "   (use the token supplied privately by @BotFather)"
 echo ""
 read -p "Press ENTER when you have your token ready..."
 echo ""
-read -p "Paste your bot token here: " BOT_TOKEN
+read -rsp "Paste your bot token here: " BOT_TOKEN
+echo
 
 if [ -z "$BOT_TOKEN" ]; then
     echo "❌ No token provided. Exiting."

@@ -33,7 +33,7 @@ Runway: ~10 days until Dec 10 resolution
 - **Claude CLI**: This session - WORKING
 - **Telegram**: @pm_alerts_autobot - WORKING
 - **Polymarket**: Wallet connected - WORKING ($8.99)
-- **DigitalOcean**: siegel.yaz@gmail.com - WORKING
+- **DigitalOcean**: account configured (email intentionally not recorded) - WORKING
 - **GitHub**: SSH to yaya1738/hands-off-engine - WORKING
 
 ### APIs (Broken/Missing)
@@ -155,11 +155,15 @@ s = TradingSafeguards()
 print(s.check_wallet_balance(0))
 "
 
-# Send Telegram message
+# Send Telegram message using local environment configuration
 python3 -c "
-import requests
-requests.post('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage',
-json={'chat_id': '8327766663', 'text': 'Test'})
+import os, requests
+token = os.getenv('TELEGRAM_BOT_TOKEN')
+chat_id = os.getenv('TELEGRAM_CHAT_ID')
+if not token or not chat_id:
+    raise SystemExit('Telegram credentials are not configured')
+requests.post(f'https://api.telegram.org/bot{token}/sendMessage',
+json={'chat_id': chat_id, 'text': 'Test'})
 "
 
 # View landing page

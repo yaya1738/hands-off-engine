@@ -1,26 +1,27 @@
 {
   "capital_one": {
-    "limit": 10000,
-    "balance": 6234.0,
-    "name": "Capital One",
-    "statement_day": 8
+    "limit": null,
+    "balance": null,
+    "name": null,
+    "statement_day": null
   },
   "paypal_cashback": {
-    "limit": 8030,
-    "balance": 7853.0,
-    "name": "PayPal Cashback",
-    "statement_day": 12
+    "limit": null,
+    "balance": null,
+    "name": null,
+    "statement_day": null
   },
   "paypal_credit": {
-    "limit": 5000,
-    "balance": 4879.0,
-    "name": "PayPal Credit",
-    "statement_day": 14
+    "limit": null,
+    "balance": null,
+    "name": null,
+    "statement_day": null
   },
   "avant_new": {
-    "limit": 2000,
-    "balance": 0.0,
-    "name": "Avant (approved, pending use)",
-    "statement_day": 17
-  }
+    "limit": null,
+    "balance": null,
+    "name": null,
+    "statement_day": null
+  },
+  "_data_status": "redacted_unknown"
 }

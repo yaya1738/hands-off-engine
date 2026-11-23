@@ -2,7 +2,8 @@
 set -euo pipefail
 BASE="$HOME/hands-off/autopilot"
 ENV="$BASE/telegram.env"
-read -rp "Paste TELEGRAM_BOT_TOKEN (from @BotFather): " TOK
+read -rsp "Paste TELEGRAM_BOT_TOKEN (from @BotFather): " TOK
+echo
 read -rp "Paste TELEGRAM_CHAT_ID (number): " CID
 mkdir -p "$BASE"
 printf "TELEGRAM_BOT_TOKEN=%s\nTELEGRAM_CHAT_ID=%s\n" "$TOK" "$CID" > "$ENV"
