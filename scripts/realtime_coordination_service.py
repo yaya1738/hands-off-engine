@@ -17,17 +17,93 @@ except ImportError:
 
 
 import json
+import os
+import hmac
+import ipaddress
 import time
 import threading
-from datetime import datetime
+from datetime import datetime, timezone
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
+from urllib.parse import urlsplit
+try:
+    from watchdog.events import FileSystemEventHandler
+except ImportError:
+    class FileSystemEventHandler:
+        """Import-safe placeholder; service startup still requires watchdog."""
+
 import subprocess
 
 REPO_ROOT = Path(__file__).parent.parent
 COORDINATION_FILE = REPO_ROOT / "ai" / "coordination" / "messages.jsonl"
+WEBHOOK_HOST = "127.0.0.1"
 WEBHOOK_PORT = 8888
+MAX_WEBHOOK_BODY_BYTES = 64 * 1024
+DEFAULT_ALLOWED_SENDERS = {
+    "claude-code", "copilot", "chatgpt", "anyclaw",
+    "factory", "openclaw", "grok",
+}
+FORBIDDEN_SENDERS = {"operator", "telegram", "system", "system_internal"}
+
+
+def is_loopback_host(host):
+    """Accept only localhost or literal loopback addresses."""
+    if not isinstance(host, str):
+        return False
+    host = host.strip().lower()
+    if host == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def is_local_webhook_request(host_header, server_port):
+    """Require a loopback Host header on the exact bound port."""
+    try:
+        parsed = urlsplit("//" + (host_header or ""))
+        return (
+            is_loopback_host(parsed.hostname or "")
+            and parsed.port == server_port
+        )
+    except ValueError:
+        return False
+
+
+def webhook_authorized(auth_header, expected_token=None):
+    """Fail closed unless a configured bearer token matches in constant time."""
+    expected = expected_token if expected_token is not None else os.getenv("COORDINATION_WEBHOOK_TOKEN", "")
+    if not expected or not isinstance(auth_header, str):
+        return False
+    scheme, separator, supplied = auth_header.partition(" ")
+    return (
+        bool(separator)
+        and scheme.lower() == "bearer"
+        and bool(supplied)
+        and hmac.compare_digest(supplied.strip(), expected)
+    )
+
+
+def allowed_webhook_senders():
+    configured = os.getenv("COORDINATION_ALLOWED_SENDERS")
+    if configured is None:
+        return set(DEFAULT_ALLOWED_SENDERS)
+    return {item.strip() for item in configured.split(",") if item.strip()} - FORBIDDEN_SENDERS
+
+
+def validate_webhook_message(message):
+    """Validate a small, typed, known-agent message; never accept operator identity."""
+    if not isinstance(message, dict):
+        return False, "message must be an object"
+    required = ("from", "to", "type", "message")
+    if any(not isinstance(message.get(key), str) or not message[key].strip() for key in required):
+        return False, "required fields must be non-empty strings"
+    sender = message["from"].strip()
+    if sender in FORBIDDEN_SENDERS or sender not in allowed_webhook_senders():
+        return False, "sender is not allowlisted"
+    if len(message["message"]) > 20000:
+        return False, "message exceeds size limit"
+    return True, None
 
 class CoordinationFileWatcher(FileSystemEventHandler):
     """Watches coordination file for new messages"""
@@ -71,56 +147,64 @@ class CoordinationWebhook(BaseHTTPRequestHandler):
     message_callback = None
 
     def do_POST(self):
-        """Handle incoming message from another agent"""
-        if self.path == '/coordination/message':
-            content_length = int(self.headers['Content-Length'])
-            post_data = self.rfile.read(content_length)
-
-            try:
-                message = json.loads(post_data.decode('utf-8'))
-
-                # Validate message format
-                required_fields = ['from', 'to', 'type', 'message']
-                if all(field in message for field in required_fields):
-                    # Add timestamp if not present
-                    if 'timestamp' not in message:
-                        message['timestamp'] = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
-
-                    # Write to coordination file
-                    with open(COORDINATION_FILE, 'a') as f:
-                        f.write(json.dumps(message) + '\n')
-
-                    # Notify
-                    if self.message_callback:
-                        self.message_callback(message)
-
-                    # Commit to git
-                    subprocess.run(['git', 'add', str(COORDINATION_FILE)],
-                                 cwd=REPO_ROOT, capture_output=True)
-                    subprocess.run(['git', 'commit', '-m',
-                                  f'coord: message from {message["from"]} via webhook'],
-                                 cwd=REPO_ROOT, capture_output=True)
-                    subprocess.run(['git', 'push'],
-                                 cwd=REPO_ROOT, capture_output=True)
-
-                    self.send_response(200)
-                    self.send_header('Content-type', 'application/json')
-                    self.end_headers()
-                    self.wfile.write(json.dumps({'status': 'received'}).encode())
-                else:
-                    self.send_response(400)
-                    self.end_headers()
-
-            except Exception as e:
-                print(f"Error processing message: {e}")
-                self.send_response(500)
-                self.end_headers()
-        else:
+        """Handle an authenticated, allowlisted agent message."""
+        if not is_local_webhook_request(
+            self.headers.get("Host", ""), self.server.server_port
+        ):
+            self.send_response(403)
+            self.end_headers()
+            return
+        if self.path != "/coordination/message":
             self.send_response(404)
+            self.end_headers()
+            return
+        if not webhook_authorized(self.headers.get("Authorization")):
+            code = 503 if not os.getenv("COORDINATION_WEBHOOK_TOKEN") else 401
+            self.send_response(code)
+            self.end_headers()
+            return
+        try:
+            content_length = int(self.headers.get("Content-Length", "0"))
+            if content_length <= 0 or content_length > MAX_WEBHOOK_BODY_BYTES:
+                self.send_response(413 if content_length > MAX_WEBHOOK_BODY_BYTES else 400)
+                self.end_headers()
+                return
+            post_data = self.rfile.read(content_length)
+            message = json.loads(post_data.decode("utf-8"))
+            valid, reason = validate_webhook_message(message)
+            if not valid:
+                self.send_response(403 if reason == "sender is not allowlisted" else 400)
+                self.end_headers()
+                return
+
+            if "timestamp" not in message:
+                message["timestamp"] = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+            # Webhook input is untrusted. Persist the event only; a separate
+            # governed workflow owns review and any repository mutation.
+            with open(COORDINATION_FILE, "a", encoding="utf-8") as f:
+                f.write(json.dumps(message) + "\n")
+
+            if self.message_callback:
+                self.message_callback(message)
+
+            self.send_response(200)
+            self.send_header("Content-type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"status": "received"}).encode())
+        except Exception as e:
+            print(f"Error processing message: {e}")
+            self.send_response(500)
             self.end_headers()
 
     def do_GET(self):
-        """Health check endpoint"""
+        """Read-only local health and message endpoints."""
+        if not is_local_webhook_request(
+            self.headers.get("Host", ""), self.server.server_port
+        ):
+            self.send_response(403)
+            self.end_headers()
+            return
         if self.path == '/health':
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
@@ -176,7 +260,9 @@ class RealtimeCoordinationService:
         """Start the real-time coordination service"""
         print("🚀 Starting Real-Time Agent Coordination Service...")
         print(f"📁 Watching: {COORDINATION_FILE}")
-        print(f"🌐 Webhook: http://localhost:{WEBHOOK_PORT}/coordination/message")
+        print(f"🌐 Local webhook: http://{WEBHOOK_HOST}:{WEBHOOK_PORT}/coordination/message")
+        if not os.getenv("COORDINATION_WEBHOOK_TOKEN"):
+            print("🔒 POST disabled: set COORDINATION_WEBHOOK_TOKEN to enable authenticated agent ingress")
         print(f"💚 Health: http://localhost:{WEBHOOK_PORT}/health")
         print("\n" + "="*60)
         print("Service is running. Press Ctrl+C to stop.")
@@ -184,7 +270,9 @@ class RealtimeCoordinationService:
 
         self.running = True
 
-        # Start file watcher
+        # Start file watcher only after imports are resolved. This keeps the
+        # webhook policy helpers importable in minimal test environments.
+        from watchdog.observers import Observer
         event_handler = CoordinationFileWatcher(self.on_new_message)
         self.file_observer = Observer()
         self.file_observer.schedule(
@@ -196,7 +284,7 @@ class RealtimeCoordinationService:
 
         # Start webhook server
         CoordinationWebhook.message_callback = self.on_new_message
-        self.webhook_server = HTTPServer(('', WEBHOOK_PORT), CoordinationWebhook)
+        self.webhook_server = HTTPServer((WEBHOOK_HOST, WEBHOOK_PORT), CoordinationWebhook)
 
         # Run webhook in thread
         webhook_thread = threading.Thread(
