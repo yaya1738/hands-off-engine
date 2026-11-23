@@ -32,9 +32,29 @@ QUEUE_FILE = REPO_ROOT / "state" / "approval_queue.json"
 class ApprovalQueue:
     """Manages pending changes requiring user approval."""
 
-    def __init__(self):
-        self.queue_file = QUEUE_FILE
+    def __init__(self, repo_root=None, queue_file=None):
+        self.repo_root = Path(repo_root).resolve() if repo_root is not None else REPO_ROOT.resolve()
+        if queue_file is not None:
+            self.queue_file = Path(queue_file)
+        elif repo_root is not None:
+            self.queue_file = self.repo_root / "state" / "approval_queue.json"
+        else:
+            self.queue_file = QUEUE_FILE
         self.queue_file.parent.mkdir(parents=True, exist_ok=True)
+
+    def _resolve_repo_path(self, file_path: str) -> Path:
+        """Resolve an action path and reject traversal or symlink escapes."""
+        if not isinstance(file_path, str) or not file_path.strip():
+            raise ValueError("file_path must be a non-empty string")
+        candidate = Path(file_path)
+        if not candidate.is_absolute():
+            candidate = self.repo_root / candidate
+        resolved = candidate.resolve(strict=False)
+        try:
+            resolved.relative_to(self.repo_root)
+        except ValueError:
+            raise ValueError("file action path must remain inside the repository root")
+        return resolved
 
     def _load_queue(self) -> Dict:
         """Load approval queue from disk."""
@@ -95,6 +115,24 @@ class ApprovalQueue:
         self._save_queue(queue)
 
         return change_id
+
+    def format_change_preview(self, change: Dict) -> str:
+        """Describe the authority surface without exposing file contents."""
+        action = change.get("proposed_action") or {}
+        action_type = action.get("type", "unknown")
+        lines = [
+            "Description: " + str(change.get("description", "No description provided")),
+            "Files affected: " + (", ".join(change.get("files_affected") or []) or "Not specified"),
+            "Action type: " + str(action_type),
+        ]
+        target = action.get("file_path")
+        if target:
+            lines.append("Target: " + str(target))
+        if action_type == "bash_command":
+            lines.append("Execution: BLOCKED — arbitrary shell commands are disabled")
+        elif action_type in {"edit_file", "write_file"}:
+            lines.append("Execution boundary: repository-local file change only")
+        return "\n".join(lines)
 
     def get_pending(self) -> List[Dict]:
         """Get all pending changes."""
@@ -180,45 +218,46 @@ class ApprovalQueue:
         try:
             if action_type == "edit_file":
                 # Edit file
-                file_path = action["file_path"]
+                file_path = self._resolve_repo_path(action["file_path"])
                 old_content = action["old_content"]
                 new_content = action["new_content"]
+                if not isinstance(old_content, str) or not old_content:
+                    return {"success": False, "error": "old_content must be a non-empty exact match"}
+                if not isinstance(new_content, str):
+                    return {"success": False, "error": "new_content must be a string"}
+                if not file_path.is_file():
+                    return {"success": False, "error": "edit target must be an existing regular file"}
 
-                with open(file_path, 'r') as f:
-                    current = f.read()
-
-                if old_content in current:
-                    updated = current.replace(old_content, new_content)
-                    with open(file_path, 'w') as f:
-                        f.write(updated)
-                    return {"success": True, "message": f"Edited {file_path}"}
-                else:
-                    return {"success": False, "error": "Old content not found in file"}
+                current = file_path.read_text(encoding="utf-8")
+                match_count = current.count(old_content)
+                if match_count != 1:
+                    return {
+                        "success": False,
+                        "error": f"old_content must match exactly once; found {match_count} matches",
+                    }
+                updated = current.replace(old_content, new_content, 1)
+                file_path.write_text(updated, encoding="utf-8")
+                return {"success": True, "message": f"Edited {file_path.relative_to(self.repo_root)}"}
 
             elif action_type == "write_file":
                 # Write new file
-                file_path = action["file_path"]
+                file_path = self._resolve_repo_path(action["file_path"])
                 content = action["content"]
-
-                with open(file_path, 'w') as f:
+                if not isinstance(content, str):
+                    return {"success": False, "error": "content must be a string"}
+                if file_path.exists():
+                    return {"success": False, "error": "write_file is create-only; target already exists"}
+                if not file_path.parent.is_dir():
+                    return {"success": False, "error": "parent directory must already exist"}
+                with file_path.open("x", encoding="utf-8") as f:
                     f.write(content)
-                return {"success": True, "message": f"Created {file_path}"}
+                return {"success": True, "message": f"Created {file_path.relative_to(self.repo_root)}"}
 
             elif action_type == "bash_command":
-                # Execute bash command
-                import subprocess
-                cmd = action["command"]
-                result = subprocess.run(
-                    cmd,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    timeout=60
-                )
+                # Approval is not a general-purpose shell execution capability.
                 return {
-                    "success": result.returncode == 0,
-                    "message": result.stdout,
-                    "error": result.stderr if result.returncode != 0 else None
+                    "success": False,
+                    "error": "arbitrary bash_command actions are disabled; use the governed executor allowlist",
                 }
 
             else:
@@ -271,6 +310,7 @@ def send_approval_notification(change_id: str, change: Dict):
     # Format notification message
     risk_emoji = {"low": "🟢", "medium": "🟡", "high": "🔴"}
     emoji = risk_emoji.get(change.get("risk_level", "medium"), "🟡")
+    action_preview = ApprovalQueue().format_change_preview(change)
 
     message = f"""{emoji} **Approval Required**
 
@@ -285,6 +325,9 @@ def send_approval_notification(change_id: str, change: Dict):
 
 **Files affected:**
 {', '.join(change['files_affected'])}
+
+**Action preview:**
+{action_preview}
 
 To approve: `/approve {change_id}`
 To reject: `/reject {change_id}`
