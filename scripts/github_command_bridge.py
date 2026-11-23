@@ -10,7 +10,7 @@ STATE=ROOT/"state/github_command_bridge_state.json"
 ISSUE=int(os.getenv("FACTORY_CONTROL_ISSUE","272"))
 REPO=os.getenv("FACTORY_GITHUB_REPO","yaya1738/hands-off-engine")
 ACTORS=frozenset(x.strip() for x in os.getenv("FACTORY_GITHUB_COMMAND_ACTORS","yaya1738").split(",") if x.strip())
-ACTIONS=frozenset({"health_check","system_status","read_file_fact","list_backends","list_parties","bus_summary","test_status","lifecycle_summary"})
+ACTIONS=frozenset({"health_check","system_status","read_file_fact","list_backends","list_parties","bus_summary","test_status","lifecycle_summary","factory_execute"})
 log=logging.getLogger("GitHubCommandBridge")
 
 def _state():
@@ -70,7 +70,11 @@ def _parse(body):
     if d["action"]=="read_file_fact":
         if not d.get("file_path"): return None
         params={k:d[k] for k in ("file_path","fact") if d.get(k)}
-    return d,params
+    elif d["action"]=="factory_execute":
+        # The GitHub bridge exposes DRYRUN only. LIVE execution must use
+        # the separate explicit-approval path in the governed runtime.
+        params={"mode":"DRYRUN","objective":d["objective"]}
+    return d,params,next_action
 
 def poll_once():
     s=_state(); done=set(map(str,s.get("processed",[]))); admitted=0
@@ -85,7 +89,7 @@ def poll_once():
                 continue
         done.add(cid)
         if actor not in ACTORS or parsed is None: continue
-        d,params=parsed
+        d,params,next_action=parsed
         msg={"from":"factory","to":"anyclaw","type":"task_assignment","message":d["objective"][:240],"msg_id":f"github-command-{cid}","timestamp":datetime.now(timezone.utc).isoformat(),"context":{"task_id":f"github-{d['idempotency_key']}","action":d["action"],"params":params,"reply_to":f"github-issue-{ISSUE}-comment-{cid}","source":"github_issue","source_comment_id":cid,"idempotency_key":d["idempotency_key"],"execution_enabled":False,"next_action":next_action}}
         BUS.parent.mkdir(parents=True,exist_ok=True)
         with BUS.open("a") as f: f.write(json.dumps(msg)+"\n")
