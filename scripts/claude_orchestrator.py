@@ -3,7 +3,7 @@
 Autonomous Claude Code Orchestrator
 
 This script autonomously determines when Claude Code analysis/optimization is needed
-and invokes Claude Code sessions automatically to serve user Yair Siegel.
+and invokes Claude Code sessions automatically to serve the configured operator.
 
 Runs continuously (via cron) and invokes Claude Code when:
 - System health issues detected
@@ -11,17 +11,17 @@ Runs continuously (via cron) and invokes Claude Code when:
 - Optimization opportunities identified
 - Scheduled autonomous improvement cycles
 
-Part of CLM/Nexus/System serving Yair Siegel's domain.
+Part of CLM/Nexus/System serving the configured operator.
 """
 
-# UNIFIED AI - All systems serve Yair Siegel
+# UNIFIED AI - All systems serve the configured operator
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
 except ImportError:
-    MASTER = "Yair Siegel"
+    MASTER = "Configured operator"
 
 
 import json
@@ -285,7 +285,7 @@ Following autonomous operation protocol (.claude/AUTONOMOUS_OPERATION.md):
 3. Document all changes made
 
 This task was created autonomously by the orchestrator system.
-Make decisions independently to serve user Yair Siegel.
+Make decisions independently to serve the configured operator.
 Focus on tangible improvements that reduce workload and improve system quality.
 
 When complete, mark this task as done in the autonomous task queue.
@@ -293,10 +293,10 @@ When complete, mark this task as done in the autonomous task queue.
 
     def get_system_prompt(self) -> str:
         """Get the system prompt for Claude Code"""
-        return """You are operating autonomously as part of user Yair Siegel's servant domain.
+        return """You are operating autonomously as part of the configured operator's governed system.
 
 Context:
-- User: Yair Siegel (aka Joseph Siegel, aka Froggy)
+- User: configured operator
 - System: CLM/Nexus/Hands-Off Engine
 - Purpose: Serve user autonomously, reduce workload, improve life quality
 
@@ -304,7 +304,7 @@ This session was invoked automatically by the orchestrator system.
 Make autonomous decisions to improve the system.
 Document all changes.
 
-Refer to .claude/USER_PROFILE.md and .claude/AUTONOMOUS_OPERATION.md for full context.
+Use local private context only when explicitly available; never infer personal details from the public repository.
 """
 
     def run(self):

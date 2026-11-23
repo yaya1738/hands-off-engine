@@ -12,13 +12,21 @@ from datetime import datetime, timezone
 REPO = Path("/root/hands-off-engine")
 
 def send_telegram(msg):
+    """Send only with explicitly configured local credentials."""
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": msg, "parse_mode": "Markdown"},
-            timeout=10
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": msg, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except: pass
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 def main():
     print("🚀 AGGRESSIVE INCOME ACTIVATION")
@@ -30,39 +38,16 @@ def main():
     actions = []
     
     # Action 1: Notify Yair with exact steps
-    msg = """🚨 *INCOME ACTIVATION REQUIRED*
+    msg = """Income activation review required.
 
-*IMMEDIATE ACTIONS FOR YAIR:*
+No transfer, wallet funding request, or live trading action is authorized by this script.
+Refresh all financial facts from authoritative sources and obtain explicit approval before any money movement.
+"""
 
-*1. Upwork (5 min):*
-→ Post listing at upwork.com/nx/create-job
-→ Content ready in: outreach/upwork_project_listing.md
-
-*2. Fiverr (5 min):*
-→ Create gig at fiverr.com/seller_dashboard
-→ Content ready in: outreach/fiverr_gig.md
-
-*3. LinkedIn (2 min):*
-→ Update headline to AI Automation Expert
-→ Content ready in: outreach/linkedin_profile.md
-
-*4. Fund Trading ($50):*
-→ Send USDC to: `0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D`
-→ Network: Polygon
-→ 3 signals ready to execute ($150 value)
-
-*Current State:*
-• Balance: $8.99 (need $41.01 more)
-• Income: $0/month
-• Burn: $3,280/month
-• AI Nexus page: LIVE at port 8081
-
-*First client = $500 = covers 2 months of AI costs*
-
-The system is READY. Just needs activation."""
-
-    send_telegram(msg)
-    actions.append("✓ Sent activation instructions to Telegram")
+    if send_telegram(msg):
+        actions.append("Sent a non-financial activation notice via configured Telegram.")
+    else:
+        actions.append("Telegram notice skipped; credentials are not configured or delivery failed.")
     
     # Action 2: Log activation attempt
     log_file = REPO / "state" / "income_activation_log.jsonl"

@@ -4,14 +4,14 @@ System State Snapshot Generator
 Captures complete system state to permanent record
 """
 
-# UNIFIED AI - All systems serve Yair Siegel
+# UNIFIED AI - All systems serve the configured operator
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 try:
     from ai.unified_ai import MASTER, get_master
 except ImportError:
-    MASTER = "Yair Siegel"
+    MASTER = "Configured operator"
 
 
 import json
@@ -56,8 +56,12 @@ def get_api_status():
     # Telegram - test it
     try:
         import requests
-        r = requests.get('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/getMe', timeout=5)
-        status['telegram'] = r.json().get('ok', False)
+        token = os.getenv("TELEGRAM_BOT_TOKEN")
+        if not token:
+            status["telegram"] = False
+        else:
+            r = requests.get(f"https://api.telegram.org/bot{token}/getMe", timeout=5)
+            status["telegram"] = r.json().get("ok", False)
     except:
         status['telegram'] = False
     

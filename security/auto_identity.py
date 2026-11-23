@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Auto Identity Detection - Always knows when it's Yair Siegel
+Private Identity Detection - configured owner verification
 
 Detection methods:
 1. SSH key fingerprint (most reliable)
@@ -13,46 +13,26 @@ Detection methods:
 import os
 import subprocess
 import hashlib
+import re
 from pathlib import Path
 from datetime import datetime
 
+def _env_list(name: str) -> list:
+    return [value.strip() for value in os.getenv(name, "").split(",") if value.strip()]
+
+
 MASTER_IDENTITY = {
-    "name": "Yair Siegel",
-    "email": "siegel.yaz@gmail.com",
-
-    # SSH key fingerprints (SHA256)
-    "key_fingerprints": [
-        "SHA256:oIAeGFrxTHyg4Tjat9u1Q05lEdy823nqxhfWuU/t7ro",  # handsoff-do138
-        "SHA256:g71K8Lk8TYFDEQCj/vmD1jjHls1GPjqyjkA7Ke7yVk4",  # pm-agent
-        "SHA256:vTfnGmsuPm8guKkew31xyAl63XMM2GspeugpFR5HyfY",  # termux@handsoff
-    ],
-
-    # Known device identifiers
-    "devices": [
-        "termux@handsoff",
-        "pm-agent@206.189.60.125",
-        "handsoff-do138",
-    ],
-
-    # Known source IPs (your phone, your servers)
-    "trusted_ips": [
-        "127.0.0.1",        # Local
-        "138.68.103.156",   # pm-helper
-        "167.172.132.72",   # ho-cli-main
-        "167.172.155.42",   # ho-compute-1
-        "178.128.155.150",  # ho-compute-2
-        "64.227.26.112",    # ho-scale
-        "157.230.221.18",   # ho-topdawg-4
-    ],
-
-    # Environment markers
-    "env_markers": [
-        ("USER", "root"),
-        ("HOME", "/root"),
-    ]
+    "name": os.getenv("HANDS_OFF_OWNER_NAME", "Configured owner"),
+    "email": os.getenv("HANDS_OFF_OWNER_EMAIL", ""),
+    "key_fingerprints": _env_list("HANDS_OFF_OWNER_SSH_KEY_FINGERPRINTS"),
+    "devices": _env_list("HANDS_OFF_OWNER_DEVICE_IDS"),
+    "trusted_ips": _env_list("HANDS_OFF_OWNER_TRUSTED_IPS"),
+    # Environment defaults such as USER=root or HOME=/root are not identity proof.
+    "env_markers": [],
 }
 
-IDENTITY_LOG = Path("/root/hands-off-engine/security/identity_checks.jsonl")
+PRIVATE_DIR = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))).expanduser()
+IDENTITY_LOG = PRIVATE_DIR / "identity_checks.jsonl"
 
 def get_ssh_key_comment() -> str:
     """Get the SSH key comment used for this connection"""
@@ -64,11 +44,9 @@ def get_ssh_key_comment() -> str:
         )
         for line in reversed(result.stdout.split('\n')):
             if 'Accepted publickey' in line:
-                # Extract key comment from log
-                parts = line.split()
-                for i, p in enumerate(parts):
-                    if p == 'SHA256:':
-                        return parts[i+1] if i+1 < len(parts) else None
+                match = re.search(r"SHA256:[A-Za-z0-9+/=]+", line)
+                if match:
+                    return match.group(0)
     except:
         pass
     return None
@@ -102,85 +80,54 @@ def check_authorized_key_used() -> bool:
     return False
 
 def is_yair() -> dict:
-    """
-    Comprehensive identity check - returns confidence score
+    """Verify the configured owner using an explicitly configured SSH fingerprint.
 
-    Returns:
-        {
-            "is_master": bool,
-            "confidence": float (0-1),
-            "signals": list of matched signals,
-            "identity": "Yair Siegel" or "Unknown"
-        }
+    Hostname, root, IP, working-directory, and SSH-agent presence are not identity
+    proof. If no private fingerprint configuration is present, deny by default.
     """
     signals = []
-    confidence = 0.0
+    known = set(MASTER_IDENTITY["key_fingerprints"])
+    fingerprint = get_ssh_key_comment()
 
-    # Check 1: SSH client IP from trusted server
-    client_ip = get_ssh_client_ip()
-    if client_ip in MASTER_IDENTITY["trusted_ips"]:
-        signals.append(f"trusted_ip:{client_ip}")
-        confidence += 0.3
-
-    # Check 2: Running as root on known system
-    if os.getuid() == 0:
-        hostname = os.uname().nodename
-        if any(d in hostname for d in ['handsoff', 'ho-', 'pm-']):
-            signals.append(f"root_on_known_host:{hostname}")
-            confidence += 0.3
-
-    # Check 3: Environment markers
-    for env_var, expected in MASTER_IDENTITY["env_markers"]:
-        if os.environ.get(env_var) == expected:
-            signals.append(f"env:{env_var}={expected}")
-            confidence += 0.1
-
-    # Check 4: SSH auth present (key-based)
-    if check_authorized_key_used():
-        signals.append("ssh_key_auth")
-        confidence += 0.2
-
-    # Check 5: Local connection (already on the server)
-    if client_ip == "127.0.0.1" or client_ip is None:
-        signals.append("local_connection")
-        confidence += 0.2
-
-    # Check 6: Process running from hands-off-engine directory
-    cwd = os.getcwd()
-    if 'hands-off' in cwd:
-        signals.append(f"cwd:{cwd}")
-        confidence += 0.1
-
-    # Normalize confidence to max 1.0
-    confidence = min(confidence, 1.0)
-
-    # Determine identity
-    is_master = confidence >= 0.5  # 50% threshold
+    if fingerprint and fingerprint in known:
+        signals.append("configured_ssh_fingerprint_match")
+        confidence = 1.0
+        is_master = True
+    else:
+        signals.append("identity_not_verified")
+        confidence = 0.0
+        is_master = False
 
     result = {
         "is_master": is_master,
-        "confidence": round(confidence, 2),
+        "confidence": confidence,
         "signals": signals,
         "identity": MASTER_IDENTITY["name"] if is_master else "Unknown",
-        "timestamp": datetime.now().isoformat()
+        "timestamp": datetime.now().isoformat(),
     }
-
-    # Log the check
     log_identity_check(result)
-
     return result
 
 def log_identity_check(result: dict):
     """Log identity checks for audit"""
     try:
         import json
-        with open(IDENTITY_LOG, "a") as f:
+        PRIVATE_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
+        try:
+            PRIVATE_DIR.chmod(0o700)
+        except OSError:
+            pass
+        with open(IDENTITY_LOG, "a", encoding="utf-8") as f:
             f.write(json.dumps(result) + "\n")
-    except:
+        try:
+            IDENTITY_LOG.chmod(0o600)
+        except OSError:
+            pass
+    except OSError:
         pass
 
 def require_yair(func):
-    """Decorator - only run if it's Yair"""
+    """Decorator - only run when configured owner identity is verified"""
     def wrapper(*args, **kwargs):
         check = is_yair()
         if not check["is_master"]:
@@ -192,7 +139,7 @@ def require_yair(func):
 
 # Quick check function for other scripts
 def am_i_yair() -> bool:
-    """Simple bool check - is the current user Yair?"""
+    """Simple bool check for configured owner identity."""
     return is_yair()["is_master"]
 
 def whoami() -> str:

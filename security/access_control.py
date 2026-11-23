@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-ACCESS CONTROL - Master tool for Yair Siegel
+ACCESS CONTROL - Private operator access manager
 Usage:
     python3 access_control.py status          # Show who has access
     python3 access_control.py pending         # Show pending requests
@@ -32,10 +32,9 @@ def show_status():
     print("=" * 50)
 
     print(f"\nMASTER: {MASTER_IDENTITY['name']}")
-    print(f"Email: {MASTER_IDENTITY['email']}")
-    print(f"Verified Devices: {len(MASTER_IDENTITY['devices'])}")
-    for d in MASTER_IDENTITY['devices']:
-        print(f"  - {d}")
+    print(f"Email configured: {'yes' if MASTER_IDENTITY['email'] else 'no'}")
+    print(f"Private device allowlist entries: {len(MASTER_IDENTITY['devices'])}")
+    print(f"Private SSH fingerprints configured: {len(MASTER_IDENTITY['ssh_key_fingerprints'])}")
 
     print("\n" + "-" * 50)
     print("ACTIVE EXTERNAL ACCESS:")
