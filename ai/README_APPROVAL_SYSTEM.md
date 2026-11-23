@@ -62,7 +62,7 @@ else:
 ```python
 {
     "type": "edit_file",
-    "file_path": "/absolute/path/to/file",
+    "file_path": "config/example.json",
     "old_content": "text to find",
     "new_content": "text to replace with"
 }
@@ -72,18 +72,16 @@ else:
 ```python
 {
     "type": "write_file",
-    "file_path": "/absolute/path/to/file",
+    "file_path": "docs/generated.md",
     "content": "full file content"
 }
 ```
 
-### 3. Bash Command
-```python
-{
-    "type": "bash_command",
-    "command": "npm install new-package"
-}
-```
+File actions are restricted to paths inside the repository. Absolute paths are accepted only when they resolve inside the repository. Path traversal, symlink escapes, `.git`, `.ssh`, `state/`, `secrets/`, and `.env*` paths are rejected.
+
+### Shell Commands
+
+Arbitrary `bash_command` actions are disabled in `ApprovalQueue`. Route executable work through the separately governed executor and its explicit policy/authorization checks.
 
 ## User Workflow (Telegram)
 
