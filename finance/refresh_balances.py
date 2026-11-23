@@ -5,11 +5,12 @@ Run periodically to keep finance hub updated
 """
 
 import json
+import os
 import requests
 from datetime import datetime
 from pathlib import Path
 
-FINANCE_HUB = Path(__file__).parent / "yair_finance_hub.json"
+FINANCE_HUB = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "finance_hub.json"
 
 def get_erc20_balance(wallet, contract, rpc_url, decimals=6):
     """Fetch ERC20 token balance"""
