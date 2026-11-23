@@ -10,16 +10,29 @@ def test_moonshot_metrics_never_infer_trading_authority_or_fake_financial_defaul
         if isinstance(node, ast.FunctionDef) and node.name == "get_system_metrics"
     )
 
-    assignments = {}
+    metrics_init = next(
+        node.value for node in function.body
+        if isinstance(node, ast.Assign)
+        and any(isinstance(target, ast.Name) and target.id == "metrics" for target in node.targets)
+    )
+    assert isinstance(metrics_init, ast.Dict)
+    assignments = {
+        key.value: value
+        for key, value in zip(metrics_init.keys, metrics_init.values)
+        if isinstance(key, ast.Constant) and isinstance(key.value, str)
+    }
+
     for node in ast.walk(function):
         if isinstance(node, ast.Assign):
             for target in node.targets:
-                if isinstance(target, ast.Name):
-                    assignments[target.id] = node.value
-                elif isinstance(target, ast.Subscript) and isinstance(target.value, ast.Name) and target.value.id == "metrics":
-                    key = target.slice.value if isinstance(target.slice, ast.Constant) else None
-                    if isinstance(key, str):
-                        assignments[key] = node.value
+                if (
+                    isinstance(target, ast.Subscript)
+                    and isinstance(target.value, ast.Name)
+                    and target.value.id == "metrics"
+                    and isinstance(target.slice, ast.Constant)
+                    and isinstance(target.slice.value, str)
+                ):
+                    assignments[target.slice.value] = node.value
 
     assert isinstance(assignments["trading_enabled"], ast.Constant)
     assert assignments["trading_enabled"].value is False
