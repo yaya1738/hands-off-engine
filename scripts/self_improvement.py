@@ -2,14 +2,16 @@
 """Self-Improvement Engine — generate and durably dispatch bounded improvements.
 
 The loop is intentionally fail-closed:
-observe -> deterministic candidate -> durable dedup -> max one dispatch -> AnyClaw
-result/continuation -> Factory intake -> next bounded decision.
+observe -> deterministic candidate -> durable dedup -> max one dispatch -> local
+Task Worker result/continuation -> Factory intake -> next bounded decision.
 
 Only existing read-only task actions are dispatched. This module never executes
 arbitrary commands or modifies source code directly.
 """
+import fcntl
 import hashlib
 import json
+import os
 from pathlib import Path
 from datetime import datetime, timezone
 
@@ -18,14 +20,15 @@ STATE = ROOT / "state"
 BUS = ROOT / "ai" / "coordination" / "messages.jsonl"
 IMPROVEMENT_STATE = STATE / "improvement_state.json"
 DISPATCH_STATE = STATE / "improvement_dispatch_state.json"
+DISPATCH_LOCK = STATE / "improvement_dispatch.lock"
 FEEDBACK_FILE = STATE / "improvement_feedback.json"
 
-# These actions already exist in the AnyClaw worker and are deliberately read-only.
+# These actions exist in the local governed Task Worker and are deliberately read-only.
 ACTION_BY_CATEGORY = {
     "reliability": ("read_file_fact", "state/health_log.jsonl"),
     "quality": ("read_file_fact", "state/learning_state.json"),
     "maintenance": ("read_file_fact", "ai/coordination/messages.jsonl"),
-    "usability": ("read_file_fact", ".termux/boot/hands-off-engine.sh"),
+    "usability": ("read_file_fact", "scripts/termux_supervisor.py"),
     "security": ("read_file_fact", "scripts/comm_hub.py"),
     "expansion": ("system_status", ""),
 }
@@ -71,7 +74,7 @@ def candidate_id(category, title, description):
 ACTION_MAP = {
     "reliability": "log_analysis",
     "quality": "add_test",
-    "maintenance": "clean_bus",
+    "maintenance": "log_analysis",
     "usability": "fix_config",
     "security": "log_analysis",
     "expansion": "generate_report",
@@ -157,8 +160,8 @@ def generate_improvements():
         lines = len(BUS.read_text().splitlines())
         if lines > 200:
             improvements.append(_candidate(
-                "maintenance", "Clean up bus messages",
-                f"Bus has {lines} lines. Archive old continuation events, keep task_assignments and results.",
+                "maintenance", "Analyze coordination bus growth",
+                f"Bus has {lines} lines. Generate a read-only message-type summary; do not prune canonical messages automatically.",
                 "medium"))
 
     if "Add Termux boot launcher" not in applied:
@@ -178,14 +181,6 @@ def generate_improvements():
             "expansion", "Expand autonomous task scope",
             f"System is stable ({rate:.0%} over {patterns['total_tasks']} tasks). Consider enabling autonomous web research, file analysis, or monitoring tasks.",
             "low"))
-
-    # Feedback-driven: add improvement applier cycle if not yet running
-    applier_state = STATE / "improvement_applier_state.json"
-    if not applier_state.exists() or json.loads(applier_state.read_text() if applier_state.exists() else "{}").get("applied_ids", []) == []:
-        improvements.append(_candidate(
-            "maintenance", "Initialize improvement applier",
-            "Run the improvement applier to start the observe→act→measure loop.",
-            "high"))
 
     # Feedback-driven: prefer categories that historically helped
     for cat, info in feedback_cats.items():
@@ -211,28 +206,101 @@ def save_improvements(improvements):
 
 def _load_dispatch_state():
     state = load_json(DISPATCH_STATE)
+    if not isinstance(state, dict):
+        state = {}
+    dispatched = state.get("dispatched", {})
+    pending = state.get("pending", {})
+    history = state.get("history", [])
     return {
-        "dispatched": state.get("dispatched", {}),
-        "history": state.get("history", []),
+        "dispatched": dispatched if isinstance(dispatched, dict) else {},
+        "pending": pending if isinstance(pending, dict) else {},
+        "history": history if isinstance(history, list) else [],
     }
 
 
+def _open_private(path, flags, file_mode):
+    """Open (creating if needed) with owner-only permissions (0600).
+
+    Newly created files are 0600 regardless of umask; existing files keep
+    their current mode (safe replacement).
+    """
+    descriptor = os.open(path, flags, 0o600)
+    return os.fdopen(descriptor, file_mode, encoding="utf-8")
+
+
+def _save_dispatch_state(state):
+    """Atomically persist the dispatch outbox and deduplication ledger."""
+    DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
+    temporary = DISPATCH_STATE.with_suffix(DISPATCH_STATE.suffix + ".tmp")
+    # 0600 regardless of umask: dispatch metadata stays owner-only.
+    with _open_private(temporary, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, "w") as handle:
+        json.dump(state, handle, indent=2, sort_keys=True)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    temporary.replace(DISPATCH_STATE)
+
+
+def _bus_contains(msg_id):
+    if not BUS.exists():
+        return False
+    with BUS.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            try:
+                if json.loads(line).get("msg_id") == msg_id:
+                    return True
+            except (ValueError, AttributeError):
+                continue
+    return False
+
+
 def _append_bus(message):
+    """Append once by msg_id and flush to durable storage before returning.
+
+    A newly created bus file is 0600 regardless of umask; an existing bus
+    file keeps its current mode.
+    """
     BUS.parent.mkdir(parents=True, exist_ok=True)
-    with BUS.open("a", encoding="utf-8") as handle:
+    if _bus_contains(message["msg_id"]):
+        return False
+    with _open_private(BUS, os.O_WRONLY | os.O_CREAT | os.O_APPEND, "a") as handle:
         handle.write(json.dumps(message, sort_keys=True) + "\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    return True
 
 
-def dispatch_one(improvements):
-    """Dispatch at most one new bounded candidate and persist the decision first."""
+def _finalize_pending(state, candidate_id_value):
+    record = state["pending"].pop(candidate_id_value)
+    dispatched = {
+        "msg_id": record["msg_id"],
+        "task_id": record["task_id"],
+        "action": record["action"],
+        "dispatched_at": record["dispatched_at"],
+    }
+    state["dispatched"][candidate_id_value] = dispatched
+    state["history"].append(dispatched | {"candidate_id": candidate_id_value})
+    _save_dispatch_state(state)
+    return record["message"]
+
+
+def _dispatch_one_locked(improvements):
     state = _load_dispatch_state()
-    now = datetime.now(timezone.utc).isoformat()
 
+    # Recover the one outstanding outbox item before considering new work.
+    # _append_bus is idempotent, covering a crash after append but before finalize.
+    if state["pending"]:
+        candidate_id_value = next(iter(state["pending"]))
+        record = state["pending"][candidate_id_value]
+        _append_bus(record["message"])
+        return _finalize_pending(state, candidate_id_value)
+
+    now = datetime.now(timezone.utc).isoformat()
     for imp in improvements:
-        cid = imp["id"]
-        if cid in state["dispatched"]:
+        cid = imp.get("id")
+        if not isinstance(cid, str) or not cid or cid in state["dispatched"]:
             continue
-        action, target = ACTION_BY_CATEGORY.get(imp["category"], (None, None))
+        action, target = ACTION_BY_CATEGORY.get(imp.get("category"), (None, None))
         if action is None:
             continue
 
@@ -244,36 +312,48 @@ def dispatch_one(improvements):
             "from": "factory",
             "to": "anyclaw",
             "type": "task_assignment",
-            "task_id": task_id,
-            "action": action,
-            "params": {"path": target} if target else {},
+            "context": {
+                "task_id": task_id,
+                "action": action,
+                "params": {"file_path": target} if target else {},
+                "reply_to": "self_improvement",
+                "correlation_id": cid,
+            },
             "payload": {
                 "candidate_id": cid,
                 "category": imp["category"],
-                "title": imp["title"],
-                "description": imp["description"],
+                "title": imp.get("title", ""),
+                "description": imp.get("description", ""),
             },
-            "reply_to": "self_improvement",
         }
 
-        # Record the durable decision before the bus write. If the process dies
-        # after this point, the candidate remains closed rather than duplicating work.
-        state["dispatched"][cid] = {
+        # Write an outbox record first. On restart, pending work is replayed
+        # idempotently and then promoted to dispatched; no task is silently lost.
+        state["pending"][cid] = {
             "msg_id": msg_id,
             "task_id": task_id,
             "action": action,
             "dispatched_at": now,
+            "message": message,
         }
-        state["history"].append(state["dispatched"][cid] | {"candidate_id": cid})
-        DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
-        DISPATCH_STATE.write_text(json.dumps(state, indent=2) + "\n")
+        _save_dispatch_state(state)
         _append_bus(message)
-        return message
+        return _finalize_pending(state, cid)
 
-    DISPATCH_STATE.parent.mkdir(parents=True, exist_ok=True)
-    DISPATCH_STATE.write_text(json.dumps(state, indent=2) + "\n")
+    _save_dispatch_state(state)
     return None
 
+
+def dispatch_one(improvements):
+    """Serialize dispatch and recover at most one durable outbox task."""
+    STATE.mkdir(parents=True, exist_ok=True)
+    # 0600 lock regardless of umask; existing locks keep their mode.
+    with _open_private(DISPATCH_LOCK, os.O_WRONLY | os.O_CREAT | os.O_APPEND, "a") as lock_handle:
+        fcntl.flock(lock_handle.fileno(), fcntl.LOCK_EX)
+        try:
+            return _dispatch_one_locked(improvements)
+        finally:
+            fcntl.flock(lock_handle.fileno(), fcntl.LOCK_UN)
 
 def run():
     improvements = generate_improvements()
@@ -283,7 +363,12 @@ def run():
 
     print(f"Self-improvement: {len(improvements)} improvements generated")
     if dispatched:
-        print(f"  dispatched: {dispatched['task_id']} -> {dispatched['action']}")
+        context = dispatched.get("context", {}) if isinstance(dispatched, dict) else {}
+        if not isinstance(context, dict):
+            context = {}
+        task_id = context.get("task_id", "unknown")
+        action = context.get("action", "unknown")
+        print(f"  dispatched: {task_id} -> {action}")
     else:
         print("  dispatched: none (all candidates already handled or unsupported)")
     for imp in improvements:

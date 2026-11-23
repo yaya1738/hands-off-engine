@@ -1,0 +1,69 @@
+name: Factory scheduler contract tests
+
+on:
+  pull_request:
+    branches: [main, factory/scheduler-single-owner-hardening-20261115]
+    paths:
+      - "scripts/scheduler.py"
+      - "scripts/process_group.py"
+      - "scripts/self_improvement.py"
+      - "scripts/improvement_cycle.py"
+      - "scripts/supervisor.py"
+      - "scripts/termux_supervisor.py"
+      - "scripts/github_governance_monitor.py"
+      - "scripts/github_governance_cycle.py"
+      - "tests/test_github_governance_cycle.py"
+      - "ai/factory/authority_gateway.py"
+      - "ai/factory/objective_review.py"
+      - "tests/test_factory_objective_review.py"
+      - "scripts/factory_objectives.py"
+      - "tests/test_factory_authority_gateway.py"
+      - "tests/test_github_governance_monitor.py"
+      - "scripts/improvement_applier.py"
+      - "tests/test_improvement_applier_safety.py"
+      - "tests/test_improvement_applier.py"
+      - "scripts/improvement_cycle.py"
+      - "tests/test_improvement_cycle_exit.py"
+      - "scripts/task_worker.py"
+      - "tests/test_scheduler_hardening.py"
+      - "tests/test_process_group_lifecycle.py"
+      - "tests/test_supervisor_ownership_contract.py"
+      - "tests/test_scheduler_heartbeat_contract.py"
+      - "tests/test_supervisor_recovery_contract.py"
+      - "tests/test_termux_supervisor_lock_ownership.py"
+      - "tests/test_self_improvement_dispatch.py"
+      - ".github/workflows/factory-scheduler-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Run scheduler and worker contract tests
+        run: |
+          python -m unittest tests/test_scheduler_hardening.py -v
+          python -m unittest tests/test_process_group_lifecycle.py -v
+          python -m unittest tests/test_supervisor_ownership_contract.py -v
+          python -m unittest tests/test_scheduler_heartbeat_contract.py -v
+          python -m unittest tests/test_supervisor_recovery_contract.py -v
+          if [ -f tests/test_termux_supervisor_lock_ownership.py ]; then
+            python -m unittest tests/test_termux_supervisor_lock_ownership.py -v
+          fi
+          python -m unittest tests/test_self_improvement_dispatch.py -v
+          python -m unittest tests/test_improvement_applier_safety.py -v
+          python -m unittest tests/test_improvement_applier.py -v
+          python -m unittest tests/test_improvement_cycle_exit.py -v
+          if [ -f tests/test_telegram_bridge_delivery.py ]; then
+            python -m unittest tests/test_telegram_bridge_delivery.py -v
+          fi
+          python -m unittest tests/test_github_governance_monitor.py -v
+          python -m unittest tests/test_factory_authority_gateway.py -v
+          python -m unittest tests/test_factory_objective_review.py -v
+          python -m unittest tests/test_github_governance_cycle.py -v
+          # adapter security contract is owned and tested by PR 373

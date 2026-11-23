@@ -32,9 +32,10 @@ def test_backoff_bounded():
     b = _get_backoff(3, 5)
     assert b == 40  # 5 * 2^3
     
-    # Cooldown at max failures
+    # Restart backoff remains capped independently of the longer cooldown.
     b = _get_backoff(10, 5)
-    assert b == COOLDOWN_DURATION
+    assert b == MAX_BACKOFF
+    assert COOLDOWN_DURATION > MAX_BACKOFF
     
     # Normal backoff is bounded
     for i in range(10):
