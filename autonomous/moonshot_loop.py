@@ -141,7 +141,7 @@ def get_system_metrics() -> dict:
 
     # Load finance hub for full resource awareness
     try:
-        finance_hub = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "yair_finance_hub.json"
+        finance_hub = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "finance_hub.json"
         if finance_hub.exists():
             hub = json.load(open(finance_hub))
             metrics["monthly_burn"] = hub.get("monthly_burn", {}).get("total_usd", 3280)
