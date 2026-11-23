@@ -76,6 +76,7 @@ log "Found $TASK_COUNT pending task(s). Invoking Claude CLI..."
 TASK_PROMPT_FILE="/tmp/claude_task_prompt_$$.txt"
 python3 << PYTHON_EOF > "$TASK_PROMPT_FILE"
 import json
+import os
 import sys
 from pathlib import Path
 
