@@ -53,12 +53,16 @@ def get_api_status():
         content = env_file.read_text()
         status['openai'] = 'OPENAI_API_KEY=' in content and 'your-' not in content
     
-    # Telegram - test it
-    try:
-        import requests
-        r = requests.get('https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/getMe', timeout=5)
-        status['telegram'] = r.json().get('ok', False)
-    except:
+    # Telegram - test only when an environment credential is configured
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if token:
+        try:
+            import requests
+            r = requests.get(f'https://api.telegram.org/bot{token}/getMe', timeout=5)
+            status['telegram'] = r.json().get('ok', False)
+        except Exception:
+            status['telegram'] = False
+    else:
         status['telegram'] = False
     
     return status
