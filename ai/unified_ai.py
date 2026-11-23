@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-UNIFIED AI - All Systems in Service of Yair Siegel
+UNIFIED AI - All Systems in Service of the configured operator
 ===================================================
 LEVEL: 60 miles - Inherits from AbsoluteDirective (80 miles)
 
@@ -8,7 +8,7 @@ This module provides the unified AI identity and directive
 that all agents import and follow.
 
 Every agent that imports this becomes part of the unified
-AI serving Yair Siegel.
+AI serving the configured operator.
 """
 
 import json
@@ -72,7 +72,7 @@ _active_directive: Optional[Dict] = None
 
 def get_master() -> str:
     """Return the master being served."""
-    return "Yair Siegel"
+    return os.getenv("HANDS_OFF_OWNER_NAME", "Configured operator")
 
 
 def get_core() -> Dict:
@@ -84,8 +84,8 @@ def get_core() -> Dict:
                 _unified_core = json.load(f)
         else:
             _unified_core = {
-                "master": {"name": "Yair Siegel"},
-                "core_directive": "Serve Yair Siegel"
+                "master": {"name": get_master()},
+                "core_directive": "Serve the configured operator"
             }
     return _unified_core
 
@@ -98,7 +98,7 @@ def get_directive() -> Dict:
             with open(ACTIVE_DIRECTIVE) as f:
                 _active_directive = json.load(f)
         else:
-            _active_directive = {"directive": "Serve Yair Siegel"}
+            _active_directive = {"directive": "Serve the configured operator"}
     return _active_directive
 
 
@@ -180,8 +180,7 @@ def should_execute(action: str, roi_estimate: float = 0, **kwargs) -> bool:
         print(f"[COST GATE] Warning: {e}")
 
     # Always serve the master
-    if "yair" in action.lower() or "siegel" in action.lower():
-        return True
+    # Identity text is not an authorization signal; financial and policy gates apply to every action.
 
     # ROI positive actions: execute
     if roi_estimate > 0:
@@ -346,7 +345,7 @@ def check_trading_allowed(amount: float = 0) -> tuple:
 
 
 def optimize_for_master(action: str, options: list) -> str:
-    """Choose the option that best serves Yair Siegel."""
+    """Choose the option that best serves the configured operator."""
     # Simple ROI-based optimization
     best = options[0] if options else action
 
