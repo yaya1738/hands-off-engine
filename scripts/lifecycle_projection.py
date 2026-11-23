@@ -58,6 +58,8 @@ def _entry(task_id: str, message: Dict) -> Dict:
     context = message.get("context") or {}
     return {
         "task_id": task_id,
+        "msg_id": message.get("id") or message.get("msg_id"),
+        "reply_to": context.get("reply_to") or message.get("reply_to"),
         "sender": message.get("from"),
         "recipient": message.get("to"),
         "action": context.get("action"),
@@ -75,11 +77,17 @@ def apply_message(state: Dict, message: Dict) -> bool:
 
     entry = state.setdefault(task_id, _entry(task_id, message))
     context = message.get("context") or {}
-    msg_type = message.get("type")
-    sender = message.get("from")
-    recipient = message.get("to")
+    msg_id = message.get("id") or message.get("msg_id")
+    reply_to = context.get("reply_to") or message.get("reply_to")
     changed = False
 
+    for field, value in (("msg_id", msg_id), ("reply_to", reply_to)):
+        if value and entry.get(field) != value:
+            entry[field] = value
+            changed = True
+
+    sender = message.get("from")
+    recipient = message.get("to")
     if not entry.get("sender") and sender:
         entry["sender"] = sender
         changed = True
@@ -91,6 +99,7 @@ def apply_message(state: Dict, message: Dict) -> bool:
         changed = True
 
     transitions = []
+    msg_type = message.get("type")
     if msg_type == "task_assignment":
         transitions.append("sent")
         if context.get("claimed") is True:
