@@ -95,3 +95,10 @@ security/owner_human_identity.json
 termux-hands-off/state/auto_sources.env
 termux-hands-off/state/ifttt.env
 termux-hands-off/state/tg/bots/handsoff.env
+
+# Local-only financial records
+finance/finance_hub.json
+finance/yair_finance_hub.json
+finance/dollar_access.json
+finance/partner_terms.json
+finance/cost_decisions.jsonl
