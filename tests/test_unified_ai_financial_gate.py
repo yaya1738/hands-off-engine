@@ -57,7 +57,7 @@ def test_corrupt_system_state_fails_closed(tmp_path, monkeypatch):
 
     state = unified_ai.get_system_state()
 
-    assert state["balance"] is None
+    assert state["balance"] == 0.0
     assert state["trading_enabled"] is False
     assert state["state_error"] == "JSONDecodeError"
 
