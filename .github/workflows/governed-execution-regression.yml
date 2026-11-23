@@ -1,0 +1,80 @@
+name: Governed execution regression tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "ai/approval_queue.py"
+      - "ai/autonomous_change.py"
+      - "ai/ai_runner.py"
+      - "autonomous/system_doctor.py"
+      - "autonomous/self_healer.py"
+      - "autonomous/claude_optimizer.py"
+      - "infrastructure/selfheal.py"
+      - "termux-hands-off/autopilot/control_server.py"
+      - "telegram/telegram_command_bot.py"
+      - "telegram/telegram_bot_listener.py"
+      - "scripts/comm_hub.py"
+      - "scripts/control_api.py"
+      - "scripts/telegram_bridge.py"
+      - "scripts/yair_control_room.py"
+      - "scripts/realtime_coordination_service.py"
+      - "autonomous/governed_authority.py"
+      - "executor/**"
+      - "scripts/factory_execution_adapter.py"
+      - "scripts/executor.py"
+      - "tests/test_ai_runner_execution_boundary.py"
+      - "tests/test_system_doctor_execution_boundary.py"
+      - "tests/test_self_healer_execution_boundary.py"
+      - "tests/test_telegram_authenticated_approval.py"
+      - "tests/test_telegram_bridge_sender_auth.py"
+      - "tests/test_yair_control_room_http_boundary.py"
+      - "tests/test_control_room_authentication.py"
+      - "tests/test_realtime_coordination_http_boundary.py"
+      - "tests/test_comm_hub_authenticated_approval.py"
+      - "tests/test_claude_optimizer_execution_boundary.py"
+      - "tests/test_autopilot_control_server_auth.py"
+      - "tests/test_selfheal_execution_boundary.py"
+      - "tests/test_approval_queue_execution_boundary.py"
+      - "tests/test_autonomous_change_execution_status.py"
+      - "tests/test_factory_execution_adapter.py"
+      - "tests/test_executor_governed_authority.py"
+      - "tests/executor/**"
+      - ".github/workflows/governed-execution-regression.yml"
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  focused-regressions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install --disable-pip-version-check pytest requests structlog watchdog
+      - name: Run governed execution regressions
+        run: >-
+          python -m pytest -q
+          tests/test_ai_runner_execution_boundary.py
+          tests/test_system_doctor_execution_boundary.py
+          tests/test_self_healer_execution_boundary.py
+          tests/test_telegram_authenticated_approval.py
+          tests/test_telegram_bridge_sender_auth.py
+          tests/test_yair_control_room_http_boundary.py
+          tests/test_control_room_authentication.py
+          tests/test_realtime_coordination_http_boundary.py
+          tests/test_comm_hub_authenticated_approval.py
+          tests/test_claude_optimizer_execution_boundary.py
+          tests/test_autopilot_control_server_auth.py
+          tests/test_selfheal_execution_boundary.py
+          tests/test_approval_queue_execution_boundary.py
+          tests/test_autonomous_change_execution_status.py
+          tests/test_factory_execution_adapter.py
+          tests/test_executor_governed_authority.py
+          tests/executor/test_basic_flow.py

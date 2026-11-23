@@ -23,11 +23,19 @@ from pathlib import Path
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent))
 
-from telegram_command_bot import TelegramCommandBot
+try:
+    from telegram_command_bot import TelegramCommandBot
+except ModuleNotFoundError:
+    from .telegram_command_bot import TelegramCommandBot
 
 # Configuration
 BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")  # Optional - restrict to specific user
+ALLOWED_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+ADMIN_USER_IDS = {
+    value.strip()
+    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+    if value.strip()
+}
 POLL_INTERVAL = 2  # seconds
 LOG_FILE = "/var/log/telegram-bot.log"
 
@@ -35,10 +43,7 @@ LOG_FILE = "/var/log/telegram-bot.log"
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.FileHandler(LOG_FILE),
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()]
 )
 logger = logging.getLogger(__name__)
 
@@ -110,13 +115,26 @@ class SimpleTelegramBot:
             if not message:
                 return
 
-            chat_id = message.get("chat", {}).get("id")
+            chat = message.get("chat", {})
+            chat_id = chat.get("id")
             text = message.get("text", "")
-            username = message.get("from", {}).get("username", "unknown")
+            sender = message.get("from", {})
+            sender_id = sender.get("id")
+            username = sender.get("username", "unknown")
 
-            # Check if chat is allowed (if ALLOWED_CHAT_ID is set)
-            if ALLOWED_CHAT_ID and str(chat_id) != ALLOWED_CHAT_ID:
-                logger.warning(f"Ignoring message from unauthorized chat: {chat_id}")
+            # A private chat and numeric sender allowlist are mandatory.
+            # TELEGRAM_CHAT_ID is an optional additional restriction, never identity.
+            if not ADMIN_USER_IDS:
+                logger.error("Telegram command denied: TELEGRAM_ADMIN_USER_IDS is not configured")
+                return
+            if chat.get("type") != "private":
+                logger.warning("Ignoring Telegram command outside a private chat")
+                return
+            if str(sender_id) not in ADMIN_USER_IDS:
+                logger.warning("Ignoring Telegram command from unauthorized user")
+                return
+            if ALLOWED_CHAT_ID and str(chat_id) != str(ALLOWED_CHAT_ID):
+                logger.warning("Ignoring Telegram command from unauthorized chat")
                 return
 
             # Only process commands (start with /)
@@ -126,7 +144,7 @@ class SimpleTelegramBot:
             logger.info(f"Received command from {username} (chat {chat_id}): {text}")
 
             # Process command using command bot
-            response = self.command_bot.process_command(text)
+            response = self.command_bot.process_command(text, actor_id=sender_id)
 
             # Send response
             self.send_message(chat_id, response)
@@ -140,10 +158,12 @@ class SimpleTelegramBot:
         logger.info("Telegram Bot Listener starting...")
         logger.info(f"Poll interval: {POLL_INTERVAL}s")
 
+        if not ADMIN_USER_IDS:
+            raise RuntimeError("TELEGRAM_ADMIN_USER_IDS is required; refusing unauthenticated command service")
+
         if ALLOWED_CHAT_ID:
-            logger.info(f"Restricted to chat ID: {ALLOWED_CHAT_ID}")
-        else:
-            logger.warning("No ALLOWED_CHAT_ID set - bot will respond to any user!")
+            logger.info(f"Additional chat restriction enabled: {ALLOWED_CHAT_ID}")
+        logger.info("Telegram commands restricted to configured numeric admin user IDs")
 
         while True:
             try:

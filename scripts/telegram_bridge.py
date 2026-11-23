@@ -43,6 +43,11 @@ TOKEN_FILE = Path.home() / ".codex" / "telegram-bridge.json"
 STATE_DIR = REPO_ROOT / "state"
 TELEGRAM_STATE = STATE_DIR / "telegram_state.json"
 MAX_MESSAGE_LENGTH = 4000
+ADMIN_USER_IDS = {
+    value.strip()
+    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+    if value.strip()
+}
 
 
 def load_config():
@@ -131,6 +136,7 @@ class TelegramBridge:
                 messages.append({
                     "update_id": update["update_id"],
                     "chat_id": msg["chat"]["id"],
+                    "chat_type": msg.get("chat", {}).get("type"),
                     "user_id": msg.get("from", {}).get("id"),
                     "username": msg.get("from", {}).get("username", ""),
                     "text": msg["text"],
@@ -149,13 +155,49 @@ class TelegramBridge:
         for msg in messages:
             text = msg["text"].strip()
 
+            # Inbound commands require a private chat and the same environment-
+            # managed numeric sender allowlist used by the command listener.
+            # Outbound notifications remain available when this allowlist is absent.
+            command = text.split()[0].split("@", 1)[0].lower() if text else ""
+            is_help = command == "/help"
+            if msg.get("chat_type") != "private" or (
+                not is_help
+                and (
+                    not ADMIN_USER_IDS
+                    or str(msg.get("user_id")) not in ADMIN_USER_IDS
+                )
+            ):
+                log.warning("Rejected Telegram inbound message from untrusted sender")
+                self.send("Denied: this Telegram user is not authorized.", chat_id=msg["chat_id"])
+                continue
+
+            authenticated_args = {
+                "authenticated": bool(not is_help and ADMIN_USER_IDS and str(msg.get("user_id")) in ADMIN_USER_IDS),
+                "authenticated_actor_id": str(msg["user_id"]) if msg.get("user_id") is not None else None,
+            }
+
             # Parse command-style messages
             if text.startswith("/approve "):
                 cmd_id = text.split(" ", 1)[1].strip()
-                response = hub.receive("operator", "approve", {"command_id": cmd_id}, channel="telegram")
+                response = hub.receive("operator", "approve", {"command_id": cmd_id}, channel="telegram", **authenticated_args)
             elif text.startswith("/reject "):
                 cmd_id = text.split(" ", 1)[1].strip()
-                response = hub.receive("operator", "reject", {"command_id": cmd_id}, channel="telegram")
+                response = hub.receive("operator", "reject", {"command_id": cmd_id}, channel="telegram", **authenticated_args)
+            elif text.startswith("/review "):
+                parts = text.split()
+                if len(parts) == 3 and parts[2].lower() in ("accept", "reject"):
+                    response = hub.receive(
+                        "operator",
+                        "objective_review",
+                        {
+                            "goal_id": parts[1],
+                            "decision": "accept_for_planning" if parts[2].lower() == "accept" else "reject",
+                        },
+                        channel="telegram",
+                        **authenticated_args,
+                    )
+                else:
+                    response = {"routed_to": "error", "error": "Usage: /review <goal_id> <accept|reject>"}
             elif text.startswith("/status"):
                 response = hub.receive("operator", "status_query", {"query": "full"}, channel="telegram")
             elif text.startswith("/trade "):
@@ -165,7 +207,7 @@ class TelegramBridge:
                     response = hub.receive("operator", "trade_command", {
                         "action": parts[1],
                         "params": {"market": parts[2], "amount": parts[3] if len(parts) > 3 else None},
-                    }, channel="telegram")
+                    }, channel="telegram", **authenticated_args)
                 else:
                     response = {"error": "Usage: /trade <buy|sell> <market> [amount]"}
             elif text.startswith("/help"):
@@ -174,7 +216,10 @@ class TelegramBridge:
                 response = hub.receive("operator", "inbound_from_operator", {"text": text}, channel="telegram")
 
             # Send response back
-            reply = response.get("response", response.get("data", response.get("result", "")))
+            if isinstance(response, dict):
+                reply = response.get("response", response.get("data", response.get("result", response.get("error", ""))))
+            else:
+                reply = response
             if isinstance(reply, dict):
                 reply = json.dumps(reply, indent=2)[:MAX_MESSAGE_LENGTH]
             elif reply:
@@ -192,6 +237,7 @@ class TelegramBridge:
 /trade <buy|sell> <market> [amount] — Execute trade (LIVE)
 /approve <id> — Approve pending command
 /reject <id> — Reject pending command
+/review <goal_id> <accept|reject> — Review a Factory objective (accept means planning only)
 /help — This message"""
 
     # ── Telegram Bot API ──

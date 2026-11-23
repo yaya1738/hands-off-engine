@@ -18,6 +18,7 @@ import time
 import json
 import subprocess
 import signal
+import glob
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Callable
@@ -267,42 +268,36 @@ class SelfHealController:
             return False
 
     def _restart_service(self, service_name: str) -> bool:
-        """Restart a service"""
-        command = self.config["restart_commands"].get(service_name)
-
-        if not command:
-            logger.error("restart_command_not_found", service=service_name)
+        """Restart only fixed, allowlisted services without a shell."""
+        services = {
+            "orchestrator": "hands-off-orchestrator",
+            "executor": "hands-off-executor",
+            "finance_watcher": "hands-off-finance-watcher",
+        }
+        unit = services.get(service_name)
+        if not unit:
+            logger.error("restart_service_not_allowlisted", service=service_name)
             return False
 
         try:
-            logger.info("restarting_service", service=service_name, command=command)
-
             result = subprocess.run(
-                command,
-                shell=True,
+                ["systemctl", "restart", unit],
                 capture_output=True,
                 text=True,
-                timeout=30
+                timeout=30,
+                check=False,
             )
-
             success = result.returncode == 0
-
             if success:
-                logger.info(
-                    "service_restarted",
-                    service=service_name,
-                    stdout=result.stdout[:200]
-                )
+                logger.info("service_restarted", service=service_name, stdout=result.stdout[:200])
             else:
                 logger.error(
                     "service_restart_failed",
                     service=service_name,
                     returncode=result.returncode,
-                    stderr=result.stderr[:200]
+                    stderr=result.stderr[:200],
                 )
-
             return success
-
         except subprocess.TimeoutExpired:
             logger.error("service_restart_timeout", service=service_name)
             return False
@@ -311,7 +306,7 @@ class SelfHealController:
                 "service_restart_error",
                 service=service_name,
                 error=str(e),
-                error_type=type(e).__name__
+                error_type=type(e).__name__,
             )
             return False
 
@@ -338,48 +333,62 @@ class SelfHealController:
             return False
 
     def _cleanup_old_files(self) -> bool:
-        """Clean up old log files and backups"""
+        """Delete aged regular files from explicitly allowed cleanup roots."""
         try:
             patterns = self.config["disk_cleanup"]["cleanup_patterns"]
-            max_age_days = self.config["disk_cleanup"]["max_backup_age_days"]
+            max_age_days = int(self.config["disk_cleanup"]["max_backup_age_days"])
+            if max_age_days < 1:
+                return False
             cutoff_time = time.time() - (max_age_days * 86400)
-
+            allowed_roots = (
+                Path("/var/log/hands-off-engine").resolve(),
+                Path("/home/user/hands-off-engine/state").resolve(),
+            )
             deleted_count = 0
             freed_bytes = 0
 
             for pattern in patterns:
                 try:
-                    # Use find command for efficient file discovery
-                    cmd = f"find {pattern} -type f -mtime +{max_age_days} 2>/dev/null"
-                    result = subprocess.run(
-                        cmd,
-                        shell=True,
-                        capture_output=True,
-                        text=True,
-                        timeout=30
-                    )
+                    # Patterns are data, never shell source. Restrict matches to
+                    # known cleanup roots or the narrow /tmp/hands-off-* prefix.
+                    if not (
+                        pattern.startswith("/var/log/hands-off-engine/")
+                        or pattern.startswith("/home/user/hands-off-engine/state/")
+                        or pattern.startswith("/tmp/hands-off-")
+                    ):
+                        logger.warning("cleanup_pattern_not_allowlisted", pattern=pattern)
+                        continue
 
-                    for file_path in result.stdout.strip().split("\n"):
-                        if file_path:
-                            try:
-                                size = os.path.getsize(file_path)
-                                os.remove(file_path)
-                                deleted_count += 1
-                                freed_bytes += size
-                            except Exception as e:
-                                logger.debug("file_delete_error", file=file_path, error=str(e))
-
+                    for raw_path in glob.glob(pattern):
+                        candidate = Path(raw_path)
+                        try:
+                            if candidate.is_symlink() or not candidate.is_file():
+                                continue
+                            resolved = candidate.resolve(strict=True)
+                            allowed = (
+                                any(resolved.is_relative_to(root) for root in allowed_roots)
+                                or (resolved.parent == Path("/tmp") and resolved.name.startswith("hands-off-"))
+                            )
+                            if not allowed:
+                                logger.warning("cleanup_target_not_allowlisted", file=str(candidate))
+                                continue
+                            stat = resolved.stat()
+                            if stat.st_mtime >= cutoff_time:
+                                continue
+                            resolved.unlink()
+                            deleted_count += 1
+                            freed_bytes += stat.st_size
+                        except Exception as e:
+                            logger.debug("file_delete_error", file=str(candidate), error=str(e))
                 except Exception as e:
                     logger.debug("cleanup_pattern_error", pattern=pattern, error=str(e))
 
             logger.info(
                 "disk_cleanup_complete",
                 deleted_files=deleted_count,
-                freed_mb=f"{freed_bytes / (1024**2):.2f}"
+                freed_mb=f"{freed_bytes / (1024**2):.2f}",
             )
-
             return deleted_count > 0
-
         except Exception as e:
             logger.error("disk_cleanup_error", error=str(e))
             return False
@@ -455,60 +464,39 @@ class SelfHealController:
 
         return restored_count > 0
 
+    def _stale_lock_files(self) -> List[Path]:
+        """Return stale regular lock files from fixed directories."""
+        cutoff = time.time() - 3600
+        matches = []
+        for pattern in ("/tmp/hands-off-*.lock", "/var/lock/hands-off-*.lock"):
+            for raw_path in glob.glob(pattern):
+                path = Path(raw_path)
+                try:
+                    if path.is_symlink() or not path.is_file():
+                        continue
+                    if path.stat().st_mtime < cutoff:
+                        matches.append(path)
+                except OSError as e:
+                    logger.debug("lock_check_error", file=str(path), error=str(e))
+        return matches
+
     def _has_stale_locks(self) -> bool:
-        """Check for stale lock files"""
-        lock_patterns = [
-            "/tmp/hands-off-*.lock",
-            "/var/lock/hands-off-*.lock",
-        ]
-
-        for pattern in lock_patterns:
-            try:
-                cmd = f"find {pattern} -type f -mmin +60 2>/dev/null"
-                result = subprocess.run(
-                    cmd,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    timeout=10
-                )
-
-                if result.stdout.strip():
-                    logger.warning("stale_locks_found", pattern=pattern)
-                    return True
-
-            except Exception as e:
-                logger.debug("lock_check_error", pattern=pattern, error=str(e))
-
-        return False
+        """Check for stale lock files without invoking a shell."""
+        stale = self._stale_lock_files()
+        if stale:
+            logger.warning("stale_locks_found", count=len(stale))
+        return bool(stale)
 
     def _clear_locks(self) -> bool:
-        """Clear stale lock files"""
-        lock_patterns = [
-            "/tmp/hands-off-*.lock",
-            "/var/lock/hands-off-*.lock",
-        ]
-
+        """Clear only stale regular lock files from fixed directories."""
         cleared_count = 0
-
-        for pattern in lock_patterns:
+        for path in self._stale_lock_files():
             try:
-                cmd = f"find {pattern} -type f -mmin +60 -delete 2>/dev/null"
-                result = subprocess.run(
-                    cmd,
-                    shell=True,
-                    capture_output=True,
-                    text=True,
-                    timeout=10
-                )
-
-                if result.returncode == 0:
-                    cleared_count += 1
-
-            except Exception as e:
-                logger.debug("lock_clear_error", pattern=pattern, error=str(e))
-
-        logger.info("locks_cleared", patterns_processed=cleared_count)
+                path.unlink()
+                cleared_count += 1
+            except OSError as e:
+                logger.debug("lock_clear_error", file=str(path), error=str(e))
+        logger.info("locks_cleared", files=cleared_count)
         return cleared_count > 0
 
     def run_once(self) -> Dict[str, any]:

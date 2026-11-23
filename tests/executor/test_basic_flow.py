@@ -52,6 +52,50 @@ def test_dryrun_returns_success():
     assert "[DRYRUN]" in result.stdout, f"Expected '[DRYRUN]' in stdout, got: {result.stdout}"
 
 
+
+def test_live_mode_is_rejected_without_governed_authority(monkeypatch):
+    import executor.command_executor as executor_module
+
+    def forbidden_run(*args, **kwargs):
+        raise AssertionError("LIVE command reached subprocess.run")
+
+    monkeypatch.setattr(executor_module.subprocess, "run", forbidden_run)
+    executor = CommandExecutor(TEST_CONFIG)
+    task = ExecutionTask(
+        task_id="test-live-blocked",
+        command=["echo", "must-not-run"],
+        working_dir=".",
+        mode="LIVE",
+    )
+
+    result = executor.execute(task)
+
+    assert result.status == "rejected"
+    assert result.mode == "LIVE"
+    assert "no governed LIVE authority grant" in result.reason
+
+
+def test_unknown_mode_is_rejected_without_execution(monkeypatch):
+    import executor.command_executor as executor_module
+
+    def forbidden_run(*args, **kwargs):
+        raise AssertionError("Unknown mode reached subprocess.run")
+
+    monkeypatch.setattr(executor_module.subprocess, "run", forbidden_run)
+    executor = CommandExecutor(TEST_CONFIG)
+    task = ExecutionTask(
+        task_id="test-unknown-mode",
+        command=["echo", "must-not-run"],
+        working_dir=".",
+        mode="AUTONOMOUS",
+    )
+
+    result = executor.execute(task)
+
+    assert result.status == "rejected"
+    assert result.mode == "AUTONOMOUS"
+    assert "no governed LIVE authority grant" in result.reason
+
 def test_unsafe_command_rejected():
     """Test that unsafe commands are rejected by the SafetyAuditor."""
     executor = CommandExecutor(TEST_CONFIG)

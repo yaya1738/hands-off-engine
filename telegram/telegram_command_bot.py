@@ -40,6 +40,12 @@ from ai.approval_queue import ApprovalQueue
 # Telegram config (from environment or config file)
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+ADMIN_USER_IDS = {
+    value.strip()
+    for value in os.getenv("TELEGRAM_ADMIN_USER_IDS", "").split(",")
+    if value.strip()
+}
+READ_ONLY_COMMANDS = {"/help"}
 
 
 class TelegramCommandBot:
@@ -68,11 +74,19 @@ class TelegramCommandBot:
             '/fixssh': self.cmd_fixssh,
         }
 
-    def process_command(self, command_text: str) -> str:
+    def process_command(self, command_text: str, actor_id=None) -> str:
         """Process incoming command and return response text."""
         parts = command_text.strip().split()
-        cmd = parts[0].lower()
+        if not parts:
+            return "Unknown command. Send /help for command list."
+        cmd = parts[0].split("@", 1)[0].lower()
         args = parts[1:] if len(parts) > 1 else []
+
+        # Help is the only unauthenticated command. All operational commands
+        # require a numeric sender ID from the central admin allowlist.
+        if cmd not in READ_ONLY_COMMANDS:
+            if not ADMIN_USER_IDS or actor_id is None or str(actor_id) not in ADMIN_USER_IDS:
+                return "Denied: authenticated Telegram user is not authorized."
 
         if cmd in self.commands:
             try:
@@ -266,24 +280,14 @@ Risk: {change['risk_level']}
         if change["status"] != "pending":
             return f"❌ Change {change_id} is already {change['status']}"
 
-        # Approve it
+        # Approval records are not execution authorization. The legacy
+        # queue executor is intentionally disabled; record the approval only.
         if queue.approve(change_id):
-            # Execute the change
-            result = queue.execute_approved(change_id)
-
-            if result["success"]:
-                return f"""✅ Approved and executed: {change_id}
-
-**{change['title']}**
-
-{result.get('message', 'Change applied successfully')}"""
-            else:
-                return f"""✅ Approved: {change_id}
-❌ Execution failed: {result.get('error', 'Unknown error')}
-
-Change is marked approved but not applied. Check logs."""
-        else:
-            return f"❌ Failed to approve {change_id}"
+            return (
+                f"Approval recorded for {change_id}. "
+                "Execution remains blocked pending governed execution."
+            )
+        return f"Failed to approve {change_id}"
 
     def cmd_reject(self, args) -> str:
         """Reject a pending change."""
@@ -429,7 +433,7 @@ Pending Tasks: {len(pending_tasks)}"""
 /pending - View pending approvals
 /approve <id> - Approve pending change
 /reject <id> - Reject pending change
-/setpat <token> - Set GitHub PAT for compute nodes
+/setpat - Disabled; use a secure out-of-band secret manager
 
 **Info:**
 /dashboard - Unified web dashboard URL
@@ -684,78 +688,8 @@ Dashboard: http://138.68.103.156:8002"""
             return f"❌ Error: {str(e)}"
 
     def cmd_setpat(self, args) -> str:
-        """Set GitHub Personal Access Token for compute nodes."""
-        if not args:
-            return """🔐 GitHub PAT Configuration
-
-Usage: /setpat <your_github_pat>
-
-This will:
-1. Store PAT in .env file
-2. Configure git on all compute nodes
-3. Enable CLI migration to larger nodes
-
-Generate PAT at: https://github.com/settings/tokens
-Required scope: repo (Full control of private repos)
-
-⚠️ Send the PAT directly - it will be stored securely."""
-
-        pat = args[0]
-
-        # Validate PAT format (github classic or fine-grained)
-        if not (pat.startswith('ghp_') or pat.startswith('github_pat_')):
-            return "❌ Invalid PAT format. Should start with 'ghp_' or 'github_pat_'"
-
-        try:
-            # Store in .env file
-            env_file = REPO_ROOT / ".env"
-            env_content = ""
-            if env_file.exists():
-                env_content = env_file.read_text()
-
-            # Update or add GITHUB_PAT
-            if "GITHUB_PAT=" in env_content:
-                lines = env_content.split('\n')
-                lines = [l if not l.startswith('GITHUB_PAT=') else f'GITHUB_PAT={pat}' for l in lines]
-                env_content = '\n'.join(lines)
-            else:
-                env_content += f'\nGITHUB_PAT={pat}\n'
-
-            env_file.write_text(env_content)
-
-            # Configure git on compute nodes
-            compute_nodes = ["134.122.124.240", "198.211.96.196", "67.205.153.121"]
-            configured = []
-
-            for node_ip in compute_nodes:
-                try:
-                    # Configure git to use PAT
-                    result = subprocess.run([
-                        'ssh', '-o', 'StrictHostKeyChecking=no', '-o', 'ConnectTimeout=10',
-                        f'root@{node_ip}',
-                        f'''cd /root/hands-off-engine && git remote set-url origin https://{pat}@github.com/yaya1738/hands-off-engine.git && git fetch --quiet && echo "OK"'''
-                    ], capture_output=True, text=True, timeout=30)
-
-                    if "OK" in result.stdout:
-                        configured.append(node_ip)
-                except Exception:
-                    pass
-
-            return f"""✅ GitHub PAT configured!
-
-Stored in .env: ✓
-Compute nodes configured: {len(configured)}/3
-Nodes: {', '.join(configured) if configured else 'none'}
-
-You can now run Claude CLI on any compute node:
-ssh root@67.205.153.121
-cd /root/hands-off-engine
-claude
-
-(This node has 8 vCPU, 16GB RAM vs current 4 vCPU)"""
-
-        except Exception as e:
-            return f"❌ Error configuring PAT: {str(e)}"
+        """PATs must never be accepted or propagated through Telegram."""
+        return "Disabled: do not send credentials through Telegram. Use a secure out-of-band secret manager."
 
     def cmd_fixssh(self, args) -> str:
         """Fix SSH access on all droplets by adding ho-cli-main key."""
