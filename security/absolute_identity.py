@@ -7,10 +7,10 @@ Verification Layers:
 1. CRYPTOGRAPHIC - SSH keys, wallet signatures (unforgeable)
 2. INFRASTRUCTURE - Known IPs, servers, devices
 3. BEHAVIORAL - Typing patterns, decision style
-4. KNOWLEDGE - Things only Yair knows
+4. KNOWLEDGE - Private owner knowledge challenge
 5. CONTEXTUAL - Project familiarity, history
 
-Threshold: 60% = YAIR, <60% = NOT YAIR, no middle ground
+Threshold: configured verification score required; otherwise access denied
 """
 
 import os
@@ -26,8 +26,8 @@ PRIVATE_DIR = Path(os.environ.get(
     "HANDS_OFF_PRIVATE_DIR",
     str(Path.home() / ".config" / "hands-off-engine"),
 )).expanduser()
-PROFILE_PATH = Path(os.environ.get("HANDS_OFF_IDENTITY_PROFILE", str(PRIVATE_DIR / "security" / "yair_identity_profile.json"))).expanduser()
-HUMAN_IDENTITY_PATH = Path(os.environ.get("HANDS_OFF_HUMAN_IDENTITY", str(PRIVATE_DIR / "security" / "yair_human_identity.json"))).expanduser()
+PROFILE_PATH = Path(os.environ.get("HANDS_OFF_IDENTITY_PROFILE", str(PRIVATE_DIR / "security" / "owner_identity_profile.json"))).expanduser()
+HUMAN_IDENTITY_PATH = Path(os.environ.get("HANDS_OFF_HUMAN_IDENTITY", str(PRIVATE_DIR / "security" / "owner_human_identity.json"))).expanduser()
 VERIFICATION_LOG = Path(os.environ.get("HANDS_OFF_IDENTITY_AUDIT_LOG", str(PRIVATE_DIR / "security" / "verification_audit.jsonl"))).expanduser()
 
 class AbsoluteIdentity:
@@ -151,7 +151,7 @@ class AbsoluteIdentity:
         return score
 
     def verify_knowledge(self, responses: dict = None) -> float:
-        """Layer 4: Knowledge only Yair would have"""
+        """Layer 4: Private owner knowledge verification"""
         if not responses:
             # Use context clues instead
             score = 0.0
@@ -172,7 +172,7 @@ class AbsoluteIdentity:
 
         # Explicit knowledge verification
         weight = self.profile.get("verification_weights", {}).get("knowledge_test", 0.1)
-        questions = self.profile.get("knowledge_verification", {}).get("questions_only_yair_knows", [])
+        questions = self.profile.get("knowledge_verification", {}).get("questions_only_owner_knows", [])
 
         correct = 0
         for q in questions:
@@ -309,7 +309,7 @@ if __name__ == "__main__":
 
     print("=" * 60)
     print("ABSOLUTE IDENTITY VERIFICATION")
-    print("SUBJECT: YAIR SIEGEL")
+    print("SUBJECT: CONFIGURED OWNER")
     print("=" * 60)
 
     print("\n[PRIVATE PROFILE]")
