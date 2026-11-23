@@ -76,7 +76,7 @@ echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 
 **Real example (YOUR ID WILL BE DIFFERENT):**
 ```bash
-echo 'export TELEGRAM_CHAT_ID="123456789"' >> ~/.bashrc
+echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 ```
 
 ### Step 2.4: Load the Settings
