@@ -1,0 +1,63 @@
+name: Private Identity Regression Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - ".claude/**"
+      - ".env.social.template"
+      - ".gitignore"
+      - "ai/**"
+      - "api/**"
+      - "autonomous/**"
+      - "docs/**"
+      - "finance/**"
+      - "scripts/**"
+      - "security/**"
+      - "state/**"
+      - "telegram/**"
+      - "termux-hands-off/state/**"
+      - "ui/**"
+      - "tests/test_private_identity_fail_closed.py"
+      - "tests/test_capital_recovery_read_only.py"
+      - ".github/workflows/private-identity-tests.yml"
+  push:
+    branches:
+      - "privacy/**"
+    paths:
+      - ".claude/**"
+      - ".env.social.template"
+      - ".gitignore"
+      - "ai/**"
+      - "api/**"
+      - "autonomous/**"
+      - "docs/**"
+      - "finance/**"
+      - "scripts/**"
+      - "security/**"
+      - "state/**"
+      - "telegram/**"
+      - "termux-hands-off/state/**"
+      - "ui/**"
+      - "tests/test_private_identity_fail_closed.py"
+      - "tests/test_capital_recovery_read_only.py"
+      - ".github/workflows/private-identity-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  private-identity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest requests
+      - name: Run private identity regression tests
+        run: python -m pytest -q tests/test_private_identity_fail_closed.py tests/test_capital_recovery_read_only.py

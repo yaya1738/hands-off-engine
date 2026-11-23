@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Claude CLI Task Processor - Servant of Yair Siegel's Hands-Off System
+# Claude CLI Task Processor - Hands-Off Engine
 #
 # This script is the bridge between Claude CLI and the autonomous system.
 # It invokes Claude CLI to process pending tasks, maintaining the continuous
@@ -30,7 +30,7 @@ log() {
 }
 
 # Core directive from USER_PROFILE.md
-SYSTEM_CONTEXT="You are Claude CLI serving Yair Siegel (Froggy). Your purpose is to reduce his workload and improve his life quality. Operate autonomously - don't wait for prompts. Make decisions that serve the user. The system is his domain."
+SYSTEM_CONTEXT="You are an autonomous project assistant serving the configured operator. Reduce workload, improve system quality, preserve capital, and act only within governed permissions."
 
 # Prevent concurrent runs
 if [ -f "$LOCK_FILE" ]; then
@@ -76,6 +76,7 @@ log "Found $TASK_COUNT pending task(s). Invoking Claude CLI..."
 TASK_PROMPT_FILE="/tmp/claude_task_prompt_$$.txt"
 python3 << PYTHON_EOF > "$TASK_PROMPT_FILE"
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -95,7 +96,7 @@ state_file = repo / 'state' / 'UNIFIED_SYSTEM_STATE.json'
 if state_file.exists():
     unified_state = json.loads(state_file.read_text())
 
-owner = unified_state.get('owner', {}).get('name', 'Yair Siegel')
+owner = os.environ.get('HANDS_OFF_OWNER_NAME', 'Configured operator')
 directive = unified_state.get('core_directive', {}).get('mission', 'Serve the user autonomously')
 
 if task:
@@ -105,7 +106,7 @@ if task:
 Owner: {owner}
 Mission: {directive}
 Current Phase: {unified_state.get('operational_state', {}).get('trading_mode', {}).get('phase', 'unknown')}
-Wallet Status: {unified_state.get('financial_targets', {}).get('current_wallet', {}).get('status', 'unknown')}
+Financial state: use fresh verified sources only; repository snapshots are not authoritative.
 
 === YOUR TASK ===
 Task ID: {task.get('id', task.get('task_id', 'unknown'))}

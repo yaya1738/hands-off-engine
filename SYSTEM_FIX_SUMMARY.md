@@ -65,7 +65,7 @@ Created `autonomous/absolute_directive.py` with:
 ```bash
 $ python3 autonomous/absolute_directive.py cascade "Test message"
 Cascaded from 80 miles to ground
-Master: Yair Siegel
+Master: the configured operator
 Levels touched: 8
 ```
 

@@ -10,13 +10,14 @@ Integrates:
 - Finance (balance, positions, trading)
 - Hardware (cluster health, nodes)
 - Coordination (agent status, messages)
-- Identity (Yair Siegel verification)
+- Identity (private configured-owner verification)
 - Signals (trading signals status)
 
-Serving: Yair Siegel
+Serving: configured operator
 """
 
 import json
+import os
 import sys
 from pathlib import Path
 from datetime import datetime
@@ -29,13 +30,13 @@ import uvicorn
 REPO_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(REPO_ROOT))
 
-# Import unified AI - this dashboard serves Yair Siegel
+# Import unified AI - this dashboard serves the configured operator
 try:
     from ai.unified_ai import MASTER, get_master, get_directive, get_system_state, get_priorities
 except ImportError:
-    MASTER = "Yair Siegel"
-    def get_master(): return "Yair Siegel"
-    def get_directive(): return {"directive": "Serve Yair Siegel"}
+    MASTER = os.getenv("HANDS_OFF_OWNER_NAME", "Configured operator")
+    def get_master(): return os.getenv("HANDS_OFF_OWNER_NAME", "Configured operator")
+    def get_directive(): return {"directive": "Serve the configured operator"}
     def get_system_state(): return {}
     def get_priorities(): return []
 
@@ -49,7 +50,7 @@ app = FastAPI(title="Unified System Dashboard", description=f"Serving {MASTER}")
 def get_finance_data():
     """Collect financial data from existing finance module."""
     try:
-        hub_file = REPO_ROOT / "finance" / "yair_finance_hub.json"
+        hub_file = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "finance" / "finance_hub.json"
         if hub_file.exists():
             with open(hub_file) as f:
                 hub = json.load(f)
@@ -156,18 +157,18 @@ def get_coordination_data():
             "active_agents": status.get("active_agents", []),
             "current_phase": status.get("current_phase", "unknown"),
             "autonomous_mode": status.get("autonomous_mode", {}),
-            "directive": directive.get("directive", "Serve Yair Siegel"),
+            "directive": directive.get("directive", "Serve the configured operator"),
             "mission": directive.get("mission", {}),
         }
     except:
         pass
-    return {"active_agents": [], "directive": "Serve Yair Siegel"}
+    return {"active_agents": [], "directive": "Serve the configured operator"}
 
 
 def get_identity_data():
     """Get identity verification status."""
     try:
-        identity_file = REPO_ROOT / "security" / "yair_siegel_identity.json"
+        identity_file = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))) / "security" / "owner_identity.json"
         if identity_file.exists():
             with open(identity_file) as f:
                 return json.load(f)

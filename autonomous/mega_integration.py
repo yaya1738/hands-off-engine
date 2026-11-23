@@ -86,6 +86,7 @@ class MegaSystemState:
 
     # Financial state
     balance_usd: float = 0.0
+    balance_status: str = "unknown"
     monthly_infra_cost: float = 0.0
     trading_enabled: bool = False
 
@@ -298,7 +299,8 @@ class MegaCoordinator:
         if HAS_UNIFIED_AI:
             try:
                 ai_state = get_system_state()
-                state.balance_usd = ai_state.get('balance', 0)
+                state.balance_usd = float(ai_state.get('balance', 0.0) or 0.0)
+                state.balance_status = ai_state.get('balance_status', 'unknown')
                 state.trading_enabled = ai_state.get('trading_enabled', False)
             except:
                 pass

@@ -11,32 +11,43 @@ import hashlib
 from datetime import datetime
 from pathlib import Path
 
+def _env_list(name: str) -> list:
+    return [value.strip() for value in os.getenv(name, "").split(",") if value.strip()]
+
+
+PRIVATE_DIR = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine"))).expanduser()
 MASTER_IDENTITY = {
-    "name": "Yair Siegel",
-    "email": "siegel.yaz@gmail.com",
-    "devices": [
-        "termux@handsoff",  # Phone
-        "pm-agent@206.189.60.125",  # Termux agent
-        "handsoff-do138",  # Server
-    ],
-    "ssh_key_fingerprints": [
-        # Your keys - SHA256 fingerprints
-    ]
+    "name": os.getenv("HANDS_OFF_OWNER_NAME", "Configured owner"),
+    "email": os.getenv("HANDS_OFF_OWNER_EMAIL", ""),
+    "devices": _env_list("HANDS_OFF_OWNER_DEVICE_IDS"),
+    "ssh_key_fingerprints": _env_list("HANDS_OFF_OWNER_SSH_KEY_FINGERPRINTS"),
 }
 
-APPROVAL_QUEUE = Path("/root/hands-off-engine/security/approval_queue.json")
-ACCESS_LOG = Path("/root/hands-off-engine/security/access_log.jsonl")
+APPROVAL_QUEUE = PRIVATE_DIR / "approval_queue.json"
+ACCESS_LOG = PRIVATE_DIR / "access_log.jsonl"
+
+
+def _ensure_private_dir() -> None:
+    PRIVATE_DIR.mkdir(parents=True, exist_ok=True, mode=0o700)
+    try:
+        PRIVATE_DIR.chmod(0o700)
+    except OSError:
+        pass
+
 
 def is_master(ssh_key_comment: str = None, device_id: str = None) -> bool:
-    """Check if accessor is the master (Yair)"""
-    if ssh_key_comment in MASTER_IDENTITY["devices"]:
-        return True
-    if device_id in MASTER_IDENTITY["devices"]:
-        return True
-    return False
+    """Require a configured SSH fingerprint; device/hostname hints alone are insufficient."""
+    fingerprints = set(MASTER_IDENTITY["ssh_key_fingerprints"])
+    devices = set(MASTER_IDENTITY["devices"])
+    if not ssh_key_comment or ssh_key_comment not in fingerprints:
+        return False
+    if device_id is not None and devices and device_id not in devices:
+        return False
+    return True
 
 def request_access(requester: str, purpose: str, benefit_to_master: str) -> str:
-    """Others must explain how access benefits Yair"""
+    """External requesters must explain the benefit to the configured operator"""
+    _ensure_private_dir()
     request = {
         "id": hashlib.sha256(f"{requester}{datetime.now()}".encode()).hexdigest()[:12],
         "requester": requester,
@@ -72,9 +83,9 @@ def approve_access(request_id: str, duration_hours: int = 1) -> dict:
     return {"error": "Request not found"}
 
 def check_access(requester: str) -> dict:
-    """Check if requester has valid access"""
-    # Master always has access
-    if is_master(device_id=requester):
+    """Check if requester is a configured SSH fingerprint or has approved access."""
+    # Master access requires a cryptographic fingerprint, not a device-name hint.
+    if is_master(ssh_key_comment=requester):
         return {"access": True, "reason": "Master identity verified", "unlimited": True}
     
     # Others need approved, non-expired access
@@ -101,8 +112,13 @@ def log_access(identity: str, action: str, granted: bool):
         "action": action,
         "granted": granted
     }
-    with open(ACCESS_LOG, "a") as f:
+    _ensure_private_dir()
+    with open(ACCESS_LOG, "a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
+    try:
+        ACCESS_LOG.chmod(0o600)
+    except OSError:
+        pass
 
 if __name__ == "__main__":
     print("Identity Gate Active")
