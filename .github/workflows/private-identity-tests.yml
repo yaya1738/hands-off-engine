@@ -40,6 +40,7 @@ on:
       - "termux-hands-off/state/**"
       - "ui/**"
       - "tests/test_private_identity_fail_closed.py"
+      - "tests/test_capital_recovery_read_only.py"
       - ".github/workflows/private-identity-tests.yml"
 
 permissions:
