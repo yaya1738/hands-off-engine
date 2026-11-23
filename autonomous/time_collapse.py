@@ -117,18 +117,21 @@ def accelerate_income_channels():
     import requests
 
     pages = [
-        ("Polymarket Affiliate", "http://138.68.103.156:8080"),
-        ("AI Nexus Consulting", "http://138.68.103.156:8081"),
+        ("Polymarket Affiliate", os.getenv("HANDS_OFF_POLYMARKET_AFFILIATE_URL")),
+        ("AI Nexus Consulting", os.getenv("HANDS_OFF_AI_NEXUS_URL")),
     ]
 
     for name, url in pages:
+        if not url:
+            results.append(f"{name}: endpoint not configured")
+            continue
         try:
             resp = requests.get(url, timeout=5)
             if resp.status_code == 200:
                 results.append(f"✓ {name}: LIVE")
             else:
                 results.append(f"✗ {name}: {resp.status_code}")
-        except:
+        except Exception:
             results.append(f"✗ {name}: DOWN")
 
     # Verify a payment endpoint only when its address is configured privately.
