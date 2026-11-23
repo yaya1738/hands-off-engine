@@ -43,6 +43,7 @@ jobs:
           bash -n scripts/prepare_private_state_migration.sh
 
       - name: Scan current source tree and Git history for embedded credentials
+        id: credential_scan
         run: |
           set +e
           docker run --rm -v "$PWD:/path" zricethezav/gitleaks:latest detect --no-git --source /path --redact --report-format json --report-path /path/gitleaks-working-tree.json --exit-code 1
@@ -86,6 +87,7 @@ jobs:
           sys.exit(1 if working or history else 0)
           PY
       - name: Run financial integrity regressions
+        if: ${{ !cancelled() && steps.credential_scan.outcome != 'skipped' }}
         run: >-
           python -m pytest
           tests/test_p0_financial_integrity_guards.py
