@@ -16,6 +16,7 @@ waiting for external events.
 """
 
 # UNIFIED AI - All systems serve the configured operator
+import os
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
