@@ -64,8 +64,10 @@ Track record available on request.</i>
 '''
 
     # Send to Telegram
-    token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
-    chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+    token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    if not token or not chat_id:
+        return
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     response = requests.post(url, json={
@@ -121,8 +123,10 @@ API: http://your-server:5000
 Help us reach $100 to activate live trading!</i>
 '''
 
-    token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
-    chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
+    token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+    if not token or not chat_id:
+        return
 
     url = f'https://api.telegram.org/bot{token}/sendMessage'
     response = requests.post(url, json={

@@ -196,15 +196,15 @@ echo "The system will now operate autonomously."
 echo "Use Telegram to monitor and control remotely."
 echo "============================================================"
 
-# Send Telegram notification
-python3 -c "
-import requests
+# Send Telegram notification only when explicitly configured.
+if ! python3 - 2>/dev/null <<'PY_TELEGRAM'
 import os
+import requests
 
-token = os.getenv('TELEGRAM_BOT_TOKEN', '8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA')
-chat_id = os.getenv('TELEGRAM_CHAT_ID', '8327766663')
-
-message = '''🚀 <b>AUTONOMOUS MODE ACTIVATED</b>
+token = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
+chat_id = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+if token and chat_id:
+    message = """🚀 <b>AUTONOMOUS MODE ACTIVATED</b>
 
 All systems configured and running:
 
@@ -218,10 +218,12 @@ All systems configured and running:
 /status /health /metrics /pause /resume
 
 System is now fully autonomous.
-'''
-
-url = f'https://api.telegram.org/bot{token}/sendMessage'
-requests.post(url, json={'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}, timeout=10)
-" 2>/dev/null || warning "Failed to send Telegram notification"
+"""
+    url = f"https://api.telegram.org/bot{token}/sendMessage"
+    requests.post(url, json={"chat_id": chat_id, "text": message, "parse_mode": "HTML"}, timeout=10)
+PY_TELEGRAM
+then
+    warning "Failed to send Telegram notification"
+fi
 
 exit 0
