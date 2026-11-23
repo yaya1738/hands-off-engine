@@ -68,11 +68,6 @@ class AbsoluteIdentity:
         except:
             pass
 
-        # Check for authorized key connection
-        if os.environ.get("SSH_AUTH_SOCK"):
-            self.signals.append("CRYPTO:ssh_agent_present")
-            score = max(score, weight * 0.5)
-
         return score
 
     def verify_infrastructure(self) -> float:
@@ -233,26 +228,33 @@ class AbsoluteIdentity:
             self._log_verification(result)
             return result
 
-        # Run all layers
-        self.score += self.verify_cryptographic()
-        self.score += self.verify_infrastructure()
-        self.score += self.verify_behavioral(message)
-        self.score += self.verify_knowledge(knowledge_responses)
-        self.score += self.verify_contextual()
-        self.score += self.verify_human_identity(human_answers)
+        # Authorization requires a positively matched configured SSH fingerprint.
+        # Hostnames, root, project paths, behavior, knowledge, and agent presence are
+        # contextual hints only and must never combine into an owner authorization.
+        crypto_score = self.verify_cryptographic()
+        if crypto_score <= 0:
+            result = {
+                "timestamp": self.verification_time.isoformat(),
+                "identity": "NOT VERIFIED - ACCESS DENIED",
+                "verified": False,
+                "confidence": 0.0,
+                "signals": self.signals or ["CRYPTO:fingerprint_not_verified"],
+                "layers_passed": 0,
+                "verdict": "UNVERIFIED",
+            }
+            self._log_verification(result)
+            return result
 
-        # Determine identity
-        threshold = 0.5  # 50% required
-        is_owner = self.score >= threshold
-
+        self.score = 1.0
+        self.signals.append("IDENTITY:configured_cryptographic_fingerprint_verified")
         result = {
             "timestamp": self.verification_time.isoformat(),
-            "identity": "CONFIGURED OWNER" if is_owner else "NOT VERIFIED - ACCESS DENIED",
-            "verified": is_owner,
-            "confidence": round(self.score * 100, 1),
+            "identity": "CONFIGURED OWNER",
+            "verified": True,
+            "confidence": 100.0,
             "signals": self.signals,
-            "layers_passed": len([s for s in self.signals if s.startswith(("CRYPTO", "INFRA"))]),
-            "verdict": "AUTHENTIC" if is_owner else "UNVERIFIED"
+            "layers_passed": 1,
+            "verdict": "AUTHENTIC",
         }
 
         # Log verification
