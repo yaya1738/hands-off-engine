@@ -93,3 +93,16 @@ A provider-by-provider rotation checklist is maintained in `docs/security/CREDEN
 A `.gitignore` entry does not remove a file already tracked by Git. Removing a file from the current tree does not remove its earlier versions from public Git history. Gitleaks passing does not establish that personal financial information or identity data is absent.
 
 No private data was copied, deleted, or overwritten in this review step. No repository visibility change, history rewrite, merge, deployment, wallet action, credential rotation, or trading action was performed.
+
+
+## Verified preservation and review-branch cleanup status (2026-11-23)
+
+The owner executed the pinned Termux preservation launcher. It reported 2,760 copied files, 2 already preserved, zero conflicts, and 426,493,620 bytes. The local SHA-256 verification then checked all 2,762 manifest entries: 2,762 hashes matched, zero files were missing, zero mismatched, and zero files had group/other permission bits. The manifest is stored at `~/.config/hands-off-engine/migration_manifest.json`. Source files were not deleted or modified by the migration.
+
+The current review branch `fix/financial-integrity-concurrency-20261122` removes 1,084 tracked paths relative to its P0 base: 213 root `state/` records, 39 Termux `state/` records, all 810 historical finance snapshot files, 3 Termux finance/log records, and 19 other sensitive/private records. The remaining state paths are limited to `.gitkeep`, source code, and the non-personal `state/script_registry.json` required by legacy execution-safety regression tests. Public-safe `.example` environment templates remain. Personal finance decision history and account metadata were also removed. The current branch tree no longer contains the tracked security archive, legacy vaults, external-account records, identity profile, or historical finance snapshots.
+
+The first CI attempt after removal exposed one test dependency on `state/script_registry.json`; that non-personal safety registry was restored from its original Git blob and the regression is being rerun. The workflow now checks out full Git history (`fetch-depth: 0`) before Gitleaks scans. Previous scans ran against a shallow checkout (one commit) and therefore did not establish that the full reachable history was clean. The full-history scan is pending; any findings must be treated as historical exposure, not suppressed as a clean result.
+
+This remains a draft, stacked review PR targeting `fix/p0-financial-integrity-20261122`, not `main`. The public `main` branch remains unchanged and still contains the previously inventoried sensitive files until the reviewed PR stack reaches and is merged into `main`. The repository remains public. No provider credentials have been rotated or revoked, no wallet or cloud account actions have been taken, no Git history has been rewritten, and no PR has been merged. The migration and cleanup do not revoke credentials already exposed in reachable history.
+
+The current cleanup retains the three public-safe integration examples: `termux-hands-off/state/auto_sources.env.example`, `termux-hands-off/state/ifttt.env.example`, and `termux-hands-off/state/tg/bots/handsoff.env.example`. The public wallet funding route remains a separate explicit privacy/business decision; it is not an authentication credential.
