@@ -34,34 +34,25 @@ from pathlib import Path
 MIN_TRADING_BALANCE = 50.0  # Minimum to start trading
 OPTIMAL_TRADING_BALANCE = 200.0  # Target for full strategy
 
-STATE_FILE = Path("/root/hands-off-engine/state/capital_recovery.json")
-LOG_FILE = Path("/var/log/hands-off/capital_recovery.log")
+PRIVATE_ROOT = Path(os.getenv("HANDS_OFF_PRIVATE_DIR", str(Path.home() / ".config" / "hands-off-engine")))
+STATE_FILE = PRIVATE_ROOT / "state" / "capital_recovery.json"
+LOG_FILE = PRIVATE_ROOT / "logs" / "capital_recovery.log"
 
 
-def get_balance() -> float:
-    """Get current Polymarket balance using trading safeguards method"""
+def get_balance():
+    """Return a fresh verified wallet balance, or None when unknown."""
     try:
-        import sys
-        sys.path.insert(0, '/root/hands-off-engine')
+        import re
         from executor.trading_safeguards import TradingSafeguards
-
         safeguards = TradingSafeguards()
-        # Check with 0 to just get balance info
-        ok, msg = safeguards.check_wallet_balance(0)
-
-        # Parse balance from message like "OK - balance: $8.99"
-        if "balance: $" in msg:
-            balance_str = msg.split("balance: $")[1].split()[0]
-            return float(balance_str)
-        elif "Insufficient balance: $" in msg:
-            balance_str = msg.split("Insufficient balance: $")[1].split()[0]
-            return float(balance_str)
-
-    except Exception as e:
-        print(f"Error getting balance: {e}")
-
-    return 0.0
-
+        ok, message = safeguards.check_wallet_balance(0)
+        if not ok:
+            return None
+        match = re.search(r"balance:\s*\$([0-9]+(?:\.[0-9]+)?)", message, re.IGNORECASE)
+        return float(match.group(1)) if match else None
+    except Exception as exc:
+        print(f"Balance verification unavailable: {type(exc).__name__}")
+        return None
 
 def load_state() -> dict:
     """Load previous state"""
@@ -113,118 +104,94 @@ def log_event(event: str):
         f.write(f"[{timestamp}] {event}\n")
 
 
-def trigger_singularity_if_ready(balance: float):
-    """Check and trigger singularity when threshold crossed"""
-    if balance >= MIN_TRADING_BALANCE:
-        try:
-            import subprocess
-            result = subprocess.run(
-                ['python3', 'autonomous/singularity_trigger.py'],
-                cwd='/root/hands-off-engine',
-                capture_output=True,
-                text=True,
-                timeout=120
-            )
-            if 'SINGULARITY TRIGGERED' in result.stdout:
-                print("[SINGULARITY] Trigger executed!")
-        except Exception as e:
-            print(f"[SINGULARITY] Error: {e}")
-
+def trigger_singularity_if_ready(balance=None):
+    """Compatibility stub: capital thresholds never authorize live trading."""
+    log_event("LIVE_TRIGGER_BLOCKED: explicit governed approval required")
+    return False
 
 def check_recovery():
-    """Main recovery check logic"""
+    """Read-only capital recovery monitor; never enables or starts live trading."""
     state = load_state()
     current_balance = get_balance()
-    previous_balance = state.get("last_balance", 0.0)
-
     now = datetime.now(timezone.utc)
-    print(f"[{now.isoformat()}] Balance: ${current_balance:.2f} (was ${previous_balance:.2f})")
-
-    # Check for singularity trigger
-    if current_balance >= MIN_TRADING_BALANCE and previous_balance < MIN_TRADING_BALANCE:
-        print("[SINGULARITY] Trading threshold crossed! Triggering...")
-        trigger_singularity_if_ready(current_balance)
-
     events = []
+    state["trading_enabled"] = False
 
-    # Check for significant balance increase (position resolution)
-    balance_increase = current_balance - previous_balance
-    if balance_increase > 10:  # $10+ increase indicates resolution
-        event = {
-            "type": "balance_increase",
-            "timestamp": now.isoformat(),
-            "previous": previous_balance,
-            "current": current_balance,
-            "increase": balance_increase
+    if current_balance is None:
+        log_event("BALANCE_UNKNOWN: no authoritative wallet result; state unchanged")
+        print(f"[{now.isoformat()}] Balance: UNKNOWN (unverified)")
+        return {
+            "balance": None,
+            "balance_status": "unknown",
+            "trading_enabled": False,
+            "events": [],
         }
-        events.append(event)
-        state["recovery_events"].append(event)
 
-        log_event(f"BALANCE_INCREASE: +${balance_increase:.2f} (${previous_balance:.2f} -> ${current_balance:.2f})")
+    previous_balance = state.get("last_balance") if state.get("last_balance_verified") else None
+    print(
+        f"[{now.isoformat()}] Verified balance: {current_balance:.2f} USD "
+        + (f"(previous verified: {previous_balance:.2f} USD)" if previous_balance is not None else "(no prior verified baseline)")
+    )
 
-        # Alert based on new capability
-        if current_balance >= OPTIMAL_TRADING_BALANCE:
-            if "optimal_trading" not in state["alerts_sent"]:
-                send_telegram(
-                    f"*💰 CAPITAL RECOVERED - OPTIMAL*\n\n"
-                    f"Balance: ${current_balance:.2f}\n"
-                    f"Increase: +${balance_increase:.2f}\n\n"
-                    f"🚀 *FULL TRADING CAPABILITY RESTORED*\n"
-                    f"System will execute intelligent alpha signals.",
-                    priority="high"
-                )
-                state["alerts_sent"].append("optimal_trading")
-                state["trading_enabled"] = True
+    if previous_balance is not None:
+        balance_increase = current_balance - previous_balance
+        if balance_increase > 10:
+            event = {
+                "type": "balance_increase",
+                "timestamp": now.isoformat(),
+                "previous": previous_balance,
+                "current": current_balance,
+                "increase": balance_increase,
+            }
+            events.append(event)
+            state.setdefault("recovery_events", []).append(event)
+            log_event(f"BALANCE_INCREASE: +{balance_increase:.2f} USD")
 
-        elif current_balance >= MIN_TRADING_BALANCE:
-            if "min_trading" not in state["alerts_sent"]:
-                send_telegram(
-                    f"*💵 CAPITAL RECOVERED - MINIMUM*\n\n"
-                    f"Balance: ${current_balance:.2f}\n"
-                    f"Increase: +${balance_increase:.2f}\n\n"
-                    f"✓ Basic trading capability restored\n"
-                    f"Target: ${OPTIMAL_TRADING_BALANCE:.0f} for full strategy",
-                    priority="medium"
-                )
-                state["alerts_sent"].append("min_trading")
-                state["trading_enabled"] = True
+            if current_balance >= MIN_TRADING_BALANCE:
+                if "capital_review" not in state.setdefault("alerts_sent", []):
+                    send_telegram(
+                        "Verified capital change detected. This monitor is read-only; "
+                        "live trading remains disabled. Manual governed review is required.",
+                        priority="high",
+                    )
+                    state["alerts_sent"].append("capital_review")
 
-    # Check if balance dropped below threshold (loss detection)
-    if previous_balance >= MIN_TRADING_BALANCE and current_balance < MIN_TRADING_BALANCE:
-        log_event(f"BALANCE_DROP: ${previous_balance:.2f} -> ${current_balance:.2f}")
-        state["trading_enabled"] = False
-        # Reset alerts so they can fire again on recovery
-        state["alerts_sent"] = []
+        if previous_balance >= MIN_TRADING_BALANCE and current_balance < MIN_TRADING_BALANCE:
+            log_event(f"BALANCE_DROP: {previous_balance:.2f} -> {current_balance:.2f} USD")
+            state["alerts_sent"] = []
 
-    # Update state
     state["last_balance"] = current_balance
+    state["last_balance_verified"] = True
     state["last_check"] = now.isoformat()
+    state["trading_enabled"] = False
     save_state(state)
 
     return {
         "balance": current_balance,
-        "trading_enabled": state["trading_enabled"],
-        "events": events
+        "balance_status": "verified",
+        "trading_enabled": False,
+        "events": events,
     }
 
-
 def main():
-    """Run recovery monitor"""
-    # Load env
-    env_file = Path("/root/hands-off-engine/.env.polymarket")
+    """Run a read-only recovery monitor."""
+    PRIVATE_ROOT.mkdir(parents=True, exist_ok=True, mode=0o700)
+    (PRIVATE_ROOT / "state").mkdir(parents=True, exist_ok=True, mode=0o700)
+    (PRIVATE_ROOT / "logs").mkdir(parents=True, exist_ok=True, mode=0o700)
+    env_file = PRIVATE_ROOT / ".env.polymarket"
     if env_file.exists():
         for line in env_file.read_text().splitlines():
-            if '=' in line and not line.startswith('#'):
-                key, value = line.split('=', 1)
-                os.environ[key.strip()] = value.strip().strip('"\'')
+            if "=" in line and not line.startswith("#"):
+                key, value = line.split("=", 1)
+                os.environ[key.strip()] = value.strip().strip("\"'")
 
     result = check_recovery()
-
-    print(f"\nCapital Recovery Status:")
-    print(f"  Balance: ${result['balance']:.2f}")
-    print(f"  Trading Enabled: {result['trading_enabled']}")
-    print(f"  Events: {len(result['events'])}")
-
+    if result["balance_status"] == "verified":
+        print(f"Balance: {result['balance']:.2f} USD")
+    else:
+        print("Balance: UNKNOWN (unverified)")
+    print("Trading Enabled: False")
+    print(f"Events: {len(result['events'])}")
     return result
 
 
