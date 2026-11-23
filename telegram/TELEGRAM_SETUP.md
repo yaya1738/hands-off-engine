@@ -28,16 +28,16 @@
 ```bash
 # Set environment variables (replace with your values)
 export TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
-export TELEGRAM_CHAT_ID="987654321"
+export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"
 
 # Make permanent (add to ~/.bashrc or /etc/environment)
 echo 'export TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"' >> ~/.bashrc
-echo 'export TELEGRAM_CHAT_ID="987654321"' >> ~/.bashrc
+echo 'export TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"' >> ~/.bashrc
 
 # Or add to system environment
 sudo tee -a /etc/environment <<EOF
 TELEGRAM_BOT_TOKEN="123456789:ABCdefGHIjklMNOpqrsTUVwxyz"
-TELEGRAM_CHAT_ID="987654321"
+TELEGRAM_CHAT_ID="YOUR_CHAT_ID_HERE"
 EOF
 ```
 
