@@ -39,6 +39,6 @@ jobs:
         with:
           python-version: "3.11"
       - name: Install test runner
-        run: python -m pip install --upgrade pip pytest
+        run: python -m pip install --upgrade pip pytest requests python-dotenv
       - name: Run financial authorization regression tests
         run: python -m pytest -q tests/test_unified_ai_financial_gate.py tests/test_pipeline_live_fail_closed.py tests/test_audit_factory.py
