@@ -56,6 +56,26 @@ def test_trading_requires_explicit_environment_authorization(monkeypatch):
     assert "LIVE_TRADING_ENABLED=1" in reason
 
 
+def test_authoritative_trading_mode_must_be_enabled(monkeypatch):
+    monkeypatch.setattr(
+        unified_ai, "get_system_state",
+        lambda: {"trading_enabled": True},
+    )
+    monkeypatch.setenv("LIVE_TRADING_ENABLED", "1")
+    fake_module = SimpleNamespace(
+        load_mode=lambda: {"live_trading_enabled": False, "auto_paused": False},
+        TradingSafeguards=lambda: SimpleNamespace(
+            check_wallet_balance=lambda amount: (True, "OK - balance: $100.00")
+        )
+    )
+    monkeypatch.setitem(sys.modules, "executor.trading_safeguards", fake_module)
+
+    allowed, reason = unified_ai.check_trading_allowed(5)
+
+    assert allowed is False
+    assert "trading_mode.json" in reason
+
+
 def test_unknown_wallet_balance_blocks_trading(monkeypatch):
     monkeypatch.setattr(
         unified_ai, "get_system_state",
@@ -63,6 +83,7 @@ def test_unknown_wallet_balance_blocks_trading(monkeypatch):
     )
     monkeypatch.setenv("LIVE_TRADING_ENABLED", "1")
     fake_module = SimpleNamespace(
+        load_mode=lambda: {"live_trading_enabled": True, "auto_paused": False},
         TradingSafeguards=lambda: SimpleNamespace(
             check_wallet_balance=lambda amount: (False, "No funder address configured")
         )
@@ -82,6 +103,7 @@ def test_verified_wallet_balance_is_required_for_trading(monkeypatch):
     )
     monkeypatch.setenv("LIVE_TRADING_ENABLED", "1")
     fake_module = SimpleNamespace(
+        load_mode=lambda: {"live_trading_enabled": True, "auto_paused": False},
         TradingSafeguards=lambda: SimpleNamespace(
             check_wallet_balance=lambda amount: (True, "OK - balance: $100.00")
         )
