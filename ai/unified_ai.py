@@ -309,21 +309,26 @@ def optimize_for_master(action: str, options: list) -> str:
     return best
 
 
-def send_master_notification(message: str, priority: str = "normal"):
-    """Send notification to the configured operator via Telegram."""
-    import requests
-
-    prefix = {"critical": "🚨🚨🚨", "high": "⚡", "normal": "📋"}.get(priority, "")
-    full_msg = f"{prefix} [UNIFIED AI]\n\n{message}\n\nServing: {MASTER}"
+def send_master_notification(message: str, priority: str = "normal") -> bool:
+    """Send a notification using local-only credentials; never embed tokens in source."""
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    chat_id = os.getenv("TELEGRAM_CHAT_ID")
+    if not token or not chat_id:
+        return False
 
     try:
-        requests.post(
-            "https://api.telegram.org/bot8214203655:AAGkAamvjQq0b7T7lmaTPDd-yYY_hvo_xvA/sendMessage",
-            json={"chat_id": "8327766663", "text": full_msg, "parse_mode": "Markdown"},
-            timeout=10
+        import requests
+        prefix = {"critical": "🚨🚨🚨", "high": "⚡", "normal": "📋"}.get(priority, "")
+        full_msg = f"{prefix} [UNIFIED AI]\n\n{message}\n\nServing: {MASTER}"
+        response = requests.post(
+            f"https://api.telegram.org/bot{token}/sendMessage",
+            json={"chat_id": chat_id, "text": full_msg, "parse_mode": "Markdown"},
+            timeout=10,
         )
-    except:
-        pass
+        response.raise_for_status()
+        return True
+    except Exception:
+        return False
 
 
 def run_system_check() -> Dict:
