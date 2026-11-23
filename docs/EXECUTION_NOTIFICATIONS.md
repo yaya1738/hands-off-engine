@@ -100,7 +100,7 @@ termux-hands-off/agent/ho-executor-notify.sh
 **Required variables:**
 ```bash
 TOKEN=123456:ABC-DEF...          # Telegram bot token
-CHAT_ID=987654321               # Your Telegram chat ID
+CHAT_ID=YOUR_CHAT_ID_HERE               # Your Telegram chat ID
 ```
 
 **Setup:**
