@@ -1,6 +1,6 @@
 {
-  "timestamp": "2025-11-30T21:06:46.285718+00:00",
-  "master": "Yair Siegel",
+  "timestamp": null,
+  "master": "Configured operator",
   "balance": 0,
   "positions_value": 0,
   "total_value": 0,
@@ -16,11 +16,7 @@
   "total_ram_gb": 136,
   "healthy_nodes": 9,
   "bottleneck_node": "pm-helper",
-  "idle_nodes": [
-    "ho-compute-2 (134.122.124.240)",
-    "ho-compute-2 (198.211.96.196)",
-    "ho-scale (67.205.153.121)"
-  ],
+  "idle_nodes": [],
   "idle_capacity_vcpus": 24,
   "idle_capacity_ram_gb": 48,
   "hardware_status": "24 vCPU idle while pm-helper bottlenecked",
@@ -48,7 +44,7 @@
     "claude-web"
   ],
   "distribution_ready": false,
-  "last_update": "2025-12-02T02:10:05.990295+00:00",
+  "last_update": null,
   "scaling_progress": 259.6,
   "hardware_health": 100,
   "balance_status": "unknown",
