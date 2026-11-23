@@ -21,7 +21,7 @@
 cd ~/hands-off-engine
 
 # Add to .env file
-echo "OPENAI_API_KEY=sk-proj-your-actual-key-here" >> .env
+echo "OPENAI_API_KEY=<OPENAI_API_KEY_SET_LOCALLY>" >> .env
 
 # Verify
 grep OPENAI_API_KEY .env
@@ -35,7 +35,7 @@ ssh your-droplet
 
 # Add to .env
 cd ~/hands-off-engine
-echo "OPENAI_API_KEY=sk-proj-your-actual-key-here" >> .env
+echo "OPENAI_API_KEY=<OPENAI_API_KEY_SET_LOCALLY>" >> .env
 
 # Verify
 grep OPENAI_API_KEY .env
