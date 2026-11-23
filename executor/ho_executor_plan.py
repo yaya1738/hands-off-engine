@@ -132,13 +132,14 @@ class Executor:
                     executed_amount=final_amount
                 )
             else:
-                # In production, this would call actual trading API
+                # This executor has no broker/API implementation. Never report a
+                # simulated result as a real order or successful live execution.
                 result = ExecutionResult(
                     market_id=action.market_id,
                     market_name=action.market_name,
-                    success=True,
-                    message=f"LIVE: Placed {action.side} order for ${final_amount:.2f}{scaling_note}",
-                    executed_amount=final_amount
+                    success=False,
+                    message="BLOCKED: live execution backend is not implemented; no order was placed.",
+                    executed_amount=0.0
                 )
 
             results.append(result)

@@ -142,6 +142,7 @@ class MegaUnifiedState:
 
     # Financial
     balance: float = 0.0
+    balance_status: str = "unknown"
     positions_value: float = 0.0
     trading_enabled: bool = False
     escape_velocity: int = 0
@@ -224,8 +225,9 @@ class MegaUnifiedSystem:
             # From unified_ai
             if HAS_UNIFIED_AI:
                 sys_state = get_system_state()
-                self.state.balance = sys_state.get("balance", 0)
-                self.state.positions_value = sys_state.get("positions_value", 0)
+                self.state.balance = float(sys_state.get("balance", 0.0) or 0.0)
+                self.state.balance_status = sys_state.get("balance_status", "unknown")
+                self.state.positions_value = float(sys_state.get("positions_value", 0.0) or 0.0)
                 self.state.trading_enabled = sys_state.get("trading_enabled", False)
                 self.state.escape_velocity = sys_state.get("escape_velocity", 0)
 
@@ -506,6 +508,7 @@ class MegaUnifiedSystem:
             "subsystems": self.state.component_status,
             "finance": {
                 "balance": self.state.balance,
+                "balance_status": self.state.balance_status,
                 "positions": self.state.positions_value,
                 "trading": self.state.trading_enabled,
                 "escape_velocity": self.state.escape_velocity
@@ -630,7 +633,10 @@ def main():
             status = "✅" if v != "missing" else "❌"
             print(f"  {status} {k}: {v}")
         print(f"\nFinance:")
-        print(f"  Balance: ${state['balance']:.2f}")
+        if state.get("balance_status") == "verified":
+            print(f"  Balance: ${state['balance']:.2f}")
+        else:
+            print("  Balance: UNKNOWN (unverified)")
         print(f"  Trading: {'Enabled' if state['trading_enabled'] else 'Disabled'}")
         print(f"  Escape Velocity: {state['escape_velocity']}/100")
         print(f"\nInfrastructure:")

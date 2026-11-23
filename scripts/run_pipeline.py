@@ -12,6 +12,7 @@ Designed to be run via cron or manually for testing.
 """
 
 import json
+import math
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -141,23 +142,40 @@ def run_pipeline(
         try:
             safeguards = TradingSafeguards()
             ok, msg = safeguards.check_wallet_balance(MIN_TRADING_BALANCE)
-            # Parse balance from message like "Wallet: $8.99"
-            import re
-            match = re.search(r'\$(\d+\.?\d*)', msg)
-            if match:
-                balance = float(match.group(1))
-                if balance < MIN_TRADING_BALANCE:
-                    if verbose:
-                        print(f"⏸️  SKIPPING PIPELINE: Balance ${balance:.2f} < ${MIN_TRADING_BALANCE} minimum")
-                        print(f"   No point generating signals we can't trade.")
-                        print(f"   Position monitor still running for exit opportunities.")
-                    results['success'] = True
-                    results['skipped'] = f"Low balance: ${balance:.2f}"
+            if not ok:
+                if not dryrun:
+                    results['error'] = f"Live run blocked: wallet verification failed: {str(msg)[:180]}"
                     return results
+                if verbose:
+                    print(f"⚠️  Wallet verification unavailable; continuing in DRYRUN only: {str(msg)[:160]}")
+            else:
+                import re
+                match = re.search(r'\$(\d+\.?\d*)', msg)
+                if not match:
+                    if not dryrun:
+                        results['error'] = "Live run blocked: verified wallet response did not contain a balance."
+                        return results
+                    if verbose:
+                        print("⚠️  Wallet response had no parseable balance; continuing in DRYRUN only.")
+                else:
+                    balance = float(match.group(1))
+                    if not math.isfinite(balance) or balance < 0:
+                        results['error'] = "Wallet verification returned an invalid balance."
+                        return results
+                    if balance < MIN_TRADING_BALANCE:
+                        if verbose:
+                            print(f"⏸️  SKIPPING PIPELINE: Balance ${balance:.2f} < ${MIN_TRADING_BALANCE} minimum")
+                            print("   No point generating signals we can't trade.")
+                            print("   Position monitor still running for exit opportunities.")
+                        results['success'] = True
+                        results['skipped'] = f"Low balance: ${balance:.2f}"
+                        return results
         except Exception as e:
-            # If balance check fails, continue anyway
+            if not dryrun:
+                results['error'] = f"Live run blocked: wallet verification raised {type(e).__name__}."
+                return results
             if verbose:
-                print(f"⚠️  Balance check failed ({e}), continuing...")
+                print(f"⚠️  Wallet check failed; continuing in DRYRUN only ({type(e).__name__}).")
 
         # Step 1: Sync Polymarket Model (Alpha)
         if verbose:
@@ -253,8 +271,9 @@ def run_pipeline(
         execution_results = executor.execute_actions(planned_actions)
         summary = executor.get_execution_summary(execution_results)
 
+        execution_success = all(result.success for result in execution_results)
         results['steps']['execute'] = {
-            'success': True,
+            'success': execution_success,
             'mode': summary['mode'],
             'total_actions': summary['total_actions'],
             'successful': summary['successful'],
@@ -263,7 +282,7 @@ def run_pipeline(
         }
 
         if verbose:
-            print(f"✓ Executed actions")
+            print("Execution phase completed" if execution_success else "⚠️ Execution phase had blocked or failed actions")
             print(f"  Mode: {summary['mode']}")
             print(f"  Successful: {summary['successful']}/{summary['total_actions']}")
             print(f"  Rejected: {summary['rejected']}")
@@ -306,8 +325,10 @@ def run_pipeline(
             if verbose:
                 print(f"✓ Execution plan written: {execution_plan_path}")
         
-        # Success!
-        results['success'] = True
+        # A blocked/failed live action must not be reported as a successful pipeline.
+        results['success'] = execution_success
+        if not execution_success:
+            results['error'] = "One or more execution actions were blocked or failed."
         end_time = datetime.now()
         results['end_time'] = end_time.isoformat()
         results['duration_seconds'] = (end_time - start_time).total_seconds()

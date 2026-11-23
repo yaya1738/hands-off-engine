@@ -214,3 +214,64 @@ class AuditLogger:
             "start_time": events[0].timestamp if events else None,
             "end_time": events[-1].timestamp if events else None
         }
+
+class ComponentAuditLogger:
+    """Component-scoped adapter used by the repository's agent modules."""
+
+    def __init__(self, component: str, log_dir: str = "audit/logs"):
+        self.component = component
+        self.logger = AuditLogger(log_dir=log_dir)
+        self.session_id = self.logger.session_id
+
+    def log_action(
+        self,
+        action_type: Optional[str] = None,
+        action_data: Optional[Dict[str, Any]] = None,
+        result: Optional[Any] = None,
+        action_details: Optional[Dict[str, Any]] = None,
+        session_id: Optional[str] = None,
+        cost: Optional[float] = None,
+        revenue: Optional[float] = None,
+        error: Optional[str] = None,
+        **metadata: Any,
+    ) -> AuditEvent:
+        """Record the legacy component action API in the canonical event log."""
+        details: Dict[str, Any] = {}
+        if action_data:
+            details.update(action_data)
+        if action_details:
+            details.update(action_details)
+        details.update(metadata)
+        outcome = None if result is None else str(result)
+        return self.logger.log_event(
+            component=self.component,
+            action=action_type or "unspecified_action",
+            metadata=details,
+            cost=cost,
+            revenue=revenue,
+            outcome=outcome,
+            error=error,
+            session_id=session_id or self.session_id,
+        )
+
+    def log_edge_detection(self, **details: Any) -> AuditEvent:
+        """Record a model edge-detection event."""
+        return self.log_action(action_type="edge_detection", action_data=details)
+
+    def log_order(self, **details: Any) -> AuditEvent:
+        """Record an order intent without asserting an exchange fill."""
+        dryrun = bool(details.get("dryrun", True))
+        outcome = "simulated" if dryrun else "submitted_unverified"
+        return self.log_action(
+            action_type="order_intent",
+            action_data=details,
+            result=outcome,
+        )
+
+
+def get_audit_logger(component: str = "default", log_dir: str = "audit/logs") -> ComponentAuditLogger:
+    """Return a component-scoped adapter for the documented audit API."""
+    if not isinstance(component, str) or not component.strip():
+        raise ValueError("component must be a non-empty string")
+    return ComponentAuditLogger(component=component, log_dir=log_dir)
+

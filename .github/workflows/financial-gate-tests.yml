@@ -1,0 +1,61 @@
+name: Financial Gate Regression Tests
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "ai/unified_ai.py"
+      - "ai/mega_unified_system.py"
+      - "autonomous/mega_integration.py"
+      - "state/unified_system_state.json"
+      - "audit/__init__.py"
+      - "audit/audit_logger.py"
+      - "executor/ho_executor_plan.py"
+      - "scripts/run_pipeline.py"
+      - "scripts/capital_recovery_monitor.py"
+      - "autonomous/singularity_trigger.py"
+      - "state/script_registry.json"
+      - "tests/test_unified_ai_financial_gate.py"
+      - "tests/test_pipeline_live_fail_closed.py"
+      - "tests/test_audit_factory.py"
+      - "tests/test_capital_recovery_read_only.py"
+      - ".github/workflows/financial-gate-tests.yml"
+  push:
+    branches:
+      - "fix/**"
+    paths:
+      - "ai/unified_ai.py"
+      - "ai/mega_unified_system.py"
+      - "autonomous/mega_integration.py"
+      - "state/unified_system_state.json"
+      - "audit/__init__.py"
+      - "audit/audit_logger.py"
+      - "executor/ho_executor_plan.py"
+      - "scripts/run_pipeline.py"
+      - "scripts/capital_recovery_monitor.py"
+      - "autonomous/singularity_trigger.py"
+      - "state/script_registry.json"
+      - "tests/test_unified_ai_financial_gate.py"
+      - "tests/test_pipeline_live_fail_closed.py"
+      - "tests/test_audit_factory.py"
+      - "tests/test_capital_recovery_read_only.py"
+      - ".github/workflows/financial-gate-tests.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  financial-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install test runner
+        run: python -m pip install --upgrade pip pytest requests python-dotenv
+      - name: Run financial authorization regression tests
+        run: python -m pytest -q tests/test_unified_ai_financial_gate.py tests/test_pipeline_live_fail_closed.py tests/test_audit_factory.py tests/test_capital_recovery_read_only.py
