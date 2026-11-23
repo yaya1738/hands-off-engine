@@ -131,13 +131,16 @@ def accelerate_income_channels():
         except:
             results.append(f"✗ {name}: DOWN")
 
-    # Verify payment address is displayed
-    try:
-        resp = requests.get("http://138.68.103.156:8081", timeout=5)
-        if "0xb6781D9278c60dC3CE8c3E355Cd04142da3BF74D" in resp.text:
-            results.append("✓ USDC payment address: VISIBLE")
-    except:
-        pass
+    # Verify a payment endpoint only when its address is configured privately.
+    payment_status_url = os.getenv("HANDS_OFF_PAYMENT_STATUS_URL")
+    funding_wallet = os.getenv("HANDS_OFF_FUNDING_WALLET")
+    if payment_status_url and funding_wallet:
+        try:
+            resp = requests.get(payment_status_url, timeout=5)
+            if resp.status_code == 200 and funding_wallet in resp.text:
+                results.append("✓ Configured payment endpoint: VISIBLE")
+        except Exception:
+            pass
 
     return {"vector": "income_channels", "results": results}
 
